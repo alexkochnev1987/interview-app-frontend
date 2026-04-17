@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import './globals.css';
+import { NavHeader } from './nav-header';
+import { AuthProvider } from '@/lib/auth-context';
 
 export const metadata: Metadata = {
   title: 'Interview App',
@@ -15,16 +16,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <header className="nav-header">
-          <Link href="/" className="logo">
-            Interview App
-          </Link>
-          <nav>
-            <Link href="/">Dashboard</Link>
-            <Link href="/interviews/new">New Interview</Link>
-          </nav>
-        </header>
-        {children}
+        <AuthProvider>
+          <NavHeader />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );
