@@ -1,4 +1,6 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+// In production, requests go to /api/* which Next.js rewrites to the backend.
+// This avoids Mixed Content (HTTPS frontend → HTTP backend).
+const API_URL = '/api';
 
 export interface Answer {
   questionIndex: number;
