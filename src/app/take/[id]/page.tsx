@@ -8,7 +8,7 @@ interface InterviewData {
   position: string;
   candidateName: string;
   totalQuestions: number;
-  currentQuestion: string | null;
+  currentQuestion: { text: string } | null;
   currentQuestionIndex: number;
   completed: boolean;
 }
@@ -270,7 +270,7 @@ export default function TakeInterviewPage() {
       </div>
 
       <div className="card question-card">
-        <h3>{interview.currentQuestion}</h3>
+        <h3>{interview.currentQuestion?.text}</h3>
 
         <div className="video-container">
           <video ref={videoRef} autoPlay muted playsInline className="video-preview" />

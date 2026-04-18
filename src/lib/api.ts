@@ -2,6 +2,42 @@
 // This avoids Mixed Content (HTTPS frontend → HTTP backend).
 const API_URL = '/api';
 
+export type QuestionDifficulty = 'easy' | 'medium' | 'hard';
+
+export interface QuestionDraft {
+  expectedConcepts: string[];
+  redFlags: string[];
+  difficulty: QuestionDifficulty;
+  weight: number;
+}
+
+export interface QuestionInput {
+  text: string;
+  expectedConcepts: string[];
+  redFlags: string[];
+  difficulty: QuestionDifficulty;
+  weight: number;
+}
+
+export interface Question extends QuestionInput {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface InterviewQuestion {
+  id: string;
+  text: string;
+  expectedConcepts: string[];
+  redFlags: string[];
+  difficulty: QuestionDifficulty;
+  weight: number;
+}
+
+export interface CandidateQuestionView {
+  text: string;
+}
+
 export interface Answer {
   questionIndex: number;
   mediaKey: string;
@@ -19,7 +55,7 @@ export interface Interview {
   id: string;
   candidateName: string;
   position: string;
-  questions: string[];
+  questions: InterviewQuestion[];
   answers: Answer[];
   status: 'pending' | 'in_progress' | 'processing' | 'completed' | 'failed';
   result?: InterviewResult;
@@ -30,7 +66,7 @@ export interface Interview {
 export interface CreateInterviewPayload {
   candidateName: string;
   position: string;
-  questions: string[];
+  questionIds: string[];
 }
 
 export interface PresignedUrlResponse {
@@ -50,6 +86,41 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   }
 
   return res.json() as Promise<T>;
+}
+
+export async function fetchQuestions(): Promise<Question[]> {
+  return request<Question[]>('/questions');
+}
+
+export async function getQuestion(id: string): Promise<Question> {
+  return request<Question>(`/questions/${id}`);
+}
+
+export async function createQuestion(data: QuestionInput): Promise<Question> {
+  return request<Question>('/questions', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateQuestion(
+  id: string,
+  data: QuestionInput,
+): Promise<Question> {
+  return request<Question>(`/questions/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function draftQuestion(
+  text: string,
+  position: string,
+): Promise<QuestionDraft> {
+  return request<QuestionDraft>('/ai/question-draft', {
+    method: 'POST',
+    body: JSON.stringify({ text, position }),
+  });
 }
 
 export async function fetchInterviews(): Promise<Interview[]> {

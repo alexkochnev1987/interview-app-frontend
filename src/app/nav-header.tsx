@@ -20,6 +20,7 @@ export function NavHeader() {
         {loading ? null : user ? (
           <>
             <Link href="/">Dashboard</Link>
+            <Link href="/questions">Questions</Link>
             <Link href="/interviews/new">New Interview</Link>
             <span className="nav-user">{user.name}</span>
             <button onClick={logout} className="btn-link">Logout</button>

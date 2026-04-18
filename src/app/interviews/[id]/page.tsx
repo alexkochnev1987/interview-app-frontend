@@ -203,13 +203,62 @@ export default function InterviewDetailPage() {
         const uploadState = uploadStates[qi] ?? { status: 'idle' };
 
         return (
-          <div key={qi} className="answer-item">
+          <div key={question.id} className="answer-item">
             <div className="answer-item-question">
               <span style={{ color: 'var(--color-text-secondary)', marginRight: '0.5rem' }}>
                 Q{qi + 1}.
               </span>
-              {question}
+              {question.text}
             </div>
+
+            <div
+              style={{
+                display: 'flex',
+                gap: '0.5rem',
+                flexWrap: 'wrap',
+                marginTop: '0.5rem',
+                marginBottom: '0.75rem',
+              }}
+            >
+              <span className="badge badge-pending">
+                {question.difficulty}
+              </span>
+              <span className="badge badge-processing">
+                weight {question.weight}
+              </span>
+            </div>
+
+            {(question.expectedConcepts.length > 0 || question.redFlags.length > 0) && (
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                  gap: '0.75rem',
+                  marginBottom: '0.75rem',
+                }}
+              >
+                <div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.25rem' }}>
+                    Expected Concepts
+                  </div>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
+                    {question.expectedConcepts.length > 0
+                      ? question.expectedConcepts.join(', ')
+                      : 'Not specified'}
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.25rem' }}>
+                    Red Flags
+                  </div>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
+                    {question.redFlags.length > 0
+                      ? question.redFlags.join(', ')
+                      : 'Not specified'}
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="answer-item-status" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               {hasAnswer || uploadState.status === 'uploaded' ? (

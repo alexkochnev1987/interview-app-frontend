@@ -1,34 +1,58 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState, type FormEvent } from 'react';
-import { createInterview } from '@/lib/api';
+import { useEffect, useState, type FormEvent } from 'react';
+import { createInterview, fetchQuestions, type Question } from '@/lib/api';
 
 export default function NewInterviewPage() {
   const router = useRouter();
   const [candidateName, setCandidateName] = useState('');
   const [position, setPosition] = useState('');
-  const [questions, setQuestions] = useState<string[]>(['']);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [selectedQuestionIds, setSelectedQuestionIds] = useState<string[]>([]);
+  const [loadingQuestions, setLoadingQuestions] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  function addQuestion() {
-    setQuestions((prev) => [...prev, '']);
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadQuestions() {
+      try {
+        const data = await fetchQuestions();
+        if (!cancelled) {
+          setQuestions(data);
+          setLoadingQuestions(false);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(
+            err instanceof Error ? err.message : 'Failed to load questions.',
+          );
+          setLoadingQuestions(false);
+        }
+      }
+    }
+
+    loadQuestions();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  function toggleQuestion(id: string) {
+    setSelectedQuestionIds((current) =>
+      current.includes(id)
+        ? current.filter((questionId) => questionId !== id)
+        : [...current, id],
+    );
   }
 
-  function removeQuestion(index: number) {
-    setQuestions((prev) => prev.filter((_, i) => i !== index));
-  }
-
-  function updateQuestion(index: number, value: string) {
-    setQuestions((prev) => prev.map((q, i) => (i === index ? value : q)));
-  }
-
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
+  async function handleSubmit(event: FormEvent) {
+    event.preventDefault();
     setError(null);
 
-    const trimmedQuestions = questions.map((q) => q.trim()).filter(Boolean);
     if (!candidateName.trim()) {
       setError('Candidate name is required.');
       return;
@@ -37,8 +61,8 @@ export default function NewInterviewPage() {
       setError('Position is required.');
       return;
     }
-    if (trimmedQuestions.length === 0) {
-      setError('At least one question is required.');
+    if (selectedQuestionIds.length === 0) {
+      setError('Select at least one question.');
       return;
     }
 
@@ -47,11 +71,13 @@ export default function NewInterviewPage() {
       const interview = await createInterview({
         candidateName: candidateName.trim(),
         position: position.trim(),
-        questions: trimmedQuestions,
+        questionIds: selectedQuestionIds,
       });
       router.push(`/interviews/${interview.id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create interview.');
+      setError(
+        err instanceof Error ? err.message : 'Failed to create interview.',
+      );
       setSubmitting(false);
     }
   }
@@ -62,7 +88,7 @@ export default function NewInterviewPage() {
 
       {error && <div className="error-message">{error}</div>}
 
-      <form onSubmit={handleSubmit} className="card" style={{ maxWidth: 600 }}>
+      <form onSubmit={handleSubmit} className="card" style={{ maxWidth: 960 }}>
         <div className="form-group">
           <label className="form-label" htmlFor="candidateName">
             Candidate Name
@@ -72,7 +98,7 @@ export default function NewInterviewPage() {
             className="form-input"
             type="text"
             value={candidateName}
-            onChange={(e) => setCandidateName(e.target.value)}
+            onChange={(event) => setCandidateName(event.target.value)}
             placeholder="e.g. Jane Doe"
             disabled={submitting}
           />
@@ -87,48 +113,121 @@ export default function NewInterviewPage() {
             className="form-input"
             type="text"
             value={position}
-            onChange={(e) => setPosition(e.target.value)}
+            onChange={(event) => setPosition(event.target.value)}
             placeholder="e.g. Senior Frontend Engineer"
             disabled={submitting}
           />
         </div>
 
         <div className="form-group">
-          <label className="form-label">Questions</label>
-          {questions.map((q, i) => (
-            <div key={i} className="question-row">
-              <input
-                className="form-input"
-                type="text"
-                value={q}
-                onChange={(e) => updateQuestion(i, e.target.value)}
-                placeholder={`Question ${i + 1}`}
-                disabled={submitting}
-              />
-              {questions.length > 1 && (
-                <button
-                  type="button"
-                  className="btn btn-danger btn-sm"
-                  onClick={() => removeQuestion(i)}
-                  disabled={submitting}
-                >
-                  Remove
-                </button>
-              )}
-            </div>
-          ))}
-          <button
-            type="button"
-            className="btn btn-outline btn-sm"
-            onClick={addQuestion}
-            disabled={submitting}
-            style={{ marginTop: '0.25rem' }}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: '1rem',
+              flexWrap: 'wrap',
+              marginBottom: '0.75rem',
+            }}
           >
-            + Add Question
-          </button>
+            <label className="form-label" style={{ marginBottom: 0 }}>
+              Select Questions
+            </label>
+            <Link href="/questions/new" className="btn btn-outline btn-sm">
+              + Create Question
+            </Link>
+          </div>
+
+          {loadingQuestions ? (
+            <div className="loading">Loading question bank...</div>
+          ) : questions.length === 0 ? (
+            <div className="empty-state">
+              <p>No saved questions yet.</p>
+              <Link href="/questions/new" className="btn btn-primary">
+                Create your first question
+              </Link>
+            </div>
+          ) : (
+            <>
+              <p
+                style={{
+                  fontSize: '0.9rem',
+                  color: 'var(--color-text-secondary)',
+                  marginBottom: '0.75rem',
+                }}
+              >
+                Selected: {selectedQuestionIds.length}
+              </p>
+
+              <div style={{ display: 'grid', gap: '0.75rem' }}>
+                {questions.map((question) => {
+                  const selected = selectedQuestionIds.includes(question.id);
+
+                  return (
+                    <label
+                      key={question.id}
+                      className="card"
+                      style={{
+                        display: 'block',
+                        cursor: 'pointer',
+                        border: selected
+                          ? '1px solid var(--color-primary)'
+                          : '1px solid var(--color-border)',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          gap: '0.75rem',
+                          alignItems: 'flex-start',
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selected}
+                          onChange={() => toggleQuestion(question.id)}
+                          disabled={submitting}
+                          style={{ marginTop: '0.25rem' }}
+                        />
+
+                        <div style={{ flex: 1 }}>
+                          <div className="card-title">{question.text}</div>
+                          <div
+                            style={{
+                              display: 'flex',
+                              gap: '0.5rem',
+                              flexWrap: 'wrap',
+                              marginBottom: '0.5rem',
+                            }}
+                          >
+                            <span className="badge badge-pending">
+                              {question.difficulty}
+                            </span>
+                            <span className="badge badge-processing">
+                              weight {question.weight}
+                            </span>
+                          </div>
+                          <div className="card-meta">
+                            Concepts: {question.expectedConcepts.join(', ') || 'Not specified'}
+                          </div>
+                          <div className="card-meta">
+                            Red flags: {question.redFlags.join(', ') || 'Not specified'}
+                          </div>
+                        </div>
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+            </>
+          )}
         </div>
 
-        <button type="submit" className="btn btn-primary" disabled={submitting}>
+        <button
+          type="submit"
+          className="btn btn-primary"
+          disabled={submitting || loadingQuestions || questions.length === 0}
+        >
           {submitting ? 'Creating...' : 'Create Interview'}
         </button>
       </form>
