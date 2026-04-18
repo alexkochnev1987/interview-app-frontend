@@ -69,6 +69,14 @@ export default function LoginPage() {
         <button type="submit" className="btn btn-primary" disabled={loading}>
           {loading ? 'Signing in...' : 'Sign In'}
         </button>
+
+        <div className="login-divider">
+          <span>or</span>
+        </div>
+
+        <a href="/api/auth/google" className="btn btn-google">
+          Sign in with Google
+        </a>
       </form>
     </div>
   );
