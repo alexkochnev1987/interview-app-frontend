@@ -5,6 +5,12 @@ export function middleware(request: NextRequest) {
   const session = request.cookies.get('session');
   const path = request.nextUrl.pathname;
 
+  // Always let API proxy to the backend (rewrites in next.config). Some hosts
+  // still invoke middleware for /api even when the matcher should skip it.
+  if (path.startsWith('/api')) {
+    return NextResponse.next();
+  }
+
   const isPublicPage =
     path === '/login' ||
     path.startsWith('/take') ||
@@ -22,5 +28,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 };
