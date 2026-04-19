@@ -79,8 +79,8 @@ export default function QuestionsPage() {
               href={`/questions/${question.id}`}
               style={{ textDecoration: 'none', color: 'inherit' }}
             >
-              <div className="card" style={{ height: '100%' }}>
-                <div className="card-title">{question.text}</div>
+                <div className="card" style={{ height: '100%' }}>
+                <div className="card-title">{question.questionText}</div>
                 <div
                   style={{
                     display: 'flex',
@@ -89,6 +89,9 @@ export default function QuestionsPage() {
                     marginBottom: '0.75rem',
                   }}
                 >
+                  {question.category && (
+                    <span className="badge badge-processing">{question.category}</span>
+                  )}
                   <span className="badge badge-pending">{question.difficulty}</span>
                   <span className="badge badge-processing">weight {question.weight}</span>
                 </div>
@@ -98,6 +101,9 @@ export default function QuestionsPage() {
                 <div className="card-meta">
                   Red flags: {question.redFlags.length}
                 </div>
+                {question.role && (
+                  <div className="card-meta">Role: {question.role}</div>
+                )}
               </div>
             </Link>
           ))}

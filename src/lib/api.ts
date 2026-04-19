@@ -3,20 +3,57 @@
 const API_URL = '/api';
 
 export type QuestionDifficulty = 'easy' | 'medium' | 'hard';
+export type QuestionRedFlagSeverity = 'low' | 'medium' | 'high';
+
+export interface QuestionExpectedConcept {
+  id: string;
+  label: string;
+  weight: number;
+  description: string;
+}
+
+export interface QuestionRedFlag {
+  id: string;
+  label: string;
+  severity: QuestionRedFlagSeverity;
+}
 
 export interface QuestionDraft {
-  expectedConcepts: string[];
-  redFlags: string[];
+  externalId?: string;
+  role?: string;
+  focus?: string;
+  outputLanguage: string;
+  category?: string;
+  subcategory?: string;
+  questionText: string;
+  followUpQuestions: string[];
+  expectedConcepts: QuestionExpectedConcept[];
+  redFlags: QuestionRedFlag[];
   difficulty: QuestionDifficulty;
   weight: number;
+  sampleGoodAnswer?: string;
+  minimumPassScore: number;
+  tags: string[];
+  metadata: Record<string, unknown>;
 }
 
 export interface QuestionInput {
-  text: string;
-  expectedConcepts: string[];
-  redFlags: string[];
+  externalId?: string;
+  role?: string;
+  focus?: string;
+  outputLanguage: string;
+  category?: string;
+  subcategory?: string;
+  questionText: string;
+  followUpQuestions: string[];
+  expectedConcepts: QuestionExpectedConcept[];
+  redFlags: QuestionRedFlag[];
   difficulty: QuestionDifficulty;
   weight: number;
+  sampleGoodAnswer?: string;
+  minimumPassScore: number;
+  tags: string[];
+  metadata: Record<string, unknown>;
 }
 
 export interface Question extends QuestionInput {
@@ -27,11 +64,22 @@ export interface Question extends QuestionInput {
 
 export interface InterviewQuestion {
   id: string;
-  text: string;
-  expectedConcepts: string[];
-  redFlags: string[];
+  externalId?: string;
+  role?: string;
+  focus?: string;
+  outputLanguage: string;
+  category?: string;
+  subcategory?: string;
+  questionText: string;
+  followUpQuestions: string[];
+  expectedConcepts: QuestionExpectedConcept[];
+  redFlags: QuestionRedFlag[];
   difficulty: QuestionDifficulty;
   weight: number;
+  sampleGoodAnswer?: string;
+  minimumPassScore: number;
+  tags: string[];
+  metadata: Record<string, unknown>;
 }
 
 export interface CandidateQuestionView {
@@ -114,12 +162,11 @@ export async function updateQuestion(
 }
 
 export async function draftQuestion(
-  text: string,
-  position: string,
+  question: Partial<QuestionInput>,
 ): Promise<QuestionDraft> {
   return request<QuestionDraft>('/ai/question-draft', {
     method: 'POST',
-    body: JSON.stringify({ text, position }),
+    body: JSON.stringify({ question }),
   });
 }
 

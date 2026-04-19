@@ -74,13 +74,23 @@ export default function EditQuestionPage() {
   return (
     <QuestionEditor
       title="Edit Question"
-      positionHint=""
       initialValue={{
-        text: question.text,
+        externalId: question.externalId,
+        role: question.role,
+        focus: question.focus,
+        outputLanguage: question.outputLanguage,
+        category: question.category,
+        subcategory: question.subcategory,
+        questionText: question.questionText,
+        followUpQuestions: question.followUpQuestions,
         expectedConcepts: question.expectedConcepts,
         redFlags: question.redFlags,
         difficulty: question.difficulty,
         weight: question.weight,
+        sampleGoodAnswer: question.sampleGoodAnswer,
+        minimumPassScore: question.minimumPassScore,
+        tags: question.tags,
+        metadata: question.metadata,
       }}
       submitLabel="Save Changes"
       onSubmit={handleSubmit}

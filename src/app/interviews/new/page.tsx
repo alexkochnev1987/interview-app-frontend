@@ -191,7 +191,7 @@ export default function NewInterviewPage() {
                         />
 
                         <div style={{ flex: 1 }}>
-                          <div className="card-title">{question.text}</div>
+                          <div className="card-title">{question.questionText}</div>
                           <div
                             style={{
                               display: 'flex',
@@ -200,6 +200,11 @@ export default function NewInterviewPage() {
                               marginBottom: '0.5rem',
                             }}
                           >
+                            {question.category && (
+                              <span className="badge badge-processing">
+                                {question.category}
+                              </span>
+                            )}
                             <span className="badge badge-pending">
                               {question.difficulty}
                             </span>
@@ -208,10 +213,10 @@ export default function NewInterviewPage() {
                             </span>
                           </div>
                           <div className="card-meta">
-                            Concepts: {question.expectedConcepts.join(', ') || 'Not specified'}
+                            Concepts: {question.expectedConcepts.map((item) => item.label).join(', ') || 'Not specified'}
                           </div>
                           <div className="card-meta">
-                            Red flags: {question.redFlags.join(', ') || 'Not specified'}
+                            Red flags: {question.redFlags.map((item) => item.label).join(', ') || 'Not specified'}
                           </div>
                         </div>
                       </div>

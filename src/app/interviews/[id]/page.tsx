@@ -208,7 +208,7 @@ export default function InterviewDetailPage() {
               <span style={{ color: 'var(--color-text-secondary)', marginRight: '0.5rem' }}>
                 Q{qi + 1}.
               </span>
-              {question.text}
+              {question.questionText}
             </div>
 
             <div
@@ -220,6 +220,11 @@ export default function InterviewDetailPage() {
                 marginBottom: '0.75rem',
               }}
             >
+              {question.category && (
+                <span className="badge badge-processing">
+                  {question.category}
+                </span>
+              )}
               <span className="badge badge-pending">
                 {question.difficulty}
               </span>
@@ -243,7 +248,7 @@ export default function InterviewDetailPage() {
                   </div>
                   <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
                     {question.expectedConcepts.length > 0
-                      ? question.expectedConcepts.join(', ')
+                      ? question.expectedConcepts.map((item) => item.label).join(', ')
                       : 'Not specified'}
                   </div>
                 </div>
@@ -253,7 +258,7 @@ export default function InterviewDetailPage() {
                   </div>
                   <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
                     {question.redFlags.length > 0
-                      ? question.redFlags.join(', ')
+                      ? question.redFlags.map((item) => item.label).join(', ')
                       : 'Not specified'}
                   </div>
                 </div>
