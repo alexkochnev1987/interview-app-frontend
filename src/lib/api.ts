@@ -89,6 +89,7 @@ export interface CandidateQuestionView {
 export interface Answer {
   questionIndex: number;
   mediaKey: string;
+  screenMediaKey?: string;
   uploadedAt: string;
 }
 

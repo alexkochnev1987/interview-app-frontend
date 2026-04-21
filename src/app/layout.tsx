@@ -1,26 +1,30 @@
-import type { Metadata } from 'next';
-import './globals.css';
-import { NavHeader } from './nav-header';
-import { AuthProvider } from '@/lib/auth-context';
+import type { Metadata } from "next"
+
+import { AuthProvider } from "@/lib/auth-context"
+
+import "./globals.css"
+import { NavHeader } from "./nav-header"
 
 export const metadata: Metadata = {
-  title: 'Interview App',
-  description: 'AI-powered interview platform',
-};
+  title: "AI Interview Architect",
+  description: "AI-powered interview platform",
+}
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   return (
     <html lang="en">
-      <body>
+      <body className="min-h-screen bg-background text-foreground antialiased">
         <AuthProvider>
-          <NavHeader />
-          {children}
+          <div className="relative min-h-screen overflow-x-clip">
+            <NavHeader />
+            {children}
+          </div>
         </AuthProvider>
       </body>
     </html>
-  );
+  )
 }

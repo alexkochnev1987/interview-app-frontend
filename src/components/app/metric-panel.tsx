@@ -1,0 +1,88 @@
+import type { ReactNode } from 'react'
+
+import { cn } from '@/lib/utils'
+
+type MetricPanelTone = 'surface' | 'elevated' | 'compact'
+
+const toneClasses: Record<MetricPanelTone, string> = {
+  surface: 'rounded-[1.5rem] bg-[hsl(var(--surface-low)/0.9)] p-5 ring-1 ring-border/45',
+  elevated: 'rounded-[1.25rem] bg-white/80 p-4 ring-1 ring-border/45',
+  compact: 'rounded-[1rem] bg-[hsl(var(--surface-low)/0.85)] p-3 ring-1 ring-border/45',
+}
+
+interface MetricPanelProps {
+  className?: string
+  description?: ReactNode
+  icon?: ReactNode
+  label: ReactNode
+  labelClassName?: string
+  tone?: MetricPanelTone
+  unstyledLabel?: boolean
+  unstyledValue?: boolean
+  value: ReactNode
+  valueClassName?: string
+}
+
+export function MetricPanel({
+  className,
+  description,
+  icon,
+  label,
+  labelClassName,
+  tone = 'surface',
+  unstyledLabel = false,
+  unstyledValue = false,
+  value,
+  valueClassName,
+}: MetricPanelProps) {
+  const hasIcon = icon !== undefined
+  const hasValue = value !== null && value !== undefined && value !== false
+
+  return (
+    <div className={cn(toneClasses[tone], className)}>
+      {hasIcon ? (
+        <div className="flex items-center gap-3 text-muted-foreground">
+          <span className="shrink-0">{icon}</span>
+          <span
+            className={cn(
+              'text-[0.72rem] font-semibold uppercase tracking-[0.2em]',
+              labelClassName
+            )}
+          >
+            {label}
+          </span>
+        </div>
+      ) : (
+        <div
+          className={cn(
+            !unstyledLabel &&
+              'text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground',
+            labelClassName,
+            unstyledLabel && 'text-inherit'
+          )}
+        >
+          {label}
+        </div>
+      )}
+
+      {hasValue ? (
+        <div
+          className={cn(
+            !unstyledValue &&
+              (hasIcon
+                ? 'mt-4 text-4xl font-semibold tracking-[-0.04em] text-foreground'
+                : 'mt-3 text-3xl font-semibold tracking-[-0.04em] text-foreground'),
+            unstyledValue && (hasIcon ? 'mt-4' : 'mt-3'),
+            valueClassName
+          )}
+        >
+          {value}
+        </div>
+      ) : null}
+
+      {description ? (
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">{description}</p>
+      ) : null}
+    </div>
+  )
+}

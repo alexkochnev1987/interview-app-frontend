@@ -3,6 +3,10 @@
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { usePathname } from 'next/navigation';
+import { Sparkles, LogOut, Plus, LayoutDashboard, LibraryBig } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 export function NavHeader() {
   const { user, loading, logout } = useAuth();
@@ -13,22 +17,84 @@ export function NavHeader() {
     return null;
   }
 
+  const links = [
+    { href: '/', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/questions', label: 'Questions', icon: LibraryBig },
+    { href: '/interviews/new', label: 'New Interview', icon: Plus },
+  ];
+
+  function isActive(href: string) {
+    if (href === '/') {
+      return pathname === '/';
+    }
+    return pathname === href || pathname.startsWith(`${href}/`);
+  }
+
   return (
-    <header className="nav-header">
-      <Link href="/" className="logo">Interview App</Link>
-      <nav>
-        {loading ? null : user ? (
-          <>
-            <Link href="/">Dashboard</Link>
-            <Link href="/questions">Questions</Link>
-            <Link href="/interviews/new">New Interview</Link>
-            <span className="nav-user">{user.name}</span>
-            <button onClick={logout} className="btn-link">Logout</button>
-          </>
-        ) : (
-          <Link href="/login">Sign In</Link>
-        )}
-      </nav>
+    <header className="sticky top-0 z-40 border-b border-border/50 bg-background/80 backdrop-blur-xl">
+      <div className="container flex min-h-20 flex-wrap items-center justify-between gap-4 py-4">
+        <Link href="/" className="flex items-center gap-3 no-underline">
+          <div className="flex size-12 items-center justify-center rounded-[1.25rem] bg-primary-gradient text-primary-foreground shadow-soft">
+            <Sparkles className="size-5" />
+          </div>
+          <div className="space-y-0.5">
+            <div className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+              Intelligent Conductor
+            </div>
+            <div className="text-sm font-semibold text-foreground md:text-base">
+              AI Interview Architect
+            </div>
+          </div>
+        </Link>
+
+        <nav className="order-3 flex w-full flex-wrap items-center gap-2 md:order-2 md:w-auto md:justify-center">
+          {loading
+            ? null
+            : user &&
+              links.map(({ href, label, icon: Icon }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className={cn(
+                    "inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium no-underline transition-colors",
+                    isActive(href)
+                      ? "bg-[hsl(var(--surface-low))] text-foreground ring-1 ring-border/60"
+                      : "text-muted-foreground hover:bg-[hsl(var(--surface-low)/0.75)] hover:text-foreground"
+                  )}
+                >
+                  <Icon className="size-4" />
+                  {label}
+                </Link>
+              ))}
+        </nav>
+
+        <div className="order-2 flex items-center gap-2 md:order-3">
+          {loading ? null : user ? (
+            <>
+              <div className="hidden rounded-full bg-[hsl(var(--surface-low))] px-3 py-2 text-right ring-1 ring-border/50 sm:block">
+                <div className="text-xs font-medium text-foreground">{user.name}</div>
+                <div className="text-[0.68rem] uppercase tracking-[0.18em] text-muted-foreground">
+                  {user.role}
+                </div>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="rounded-full bg-white/70 backdrop-blur-sm"
+                onClick={logout}
+              >
+                <LogOut className="size-4" />
+                Logout
+              </Button>
+            </>
+          ) : (
+            <Button asChild size="sm" className="rounded-full bg-primary-gradient shadow-soft hover:brightness-105">
+              <Link href="/login">Sign In</Link>
+            </Button>
+          )}
+        </div>
+      </div>
     </header>
   );
 }
