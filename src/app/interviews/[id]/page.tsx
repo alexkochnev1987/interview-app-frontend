@@ -44,6 +44,36 @@ interface QuestionUploadState {
   errorMessage?: string
 }
 
+function formatAnswerDuration(seconds?: number) {
+  if (!seconds || seconds < 1) {
+    return 'n/a'
+  }
+
+  const minutes = Math.floor(seconds / 60)
+  const remainder = seconds % 60
+  return `${minutes}:${remainder.toString().padStart(2, '0')}`
+}
+
+function formatFileSize(bytes?: number) {
+  if (!bytes || bytes < 1) {
+    return 'n/a'
+  }
+
+  if (bytes < 1024 * 1024) {
+    return `${Math.round(bytes / 1024)} KB`
+  }
+
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
+
+function formatWorkflowStage(stage?: string) {
+  if (!stage) {
+    return 'idle'
+  }
+
+  return stage.replaceAll('_', ' ')
+}
+
 export default function InterviewDetailPage() {
   const params = useParams<{ id: string }>()
   const id = params.id
@@ -215,11 +245,11 @@ export default function InterviewDetailPage() {
     return null
   }
 
-  const answeredCount = interview.answers.length
+  const answeredCount = interview.answers.filter((answer) => answer.status === 'submitted').length
   const totalQuestions = interview.questions.length
   const progressValue = totalQuestions === 0 ? 0 : Math.round((answeredCount / totalQuestions) * 100)
   const allAnswered = interview.questions.every((_, qi) =>
-    interview.answers.some((answer) => answer.questionIndex === qi)
+    interview.answers.some((answer) => answer.questionIndex === qi && answer.status === 'submitted')
   )
   const isTerminal = interview.status === 'completed' || interview.status === 'failed'
   const canComplete = allAnswered && !isTerminal && interview.status !== 'processing'
@@ -347,6 +377,27 @@ export default function InterviewDetailPage() {
                 <p className="text-sm leading-6 text-muted-foreground">{results.summary}</p>
               </div>
             ) : null}
+
+            {interview.workflow ? (
+              <div className="space-y-3 rounded-[1.5rem] bg-white/80 p-5 ring-1 ring-border/45">
+                <div className="flex items-center gap-2 text-foreground">
+                  <Layers3 className="size-4 text-[hsl(var(--primary))]" />
+                  <span className="text-sm font-medium">Workflow</span>
+                </div>
+                <p className="text-sm leading-6 text-muted-foreground">
+                  Status: <strong>{interview.workflow.status.replace('_', ' ')}</strong>
+                  {interview.workflow.currentStage
+                    ? ` • stage: ${formatWorkflowStage(interview.workflow.currentStage)}`
+                    : ''}
+                </p>
+                <p className="text-sm leading-6 text-muted-foreground">
+                  Last update {new Date(interview.workflow.lastUpdatedAt).toLocaleString()}
+                </p>
+                {interview.workflow.errorMessage ? (
+                  <p className="text-sm leading-6 text-rose-700">{interview.workflow.errorMessage}</p>
+                ) : null}
+              </div>
+            ) : null}
           </CardContent>
         </Card>
       </section>
@@ -375,7 +426,8 @@ export default function InterviewDetailPage() {
 
         <div className="grid gap-4">
           {interview.questions.map((question, questionIndex) => {
-            const hasAnswer = interview.answers.some((answer) => answer.questionIndex === questionIndex)
+            const answer = interview.answers.find((item) => item.questionIndex === questionIndex)
+            const hasAnswer = Boolean(answer)
             const uploadState = uploadStates[questionIndex] ?? { status: 'idle' }
 
             return (
@@ -401,9 +453,11 @@ export default function InterviewDetailPage() {
                       </CardTitle>
                     </div>
 
-                    <div className="flex flex-col items-end gap-2">
-                      {hasAnswer || uploadState.status === 'uploaded' ? (
-                        <StatusPill tone="completed">Uploaded</StatusPill>
+                      <div className="flex flex-col items-end gap-2">
+                      {answer?.status === 'submitted' ? (
+                        <StatusPill tone="completed">Submitted</StatusPill>
+                      ) : hasAnswer || uploadState.status === 'uploaded' ? (
+                        <StatusPill tone="processing">Draft saved</StatusPill>
                       ) : uploadState.status === 'uploading' ? (
                         <StatusPill tone="processing">Uploading</StatusPill>
                       ) : uploadState.status === 'error' ? (
@@ -440,6 +494,42 @@ export default function InterviewDetailPage() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  {answer ? (
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <div className="rounded-[1.25rem] bg-[hsl(var(--surface-low)/0.85)] p-4 ring-1 ring-border/45">
+                        <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                          Recorded answer
+                        </div>
+                        <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                          Duration {formatAnswerDuration(answer.durationSeconds)} • retakes {answer.retakeCount ?? 0}
+                        </p>
+                        <p className="text-sm leading-6 text-muted-foreground">
+                          Camera {formatFileSize(answer.camera?.fileSizeBytes)} • screen {formatFileSize(answer.screen?.fileSizeBytes)}
+                        </p>
+                        <p className="text-sm leading-6 text-muted-foreground">
+                          Status {answer.status} • versions {answer.versions?.length ?? 1}
+                        </p>
+                        <p className="text-sm leading-6 text-muted-foreground">
+                          Uploaded {new Date(answer.uploadedAt).toLocaleString()}
+                        </p>
+                      </div>
+                      <div className="rounded-[1.25rem] bg-[hsl(var(--surface-low)/0.85)] p-4 ring-1 ring-border/45">
+                        <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                          Evaluation signals
+                        </div>
+                        <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                          Hidden tabs {answer.behaviorSignals?.tabHiddenCount ?? 0} • blur {answer.behaviorSignals?.windowBlurCount ?? 0} • paste {answer.behaviorSignals?.pasteCount ?? 0}
+                        </p>
+                        <p className="text-sm leading-6 text-muted-foreground">
+                          Keydown {answer.behaviorSignals?.keydownCount ?? 0} • resize {answer.behaviorSignals?.resizeCount ?? 0}
+                        </p>
+                        <p className="text-sm leading-6 text-muted-foreground">
+                          Transcript {answer.transcript?.text ? 'ready' : 'pending'} • evaluation {answer.evaluation?.overallScore !== undefined ? 'ready' : 'pending'}
+                        </p>
+                      </div>
+                    </div>
+                  ) : null}
+
                   <div className="grid gap-4 md:grid-cols-2">
                     <div className="rounded-[1.25rem] bg-[hsl(var(--surface-low)/0.85)] p-4 ring-1 ring-border/45">
                       <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
@@ -503,6 +593,22 @@ export default function InterviewDetailPage() {
                   {results.overallScore}
                 </div>
                 <p className="text-sm leading-7 text-muted-foreground">{results.summary}</p>
+                <div className="flex flex-wrap gap-2">
+                  {results.decision ? (
+                    <StatusPill tone="neutral">{results.decision}</StatusPill>
+                  ) : null}
+                  {results.trustScore !== undefined ? (
+                    <StatusPill tone="neutral">trust {results.trustScore}</StatusPill>
+                  ) : null}
+                  {results.rubricVersion ? (
+                    <StatusPill tone="neutral">{results.rubricVersion}</StatusPill>
+                  ) : null}
+                </div>
+                {results.trustFlags?.length ? (
+                  <p className="text-sm leading-7 text-muted-foreground">
+                    Flags: {results.trustFlags.join(', ')}
+                  </p>
+                ) : null}
               </CardContent>
             </Card>
 

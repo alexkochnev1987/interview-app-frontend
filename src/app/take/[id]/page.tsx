@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams, useSearchParams } from 'next/navigation'
 import {
   Camera,
@@ -31,12 +31,18 @@ interface InterviewData {
   totalQuestions: number
   currentQuestion: { text: string } | null
   currentQuestionIndex: number
+  currentAnswerMeta: {
+    status: 'recording' | 'submitted'
+    versionCount: number
+    selectedVersionNumber: number
+  } | null
   completed: boolean
 }
 
-type Stage = 'loading' | 'consent' | 'interview' | 'recording' | 'review' | 'complete'
+type Stage = 'loading' | 'consent' | 'interview' | 'recording' | 'transition' | 'complete'
 type PermissionStatus = 'idle' | 'pending' | 'granted' | 'denied'
 type CaptureTarget = 'camera' | 'screen'
+type PendingVersionAction = 'submit' | 'rerecord' | null
 type ScreenTrackSettings = MediaTrackSettings & { displaySurface?: string }
 type InterviewDisplayMediaOptions = DisplayMediaStreamOptions & {
   monitorTypeSurfaces?: 'include' | 'exclude'
@@ -45,10 +51,61 @@ type InterviewDisplayMediaOptions = DisplayMediaStreamOptions & {
   systemAudio?: 'include' | 'exclude'
 }
 
-interface PendingRecordingState {
-  cameraBlob: Blob | null
-  screenBlob: Blob | null
-  remainingStops: number
+interface AnswerBehaviorSignals {
+  tabHiddenCount: number
+  windowBlurCount: number
+  pasteCount: number
+  keydownCount: number
+  resizeCount: number
+}
+
+interface AnswerBehaviorEvent {
+  eventType: 'tab_hidden' | 'window_blur' | 'paste' | 'keydown' | 'resize'
+  occurredAt: string
+  versionNumber: number
+}
+
+interface MultipartUploadSessionResponse {
+  mediaKey: string
+  uploadId: string
+}
+
+interface MultipartUploadPartResponse {
+  mediaKey: string
+  uploadId: string
+  partNumber: number
+  uploadUrl: string
+}
+
+interface MultipartUploadSession {
+  mediaKey: string
+  uploadId: string
+  nextPartNumber: number
+  bufferedChunks: Blob[]
+  bufferedBytes: number
+  recordedBytes: number
+  uploadChain: Promise<void>
+  completed: boolean
+  aborted: boolean
+}
+
+interface MultipartUploadState {
+  camera: MultipartUploadSession | null
+  screen: MultipartUploadSession | null
+}
+
+const MULTIPART_PART_SIZE_BYTES = 6 * 1024 * 1024
+const PROGRESS_HEARTBEAT_MS = 3000
+const PROGRESS_DEBOUNCE_MS = 400
+
+function createEmptyBehaviorSignals(): AnswerBehaviorSignals {
+  return {
+    tabHiddenCount: 0,
+    windowBlurCount: 0,
+    pasteCount: 0,
+    keydownCount: 0,
+    resizeCount: 0,
+  }
 }
 
 function permissionLabel(status: PermissionStatus) {
@@ -81,53 +138,124 @@ export default function TakeInterviewPage() {
   const params = useParams()
   const searchParams = useSearchParams()
   const id = params.id as string
-  const token = searchParams.get('token') || ''
+  const candidateToken = searchParams.get('token')?.trim() ?? ''
 
   const [stage, setStage] = useState<Stage>('loading')
   const [interview, setInterview] = useState<InterviewData | null>(null)
   const [error, setError] = useState('')
   const [consent, setConsent] = useState(false)
   const [recording, setRecording] = useState(false)
-  const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null)
-  const [screenRecordedBlob, setScreenRecordedBlob] = useState<Blob | null>(null)
   const [timeLeft, setTimeLeft] = useState(240)
-  const [reRecordUsed, setReRecordUsed] = useState(false)
+  const [retakeCount, setRetakeCount] = useState(0)
+  const [currentVersionNumber, setCurrentVersionNumber] = useState(1)
   const [uploading, setUploading] = useState(false)
   const [cameraStatus, setCameraStatus] = useState<PermissionStatus>('idle')
   const [screenStatus, setScreenStatus] = useState<PermissionStatus>('idle')
   const [screenSurface, setScreenSurface] = useState('')
   const [setupBusy, setSetupBusy] = useState(false)
   const [setupError, setSetupError] = useState('')
+  const [transitionLabel, setTransitionLabel] = useState('')
 
   const videoRef = useRef<HTMLVideoElement>(null)
   const cameraRecorderRef = useRef<MediaRecorder | null>(null)
   const screenRecorderRef = useRef<MediaRecorder | null>(null)
-  const cameraChunksRef = useRef<Blob[]>([])
-  const screenChunksRef = useRef<Blob[]>([])
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const progressHeartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const progressFlushTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const cameraStreamRef = useRef<MediaStream | null>(null)
   const screenStreamRef = useRef<MediaStream | null>(null)
   const discardRecordingRef = useRef(false)
-  const pendingRecordingRef = useRef<PendingRecordingState>({
-    cameraBlob: null,
-    screenBlob: null,
-    remainingStops: 0,
+  const answerStartedAtRef = useRef<string | null>(null)
+  const answerStartedAtMsRef = useRef<number | null>(null)
+  const answerStoppedAtMsRef = useRef<number | null>(null)
+  const answerDurationSecondsRef = useRef<number>(0)
+  const stoppedRecordersRef = useRef(0)
+  const currentVersionNumberRef = useRef(1)
+  const behaviorSignalsRef = useRef<AnswerBehaviorSignals>(createEmptyBehaviorSignals())
+  const behaviorEventsRef = useRef<AnswerBehaviorEvent[]>([])
+  const flushedBehaviorEventCountRef = useRef(0)
+  const progressRequestChainRef = useRef(Promise.resolve())
+  const pendingVersionActionRef = useRef<PendingVersionAction>(null)
+  const multipartUploadsRef = useRef<MultipartUploadState>({
+    camera: null,
+    screen: null,
   })
-
-  const reviewUrl = useMemo(() => {
-    if (!recordedBlob) {
-      return null
-    }
-    return URL.createObjectURL(recordedBlob)
-  }, [recordedBlob])
+  const beginRecordingRef = useRef<(nextVersionNumber: number) => Promise<void>>(
+    async () => undefined,
+  )
+  const autoStartedQuestionKeyRef = useRef('')
 
   useEffect(() => {
-    return () => {
-      if (reviewUrl) {
-        URL.revokeObjectURL(reviewUrl)
+    if (!recording) {
+      return
+    }
+
+    const recordBehaviorEvent = (
+      eventType: AnswerBehaviorEvent['eventType'],
+      signalKey: keyof AnswerBehaviorSignals,
+    ) => {
+      behaviorSignalsRef.current = {
+        ...behaviorSignalsRef.current,
+        [signalKey]: behaviorSignalsRef.current[signalKey] + 1,
+      }
+
+      behaviorEventsRef.current = [
+        ...behaviorEventsRef.current,
+        {
+          eventType,
+          occurredAt: new Date().toISOString(),
+          versionNumber: currentVersionNumberRef.current,
+        },
+      ]
+
+      scheduleProgressFlush('event')
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        recordBehaviorEvent('tab_hidden', 'tabHiddenCount')
       }
     }
-  }, [reviewUrl])
+
+    const handleWindowBlur = () => {
+      recordBehaviorEvent('window_blur', 'windowBlurCount')
+    }
+
+    const handlePaste = () => {
+      recordBehaviorEvent('paste', 'pasteCount')
+    }
+
+    const handleResize = () => {
+      recordBehaviorEvent('resize', 'resizeCount')
+    }
+
+    const handleKeydown = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey) {
+        return
+      }
+
+      if (event.key === 'Shift' || event.key === 'CapsLock') {
+        return
+      }
+
+      recordBehaviorEvent('keydown', 'keydownCount')
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    window.addEventListener('blur', handleWindowBlur)
+    document.addEventListener('paste', handlePaste)
+    window.addEventListener('resize', handleResize)
+    window.addEventListener('keydown', handleKeydown, true)
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      window.removeEventListener('blur', handleWindowBlur)
+      document.removeEventListener('paste', handlePaste)
+      window.removeEventListener('resize', handleResize)
+      window.removeEventListener('keydown', handleKeydown, true)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [recording])
 
   function stopMediaStream(stream: MediaStream | null) {
     if (!stream) {
@@ -159,23 +287,42 @@ export default function TakeInterviewPage() {
     }
   }
 
-  function clearRecordingArtifacts() {
-    setRecordedBlob(null)
-    setScreenRecordedBlob(null)
-    cameraChunksRef.current = []
-    screenChunksRef.current = []
-    pendingRecordingRef.current = {
-      cameraBlob: null,
-      screenBlob: null,
-      remainingStops: 0,
-    }
-  }
-
-  function stopActiveRecorders() {
+  function clearProgressTimers() {
     if (timerRef.current) {
       clearInterval(timerRef.current)
       timerRef.current = null
     }
+
+    if (progressHeartbeatRef.current) {
+      clearInterval(progressHeartbeatRef.current)
+      progressHeartbeatRef.current = null
+    }
+
+    if (progressFlushTimeoutRef.current) {
+      clearTimeout(progressFlushTimeoutRef.current)
+      progressFlushTimeoutRef.current = null
+    }
+  }
+
+  function clearRecordingArtifacts() {
+    clearProgressTimers()
+    answerStartedAtRef.current = null
+    answerStartedAtMsRef.current = null
+    answerStoppedAtMsRef.current = null
+    answerDurationSecondsRef.current = 0
+    stoppedRecordersRef.current = 0
+    behaviorSignalsRef.current = createEmptyBehaviorSignals()
+    behaviorEventsRef.current = []
+    flushedBehaviorEventCountRef.current = 0
+    progressRequestChainRef.current = Promise.resolve()
+    multipartUploadsRef.current = {
+      camera: null,
+      screen: null,
+    }
+  }
+
+  function stopActiveRecorders() {
+    clearProgressTimers()
 
     if (cameraRecorderRef.current?.state === 'recording') {
       cameraRecorderRef.current.stop()
@@ -190,13 +337,17 @@ export default function TakeInterviewPage() {
 
   function resetInterviewSetup(message: string) {
     discardRecordingRef.current = true
+    pendingVersionActionRef.current = null
     stopActiveRecorders()
+    void abortMultipartUploads()
     clearRecordingArtifacts()
     setCameraStatus('idle')
     setScreenStatus('denied')
     setScreenSurface('')
     setSetupBusy(false)
     setSetupError(message)
+    setTransitionLabel('')
+    autoStartedQuestionKeyRef.current = ''
     releaseCaptureStreams()
     setStage('consent')
   }
@@ -225,14 +376,24 @@ export default function TakeInterviewPage() {
     return 'Camera, microphone, and screen sharing must be enabled before the interview can start.'
   }
 
-  async function loadInterview(mode: 'initial' | 'resume' = 'initial') {
+  async function loadInterview(
+    mode: 'initial' | 'resume' = 'initial',
+    tokenOverride?: string,
+  ) {
     try {
-      const response = await fetch(`/api/take/${id}?token=${token}`)
+      const apiUrl = tokenOverride
+        ? `/api/take/${id}?token=${encodeURIComponent(tokenOverride)}`
+        : `/api/take/${id}`
+      const response = await fetch(apiUrl)
       if (!response.ok) {
         throw new Error('Invalid or expired interview link')
       }
       const data: InterviewData = await response.json()
       setInterview(data)
+
+      if (mode === 'initial' && tokenOverride && typeof window !== 'undefined') {
+        window.history.replaceState(null, '', `/take/${id}`)
+      }
 
       if (data.completed) {
         releaseCaptureStreams()
@@ -248,12 +409,11 @@ export default function TakeInterviewPage() {
   }
 
   useEffect(() => {
-    void loadInterview('initial')
+    void loadInterview('initial', candidateToken)
 
     return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current)
-      }
+      clearProgressTimers()
+      void abortMultipartUploads()
       releaseCaptureStreams()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -331,19 +491,285 @@ export default function TakeInterviewPage() {
     }
   }
 
-  function finalizeRecordingPart(target: CaptureTarget) {
-    const pending = pendingRecordingRef.current
+  async function startMultipartUploadSession(
+    questionIndex: number,
+    mediaType: CaptureTarget,
+  ): Promise<MultipartUploadSession> {
+    const response = await fetch('/api/upload/multipart/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        questionIndex,
+        contentType: 'video/webm',
+        mediaType,
+      }),
+    })
 
-    if (target === 'camera' && cameraChunksRef.current.length > 0) {
-      pending.cameraBlob = new Blob(cameraChunksRef.current, { type: 'video/webm' })
+    if (!response.ok) {
+      throw new Error(`Failed to initialize ${mediaType} upload for this answer version.`)
     }
 
-    if (target === 'screen' && screenChunksRef.current.length > 0) {
-      pending.screenBlob = new Blob(screenChunksRef.current, { type: 'video/webm' })
+    const session = (await response.json()) as MultipartUploadSessionResponse
+    return {
+      mediaKey: session.mediaKey,
+      uploadId: session.uploadId,
+      nextPartNumber: 1,
+      bufferedChunks: [],
+      bufferedBytes: 0,
+      recordedBytes: 0,
+      uploadChain: Promise.resolve(),
+      completed: false,
+      aborted: false,
+    }
+  }
+
+  function getMultipartSession(target: CaptureTarget): MultipartUploadSession {
+    const session = multipartUploadsRef.current[target]
+    if (!session) {
+      throw new Error(`${target} upload session is not initialized.`)
     }
 
-    pending.remainingStops -= 1
-    if (pending.remainingStops > 0) {
+    return session
+  }
+
+  async function flushAnswerProgress(forceAllEvents = false) {
+    if (!interview) {
+      return
+    }
+
+    const cameraUpload = multipartUploadsRef.current.camera
+    if (!cameraUpload) {
+      return
+    }
+
+    const screenUpload = multipartUploadsRef.current.screen
+    const eventStartIndex = forceAllEvents ? 0 : flushedBehaviorEventCountRef.current
+    const behaviorEvents = behaviorEventsRef.current.slice(eventStartIndex)
+
+    const response = await fetch(`/api/take/${id}/answer/progress`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        questionIndex: interview.currentQuestionIndex,
+        versionNumber: currentVersionNumberRef.current,
+        mediaKey: cameraUpload.mediaKey,
+        screenMediaKey: screenUpload?.mediaKey,
+        durationSeconds: answerDurationSecondsRef.current || undefined,
+        startedAt: answerStartedAtRef.current ?? undefined,
+        submittedAt: answerStoppedAtMsRef.current
+          ? new Date(answerStoppedAtMsRef.current).toISOString()
+          : undefined,
+        cameraFileSizeBytes: cameraUpload.recordedBytes || undefined,
+        screenFileSizeBytes: screenUpload?.recordedBytes || undefined,
+        behaviorSignals: behaviorSignalsRef.current,
+        behaviorEvents,
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to save interview progress.')
+    }
+
+    flushedBehaviorEventCountRef.current = behaviorEventsRef.current.length
+  }
+
+  function enqueueProgressFlush(forceAllEvents = false) {
+    progressRequestChainRef.current = progressRequestChainRef.current
+      .catch(() => undefined)
+      .then(() => flushAnswerProgress(forceAllEvents))
+
+    return progressRequestChainRef.current
+  }
+
+  function scheduleProgressFlush(reason: 'event' | 'heartbeat' | 'start' | 'stop') {
+    if (!multipartUploadsRef.current.camera) {
+      return
+    }
+
+    if (reason === 'start' || reason === 'stop') {
+      if (progressFlushTimeoutRef.current) {
+        clearTimeout(progressFlushTimeoutRef.current)
+        progressFlushTimeoutRef.current = null
+      }
+
+      void enqueueProgressFlush(true).catch(() => undefined)
+      return
+    }
+
+    if (progressFlushTimeoutRef.current) {
+      return
+    }
+
+    progressFlushTimeoutRef.current = setTimeout(() => {
+      progressFlushTimeoutRef.current = null
+      void enqueueProgressFlush(false).catch(() => undefined)
+    }, PROGRESS_DEBOUNCE_MS)
+  }
+
+  function startProgressHeartbeat() {
+    if (progressHeartbeatRef.current) {
+      clearInterval(progressHeartbeatRef.current)
+    }
+
+    progressHeartbeatRef.current = setInterval(() => {
+      scheduleProgressFlush('heartbeat')
+    }, PROGRESS_HEARTBEAT_MS)
+  }
+
+  async function presignMultipartPartUpload(
+    target: CaptureTarget,
+    session: MultipartUploadSession,
+    questionIndex: number,
+    partNumber: number,
+  ): Promise<MultipartUploadPartResponse> {
+    const response = await fetch('/api/upload/multipart/part', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        questionIndex,
+        mediaKey: session.mediaKey,
+        uploadId: session.uploadId,
+        partNumber,
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to prepare ${target} upload chunk ${partNumber}.`)
+    }
+
+    return (await response.json()) as MultipartUploadPartResponse
+  }
+
+  function queueBufferedUpload(target: CaptureTarget, forceFinal = false) {
+    const session = multipartUploadsRef.current[target]
+    if (!session) {
+      return Promise.resolve()
+    }
+
+    session.uploadChain = session.uploadChain.then(async () => {
+      let activeSession = multipartUploadsRef.current[target]
+
+      while (
+        activeSession &&
+        !activeSession.aborted &&
+        !activeSession.completed &&
+        (activeSession.bufferedBytes >= MULTIPART_PART_SIZE_BYTES ||
+          (forceFinal && activeSession.bufferedBytes > 0))
+      ) {
+        const partBlob = new Blob(activeSession.bufferedChunks, { type: 'video/webm' })
+        activeSession.bufferedChunks = []
+        activeSession.bufferedBytes = 0
+
+        const partNumber = activeSession.nextPartNumber
+        activeSession.nextPartNumber += 1
+
+        const partUpload = await presignMultipartPartUpload(
+          target,
+          activeSession,
+          interview?.currentQuestionIndex ?? 0,
+          partNumber,
+        )
+
+        const uploadResponse = await fetch(partUpload.uploadUrl, {
+          method: 'PUT',
+          body: partBlob,
+          headers: { 'Content-Type': 'video/webm' },
+        })
+
+        if (!uploadResponse.ok) {
+          throw new Error(`Chunk upload failed for ${target} recording.`)
+        }
+
+        activeSession = multipartUploadsRef.current[target]
+        scheduleProgressFlush('heartbeat')
+      }
+    })
+
+    return session.uploadChain
+  }
+
+  function handleRecordedChunk(target: CaptureTarget, blob: Blob) {
+    if (blob.size < 1) {
+      return
+    }
+
+    const session = multipartUploadsRef.current[target]
+    if (!session || session.aborted || session.completed) {
+      return
+    }
+
+    session.bufferedChunks.push(blob)
+    session.bufferedBytes += blob.size
+    session.recordedBytes += blob.size
+
+    if (session.bufferedBytes >= MULTIPART_PART_SIZE_BYTES) {
+      void queueBufferedUpload(target).catch(() => undefined)
+    }
+
+    scheduleProgressFlush('heartbeat')
+  }
+
+  async function completeMultipartUpload(target: CaptureTarget) {
+    const session = getMultipartSession(target)
+    if (session.completed || session.aborted) {
+      return
+    }
+
+    const response = await fetch('/api/upload/multipart/complete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        questionIndex: interview?.currentQuestionIndex ?? 0,
+        mediaKey: session.mediaKey,
+        uploadId: session.uploadId,
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to finalize ${target} upload.`)
+    }
+
+    session.completed = true
+  }
+
+  async function abortMultipartUploads() {
+    const uploadsSnapshot = multipartUploadsRef.current
+    const entries = (
+      [
+        ['camera', uploadsSnapshot.camera],
+        ['screen', uploadsSnapshot.screen],
+      ] as const
+    ).filter(([, session]) => Boolean(session))
+
+    await Promise.all(
+      entries.map(async ([target, session]) => {
+        if (!session || session.aborted || session.completed) {
+          return
+        }
+
+        session.aborted = true
+
+        try {
+          await session.uploadChain.catch(() => undefined)
+          await fetch('/api/upload/multipart/abort', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              questionIndex: interview?.currentQuestionIndex ?? 0,
+              mediaKey: session.mediaKey,
+              uploadId: session.uploadId,
+            }),
+          })
+        } catch {
+          console.error(`Failed to abort ${target} multipart upload.`)
+        }
+      }),
+    )
+  }
+
+  function handleRecorderStopped() {
+    stoppedRecordersRef.current += 1
+    if (stoppedRecordersRef.current < 2) {
       return
     }
 
@@ -355,30 +781,58 @@ export default function TakeInterviewPage() {
       return
     }
 
-    if (!pending.cameraBlob || !pending.screenBlob) {
+    const pendingAction = pendingVersionActionRef.current
+    if (!pendingAction) {
       clearRecordingArtifacts()
-      setSetupError('Recording failed. Please repeat this answer once more.')
+      setSetupError('Recording stopped without a follow-up action. Start a new version for this answer.')
       setStage('interview')
       return
     }
 
-    setRecordedBlob(pending.cameraBlob)
-    setScreenRecordedBlob(pending.screenBlob)
-    setStage('review')
+    void persistCurrentVersion(pendingAction)
   }
 
-  function startRecording() {
+  async function beginRecording(nextVersionNumber: number) {
     if (!cameraStreamRef.current || !screenStreamRef.current) {
       resetInterviewSetup('Camera, microphone, and entire-screen sharing must stay active before recording.')
       return
     }
 
+    if (!interview?.currentQuestion) {
+      return
+    }
+
     clearRecordingArtifacts()
     discardRecordingRef.current = false
-    pendingRecordingRef.current = {
-      cameraBlob: null,
-      screenBlob: null,
-      remainingStops: 2,
+    pendingVersionActionRef.current = null
+    currentVersionNumberRef.current = nextVersionNumber
+    setCurrentVersionNumber(nextVersionNumber)
+    setRetakeCount(Math.max(nextVersionNumber - 1, 0))
+    answerStartedAtRef.current = new Date().toISOString()
+    answerStartedAtMsRef.current = Date.now()
+    answerStoppedAtMsRef.current = null
+    stoppedRecordersRef.current = 0
+
+    try {
+      const [cameraUpload, screenUpload] = await Promise.all([
+        startMultipartUploadSession(interview.currentQuestionIndex, 'camera'),
+        startMultipartUploadSession(interview.currentQuestionIndex, 'screen'),
+      ])
+
+      multipartUploadsRef.current = {
+        camera: cameraUpload,
+        screen: screenUpload,
+      }
+
+      await flushAnswerProgress(true)
+      startProgressHeartbeat()
+    } catch (err) {
+      await abortMultipartUploads()
+      clearRecordingArtifacts()
+      setSetupError(err instanceof Error ? err.message : 'Failed to start recording.')
+      autoStartedQuestionKeyRef.current = ''
+      setStage('interview')
+      return
     }
 
     const recorderOptions: MediaRecorderOptions = {
@@ -388,22 +842,18 @@ export default function TakeInterviewPage() {
 
     const cameraRecorder = new MediaRecorder(cameraStreamRef.current, recorderOptions)
     cameraRecorder.ondataavailable = (event) => {
-      if (event.data.size > 0) {
-        cameraChunksRef.current.push(event.data)
-      }
+      handleRecordedChunk('camera', event.data)
     }
     cameraRecorder.onstop = () => {
-      finalizeRecordingPart('camera')
+      handleRecorderStopped()
     }
 
     const screenRecorder = new MediaRecorder(screenStreamRef.current, recorderOptions)
     screenRecorder.ondataavailable = (event) => {
-      if (event.data.size > 0) {
-        screenChunksRef.current.push(event.data)
-      }
+      handleRecordedChunk('screen', event.data)
     }
     screenRecorder.onstop = () => {
-      finalizeRecordingPart('screen')
+      handleRecorderStopped()
     }
 
     cameraRecorderRef.current = cameraRecorder
@@ -415,11 +865,12 @@ export default function TakeInterviewPage() {
     setTimeLeft(240)
     setSetupError('')
     setStage('recording')
+    setTransitionLabel('')
 
     timerRef.current = setInterval(() => {
       setTimeLeft((current) => {
         if (current <= 1) {
-          stopRecording()
+          requestVersionAction('submit')
           return 0
         }
         return current - 1
@@ -427,87 +878,146 @@ export default function TakeInterviewPage() {
     }, 1000)
   }
 
+  beginRecordingRef.current = beginRecording
+
+  useEffect(() => {
+    const readyForAutoStart =
+      stage === 'interview' &&
+      !recording &&
+      !uploading &&
+      Boolean(interview?.currentQuestion) &&
+      cameraStatus === 'granted' &&
+      screenStatus === 'granted' &&
+      screenSurface === 'monitor'
+
+    if (!readyForAutoStart || !interview) {
+      return
+    }
+
+    const questionKey = `${interview.id}:${interview.currentQuestionIndex}:${interview.currentAnswerMeta?.versionCount ?? 0}:${stage}`
+    if (autoStartedQuestionKeyRef.current === questionKey) {
+      return
+    }
+
+    autoStartedQuestionKeyRef.current = questionKey
+    const nextVersionNumber = (interview.currentAnswerMeta?.versionCount ?? 0) + 1
+    void beginRecordingRef.current(nextVersionNumber)
+  }, [
+    cameraStatus,
+    interview,
+    recording,
+    screenStatus,
+    screenSurface,
+    stage,
+    uploading,
+  ])
+
   function stopRecording() {
+    const stopTimestamp = Date.now()
+
+    if (!answerStoppedAtMsRef.current) {
+      answerStoppedAtMsRef.current = stopTimestamp
+    }
+
+    if (answerStartedAtMsRef.current) {
+      answerDurationSecondsRef.current = Math.max(
+        1,
+        Math.round((answerStoppedAtMsRef.current - answerStartedAtMsRef.current) / 1000),
+      )
+    }
+
     stopActiveRecorders()
   }
 
-  function handleReRecord() {
-    clearRecordingArtifacts()
-    setReRecordUsed(true)
-    setStage('interview')
+  function requestVersionAction(action: PendingVersionAction) {
+    if (!action || uploading || !recording) {
+      return
+    }
+
+    pendingVersionActionRef.current = action
+    setTransitionLabel(
+      action === 'submit'
+        ? 'Submitting answer and moving to the next question...'
+        : 'Saving this version and starting a new recording...'
+    )
+    setStage('transition')
+    scheduleProgressFlush('stop')
+    stopRecording()
   }
 
-  async function uploadRecording(
-    blob: Blob,
-    questionIndex: number,
-    mediaType: CaptureTarget,
-  ): Promise<{ mediaKey: string }> {
-    const presignResponse = await fetch('/api/upload/presign', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        interviewId: id,
-        questionIndex,
-        contentType: 'video/webm',
-        mediaType,
-      }),
-    })
-
-    if (!presignResponse.ok) {
-      throw new Error(`Failed to prepare the ${mediaType} upload.`)
-    }
-
-    const { uploadUrl, mediaKey } = (await presignResponse.json()) as {
-      uploadUrl: string
-      mediaKey: string
-    }
-
-    const uploadResponse = await fetch(uploadUrl, {
-      method: 'PUT',
-      body: blob,
-      headers: { 'Content-Type': 'video/webm' },
-    })
-
-    if (!uploadResponse.ok) {
-      throw new Error(`Upload failed while sending the ${mediaType} recording.`)
-    }
-
-    return { mediaKey }
-  }
-
-  async function handleSubmitAnswer() {
-    if (!recordedBlob || !screenRecordedBlob || !interview) {
+  async function persistCurrentVersion(
+    action: Exclude<PendingVersionAction, null>,
+  ) {
+    if (!interview) {
       return
     }
 
     setUploading(true)
 
     try {
-      const [cameraUpload, screenUpload] = await Promise.all([
-        uploadRecording(recordedBlob, interview.currentQuestionIndex, 'camera'),
-        uploadRecording(screenRecordedBlob, interview.currentQuestionIndex, 'screen'),
+      await enqueueProgressFlush(true)
+      await Promise.all([
+        queueBufferedUpload('camera', true),
+        queueBufferedUpload('screen', true),
+      ])
+      await Promise.all([
+        completeMultipartUpload('camera'),
+        completeMultipartUpload('screen'),
       ])
 
-      const answerResponse = await fetch(`/api/take/${id}/answer?token=${token}`, {
+      const cameraUpload = getMultipartSession('camera')
+      const screenUpload = getMultipartSession('screen')
+
+      const answerResponse = await fetch(`/api/take/${id}/answer`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           questionIndex: interview.currentQuestionIndex,
+          versionNumber: currentVersionNumberRef.current,
+          submitAnswer: action === 'submit',
           mediaKey: cameraUpload.mediaKey,
           screenMediaKey: screenUpload.mediaKey,
+          durationSeconds: answerDurationSecondsRef.current || 1,
+          startedAt:
+            answerStartedAtRef.current ?? new Date(Date.now() - 1000).toISOString(),
+          submittedAt: new Date().toISOString(),
+          cameraFileSizeBytes: cameraUpload.recordedBytes,
+          screenFileSizeBytes: screenUpload.recordedBytes,
+          behaviorSignals: behaviorSignalsRef.current,
+          behaviorEvents: behaviorEventsRef.current,
         }),
       })
 
       if (!answerResponse.ok) {
-        throw new Error('Answer submission failed.')
+        throw new Error(
+          action === 'submit'
+            ? 'Answer submission failed.'
+            : 'Re-record version could not be saved.',
+        )
       }
 
       clearRecordingArtifacts()
-      setReRecordUsed(false)
-      await loadInterview('resume')
+      pendingVersionActionRef.current = null
+
+      if (action === 'submit') {
+        setCurrentVersionNumber(1)
+        currentVersionNumberRef.current = 1
+        setRetakeCount(0)
+        await loadInterview('resume')
+      } else {
+        const nextVersionNumber = currentVersionNumberRef.current + 1
+        setCurrentVersionNumber(nextVersionNumber)
+        currentVersionNumberRef.current = nextVersionNumber
+        setRetakeCount(nextVersionNumber - 1)
+        await beginRecording(nextVersionNumber)
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Upload failed')
+      await abortMultipartUploads()
+      setSetupError(err instanceof Error ? err.message : 'Upload failed')
+      autoStartedQuestionKeyRef.current = ''
+      setStage('interview')
     } finally {
+      setTransitionLabel('')
       setUploading(false)
     }
   }
@@ -518,7 +1028,7 @@ export default function TakeInterviewPage() {
     return `${minutes}:${remainder.toString().padStart(2, '0')}`
   }
 
-  if (error) {
+  if (error && !interview) {
     return (
       <main className="container py-12">
         <Alert variant="destructive" className="border-rose-200/70 bg-rose-50/85">
@@ -779,12 +1289,10 @@ export default function TakeInterviewPage() {
               <MetricPanel tone="elevated" label="Recording limit" value="4:00" />
               <MetricPanel
                 tone="elevated"
-                label="Re-record"
-                value={reRecordUsed ? 'Used' : 'Available'}
+                label="Answer version"
+                value={`v${currentVersionNumber}`}
                 valueClassName="mt-3 text-sm leading-6 text-foreground"
-                description={
-                  reRecordUsed ? 'Already used for this answer.' : 'Available once before submit.'
-                }
+                description={`Previous versions kept: ${retakeCount}`}
               />
             </div>
           </CardContent>
@@ -798,15 +1306,15 @@ export default function TakeInterviewPage() {
                   tone={
                     stage === 'recording'
                       ? 'processing'
-                      : stage === 'review'
-                        ? 'completed'
+                      : stage === 'transition'
+                        ? 'neutral'
                         : 'neutral'
                   }
                 >
                   {stage === 'recording'
                     ? 'Recording'
-                    : stage === 'review'
-                      ? 'Ready to submit'
+                    : stage === 'transition'
+                      ? 'Saving version'
                       : 'Awaiting response'}
                 </StatusPill>
                 {stage === 'recording' ? (
@@ -823,17 +1331,7 @@ export default function TakeInterviewPage() {
             </div>
 
             <div className="video-container ring-1 ring-border/45">
-              {stage === 'review' && reviewUrl ? (
-                <video
-                  key={reviewUrl}
-                  src={reviewUrl}
-                  controls
-                  playsInline
-                  className="video-preview"
-                />
-              ) : (
-                <video ref={videoRef} autoPlay muted playsInline className="video-preview" />
-              )}
+              <video ref={videoRef} autoPlay muted playsInline className="video-preview" />
 
               {stage === 'recording' ? (
                 <div className="timer">
@@ -847,56 +1345,43 @@ export default function TakeInterviewPage() {
                 Guidance
               </div>
               <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                {stage === 'review'
-                  ? 'Review the camera recording once, then submit. The full-screen recording for the same answer will be uploaded in parallel.'
-                  : 'When you are ready, start recording and answer in one clear take while keeping the entire screen shared.'}
+                {stage === 'transition'
+                  ? transitionLabel || 'Saving the current answer version.'
+                  : 'Recording starts automatically for each question. Use Submit when the answer is ready, or Re-record to create a new version for the same question.'}
               </p>
             </div>
 
             <div className="flex flex-wrap gap-3">
               {stage === 'interview' ? (
-                <Button
-                  type="button"
-                  onClick={startRecording}
-                  className="rounded-full bg-primary-gradient px-5 shadow-soft hover:brightness-105"
-                >
-                  Start Recording
-                </Button>
+                <StatusPill tone="neutral">Preparing recording...</StatusPill>
               ) : null}
 
               {stage === 'recording' ? (
-                <Button
-                  type="button"
-                  variant="destructive"
-                  onClick={stopRecording}
-                  disabled={!recording}
-                  className="rounded-full"
-                >
-                  Stop Recording
-                </Button>
-              ) : null}
-
-              {stage === 'review' ? (
                 <>
-                  {!reRecordUsed ? (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handleReRecord}
-                      className="rounded-full bg-white/80"
-                    >
-                      Re-record
-                    </Button>
-                  ) : null}
                   <Button
                     type="button"
-                    onClick={handleSubmitAnswer}
+                    variant="outline"
+                    onClick={() => requestVersionAction('rerecord')}
+                    disabled={uploading}
+                    className="rounded-full bg-white/80"
+                  >
+                    Re-record as new version
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => requestVersionAction('submit')}
                     disabled={uploading}
                     className="rounded-full bg-primary-gradient px-5 shadow-soft hover:brightness-105"
                   >
-                    {uploading ? 'Uploading camera + screen...' : 'Submit & Next'}
+                    Submit & Next
                   </Button>
                 </>
+              ) : null}
+
+              {stage === 'transition' ? (
+                <StatusPill tone="processing">
+                  {transitionLabel || 'Saving current version'}
+                </StatusPill>
               ) : null}
             </div>
           </CardContent>

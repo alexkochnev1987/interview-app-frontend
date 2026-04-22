@@ -122,6 +122,8 @@ const MOCK_INTERVIEWS: Interview[] = [
     answers: [
       {
         questionIndex: 0,
+        questionId: 'mock-2-q1',
+        status: 'submitted',
         mediaKey: 's3://mock-camera',
         screenMediaKey: 's3://mock-screen',
         uploadedAt: new Date().toISOString(),
@@ -421,7 +423,7 @@ export default function DashboardPage() {
                           Uploaded
                         </div>
                         <div className="mt-2 text-xl font-semibold tracking-[-0.03em] text-foreground">
-                          {interview.answers.length}
+                          {interview.answers.filter((answer) => answer.status === 'submitted').length}
                         </div>
                       </div>
                     </div>
