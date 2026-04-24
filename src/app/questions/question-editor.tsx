@@ -288,6 +288,44 @@ export function QuestionEditor({
     )
   }, [aiDraft, dismissedDraftFields, value])
 
+  function renderAiSuggestion(field: DraftFieldKey) {
+    if (!aiDraft || !pendingDraftFields.some((p) => p.key === field)) {
+      return null
+    }
+
+    return (
+      <div className="mt-3 rounded-[1.25rem] bg-[hsl(var(--primary-fixed)/0.55)] p-4 ring-1 ring-[hsl(var(--primary)/0.15)]">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-[hsl(var(--primary))]">
+            AI suggestion
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => applyDraftField(field)}
+              className="rounded-full bg-primary-gradient shadow-soft hover:brightness-105"
+            >
+              Use AI value
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() => keepCurrentField(field)}
+              className="rounded-full bg-white/80"
+            >
+              Keep current
+            </Button>
+          </div>
+        </div>
+        <pre className="mt-3 whitespace-pre-wrap break-words font-mono text-sm leading-6 text-foreground">
+          {previewValue(aiDraft[field])}
+        </pre>
+      </div>
+    )
+  }
+
   const similaritySignalSummary = useMemo(() => {
     const textTokens = tokenize(value.questionText)
     return {
@@ -416,33 +454,18 @@ export function QuestionEditor({
     <main className="container space-y-6 py-10 md:space-y-8 md:py-12">
       <Card className="border-white/65 bg-white/88 shadow-float">
         <CardContent className="flex flex-col gap-6 px-8 py-8">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div className="space-y-4">
-              <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
-                Unified Question Editor
-              </EyebrowBadge>
-              <div className="space-y-3">
-                <h1 className="text-4xl font-semibold tracking-[-0.04em] text-foreground md:text-5xl">
-                  {title}
-                </h1>
-                <p className="max-w-2xl text-base leading-7 text-muted-foreground md:text-lg">
-                  Shape the prompt, define the rubric, and keep AI-generated draft suggestions
-                  visible as explicit diffs instead of invisible background mutations.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleGenerate}
-                disabled={submitting || aiStatus === 'loading'}
-                className="rounded-full bg-white/75"
-              >
-                <WandSparkles className="size-4" />
-                {aiStatus === 'loading' ? 'Generating...' : 'Generate AI Draft'}
-              </Button>
+          <div className="space-y-4">
+            <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
+              Unified Question Editor
+            </EyebrowBadge>
+            <div className="space-y-3">
+              <h1 className="text-4xl font-semibold tracking-[-0.04em] text-foreground md:text-5xl">
+                {title}
+              </h1>
+              <p className="max-w-2xl text-base leading-7 text-muted-foreground md:text-lg">
+                Shape the prompt, define the rubric, and keep AI-generated draft suggestions
+                visible as explicit diffs instead of invisible background mutations.
+              </p>
             </div>
           </div>
 
@@ -465,93 +488,48 @@ export function QuestionEditor({
         </Alert>
       ) : null}
 
-      {aiDraft ? (
-        <Card className="border-white/65 bg-white/88 shadow-soft">
-          <CardHeader className="flex flex-row items-start justify-between gap-4">
-            <div className="space-y-1.5">
-              <CardTitle className="text-2xl tracking-[-0.03em]">AI draft diff</CardTitle>
-              <CardDescription className="text-sm leading-6">
-                Review changes field by field. The current state always stays visible beside the AI
-                proposal.
-              </CardDescription>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <StatusPill tone="neutral">{pendingDraftFields.length} pending</StatusPill>
-              <Button
-                type="button"
-                onClick={applyAllAiFields}
-                disabled={pendingDraftFields.length === 0}
-                className="rounded-full bg-primary-gradient shadow-soft hover:brightness-105"
-              >
-                Apply all AI fields
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {pendingDraftFields.length === 0 ? (
-              <div className="rounded-[1.5rem] bg-[hsl(var(--surface-low)/0.8)] p-8 text-sm leading-6 text-muted-foreground ring-1 ring-border/45">
-                No unapplied AI differences remain.
-              </div>
-            ) : (
-              <div className="grid gap-4">
-                {pendingDraftFields.map(({ key, label }) => (
-                  <div
-                    key={key}
-                    className="rounded-[1.5rem] bg-[hsl(var(--surface-low)/0.85)] p-4 ring-1 ring-border/45"
-                  >
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                      <div className="text-base font-semibold tracking-[-0.02em] text-foreground">
-                        {label}
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        <Button
-                          type="button"
-                          size="sm"
-                          onClick={() => applyDraftField(key)}
-                          className="rounded-full bg-primary-gradient shadow-soft hover:brightness-105"
-                        >
-                          Use AI value
-                        </Button>
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="outline"
-                          onClick={() => keepCurrentField(key)}
-                          className="rounded-full bg-white/80"
-                        >
-                          Keep current
-                        </Button>
-                      </div>
-                    </div>
-
-                    <div className="mt-4 grid gap-3 lg:grid-cols-2">
-                      <div className="rounded-[1.25rem] bg-white/80 p-4 ring-1 ring-border/40">
-                        <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                          Current
-                        </div>
-                        <pre className="mt-3 whitespace-pre-wrap break-words font-mono text-sm leading-6 text-foreground">
-                          {previewValue(value[key])}
-                        </pre>
-                      </div>
-                      <div className="rounded-[1.25rem] bg-[hsl(var(--primary-fixed)/0.7)] p-4 ring-1 ring-[hsl(var(--primary)/0.12)]">
-                        <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-[hsl(var(--primary))]">
-                          AI
-                        </div>
-                        <pre className="mt-3 whitespace-pre-wrap break-words font-mono text-sm leading-6 text-foreground">
-                          {previewValue(aiDraft[key])}
-                        </pre>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      ) : null}
-
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-start">
         <form onSubmit={handleSubmit} className="space-y-6">
+          <Card className="border-white/65 bg-white/88 shadow-soft">
+            <CardContent className="space-y-6 px-8 py-8">
+              <QuestionEditorSectionIntro
+                title="Prompt and follow-up"
+                description="Write the core question clearly, then capture the follow-up probes that interviewers should keep ready."
+                icon={<Sparkles className="size-4" />}
+              />
+
+              <QuestionEditorField htmlFor="questionText" label="Question text">
+                <Textarea
+                  id="questionText"
+                  value={value.questionText}
+                  onChange={(event) => update({ questionText: event.target.value })}
+                  placeholder="e.g. What is a closure in JavaScript?"
+                  disabled={submitting}
+                  className="min-h-[150px] rounded-[1.5rem] border-white/70 bg-[hsl(var(--surface-low)/0.8)] px-4 py-3 text-base leading-7"
+                />
+                {renderAiSuggestion('questionText')}
+              </QuestionEditorField>
+
+              <QuestionEditorField
+                htmlFor="followUpQuestions"
+                label="Follow-up questions"
+                hint="Use one line per probe so the interviewer can keep cadence during the session."
+              >
+                <Textarea
+                  id="followUpQuestions"
+                  value={joinStringList(value.followUpQuestions)}
+                  onChange={(event) =>
+                    update({ followUpQuestions: parseStringList(event.target.value) })
+                  }
+                  placeholder="One question per line"
+                  disabled={submitting}
+                  className="min-h-[140px] rounded-[1.5rem] border-white/70 bg-[hsl(var(--surface-low)/0.8)] px-4 py-3 leading-7"
+                />
+                {renderAiSuggestion('followUpQuestions')}
+              </QuestionEditorField>
+            </CardContent>
+          </Card>
+
           <Card className="border-white/65 bg-white/88 shadow-soft">
             <CardContent className="space-y-6 px-8 py-8">
               <QuestionEditorSectionIntro
@@ -620,6 +598,7 @@ export function QuestionEditor({
                     disabled={submitting}
                     className="h-11 rounded-2xl border-white/70 bg-[hsl(var(--surface-low)/0.8)]"
                   />
+                  {renderAiSuggestion('category')}
                 </QuestionEditorField>
 
                 <QuestionEditorField htmlFor="subcategory" label="Subcategory">
@@ -631,6 +610,7 @@ export function QuestionEditor({
                     disabled={submitting}
                     className="h-11 rounded-2xl border-white/70 bg-[hsl(var(--surface-low)/0.8)]"
                   />
+                  {renderAiSuggestion('subcategory')}
                 </QuestionEditorField>
 
                 <QuestionEditorField htmlFor="difficulty" label="Difficulty">
@@ -648,6 +628,7 @@ export function QuestionEditor({
                       <SelectItem value="hard">hard</SelectItem>
                     </SelectContent>
                   </Select>
+                  {renderAiSuggestion('difficulty')}
                 </QuestionEditorField>
 
                 <QuestionEditorField htmlFor="weight" label="Weight">
@@ -664,6 +645,7 @@ export function QuestionEditor({
                     disabled={submitting}
                     className="h-11 rounded-2xl border-white/70 bg-[hsl(var(--surface-low)/0.8)]"
                   />
+                  {renderAiSuggestion('weight')}
                 </QuestionEditorField>
 
                 <QuestionEditorField htmlFor="minimumPassScore" label="Minimum pass score">
@@ -685,46 +667,9 @@ export function QuestionEditor({
                     disabled={submitting}
                     className="h-11 rounded-2xl border-white/70 bg-[hsl(var(--surface-low)/0.8)]"
                   />
+                  {renderAiSuggestion('minimumPassScore')}
                 </QuestionEditorField>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-white/65 bg-white/88 shadow-soft">
-            <CardContent className="space-y-6 px-8 py-8">
-              <QuestionEditorSectionIntro
-                title="Prompt and follow-up"
-                description="Write the core question clearly, then capture the follow-up probes that interviewers should keep ready."
-                icon={<Sparkles className="size-4" />}
-              />
-
-              <QuestionEditorField htmlFor="questionText" label="Question text">
-                <Textarea
-                  id="questionText"
-                  value={value.questionText}
-                  onChange={(event) => update({ questionText: event.target.value })}
-                  placeholder="e.g. What is a closure in JavaScript?"
-                  disabled={submitting}
-                  className="min-h-[150px] rounded-[1.5rem] border-white/70 bg-[hsl(var(--surface-low)/0.8)] px-4 py-3 text-base leading-7"
-                />
-              </QuestionEditorField>
-
-              <QuestionEditorField
-                htmlFor="followUpQuestions"
-                label="Follow-up questions"
-                hint="Use one line per probe so the interviewer can keep cadence during the session."
-              >
-                <Textarea
-                  id="followUpQuestions"
-                  value={joinStringList(value.followUpQuestions)}
-                  onChange={(event) =>
-                    update({ followUpQuestions: parseStringList(event.target.value) })
-                  }
-                  placeholder="One question per line"
-                  disabled={submitting}
-                  className="min-h-[140px] rounded-[1.5rem] border-white/70 bg-[hsl(var(--surface-low)/0.8)] px-4 py-3 leading-7"
-                />
-              </QuestionEditorField>
             </CardContent>
           </Card>
 
@@ -752,6 +697,7 @@ export function QuestionEditor({
                     disabled={submitting}
                     className="min-h-[220px] rounded-[1.5rem] border-white/70 bg-[hsl(var(--surface-low)/0.8)] px-4 py-3 font-mono text-sm leading-7"
                   />
+                  {renderAiSuggestion('expectedConcepts')}
                 </QuestionEditorField>
 
                 <QuestionEditorField
@@ -767,6 +713,7 @@ export function QuestionEditor({
                     disabled={submitting}
                     className="min-h-[220px] rounded-[1.5rem] border-white/70 bg-[hsl(var(--surface-low)/0.8)] px-4 py-3 font-mono text-sm leading-7"
                   />
+                  {renderAiSuggestion('redFlags')}
                 </QuestionEditorField>
               </div>
             </CardContent>
@@ -794,6 +741,7 @@ export function QuestionEditor({
                     disabled={submitting}
                     className="min-h-[220px] rounded-[1.5rem] border-white/70 bg-[hsl(var(--surface-low)/0.8)] px-4 py-3 leading-7"
                   />
+                  {renderAiSuggestion('sampleGoodAnswer')}
                 </QuestionEditorField>
 
                 <div className="space-y-6">
@@ -810,6 +758,7 @@ export function QuestionEditor({
                       disabled={submitting}
                       className="min-h-[120px] rounded-[1.5rem] border-white/70 bg-[hsl(var(--surface-low)/0.8)] px-4 py-3 leading-7"
                     />
+                    {renderAiSuggestion('tags')}
                   </QuestionEditorField>
 
                   <QuestionEditorField
@@ -831,23 +780,72 @@ export function QuestionEditor({
             </CardContent>
           </Card>
 
-          <div className="flex flex-wrap items-center justify-between gap-4 rounded-[1.75rem] border border-white/65 bg-white/88 px-6 py-5 shadow-soft">
-            <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
-              Saving preserves the current rubric state exactly as shown above. AI proposals are
-              only persisted after you explicitly apply them.
-            </p>
-            <Button
-              type="submit"
-              disabled={submitting}
-              className="rounded-full bg-primary-gradient px-5 shadow-soft hover:brightness-105"
-            >
-              <Save className="size-4" />
-              {submitting ? 'Saving...' : submitLabel}
-            </Button>
-          </div>
+          <Card className="border-white/65 bg-white/88 shadow-soft">
+            <CardContent className="flex flex-col gap-4 px-8 py-6 sm:flex-row sm:items-center sm:justify-between">
+              <div className="space-y-1">
+                <h3 className="text-lg font-semibold tracking-[-0.02em] text-foreground">
+                  Ready to save?
+                </h3>
+                <p className="text-sm leading-6 text-muted-foreground">
+                  Only values shown in the fields above will be persisted. Pending AI
+                  suggestions are ignored until you apply them.
+                </p>
+              </div>
+              <Button
+                type="submit"
+                disabled={submitting}
+                className="h-11 shrink-0 rounded-full bg-primary-gradient px-6 font-semibold shadow-soft hover:brightness-105"
+              >
+                <Save className="size-4" />
+                {submitting ? 'Saving...' : submitLabel}
+              </Button>
+            </CardContent>
+          </Card>
         </form>
 
         <aside className="space-y-6">
+          <Card className="border-white/65 bg-white/88 shadow-soft">
+            <CardHeader className="space-y-5">
+              <div className="space-y-1.5">
+                <div className="flex items-start justify-between gap-3">
+                  <CardTitle className="text-2xl tracking-[-0.03em]">AI draft</CardTitle>
+                  {aiDraft && pendingDraftFields.length > 0 ? (
+                    <StatusPill tone="neutral">
+                      {pendingDraftFields.length} pending
+                    </StatusPill>
+                  ) : null}
+                </div>
+                <CardDescription className="text-sm leading-6">
+                  Let AI propose category, follow-up probes, expected concepts, red flags, and
+                  tags based on your question text. Each change shows up as a reviewable diff
+                  before anything is applied.
+                </CardDescription>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-end gap-2">
+                {aiDraft && pendingDraftFields.length > 0 ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={applyAllAiFields}
+                    className="rounded-full bg-white/80"
+                  >
+                    Apply all
+                  </Button>
+                ) : null}
+                <Button
+                  type="button"
+                  onClick={handleGenerate}
+                  disabled={submitting || aiStatus === 'loading'}
+                  className="rounded-full bg-primary-gradient shadow-soft hover:brightness-105"
+                >
+                  <WandSparkles className="size-4" />
+                  {aiStatus === 'loading' ? 'Generating...' : 'Generate AI Draft'}
+                </Button>
+              </div>
+            </CardHeader>
+          </Card>
+
           <Card className="border-white/65 bg-white/88 shadow-soft">
             <CardHeader className="space-y-5">
               <div className="space-y-1.5">
