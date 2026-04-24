@@ -105,41 +105,36 @@ export default function QuestionsPage() {
                 evaluation rubric visible instead of buried in JSON.
               </p>
             </div>
-            <div className="flex flex-wrap gap-3">
+            <div>
               <Button
                 asChild
-                className="rounded-full bg-primary-gradient px-5 shadow-soft hover:brightness-105"
+                className="h-14 rounded-full bg-primary-gradient px-8 text-base font-semibold shadow-soft hover:brightness-105"
               >
                 <Link href="/questions/new">
-                  <Plus className="size-4" />
+                  <Plus className="size-5" />
                   New Question
                 </Link>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                className="rounded-full bg-white/70 backdrop-blur-sm"
-              >
-                <Link href="/interviews/new">Build an interview</Link>
               </Button>
             </div>
           </CardContent>
         </Card>
 
         <Card className="border-white/60 bg-[hsl(var(--surface-low)/0.9)] shadow-soft">
-          <CardHeader>
+          <CardContent className="flex h-full flex-col gap-6 px-8 py-8">
             <EyebrowBadge icon={<Filter className="size-3.5" />} tone="muted">
               Overview
             </EyebrowBadge>
-            <CardTitle className="text-2xl tracking-[-0.03em]">Library health</CardTitle>
-            <CardDescription className="text-sm leading-6">
-              The new surface emphasizes utility metadata and evaluation depth rather than generic
-              admin cards.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-4 sm:grid-cols-2">
-            <MetricPanel tone="elevated" label="Total questions" value={loading ? '...' : questions.length} />
-            <MetricPanel tone="elevated" label="Visible now" value={loading ? '...' : filteredQuestions.length} />
+            <div className="space-y-3">
+              <CardTitle className="text-2xl tracking-[-0.03em]">Library health</CardTitle>
+              <CardDescription className="text-sm leading-6">
+                The new surface emphasizes utility metadata and evaluation depth rather than generic
+                admin cards.
+              </CardDescription>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <MetricPanel tone="elevated" label="Total questions" value={loading ? '...' : questions.length} />
+              <MetricPanel tone="elevated" label="Visible now" value={loading ? '...' : filteredQuestions.length} />
+            </div>
           </CardContent>
         </Card>
       </section>
@@ -151,8 +146,8 @@ export default function QuestionsPage() {
         </Alert>
       )}
 
-      <Card className="border-white/60 bg-white/86 shadow-soft">
-        <CardContent className="grid gap-4 px-6 py-6 md:grid-cols-[1fr_220px]">
+      <Card className="border-white/60 bg-white/86 py-2 shadow-soft">
+        <CardContent className="grid gap-4 px-6 md:grid-cols-[1fr_220px]">
           <div className="relative">
             <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
