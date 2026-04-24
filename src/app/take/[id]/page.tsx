@@ -148,7 +148,6 @@ export default function TakeInterviewPage() {
     start: startBrowserTranscript,
     stop: stopBrowserTranscript,
     reset: resetBrowserTranscript,
-    getSnapshot: getBrowserTranscriptSnapshot,
   } = useBrowserTranscript()
 
   const [stage, setStage] = useState<Stage>('loading')
@@ -813,6 +812,7 @@ export default function TakeInterviewPage() {
       return
     }
 
+    resetBrowserTranscript()
     clearRecordingArtifacts()
     discardRecordingRef.current = false
     pendingVersionActionRef.current = null
@@ -981,10 +981,7 @@ export default function TakeInterviewPage() {
       const screenUpload = getMultipartSession('screen')
       const transcriptSnapshot =
         action === 'submit'
-          ? (() => {
-              stopBrowserTranscript({ finalize: true, timeoutMs: 700 })
-              return getBrowserTranscriptSnapshot()
-            })()
+          ? await stopBrowserTranscript({ finalize: true, timeoutMs: 700 })
           : null
       const answerPayload = {
         questionIndex: interview.currentQuestionIndex,
@@ -1034,6 +1031,7 @@ export default function TakeInterviewPage() {
         setCurrentVersionNumber(1)
         currentVersionNumberRef.current = 1
         setRetakeCount(0)
+        resetBrowserTranscript()
         await loadInterview('resume')
       } else {
         const nextVersionNumber = currentVersionNumberRef.current + 1
@@ -1362,38 +1360,41 @@ export default function TakeInterviewPage() {
               </h2>
             </div>
 
-            {(stage === 'recording' || browserTranscriptWarning) && (
-              <div className="rounded-[1.25rem] bg-[hsl(var(--surface-low)/0.85)] p-4 ring-1 ring-border/45">
-                <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                  Live transcript
-                </div>
-                {!isBrowserTranscriptSupported ? (
-                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                    Live transcript is unavailable in this browser. Recording continues as usual.
-                  </p>
-                ) : (
-                  <p className="mt-2 text-sm leading-6 text-foreground">
-                    {finalTranscript || interimTranscript
-                      ? (
-                          <>
-                            {finalTranscript}
-                            {interimTranscript ? (
-                              <span className="ml-1 italic text-muted-foreground">
-                                {interimTranscript} (draft)
-                              </span>
-                            ) : null}
-                          </>
-                        )
-                      : 'Listening... transcript will appear here.'}
-                  </p>
-                )}
-                {browserTranscriptWarning ? (
-                  <p className="mt-2 text-xs leading-5 text-amber-700">
-                    {browserTranscriptWarning}
-                  </p>
-                ) : null}
+            <div className="min-h-[130px] rounded-[1.25rem] bg-[hsl(var(--surface-low)/0.85)] p-4 ring-1 ring-border/45">
+              <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                Live transcript
               </div>
-            )}
+              {!isBrowserTranscriptSupported ? (
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  Live transcript is unavailable in this browser. Recording continues as usual.
+                </p>
+              ) : (
+                <p className="mt-2 text-sm leading-6 text-foreground">
+                  {finalTranscript || interimTranscript ? (
+                    <>
+                      {finalTranscript}
+                      {interimTranscript ? (
+                        <span className="ml-1 italic text-muted-foreground">
+                          {interimTranscript} (draft)
+                        </span>
+                      ) : null}
+                    </>
+                  ) : (
+                    'Transcript will appear while you speak...'
+                  )}
+                </p>
+              )}
+              {stage === 'transition' ? (
+                <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                  Updating transcript for the next question...
+                </p>
+              ) : null}
+              {browserTranscriptWarning ? (
+                <p className="mt-2 text-xs leading-5 text-amber-700">
+                  {browserTranscriptWarning}
+                </p>
+              ) : null}
+            </div>
 
             <div className="video-container ring-1 ring-border/45">
               <video ref={videoRef} autoPlay muted playsInline className="video-preview" />

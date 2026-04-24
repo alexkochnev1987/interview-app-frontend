@@ -50,6 +50,8 @@ export function useBrowserTranscript() {
   const recognitionRef = useRef<BrowserSpeechRecognitionInstance | null>(null);
   const stopTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const languageRef = useRef(getDefaultLanguage());
+  const interimTranscriptRef = useRef('');
+  const finalTranscriptRef = useRef('');
   const isSessionActiveRef = useRef(false);
   const restartAttemptsRef = useRef(0);
 
@@ -78,6 +80,30 @@ export function useBrowserTranscript() {
     }
 
     return `${base} ${trimmedChunk}`;
+  }, []);
+
+  const setInterimTranscriptValue = useCallback((value: string) => {
+    interimTranscriptRef.current = value;
+    setInterimTranscript(value);
+  }, []);
+
+  const setFinalTranscriptValue = useCallback((value: string) => {
+    finalTranscriptRef.current = value;
+    setFinalTranscript(value);
+  }, []);
+
+  const buildSnapshot = useCallback((): BrowserTranscriptSnapshot => {
+    const interim = interimTranscriptRef.current;
+    const final = finalTranscriptRef.current;
+    const text = [final, interim].filter(Boolean).join(' ').trim();
+
+    return {
+      text,
+      language: languageRef.current,
+      provider: PROVIDER,
+      generatedAt: new Date().toISOString(),
+      isFinal: !interim.trim(),
+    };
   }, []);
 
   const ensureRecognition = useCallback(() => {
@@ -125,6 +151,10 @@ export function useBrowserTranscript() {
     };
 
     recognition.onresult = (event) => {
+      if (!isSessionActiveRef.current) {
+        return;
+      }
+
       let interim = '';
       let finalChunk = '';
 
@@ -139,9 +169,10 @@ export function useBrowserTranscript() {
       }
 
       if (finalChunk) {
-        setFinalTranscript((prev) => appendFinalText(prev, finalChunk));
+        const nextFinalTranscript = appendFinalText(finalTranscriptRef.current, finalChunk);
+        setFinalTranscriptValue(nextFinalTranscript);
       }
-      setInterimTranscript(interim);
+      setInterimTranscriptValue(interim);
     };
 
     recognition.onerror = (event) => {
@@ -150,12 +181,14 @@ export function useBrowserTranscript() {
 
     recognitionRef.current = recognition;
     return recognition;
-  }, [appendFinalText, clearStopTimeout]);
+  }, [appendFinalText, clearStopTimeout, setFinalTranscriptValue, setInterimTranscriptValue]);
 
   const start = useCallback(() => {
     setWarning(undefined);
     restartAttemptsRef.current = 0;
     isSessionActiveRef.current = true;
+    setInterimTranscriptValue('');
+    setFinalTranscriptValue('');
 
     const recognition = ensureRecognition();
     if (!recognition) {
@@ -175,25 +208,35 @@ export function useBrowserTranscript() {
       const message = error instanceof Error ? error.message : 'Unable to start speech recognition';
       setWarning(message);
     }
-  }, [ensureRecognition]);
+  }, [ensureRecognition, setFinalTranscriptValue, setInterimTranscriptValue]);
 
   const stop = useCallback(
-    (options?: StopOptions) => {
+    async (options?: StopOptions): Promise<BrowserTranscriptSnapshot> => {
       const recognition = recognitionRef.current;
       isSessionActiveRef.current = false;
       restartAttemptsRef.current = 0;
 
-      if (!recognition) {
-        return;
-      }
-
       const finalize = Boolean(options?.finalize);
       const timeoutMs = Math.max(0, options?.timeoutMs ?? DEFAULT_STOP_TIMEOUT_MS);
 
+      const finalizeTranscript = () => {
+        if (!finalize) {
+          return;
+        }
+
+        const nextFinalTranscript = appendFinalText(
+          finalTranscriptRef.current,
+          interimTranscriptRef.current,
+        );
+        setFinalTranscriptValue(nextFinalTranscript);
+        setInterimTranscriptValue('');
+      };
+
       const stopNow = () => {
-        if (finalize) {
-          setFinalTranscript((prev) => appendFinalText(prev, interimTranscript));
-          setInterimTranscript('');
+        finalizeTranscript();
+
+        if (!recognition) {
+          return;
         }
 
         try {
@@ -206,9 +249,25 @@ export function useBrowserTranscript() {
       };
 
       clearStopTimeout();
-      stopTimeoutRef.current = setTimeout(stopNow, timeoutMs);
+      if (timeoutMs === 0) {
+        stopNow();
+        return buildSnapshot();
+      }
+
+      return new Promise<BrowserTranscriptSnapshot>((resolve) => {
+        stopTimeoutRef.current = setTimeout(() => {
+          stopNow();
+          resolve(buildSnapshot());
+        }, timeoutMs);
+      });
     },
-    [appendFinalText, clearStopTimeout, interimTranscript],
+    [
+      appendFinalText,
+      buildSnapshot,
+      clearStopTimeout,
+      setFinalTranscriptValue,
+      setInterimTranscriptValue,
+    ],
   );
 
   const reset = useCallback(() => {
@@ -228,22 +287,14 @@ export function useBrowserTranscript() {
     }
 
     setIsListening(false);
-    setInterimTranscript('');
-    setFinalTranscript('');
+    setInterimTranscriptValue('');
+    setFinalTranscriptValue('');
     setWarning(undefined);
-  }, [clearStopTimeout]);
+  }, [clearStopTimeout, setFinalTranscriptValue, setInterimTranscriptValue]);
 
   const getSnapshot = useCallback((): BrowserTranscriptSnapshot => {
-    const text = [finalTranscript, interimTranscript].filter(Boolean).join(' ').trim();
-
-    return {
-      text,
-      language: languageRef.current,
-      provider: PROVIDER,
-      generatedAt: new Date().toISOString(),
-      isFinal: !interimTranscript.trim(),
-    };
-  }, [finalTranscript, interimTranscript]);
+    return buildSnapshot();
+  }, [buildSnapshot]);
 
   useEffect(() => {
     return () => {
