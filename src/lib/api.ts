@@ -287,6 +287,27 @@ export async function draftQuestion(
   });
 }
 
+export interface SimilarQuestionMatch {
+  question: Question;
+  score: number;
+  reasons: string[];
+}
+
+export async function findSimilarQuestions(
+  draft: Partial<QuestionInput>,
+  excludeQuestionId?: string,
+  limit = 5,
+): Promise<SimilarQuestionMatch[]> {
+  const res = await request<{ matches: SimilarQuestionMatch[] }>(
+    '/questions/similar',
+    {
+      method: 'POST',
+      body: JSON.stringify({ draft, excludeQuestionId, limit }),
+    },
+  );
+  return res.matches;
+}
+
 export async function fetchInterviews(): Promise<Interview[]> {
   return request<Interview[]>('/interviews');
 }

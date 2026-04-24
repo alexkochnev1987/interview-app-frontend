@@ -23,13 +23,13 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 import {
   draftQuestion,
-  fetchQuestions,
+  findSimilarQuestions,
   type QuestionDraft,
   type QuestionDifficulty,
   type QuestionExpectedConcept,
-  type Question,
   type QuestionInput,
   type QuestionRedFlag,
+  type SimilarQuestionMatch,
 } from '@/lib/api'
 import { truncateText } from '@/lib/text'
 
@@ -43,12 +43,6 @@ interface QuestionEditorProps {
   initialValue?: QuestionInput
   submitLabel: string
   onSubmit: (value: QuestionInput) => Promise<void>
-}
-
-interface SimilarQuestionMatch {
-  question: Question
-  reasons: string[]
-  score: number
 }
 
 const DEFAULT_VALUE: QuestionInput = {
@@ -92,128 +86,6 @@ function tokenize(value: string): string[] {
   const matches = value.toLowerCase().match(/[a-z0-9]+/g) ?? []
 
   return Array.from(new Set(matches.filter((item) => item.length > 2)))
-}
-
-function calculateOverlap(left: string[], right: string[]): number {
-  if (left.length === 0 || right.length === 0) {
-    return 0
-  }
-
-  const leftSet = new Set(left)
-  const rightSet = new Set(right)
-  let shared = 0
-
-  leftSet.forEach((item) => {
-    if (rightSet.has(item)) {
-      shared += 1
-    }
-  })
-
-  return shared / Math.min(leftSet.size, rightSet.size)
-}
-
-function buildSimilarityTokens(value: Pick<
-  QuestionInput,
-  'category' | 'expectedConcepts' | 'focus' | 'questionText' | 'role' | 'subcategory' | 'tags'
->) {
-  return {
-    text: tokenize(
-      [value.questionText, value.category, value.subcategory, value.role, value.focus]
-        .filter(Boolean)
-        .join(' ')
-    ),
-    tags: tokenize(value.tags.join(' ')),
-    concepts: tokenize(
-      value.expectedConcepts
-        .map((item) => [item.id, item.label, item.description].filter(Boolean).join(' '))
-        .join(' ')
-    ),
-  }
-}
-
-function buildSimilarQuestionMatches(
-  source: QuestionInput,
-  candidates: Question[],
-  currentQuestionId?: string
-): SimilarQuestionMatch[] {
-  const sourceTokens = buildSimilarityTokens(source)
-  const sourceQuestionText = normalizeComparable(source.questionText)
-  const sourceCategory = normalizeComparable(source.category)
-  const sourceSubcategory = normalizeComparable(source.subcategory)
-  const sourceRole = normalizeComparable(source.role)
-
-  return candidates
-    .filter((question) => question.id !== currentQuestionId)
-    .map((question) => {
-      const candidateTokens = buildSimilarityTokens(question)
-      const reasons: string[] = []
-      let score = 0
-
-      const questionTextMatch =
-        sourceQuestionText !== '' &&
-        sourceQuestionText === normalizeComparable(question.questionText)
-
-      if (questionTextMatch) {
-        reasons.push('Identical prompt text')
-        score = 0.94
-      }
-
-      const textOverlap = calculateOverlap(sourceTokens.text, candidateTokens.text)
-      if (textOverlap > 0) {
-        score += Math.min(textOverlap * 0.48, 0.48)
-        if (textOverlap >= 0.18) {
-          reasons.push(`${Math.round(textOverlap * 100)}% prompt overlap`)
-        }
-      }
-
-      const conceptOverlap = calculateOverlap(sourceTokens.concepts, candidateTokens.concepts)
-      if (conceptOverlap > 0) {
-        score += Math.min(conceptOverlap * 0.24, 0.24)
-        if (conceptOverlap >= 0.2) {
-          reasons.push(`${Math.round(conceptOverlap * 100)}% rubric overlap`)
-        }
-      }
-
-      const tagOverlap = calculateOverlap(sourceTokens.tags, candidateTokens.tags)
-      if (tagOverlap > 0) {
-        score += Math.min(tagOverlap * 0.16, 0.16)
-        if (tagOverlap >= 0.2) {
-          reasons.push(`${Math.round(tagOverlap * 100)}% tag overlap`)
-        }
-      }
-
-      if (sourceCategory !== '' && sourceCategory === normalizeComparable(question.category)) {
-        score += 0.06
-        reasons.push(`Same category: ${question.category}`)
-      }
-
-      if (
-        sourceSubcategory !== '' &&
-        sourceSubcategory === normalizeComparable(question.subcategory)
-      ) {
-        score += 0.05
-        reasons.push(`Same subcategory: ${question.subcategory}`)
-      }
-
-      if (sourceRole !== '' && sourceRole === normalizeComparable(question.role)) {
-        score += 0.03
-        reasons.push(`Same role: ${question.role}`)
-      }
-
-      if (source.difficulty === question.difficulty) {
-        score += 0.02
-        reasons.push(`Same difficulty: ${question.difficulty}`)
-      }
-
-      return {
-        question,
-        reasons: Array.from(new Set(reasons)).slice(0, 3),
-        score: Math.min(score, 0.99),
-      }
-    })
-    .filter((match) => match.score >= 0.18)
-    .sort((left, right) => right.score - left.score)
-    .slice(0, 5)
 }
 
 function parseStringList(value: string): string[] {
@@ -485,8 +357,8 @@ export function QuestionEditor({
     setLastSimilaritySignature(similaritySignature)
 
     try {
-      const questions = await fetchQuestions()
-      setSimilarQuestions(buildSimilarQuestionMatches(value, questions, questionId))
+      const matches = await findSimilarQuestions(value, questionId)
+      setSimilarQuestions(matches)
       setSimilarStatus('success')
     } catch (err) {
       setSimilarStatus('error')
@@ -561,20 +433,6 @@ export function QuestionEditor({
             </div>
 
             <div className="flex flex-wrap gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleFindSimilar}
-                disabled={submitting || similarStatus === 'loading' || !hasSimilarityInput}
-                className="rounded-full bg-white/75"
-              >
-                <Search className="size-4" />
-                {similarStatus === 'loading'
-                  ? 'Searching...'
-                  : similarResultsStale
-                    ? 'Refresh similar'
-                    : 'Find similar'}
-              </Button>
               <Button
                 type="button"
                 variant="outline"
@@ -989,20 +847,15 @@ export function QuestionEditor({
           </div>
         </form>
 
-        <aside className="space-y-6 xl:sticky xl:top-24">
+        <aside className="space-y-6">
           <Card className="border-white/65 bg-white/88 shadow-soft">
             <CardHeader className="space-y-5">
-              <div className="flex items-start justify-between gap-4">
-                <div className="space-y-1.5">
-                  <CardTitle className="text-2xl tracking-[-0.03em]">Similar questions</CardTitle>
-                  <CardDescription className="text-sm leading-6">
-                    Check for duplicates and near-duplicates against the current library before you
-                    save a new prompt or update an old one.
-                  </CardDescription>
-                </div>
-                <div className="flex size-11 shrink-0 items-center justify-center rounded-[1.35rem] bg-[hsl(var(--surface-low)/0.95)] text-[hsl(var(--primary))] ring-1 ring-border/45">
-                  <Search className="size-4" />
-                </div>
+              <div className="space-y-1.5">
+                <CardTitle className="text-2xl tracking-[-0.03em]">Similar questions</CardTitle>
+                <CardDescription className="text-sm leading-6">
+                  Check for duplicates and near-duplicates against the current library before you
+                  save a new prompt or update an old one.
+                </CardDescription>
               </div>
 
               <div className="grid grid-cols-3 gap-3">
