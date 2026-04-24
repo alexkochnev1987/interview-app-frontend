@@ -23,6 +23,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
+import { useBrowserTranscript } from '@/lib/use-browser-transcript'
 
 interface InterviewData {
   id: string
@@ -139,6 +140,16 @@ export default function TakeInterviewPage() {
   const searchParams = useSearchParams()
   const id = params.id as string
   const candidateToken = searchParams.get('token')?.trim() ?? ''
+  const {
+    isSupported: isBrowserTranscriptSupported,
+    interimTranscript,
+    finalTranscript,
+    warning: browserTranscriptWarning,
+    start: startBrowserTranscript,
+    stop: stopBrowserTranscript,
+    reset: resetBrowserTranscript,
+    getSnapshot: getBrowserTranscriptSnapshot,
+  } = useBrowserTranscript()
 
   const [stage, setStage] = useState<Stage>('loading')
   const [interview, setInterview] = useState<InterviewData | null>(null)
@@ -860,6 +871,7 @@ export default function TakeInterviewPage() {
     screenRecorderRef.current = screenRecorder
     cameraRecorder.start(1000)
     screenRecorder.start(1000)
+    startBrowserTranscript()
 
     setRecording(true)
     setTimeLeft(240)
@@ -967,25 +979,44 @@ export default function TakeInterviewPage() {
 
       const cameraUpload = getMultipartSession('camera')
       const screenUpload = getMultipartSession('screen')
+      const transcriptSnapshot =
+        action === 'submit'
+          ? (() => {
+              stopBrowserTranscript({ finalize: true, timeoutMs: 700 })
+              return getBrowserTranscriptSnapshot()
+            })()
+          : null
+      const answerPayload = {
+        questionIndex: interview.currentQuestionIndex,
+        versionNumber: currentVersionNumberRef.current,
+        submitAnswer: action === 'submit',
+        mediaKey: cameraUpload.mediaKey,
+        screenMediaKey: screenUpload.mediaKey,
+        durationSeconds: answerDurationSecondsRef.current || 1,
+        startedAt:
+          answerStartedAtRef.current ?? new Date(Date.now() - 1000).toISOString(),
+        submittedAt: new Date().toISOString(),
+        cameraFileSizeBytes: cameraUpload.recordedBytes,
+        screenFileSizeBytes: screenUpload.recordedBytes,
+        behaviorSignals: behaviorSignalsRef.current,
+        behaviorEvents: behaviorEventsRef.current,
+        ...(transcriptSnapshot?.text.trim()
+          ? {
+              clientTranscript: {
+                text: transcriptSnapshot.text,
+                language: transcriptSnapshot.language,
+                provider: transcriptSnapshot.provider,
+                generatedAt: transcriptSnapshot.generatedAt,
+                isFinal: true as const,
+              },
+            }
+          : {}),
+      }
 
       const answerResponse = await fetch(`/api/take/${id}/answer`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          questionIndex: interview.currentQuestionIndex,
-          versionNumber: currentVersionNumberRef.current,
-          submitAnswer: action === 'submit',
-          mediaKey: cameraUpload.mediaKey,
-          screenMediaKey: screenUpload.mediaKey,
-          durationSeconds: answerDurationSecondsRef.current || 1,
-          startedAt:
-            answerStartedAtRef.current ?? new Date(Date.now() - 1000).toISOString(),
-          submittedAt: new Date().toISOString(),
-          cameraFileSizeBytes: cameraUpload.recordedBytes,
-          screenFileSizeBytes: screenUpload.recordedBytes,
-          behaviorSignals: behaviorSignalsRef.current,
-          behaviorEvents: behaviorEventsRef.current,
-        }),
+        body: JSON.stringify(answerPayload),
       })
 
       if (!answerResponse.ok) {
@@ -1009,6 +1040,7 @@ export default function TakeInterviewPage() {
         setCurrentVersionNumber(nextVersionNumber)
         currentVersionNumberRef.current = nextVersionNumber
         setRetakeCount(nextVersionNumber - 1)
+        resetBrowserTranscript()
         await beginRecording(nextVersionNumber)
       }
     } catch (err) {
@@ -1329,6 +1361,39 @@ export default function TakeInterviewPage() {
                 {interview.currentQuestion?.text}
               </h2>
             </div>
+
+            {(stage === 'recording' || browserTranscriptWarning) && (
+              <div className="rounded-[1.25rem] bg-[hsl(var(--surface-low)/0.85)] p-4 ring-1 ring-border/45">
+                <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  Live transcript
+                </div>
+                {!isBrowserTranscriptSupported ? (
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                    Live transcript is unavailable in this browser. Recording continues as usual.
+                  </p>
+                ) : (
+                  <p className="mt-2 text-sm leading-6 text-foreground">
+                    {finalTranscript || interimTranscript
+                      ? (
+                          <>
+                            {finalTranscript}
+                            {interimTranscript ? (
+                              <span className="ml-1 italic text-muted-foreground">
+                                {interimTranscript} (draft)
+                              </span>
+                            ) : null}
+                          </>
+                        )
+                      : 'Listening... transcript will appear here.'}
+                  </p>
+                )}
+                {browserTranscriptWarning ? (
+                  <p className="mt-2 text-xs leading-5 text-amber-700">
+                    {browserTranscriptWarning}
+                  </p>
+                ) : null}
+              </div>
+            )}
 
             <div className="video-container ring-1 ring-border/45">
               <video ref={videoRef} autoPlay muted playsInline className="video-preview" />
