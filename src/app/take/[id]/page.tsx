@@ -17,12 +17,14 @@ import { EyebrowBadge } from '@/components/app/eyebrow-badge'
 import { MetricPanel } from '@/components/app/metric-panel'
 import { StatusPill } from '@/components/app/status-pill'
 import { LoadingStateCard } from '@/components/app/state-card'
+import { LiveTranscriptPanel } from '@/components/take/live-transcript-panel'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
+import { useBrowserTranscript } from '@/lib/use-browser-transcript'
 
 interface InterviewData {
   id: string
@@ -139,6 +141,16 @@ export default function TakeInterviewPage() {
   const searchParams = useSearchParams()
   const id = params.id as string
   const candidateToken = searchParams.get('token')?.trim() ?? ''
+  const {
+    isSupported: isBrowserTranscriptSupported,
+    interimTranscript,
+    finalTranscript,
+    warning: browserTranscriptWarning,
+    start: startBrowserTranscript,
+    stop: stopBrowserTranscript,
+    reset: resetBrowserTranscript,
+    getSnapshot: getBrowserTranscriptSnapshot,
+  } = useBrowserTranscript()
 
   const [stage, setStage] = useState<Stage>('loading')
   const [interview, setInterview] = useState<InterviewData | null>(null)
@@ -545,6 +557,7 @@ export default function TakeInterviewPage() {
     const screenUpload = multipartUploadsRef.current.screen
     const eventStartIndex = forceAllEvents ? 0 : flushedBehaviorEventCountRef.current
     const behaviorEvents = behaviorEventsRef.current.slice(eventStartIndex)
+    const transcriptSnapshot = forceAllEvents ? getBrowserTranscriptSnapshot() : null
 
     const response = await fetch(`/api/take/${id}/answer/progress`, {
       method: 'POST',
@@ -563,6 +576,17 @@ export default function TakeInterviewPage() {
         screenFileSizeBytes: screenUpload?.recordedBytes || undefined,
         behaviorSignals: behaviorSignalsRef.current,
         behaviorEvents,
+        ...(transcriptSnapshot?.text.trim()
+          ? {
+              clientTranscript: {
+                text: transcriptSnapshot.text,
+                language: transcriptSnapshot.language,
+                provider: transcriptSnapshot.provider,
+                generatedAt: transcriptSnapshot.generatedAt,
+                isFinal: transcriptSnapshot.isFinal,
+              },
+            }
+          : {}),
       }),
     })
 
@@ -802,6 +826,7 @@ export default function TakeInterviewPage() {
       return
     }
 
+    resetBrowserTranscript()
     clearRecordingArtifacts()
     discardRecordingRef.current = false
     pendingVersionActionRef.current = null
@@ -860,6 +885,7 @@ export default function TakeInterviewPage() {
     screenRecorderRef.current = screenRecorder
     cameraRecorder.start(1000)
     screenRecorder.start(1000)
+    startBrowserTranscript()
 
     setRecording(true)
     setTimeLeft(240)
@@ -967,25 +993,41 @@ export default function TakeInterviewPage() {
 
       const cameraUpload = getMultipartSession('camera')
       const screenUpload = getMultipartSession('screen')
+      const transcriptSnapshot =
+        action === 'submit'
+          ? await stopBrowserTranscript({ finalize: true, timeoutMs: 700 })
+          : null
+      const answerPayload = {
+        questionIndex: interview.currentQuestionIndex,
+        versionNumber: currentVersionNumberRef.current,
+        submitAnswer: action === 'submit',
+        mediaKey: cameraUpload.mediaKey,
+        screenMediaKey: screenUpload.mediaKey,
+        durationSeconds: answerDurationSecondsRef.current || 1,
+        startedAt:
+          answerStartedAtRef.current ?? new Date(Date.now() - 1000).toISOString(),
+        submittedAt: new Date().toISOString(),
+        cameraFileSizeBytes: cameraUpload.recordedBytes,
+        screenFileSizeBytes: screenUpload.recordedBytes,
+        behaviorSignals: behaviorSignalsRef.current,
+        behaviorEvents: behaviorEventsRef.current,
+        ...(transcriptSnapshot?.text.trim()
+          ? {
+              clientTranscript: {
+                text: transcriptSnapshot.text,
+                language: transcriptSnapshot.language,
+                provider: transcriptSnapshot.provider,
+                generatedAt: transcriptSnapshot.generatedAt,
+                isFinal: true as const,
+              },
+            }
+          : {}),
+      }
 
       const answerResponse = await fetch(`/api/take/${id}/answer`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          questionIndex: interview.currentQuestionIndex,
-          versionNumber: currentVersionNumberRef.current,
-          submitAnswer: action === 'submit',
-          mediaKey: cameraUpload.mediaKey,
-          screenMediaKey: screenUpload.mediaKey,
-          durationSeconds: answerDurationSecondsRef.current || 1,
-          startedAt:
-            answerStartedAtRef.current ?? new Date(Date.now() - 1000).toISOString(),
-          submittedAt: new Date().toISOString(),
-          cameraFileSizeBytes: cameraUpload.recordedBytes,
-          screenFileSizeBytes: screenUpload.recordedBytes,
-          behaviorSignals: behaviorSignalsRef.current,
-          behaviorEvents: behaviorEventsRef.current,
-        }),
+        body: JSON.stringify(answerPayload),
       })
 
       if (!answerResponse.ok) {
@@ -1003,12 +1045,14 @@ export default function TakeInterviewPage() {
         setCurrentVersionNumber(1)
         currentVersionNumberRef.current = 1
         setRetakeCount(0)
+        resetBrowserTranscript()
         await loadInterview('resume')
       } else {
         const nextVersionNumber = currentVersionNumberRef.current + 1
         setCurrentVersionNumber(nextVersionNumber)
         currentVersionNumberRef.current = nextVersionNumber
         setRetakeCount(nextVersionNumber - 1)
+        resetBrowserTranscript()
         await beginRecording(nextVersionNumber)
       }
     } catch (err) {
@@ -1166,6 +1210,7 @@ export default function TakeInterviewPage() {
                   <ul className="space-y-2 text-sm leading-6 text-muted-foreground">
                     <li>Camera video and microphone audio for each answer</li>
                     <li>Full-monitor screen recording in parallel with each answer</li>
+                    <li>Speech transcript snippets and metadata for answer quality analysis</li>
                     <li>Browser activity such as tab switches</li>
                     <li>Session metadata including answer timing</li>
                   </ul>
@@ -1329,6 +1374,14 @@ export default function TakeInterviewPage() {
                 {interview.currentQuestion?.text}
               </h2>
             </div>
+
+            <LiveTranscriptPanel
+              isSupported={isBrowserTranscriptSupported}
+              finalTranscript={finalTranscript}
+              interimTranscript={interimTranscript}
+              warning={browserTranscriptWarning}
+              stage={stage}
+            />
 
             <div className="video-container ring-1 ring-border/45">
               <video ref={videoRef} autoPlay muted playsInline className="video-preview" />
