@@ -148,6 +148,7 @@ export default function TakeInterviewPage() {
     start: startBrowserTranscript,
     stop: stopBrowserTranscript,
     reset: resetBrowserTranscript,
+    getSnapshot: getBrowserTranscriptSnapshot,
   } = useBrowserTranscript()
 
   const [stage, setStage] = useState<Stage>('loading')
@@ -555,6 +556,7 @@ export default function TakeInterviewPage() {
     const screenUpload = multipartUploadsRef.current.screen
     const eventStartIndex = forceAllEvents ? 0 : flushedBehaviorEventCountRef.current
     const behaviorEvents = behaviorEventsRef.current.slice(eventStartIndex)
+    const transcriptSnapshot = getBrowserTranscriptSnapshot()
 
     const response = await fetch(`/api/take/${id}/answer/progress`, {
       method: 'POST',
@@ -573,6 +575,17 @@ export default function TakeInterviewPage() {
         screenFileSizeBytes: screenUpload?.recordedBytes || undefined,
         behaviorSignals: behaviorSignalsRef.current,
         behaviorEvents,
+        ...(transcriptSnapshot.text.trim()
+          ? {
+              clientTranscript: {
+                text: transcriptSnapshot.text,
+                language: transcriptSnapshot.language,
+                provider: transcriptSnapshot.provider,
+                generatedAt: transcriptSnapshot.generatedAt,
+                isFinal: transcriptSnapshot.isFinal,
+              },
+            }
+          : {}),
       }),
     })
 

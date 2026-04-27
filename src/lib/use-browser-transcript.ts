@@ -49,6 +49,7 @@ export function useBrowserTranscript() {
 
   const recognitionRef = useRef<BrowserSpeechRecognitionInstance | null>(null);
   const stopTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingStopResolveRef = useRef<((snapshot: BrowserTranscriptSnapshot) => void) | null>(null);
   const languageRef = useRef(getDefaultLanguage());
   const interimTranscriptRef = useRef('');
   const finalTranscriptRef = useRef('');
@@ -129,7 +130,12 @@ export function useBrowserTranscript() {
 
     recognition.onend = () => {
       setIsListening(false);
-      clearStopTimeout();
+      const pendingStopResolve = pendingStopResolveRef.current;
+      if (pendingStopResolve) {
+        pendingStopResolveRef.current = null;
+        clearStopTimeout();
+        pendingStopResolve(buildSnapshot());
+      }
 
       if (!isSessionActiveRef.current) {
         return;
@@ -181,7 +187,13 @@ export function useBrowserTranscript() {
 
     recognitionRef.current = recognition;
     return recognition;
-  }, [appendFinalText, clearStopTimeout, setFinalTranscriptValue, setInterimTranscriptValue]);
+  }, [
+    appendFinalText,
+    buildSnapshot,
+    clearStopTimeout,
+    setFinalTranscriptValue,
+    setInterimTranscriptValue,
+  ]);
 
   const start = useCallback(() => {
     setWarning(undefined);
@@ -232,11 +244,31 @@ export function useBrowserTranscript() {
         setInterimTranscriptValue('');
       };
 
-      const stopNow = () => {
-        finalizeTranscript();
+      // Ensure a previous pending stop cannot remain unresolved.
+      if (pendingStopResolveRef.current) {
+        const pendingStopResolve = pendingStopResolveRef.current;
+        pendingStopResolveRef.current = null;
+        pendingStopResolve(buildSnapshot());
+      }
+      clearStopTimeout();
+      finalizeTranscript();
 
-        if (!recognition) {
-          return;
+      if (!recognition) {
+        return buildSnapshot();
+      }
+
+      return new Promise<BrowserTranscriptSnapshot>((resolve) => {
+        pendingStopResolveRef.current = resolve;
+        if (timeoutMs > 0) {
+          stopTimeoutRef.current = setTimeout(() => {
+            const pendingStopResolve = pendingStopResolveRef.current;
+            if (!pendingStopResolve) {
+              return;
+            }
+
+            pendingStopResolveRef.current = null;
+            pendingStopResolve(buildSnapshot());
+          }, timeoutMs);
         }
 
         try {
@@ -245,20 +277,15 @@ export function useBrowserTranscript() {
           const message = error instanceof Error ? error.message : 'Unable to stop speech recognition';
           setWarning(message);
           setIsListening(false);
+          const pendingStopResolve = pendingStopResolveRef.current;
+          if (!pendingStopResolve) {
+            return;
+          }
+
+          pendingStopResolveRef.current = null;
+          clearStopTimeout();
+          pendingStopResolve(buildSnapshot());
         }
-      };
-
-      clearStopTimeout();
-      if (timeoutMs === 0) {
-        stopNow();
-        return buildSnapshot();
-      }
-
-      return new Promise<BrowserTranscriptSnapshot>((resolve) => {
-        stopTimeoutRef.current = setTimeout(() => {
-          stopNow();
-          resolve(buildSnapshot());
-        }, timeoutMs);
       });
     },
     [
