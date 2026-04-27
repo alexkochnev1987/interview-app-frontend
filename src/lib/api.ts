@@ -130,6 +130,15 @@ export interface AnswerTranscript {
   language?: string;
   provider?: string;
   generatedAt?: string;
+  isFinal?: boolean;
+}
+
+export interface ClientTranscriptPayload {
+  text: string;
+  language: string;
+  provider: 'browser-web-speech';
+  generatedAt: string;
+  isFinal: boolean;
 }
 
 export interface AnswerEvaluation {
