@@ -1,13 +1,14 @@
 'use client'
 
 import Link from 'next/link'
-import { useDeferredValue, useEffect, useState } from 'react'
+import { useDeferredValue, useState } from 'react'
 import { Filter, Plus, Search, Sparkles } from 'lucide-react'
 
 import { EyebrowBadge } from '@/components/app/eyebrow-badge'
 import { MetricPanel } from '@/components/app/metric-panel'
-import { StatusPill } from '@/components/app/status-pill'
 import { EmptyStateCard, LoadingStateCard } from '@/components/app/state-card'
+import { QuestionCard } from '@/components/questions/question-card'
+import { QuestionsToolbar } from '@/components/questions/questions-toolbar'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {
@@ -17,75 +18,19 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { fetchQuestions, type Question } from '@/lib/api'
-import { truncateText } from '@/lib/text'
-
-type DifficultyFilter = 'all' | 'easy' | 'medium' | 'hard'
+import { filterQuestions, type DifficultyFilter } from '@/features/questions/filter-questions'
+import { useQuestions } from '@/hooks/use-questions'
 
 export default function QuestionsPage() {
-  const [questions, setQuestions] = useState<Question[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { questions, loading, error } = useQuestions()
   const [query, setQuery] = useState('')
   const [difficulty, setDifficulty] = useState<DifficultyFilter>('all')
   const deferredQuery = useDeferredValue(query)
 
-  useEffect(() => {
-    let cancelled = false
-
-    async function load() {
-      try {
-        const data = await fetchQuestions()
-        if (!cancelled) {
-          setQuestions(data)
-          setLoading(false)
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setError(err instanceof Error ? err.message : 'Failed to load questions.')
-          setLoading(false)
-        }
-      }
-    }
-
-    load()
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
-  const normalizedQuery = deferredQuery.trim().toLowerCase()
-  const filteredQuestions = questions.filter((question) => {
-    const matchesDifficulty = difficulty === 'all' || question.difficulty === difficulty
-    if (!matchesDifficulty) {
-      return false
-    }
-
-    if (!normalizedQuery) {
-      return true
-    }
-
-    const haystack = [
-      question.questionText,
-      question.role ?? '',
-      question.category ?? '',
-      question.subcategory ?? '',
-      question.tags.join(' '),
-      question.expectedConcepts.map((item) => item.label).join(' '),
-      question.redFlags.map((item) => item.label).join(' '),
-    ]
-      .join(' ')
-      .toLowerCase()
-
-    return haystack.includes(normalizedQuery)
+  const filteredQuestions = filterQuestions({
+    questions,
+    query: deferredQuery,
+    difficulty,
   })
 
   return (
@@ -151,30 +96,12 @@ export default function QuestionsPage() {
         </Alert>
       )}
 
-      <Card className="border-white/60 bg-white/86 shadow-soft">
-        <CardContent className="grid gap-4 px-6 py-6 md:grid-cols-[1fr_220px]">
-          <div className="relative">
-            <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search by prompt, role, category, concept, or red flag"
-              className="h-12 rounded-full border-white/70 bg-[hsl(var(--surface-low)/0.8)] pl-11 shadow-none"
-            />
-          </div>
-          <Select value={difficulty} onValueChange={(value) => setDifficulty(value as DifficultyFilter)}>
-            <SelectTrigger className="h-12 w-full rounded-full border-white/70 bg-[hsl(var(--surface-low)/0.8)] px-4 shadow-none">
-              <SelectValue placeholder="All difficulties" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All difficulties</SelectItem>
-              <SelectItem value="easy">Easy</SelectItem>
-              <SelectItem value="medium">Medium</SelectItem>
-              <SelectItem value="hard">Hard</SelectItem>
-            </SelectContent>
-          </Select>
-        </CardContent>
-      </Card>
+      <QuestionsToolbar
+        query={query}
+        difficulty={difficulty}
+        onQueryChange={setQuery}
+        onDifficultyChange={setDifficulty}
+      />
 
       {loading ? (
         <LoadingStateCard label="Loading questions..." />
@@ -199,74 +126,7 @@ export default function QuestionsPage() {
       ) : (
         <section className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
           {filteredQuestions.map((question) => (
-            <Link key={question.id} href={`/questions/${question.id}`} className="group no-underline">
-              <Card className="h-full border-white/65 bg-white/88 transition-transform duration-200 hover:-translate-y-1 hover:shadow-float">
-                <CardHeader className="space-y-4">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <StatusPill tone={question.difficulty}>{question.difficulty}</StatusPill>
-                    {question.category ? (
-                      <StatusPill tone="neutral" className="normal-case tracking-[0.08em]">
-                        {question.category}
-                      </StatusPill>
-                    ) : null}
-                  </div>
-                  <div className="space-y-2">
-                    <CardTitle className="line-clamp-3 text-lg leading-7 tracking-[-0.03em]">
-                      {truncateText(question.questionText)}
-                    </CardTitle>
-                    <CardDescription>
-                      {question.role ? `${question.role} · ` : ''}
-                      weight {question.weight}
-                    </CardDescription>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-3 text-sm">
-                    <MetricPanel
-                      tone="compact"
-                      label="Concepts"
-                      value={question.expectedConcepts.length}
-                      valueClassName="mt-2 text-xl font-semibold tracking-[-0.03em] text-foreground"
-                    />
-                    <MetricPanel
-                      tone="compact"
-                      label="Red flags"
-                      value={question.redFlags.length}
-                      valueClassName="mt-2 text-xl font-semibold tracking-[-0.03em] text-foreground"
-                    />
-                  </div>
-
-                  <div className="space-y-3">
-                    <div>
-                      <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                        Expected concepts
-                      </div>
-                      <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                        {question.expectedConcepts.length > 0
-                          ? question.expectedConcepts
-                              .slice(0, 3)
-                              .map((item) => item.label)
-                              .join(', ')
-                          : 'Not specified'}
-                      </p>
-                    </div>
-                    <div>
-                      <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                        Red flag signals
-                      </div>
-                      <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                        {question.redFlags.length > 0
-                          ? question.redFlags
-                              .slice(0, 2)
-                              .map((item) => item.label)
-                              .join(', ')
-                          : 'Not specified'}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
+            <QuestionCard key={question.id} question={question} />
           ))}
         </section>
       )}
