@@ -557,7 +557,7 @@ export default function TakeInterviewPage() {
     const screenUpload = multipartUploadsRef.current.screen
     const eventStartIndex = forceAllEvents ? 0 : flushedBehaviorEventCountRef.current
     const behaviorEvents = behaviorEventsRef.current.slice(eventStartIndex)
-    const transcriptSnapshot = getBrowserTranscriptSnapshot()
+    const transcriptSnapshot = forceAllEvents ? getBrowserTranscriptSnapshot() : null
 
     const response = await fetch(`/api/take/${id}/answer/progress`, {
       method: 'POST',
@@ -576,7 +576,7 @@ export default function TakeInterviewPage() {
         screenFileSizeBytes: screenUpload?.recordedBytes || undefined,
         behaviorSignals: behaviorSignalsRef.current,
         behaviorEvents,
-        ...(transcriptSnapshot.text.trim()
+        ...(transcriptSnapshot?.text.trim()
           ? {
               clientTranscript: {
                 text: transcriptSnapshot.text,
@@ -1210,6 +1210,7 @@ export default function TakeInterviewPage() {
                   <ul className="space-y-2 text-sm leading-6 text-muted-foreground">
                     <li>Camera video and microphone audio for each answer</li>
                     <li>Full-monitor screen recording in parallel with each answer</li>
+                    <li>Speech transcript snippets and metadata for answer quality analysis</li>
                     <li>Browser activity such as tab switches</li>
                     <li>Session metadata including answer timing</li>
                   </ul>
