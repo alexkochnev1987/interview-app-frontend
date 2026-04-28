@@ -6,18 +6,14 @@ import { Filter, Plus, Search, Sparkles } from 'lucide-react'
 
 import { EyebrowBadge } from '@/components/app/eyebrow-badge'
 import { MetricPanel } from '@/components/app/metric-panel'
+import { SurfaceCard } from '@/components/app/surface-card'
+import { ThreeColumnCardsGrid, TwoPanelHeroGrid } from '@/components/layout/grid-layouts'
 import { EmptyStateCard, LoadingStateCard } from '@/components/app/state-card'
 import { QuestionCard } from '@/components/questions/question-card'
 import { QuestionsToolbar } from '@/components/questions/questions-toolbar'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { filterQuestions, type DifficultyFilter } from '@/features/questions/filter-questions'
 import { useQuestions } from '@/hooks/use-questions'
 
@@ -35,8 +31,8 @@ export default function QuestionsPage() {
 
   return (
     <main className="container space-y-8 py-10 md:space-y-10 md:py-12">
-      <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-        <Card className="border-white/65 bg-white/88 shadow-float">
+      <TwoPanelHeroGrid>
+        <SurfaceCard tone="glassFloat">
           <CardContent className="flex h-full flex-col gap-6 px-8 py-8">
             <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
               Question Library
@@ -51,10 +47,7 @@ export default function QuestionsPage() {
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
-              <Button
-                asChild
-                className="rounded-full bg-primary-gradient px-5 shadow-soft hover:brightness-105"
-              >
+              <Button asChild variant="gradient">
                 <Link href="/questions/new">
                   <Plus className="size-4" />
                   New Question
@@ -69,9 +62,9 @@ export default function QuestionsPage() {
               </Button>
             </div>
           </CardContent>
-        </Card>
+        </SurfaceCard>
 
-        <Card className="border-white/60 bg-[hsl(var(--surface-low)/0.9)] shadow-soft">
+        <SurfaceCard tone="mutedSoft">
           <CardHeader>
             <EyebrowBadge icon={<Filter className="size-3.5" />} tone="muted">
               Overview
@@ -86,11 +79,11 @@ export default function QuestionsPage() {
             <MetricPanel tone="elevated" label="Total questions" value={loading ? '...' : questions.length} />
             <MetricPanel tone="elevated" label="Visible now" value={loading ? '...' : filteredQuestions.length} />
           </CardContent>
-        </Card>
-      </section>
+        </SurfaceCard>
+      </TwoPanelHeroGrid>
 
       {error && (
-        <Alert variant="destructive" className="border-rose-200/70 bg-rose-50/85">
+        <Alert variant="destructive">
           <AlertTitle>Question feed unavailable</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
@@ -115,20 +108,17 @@ export default function QuestionsPage() {
               : 'Try widening the search or reset the difficulty filter to bring more prompts back in.'
           }
           action={
-            <Button
-              asChild
-              className="rounded-full bg-primary-gradient px-5 shadow-soft hover:brightness-105"
-            >
+            <Button asChild variant="gradient">
               <Link href="/questions/new">Create Question</Link>
             </Button>
           }
         />
       ) : (
-        <section className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
+        <ThreeColumnCardsGrid>
           {filteredQuestions.map((question) => (
             <QuestionCard key={question.id} question={question} />
           ))}
-        </section>
+        </ThreeColumnCardsGrid>
       )}
     </main>
   )

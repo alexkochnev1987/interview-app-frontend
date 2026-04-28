@@ -6,6 +6,7 @@ import { FeedbackCategoryGrid } from '@/components/feedback/feedback-category-gr
 import { FeedbackHero } from '@/components/feedback/feedback-hero';
 import { FeedbackInsights } from '@/components/feedback/feedback-insights';
 import { FeedbackSnapshot } from '@/components/feedback/feedback-snapshot';
+import { FeedbackBottomGrid, FeedbackTopGrid } from '@/components/layout/grid-layouts';
 import { LoadingStateCard } from '@/components/app/state-card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useFeedback } from '@/features/feedback/use-feedback';
@@ -20,7 +21,7 @@ export default function FeedbackPage() {
   if (error) {
     return (
       <main className="container py-12">
-        <Alert variant="destructive" className="mx-auto max-w-4xl border-rose-200/70 bg-rose-50/85">
+        <Alert variant="destructive" className="mx-auto max-w-4xl">
           <AlertTitle>Feedback unavailable</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
@@ -38,15 +39,15 @@ export default function FeedbackPage() {
 
   return (
     <main className="container space-y-8 py-10 md:py-12">
-      <section className="mx-auto grid max-w-6xl gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+      <FeedbackTopGrid>
         <FeedbackHero feedback={feedback} />
         <FeedbackSnapshot feedback={feedback} />
-      </section>
+      </FeedbackTopGrid>
 
-      <section className="mx-auto grid max-w-6xl gap-6 xl:grid-cols-[0.85fr_1.15fr]">
+      <FeedbackBottomGrid>
         {feedback.categoryScores ? <FeedbackCategoryGrid categoryScores={feedback.categoryScores} /> : null}
         <FeedbackInsights feedback={feedback} />
-      </section>
+      </FeedbackBottomGrid>
     </main>
   );
 }

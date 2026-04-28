@@ -2,7 +2,8 @@ import { ChartColumnBig } from 'lucide-react';
 
 import { EyebrowBadge } from '@/components/app/eyebrow-badge';
 import { MetricPanel } from '@/components/app/metric-panel';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { SurfaceCard } from '@/components/app/surface-card';
+import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface FeedbackCategoryGridProps {
   categoryScores: Record<string, number>;
@@ -10,7 +11,7 @@ interface FeedbackCategoryGridProps {
 
 export function FeedbackCategoryGrid({ categoryScores }: FeedbackCategoryGridProps) {
   return (
-    <Card className="border-white/65 bg-white/88 shadow-soft">
+    <SurfaceCard tone="glassSoft">
       <CardHeader>
         <EyebrowBadge icon={<ChartColumnBig className="size-3.5" />} tone="primary">
           Category scores
@@ -29,6 +30,6 @@ export function FeedbackCategoryGrid({ categoryScores }: FeedbackCategoryGridPro
           />
         ))}
       </CardContent>
-    </Card>
+    </SurfaceCard>
   );
 }

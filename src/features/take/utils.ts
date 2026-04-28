@@ -38,7 +38,7 @@ export function permissionClasses(status: TakePermissionStatus) {
     case 'granted':
       return 'bg-emerald-100 text-emerald-800 ring-emerald-200/80';
     case 'denied':
-      return 'bg-rose-100 text-rose-800 ring-rose-200/80';
+      return 'bg-destructive/10 text-destructive ring-destructive/30';
     default:
       return 'bg-[hsl(var(--surface-high)/0.9)] text-muted-foreground ring-border/50';
   }

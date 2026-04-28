@@ -4,9 +4,10 @@ import Link from 'next/link';
 import { AlertTriangle, ArrowLeft, LoaderCircle, PenSquare } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { SurfaceCard } from '@/components/app/surface-card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   getQuestion,
   updateQuestion,
@@ -59,7 +60,7 @@ export default function EditQuestionPage() {
   if (loading) {
     return (
       <main className="container py-10 md:py-12">
-        <Card className="border-white/65 bg-white/88 shadow-float">
+        <SurfaceCard tone="glassFloat">
           <CardContent className="flex min-h-[300px] flex-col items-center justify-center gap-5 px-8 py-12 text-center">
             <div className="flex size-14 items-center justify-center rounded-[1.6rem] bg-[hsl(var(--surface-low)/0.95)] text-[hsl(var(--primary))] ring-1 ring-border/45">
               <LoaderCircle className="size-5 animate-spin" />
@@ -73,7 +74,7 @@ export default function EditQuestionPage() {
               </p>
             </div>
           </CardContent>
-        </Card>
+        </SurfaceCard>
       </main>
     );
   }
@@ -81,9 +82,9 @@ export default function EditQuestionPage() {
   if (error || !question) {
     return (
       <main className="container py-10 md:py-12">
-        <Card className="border-white/65 bg-white/88 shadow-float">
+        <SurfaceCard tone="glassFloat">
           <CardHeader className="space-y-4">
-            <div className="flex size-14 items-center justify-center rounded-[1.6rem] bg-rose-50 text-rose-600 ring-1 ring-rose-200">
+            <div className="flex size-14 items-center justify-center rounded-[1.6rem] bg-destructive/10 text-destructive ring-1 ring-destructive/30">
               <AlertTriangle className="size-5" />
             </div>
             <div className="space-y-2">
@@ -95,13 +96,13 @@ export default function EditQuestionPage() {
             </div>
           </CardHeader>
           <CardContent className="space-y-5">
-            <Alert variant="destructive" className="border-rose-200/70 bg-rose-50/85">
+            <Alert variant="destructive">
               <AlertTitle>Load failed</AlertTitle>
               <AlertDescription>{error ?? 'Question not found.'}</AlertDescription>
             </Alert>
 
             <div className="flex flex-wrap gap-3">
-              <Button asChild className="rounded-full bg-primary-gradient shadow-soft hover:brightness-105">
+              <Button asChild variant="gradient">
                 <Link href="/questions">
                   <ArrowLeft className="size-4" />
                   Back to Question Library
@@ -115,7 +116,7 @@ export default function EditQuestionPage() {
               </Button>
             </div>
           </CardContent>
-        </Card>
+        </SurfaceCard>
       </main>
     );
   }

@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import { Search } from 'lucide-react';
 
+import { SurfaceCard } from '@/components/app/surface-card';
 import { StatusPill } from '@/components/app/status-pill';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import type { SimilarQuestionMatch } from '@/lib/api';
 import { truncateText } from '@/lib/text';
 
@@ -39,7 +40,7 @@ export function QuestionEditorSimilarPanel({
   similarQuestions,
 }: QuestionEditorSimilarPanelProps) {
   return (
-    <Card className="border-white/65 bg-white/88 shadow-soft">
+    <SurfaceCard tone="glassSoft">
       <CardHeader className="space-y-5">
         <div className="space-y-1.5">
           <CardTitle className="text-2xl tracking-[-0.03em]">Similar questions</CardTitle>
@@ -107,7 +108,7 @@ export function QuestionEditorSimilarPanel({
         ) : null}
 
         {similarStatus === 'error' && similarError ? (
-          <Alert variant="destructive" className="border-rose-200/70 bg-rose-50/85">
+          <Alert variant="destructive">
             <AlertTitle>Similarity search failed</AlertTitle>
             <AlertDescription>{similarError}</AlertDescription>
           </Alert>
@@ -163,6 +164,6 @@ export function QuestionEditorSimilarPanel({
           </div>
         ))}
       </CardContent>
-    </Card>
+    </SurfaceCard>
   );
 }

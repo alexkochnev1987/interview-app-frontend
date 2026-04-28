@@ -3,7 +3,8 @@ import { BriefcaseBusiness, Clock3 } from 'lucide-react';
 import { EyebrowBadge } from '@/components/app/eyebrow-badge';
 import { MetricPanel } from '@/components/app/metric-panel';
 import { StatusPill } from '@/components/app/status-pill';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { SurfaceCard } from '@/components/app/surface-card';
+import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface DashboardSnapshotProps {
   completedCount: number;
@@ -13,7 +14,7 @@ interface DashboardSnapshotProps {
 
 export function DashboardSnapshot({ completedCount, loading, usingMock }: DashboardSnapshotProps) {
   return (
-    <Card className="border-white/60 bg-[hsl(var(--surface-low)/0.9)] shadow-soft">
+    <SurfaceCard tone="mutedSoft">
       <CardHeader className="space-y-3">
         <EyebrowBadge icon={<BriefcaseBusiness className="size-3.5" />} tone="muted">
           Snapshot
@@ -61,6 +62,6 @@ export function DashboardSnapshot({ completedCount, loading, usingMock }: Dashbo
           }
         />
       </CardContent>
-    </Card>
+    </SurfaceCard>
   );
 }

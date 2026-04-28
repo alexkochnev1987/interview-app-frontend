@@ -1,12 +1,13 @@
 import type { RefObject } from 'react';
 
+import { SurfaceCard } from '@/components/app/surface-card';
 import { TakeRecordingActions } from '@/components/take/recording/take-recording-actions';
 import { TakeRecordingGuidance } from '@/components/take/recording/take-recording-guidance';
 import { TakeRecordingHeader } from '@/components/take/recording/take-recording-header';
 import { TakeRecordingPreview } from '@/components/take/recording/take-recording-preview';
 import { TakeRecordingStatus } from '@/components/take/recording/take-recording-status';
 import { LiveTranscriptPanel } from '@/components/take/live-transcript-panel';
-import { Card, CardContent } from '@/components/ui/card';
+import { CardContent } from '@/components/ui/card';
 import type { InterviewDataView, TakeStage } from '@/components/take/types';
 
 interface TakeRecordingScreenProps {
@@ -53,7 +54,7 @@ export function TakeRecordingScreen({
   return (
     <main className="container space-y-8 py-10 md:py-12">
       <section className="mx-auto grid max-w-6xl gap-6 xl:grid-cols-[0.84fr_1.16fr]">
-        <Card className="border-white/65 bg-white/88 shadow-soft">
+        <SurfaceCard tone="glassSoft">
           <CardContent className="space-y-6 px-8 py-8">
             <TakeRecordingHeader
               interview={interview}
@@ -64,9 +65,9 @@ export function TakeRecordingScreen({
               retakeCount={retakeCount}
             />
           </CardContent>
-        </Card>
+        </SurfaceCard>
 
-        <Card className="border-white/65 bg-white/88 shadow-float">
+        <SurfaceCard tone="glassFloat">
           <CardContent className="space-y-6 px-8 py-8">
             <div className="space-y-3">
               <TakeRecordingStatus stage={stage} timeLeft={timeLeft} formatTime={formatTime} />
@@ -100,7 +101,7 @@ export function TakeRecordingScreen({
               onSubmit={onSubmit}
             />
           </CardContent>
-        </Card>
+        </SurfaceCard>
       </section>
     </main>
   );

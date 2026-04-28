@@ -7,6 +7,7 @@ import { LoadingStateCard } from '@/components/app/state-card'
 import { InterviewDetailHero } from '@/components/interviews/detail/interview-detail-hero'
 import { InterviewQuestionCard } from '@/components/interviews/detail/interview-question-card'
 import { InterviewResultsSection } from '@/components/interviews/detail/interview-results-section'
+import { SectionHeaderRow } from '@/components/layout/grid-layouts'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { useInterviewDetail } from '@/features/interviews/use-interview-detail'
@@ -38,7 +39,7 @@ export default function InterviewDetailPage() {
   if (error && !interview) {
     return (
       <main className="container space-y-6 py-12">
-        <Alert variant="destructive" className="border-rose-200/70 bg-rose-50/85">
+        <Alert variant="destructive">
           <AlertTitle>Interview unavailable</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
@@ -84,14 +85,14 @@ export default function InterviewDetailPage() {
       />
 
       {error ? (
-        <Alert variant="destructive" className="border-rose-200/70 bg-rose-50/85">
+        <Alert variant="destructive">
           <AlertTitle>Interview action failed</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       ) : null}
 
       <section className="space-y-4">
-        <div className="flex flex-wrap items-end justify-between gap-4">
+        <SectionHeaderRow>
           <div className="space-y-2">
             <div className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
               Candidate packet
@@ -103,7 +104,7 @@ export default function InterviewDetailPage() {
           <div className="text-sm text-muted-foreground">
             Upload audio/video manually if the candidate flow was completed outside the browser.
           </div>
-        </div>
+        </SectionHeaderRow>
 
         <div className="grid gap-4">
           {interview.questions.map((question, questionIndex) => {

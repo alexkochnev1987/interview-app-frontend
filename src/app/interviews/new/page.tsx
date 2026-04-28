@@ -6,12 +6,14 @@ import { useRouter } from 'next/navigation'
 import { CirclePlus, Sparkles } from 'lucide-react'
 
 import { EyebrowBadge } from '@/components/app/eyebrow-badge'
+import { InterviewSetupFormGrid, TwoPanelHeroGrid } from '@/components/layout/grid-layouts'
 import { CandidateBriefForm } from '@/components/interviews/new/candidate-brief-form'
 import { MetricPanel } from '@/components/app/metric-panel'
+import { SurfaceCard } from '@/components/app/surface-card'
 import { QuestionSelector } from '@/components/interviews/new/question-selector'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useQuestions } from '@/hooks/use-questions'
 import { createInterview } from '@/lib/api'
 
@@ -64,8 +66,8 @@ export default function NewInterviewPage() {
   }
   return (
     <main className="container space-y-8 py-10 md:space-y-10 md:py-12">
-      <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-        <Card className="border-white/65 bg-white/88 shadow-float">
+      <TwoPanelHeroGrid>
+        <SurfaceCard tone="glassFloat">
           <CardContent className="space-y-6 px-8 py-8">
             <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
               Create Interview Flow
@@ -80,10 +82,7 @@ export default function NewInterviewPage() {
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
-              <Button
-                asChild
-                className="rounded-full bg-primary-gradient px-5 shadow-soft hover:brightness-105"
-              >
+              <Button asChild variant="gradient">
                 <Link href="/questions/new">
                   <CirclePlus className="size-4" />
                   Create Question
@@ -98,9 +97,9 @@ export default function NewInterviewPage() {
               </Button>
             </div>
           </CardContent>
-        </Card>
+        </SurfaceCard>
 
-        <Card className="border-white/60 bg-[hsl(var(--surface-low)/0.9)] shadow-soft">
+        <SurfaceCard tone="mutedSoft">
           <CardHeader>
             <CardTitle className="text-2xl tracking-[-0.03em]">Selection summary</CardTitle>
             <CardDescription className="text-sm leading-6">
@@ -116,34 +115,36 @@ export default function NewInterviewPage() {
               value={loadingQuestions ? '...' : questions.length}
             />
           </CardContent>
-        </Card>
-      </section>
+        </SurfaceCard>
+      </TwoPanelHeroGrid>
 
       {error ?? questionsError ? (
-        <Alert variant="destructive" className="border-rose-200/70 bg-rose-50/85">
+        <Alert variant="destructive">
           <AlertTitle>Interview setup blocked</AlertTitle>
           <AlertDescription>{error ?? questionsError}</AlertDescription>
         </Alert>
       ) : null}
 
-      <form onSubmit={handleSubmit} className="grid gap-6 xl:grid-cols-[0.72fr_1.28fr]">
-        <CandidateBriefForm
-          candidateName={candidateName}
-          position={position}
-          submitting={submitting}
-          loadingQuestions={loadingQuestions}
-          questionsCount={questions.length}
-          onCandidateNameChange={setCandidateName}
-          onPositionChange={setPosition}
-        />
+      <form onSubmit={handleSubmit}>
+        <InterviewSetupFormGrid>
+          <CandidateBriefForm
+            candidateName={candidateName}
+            position={position}
+            submitting={submitting}
+            loadingQuestions={loadingQuestions}
+            questionsCount={questions.length}
+            onCandidateNameChange={setCandidateName}
+            onPositionChange={setPosition}
+          />
 
-        <QuestionSelector
-          questions={questions}
-          selectedQuestionIds={selectedQuestionIds}
-          loadingQuestions={loadingQuestions}
-          submitting={submitting}
-          onToggleQuestion={toggleQuestion}
-        />
+          <QuestionSelector
+            questions={questions}
+            selectedQuestionIds={selectedQuestionIds}
+            loadingQuestions={loadingQuestions}
+            submitting={submitting}
+            onToggleQuestion={toggleQuestion}
+          />
+        </InterviewSetupFormGrid>
       </form>
     </main>
   )

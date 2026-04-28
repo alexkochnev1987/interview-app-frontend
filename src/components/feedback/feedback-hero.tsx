@@ -1,8 +1,9 @@
 import { Sparkles } from 'lucide-react';
 
 import { EyebrowBadge } from '@/components/app/eyebrow-badge';
+import { SurfaceCard } from '@/components/app/surface-card';
 import { StatusPill } from '@/components/app/status-pill';
-import { Card, CardContent } from '@/components/ui/card';
+import { CardContent } from '@/components/ui/card';
 import { resultTone } from '@/features/feedback/result-tone';
 import type { Feedback } from '@/features/feedback/types';
 
@@ -12,7 +13,7 @@ interface FeedbackHeroProps {
 
 export function FeedbackHero({ feedback }: FeedbackHeroProps) {
   return (
-    <Card className="border-white/65 bg-white/88 shadow-float">
+    <SurfaceCard tone="glassFloat">
       <CardContent className="space-y-6 px-8 py-8">
         <EyebrowBadge icon={<Sparkles className="size-3.5" />}>Interview feedback</EyebrowBadge>
 
@@ -35,6 +36,6 @@ export function FeedbackHero({ feedback }: FeedbackHeroProps) {
           <StatusPill tone="neutral">Reviewed {new Date(feedback.date).toLocaleDateString()}</StatusPill>
         </div>
       </CardContent>
-    </Card>
+    </SurfaceCard>
   );
 }

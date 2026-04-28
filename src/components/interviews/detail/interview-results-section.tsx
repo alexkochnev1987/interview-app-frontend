@@ -1,8 +1,10 @@
 import { FileVideo2 } from 'lucide-react';
 
 import { EyebrowBadge } from '@/components/app/eyebrow-badge';
+import { SurfaceCard } from '@/components/app/surface-card';
+import { SectionHeaderRow } from '@/components/layout/grid-layouts';
 import { StatusPill } from '@/components/app/status-pill';
-import { Card, CardContent } from '@/components/ui/card';
+import { CardContent } from '@/components/ui/card';
 import type { InterviewResult } from '@/lib/api';
 
 interface InterviewResultsSectionProps {
@@ -12,7 +14,7 @@ interface InterviewResultsSectionProps {
 export function InterviewResultsSection({ results }: InterviewResultsSectionProps) {
   return (
     <section className="space-y-4">
-      <div className="flex flex-wrap items-end justify-between gap-4">
+      <SectionHeaderRow>
         <div className="space-y-2">
           <div className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
             Scorecard
@@ -22,10 +24,10 @@ export function InterviewResultsSection({ results }: InterviewResultsSectionProp
         <div className="text-sm leading-6 text-muted-foreground">
           Candidate feedback remains a tokenized route shared separately from the recruiter UI.
         </div>
-      </div>
+      </SectionHeaderRow>
 
       <div className="grid gap-4 xl:grid-cols-[0.85fr_1.15fr]">
-        <Card className="border-white/65 bg-white/88 shadow-soft">
+        <SurfaceCard tone="glassSoft">
           <CardContent className="space-y-5 px-8 py-8">
             <EyebrowBadge icon={<FileVideo2 className="size-3.5" />} tone="primary">
               Overall score
@@ -45,11 +47,11 @@ export function InterviewResultsSection({ results }: InterviewResultsSectionProp
               <p className="text-sm leading-7 text-muted-foreground">Flags: {results.trustFlags.join(', ')}</p>
             ) : null}
           </CardContent>
-        </Card>
+        </SurfaceCard>
 
         <div className="grid gap-4 md:grid-cols-3">
           {Object.entries(results.categoryScores).map(([category, score]) => (
-            <Card key={category} className="border-white/65 bg-white/88 shadow-soft">
+            <SurfaceCard key={category} tone="glassSoft">
               <CardContent className="space-y-3 px-6 py-6 text-center">
                 <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                   {category}
@@ -59,7 +61,7 @@ export function InterviewResultsSection({ results }: InterviewResultsSectionProp
                 </div>
                 <p className="text-sm text-muted-foreground">out of 100</p>
               </CardContent>
-            </Card>
+            </SurfaceCard>
           ))}
         </div>
       </div>

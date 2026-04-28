@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Users } from 'lucide-react';
 
 import { EmptyStateCard, LoadingStateCard } from '@/components/app/state-card';
+import { SectionHeaderRow, ThreeColumnCardsGrid } from '@/components/layout/grid-layouts';
 import { Button } from '@/components/ui/button';
 import type { Interview } from '@/lib/api';
 
@@ -24,7 +25,7 @@ export function InterviewsGrid({ interviews, loading }: InterviewsGridProps) {
         title="No interviews yet"
         description="Start with a candidate, attach questions from the bank, and this dashboard becomes your operating surface."
         action={
-          <Button asChild className="rounded-full bg-primary-gradient px-5 shadow-soft hover:brightness-105">
+          <Button asChild variant="gradient">
             <Link href="/interviews/new">Create your first interview</Link>
           </Button>
         }
@@ -34,7 +35,7 @@ export function InterviewsGrid({ interviews, loading }: InterviewsGridProps) {
 
   return (
     <section className="space-y-4">
-      <div className="flex flex-wrap items-end justify-between gap-4">
+      <SectionHeaderRow>
         <div className="space-y-2">
           <div className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
             Active records
@@ -44,13 +45,13 @@ export function InterviewsGrid({ interviews, loading }: InterviewsGridProps) {
         <Button asChild variant="outline" className="rounded-full bg-white/70 backdrop-blur-sm">
           <Link href="/questions/new">Create a new question</Link>
         </Button>
-      </div>
+      </SectionHeaderRow>
 
-      <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
+      <ThreeColumnCardsGrid>
         {interviews.map((interview) => (
           <InterviewCard key={interview.id} interview={interview} />
         ))}
-      </div>
+      </ThreeColumnCardsGrid>
     </section>
   );
 }

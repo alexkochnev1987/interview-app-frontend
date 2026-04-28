@@ -31,7 +31,7 @@ export function DashboardHero({ activeCount, candidatesCount, questionVolume }: 
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <Button asChild className="rounded-full bg-primary-gradient px-5 shadow-soft hover:brightness-105">
+            <Button asChild variant="gradient">
               <Link href="/interviews/new">
                 New Interview
                 <ArrowRight className="size-4" />

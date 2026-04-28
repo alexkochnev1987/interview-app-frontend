@@ -120,7 +120,7 @@ export default function LoginPage() {
         <CardContent className="px-8 pb-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error ? (
-              <Alert variant="destructive" className="border-rose-200/70 bg-rose-50/85">
+              <Alert variant="destructive">
                 <AlertTitle>Authentication failed</AlertTitle>
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
@@ -157,7 +157,8 @@ export default function LoginPage() {
             <Button
               type="submit"
               disabled={loading}
-              className="h-11 w-full rounded-2xl bg-primary-gradient shadow-soft hover:brightness-105"
+              variant="gradient"
+              className="h-11 w-full rounded-2xl"
             >
               {loading ? 'Signing in...' : 'Sign In'}
             </Button>

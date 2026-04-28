@@ -3,8 +3,9 @@ import { Sparkles, WandSparkles } from 'lucide-react';
 import { EyebrowBadge } from '@/components/app/eyebrow-badge';
 import { MetricPanel } from '@/components/app/metric-panel';
 import { StatusPill } from '@/components/app/status-pill';
+import { SurfaceCard } from '@/components/app/surface-card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { CardContent } from '@/components/ui/card';
 import type { QuestionInput } from '@/lib/api';
 
 interface QuestionEditorHeroCardProps {
@@ -27,7 +28,7 @@ export function QuestionEditorHeroCard({
   onGenerate,
 }: QuestionEditorHeroCardProps) {
   return (
-    <Card className="border-white/65 bg-white/88 shadow-float">
+    <SurfaceCard tone="glassFloat">
       <CardContent className="flex flex-col gap-6 px-8 py-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="space-y-4">
@@ -67,6 +68,6 @@ export function QuestionEditorHeroCard({
           <MetricPanel label="Pending AI diffs" value={pendingDraftFieldsCount} />
         </div>
       </CardContent>
-    </Card>
+    </SurfaceCard>
   );
 }

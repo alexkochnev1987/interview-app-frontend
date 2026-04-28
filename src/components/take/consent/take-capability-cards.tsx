@@ -1,11 +1,12 @@
 import { Camera, Mic, ShieldCheck, Video } from 'lucide-react';
 
-import { Card, CardContent } from '@/components/ui/card';
+import { SurfaceCard } from '@/components/app/surface-card';
+import { CardContent } from '@/components/ui/card';
 
 export function TakeCapabilityCards() {
   return (
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-      <Card className="border-white/60 bg-[hsl(var(--surface-low)/0.9)] shadow-soft">
+      <SurfaceCard tone="mutedSoft">
         <CardContent className="space-y-3 px-5 py-5">
           <Camera className="size-5 text-[hsl(var(--primary))]" />
           <div className="space-y-1">
@@ -15,9 +16,9 @@ export function TakeCapabilityCards() {
             </p>
           </div>
         </CardContent>
-      </Card>
+      </SurfaceCard>
 
-      <Card className="border-white/60 bg-[hsl(var(--surface-low)/0.9)] shadow-soft">
+      <SurfaceCard tone="mutedSoft">
         <CardContent className="space-y-3 px-5 py-5">
           <Mic className="size-5 text-[hsl(var(--primary))]" />
           <div className="space-y-1">
@@ -27,9 +28,9 @@ export function TakeCapabilityCards() {
             </p>
           </div>
         </CardContent>
-      </Card>
+      </SurfaceCard>
 
-      <Card className="border-white/60 bg-[hsl(var(--surface-low)/0.9)] shadow-soft">
+      <SurfaceCard tone="mutedSoft">
         <CardContent className="space-y-3 px-5 py-5">
           <Video className="size-5 text-[hsl(var(--primary))]" />
           <div className="space-y-1">
@@ -39,9 +40,9 @@ export function TakeCapabilityCards() {
             </p>
           </div>
         </CardContent>
-      </Card>
+      </SurfaceCard>
 
-      <Card className="border-white/60 bg-[hsl(var(--surface-low)/0.9)] shadow-soft">
+      <SurfaceCard tone="mutedSoft">
         <CardContent className="space-y-3 px-5 py-5">
           <ShieldCheck className="size-5 text-[hsl(var(--primary))]" />
           <div className="space-y-1">
@@ -51,7 +52,7 @@ export function TakeCapabilityCards() {
             </p>
           </div>
         </CardContent>
-      </Card>
+      </SurfaceCard>
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { Sparkles } from 'lucide-react';
 import { DashboardHero } from '@/components/dashboard/dashboard-hero';
 import { DashboardSnapshot } from '@/components/dashboard/dashboard-snapshot';
 import { InterviewsGrid } from '@/components/dashboard/interviews-grid';
+import { DashboardHeroGrid } from '@/components/layout/grid-layouts';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { getDashboardMetrics } from '@/features/dashboard/dashboard-metrics';
 import { useDashboardInterviews } from '@/features/dashboard/use-dashboard-interviews';
@@ -14,14 +15,14 @@ export default function DashboardPage() {
 
   return (
     <main className="container space-y-8 py-10 md:space-y-10 md:py-12">
-      <section className="grid gap-6 xl:grid-cols-[1.3fr_0.7fr]">
+      <DashboardHeroGrid>
         <DashboardHero
           activeCount={activeCount}
           candidatesCount={interviews.length}
           questionVolume={questionVolume}
         />
         <DashboardSnapshot completedCount={completedCount} loading={loading} usingMock={usingMock} />
-      </section>
+      </DashboardHeroGrid>
 
       {usingMock && (
         <Alert className="border-amber-200/70 bg-amber-50/80 text-amber-950">

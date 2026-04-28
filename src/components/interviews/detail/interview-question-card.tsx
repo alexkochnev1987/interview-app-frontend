@@ -1,9 +1,10 @@
 import { CircleAlert, Upload } from 'lucide-react';
 
+import { SurfaceCard } from '@/components/app/surface-card';
 import { StatusPill } from '@/components/app/status-pill';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatAnswerDuration, formatFileSize } from '@/features/interviews/detail-formatters';
 import type { Interview } from '@/lib/api';
 import { cn } from '@/lib/utils';
@@ -39,7 +40,7 @@ export function InterviewQuestionCard({
   const hasAnswer = Boolean(answer);
 
   return (
-    <Card className="border-white/65 bg-white/88 shadow-soft transition-transform duration-200 hover:-translate-y-0.5">
+    <SurfaceCard tone="glassSoft" className="transition-transform duration-200 hover:-translate-y-0.5">
       <CardHeader className="gap-4">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="space-y-3">
@@ -83,10 +84,7 @@ export function InterviewQuestionCard({
                   variant={uploadState.status === 'error' ? 'destructive' : 'outline'}
                   size="sm"
                   onClick={onUploadClick}
-                  className={cn(
-                    'rounded-full bg-white/75',
-                    uploadState.status === 'error' && 'bg-rose-50 hover:bg-rose-100',
-                  )}
+                  className={cn('rounded-full bg-white/75')}
                 >
                   <Upload className="size-4" />
                   {uploadState.status === 'error' ? 'Retry upload' : 'Upload file'}
@@ -157,13 +155,13 @@ export function InterviewQuestionCard({
         </div>
 
         {uploadState.status === 'error' && uploadState.errorMessage ? (
-          <Alert variant="destructive" className="border-rose-200/70 bg-rose-50/85">
+          <Alert variant="destructive">
             <CircleAlert className="size-4" />
             <AlertTitle>Upload error</AlertTitle>
             <AlertDescription>{uploadState.errorMessage}</AlertDescription>
           </Alert>
         ) : null}
       </CardContent>
-    </Card>
+    </SurfaceCard>
   );
 }

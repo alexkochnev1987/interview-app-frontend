@@ -1,8 +1,9 @@
 import { ArrowRight, BriefcaseBusiness, UserRound } from 'lucide-react';
 
 import { MetricPanel } from '@/components/app/metric-panel';
+import { SurfaceCard } from '@/components/app/surface-card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -26,7 +27,7 @@ export function CandidateBriefForm({
   onPositionChange,
 }: CandidateBriefFormProps) {
   return (
-    <Card className="border-white/65 bg-white/88 shadow-soft">
+    <SurfaceCard tone="glassSoft">
       <CardHeader>
         <CardTitle className="text-2xl tracking-[-0.03em]">Candidate brief</CardTitle>
         <CardDescription className="text-sm leading-6">
@@ -74,13 +75,14 @@ export function CandidateBriefForm({
           <Button
             type="submit"
             disabled={submitting || loadingQuestions || questionsCount === 0}
-            className="mt-5 w-full rounded-2xl bg-primary-gradient shadow-soft hover:brightness-105"
+            variant="gradient"
+            className="mt-5 w-full rounded-2xl"
           >
             {submitting ? 'Creating...' : 'Create Interview'}
             <ArrowRight className="size-4" />
           </Button>
         </div>
       </CardContent>
-    </Card>
+    </SurfaceCard>
   );
 }

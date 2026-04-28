@@ -36,7 +36,7 @@ export function TakeRecordingActions({
             type="button"
             onClick={onSubmit}
             disabled={uploading}
-            className="rounded-full bg-primary-gradient px-5 shadow-soft hover:brightness-105"
+            variant="gradient"
           >
             Submit & Next
           </Button>

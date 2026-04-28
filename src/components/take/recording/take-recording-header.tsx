@@ -54,7 +54,7 @@ export function TakeRecordingHeader({
           </StatusPill>
         </div>
         {setupError ? (
-          <Alert variant="destructive" className="border-rose-200/70 bg-rose-50/85">
+          <Alert variant="destructive">
             <AlertTitle>Capture interrupted</AlertTitle>
             <AlertDescription>{setupError}</AlertDescription>
           </Alert>

@@ -1,10 +1,11 @@
 import { BrainCircuit, Save, Sparkles, WandSparkles } from 'lucide-react';
 import type { FormEvent } from 'react';
 
+import { SurfaceCard } from '@/components/app/surface-card';
 import { QuestionEditorField } from '@/components/questions/question-editor-field';
 import { QuestionEditorSectionIntro } from '@/components/questions/question-editor-section-intro';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
@@ -39,7 +40,7 @@ export function QuestionEditorForm({
 }: QuestionEditorFormProps) {
   return (
     <form onSubmit={onSubmit} className="space-y-6">
-      <Card className="border-white/65 bg-white/88 shadow-soft">
+      <SurfaceCard tone="glassSoft">
         <CardContent className="space-y-6 px-8 py-8">
           <QuestionEditorSectionIntro
             title="Question identity"
@@ -170,9 +171,9 @@ export function QuestionEditorForm({
             </QuestionEditorField>
           </div>
         </CardContent>
-      </Card>
+      </SurfaceCard>
 
-      <Card className="border-white/65 bg-white/88 shadow-soft">
+      <SurfaceCard tone="glassSoft">
         <CardContent className="space-y-6 px-8 py-8">
           <QuestionEditorSectionIntro
             title="Prompt and follow-up"
@@ -206,9 +207,9 @@ export function QuestionEditorForm({
             />
           </QuestionEditorField>
         </CardContent>
-      </Card>
+      </SurfaceCard>
 
-      <Card className="border-white/65 bg-white/88 shadow-soft">
+      <SurfaceCard tone="glassSoft">
         <CardContent className="space-y-6 px-8 py-8">
           <QuestionEditorSectionIntro
             title="Evaluation rubric"
@@ -244,9 +245,9 @@ export function QuestionEditorForm({
             </QuestionEditorField>
           </div>
         </CardContent>
-      </Card>
+      </SurfaceCard>
 
-      <Card className="border-white/65 bg-white/88 shadow-soft">
+      <SurfaceCard tone="glassSoft">
         <CardContent className="space-y-6 px-8 py-8">
           <QuestionEditorSectionIntro
             title="Reference material"
@@ -303,7 +304,7 @@ export function QuestionEditorForm({
             </div>
           </div>
         </CardContent>
-      </Card>
+      </SurfaceCard>
 
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-[1.75rem] border border-white/65 bg-white/88 px-6 py-5 shadow-soft">
         <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
@@ -313,7 +314,7 @@ export function QuestionEditorForm({
         <Button
           type="submit"
           disabled={submitting}
-          className="rounded-full bg-primary-gradient px-5 shadow-soft hover:brightness-105"
+          variant="gradient"
         >
           <Save className="size-4" />
           {submitting ? 'Saving...' : submitLabel}

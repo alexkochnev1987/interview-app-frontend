@@ -2,8 +2,9 @@ import Link from 'next/link';
 
 import { StatusPill } from '@/components/app/status-pill';
 import { EmptyStateCard, LoadingStateCard } from '@/components/app/state-card';
+import { SurfaceCard } from '@/components/app/surface-card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import type { Question } from '@/lib/api';
 import { cn } from '@/lib/utils';
@@ -28,7 +29,7 @@ export function QuestionSelector({
   const selectedQuestions = questions.filter((question) => selectedQuestionIds.includes(question.id));
 
   return (
-    <Card className="border-white/65 bg-white/88 shadow-soft">
+    <SurfaceCard tone="glassSoft">
       <CardHeader className="flex flex-row items-start justify-between gap-4">
         <div className="space-y-1.5">
           <CardTitle className="text-2xl tracking-[-0.03em]">Question selection</CardTitle>
@@ -50,10 +51,7 @@ export function QuestionSelector({
             title="No saved questions yet"
             description="Create the first reusable prompt before you assemble an interview packet."
             action={
-              <Button
-                asChild
-                className="rounded-full bg-primary-gradient px-5 shadow-soft hover:brightness-105"
-              >
+              <Button asChild variant="gradient">
                 <Link href="/questions/new">Create your first question</Link>
               </Button>
             }
@@ -131,6 +129,6 @@ export function QuestionSelector({
 
         <SelectedPacketPreview selectedQuestions={selectedQuestions} />
       </CardContent>
-    </Card>
+    </SurfaceCard>
   );
 }

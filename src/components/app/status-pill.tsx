@@ -26,7 +26,7 @@ const toneClasses: Record<StatusTone, string> = {
   completed:
     "bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200",
   failed:
-    "bg-rose-100 text-rose-800 ring-1 ring-rose-200",
+    "bg-destructive/10 text-destructive ring-1 ring-destructive/30",
   easy: "bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200",
   medium: "bg-amber-100 text-amber-800 ring-1 ring-amber-200",
   hard: "bg-violet-100 text-violet-800 ring-1 ring-violet-200",

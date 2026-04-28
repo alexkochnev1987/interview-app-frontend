@@ -3,8 +3,10 @@ import { ArrowLeft, CheckCircle2, CircleDashed, Layers3, Sparkles } from 'lucide
 import { EyebrowBadge } from '@/components/app/eyebrow-badge';
 import { MetricPanel } from '@/components/app/metric-panel';
 import { StatusPill } from '@/components/app/status-pill';
+import { SurfaceCard } from '@/components/app/surface-card';
+import { InterviewDetailHeroGrid } from '@/components/layout/grid-layouts';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { formatWorkflowStage } from '@/features/interviews/detail-formatters';
 import type { Interview, InterviewResult } from '@/lib/api';
@@ -34,8 +36,8 @@ export function InterviewDetailHero({
   progressValue,
 }: InterviewDetailHeroProps) {
   return (
-    <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-      <Card className="border-white/65 bg-white/88 shadow-float">
+    <InterviewDetailHeroGrid>
+      <SurfaceCard tone="glassFloat">
         <CardContent className="space-y-8 px-8 py-8">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="space-y-4">
@@ -71,7 +73,7 @@ export function InterviewDetailHero({
                   type="button"
                   onClick={onComplete}
                   disabled={!canComplete || completing}
-                  className="rounded-full bg-primary-gradient px-5 shadow-soft hover:brightness-105"
+                  variant="gradient"
                 >
                   {completing
                     ? 'Completing...'
@@ -101,9 +103,9 @@ export function InterviewDetailHero({
             />
           </div>
         </CardContent>
-      </Card>
+      </SurfaceCard>
 
-      <Card className="border-white/60 bg-[hsl(var(--surface-low)/0.9)] shadow-soft">
+      <SurfaceCard tone="mutedSoft">
         <CardHeader>
           <EyebrowBadge icon={<Sparkles className="size-3.5" />} tone="muted">
             Interview progress
@@ -173,7 +175,7 @@ export function InterviewDetailHero({
             </div>
           ) : null}
         </CardContent>
-      </Card>
-    </section>
+      </SurfaceCard>
+    </InterviewDetailHeroGrid>
   );
 }

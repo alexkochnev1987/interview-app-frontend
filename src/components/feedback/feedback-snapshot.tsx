@@ -1,7 +1,8 @@
 import { BadgeCheck, Clock3 } from 'lucide-react';
 
 import { MetricPanel } from '@/components/app/metric-panel';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { SurfaceCard } from '@/components/app/surface-card';
+import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import type { Feedback } from '@/features/feedback/types';
 
 interface FeedbackSnapshotProps {
@@ -10,7 +11,7 @@ interface FeedbackSnapshotProps {
 
 export function FeedbackSnapshot({ feedback }: FeedbackSnapshotProps) {
   return (
-    <Card className="border-white/60 bg-[hsl(var(--surface-low)/0.9)] shadow-soft">
+    <SurfaceCard tone="mutedSoft">
       <CardHeader>
         <CardTitle className="text-2xl tracking-[-0.03em]">Snapshot</CardTitle>
         <CardDescription className="text-sm leading-6">
@@ -33,6 +34,6 @@ export function FeedbackSnapshot({ feedback }: FeedbackSnapshotProps) {
           valueClassName="mt-3 text-sm leading-6 text-foreground"
         />
       </CardContent>
-    </Card>
+    </SurfaceCard>
   );
 }

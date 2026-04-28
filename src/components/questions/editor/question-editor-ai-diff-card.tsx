@@ -1,6 +1,7 @@
 import { StatusPill } from '@/components/app/status-pill';
+import { SurfaceCard } from '@/components/app/surface-card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import type { QuestionDraft, QuestionInput } from '@/lib/api';
 import { previewValue } from '@/features/questions/editor';
 
@@ -28,7 +29,7 @@ export function QuestionEditorAiDiffCard({
   }
 
   return (
-    <Card className="border-white/65 bg-white/88 shadow-soft">
+    <SurfaceCard tone="glassSoft">
       <CardHeader className="flex flex-row items-start justify-between gap-4">
         <div className="space-y-1.5">
           <CardTitle className="text-2xl tracking-[-0.03em]">AI draft diff</CardTitle>
@@ -39,12 +40,7 @@ export function QuestionEditorAiDiffCard({
         </div>
         <div className="flex flex-wrap gap-3">
           <StatusPill tone="neutral">{pendingDraftFields.length} pending</StatusPill>
-          <Button
-            type="button"
-            onClick={onApplyAll}
-            disabled={pendingDraftFields.length === 0}
-            className="rounded-full bg-primary-gradient shadow-soft hover:brightness-105"
-          >
+          <Button type="button" onClick={onApplyAll} disabled={pendingDraftFields.length === 0} variant="gradient">
             Apply all AI fields
           </Button>
         </div>
@@ -70,7 +66,7 @@ export function QuestionEditorAiDiffCard({
                       type="button"
                       size="sm"
                       onClick={() => onApplyField(key)}
-                      className="rounded-full bg-primary-gradient shadow-soft hover:brightness-105"
+                      variant="gradient"
                     >
                       Use AI value
                     </Button>
@@ -109,6 +105,6 @@ export function QuestionEditorAiDiffCard({
           </div>
         )}
       </CardContent>
-    </Card>
+    </SurfaceCard>
   );
 }

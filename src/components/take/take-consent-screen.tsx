@@ -1,6 +1,7 @@
 import { Sparkles } from 'lucide-react';
 
 import { EyebrowBadge } from '@/components/app/eyebrow-badge';
+import { SurfaceCard } from '@/components/app/surface-card';
 import { TakeCapabilityCards } from '@/components/take/consent/take-capability-cards';
 import { TakeConsentCheckboxBlock } from '@/components/take/consent/take-consent-checkbox-block';
 import { TakePermissionStatusList } from '@/components/take/consent/take-permission-status-list';
@@ -38,7 +39,7 @@ export function TakeConsentScreen({
 }: TakeConsentScreenProps) {
   return (
     <main className="container space-y-8 py-10 md:py-12">
-      <Card className="mx-auto max-w-5xl border-white/65 bg-white/88 shadow-float">
+      <SurfaceCard tone="glassFloat" className="mx-auto max-w-5xl">
         <CardContent className="grid gap-8 px-8 py-8 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="space-y-5">
             <EyebrowBadge icon={<Sparkles className="size-3.5" />}>Candidate interview</EyebrowBadge>
@@ -85,7 +86,7 @@ export function TakeConsentScreen({
               />
 
               {setupError ? (
-                <Alert variant="destructive" className="border-rose-200/70 bg-rose-50/85">
+                <Alert variant="destructive">
                   <AlertTitle>Setup incomplete</AlertTitle>
                   <AlertDescription>{setupError}</AlertDescription>
                 </Alert>
@@ -97,14 +98,15 @@ export function TakeConsentScreen({
                 type="button"
                 disabled={!consent || setupBusy}
                 onClick={onStartInterview}
-                className="h-11 w-full rounded-2xl bg-primary-gradient shadow-soft hover:brightness-105"
+                variant="gradient"
+                className="h-11 w-full rounded-2xl"
               >
                 {setupBusy ? 'Requesting access...' : 'Allow Camera, Mic & Entire Screen'}
               </Button>
             </CardContent>
           </Card>
         </CardContent>
-      </Card>
+      </SurfaceCard>
     </main>
   );
 }

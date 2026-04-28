@@ -5,6 +5,7 @@ import { QuestionEditorAiDiffCard } from '@/components/questions/editor/question
 import { QuestionEditorForm } from '@/components/questions/editor/question-editor-form'
 import { QuestionEditorHeroCard } from '@/components/questions/editor/question-editor-hero-card'
 import { QuestionEditorSimilarPanel } from '@/components/questions/editor/question-editor-similar-panel'
+import { QuestionEditorMainGrid } from '@/components/layout/grid-layouts'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import {
   draftQuestion,
@@ -278,7 +279,7 @@ export function QuestionEditor({
       />
 
       {error ? (
-        <Alert variant="destructive" className="border-rose-200/70 bg-rose-50/85">
+        <Alert variant="destructive">
           <AlertTitle>Question editor issue</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
@@ -293,7 +294,7 @@ export function QuestionEditor({
         value={value}
       />
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-start">
+      <QuestionEditorMainGrid>
         <QuestionEditorForm
           value={value}
           metadataText={metadataText}
@@ -317,7 +318,7 @@ export function QuestionEditor({
             similarQuestions={similarQuestions}
           />
         </aside>
-      </div>
+      </QuestionEditorMainGrid>
     </main>
   )
 }

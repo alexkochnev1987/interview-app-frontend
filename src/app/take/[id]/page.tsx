@@ -412,7 +412,7 @@ export default function TakeInterviewPage() {
   if (error && !interview) {
     return (
       <main className="container py-12">
-        <Alert variant="destructive" className="border-rose-200/70 bg-rose-50/85">
+        <Alert variant="destructive">
           <AlertTitle>Interview unavailable</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
