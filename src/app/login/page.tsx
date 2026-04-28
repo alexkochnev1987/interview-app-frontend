@@ -8,7 +8,7 @@ import { EyebrowBadge } from '@/components/app/eyebrow-badge'
 import { LoginFeatureCard } from '@/components/login/login-feature-card'
 import { SurfaceCard } from '@/components/app/surface-card'
 import { CardContentForm, CardHeaderForm, HeroDescription } from '@/components/layout/content-presets'
-import { LoginFeatureGrid } from '@/components/layout/grid-layouts'
+import { MetricsThreeUpGrid } from '@/components/layout/grid-layouts'
 import { LoginPageShell } from '@/components/layout/page-shell'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -68,7 +68,7 @@ export default function LoginPage() {
           </HeroDescription>
         </div>
 
-        <LoginFeatureGrid>
+        <MetricsThreeUpGrid>
           <LoginFeatureCard
             icon={<ShieldCheck className="size-4" />}
             title="Protected access"
@@ -84,7 +84,7 @@ export default function LoginPage() {
             title="Fast triage"
             description="Move from sign-in straight into active interviews and scorecards."
           />
-        </LoginFeatureGrid>
+        </MetricsThreeUpGrid>
       </section>
 
       <SurfaceCard tone="glassFloat">

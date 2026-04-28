@@ -16,7 +16,7 @@ interface PageMainEditorProps {
   children: ReactNode;
 }
 
-interface PageMainY10Props {
+interface PageMainTightProps {
   children: ReactNode;
 }
 
@@ -48,7 +48,7 @@ export function PageMainEditor({ children }: PageMainEditorProps) {
   return <main className="container space-y-6 py-10 md:space-y-8 md:py-12">{children}</main>;
 }
 
-export function PageMainY10({ children }: PageMainY10Props) {
+export function PageMainTight({ children }: PageMainTightProps) {
   return <main className="container py-10 md:py-12">{children}</main>;
 }
 

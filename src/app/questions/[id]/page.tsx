@@ -6,7 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { SurfaceCard } from '@/components/app/surface-card';
 import { ActionRow } from '@/components/layout/content-presets';
-import { PageMainY10 } from '@/components/layout/page-shell';
+import { PageMainTight } from '@/components/layout/page-shell';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -61,7 +61,7 @@ export default function EditQuestionPage() {
 
   if (loading) {
     return (
-      <PageMainY10>
+      <PageMainTight>
         <SurfaceCard tone="glassFloat">
           <CardContent className="flex min-h-[300px] flex-col items-center justify-center gap-5 px-8 py-12 text-center">
             <div className="flex size-14 items-center justify-center rounded-[1.6rem] bg-[hsl(var(--surface-low)/0.95)] text-[hsl(var(--primary))] ring-1 ring-border/45">
@@ -77,13 +77,13 @@ export default function EditQuestionPage() {
             </div>
           </CardContent>
         </SurfaceCard>
-      </PageMainY10>
+      </PageMainTight>
     );
   }
 
   if (error || !question) {
     return (
-      <PageMainY10>
+      <PageMainTight>
         <SurfaceCard tone="glassFloat">
           <CardHeader className="space-y-4">
             <div className="flex size-14 items-center justify-center rounded-[1.6rem] bg-destructive/10 text-destructive ring-1 ring-destructive/30">
@@ -119,7 +119,7 @@ export default function EditQuestionPage() {
             </ActionRow>
           </CardContent>
         </SurfaceCard>
-      </PageMainY10>
+      </PageMainTight>
     );
   }
 

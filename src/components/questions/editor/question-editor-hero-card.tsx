@@ -5,7 +5,7 @@ import { MetricPanel } from '@/components/app/metric-panel';
 import { StatusPill } from '@/components/app/status-pill';
 import { SurfaceCard } from '@/components/app/surface-card';
 import { ActionRow, CardContentHero, HeroDescription, HeroTitle } from '@/components/layout/content-presets';
-import { HeaderSplitRow, LoginFeatureGrid } from '@/components/layout/grid-layouts';
+import { HeaderSplitRow, MetricsThreeUpGrid } from '@/components/layout/grid-layouts';
 import { Button } from '@/components/ui/button';
 import type { QuestionInput } from '@/lib/api';
 
@@ -56,7 +56,7 @@ export function QuestionEditorHeroCard({
           </ActionRow>
         </HeaderSplitRow>
 
-        <LoginFeatureGrid>
+        <MetricsThreeUpGrid>
           <MetricPanel
             label="Difficulty"
             value={<StatusPill tone={difficulty}>{difficulty}</StatusPill>}
@@ -64,7 +64,7 @@ export function QuestionEditorHeroCard({
           />
           <MetricPanel label="Weight" value={weight} />
           <MetricPanel label="Pending AI diffs" value={pendingDraftFieldsCount} />
-        </LoginFeatureGrid>
+        </MetricsThreeUpGrid>
       </CardContentHero>
     </SurfaceCard>
   );

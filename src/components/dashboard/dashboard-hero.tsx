@@ -4,7 +4,7 @@ import { ArrowRight, CircleDashed, Layers3, Sparkles, Users } from 'lucide-react
 import { EyebrowBadge } from '@/components/app/eyebrow-badge';
 import { MetricPanel } from '@/components/app/metric-panel';
 import { ActionRow, HeroDescription, HeroTitle } from '@/components/layout/content-presets';
-import { HeaderSplitRow, LoginFeatureGrid } from '@/components/layout/grid-layouts';
+import { HeaderSplitRow, MetricsThreeUpGrid } from '@/components/layout/grid-layouts';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -43,7 +43,7 @@ export function DashboardHero({ activeCount, candidatesCount, questionVolume }: 
           </ActionRow>
         </HeaderSplitRow>
 
-        <LoginFeatureGrid>
+        <MetricsThreeUpGrid>
           <MetricPanel
             icon={<CircleDashed className="size-4" />}
             label="Active"
@@ -65,7 +65,7 @@ export function DashboardHero({ activeCount, candidatesCount, questionVolume }: 
             valueClassName="mt-4 text-4xl font-semibold tracking-[-0.04em] text-foreground"
             description="Questions currently attached across all visible interviews."
           />
-        </LoginFeatureGrid>
+        </MetricsThreeUpGrid>
       </CardContent>
     </Card>
   );

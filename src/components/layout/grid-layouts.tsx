@@ -28,10 +28,6 @@ interface FeedbackBottomGridProps {
   children: ReactNode;
 }
 
-interface LoginFeatureGridProps {
-  children: ReactNode;
-}
-
 interface SectionStackProps {
   children: ReactNode;
 }
@@ -86,10 +82,6 @@ export function FeedbackTopGrid({ children }: FeedbackTopGridProps) {
 
 export function FeedbackBottomGrid({ children }: FeedbackBottomGridProps) {
   return <section className="mx-auto grid max-w-6xl gap-6 xl:grid-cols-[0.85fr_1.15fr]">{children}</section>;
-}
-
-export function LoginFeatureGrid({ children }: LoginFeatureGridProps) {
-  return <MetricsThreeUpGrid>{children}</MetricsThreeUpGrid>;
 }
 
 export function MetricsThreeUpGrid({ children }: MetricsThreeUpGridProps) {
