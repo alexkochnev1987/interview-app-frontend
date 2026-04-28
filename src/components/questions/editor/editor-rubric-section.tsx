@@ -1,11 +1,15 @@
 'use client'
 
 import { WandSparkles } from 'lucide-react'
-import { type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 
 import { Card, CardContent } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
-import { type QuestionInput } from '@/lib/api'
+import {
+  type QuestionExpectedConcept,
+  type QuestionInput,
+  type QuestionRedFlag,
+} from '@/lib/api'
 import {
   formatExpectedConcepts,
   formatRedFlags,
@@ -44,15 +48,14 @@ export function EditorRubricSection({
             label="Expected concepts"
             hint="Format: id | label | weight | description"
           >
-            <Textarea
+            <RawListTextarea
               id="expectedConcepts"
-              value={formatExpectedConcepts(value.expectedConcepts)}
-              onChange={(event) =>
-                onUpdate({ expectedConcepts: parseExpectedConcepts(event.target.value) })
-              }
+              parsedValue={value.expectedConcepts}
+              format={formatExpectedConcepts}
+              parse={parseExpectedConcepts}
+              onParsedChange={(next) => onUpdate({ expectedConcepts: next })}
               placeholder="id | label | weight | description"
               disabled={submitting}
-              className="min-h-[220px] rounded-[1.5rem] border-white/70 bg-[hsl(var(--surface-low)/0.8)] px-4 py-3 font-mono text-sm leading-7"
             />
             {renderAiSuggestion('expectedConcepts')}
           </QuestionEditorField>
@@ -62,18 +65,68 @@ export function EditorRubricSection({
             label="Red flags"
             hint="Format: id | label | severity"
           >
-            <Textarea
+            <RawListTextarea
               id="redFlags"
-              value={formatRedFlags(value.redFlags)}
-              onChange={(event) => onUpdate({ redFlags: parseRedFlags(event.target.value) })}
+              parsedValue={value.redFlags}
+              format={formatRedFlags}
+              parse={parseRedFlags}
+              onParsedChange={(next) => onUpdate({ redFlags: next })}
               placeholder="id | label | severity"
               disabled={submitting}
-              className="min-h-[220px] rounded-[1.5rem] border-white/70 bg-[hsl(var(--surface-low)/0.8)] px-4 py-3 font-mono text-sm leading-7"
             />
             {renderAiSuggestion('redFlags')}
           </QuestionEditorField>
         </div>
       </CardContent>
     </Card>
+  )
+}
+
+type ListItem = QuestionExpectedConcept | QuestionRedFlag
+
+interface RawListTextareaProps<T extends ListItem> {
+  id: string
+  parsedValue: T[]
+  format: (items: T[]) => string
+  parse: (text: string) => T[]
+  onParsedChange: (next: T[]) => void
+  placeholder: string
+  disabled: boolean
+}
+
+function RawListTextarea<T extends ListItem>({
+  id,
+  parsedValue,
+  format,
+  parse,
+  onParsedChange,
+  placeholder,
+  disabled,
+}: RawListTextareaProps<T>) {
+  const [text, setText] = useState(() => format(parsedValue))
+  const lastSyncedRef = useRef(parsedValue)
+
+  useEffect(() => {
+    if (parsedValue === lastSyncedRef.current) return
+    lastSyncedRef.current = parsedValue
+    setText(format(parsedValue))
+  }, [parsedValue, format])
+
+  function handleChange(nextText: string) {
+    setText(nextText)
+    const parsed = parse(nextText)
+    lastSyncedRef.current = parsed
+    onParsedChange(parsed)
+  }
+
+  return (
+    <Textarea
+      id={id}
+      value={text}
+      onChange={(event) => handleChange(event.target.value)}
+      placeholder={placeholder}
+      disabled={disabled}
+      className="min-h-[220px] rounded-[1.5rem] border-white/70 bg-[hsl(var(--surface-low)/0.8)] px-4 py-3 font-mono text-sm leading-7"
+    />
   )
 }

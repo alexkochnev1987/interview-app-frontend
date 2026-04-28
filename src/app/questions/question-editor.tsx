@@ -84,6 +84,8 @@ export function QuestionEditor({
       setDismissedDraftFields([])
       setAiStatus('idle')
     } catch (err) {
+      setAiDraft(null)
+      setDismissedDraftFields([])
       setAiStatus('error')
       setError(err instanceof Error ? err.message : 'Failed to generate question draft.')
     }
@@ -102,16 +104,14 @@ export function QuestionEditor({
   }
 
   function applyAllAiFields() {
-    if (!aiDraft) return
-    setValue((current) => ({
-      ...current,
-      ...aiDraft,
-      externalId: current.externalId,
-      role: current.role,
-      focus: current.focus,
-      outputLanguage: current.outputLanguage,
-    }))
-    setDismissedDraftFields([])
+    if (!aiDraft || pendingDraftFields.length === 0) return
+    setValue((current) => {
+      let next = current
+      for (const { key } of pendingDraftFields) {
+        next = { ...next, [key]: aiDraft[key] }
+      }
+      return next
+    })
   }
 
   const pendingDraftFields = useMemo(() => {
@@ -169,13 +169,13 @@ export function QuestionEditor({
       return
     }
 
-    const submittedValue = value
-    const submittedMetadataText = metadataText
-
     setSubmitting(true)
     try {
       await onSubmit(payload)
-      markSaved(submittedValue, submittedMetadataText)
+      const normalizedMetadataText = formatMetadata(payload.metadata)
+      setValue(payload)
+      setMetadataText(normalizedMetadataText)
+      markSaved(payload, normalizedMetadataText)
       setSubmitting(false)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save question.')

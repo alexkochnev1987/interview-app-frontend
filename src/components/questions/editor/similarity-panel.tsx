@@ -103,9 +103,11 @@ export function SimilarityPanel({
           </PanelMessage>
         ) : null}
 
-        {matches.map((match) => (
-          <SimilarMatchRow key={match.question.id} match={match} />
-        ))}
+        {status === 'success'
+          ? matches.map((match) => (
+              <SimilarMatchRow key={match.question.id} match={match} />
+            ))
+          : null}
       </CardContent>
     </Card>
   )

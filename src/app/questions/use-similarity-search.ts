@@ -124,6 +124,7 @@ export function useSimilaritySearch({
         setLastFetchedSignature(signature)
       } catch (err) {
         if (cancelled) return
+        setMatches([])
         setStatus('error')
         setError(err instanceof Error ? err.message : 'Failed to load similar questions.')
         setLastFetchedSignature(signature)
@@ -152,6 +153,7 @@ export function useSimilaritySearch({
       setMatches(result)
       setStatus('success')
     } catch (err) {
+      setMatches([])
       setStatus('error')
       setError(err instanceof Error ? err.message : 'Failed to load similar questions.')
     }
