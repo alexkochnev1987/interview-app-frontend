@@ -1,59 +1,243 @@
 'use client'
 
 import { useParams } from 'next/navigation'
-import { ArrowLeft } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import {
+  ArrowLeft,
+  CheckCircle2,
+  CircleAlert,
+  CircleDashed,
+  FileVideo2,
+  Layers3,
+  Sparkles,
+  Upload,
+} from 'lucide-react'
 
+import { EyebrowBadge } from '@/components/app/eyebrow-badge'
+import { MetricPanel } from '@/components/app/metric-panel'
+import { StatusPill } from '@/components/app/status-pill'
 import { LoadingStateCard } from '@/components/app/state-card'
-import { InterviewDetailHero } from '@/components/interviews/detail/interview-detail-hero'
-import { InterviewQuestionCard } from '@/components/interviews/detail/interview-question-card'
-import { InterviewResultsSection } from '@/components/interviews/detail/interview-results-section'
-import { PageMainCompact, PageMainCompactStack, PageMainWideGap } from '@/components/layout/page-shell'
-import { SectionHeaderRow, SectionStack, SingleColumnGrid } from '@/components/layout/grid-layouts'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { useInterviewDetail } from '@/features/interviews/use-interview-detail'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Progress } from '@/components/ui/progress'
+import { cn } from '@/lib/utils'
+import {
+  completeInterview,
+  completeUpload,
+  getInterview,
+  getPresignedUrl,
+  getResults,
+  type Interview,
+  type InterviewResult,
+} from '@/lib/api'
+import {
+  formatInterviewDate,
+  formatInterviewStatusLabel,
+  getCandidateInitials,
+} from '@/lib/interview-formatters'
+
+type UploadStatus = 'idle' | 'uploading' | 'uploaded' | 'error'
+
+interface QuestionUploadState {
+  status: UploadStatus
+  errorMessage?: string
+}
+
+function formatAnswerDuration(seconds?: number) {
+  if (!seconds || seconds < 1) {
+    return 'n/a'
+  }
+
+  const minutes = Math.floor(seconds / 60)
+  const remainder = seconds % 60
+  return `${minutes}:${remainder.toString().padStart(2, '0')}`
+}
+
+function formatFileSize(bytes?: number) {
+  if (!bytes || bytes < 1) {
+    return 'n/a'
+  }
+
+  if (bytes < 1024 * 1024) {
+    return `${Math.round(bytes / 1024)} KB`
+  }
+
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
+
+function formatWorkflowStage(stage?: string) {
+  if (!stage) {
+    return 'idle'
+  }
+
+  return stage.replaceAll('_', ' ')
+}
 
 export default function InterviewDetailPage() {
   const params = useParams<{ id: string }>()
   const id = params.id
-  const {
-    interview,
-    results,
-    loading,
-    error,
-    completing,
-    uploadStates,
-    fileInputRefs,
-    setFileInputRef,
-    handleUpload,
-    handleComplete,
-  } = useInterviewDetail(id)
+
+  const [interview, setInterview] = useState<Interview | null>(null)
+  const [results, setResults] = useState<InterviewResult | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [completing, setCompleting] = useState(false)
+  const [uploadStates, setUploadStates] = useState<QuestionUploadState[]>([])
+  const fileInputRefs = useRef<(HTMLInputElement | null)[]>([])
+
+  const loadInterview = useCallback(async () => {
+    try {
+      const data = await getInterview(id)
+      setInterview(data)
+      setUploadStates(
+        data.questions.map((_, qi) => {
+          const hasAnswer = data.answers.some((answer) => answer.questionIndex === qi)
+          return { status: hasAnswer ? 'uploaded' : 'idle' } as QuestionUploadState
+        })
+      )
+
+      if (data.status === 'completed') {
+        try {
+          const nextResults = await getResults(id)
+          setResults(nextResults)
+        } catch {
+          // Results may still be processing even after completion.
+        }
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load interview.')
+    } finally {
+      setLoading(false)
+    }
+  }, [id])
+
+  useEffect(() => {
+    loadInterview()
+  }, [loadInterview])
+
+  function setFileInputRef(index: number, element: HTMLInputElement | null) {
+    fileInputRefs.current[index] = element
+  }
+
+  async function handleUpload(questionIndex: number) {
+    const fileInput = fileInputRefs.current[questionIndex]
+    if (!fileInput?.files?.length || !interview) {
+      return
+    }
+
+    const file = fileInput.files[0]
+
+    setUploadStates((current) =>
+      current.map((state, index) => (index === questionIndex ? { status: 'uploading' } : state))
+    )
+
+    try {
+      const { uploadUrl, mediaKey } = await getPresignedUrl(interview.id, questionIndex, file.type)
+
+      const uploadResponse = await fetch(uploadUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': file.type },
+        body: file,
+      })
+
+      if (!uploadResponse.ok) {
+        throw new Error('Upload to storage failed')
+      }
+
+      const updatedInterview = await completeUpload(interview.id, questionIndex, mediaKey)
+      setInterview(updatedInterview)
+      setUploadStates((current) =>
+        current.map((state, index) =>
+          index === questionIndex ? { status: 'uploaded' } : state
+        )
+      )
+    } catch (err) {
+      setUploadStates((current) =>
+        current.map((state, index) =>
+          index === questionIndex
+            ? {
+                status: 'error',
+                errorMessage: err instanceof Error ? err.message : 'Upload failed',
+              }
+            : state
+        )
+      )
+    }
+  }
+
+  async function handleComplete() {
+    if (!interview) {
+      return
+    }
+
+    setCompleting(true)
+    setError(null)
+
+    try {
+      const updatedInterview = await completeInterview(interview.id)
+      setInterview(updatedInterview)
+
+      if (updatedInterview.status === 'completed') {
+        try {
+          const nextResults = await getResults(interview.id)
+          setResults(nextResults)
+        } catch {
+          // Results may still be processing after completion.
+        }
+      }
+
+      if (updatedInterview.status === 'processing') {
+        const pollId = window.setInterval(async () => {
+          try {
+            const refreshedInterview = await getInterview(interview.id)
+            setInterview(refreshedInterview)
+
+            if (refreshedInterview.status === 'completed') {
+              window.clearInterval(pollId)
+              const nextResults = await getResults(interview.id)
+              setResults(nextResults)
+            } else if (refreshedInterview.status === 'failed') {
+              window.clearInterval(pollId)
+            }
+          } catch {
+            window.clearInterval(pollId)
+          }
+        }, 2000)
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to complete interview.')
+    } finally {
+      setCompleting(false)
+    }
+  }
 
   if (loading) {
     return (
-      <PageMainCompact>
+      <main className="container py-12">
         <LoadingStateCard label="Loading interview..." />
-      </PageMainCompact>
+      </main>
     )
   }
 
   if (error && !interview) {
     return (
-      <PageMainCompactStack>
-        <Alert variant="destructive">
+      <main className="container space-y-6 py-12">
+        <Alert variant="destructive" className="border-rose-200/70 bg-rose-50/85">
           <AlertTitle>Interview unavailable</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
         <Button
           asChild
-          variant="outline-soft-strong"
+          variant="outline"
+          className="rounded-full bg-white/75"
         >
           <a href="/">
             <ArrowLeft className="size-4" />
             Back to dashboard
           </a>
         </Button>
-      </PageMainCompactStack>
+      </main>
     )
   }
 
@@ -71,28 +255,162 @@ export default function InterviewDetailPage() {
   const canComplete = allAnswered && !isTerminal && interview.status !== 'processing'
 
   return (
-    <PageMainWideGap>
-      <InterviewDetailHero
-        interview={interview}
-        results={results}
-        completing={completing}
-        isTerminal={isTerminal}
-        canComplete={canComplete}
-        onComplete={handleComplete}
-        answeredCount={answeredCount}
-        totalQuestions={totalQuestions}
-        progressValue={progressValue}
-      />
+    <main className="container space-y-8 py-10 md:space-y-10 md:py-12">
+      <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+        <Card className="border-white/65 bg-white/88 shadow-float">
+          <CardContent className="space-y-8 px-8 py-8">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div className="space-y-4">
+                <a
+                  href="/"
+                  className="inline-flex items-center gap-2 rounded-full bg-[hsl(var(--surface-low)/0.9)] px-3 py-1 text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground ring-1 ring-border/50"
+                >
+                  <ArrowLeft className="size-3.5" />
+                  Back to dashboard
+                </a>
+
+                <div className="flex items-center gap-4">
+                  <div className="flex size-16 items-center justify-center rounded-[1.4rem] bg-[hsl(var(--primary-fixed)/0.9)] text-lg font-semibold text-[hsl(var(--primary))]">
+                    {getCandidateInitials(interview.candidateName)}
+                  </div>
+                  <div className="space-y-1.5">
+                    <h1 className="text-4xl font-semibold tracking-[-0.04em] text-foreground md:text-5xl">
+                      {interview.candidateName}
+                    </h1>
+                    <p className="text-base text-muted-foreground md:text-lg">{interview.position}</p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3">
+                  <StatusPill tone={interview.status}>
+                    {formatInterviewStatusLabel(interview.status)}
+                  </StatusPill>
+                  <StatusPill tone="neutral">
+                    Created {formatInterviewDate(interview.createdAt)}
+                  </StatusPill>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-3">
+                {!isTerminal ? (
+                  <Button
+                    type="button"
+                    onClick={handleComplete}
+                    disabled={!canComplete || completing}
+                    className="rounded-full bg-primary-gradient px-5 shadow-soft hover:brightness-105"
+                  >
+                    {completing
+                      ? 'Completing...'
+                      : interview.status === 'processing'
+                        ? 'Processing...'
+                        : 'Complete Interview'}
+                  </Button>
+                ) : null}
+              </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-3">
+              <MetricPanel
+                label="Questions"
+                value={totalQuestions}
+                valueClassName="mt-3 text-4xl font-semibold tracking-[-0.04em] text-foreground"
+              />
+              <MetricPanel
+                label="Uploaded"
+                value={answeredCount}
+                valueClassName="mt-3 text-4xl font-semibold tracking-[-0.04em] text-foreground"
+              />
+              <MetricPanel
+                label="Overall score"
+                value={results ? results.overallScore : '--'}
+                valueClassName="mt-3 text-4xl font-semibold tracking-[-0.04em] text-foreground"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-white/60 bg-[hsl(var(--surface-low)/0.9)] shadow-soft">
+          <CardHeader>
+            <EyebrowBadge icon={<Sparkles className="size-3.5" />} tone="muted">
+              Interview progress
+            </EyebrowBadge>
+            <CardTitle className="text-2xl tracking-[-0.03em]">Answer packet status</CardTitle>
+            <CardDescription className="text-sm leading-6">
+              Recruiter-side review stays anchored to upload completion first, then shifts into
+              scoring once the packet is fully assembled.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-3 rounded-[1.5rem] bg-white/80 p-5 ring-1 ring-border/45">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-sm font-medium text-foreground">Completion</span>
+                <StatusPill tone="neutral">{progressValue}%</StatusPill>
+              </div>
+              <Progress value={progressValue} className="h-2.5 rounded-full bg-white" />
+              <p className="text-sm leading-6 text-muted-foreground">
+                {answeredCount} of {totalQuestions} answers uploaded.
+              </p>
+            </div>
+
+            <div className="space-y-3 rounded-[1.5rem] bg-white/80 p-5 ring-1 ring-border/45">
+              <div className="flex items-center gap-2 text-foreground">
+                {canComplete ? (
+                  <CheckCircle2 className="size-4 text-emerald-600" />
+                ) : (
+                  <CircleDashed className="size-4 text-muted-foreground" />
+                )}
+                <span className="text-sm font-medium">Ready state</span>
+              </div>
+              <p className="text-sm leading-6 text-muted-foreground">
+                {canComplete
+                  ? 'All answers are in place. You can send the packet for scoring now.'
+                  : 'Scoring stays locked until every question has an uploaded answer.'}
+              </p>
+            </div>
+
+            {results ? (
+              <div className="space-y-3 rounded-[1.5rem] bg-white/80 p-5 ring-1 ring-border/45">
+                <div className="flex items-center gap-2 text-foreground">
+                  <Layers3 className="size-4 text-[hsl(var(--primary))]" />
+                  <span className="text-sm font-medium">Results summary</span>
+                </div>
+                <p className="text-sm leading-6 text-muted-foreground">{results.summary}</p>
+              </div>
+            ) : null}
+
+            {interview.workflow ? (
+              <div className="space-y-3 rounded-[1.5rem] bg-white/80 p-5 ring-1 ring-border/45">
+                <div className="flex items-center gap-2 text-foreground">
+                  <Layers3 className="size-4 text-[hsl(var(--primary))]" />
+                  <span className="text-sm font-medium">Workflow</span>
+                </div>
+                <p className="text-sm leading-6 text-muted-foreground">
+                  Status: <strong>{interview.workflow.status.replace('_', ' ')}</strong>
+                  {interview.workflow.currentStage
+                    ? ` • stage: ${formatWorkflowStage(interview.workflow.currentStage)}`
+                    : ''}
+                </p>
+                <p className="text-sm leading-6 text-muted-foreground">
+                  Last update {new Date(interview.workflow.lastUpdatedAt).toLocaleString()}
+                </p>
+                {interview.workflow.errorMessage ? (
+                  <p className="text-sm leading-6 text-rose-700">{interview.workflow.errorMessage}</p>
+                ) : null}
+              </div>
+            ) : null}
+          </CardContent>
+        </Card>
+      </section>
 
       {error ? (
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="border-rose-200/70 bg-rose-50/85">
           <AlertTitle>Interview action failed</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       ) : null}
 
-      <SectionStack>
-        <SectionHeaderRow>
+      <section className="space-y-4">
+        <div className="flex flex-wrap items-end justify-between gap-4">
           <div className="space-y-2">
             <div className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
               Candidate packet
@@ -104,32 +422,214 @@ export default function InterviewDetailPage() {
           <div className="text-sm text-muted-foreground">
             Upload audio/video manually if the candidate flow was completed outside the browser.
           </div>
-        </SectionHeaderRow>
+        </div>
 
-        <SingleColumnGrid>
+        <div className="grid gap-4">
           {interview.questions.map((question, questionIndex) => {
             const answer = interview.answers.find((item) => item.questionIndex === questionIndex)
+            const hasAnswer = Boolean(answer)
             const uploadState = uploadStates[questionIndex] ?? { status: 'idle' }
 
             return (
-              <InterviewQuestionCard
+              <Card
                 key={question.id}
-                question={question}
-                questionIndex={questionIndex}
-                answer={answer}
-                uploadState={uploadState}
-                isTerminal={isTerminal}
-                interviewStatus={interview.status}
-                onUploadClick={() => fileInputRefs.current[questionIndex]?.click()}
-                onFileChange={() => handleUpload(questionIndex)}
-                setFileInputRef={(element) => setFileInputRef(questionIndex, element)}
-              />
+                className="border-white/65 bg-white/88 shadow-soft transition-transform duration-200 hover:-translate-y-0.5"
+              >
+                <CardHeader className="gap-4">
+                  <div className="flex flex-wrap items-start justify-between gap-4">
+                    <div className="space-y-3">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <StatusPill tone="neutral">Q{questionIndex + 1}</StatusPill>
+                        <StatusPill tone={question.difficulty}>{question.difficulty}</StatusPill>
+                        {question.category ? (
+                          <StatusPill tone="neutral" className="normal-case tracking-[0.08em]">
+                            {question.category}
+                          </StatusPill>
+                        ) : null}
+                        <StatusPill tone="neutral">weight {question.weight}</StatusPill>
+                      </div>
+                      <CardTitle className="max-w-4xl text-xl tracking-[-0.03em]">
+                        {question.questionText}
+                      </CardTitle>
+                    </div>
+
+                      <div className="flex flex-col items-end gap-2">
+                      {answer?.status === 'submitted' ? (
+                        <StatusPill tone="completed">Submitted</StatusPill>
+                      ) : hasAnswer || uploadState.status === 'uploaded' ? (
+                        <StatusPill tone="processing">Draft saved</StatusPill>
+                      ) : uploadState.status === 'uploading' ? (
+                        <StatusPill tone="processing">Uploading</StatusPill>
+                      ) : uploadState.status === 'error' ? (
+                        <StatusPill tone="failed">Upload failed</StatusPill>
+                      ) : (
+                        <StatusPill tone="pending">Pending</StatusPill>
+                      )}
+
+                      {!isTerminal && interview.status !== 'processing' ? (
+                        <>
+                          <input
+                            type="file"
+                            accept="video/*,audio/*"
+                            ref={(element) => setFileInputRef(questionIndex, element)}
+                            className="hidden"
+                            onChange={() => handleUpload(questionIndex)}
+                          />
+                          <Button
+                            type="button"
+                            variant={uploadState.status === 'error' ? 'destructive' : 'outline'}
+                            size="sm"
+                            onClick={() => fileInputRefs.current[questionIndex]?.click()}
+                            className={cn(
+                              'rounded-full bg-white/75',
+                              uploadState.status === 'error' && 'bg-rose-50 hover:bg-rose-100'
+                            )}
+                          >
+                            <Upload className="size-4" />
+                            {uploadState.status === 'error' ? 'Retry upload' : 'Upload file'}
+                          </Button>
+                        </>
+                      ) : null}
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {answer ? (
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <div className="rounded-[1.25rem] bg-[hsl(var(--surface-low)/0.85)] p-4 ring-1 ring-border/45">
+                        <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                          Recorded answer
+                        </div>
+                        <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                          Duration {formatAnswerDuration(answer.durationSeconds)} • retakes {answer.retakeCount ?? 0}
+                        </p>
+                        <p className="text-sm leading-6 text-muted-foreground">
+                          Camera {formatFileSize(answer.camera?.fileSizeBytes)} • screen {formatFileSize(answer.screen?.fileSizeBytes)}
+                        </p>
+                        <p className="text-sm leading-6 text-muted-foreground">
+                          Status {answer.status} • versions {answer.versions?.length ?? 1}
+                        </p>
+                        <p className="text-sm leading-6 text-muted-foreground">
+                          Uploaded {new Date(answer.uploadedAt).toLocaleString()}
+                        </p>
+                      </div>
+                      <div className="rounded-[1.25rem] bg-[hsl(var(--surface-low)/0.85)] p-4 ring-1 ring-border/45">
+                        <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                          Evaluation signals
+                        </div>
+                        <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                          Hidden tabs {answer.behaviorSignals?.tabHiddenCount ?? 0} • blur {answer.behaviorSignals?.windowBlurCount ?? 0} • paste {answer.behaviorSignals?.pasteCount ?? 0}
+                        </p>
+                        <p className="text-sm leading-6 text-muted-foreground">
+                          Keydown {answer.behaviorSignals?.keydownCount ?? 0} • resize {answer.behaviorSignals?.resizeCount ?? 0}
+                        </p>
+                        <p className="text-sm leading-6 text-muted-foreground">
+                          Transcript {answer.transcript?.text ? 'ready' : 'pending'} • evaluation {answer.evaluation?.overallScore !== undefined ? 'ready' : 'pending'}
+                        </p>
+                      </div>
+                    </div>
+                  ) : null}
+
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="rounded-[1.25rem] bg-[hsl(var(--surface-low)/0.85)] p-4 ring-1 ring-border/45">
+                      <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                        Expected concepts
+                      </div>
+                      <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                        {question.expectedConcepts.length > 0
+                          ? question.expectedConcepts.map((item) => item.label).join(', ')
+                          : 'Not specified'}
+                      </p>
+                    </div>
+                    <div className="rounded-[1.25rem] bg-[hsl(var(--surface-low)/0.85)] p-4 ring-1 ring-border/45">
+                      <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                        Red flags
+                      </div>
+                      <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                        {question.redFlags.length > 0
+                          ? question.redFlags.map((item) => item.label).join(', ')
+                          : 'Not specified'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {uploadState.status === 'error' && uploadState.errorMessage ? (
+                    <Alert variant="destructive" className="border-rose-200/70 bg-rose-50/85">
+                      <CircleAlert className="size-4" />
+                      <AlertTitle>Upload error</AlertTitle>
+                      <AlertDescription>{uploadState.errorMessage}</AlertDescription>
+                    </Alert>
+                  ) : null}
+                </CardContent>
+              </Card>
             )
           })}
-        </SingleColumnGrid>
-      </SectionStack>
+        </div>
+      </section>
 
-      {results ? <InterviewResultsSection results={results} /> : null}
-    </PageMainWideGap>
+      {results ? (
+        <section className="space-y-4">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div className="space-y-2">
+              <div className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+                Scorecard
+              </div>
+              <h2 className="text-2xl font-semibold tracking-[-0.03em] text-foreground">
+                Interview results
+              </h2>
+            </div>
+            <div className="text-sm leading-6 text-muted-foreground">
+              Candidate feedback remains a tokenized route shared separately from the recruiter UI.
+            </div>
+          </div>
+
+          <div className="grid gap-4 xl:grid-cols-[0.85fr_1.15fr]">
+            <Card className="border-white/65 bg-white/88 shadow-soft">
+            <CardContent className="space-y-5 px-8 py-8">
+                <EyebrowBadge icon={<FileVideo2 className="size-3.5" />} tone="primary">
+                  Overall score
+                </EyebrowBadge>
+                <div className="text-6xl font-semibold tracking-[-0.06em] text-[hsl(var(--primary))]">
+                  {results.overallScore}
+                </div>
+                <p className="text-sm leading-7 text-muted-foreground">{results.summary}</p>
+                <div className="flex flex-wrap gap-2">
+                  {results.decision ? (
+                    <StatusPill tone="neutral">{results.decision}</StatusPill>
+                  ) : null}
+                  {results.trustScore !== undefined ? (
+                    <StatusPill tone="neutral">trust {results.trustScore}</StatusPill>
+                  ) : null}
+                  {results.rubricVersion ? (
+                    <StatusPill tone="neutral">{results.rubricVersion}</StatusPill>
+                  ) : null}
+                </div>
+                {results.trustFlags?.length ? (
+                  <p className="text-sm leading-7 text-muted-foreground">
+                    Flags: {results.trustFlags.join(', ')}
+                  </p>
+                ) : null}
+              </CardContent>
+            </Card>
+
+            <div className="grid gap-4 md:grid-cols-3">
+              {Object.entries(results.categoryScores).map(([category, score]) => (
+                <Card key={category} className="border-white/65 bg-white/88 shadow-soft">
+                  <CardContent className="space-y-3 px-6 py-6 text-center">
+                    <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                      {category}
+                    </div>
+                    <div className="text-4xl font-semibold tracking-[-0.05em] text-[hsl(var(--primary))]">
+                      {score}
+                    </div>
+                    <p className="text-sm text-muted-foreground">out of 100</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
+    </main>
   )
 }

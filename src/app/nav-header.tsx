@@ -89,7 +89,7 @@ export function NavHeader() {
               </Button>
             </>
           ) : (
-            <Button asChild size="sm" variant="gradient">
+            <Button asChild size="sm" className="rounded-full bg-primary-gradient shadow-soft hover:brightness-105">
               <Link href="/login">Sign In</Link>
             </Button>
           )}
