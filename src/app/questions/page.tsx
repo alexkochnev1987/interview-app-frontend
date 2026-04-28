@@ -8,6 +8,8 @@ import { EyebrowBadge } from '@/components/app/eyebrow-badge'
 import { MetricPanel } from '@/components/app/metric-panel'
 import { SurfaceCard } from '@/components/app/surface-card'
 import { ThreeColumnCardsGrid, TwoPanelHeroGrid } from '@/components/layout/grid-layouts'
+import { ActionRow, CardContentHero, SectionCardTitle } from '@/components/layout/content-presets'
+import { PageMainWideGap } from '@/components/layout/page-shell'
 import { EmptyStateCard, LoadingStateCard } from '@/components/app/state-card'
 import { QuestionCard } from '@/components/questions/question-card'
 import { QuestionsToolbar } from '@/components/questions/questions-toolbar'
@@ -30,10 +32,10 @@ export default function QuestionsPage() {
   })
 
   return (
-    <main className="container space-y-8 py-10 md:space-y-10 md:py-12">
+    <PageMainWideGap>
       <TwoPanelHeroGrid>
         <SurfaceCard tone="glassFloat">
-          <CardContent className="flex h-full flex-col gap-6 px-8 py-8">
+          <CardContentHero>
             <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
               Question Library
             </EyebrowBadge>
@@ -46,7 +48,7 @@ export default function QuestionsPage() {
                 evaluation rubric visible instead of buried in JSON.
               </p>
             </div>
-            <div className="flex flex-wrap gap-3">
+            <ActionRow>
               <Button asChild variant="gradient">
                 <Link href="/questions/new">
                   <Plus className="size-4" />
@@ -55,13 +57,12 @@ export default function QuestionsPage() {
               </Button>
               <Button
                 asChild
-                variant="outline"
-                className="rounded-full bg-white/70 backdrop-blur-sm"
+                variant="outline-soft"
               >
                 <Link href="/interviews/new">Build an interview</Link>
               </Button>
-            </div>
-          </CardContent>
+            </ActionRow>
+          </CardContentHero>
         </SurfaceCard>
 
         <SurfaceCard tone="mutedSoft">
@@ -69,7 +70,7 @@ export default function QuestionsPage() {
             <EyebrowBadge icon={<Filter className="size-3.5" />} tone="muted">
               Overview
             </EyebrowBadge>
-            <CardTitle className="text-2xl tracking-[-0.03em]">Library health</CardTitle>
+            <SectionCardTitle>Library health</SectionCardTitle>
             <CardDescription className="text-sm leading-6">
               The new surface emphasizes utility metadata and evaluation depth rather than generic
               admin cards.
@@ -120,6 +121,6 @@ export default function QuestionsPage() {
           ))}
         </ThreeColumnCardsGrid>
       )}
-    </main>
+    </PageMainWideGap>
   )
 }

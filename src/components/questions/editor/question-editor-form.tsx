@@ -2,10 +2,10 @@ import { BrainCircuit, Save, Sparkles, WandSparkles } from 'lucide-react';
 import type { FormEvent } from 'react';
 
 import { SurfaceCard } from '@/components/app/surface-card';
+import { CardContentSpacious } from '@/components/layout/content-presets';
 import { QuestionEditorField } from '@/components/questions/question-editor-field';
 import { QuestionEditorSectionIntro } from '@/components/questions/question-editor-section-intro';
 import { Button } from '@/components/ui/button';
-import { CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
@@ -41,7 +41,7 @@ export function QuestionEditorForm({
   return (
     <form onSubmit={onSubmit} className="space-y-6">
       <SurfaceCard tone="glassSoft">
-        <CardContent className="space-y-6 px-8 py-8">
+        <CardContentSpacious>
           <QuestionEditorSectionIntro
             title="Question identity"
             description="Anchor the prompt in the role and taxonomy you expect recruiters to search later."
@@ -170,11 +170,11 @@ export function QuestionEditorForm({
               />
             </QuestionEditorField>
           </div>
-        </CardContent>
+        </CardContentSpacious>
       </SurfaceCard>
 
       <SurfaceCard tone="glassSoft">
-        <CardContent className="space-y-6 px-8 py-8">
+        <CardContentSpacious>
           <QuestionEditorSectionIntro
             title="Prompt and follow-up"
             description="Write the core question clearly, then capture the follow-up probes that interviewers should keep ready."
@@ -206,11 +206,11 @@ export function QuestionEditorForm({
               className="min-h-[140px] rounded-[1.5rem] border-white/70 bg-[hsl(var(--surface-low)/0.8)] px-4 py-3 leading-7"
             />
           </QuestionEditorField>
-        </CardContent>
+        </CardContentSpacious>
       </SurfaceCard>
 
       <SurfaceCard tone="glassSoft">
-        <CardContent className="space-y-6 px-8 py-8">
+        <CardContentSpacious>
           <QuestionEditorSectionIntro
             title="Evaluation rubric"
             description="Define what a good answer must cover and which signals should reduce confidence."
@@ -244,11 +244,11 @@ export function QuestionEditorForm({
               />
             </QuestionEditorField>
           </div>
-        </CardContent>
+        </CardContentSpacious>
       </SurfaceCard>
 
       <SurfaceCard tone="glassSoft">
-        <CardContent className="space-y-6 px-8 py-8">
+        <CardContentSpacious>
           <QuestionEditorSectionIntro
             title="Reference material"
             description="Store extra context for future reviewers, exports, and scoring experiments."
@@ -303,7 +303,7 @@ export function QuestionEditorForm({
               </QuestionEditorField>
             </div>
           </div>
-        </CardContent>
+        </CardContentSpacious>
       </SurfaceCard>
 
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-[1.75rem] border border-white/65 bg-white/88 px-6 py-5 shadow-soft">

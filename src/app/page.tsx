@@ -5,6 +5,7 @@ import { DashboardHero } from '@/components/dashboard/dashboard-hero';
 import { DashboardSnapshot } from '@/components/dashboard/dashboard-snapshot';
 import { InterviewsGrid } from '@/components/dashboard/interviews-grid';
 import { DashboardHeroGrid } from '@/components/layout/grid-layouts';
+import { PageMainWideGap } from '@/components/layout/page-shell';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { getDashboardMetrics } from '@/features/dashboard/dashboard-metrics';
 import { useDashboardInterviews } from '@/features/dashboard/use-dashboard-interviews';
@@ -14,7 +15,7 @@ export default function DashboardPage() {
   const { activeCount, completedCount, questionVolume } = getDashboardMetrics(interviews);
 
   return (
-    <main className="container space-y-8 py-10 md:space-y-10 md:py-12">
+    <PageMainWideGap>
       <DashboardHeroGrid>
         <DashboardHero
           activeCount={activeCount}
@@ -35,6 +36,6 @@ export default function DashboardPage() {
       )}
 
       <InterviewsGrid interviews={interviews} loading={loading} />
-    </main>
+    </PageMainWideGap>
   );
 }

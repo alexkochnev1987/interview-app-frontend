@@ -1,13 +1,15 @@
 import { Sparkles } from 'lucide-react';
 
 import { EyebrowBadge } from '@/components/app/eyebrow-badge';
-import { SurfaceCard } from '@/components/app/surface-card';
+import { SurfaceCardMax5xl } from '@/components/app/surface-card';
+import { SectionCardTitle } from '@/components/layout/content-presets';
+import { PageMain } from '@/components/layout/page-shell';
 import { TakeCapabilityCards } from '@/components/take/consent/take-capability-cards';
 import { TakeConsentCheckboxBlock } from '@/components/take/consent/take-consent-checkbox-block';
 import { TakePermissionStatusList } from '@/components/take/consent/take-permission-status-list';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import type { InterviewDataView, PermissionStatus } from '@/components/take/types';
 
 interface TakeConsentScreenProps {
@@ -38,8 +40,8 @@ export function TakeConsentScreen({
   permissionClasses,
 }: TakeConsentScreenProps) {
   return (
-    <main className="container space-y-8 py-10 md:py-12">
-      <SurfaceCard tone="glassFloat" className="mx-auto max-w-5xl">
+    <PageMain>
+      <SurfaceCardMax5xl tone="glassFloat">
         <CardContent className="grid gap-8 px-8 py-8 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="space-y-5">
             <EyebrowBadge icon={<Sparkles className="size-3.5" />}>Candidate interview</EyebrowBadge>
@@ -59,7 +61,7 @@ export function TakeConsentScreen({
 
           <Card className="border-white/70 bg-white/90 shadow-soft">
             <CardHeader className="space-y-2">
-              <CardTitle className="text-2xl tracking-[-0.03em]">Before you start</CardTitle>
+              <SectionCardTitle>Before you start</SectionCardTitle>
               <CardDescription className="text-sm leading-6">
                 One button will request camera, microphone, and then full-screen sharing.
               </CardDescription>
@@ -106,7 +108,7 @@ export function TakeConsentScreen({
             </CardContent>
           </Card>
         </CardContent>
-      </SurfaceCard>
-    </main>
+      </SurfaceCardMax5xl>
+    </PageMain>
   );
 }

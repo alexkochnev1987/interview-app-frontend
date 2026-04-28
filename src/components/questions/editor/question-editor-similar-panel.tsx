@@ -2,10 +2,11 @@ import Link from 'next/link';
 import { Search } from 'lucide-react';
 
 import { SurfaceCard } from '@/components/app/surface-card';
+import { SectionCardTitle } from '@/components/layout/content-presets';
 import { StatusPill } from '@/components/app/status-pill';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import type { SimilarQuestionMatch } from '@/lib/api';
 import { truncateText } from '@/lib/text';
 
@@ -43,7 +44,7 @@ export function QuestionEditorSimilarPanel({
     <SurfaceCard tone="glassSoft">
       <CardHeader className="space-y-5">
         <div className="space-y-1.5">
-          <CardTitle className="text-2xl tracking-[-0.03em]">Similar questions</CardTitle>
+          <SectionCardTitle>Similar questions</SectionCardTitle>
           <CardDescription className="text-sm leading-6">
             Check for duplicates and near-duplicates against the current library before you save a
             new prompt or update an old one.

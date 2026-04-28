@@ -7,7 +7,8 @@ import { LoadingStateCard } from '@/components/app/state-card'
 import { InterviewDetailHero } from '@/components/interviews/detail/interview-detail-hero'
 import { InterviewQuestionCard } from '@/components/interviews/detail/interview-question-card'
 import { InterviewResultsSection } from '@/components/interviews/detail/interview-results-section'
-import { SectionHeaderRow } from '@/components/layout/grid-layouts'
+import { PageMainCompact, PageMainCompactStack, PageMainWideGap } from '@/components/layout/page-shell'
+import { SectionHeaderRow, SectionStack, SingleColumnGrid } from '@/components/layout/grid-layouts'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { useInterviewDetail } from '@/features/interviews/use-interview-detail'
@@ -30,30 +31,29 @@ export default function InterviewDetailPage() {
 
   if (loading) {
     return (
-      <main className="container py-12">
+      <PageMainCompact>
         <LoadingStateCard label="Loading interview..." />
-      </main>
+      </PageMainCompact>
     )
   }
 
   if (error && !interview) {
     return (
-      <main className="container space-y-6 py-12">
+      <PageMainCompactStack>
         <Alert variant="destructive">
           <AlertTitle>Interview unavailable</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
         <Button
           asChild
-          variant="outline"
-          className="rounded-full bg-white/75"
+          variant="outline-soft-strong"
         >
           <a href="/">
             <ArrowLeft className="size-4" />
             Back to dashboard
           </a>
         </Button>
-      </main>
+      </PageMainCompactStack>
     )
   }
 
@@ -71,7 +71,7 @@ export default function InterviewDetailPage() {
   const canComplete = allAnswered && !isTerminal && interview.status !== 'processing'
 
   return (
-    <main className="container space-y-8 py-10 md:space-y-10 md:py-12">
+    <PageMainWideGap>
       <InterviewDetailHero
         interview={interview}
         results={results}
@@ -91,7 +91,7 @@ export default function InterviewDetailPage() {
         </Alert>
       ) : null}
 
-      <section className="space-y-4">
+      <SectionStack>
         <SectionHeaderRow>
           <div className="space-y-2">
             <div className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
@@ -106,7 +106,7 @@ export default function InterviewDetailPage() {
           </div>
         </SectionHeaderRow>
 
-        <div className="grid gap-4">
+        <SingleColumnGrid>
           {interview.questions.map((question, questionIndex) => {
             const answer = interview.answers.find((item) => item.questionIndex === questionIndex)
             const uploadState = uploadStates[questionIndex] ?? { status: 'idle' }
@@ -126,10 +126,10 @@ export default function InterviewDetailPage() {
               />
             )
           })}
-        </div>
-      </section>
+        </SingleColumnGrid>
+      </SectionStack>
 
       {results ? <InterviewResultsSection results={results} /> : null}
-    </main>
+    </PageMainWideGap>
   )
 }

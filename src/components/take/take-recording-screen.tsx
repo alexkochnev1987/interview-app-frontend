@@ -1,13 +1,14 @@
 import type { RefObject } from 'react';
 
 import { SurfaceCard } from '@/components/app/surface-card';
+import { CardContentSpacious } from '@/components/layout/content-presets';
+import { PageMain } from '@/components/layout/page-shell';
 import { TakeRecordingActions } from '@/components/take/recording/take-recording-actions';
 import { TakeRecordingGuidance } from '@/components/take/recording/take-recording-guidance';
 import { TakeRecordingHeader } from '@/components/take/recording/take-recording-header';
 import { TakeRecordingPreview } from '@/components/take/recording/take-recording-preview';
 import { TakeRecordingStatus } from '@/components/take/recording/take-recording-status';
 import { LiveTranscriptPanel } from '@/components/take/live-transcript-panel';
-import { CardContent } from '@/components/ui/card';
 import type { InterviewDataView, TakeStage } from '@/components/take/types';
 
 interface TakeRecordingScreenProps {
@@ -52,10 +53,10 @@ export function TakeRecordingScreen({
   onSubmit,
 }: TakeRecordingScreenProps) {
   return (
-    <main className="container space-y-8 py-10 md:py-12">
+    <PageMain>
       <section className="mx-auto grid max-w-6xl gap-6 xl:grid-cols-[0.84fr_1.16fr]">
         <SurfaceCard tone="glassSoft">
-          <CardContent className="space-y-6 px-8 py-8">
+          <CardContentSpacious>
             <TakeRecordingHeader
               interview={interview}
               progressValue={progressValue}
@@ -64,11 +65,11 @@ export function TakeRecordingScreen({
               currentVersionNumber={currentVersionNumber}
               retakeCount={retakeCount}
             />
-          </CardContent>
+          </CardContentSpacious>
         </SurfaceCard>
 
         <SurfaceCard tone="glassFloat">
-          <CardContent className="space-y-6 px-8 py-8">
+          <CardContentSpacious>
             <div className="space-y-3">
               <TakeRecordingStatus stage={stage} timeLeft={timeLeft} formatTime={formatTime} />
 
@@ -100,9 +101,9 @@ export function TakeRecordingScreen({
               onRerecord={onRerecord}
               onSubmit={onSubmit}
             />
-          </CardContent>
+          </CardContentSpacious>
         </SurfaceCard>
       </section>
-    </main>
+    </PageMain>
   );
 }

@@ -1,7 +1,8 @@
 import { StatusPill } from '@/components/app/status-pill';
 import { SurfaceCard } from '@/components/app/surface-card';
+import { ActionRow, SectionCardTitle } from '@/components/layout/content-presets';
 import { Button } from '@/components/ui/button';
-import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import type { QuestionDraft, QuestionInput } from '@/lib/api';
 import { previewValue } from '@/features/questions/editor';
 
@@ -32,18 +33,18 @@ export function QuestionEditorAiDiffCard({
     <SurfaceCard tone="glassSoft">
       <CardHeader className="flex flex-row items-start justify-between gap-4">
         <div className="space-y-1.5">
-          <CardTitle className="text-2xl tracking-[-0.03em]">AI draft diff</CardTitle>
+          <SectionCardTitle>AI draft diff</SectionCardTitle>
           <CardDescription className="text-sm leading-6">
             Review changes field by field. The current state always stays visible beside the AI
             proposal.
           </CardDescription>
         </div>
-        <div className="flex flex-wrap gap-3">
+        <ActionRow>
           <StatusPill tone="neutral">{pendingDraftFields.length} pending</StatusPill>
           <Button type="button" onClick={onApplyAll} disabled={pendingDraftFields.length === 0} variant="gradient">
             Apply all AI fields
           </Button>
-        </div>
+        </ActionRow>
       </CardHeader>
       <CardContent>
         {pendingDraftFields.length === 0 ? (

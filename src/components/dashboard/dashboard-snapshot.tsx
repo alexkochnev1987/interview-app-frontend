@@ -4,7 +4,8 @@ import { EyebrowBadge } from '@/components/app/eyebrow-badge';
 import { MetricPanel } from '@/components/app/metric-panel';
 import { StatusPill } from '@/components/app/status-pill';
 import { SurfaceCard } from '@/components/app/surface-card';
-import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { SectionCardTitle } from '@/components/layout/content-presets';
+import { CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 
 interface DashboardSnapshotProps {
   completedCount: number;
@@ -19,7 +20,7 @@ export function DashboardSnapshot({ completedCount, loading, usingMock }: Dashbo
         <EyebrowBadge icon={<BriefcaseBusiness className="size-3.5" />} tone="muted">
           Snapshot
         </EyebrowBadge>
-        <CardTitle className="text-2xl tracking-[-0.03em]">Today&apos;s pipeline</CardTitle>
+        <SectionCardTitle>Today&apos;s pipeline</SectionCardTitle>
         <CardDescription className="max-w-sm text-sm leading-6">
           The redesigned shell uses tonal layers instead of hard separators, so activity stays
           readable even when the data density grows.

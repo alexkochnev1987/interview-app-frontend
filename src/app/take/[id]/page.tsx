@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useParams, useSearchParams } from 'next/navigation'
 import { LoadingStateCard } from '@/components/app/state-card'
+import { MaxWidth4xl, PageMainCompact } from '@/components/layout/page-shell'
 import { TakeCompleteScreen } from '@/components/take/take-complete-screen'
 import { TakeConsentScreen } from '@/components/take/take-consent-screen'
 import { TakeRecordingScreen } from '@/components/take/take-recording-screen'
@@ -411,20 +412,24 @@ export default function TakeInterviewPage() {
 
   if (error && !interview) {
     return (
-      <main className="container py-12">
-        <Alert variant="destructive">
-          <AlertTitle>Interview unavailable</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      </main>
+      <PageMainCompact>
+        <MaxWidth4xl>
+          <Alert variant="destructive">
+            <AlertTitle>Interview unavailable</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        </MaxWidth4xl>
+      </PageMainCompact>
     )
   }
 
   if (stage === 'loading' || !interview) {
     return (
-      <main className="container py-12">
-        <LoadingStateCard className="mx-auto max-w-4xl" label="Loading interview..." />
-      </main>
+      <PageMainCompact>
+        <MaxWidth4xl>
+          <LoadingStateCard label="Loading interview..." />
+        </MaxWidth4xl>
+      </PageMainCompact>
     )
   }
 

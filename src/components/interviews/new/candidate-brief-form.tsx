@@ -2,8 +2,9 @@ import { ArrowRight, BriefcaseBusiness, UserRound } from 'lucide-react';
 
 import { MetricPanel } from '@/components/app/metric-panel';
 import { SurfaceCard } from '@/components/app/surface-card';
+import { SectionCardTitle } from '@/components/layout/content-presets';
 import { Button } from '@/components/ui/button';
-import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -29,7 +30,7 @@ export function CandidateBriefForm({
   return (
     <SurfaceCard tone="glassSoft">
       <CardHeader>
-        <CardTitle className="text-2xl tracking-[-0.03em]">Candidate brief</CardTitle>
+        <SectionCardTitle>Candidate brief</SectionCardTitle>
         <CardDescription className="text-sm leading-6">
           This metadata will anchor the scoring context once answers arrive.
         </CardDescription>

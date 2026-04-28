@@ -13,7 +13,9 @@ import { SurfaceCard } from '@/components/app/surface-card'
 import { QuestionSelector } from '@/components/interviews/new/question-selector'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
+import { ActionRow, CardContentSpacious, SectionCardTitle } from '@/components/layout/content-presets'
 import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { PageMainWideGap } from '@/components/layout/page-shell'
 import { useQuestions } from '@/hooks/use-questions'
 import { createInterview } from '@/lib/api'
 
@@ -65,10 +67,10 @@ export default function NewInterviewPage() {
     }
   }
   return (
-    <main className="container space-y-8 py-10 md:space-y-10 md:py-12">
+    <PageMainWideGap>
       <TwoPanelHeroGrid>
         <SurfaceCard tone="glassFloat">
-          <CardContent className="space-y-6 px-8 py-8">
+          <CardContentSpacious>
             <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
               Create Interview Flow
             </EyebrowBadge>
@@ -81,7 +83,7 @@ export default function NewInterviewPage() {
                 criteria explicit before the recording session starts.
               </p>
             </div>
-            <div className="flex flex-wrap gap-3">
+            <ActionRow>
               <Button asChild variant="gradient">
                 <Link href="/questions/new">
                   <CirclePlus className="size-4" />
@@ -90,18 +92,17 @@ export default function NewInterviewPage() {
               </Button>
               <Button
                 asChild
-                variant="outline"
-                className="rounded-full bg-white/70 backdrop-blur-sm"
+                variant="outline-soft"
               >
                 <Link href="/questions">Open Question Bank</Link>
               </Button>
-            </div>
-          </CardContent>
+            </ActionRow>
+          </CardContentSpacious>
         </SurfaceCard>
 
         <SurfaceCard tone="mutedSoft">
           <CardHeader>
-            <CardTitle className="text-2xl tracking-[-0.03em]">Selection summary</CardTitle>
+            <SectionCardTitle>Selection summary</SectionCardTitle>
             <CardDescription className="text-sm leading-6">
               Keep the prompt set tight. Dense but intentional interviews score better than generic
               long-form sessions.
@@ -146,6 +147,6 @@ export default function NewInterviewPage() {
           />
         </InterviewSetupFormGrid>
       </form>
-    </main>
+    </PageMainWideGap>
   )
 }

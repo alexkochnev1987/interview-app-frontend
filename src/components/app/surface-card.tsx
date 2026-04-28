@@ -24,3 +24,21 @@ interface SurfaceCardProps
 export function SurfaceCard({ tone, className, ...props }: SurfaceCardProps) {
   return <Card className={cn(surfaceCardVariants({ tone }), className)} {...props} />;
 }
+
+interface SurfaceCardMax5xlProps extends Omit<SurfaceCardProps, 'className'> {}
+
+export function SurfaceCardMax5xl({ tone, ...props }: SurfaceCardMax5xlProps) {
+  return <SurfaceCard tone={tone} className="mx-auto max-w-5xl" {...props} />;
+}
+
+interface SurfaceCardLiftProps extends Omit<SurfaceCardProps, 'className'> {}
+
+export function SurfaceCardLift({ tone, ...props }: SurfaceCardLiftProps) {
+  return (
+    <SurfaceCard
+      tone={tone}
+      className="transition-transform duration-200 hover:-translate-y-0.5"
+      {...props}
+    />
+  );
+}

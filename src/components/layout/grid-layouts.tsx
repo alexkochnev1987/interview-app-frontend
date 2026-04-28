@@ -28,6 +28,18 @@ interface FeedbackBottomGridProps {
   children: ReactNode;
 }
 
+interface LoginFeatureGridProps {
+  children: ReactNode;
+}
+
+interface SectionStackProps {
+  children: ReactNode;
+}
+
+interface SingleColumnGridProps {
+  children: ReactNode;
+}
+
 export function ThreeColumnCardsGrid({ children }: ThreeColumnCardsGridProps) {
   return <section className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">{children}</section>;
 }
@@ -62,4 +74,16 @@ export function FeedbackTopGrid({ children }: FeedbackTopGridProps) {
 
 export function FeedbackBottomGrid({ children }: FeedbackBottomGridProps) {
   return <section className="mx-auto grid max-w-6xl gap-6 xl:grid-cols-[0.85fr_1.15fr]">{children}</section>;
+}
+
+export function LoginFeatureGrid({ children }: LoginFeatureGridProps) {
+  return <div className="grid gap-4 md:grid-cols-3">{children}</div>;
+}
+
+export function SectionStack({ children }: SectionStackProps) {
+  return <section className="space-y-4">{children}</section>;
+}
+
+export function SingleColumnGrid({ children }: SingleColumnGridProps) {
+  return <div className="grid gap-4">{children}</div>;
 }

@@ -4,6 +4,7 @@ import { EyebrowBadge } from '@/components/app/eyebrow-badge';
 import { MetricPanel } from '@/components/app/metric-panel';
 import { StatusPill } from '@/components/app/status-pill';
 import { SurfaceCard } from '@/components/app/surface-card';
+import { ActionRow } from '@/components/layout/content-presets';
 import { Button } from '@/components/ui/button';
 import { CardContent } from '@/components/ui/card';
 import type { QuestionInput } from '@/lib/api';
@@ -44,7 +45,7 @@ export function QuestionEditorHeroCard({
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-3">
+          <ActionRow>
             <Button
               type="button"
               variant="outline"
@@ -55,7 +56,7 @@ export function QuestionEditorHeroCard({
               <WandSparkles className="size-4" />
               {aiLoading ? 'Generating...' : 'Generate AI Draft'}
             </Button>
-          </div>
+          </ActionRow>
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">

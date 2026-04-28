@@ -6,6 +6,7 @@ import { QuestionEditorForm } from '@/components/questions/editor/question-edito
 import { QuestionEditorHeroCard } from '@/components/questions/editor/question-editor-hero-card'
 import { QuestionEditorSimilarPanel } from '@/components/questions/editor/question-editor-similar-panel'
 import { QuestionEditorMainGrid } from '@/components/layout/grid-layouts'
+import { PageMainEditor } from '@/components/layout/page-shell'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import {
   draftQuestion,
@@ -267,7 +268,7 @@ export function QuestionEditor({
   }
 
   return (
-    <main className="container space-y-6 py-10 md:space-y-8 md:py-12">
+    <PageMainEditor>
       <QuestionEditorHeroCard
         title={title}
         difficulty={value.difficulty}
@@ -319,6 +320,6 @@ export function QuestionEditor({
           />
         </aside>
       </QuestionEditorMainGrid>
-    </main>
+    </PageMainEditor>
   )
 }

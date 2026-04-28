@@ -3,6 +3,7 @@ import { ArrowRight, CircleDashed, Layers3, Sparkles, Users } from 'lucide-react
 
 import { EyebrowBadge } from '@/components/app/eyebrow-badge';
 import { MetricPanel } from '@/components/app/metric-panel';
+import { ActionRow } from '@/components/layout/content-presets';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -30,17 +31,17 @@ export function DashboardHero({ activeCount, candidatesCount, questionVolume }: 
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-3">
+          <ActionRow>
             <Button asChild variant="gradient">
               <Link href="/interviews/new">
                 New Interview
                 <ArrowRight className="size-4" />
               </Link>
             </Button>
-            <Button asChild variant="outline" className="rounded-full bg-white/70 backdrop-blur-sm">
+            <Button asChild variant="outline-soft">
               <Link href="/questions">Question Bank</Link>
             </Button>
-          </div>
+          </ActionRow>
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">

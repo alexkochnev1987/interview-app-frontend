@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { StatusPill } from '@/components/app/status-pill';
 import { EmptyStateCard, LoadingStateCard } from '@/components/app/state-card';
 import { SurfaceCard } from '@/components/app/surface-card';
+import { SectionCardTitle } from '@/components/layout/content-presets';
 import { Button } from '@/components/ui/button';
 import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -32,7 +33,7 @@ export function QuestionSelector({
     <SurfaceCard tone="glassSoft">
       <CardHeader className="flex flex-row items-start justify-between gap-4">
         <div className="space-y-1.5">
-          <CardTitle className="text-2xl tracking-[-0.03em]">Question selection</CardTitle>
+          <SectionCardTitle>Question selection</SectionCardTitle>
           <CardDescription className="text-sm leading-6">
             Pick the prompts that actually differentiate the candidate.
           </CardDescription>

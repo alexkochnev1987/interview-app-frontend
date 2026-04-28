@@ -5,6 +5,8 @@ import { AlertTriangle, ArrowLeft, LoaderCircle, PenSquare } from 'lucide-react'
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { SurfaceCard } from '@/components/app/surface-card';
+import { ActionRow } from '@/components/layout/content-presets';
+import { PageMainY10 } from '@/components/layout/page-shell';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -59,7 +61,7 @@ export default function EditQuestionPage() {
 
   if (loading) {
     return (
-      <main className="container py-10 md:py-12">
+      <PageMainY10>
         <SurfaceCard tone="glassFloat">
           <CardContent className="flex min-h-[300px] flex-col items-center justify-center gap-5 px-8 py-12 text-center">
             <div className="flex size-14 items-center justify-center rounded-[1.6rem] bg-[hsl(var(--surface-low)/0.95)] text-[hsl(var(--primary))] ring-1 ring-border/45">
@@ -75,13 +77,13 @@ export default function EditQuestionPage() {
             </div>
           </CardContent>
         </SurfaceCard>
-      </main>
+      </PageMainY10>
     );
   }
 
   if (error || !question) {
     return (
-      <main className="container py-10 md:py-12">
+      <PageMainY10>
         <SurfaceCard tone="glassFloat">
           <CardHeader className="space-y-4">
             <div className="flex size-14 items-center justify-center rounded-[1.6rem] bg-destructive/10 text-destructive ring-1 ring-destructive/30">
@@ -101,23 +103,23 @@ export default function EditQuestionPage() {
               <AlertDescription>{error ?? 'Question not found.'}</AlertDescription>
             </Alert>
 
-            <div className="flex flex-wrap gap-3">
+            <ActionRow>
               <Button asChild variant="gradient">
                 <Link href="/questions">
                   <ArrowLeft className="size-4" />
                   Back to Question Library
                 </Link>
               </Button>
-              <Button asChild variant="outline" className="rounded-full bg-white/80">
+              <Button asChild variant="outline-soft-strong">
                 <Link href="/questions/new">
                   <PenSquare className="size-4" />
                   Create New Question
                 </Link>
               </Button>
-            </div>
+            </ActionRow>
           </CardContent>
         </SurfaceCard>
-      </main>
+      </PageMainY10>
     );
   }
 

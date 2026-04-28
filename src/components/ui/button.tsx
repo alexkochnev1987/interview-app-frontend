@@ -12,8 +12,16 @@ const buttonVariants = cva(
         default: "bg-primary text-primary-foreground [a]:hover:bg-primary/80",
         gradient:
           "rounded-full bg-primary-gradient px-5 text-primary-foreground shadow-soft hover:brightness-105",
+        "gradient-full":
+          "h-11 w-full rounded-2xl bg-primary-gradient px-5 text-primary-foreground shadow-soft hover:brightness-105",
         outline:
           "border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
+        "outline-soft":
+          "rounded-full border-white/70 bg-white/70 text-foreground backdrop-blur-sm hover:bg-white/80",
+        "outline-soft-strong":
+          "rounded-full border-white/70 bg-white/75 text-foreground hover:bg-white/85",
+        "outline-full":
+          "h-11 w-full rounded-2xl border-white/70 bg-white/75 text-foreground hover:bg-white/85",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
         ghost:

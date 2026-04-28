@@ -42,7 +42,7 @@ export function InterviewsGrid({ interviews, loading }: InterviewsGridProps) {
           </div>
           <h2 className="text-2xl font-semibold tracking-[-0.03em] text-foreground">Recent interviews</h2>
         </div>
-        <Button asChild variant="outline" className="rounded-full bg-white/70 backdrop-blur-sm">
+        <Button asChild variant="outline-soft">
           <Link href="/questions/new">Create a new question</Link>
         </Button>
       </SectionHeaderRow>

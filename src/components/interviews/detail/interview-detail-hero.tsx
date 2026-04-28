@@ -5,8 +5,9 @@ import { MetricPanel } from '@/components/app/metric-panel';
 import { StatusPill } from '@/components/app/status-pill';
 import { SurfaceCard } from '@/components/app/surface-card';
 import { InterviewDetailHeroGrid } from '@/components/layout/grid-layouts';
+import { ActionRow, SectionCardTitle } from '@/components/layout/content-presets';
 import { Button } from '@/components/ui/button';
-import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { formatWorkflowStage } from '@/features/interviews/detail-formatters';
 import type { Interview, InterviewResult } from '@/lib/api';
@@ -67,7 +68,7 @@ export function InterviewDetailHero({
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-3">
+            <ActionRow>
               {!isTerminal ? (
                 <Button
                   type="button"
@@ -82,7 +83,7 @@ export function InterviewDetailHero({
                       : 'Complete Interview'}
                 </Button>
               ) : null}
-            </div>
+            </ActionRow>
           </div>
 
           <div className="grid gap-4 md:grid-cols-3">
@@ -110,7 +111,7 @@ export function InterviewDetailHero({
           <EyebrowBadge icon={<Sparkles className="size-3.5" />} tone="muted">
             Interview progress
           </EyebrowBadge>
-          <CardTitle className="text-2xl tracking-[-0.03em]">Answer packet status</CardTitle>
+          <SectionCardTitle>Answer packet status</SectionCardTitle>
           <CardDescription className="text-sm leading-6">
             Recruiter-side review stays anchored to upload completion first, then shifts into
             scoring once the packet is fully assembled.
@@ -170,7 +171,7 @@ export function InterviewDetailHero({
                 Last update {new Date(interview.workflow.lastUpdatedAt).toLocaleString()}
               </p>
               {interview.workflow.errorMessage ? (
-                <p className="text-sm leading-6 text-rose-700">{interview.workflow.errorMessage}</p>
+                <p className="text-sm leading-6 text-destructive">{interview.workflow.errorMessage}</p>
               ) : null}
             </div>
           ) : null}

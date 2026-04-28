@@ -1,6 +1,6 @@
 import { CircleAlert, Upload } from 'lucide-react';
 
-import { SurfaceCard } from '@/components/app/surface-card';
+import { SurfaceCardLift } from '@/components/app/surface-card';
 import { StatusPill } from '@/components/app/status-pill';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -40,7 +40,7 @@ export function InterviewQuestionCard({
   const hasAnswer = Boolean(answer);
 
   return (
-    <SurfaceCard tone="glassSoft" className="transition-transform duration-200 hover:-translate-y-0.5">
+    <SurfaceCardLift tone="glassSoft">
       <CardHeader className="gap-4">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="space-y-3">
@@ -162,6 +162,6 @@ export function InterviewQuestionCard({
           </Alert>
         ) : null}
       </CardContent>
-    </SurfaceCard>
+    </SurfaceCardLift>
   );
 }
