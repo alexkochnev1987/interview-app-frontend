@@ -7,8 +7,8 @@ import { Filter, Plus, Search, Sparkles } from 'lucide-react'
 import { EyebrowBadge } from '@/components/app/eyebrow-badge'
 import { MetricPanel } from '@/components/app/metric-panel'
 import { SurfaceCard } from '@/components/app/surface-card'
-import { ThreeColumnCardsGrid, TwoPanelHeroGrid } from '@/components/layout/grid-layouts'
-import { ActionRow, CardContentHero, SectionCardTitle } from '@/components/layout/content-presets'
+import { ThreeColumnCardsGrid, TwoPanelHeroGrid, TwoUpSmGrid } from '@/components/layout/grid-layouts'
+import { ActionRow, CardContentHero, HeroDescription, HeroTitle, SectionCardTitle } from '@/components/layout/content-presets'
 import { PageMainWideGap } from '@/components/layout/page-shell'
 import { EmptyStateCard, LoadingStateCard } from '@/components/app/state-card'
 import { QuestionCard } from '@/components/questions/question-card'
@@ -40,13 +40,11 @@ export default function QuestionsPage() {
               Question Library
             </EyebrowBadge>
             <div className="space-y-3">
-              <h1 className="text-4xl font-semibold tracking-[-0.04em] text-foreground md:text-5xl">
-                Curate the question bank before AI scoring ever sees a candidate.
-              </h1>
-              <p className="max-w-2xl text-base leading-7 text-muted-foreground md:text-lg">
+              <HeroTitle>Curate the question bank before AI scoring ever sees a candidate.</HeroTitle>
+              <HeroDescription>
                 Store reusable prompts, codify expected concepts and red flags, and keep your
                 evaluation rubric visible instead of buried in JSON.
-              </p>
+              </HeroDescription>
             </div>
             <ActionRow>
               <Button asChild variant="gradient">
@@ -76,10 +74,10 @@ export default function QuestionsPage() {
               admin cards.
             </CardDescription>
           </CardHeader>
-          <CardContent className="grid gap-4 sm:grid-cols-2">
+          <TwoUpSmGrid>
             <MetricPanel tone="elevated" label="Total questions" value={loading ? '...' : questions.length} />
             <MetricPanel tone="elevated" label="Visible now" value={loading ? '...' : filteredQuestions.length} />
-          </CardContent>
+          </TwoUpSmGrid>
         </SurfaceCard>
       </TwoPanelHeroGrid>
 

@@ -40,6 +40,18 @@ interface SingleColumnGridProps {
   children: ReactNode;
 }
 
+interface TwoUpSmGridProps {
+  children: ReactNode;
+}
+
+interface HeaderSplitRowProps {
+  children: ReactNode;
+}
+
+interface MetricsThreeUpGridProps {
+  children: ReactNode;
+}
+
 export function ThreeColumnCardsGrid({ children }: ThreeColumnCardsGridProps) {
   return <section className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">{children}</section>;
 }
@@ -77,6 +89,10 @@ export function FeedbackBottomGrid({ children }: FeedbackBottomGridProps) {
 }
 
 export function LoginFeatureGrid({ children }: LoginFeatureGridProps) {
+  return <MetricsThreeUpGrid>{children}</MetricsThreeUpGrid>;
+}
+
+export function MetricsThreeUpGrid({ children }: MetricsThreeUpGridProps) {
   return <div className="grid gap-4 md:grid-cols-3">{children}</div>;
 }
 
@@ -86,4 +102,12 @@ export function SectionStack({ children }: SectionStackProps) {
 
 export function SingleColumnGrid({ children }: SingleColumnGridProps) {
   return <div className="grid gap-4">{children}</div>;
+}
+
+export function TwoUpSmGrid({ children }: TwoUpSmGridProps) {
+  return <div className="grid gap-4 sm:grid-cols-2">{children}</div>;
+}
+
+export function HeaderSplitRow({ children }: HeaderSplitRowProps) {
+  return <div className="flex flex-wrap items-start justify-between gap-4">{children}</div>;
 }

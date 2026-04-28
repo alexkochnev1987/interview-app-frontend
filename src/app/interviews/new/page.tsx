@@ -6,14 +6,14 @@ import { useRouter } from 'next/navigation'
 import { CirclePlus, Sparkles } from 'lucide-react'
 
 import { EyebrowBadge } from '@/components/app/eyebrow-badge'
-import { InterviewSetupFormGrid, TwoPanelHeroGrid } from '@/components/layout/grid-layouts'
+import { InterviewSetupFormGrid, TwoPanelHeroGrid, TwoUpSmGrid } from '@/components/layout/grid-layouts'
 import { CandidateBriefForm } from '@/components/interviews/new/candidate-brief-form'
 import { MetricPanel } from '@/components/app/metric-panel'
 import { SurfaceCard } from '@/components/app/surface-card'
 import { QuestionSelector } from '@/components/interviews/new/question-selector'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { ActionRow, CardContentSpacious, SectionCardTitle } from '@/components/layout/content-presets'
+import { ActionRow, CardContentSpacious, HeroDescription, HeroTitle, SectionCardTitle } from '@/components/layout/content-presets'
 import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { PageMainWideGap } from '@/components/layout/page-shell'
 import { useQuestions } from '@/hooks/use-questions'
@@ -75,13 +75,11 @@ export default function NewInterviewPage() {
               Create Interview Flow
             </EyebrowBadge>
             <div className="space-y-3">
-              <h1 className="text-4xl font-semibold tracking-[-0.04em] text-foreground md:text-5xl">
-                Assemble the candidate packet before you send the interview link.
-              </h1>
-              <p className="max-w-2xl text-base leading-7 text-muted-foreground md:text-lg">
+              <HeroTitle>Assemble the candidate packet before you send the interview link.</HeroTitle>
+              <HeroDescription>
                 Capture the role, choose only the questions that matter, and keep the decision
                 criteria explicit before the recording session starts.
-              </p>
+              </HeroDescription>
             </div>
             <ActionRow>
               <Button asChild variant="gradient">
@@ -108,14 +106,14 @@ export default function NewInterviewPage() {
               long-form sessions.
             </CardDescription>
           </CardHeader>
-          <CardContent className="grid gap-4 sm:grid-cols-2">
+          <TwoUpSmGrid>
             <MetricPanel tone="elevated" label="Selected" value={selectedQuestionIds.length} />
             <MetricPanel
               tone="elevated"
               label="Available"
               value={loadingQuestions ? '...' : questions.length}
             />
-          </CardContent>
+          </TwoUpSmGrid>
         </SurfaceCard>
       </TwoPanelHeroGrid>
 

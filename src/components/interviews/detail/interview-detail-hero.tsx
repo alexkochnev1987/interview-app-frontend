@@ -4,8 +4,8 @@ import { EyebrowBadge } from '@/components/app/eyebrow-badge';
 import { MetricPanel } from '@/components/app/metric-panel';
 import { StatusPill } from '@/components/app/status-pill';
 import { SurfaceCard } from '@/components/app/surface-card';
-import { InterviewDetailHeroGrid } from '@/components/layout/grid-layouts';
-import { ActionRow, SectionCardTitle } from '@/components/layout/content-presets';
+import { HeaderSplitRow, InterviewDetailHeroGrid, MetricsThreeUpGrid } from '@/components/layout/grid-layouts';
+import { ActionRow, BodyMutedSm, HeroTitle, SectionCardTitle } from '@/components/layout/content-presets';
 import { Button } from '@/components/ui/button';
 import { CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -40,7 +40,7 @@ export function InterviewDetailHero({
     <InterviewDetailHeroGrid>
       <SurfaceCard tone="glassFloat">
         <CardContent className="space-y-8 px-8 py-8">
-          <div className="flex flex-wrap items-start justify-between gap-4">
+          <HeaderSplitRow>
             <div className="space-y-4">
               <a
                 href="/"
@@ -55,9 +55,7 @@ export function InterviewDetailHero({
                   {getCandidateInitials(interview.candidateName)}
                 </div>
                 <div className="space-y-1.5">
-                  <h1 className="text-4xl font-semibold tracking-[-0.04em] text-foreground md:text-5xl">
-                    {interview.candidateName}
-                  </h1>
+                  <HeroTitle>{interview.candidateName}</HeroTitle>
                   <p className="text-base text-muted-foreground md:text-lg">{interview.position}</p>
                 </div>
               </div>
@@ -84,9 +82,9 @@ export function InterviewDetailHero({
                 </Button>
               ) : null}
             </ActionRow>
-          </div>
+          </HeaderSplitRow>
 
-          <div className="grid gap-4 md:grid-cols-3">
+          <MetricsThreeUpGrid>
             <MetricPanel
               label="Questions"
               value={totalQuestions}
@@ -102,7 +100,7 @@ export function InterviewDetailHero({
               value={results ? results.overallScore : '--'}
               valueClassName="mt-3 text-4xl font-semibold tracking-[-0.04em] text-foreground"
             />
-          </div>
+          </MetricsThreeUpGrid>
         </CardContent>
       </SurfaceCard>
 
@@ -124,25 +122,25 @@ export function InterviewDetailHero({
               <StatusPill tone="neutral">{progressValue}%</StatusPill>
             </div>
             <Progress value={progressValue} className="h-2.5 rounded-full bg-white" />
-            <p className="text-sm leading-6 text-muted-foreground">
+            <BodyMutedSm>
               {answeredCount} of {totalQuestions} answers uploaded.
-            </p>
+            </BodyMutedSm>
           </div>
 
           <div className="space-y-3 rounded-[1.5rem] bg-white/80 p-5 ring-1 ring-border/45">
             <div className="flex items-center gap-2 text-foreground">
               {canComplete ? (
-                <CheckCircle2 className="size-4 text-emerald-600" />
+                <CheckCircle2 className="size-4 text-[var(--color-status-completed-fg)]" />
               ) : (
                 <CircleDashed className="size-4 text-muted-foreground" />
               )}
               <span className="text-sm font-medium">Ready state</span>
             </div>
-            <p className="text-sm leading-6 text-muted-foreground">
+            <BodyMutedSm>
               {canComplete
                 ? 'All answers are in place. You can send the packet for scoring now.'
                 : 'Scoring stays locked until every question has an uploaded answer.'}
-            </p>
+            </BodyMutedSm>
           </div>
 
           {results ? (
@@ -151,7 +149,7 @@ export function InterviewDetailHero({
                 <Layers3 className="size-4 text-[hsl(var(--primary))]" />
                 <span className="text-sm font-medium">Results summary</span>
               </div>
-              <p className="text-sm leading-6 text-muted-foreground">{results.summary}</p>
+              <BodyMutedSm>{results.summary}</BodyMutedSm>
             </div>
           ) : null}
 
@@ -161,15 +159,13 @@ export function InterviewDetailHero({
                 <Layers3 className="size-4 text-[hsl(var(--primary))]" />
                 <span className="text-sm font-medium">Workflow</span>
               </div>
-              <p className="text-sm leading-6 text-muted-foreground">
+              <BodyMutedSm>
                 Status: <strong>{interview.workflow.status.replace('_', ' ')}</strong>
                 {interview.workflow.currentStage
                   ? ` • stage: ${formatWorkflowStage(interview.workflow.currentStage)}`
                   : ''}
-              </p>
-              <p className="text-sm leading-6 text-muted-foreground">
-                Last update {new Date(interview.workflow.lastUpdatedAt).toLocaleString()}
-              </p>
+              </BodyMutedSm>
+              <BodyMutedSm>Last update {new Date(interview.workflow.lastUpdatedAt).toLocaleString()}</BodyMutedSm>
               {interview.workflow.errorMessage ? (
                 <p className="text-sm leading-6 text-destructive">{interview.workflow.errorMessage}</p>
               ) : null}

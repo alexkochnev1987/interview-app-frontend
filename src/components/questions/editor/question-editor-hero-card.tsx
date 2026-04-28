@@ -4,9 +4,9 @@ import { EyebrowBadge } from '@/components/app/eyebrow-badge';
 import { MetricPanel } from '@/components/app/metric-panel';
 import { StatusPill } from '@/components/app/status-pill';
 import { SurfaceCard } from '@/components/app/surface-card';
-import { ActionRow } from '@/components/layout/content-presets';
+import { ActionRow, CardContentHero, HeroDescription, HeroTitle } from '@/components/layout/content-presets';
+import { HeaderSplitRow, LoginFeatureGrid } from '@/components/layout/grid-layouts';
 import { Button } from '@/components/ui/button';
-import { CardContent } from '@/components/ui/card';
 import type { QuestionInput } from '@/lib/api';
 
 interface QuestionEditorHeroCardProps {
@@ -30,36 +30,33 @@ export function QuestionEditorHeroCard({
 }: QuestionEditorHeroCardProps) {
   return (
     <SurfaceCard tone="glassFloat">
-      <CardContent className="flex flex-col gap-6 px-8 py-8">
-        <div className="flex flex-wrap items-start justify-between gap-4">
+      <CardContentHero>
+        <HeaderSplitRow>
           <div className="space-y-4">
             <EyebrowBadge icon={<Sparkles className="size-3.5" />}>Unified Question Editor</EyebrowBadge>
             <div className="space-y-3">
-              <h1 className="text-4xl font-semibold tracking-[-0.04em] text-foreground md:text-5xl">
-                {title}
-              </h1>
-              <p className="max-w-2xl text-base leading-7 text-muted-foreground md:text-lg">
+              <HeroTitle>{title}</HeroTitle>
+              <HeroDescription>
                 Shape the prompt, define the rubric, and keep AI-generated draft suggestions visible
                 as explicit diffs instead of invisible background mutations.
-              </p>
+              </HeroDescription>
             </div>
           </div>
 
           <ActionRow>
             <Button
               type="button"
-              variant="outline"
+              variant="outline-soft-strong"
               onClick={onGenerate}
               disabled={submitting || aiLoading}
-              className="rounded-full bg-white/75"
             >
               <WandSparkles className="size-4" />
               {aiLoading ? 'Generating...' : 'Generate AI Draft'}
             </Button>
           </ActionRow>
-        </div>
+        </HeaderSplitRow>
 
-        <div className="grid gap-4 md:grid-cols-3">
+        <LoginFeatureGrid>
           <MetricPanel
             label="Difficulty"
             value={<StatusPill tone={difficulty}>{difficulty}</StatusPill>}
@@ -67,8 +64,8 @@ export function QuestionEditorHeroCard({
           />
           <MetricPanel label="Weight" value={weight} />
           <MetricPanel label="Pending AI diffs" value={pendingDraftFieldsCount} />
-        </div>
-      </CardContent>
+        </LoginFeatureGrid>
+      </CardContentHero>
     </SurfaceCard>
   );
 }

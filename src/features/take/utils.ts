@@ -34,9 +34,9 @@ export function permissionLabel(status: TakePermissionStatus) {
 export function permissionClasses(status: TakePermissionStatus) {
   switch (status) {
     case 'pending':
-      return 'bg-blue-100 text-blue-800 ring-blue-200/80';
+      return 'bg-[var(--color-status-pending-bg)] text-[var(--color-status-pending-fg)] ring-[var(--color-status-pending-ring)]/80';
     case 'granted':
-      return 'bg-emerald-100 text-emerald-800 ring-emerald-200/80';
+      return 'bg-[var(--color-status-completed-bg)] text-[var(--color-status-completed-fg)] ring-[var(--color-status-completed-ring)]/80';
     case 'denied':
       return 'bg-destructive/10 text-destructive ring-destructive/30';
     default:

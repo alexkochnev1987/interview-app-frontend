@@ -26,7 +26,7 @@ export default function DashboardPage() {
       </DashboardHeroGrid>
 
       {usingMock && (
-        <Alert className="border-amber-200/70 bg-amber-50/80 text-amber-950">
+        <Alert variant="warning">
           <Sparkles className="size-4" />
           <AlertTitle>Demo data enabled</AlertTitle>
           <AlertDescription>

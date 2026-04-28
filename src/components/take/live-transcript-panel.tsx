@@ -1,3 +1,5 @@
+import { BodyMutedSm, EyebrowLabel } from '@/components/layout/content-presets';
+
 type TakeStage = 'loading' | 'consent' | 'interview' | 'recording' | 'transition' | 'complete';
 
 interface LiveTranscriptPanelProps {
@@ -17,13 +19,11 @@ export function LiveTranscriptPanel({
 }: LiveTranscriptPanelProps) {
   return (
     <div className="min-h-[130px] rounded-[1.25rem] bg-[hsl(var(--surface-low)/0.85)] p-4 ring-1 ring-border/45">
-      <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-        Live transcript
-      </div>
+      <EyebrowLabel>Live transcript</EyebrowLabel>
       {!isSupported ? (
-        <p className="mt-2 text-sm leading-6 text-muted-foreground">
-          Live transcript is unavailable in this browser. Recording continues as usual.
-        </p>
+        <div className="mt-2">
+          <BodyMutedSm>Live transcript is unavailable in this browser. Recording continues as usual.</BodyMutedSm>
+        </div>
       ) : (
         <p className="mt-2 text-sm leading-6 text-foreground">
           {finalTranscript || interimTranscript ? (
@@ -43,7 +43,9 @@ export function LiveTranscriptPanel({
           Updating transcript for the next question...
         </p>
       ) : null}
-      {warning ? <p className="mt-2 text-xs leading-5 text-amber-700">{warning}</p> : null}
+      {warning ? (
+        <p className="mt-2 text-xs leading-5 text-[var(--color-status-pending-fg)]">{warning}</p>
+      ) : null}
     </div>
   );
 }

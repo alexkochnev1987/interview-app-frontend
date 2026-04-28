@@ -1,13 +1,13 @@
 import { Camera, Mic, ShieldCheck, Video } from 'lucide-react';
 
 import { SurfaceCard } from '@/components/app/surface-card';
-import { CardContent } from '@/components/ui/card';
+import { CardContentCompact } from '@/components/layout/content-presets';
 
 export function TakeCapabilityCards() {
   return (
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
       <SurfaceCard tone="mutedSoft">
-        <CardContent className="space-y-3 px-5 py-5">
+        <CardContentCompact>
           <Camera className="size-5 text-[hsl(var(--primary))]" />
           <div className="space-y-1">
             <div className="text-sm font-semibold text-foreground">Camera</div>
@@ -15,11 +15,11 @@ export function TakeCapabilityCards() {
               Recorded separately for every answer.
             </p>
           </div>
-        </CardContent>
+        </CardContentCompact>
       </SurfaceCard>
 
       <SurfaceCard tone="mutedSoft">
-        <CardContent className="space-y-3 px-5 py-5">
+        <CardContentCompact>
           <Mic className="size-5 text-[hsl(var(--primary))]" />
           <div className="space-y-1">
             <div className="text-sm font-semibold text-foreground">Microphone</div>
@@ -27,11 +27,11 @@ export function TakeCapabilityCards() {
               Captured together with your camera feed.
             </p>
           </div>
-        </CardContent>
+        </CardContentCompact>
       </SurfaceCard>
 
       <SurfaceCard tone="mutedSoft">
-        <CardContent className="space-y-3 px-5 py-5">
+        <CardContentCompact>
           <Video className="size-5 text-[hsl(var(--primary))]" />
           <div className="space-y-1">
             <div className="text-sm font-semibold text-foreground">Entire screen</div>
@@ -39,11 +39,11 @@ export function TakeCapabilityCards() {
               Must be shared as <strong>Entire screen</strong>, not a tab or app window.
             </p>
           </div>
-        </CardContent>
+        </CardContentCompact>
       </SurfaceCard>
 
       <SurfaceCard tone="mutedSoft">
-        <CardContent className="space-y-3 px-5 py-5">
+        <CardContentCompact>
           <ShieldCheck className="size-5 text-[hsl(var(--primary))]" />
           <div className="space-y-1">
             <div className="text-sm font-semibold text-foreground">Fairness checks</div>
@@ -51,7 +51,7 @@ export function TakeCapabilityCards() {
               Session and browser activity may be stored for evaluation integrity.
             </p>
           </div>
-        </CardContent>
+        </CardContentCompact>
       </SurfaceCard>
     </div>
   );

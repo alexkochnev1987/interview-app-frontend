@@ -2,7 +2,8 @@ import { FileVideo2 } from 'lucide-react';
 
 import { EyebrowBadge } from '@/components/app/eyebrow-badge';
 import { SurfaceCard } from '@/components/app/surface-card';
-import { SectionHeaderRow } from '@/components/layout/grid-layouts';
+import { MetricsThreeUpGrid, SectionHeaderRow } from '@/components/layout/grid-layouts';
+import { BodyMutedSm, EyebrowLabel } from '@/components/layout/content-presets';
 import { StatusPill } from '@/components/app/status-pill';
 import { CardContent } from '@/components/ui/card';
 import type { InterviewResult } from '@/lib/api';
@@ -21,9 +22,7 @@ export function InterviewResultsSection({ results }: InterviewResultsSectionProp
           </div>
           <h2 className="text-2xl font-semibold tracking-[-0.03em] text-foreground">Interview results</h2>
         </div>
-        <div className="text-sm leading-6 text-muted-foreground">
-          Candidate feedback remains a tokenized route shared separately from the recruiter UI.
-        </div>
+        <BodyMutedSm>Candidate feedback remains a tokenized route shared separately from the recruiter UI.</BodyMutedSm>
       </SectionHeaderRow>
 
       <div className="grid gap-4 xl:grid-cols-[0.85fr_1.15fr]">
@@ -49,13 +48,11 @@ export function InterviewResultsSection({ results }: InterviewResultsSectionProp
           </CardContent>
         </SurfaceCard>
 
-        <div className="grid gap-4 md:grid-cols-3">
+        <MetricsThreeUpGrid>
           {Object.entries(results.categoryScores).map(([category, score]) => (
             <SurfaceCard key={category} tone="glassSoft">
               <CardContent className="space-y-3 px-6 py-6 text-center">
-                <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                  {category}
-                </div>
+                <EyebrowLabel>{category}</EyebrowLabel>
                 <div className="text-4xl font-semibold tracking-[-0.05em] text-[hsl(var(--primary))]">
                   {score}
                 </div>
@@ -63,7 +60,7 @@ export function InterviewResultsSection({ results }: InterviewResultsSectionProp
               </CardContent>
             </SurfaceCard>
           ))}
-        </div>
+        </MetricsThreeUpGrid>
       </div>
     </section>
   );

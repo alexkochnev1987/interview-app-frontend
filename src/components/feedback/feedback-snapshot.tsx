@@ -3,7 +3,8 @@ import { BadgeCheck, Clock3 } from 'lucide-react';
 import { MetricPanel } from '@/components/app/metric-panel';
 import { SurfaceCard } from '@/components/app/surface-card';
 import { SectionCardTitle } from '@/components/layout/content-presets';
-import { CardContent, CardDescription, CardHeader } from '@/components/ui/card';
+import { TwoUpSmGrid } from '@/components/layout/grid-layouts';
+import { CardDescription, CardHeader } from '@/components/ui/card';
 import type { Feedback } from '@/features/feedback/types';
 
 interface FeedbackSnapshotProps {
@@ -19,7 +20,7 @@ export function FeedbackSnapshot({ feedback }: FeedbackSnapshotProps) {
           A compact overview of your current outcome and when this shared link expires.
         </CardDescription>
       </CardHeader>
-      <CardContent className="grid gap-4 sm:grid-cols-2">
+      <TwoUpSmGrid>
         <MetricPanel
           tone="elevated"
           icon={<BadgeCheck className="size-4" />}
@@ -34,7 +35,7 @@ export function FeedbackSnapshot({ feedback }: FeedbackSnapshotProps) {
           value={new Date(feedback.expiresAt).toLocaleDateString()}
           valueClassName="mt-3 text-sm leading-6 text-foreground"
         />
-      </CardContent>
+      </TwoUpSmGrid>
     </SurfaceCard>
   );
 }

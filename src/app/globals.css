@@ -49,10 +49,20 @@
     --color-danger: hsl(var(--destructive));
     --color-danger-hover: hsl(var(--destructive) / 0.9);
     --color-status-pending-bg: rgb(254 243 199);
+    --color-status-pending-fg: rgb(146 64 14);
+    --color-status-pending-ring: rgb(253 230 138);
     --color-status-in-progress-bg: rgb(224 242 254);
+    --color-status-in-progress-fg: rgb(7 89 133);
+    --color-status-in-progress-ring: rgb(186 230 253);
     --color-status-processing-bg: rgb(255 237 213);
+    --color-status-processing-fg: rgb(154 52 18);
+    --color-status-processing-ring: rgb(254 215 170);
     --color-status-completed-bg: rgb(209 250 229);
+    --color-status-completed-fg: rgb(6 95 70);
+    --color-status-completed-ring: rgb(167 243 208);
     --color-status-failed-bg: rgb(255 228 230);
+    --color-status-failed-fg: rgb(159 18 57);
+    --color-status-failed-ring: rgb(254 205 211);
     --transition: 180ms ease;
   }
 

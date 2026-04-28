@@ -1,6 +1,7 @@
 import { CheckCircle2 } from 'lucide-react';
 
 import { SurfaceCard } from '@/components/app/surface-card';
+import { HeroTitle } from '@/components/layout/content-presets';
 import { MaxWidth4xl, PageMainCompact } from '@/components/layout/page-shell';
 import { CardContent } from '@/components/ui/card';
 
@@ -19,9 +20,7 @@ export function TakeCompleteScreen({ candidateName, position }: TakeCompleteScre
               <CheckCircle2 className="size-8" />
             </div>
             <div className="space-y-3">
-              <h1 className="text-4xl font-semibold tracking-[-0.04em] text-foreground md:text-5xl">
-                Thank you, {candidateName}
-              </h1>
+              <HeroTitle>Thank you, {candidateName}</HeroTitle>
               <p className="text-base leading-7 text-muted-foreground md:text-lg">
                 Your interview for <strong>{position}</strong> has been submitted.
               </p>

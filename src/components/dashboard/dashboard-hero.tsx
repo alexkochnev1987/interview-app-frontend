@@ -3,7 +3,8 @@ import { ArrowRight, CircleDashed, Layers3, Sparkles, Users } from 'lucide-react
 
 import { EyebrowBadge } from '@/components/app/eyebrow-badge';
 import { MetricPanel } from '@/components/app/metric-panel';
-import { ActionRow } from '@/components/layout/content-presets';
+import { ActionRow, HeroDescription, HeroTitle } from '@/components/layout/content-presets';
+import { HeaderSplitRow, LoginFeatureGrid } from '@/components/layout/grid-layouts';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -17,17 +18,15 @@ export function DashboardHero({ activeCount, candidatesCount, questionVolume }: 
   return (
     <Card className="overflow-hidden border-white/65 bg-white/86 shadow-float backdrop-blur-xl">
       <CardContent className="flex h-full flex-col gap-8 px-8 py-8">
-        <div className="flex flex-wrap items-start justify-between gap-4">
+        <HeaderSplitRow>
           <div className="max-w-2xl space-y-4">
             <EyebrowBadge icon={<Sparkles className="size-3.5" />}>Recruiter Dashboard</EyebrowBadge>
             <div className="space-y-3">
-              <h1 className="max-w-3xl text-4xl font-semibold tracking-[-0.04em] text-foreground md:text-5xl">
-                Run your interview pipeline from one editorial command surface.
-              </h1>
-              <p className="max-w-2xl text-base leading-7 text-muted-foreground md:text-lg">
+              <HeroTitle>Run your interview pipeline from one editorial command surface.</HeroTitle>
+              <HeroDescription>
                 Monitor active sessions, spot stalled candidates, and keep scoring flows moving
                 without dropping into separate admin tools.
-              </p>
+              </HeroDescription>
             </div>
           </div>
 
@@ -42,9 +41,9 @@ export function DashboardHero({ activeCount, candidatesCount, questionVolume }: 
               <Link href="/questions">Question Bank</Link>
             </Button>
           </ActionRow>
-        </div>
+        </HeaderSplitRow>
 
-        <div className="grid gap-4 md:grid-cols-3">
+        <LoginFeatureGrid>
           <MetricPanel
             icon={<CircleDashed className="size-4" />}
             label="Active"
@@ -66,7 +65,7 @@ export function DashboardHero({ activeCount, candidatesCount, questionVolume }: 
             valueClassName="mt-4 text-4xl font-semibold tracking-[-0.04em] text-foreground"
             description="Questions currently attached across all visible interviews."
           />
-        </div>
+        </LoginFeatureGrid>
       </CardContent>
     </Card>
   );

@@ -2,7 +2,7 @@ import { Sparkles } from 'lucide-react';
 
 import { EyebrowBadge } from '@/components/app/eyebrow-badge';
 import { SurfaceCardMax5xl } from '@/components/app/surface-card';
-import { SectionCardTitle } from '@/components/layout/content-presets';
+import { HeroTitle, SectionCardTitle } from '@/components/layout/content-presets';
 import { PageMain } from '@/components/layout/page-shell';
 import { TakeCapabilityCards } from '@/components/take/consent/take-capability-cards';
 import { TakeConsentCheckboxBlock } from '@/components/take/consent/take-consent-checkbox-block';
@@ -47,9 +47,7 @@ export function TakeConsentScreen({
             <EyebrowBadge icon={<Sparkles className="size-3.5" />}>Candidate interview</EyebrowBadge>
 
             <div className="space-y-3">
-              <h1 className="text-4xl font-semibold tracking-[-0.04em] text-foreground md:text-5xl">
-                Interview for {interview.position}
-              </h1>
+              <HeroTitle>Interview for {interview.position}</HeroTitle>
               <p className="text-base leading-7 text-muted-foreground md:text-lg">
                 Welcome, {interview.candidateName}. You will answer {interview.totalQuestions}{' '}
                 questions, with up to four minutes for each response.
@@ -100,7 +98,8 @@ export function TakeConsentScreen({
                 type="button"
                 disabled={!consent || setupBusy}
                 onClick={onStartInterview}
-                variant="gradient-full"
+                variant="gradient"
+                size="full"
               >
                 {setupBusy ? 'Requesting access...' : 'Allow Camera, Mic & Entire Screen'}
               </Button>

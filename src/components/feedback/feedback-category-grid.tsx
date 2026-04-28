@@ -4,7 +4,8 @@ import { EyebrowBadge } from '@/components/app/eyebrow-badge';
 import { MetricPanel } from '@/components/app/metric-panel';
 import { SurfaceCard } from '@/components/app/surface-card';
 import { SectionCardTitle } from '@/components/layout/content-presets';
-import { CardContent, CardHeader } from '@/components/ui/card';
+import { TwoUpSmGrid } from '@/components/layout/grid-layouts';
+import { CardHeader } from '@/components/ui/card';
 
 interface FeedbackCategoryGridProps {
   categoryScores: Record<string, number>;
@@ -19,7 +20,7 @@ export function FeedbackCategoryGrid({ categoryScores }: FeedbackCategoryGridPro
         </EyebrowBadge>
         <SectionCardTitle>Breakdown</SectionCardTitle>
       </CardHeader>
-      <CardContent className="grid gap-4 sm:grid-cols-2">
+      <TwoUpSmGrid>
         {Object.entries(categoryScores).map(([category, score]) => (
           <MetricPanel
             key={category}
@@ -30,7 +31,7 @@ export function FeedbackCategoryGrid({ categoryScores }: FeedbackCategoryGridPro
             description="out of 100"
           />
         ))}
-      </CardContent>
+      </TwoUpSmGrid>
     </SurfaceCard>
   );
 }

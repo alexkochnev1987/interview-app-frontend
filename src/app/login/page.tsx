@@ -7,7 +7,7 @@ import { ArrowRight, LockKeyhole, ShieldCheck, Sparkles } from 'lucide-react'
 import { EyebrowBadge } from '@/components/app/eyebrow-badge'
 import { LoginFeatureCard } from '@/components/login/login-feature-card'
 import { SurfaceCard } from '@/components/app/surface-card'
-import { CardContentForm, CardHeaderForm } from '@/components/layout/content-presets'
+import { CardContentForm, CardHeaderForm, HeroDescription } from '@/components/layout/content-presets'
 import { LoginFeatureGrid } from '@/components/layout/grid-layouts'
 import { LoginPageShell } from '@/components/layout/page-shell'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -62,10 +62,10 @@ export default function LoginPage() {
           <h1 className="max-w-3xl text-4xl font-semibold tracking-[-0.05em] text-foreground md:text-6xl">
             Review candidate performance with the calm of an editorial workspace.
           </h1>
-          <p className="max-w-2xl text-base leading-7 text-muted-foreground md:text-lg">
+          <HeroDescription>
             The new design system trades brittle admin chrome for layered surfaces, sharper
             hierarchy, and faster decision-making during interview review.
-          </p>
+          </HeroDescription>
         </div>
 
         <LoginFeatureGrid>
@@ -136,7 +136,8 @@ export default function LoginPage() {
             <Button
               type="submit"
               disabled={loading}
-              variant="gradient-full"
+              variant="gradient"
+              size="full"
             >
               {loading ? 'Signing in...' : 'Sign In'}
             </Button>
@@ -150,7 +151,8 @@ export default function LoginPage() {
 
             <Button
               asChild
-              variant="outline-full"
+              variant="outline-soft-strong"
+              size="full"
             >
               <a href="/api/auth/google">Sign in with Google</a>
             </Button>

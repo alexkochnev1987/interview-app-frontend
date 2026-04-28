@@ -76,7 +76,8 @@ export function CandidateBriefForm({
           <Button
             type="submit"
             disabled={submitting || loadingQuestions || questionsCount === 0}
-            variant="gradient-full"
+            variant="gradient"
+            size="full"
           >
             {submitting ? 'Creating...' : 'Create Interview'}
             <ArrowRight className="size-4" />

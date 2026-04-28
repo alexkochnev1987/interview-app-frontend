@@ -21,18 +21,18 @@ const toneClasses: Record<StatusTone, string> = {
   neutral_meta:
     "bg-[hsl(var(--surface-low))] text-[hsl(var(--muted-foreground))] normal-case tracking-[0.08em] ring-1 ring-[hsl(var(--border)/0.55)]",
   pending:
-    "bg-amber-100 text-amber-800 ring-1 ring-amber-200",
+    "bg-[var(--color-status-pending-bg)] text-[var(--color-status-pending-fg)] ring-1 ring-[var(--color-status-pending-ring)]",
   in_progress:
-    "bg-sky-100 text-sky-800 ring-1 ring-sky-200",
+    "bg-[var(--color-status-in-progress-bg)] text-[var(--color-status-in-progress-fg)] ring-1 ring-[var(--color-status-in-progress-ring)]",
   processing:
-    "bg-orange-100 text-orange-800 ring-1 ring-orange-200",
+    "bg-[var(--color-status-processing-bg)] text-[var(--color-status-processing-fg)] ring-1 ring-[var(--color-status-processing-ring)]",
   completed:
-    "bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200",
+    "bg-[var(--color-status-completed-bg)] text-[var(--color-status-completed-fg)] ring-1 ring-[var(--color-status-completed-ring)]",
   failed:
     "bg-destructive/10 text-destructive ring-1 ring-destructive/30",
-  easy: "bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200",
-  medium: "bg-amber-100 text-amber-800 ring-1 ring-amber-200",
-  hard: "bg-violet-100 text-violet-800 ring-1 ring-violet-200",
+  easy: "bg-[var(--color-status-completed-bg)] text-[var(--color-status-completed-fg)] ring-1 ring-[var(--color-status-completed-ring)]",
+  medium: "bg-[var(--color-status-pending-bg)] text-[var(--color-status-pending-fg)] ring-1 ring-[var(--color-status-pending-ring)]",
+  hard: "bg-[var(--color-status-failed-bg)] text-[var(--color-status-failed-fg)] ring-1 ring-[var(--color-status-failed-ring)]",
 }
 
 interface StatusPillProps extends ComponentProps<"span"> {
