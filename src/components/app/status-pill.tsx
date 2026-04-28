@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils"
 
 type StatusTone =
   | "neutral"
+  | "neutral_meta"
   | "pending"
   | "in_progress"
   | "processing"
@@ -17,6 +18,8 @@ type StatusTone =
 const toneClasses: Record<StatusTone, string> = {
   neutral:
     "bg-[hsl(var(--surface-low))] text-[hsl(var(--muted-foreground))] ring-1 ring-[hsl(var(--border)/0.55)]",
+  neutral_meta:
+    "bg-[hsl(var(--surface-low))] text-[hsl(var(--muted-foreground))] normal-case tracking-[0.08em] ring-1 ring-[hsl(var(--border)/0.55)]",
   pending:
     "bg-amber-100 text-amber-800 ring-1 ring-amber-200",
   in_progress:

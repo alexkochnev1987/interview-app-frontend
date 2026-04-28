@@ -72,12 +72,11 @@ export function CandidateBriefForm({
           value={null}
           valueClassName="mt-0"
         />
-        <div>
+        <div className="mt-5">
           <Button
             type="submit"
             disabled={submitting || loadingQuestions || questionsCount === 0}
-            variant="gradient"
-            className="mt-5 w-full rounded-2xl"
+            variant="gradient-full"
           >
             {submitting ? 'Creating...' : 'Create Interview'}
             <ArrowRight className="size-4" />

@@ -100,8 +100,7 @@ export function TakeConsentScreen({
                 type="button"
                 disabled={!consent || setupBusy}
                 onClick={onStartInterview}
-                variant="gradient"
-                className="h-11 w-full rounded-2xl"
+                variant="gradient-full"
               >
                 {setupBusy ? 'Requesting access...' : 'Allow Camera, Mic & Entire Screen'}
               </Button>

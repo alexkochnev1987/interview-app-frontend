@@ -83,7 +83,7 @@ export function QuestionSelector({
                     <div className="flex flex-wrap items-center gap-2">
                       <StatusPill tone={question.difficulty}>{question.difficulty}</StatusPill>
                       {question.category ? (
-                        <StatusPill tone="neutral" className="normal-case tracking-[0.08em]">
+                        <StatusPill tone="neutral_meta">
                           {question.category}
                         </StatusPill>
                       ) : null}

@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatAnswerDuration, formatFileSize } from '@/features/interviews/detail-formatters';
 import type { Interview } from '@/lib/api';
-import { cn } from '@/lib/utils';
 
 interface UploadState {
   status: 'idle' | 'uploading' | 'uploaded' | 'error';
@@ -48,7 +47,7 @@ export function InterviewQuestionCard({
               <StatusPill tone="neutral">Q{questionIndex + 1}</StatusPill>
               <StatusPill tone={question.difficulty}>{question.difficulty}</StatusPill>
               {question.category ? (
-                <StatusPill tone="neutral" className="normal-case tracking-[0.08em]">
+                <StatusPill tone="neutral_meta">
                   {question.category}
                 </StatusPill>
               ) : null}
@@ -81,10 +80,9 @@ export function InterviewQuestionCard({
                 />
                 <Button
                   type="button"
-                  variant={uploadState.status === 'error' ? 'destructive' : 'outline'}
+                  variant={uploadState.status === 'error' ? 'destructive' : 'outline-soft-strong'}
                   size="sm"
                   onClick={onUploadClick}
-                  className={cn('rounded-full bg-white/75')}
                 >
                   <Upload className="size-4" />
                   {uploadState.status === 'error' ? 'Retry upload' : 'Upload file'}

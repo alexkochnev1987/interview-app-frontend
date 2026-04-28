@@ -145,7 +145,7 @@ export function QuestionEditorSimilarPanel({
                 </div>
               </div>
 
-              <Button type="button" variant="outline" size="sm" asChild className="rounded-full bg-white/80">
+              <Button type="button" variant="outline-soft-strong" size="sm" asChild>
                 <Link href={`/questions/${match.question.id}`}>Open</Link>
               </Button>
             </div>
