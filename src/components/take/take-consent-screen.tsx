@@ -1,11 +1,12 @@
-import { Camera, Mic, ShieldCheck, Sparkles, Video } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
 import { EyebrowBadge } from '@/components/app/eyebrow-badge';
+import { TakeCapabilityCards } from '@/components/take/consent/take-capability-cards';
+import { TakeConsentCheckboxBlock } from '@/components/take/consent/take-consent-checkbox-block';
+import { TakePermissionStatusList } from '@/components/take/consent/take-permission-status-list';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
 import type { InterviewDataView, PermissionStatus } from '@/components/take/types';
 
 interface TakeConsentScreenProps {
@@ -52,55 +53,7 @@ export function TakeConsentScreen({
               </p>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-              <Card className="border-white/60 bg-[hsl(var(--surface-low)/0.9)] shadow-soft">
-                <CardContent className="space-y-3 px-5 py-5">
-                  <Camera className="size-5 text-[hsl(var(--primary))]" />
-                  <div className="space-y-1">
-                    <div className="text-sm font-semibold text-foreground">Camera</div>
-                    <p className="text-sm leading-6 text-muted-foreground">
-                      Recorded separately for every answer.
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-white/60 bg-[hsl(var(--surface-low)/0.9)] shadow-soft">
-                <CardContent className="space-y-3 px-5 py-5">
-                  <Mic className="size-5 text-[hsl(var(--primary))]" />
-                  <div className="space-y-1">
-                    <div className="text-sm font-semibold text-foreground">Microphone</div>
-                    <p className="text-sm leading-6 text-muted-foreground">
-                      Captured together with your camera feed.
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-white/60 bg-[hsl(var(--surface-low)/0.9)] shadow-soft">
-                <CardContent className="space-y-3 px-5 py-5">
-                  <Video className="size-5 text-[hsl(var(--primary))]" />
-                  <div className="space-y-1">
-                    <div className="text-sm font-semibold text-foreground">Entire screen</div>
-                    <p className="text-sm leading-6 text-muted-foreground">
-                      Must be shared as <strong>Entire screen</strong>, not a tab or app window.
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-white/60 bg-[hsl(var(--surface-low)/0.9)] shadow-soft">
-                <CardContent className="space-y-3 px-5 py-5">
-                  <ShieldCheck className="size-5 text-[hsl(var(--primary))]" />
-                  <div className="space-y-1">
-                    <div className="text-sm font-semibold text-foreground">Fairness checks</div>
-                    <p className="text-sm leading-6 text-muted-foreground">
-                      Session and browser activity may be stored for evaluation integrity.
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+            <TakeCapabilityCards />
           </div>
 
           <Card className="border-white/70 bg-white/90 shadow-soft">
@@ -123,37 +76,13 @@ export function TakeConsentScreen({
                 </ul>
               </div>
 
-              <div className="space-y-3 rounded-[1.5rem] bg-white/85 p-5 ring-1 ring-border/45">
-                <div className="flex items-center justify-between gap-3 rounded-[1rem] bg-[hsl(var(--surface-low)/0.8)] px-4 py-3">
-                  <div className="space-y-1">
-                    <div className="text-sm font-semibold text-foreground">Camera and microphone</div>
-                    <p className="text-xs leading-5 text-muted-foreground">
-                      Required before recording can begin.
-                    </p>
-                  </div>
-                  <span
-                    className={`rounded-full px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.16em] ring-1 ${permissionClasses(cameraStatus)}`}
-                  >
-                    {permissionLabel(cameraStatus)}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between gap-3 rounded-[1rem] bg-[hsl(var(--surface-low)/0.8)] px-4 py-3">
-                  <div className="space-y-1">
-                    <div className="text-sm font-semibold text-foreground">Entire screen share</div>
-                    <p className="text-xs leading-5 text-muted-foreground">
-                      {screenSurface === 'monitor'
-                        ? 'Entire screen is confirmed and ready.'
-                        : 'In the share picker, choose Entire screen / Screen.'}
-                    </p>
-                  </div>
-                  <span
-                    className={`rounded-full px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.16em] ring-1 ${permissionClasses(screenStatus)}`}
-                  >
-                    {permissionLabel(screenStatus)}
-                  </span>
-                </div>
-              </div>
+              <TakePermissionStatusList
+                cameraStatus={cameraStatus}
+                screenStatus={screenStatus}
+                screenSurface={screenSurface}
+                permissionLabel={permissionLabel}
+                permissionClasses={permissionClasses}
+              />
 
               {setupError ? (
                 <Alert variant="destructive" className="border-rose-200/70 bg-rose-50/85">
@@ -162,22 +91,7 @@ export function TakeConsentScreen({
                 </Alert>
               ) : null}
 
-              <div className="flex items-start gap-3 rounded-[1.25rem] bg-white/85 p-4 ring-1 ring-border/45">
-                <Checkbox
-                  id="consent"
-                  checked={consent}
-                  onCheckedChange={(checked) => onConsentChange(Boolean(checked))}
-                  className="mt-1"
-                />
-                <div className="space-y-2">
-                  <Label htmlFor="consent" className="text-sm font-semibold text-foreground">
-                    I agree to the recording and data collection terms.
-                  </Label>
-                  <p className="text-sm leading-6 text-muted-foreground">
-                    Data is used only for interview evaluation and is stored for 90 days.
-                  </p>
-                </div>
-              </div>
+              <TakeConsentCheckboxBlock consent={consent} onConsentChange={onConsentChange} />
 
               <Button
                 type="button"

@@ -3,6 +3,7 @@ export * from './progress';
 export * from './runtime';
 export * from './uploads';
 export * from './use-take-auto-start-recording';
+export * from './use-take-answer-persistence';
 export * from './use-take-behavior-tracking';
 export * from './use-take-begin-recording';
 export * from './use-take-interview-loader';

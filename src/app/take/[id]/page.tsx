@@ -8,31 +8,20 @@ import { TakeConsentScreen } from '@/components/take/take-consent-screen'
 import { TakeRecordingScreen } from '@/components/take/take-recording-screen'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import {
-  abortMultipartUploads as abortMultipartUploadsData,
-  buildFlushBehaviorEvents,
-  enqueueProgressFlush as enqueueProgressFlushData,
-  handleRecordedChunk as handleRecordedChunkData,
-  queueBufferedUpload as queueBufferedUploadData,
+  getMultipartSession,
   releaseCaptureStreams,
-  scheduleProgressFlush as scheduleProgressFlushData,
-  startProgressHeartbeat as startProgressHeartbeatData,
   stopMediaStream,
   type AnswerBehaviorEvent,
-  type CaptureTarget,
-  type MultipartUploadSession,
   type MultipartUploadState,
   type TakeBehaviorSignals,
   type TakePermissionStatus,
-  buildProgressPayload,
   clearProgressTimers,
   createEmptyBehaviorSignals,
-  createMultipartUploadSession,
   formatTime,
-  getMultipartSession,
   getPermissionErrorMessage,
   permissionClasses,
   permissionLabel,
-  completeMultipartUpload as completeMultipartUploadData,
+  useTakeAnswerPersistence,
   useTakeAutoStartRecording,
   useTakeBehaviorTracking,
   useTakeBeginRecording,
@@ -41,14 +30,7 @@ import {
   useTakeRecordingControls,
 } from '@/features/take'
 import {
-  abortMultipartUpload,
-  completeMultipartUpload as completeMultipartUploadRequest,
-  presignMultipartPart,
-  sendTakeAnswerProgress,
-  startMultipartUpload,
   submitTakeAnswer,
-  uploadMultipartPart,
-  type MultipartUploadPartResponse,
   type TakeInterviewData,
 } from '@/lib/api'
 
@@ -215,138 +197,93 @@ export default function TakeInterviewPage() {
     screenStreamRef,
   })
 
-  async function startMultipartUploadSession(
-    questionIndex: number,
-    mediaType: CaptureTarget,
-  ): Promise<MultipartUploadSession> {
-    const session = await startMultipartUpload(questionIndex, mediaType)
-    return createMultipartUploadSession(session)
-  }
+  const {
+    startMultipartUploadSession,
+    flushAnswerProgress,
+    enqueueProgressFlush,
+    scheduleProgressFlush,
+    startProgressHeartbeat,
+    queueBufferedUpload,
+    handleRecordedChunk,
+    completeMultipartUpload,
+    abortMultipartUploads,
+  } = useTakeAnswerPersistence({
+    id,
+    interview,
+    currentVersionNumberRef,
+    answerStartedAtRef,
+    answerStoppedAtMsRef,
+    answerDurationSecondsRef,
+    behaviorSignalsRef,
+    behaviorEventsRef,
+    flushedBehaviorEventCountRef,
+    progressRequestChainRef,
+    progressHeartbeatRef,
+    progressFlushTimeoutRef,
+    timerRef,
+    multipartUploadsRef,
+    progressHeartbeatMs: PROGRESS_HEARTBEAT_MS,
+    progressDebounceMs: PROGRESS_DEBOUNCE_MS,
+  })
 
-  async function flushAnswerProgress(forceAllEvents = false) {
+  async function persistCurrentVersion(action: Exclude<PendingVersionAction, null>) {
     if (!interview) {
       return
     }
 
-    const cameraUpload = multipartUploadsRef.current.camera
-    if (!cameraUpload) {
-      return
-    }
+    setUploading(true)
 
-    const screenUpload = multipartUploadsRef.current.screen
-    const behaviorEvents = buildFlushBehaviorEvents({
-      behaviorEvents: behaviorEventsRef.current,
-      forceAllEvents,
-      flushedBehaviorEventCount: flushedBehaviorEventCountRef.current,
-    })
+    try {
+      await enqueueProgressFlush(true)
+      await Promise.all([queueBufferedUpload('camera', true), queueBufferedUpload('screen', true)])
+      await Promise.all([completeMultipartUpload('camera'), completeMultipartUpload('screen')])
 
-    await sendTakeAnswerProgress(
-      id,
-      buildProgressPayload({
+      const cameraUpload = getMultipartSession(multipartUploadsRef.current, 'camera')
+      const screenUpload = getMultipartSession(multipartUploadsRef.current, 'screen')
+
+      await submitTakeAnswer(id, {
         questionIndex: interview.currentQuestionIndex,
         versionNumber: currentVersionNumberRef.current,
+        submitAnswer: action === 'submit',
         mediaKey: cameraUpload.mediaKey,
-        screenMediaKey: screenUpload?.mediaKey,
-        durationSeconds: answerDurationSecondsRef.current,
-        startedAt: answerStartedAtRef.current ?? undefined,
-        submittedAtMs: answerStoppedAtMsRef.current,
+        screenMediaKey: screenUpload.mediaKey,
+        durationSeconds: answerDurationSecondsRef.current || 1,
+        startedAt: answerStartedAtRef.current ?? new Date(Date.now() - 1000).toISOString(),
+        submittedAt: new Date().toISOString(),
         cameraFileSizeBytes: cameraUpload.recordedBytes,
-        screenFileSizeBytes: screenUpload?.recordedBytes,
+        screenFileSizeBytes: screenUpload.recordedBytes,
         behaviorSignals: behaviorSignalsRef.current,
-        behaviorEvents,
-      }),
-    )
+        behaviorEvents: behaviorEventsRef.current,
+      })
 
-    flushedBehaviorEventCountRef.current = behaviorEventsRef.current.length
-  }
+      clearRecordingArtifacts()
+      pendingVersionActionRef.current = null
 
-  function enqueueProgressFlush(forceAllEvents = false) {
-    return enqueueProgressFlushData({
-      progressRequestChainRef,
-      flushAnswerProgress: (forceAll) => flushAnswerProgress(forceAll),
-      forceAllEvents,
-    })
-  }
-
-  function scheduleProgressFlush(reason: 'event' | 'heartbeat' | 'start' | 'stop') {
-    scheduleProgressFlushData({
-      multipartUploadsRef,
-      progressFlushTimeoutRef,
-      enqueueProgressFlush: (forceAll = false) => enqueueProgressFlush(forceAll),
-      reason,
-      progressDebounceMs: PROGRESS_DEBOUNCE_MS,
-    })
-  }
-
-  function startProgressHeartbeat() {
-    startProgressHeartbeatData({
-      progressHeartbeatRef,
-      progressHeartbeatMs: PROGRESS_HEARTBEAT_MS,
-      scheduleProgressFlush: (reason) => scheduleProgressFlush(reason),
-    })
-  }
-
-  async function presignMultipartPartUpload(
-    target: CaptureTarget,
-    session: MultipartUploadSession,
-    questionIndex: number,
-    partNumber: number,
-  ): Promise<MultipartUploadPartResponse> {
-    try {
-      return await presignMultipartPart(
-        questionIndex,
-        session.mediaKey,
-        session.uploadId,
-        partNumber,
-      )
-    } catch (error) {
-      throw new Error(
-        error instanceof Error
-          ? error.message.replace('upload', target)
-          : `Failed to prepare ${target} upload chunk ${partNumber}.`,
-      )
+      if (action === 'submit') {
+        setCurrentVersionNumber(1)
+        currentVersionNumberRef.current = 1
+        setRetakeCount(0)
+        await loadInterview('resume')
+      } else {
+        const nextVersionNumber = currentVersionNumberRef.current + 1
+        setCurrentVersionNumber(nextVersionNumber)
+        currentVersionNumberRef.current = nextVersionNumber
+        setRetakeCount(nextVersionNumber - 1)
+        await beginRecording({
+          nextVersionNumber,
+          hasCurrentQuestion: Boolean(interview.currentQuestion),
+          currentQuestionIndex: interview.currentQuestionIndex,
+        })
+      }
+    } catch (err) {
+      await abortMultipartUploads()
+      setSetupError(err instanceof Error ? err.message : 'Upload failed')
+      autoStartedQuestionKeyRef.current = ''
+      setStage('interview')
+    } finally {
+      setTransitionLabel('')
+      setUploading(false)
     }
-  }
-
-  function queueBufferedUpload(target: CaptureTarget, forceFinal = false) {
-    return queueBufferedUploadData({
-      target,
-      multipartUploadsRef,
-      forceFinal,
-      questionIndex: interview?.currentQuestionIndex ?? 0,
-      presignMultipartPartUpload,
-      uploadMultipartPart,
-      scheduleProgressFlush: (reason) => scheduleProgressFlush(reason),
-    })
-  }
-
-  function handleRecordedChunk(target: CaptureTarget, blob: Blob) {
-    handleRecordedChunkData({
-      target,
-      blob,
-      multipartUploadsRef,
-      questionIndex: interview?.currentQuestionIndex ?? 0,
-      queueBufferedUpload: (nextTarget, nextForceFinal = false) =>
-        queueBufferedUpload(nextTarget, nextForceFinal),
-      scheduleProgressFlush: (reason) => scheduleProgressFlush(reason),
-    })
-  }
-
-  async function completeMultipartUpload(target: CaptureTarget) {
-    await completeMultipartUploadData({
-      target,
-      multipartUploadsRef,
-      questionIndex: interview?.currentQuestionIndex ?? 0,
-      completeMultipartUploadRequest,
-    })
-  }
-
-  async function abortMultipartUploads() {
-    await abortMultipartUploadsData({
-      multipartUploadsRef,
-      questionIndex: interview?.currentQuestionIndex ?? 0,
-      abortMultipartUploadRequest: abortMultipartUpload,
-    })
   }
 
   function onRecordersStopped() {
@@ -441,74 +378,6 @@ export default function TakeInterviewPage() {
       hasCurrentQuestion: Boolean(interview?.currentQuestion),
       currentQuestionIndex: interview?.currentQuestionIndex ?? 0,
     })
-  }
-
-  async function persistCurrentVersion(
-    action: Exclude<PendingVersionAction, null>,
-  ) {
-    if (!interview) {
-      return
-    }
-
-    setUploading(true)
-
-    try {
-      await enqueueProgressFlush(true)
-      await Promise.all([
-        queueBufferedUpload('camera', true),
-        queueBufferedUpload('screen', true),
-      ])
-      await Promise.all([
-        completeMultipartUpload('camera'),
-        completeMultipartUpload('screen'),
-      ])
-
-      const cameraUpload = getMultipartSession(multipartUploadsRef.current, 'camera')
-      const screenUpload = getMultipartSession(multipartUploadsRef.current, 'screen')
-
-      await submitTakeAnswer(id, {
-        questionIndex: interview.currentQuestionIndex,
-        versionNumber: currentVersionNumberRef.current,
-        submitAnswer: action === 'submit',
-        mediaKey: cameraUpload.mediaKey,
-        screenMediaKey: screenUpload.mediaKey,
-        durationSeconds: answerDurationSecondsRef.current || 1,
-        startedAt: answerStartedAtRef.current ?? new Date(Date.now() - 1000).toISOString(),
-        submittedAt: new Date().toISOString(),
-        cameraFileSizeBytes: cameraUpload.recordedBytes,
-        screenFileSizeBytes: screenUpload.recordedBytes,
-        behaviorSignals: behaviorSignalsRef.current,
-        behaviorEvents: behaviorEventsRef.current,
-      })
-
-      clearRecordingArtifacts()
-      pendingVersionActionRef.current = null
-
-      if (action === 'submit') {
-        setCurrentVersionNumber(1)
-        currentVersionNumberRef.current = 1
-        setRetakeCount(0)
-        await loadInterview('resume')
-      } else {
-        const nextVersionNumber = currentVersionNumberRef.current + 1
-        setCurrentVersionNumber(nextVersionNumber)
-        currentVersionNumberRef.current = nextVersionNumber
-        setRetakeCount(nextVersionNumber - 1)
-        await beginRecording({
-          nextVersionNumber,
-          hasCurrentQuestion: Boolean(interview.currentQuestion),
-          currentQuestionIndex: interview.currentQuestionIndex,
-        })
-      }
-    } catch (err) {
-      await abortMultipartUploads()
-      setSetupError(err instanceof Error ? err.message : 'Upload failed')
-      autoStartedQuestionKeyRef.current = ''
-      setStage('interview')
-    } finally {
-      setTransitionLabel('')
-      setUploading(false)
-    }
   }
 
   if (error && !interview) {
