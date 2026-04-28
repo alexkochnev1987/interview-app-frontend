@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { request, requestVoid } from '@/lib/api/client';
+import { getMe, logout as logoutRequest } from '@/lib/api';
 
 interface User {
   id: string;
@@ -27,14 +27,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    request<User>('/auth/me')
+    getMe()
       .then((data) => setUser(data))
       .catch(() => setUser(null))
       .finally(() => setLoading(false));
   }, []);
 
   const logout = async () => {
-    await requestVoid('/auth/logout', { method: 'POST' });
+    await logoutRequest();
     setUser(null);
     window.location.href = '/login';
   };

@@ -1,6 +1,5 @@
 import { BodyMutedSm, EyebrowLabel } from '@/components/layout/content-presets';
-
-type TakeStage = 'loading' | 'consent' | 'interview' | 'recording' | 'transition' | 'complete';
+import type { TakeStage } from '@/components/take/types';
 
 interface LiveTranscriptPanelProps {
   isSupported: boolean;

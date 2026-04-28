@@ -11,14 +11,6 @@ export interface InterviewDataView {
     status: 'recording' | 'submitted';
     versionCount: number;
     selectedVersionNumber: number;
-    transcriptText?: string;
-    hasTranscript?: boolean;
-    transcriptStatus?: 'pending' | 'processing' | 'ready' | 'failed';
-    transcript?: {
-      text?: string;
-      status?: 'pending' | 'processing' | 'ready' | 'failed';
-      ready?: boolean;
-    };
   } | null;
 }
 

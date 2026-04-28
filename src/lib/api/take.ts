@@ -1,20 +1,7 @@
 import { request, requestVoid } from './client';
+import type { AnswerBehaviorEvent, AnswerBehaviorSignals } from './types';
 
 type CaptureTarget = 'camera' | 'screen';
-
-interface ProgressBehaviorSignals {
-  tabHiddenCount: number;
-  windowBlurCount: number;
-  pasteCount: number;
-  keydownCount: number;
-  resizeCount: number;
-}
-
-interface ProgressBehaviorEvent {
-  eventType: 'tab_hidden' | 'window_blur' | 'paste' | 'keydown' | 'resize';
-  occurredAt: string;
-  versionNumber: number;
-}
 
 interface ClientTranscriptPayload {
   text: string;
@@ -61,8 +48,8 @@ export interface TakeProgressPayload {
   submittedAt?: string;
   cameraFileSizeBytes?: number;
   screenFileSizeBytes?: number;
-  behaviorSignals: ProgressBehaviorSignals;
-  behaviorEvents: ProgressBehaviorEvent[];
+  behaviorSignals: AnswerBehaviorSignals;
+  behaviorEvents: AnswerBehaviorEvent[];
   clientTranscript?: ClientTranscriptPayload;
 }
 
@@ -77,8 +64,8 @@ export async function getTakeInterview(
   try {
     const query = token ? `?token=${encodeURIComponent(token)}` : '';
     return await request<TakeInterviewData>(`/take/${id}${query}`);
-  } catch {
-    throw new Error('Invalid or expired interview link');
+  } catch (err) {
+    throw new Error('Invalid or expired interview link', { cause: err });
   }
 }
 
@@ -95,8 +82,10 @@ export async function startMultipartUpload(
         mediaType,
       }),
     });
-  } catch {
-    throw new Error(`Failed to initialize ${mediaType} upload for this answer version.`);
+  } catch (err) {
+    throw new Error(`Failed to initialize ${mediaType} upload for this answer version.`, {
+      cause: err,
+    });
   }
 }
 
@@ -109,8 +98,8 @@ export async function sendTakeAnswerProgress(
       method: 'POST',
       body: JSON.stringify(payload),
     });
-  } catch {
-    throw new Error('Failed to save interview progress.');
+  } catch (err) {
+    throw new Error('Failed to save interview progress.', { cause: err });
   }
 }
 
@@ -130,8 +119,8 @@ export async function presignMultipartPart(
         partNumber,
       }),
     });
-  } catch {
-    throw new Error(`Failed to prepare upload chunk ${partNumber}.`);
+  } catch (err) {
+    throw new Error(`Failed to prepare upload chunk ${partNumber}.`, { cause: err });
   }
 }
 
@@ -160,8 +149,8 @@ export async function completeMultipartUpload(
         uploadId,
       }),
     });
-  } catch {
-    throw new Error('Failed to finalize upload.');
+  } catch (err) {
+    throw new Error('Failed to finalize upload.', { cause: err });
   }
 }
 
@@ -189,7 +178,10 @@ export async function submitTakeAnswer(
       method: 'POST',
       body: JSON.stringify(payload),
     });
-  } catch {
-    throw new Error(payload.submitAnswer ? 'Answer submission failed.' : 'Re-record version could not be saved.');
+  } catch (err) {
+    throw new Error(
+      payload.submitAnswer ? 'Answer submission failed.' : 'Re-record version could not be saved.',
+      { cause: err },
+    );
   }
 }

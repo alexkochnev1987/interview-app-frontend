@@ -1,6 +1,5 @@
 import type { MutableRefObject } from 'react';
-
-import type { TakePermissionStatus } from './utils';
+import type { PermissionStatus } from '@/components/take/types';
 
 type ScreenTrackSettings = MediaTrackSettings & { displaySurface?: string };
 type InterviewDisplayMediaOptions = DisplayMediaStreamOptions & {
@@ -13,8 +12,8 @@ type InterviewDisplayMediaOptions = DisplayMediaStreamOptions & {
 interface UseTakePermissionsParams {
   setSetupBusy: (value: boolean) => void;
   setSetupError: (value: string) => void;
-  setCameraStatus: (value: TakePermissionStatus) => void;
-  setScreenStatus: (value: TakePermissionStatus) => void;
+  setCameraStatus: (value: PermissionStatus) => void;
+  setScreenStatus: (value: PermissionStatus) => void;
   setScreenSurface: (value: string) => void;
   setStage: (value: 'interview') => void;
   clearRecordingArtifacts: () => void;

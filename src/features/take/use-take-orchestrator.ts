@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 
 import { useBrowserTranscript } from '@/lib/use-browser-transcript';
 import { submitTakeAnswer, type TakeInterviewData } from '@/lib/api';
+import type { PermissionStatus } from '@/components/take/types';
 import {
   clearProgressTimers,
   createEmptyBehaviorSignals,
@@ -24,12 +25,10 @@ import {
   type MultipartUploadState,
   type Stage,
   type TakeBehaviorSignals,
-  type TakePermissionStatus,
   progressValueForStage,
 } from '@/features/take';
 
 type InterviewData = TakeInterviewData;
-type PermissionStatus = TakePermissionStatus;
 type PendingVersionAction = 'submit' | 'rerecord' | null;
 type AnswerBehaviorSignals = TakeBehaviorSignals;
 

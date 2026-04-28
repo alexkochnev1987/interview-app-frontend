@@ -33,9 +33,9 @@ interface QuestionBase {
   metadata: Record<string, unknown>;
 }
 
-export interface QuestionDraft extends QuestionBase {}
+export type QuestionDraft = QuestionBase;
 
-export interface QuestionInput extends QuestionBase {}
+export type QuestionInput = QuestionBase;
 
 export interface Question extends QuestionInput {
   id: string;

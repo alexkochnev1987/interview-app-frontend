@@ -1,4 +1,4 @@
-export type TakePermissionStatus = 'idle' | 'pending' | 'granted' | 'denied';
+import type { PermissionStatus } from '@/components/take/types';
 
 export interface TakeBehaviorSignals {
   tabHiddenCount: number;
@@ -18,7 +18,7 @@ export function createEmptyBehaviorSignals(): TakeBehaviorSignals {
   };
 }
 
-export function permissionLabel(status: TakePermissionStatus) {
+export function permissionLabel(status: PermissionStatus) {
   switch (status) {
     case 'pending':
       return 'Pending';
@@ -31,7 +31,7 @@ export function permissionLabel(status: TakePermissionStatus) {
   }
 }
 
-export function permissionClasses(status: TakePermissionStatus) {
+export function permissionClasses(status: PermissionStatus) {
   switch (status) {
     case 'pending':
       return 'bg-[var(--color-status-pending-bg)] text-[var(--color-status-pending-fg)] ring-[var(--color-status-pending-ring)]/80';
