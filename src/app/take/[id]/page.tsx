@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useRef, useState } from 'react'
 import { useParams, useSearchParams } from 'next/navigation'
 import { LoadingStateCard } from '@/components/app/state-card'
 import { TakeCompleteScreen } from '@/components/take/take-complete-screen'
@@ -10,6 +11,12 @@ import {
   getMultipartSession,
   releaseCaptureStreams,
   stopMediaStream,
+  type AnswerBehaviorEvent,
+  type MultipartUploadState,
+  type TakeBehaviorSignals,
+  type TakePermissionStatus,
+  clearProgressTimers,
+  createEmptyBehaviorSignals,
   formatTime,
   getPermissionErrorMessage,
   permissionClasses,
@@ -21,13 +28,19 @@ import {
   useTakeInterviewLoader,
   useTakePermissions,
   useTakeRecordingControls,
-  useTakeSessionController,
 } from '@/features/take'
 import {
   submitTakeAnswer,
+  type TakeInterviewData,
 } from '@/lib/api'
 
+type InterviewData = TakeInterviewData
+
+type Stage = 'loading' | 'consent' | 'interview' | 'recording' | 'transition' | 'complete'
+type PermissionStatus = TakePermissionStatus
 type PendingVersionAction = 'submit' | 'rerecord' | null
+
+type AnswerBehaviorSignals = TakeBehaviorSignals
 
 const PROGRESS_HEARTBEAT_MS = 3000
 const PROGRESS_DEBOUNCE_MS = 400
@@ -38,64 +51,89 @@ export default function TakeInterviewPage() {
   const id = params.id as string
   const candidateToken = searchParams.get('token')?.trim() ?? ''
 
-  const {
-    stage,
-    setStage,
-    interview,
-    setInterview,
-    error,
-    setError,
-    consent,
-    setConsent,
-    recording,
-    setRecording,
-    timeLeft,
-    setTimeLeft,
-    retakeCount,
-    setRetakeCount,
-    currentVersionNumber,
-    setCurrentVersionNumber,
-    uploading,
-    setUploading,
-    cameraStatus,
-    setCameraStatus,
-    screenStatus,
-    setScreenStatus,
-    screenSurface,
-    setScreenSurface,
-    setupBusy,
-    setSetupBusy,
-    setupError,
-    setSetupError,
-    transitionLabel,
-    setTransitionLabel,
-    videoRef,
-    cameraRecorderRef,
-    screenRecorderRef,
-    timerRef,
-    progressHeartbeatRef,
-    progressFlushTimeoutRef,
-    cameraStreamRef,
-    screenStreamRef,
-    discardRecordingRef,
-    answerStartedAtRef,
-    answerStartedAtMsRef,
-    answerStoppedAtMsRef,
-    answerDurationSecondsRef,
-    stoppedRecordersRef,
-    currentVersionNumberRef,
-    behaviorSignalsRef,
-    behaviorEventsRef,
-    flushedBehaviorEventCountRef,
-    progressRequestChainRef,
-    pendingVersionActionRef,
-    multipartUploadsRef,
-    beginRecordingRef,
-    autoStartedQuestionKeyRef,
-    attachCameraPreview,
-    clearRecordingArtifacts,
-    stopActiveRecorders,
-  } = useTakeSessionController()
+  const [stage, setStage] = useState<Stage>('loading')
+  const [interview, setInterview] = useState<InterviewData | null>(null)
+  const [error, setError] = useState('')
+  const [consent, setConsent] = useState(false)
+  const [recording, setRecording] = useState(false)
+  const [timeLeft, setTimeLeft] = useState(240)
+  const [retakeCount, setRetakeCount] = useState(0)
+  const [currentVersionNumber, setCurrentVersionNumber] = useState(1)
+  const [uploading, setUploading] = useState(false)
+  const [cameraStatus, setCameraStatus] = useState<PermissionStatus>('idle')
+  const [screenStatus, setScreenStatus] = useState<PermissionStatus>('idle')
+  const [screenSurface, setScreenSurface] = useState('')
+  const [setupBusy, setSetupBusy] = useState(false)
+  const [setupError, setSetupError] = useState('')
+  const [transitionLabel, setTransitionLabel] = useState('')
+
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const cameraRecorderRef = useRef<MediaRecorder | null>(null)
+  const screenRecorderRef = useRef<MediaRecorder | null>(null)
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const progressHeartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const progressFlushTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const cameraStreamRef = useRef<MediaStream | null>(null)
+  const screenStreamRef = useRef<MediaStream | null>(null)
+  const discardRecordingRef = useRef(false)
+  const answerStartedAtRef = useRef<string | null>(null)
+  const answerStartedAtMsRef = useRef<number | null>(null)
+  const answerStoppedAtMsRef = useRef<number | null>(null)
+  const answerDurationSecondsRef = useRef<number>(0)
+  const stoppedRecordersRef = useRef(0)
+  const currentVersionNumberRef = useRef(1)
+  const behaviorSignalsRef = useRef<AnswerBehaviorSignals>(createEmptyBehaviorSignals())
+  const behaviorEventsRef = useRef<AnswerBehaviorEvent[]>([])
+  const flushedBehaviorEventCountRef = useRef(0)
+  const progressRequestChainRef = useRef(Promise.resolve())
+  const pendingVersionActionRef = useRef<PendingVersionAction>(null)
+  const multipartUploadsRef = useRef<MultipartUploadState>({
+    camera: null,
+    screen: null,
+  })
+  const beginRecordingRef = useRef<(nextVersionNumber: number) => Promise<void>>(
+    async () => undefined,
+  )
+  const autoStartedQuestionKeyRef = useRef('')
+
+  function attachCameraPreview(stream: MediaStream) {
+    cameraStreamRef.current = stream
+    if (videoRef.current) {
+      videoRef.current.srcObject = stream
+      void videoRef.current.play().catch(() => undefined)
+    }
+  }
+
+  function clearRecordingArtifacts() {
+    clearProgressTimers(timerRef, progressHeartbeatRef, progressFlushTimeoutRef)
+    answerStartedAtRef.current = null
+    answerStartedAtMsRef.current = null
+    answerStoppedAtMsRef.current = null
+    answerDurationSecondsRef.current = 0
+    stoppedRecordersRef.current = 0
+    behaviorSignalsRef.current = createEmptyBehaviorSignals()
+    behaviorEventsRef.current = []
+    flushedBehaviorEventCountRef.current = 0
+    progressRequestChainRef.current = Promise.resolve()
+    multipartUploadsRef.current = {
+      camera: null,
+      screen: null,
+    }
+  }
+
+  function stopActiveRecorders() {
+    clearProgressTimers(timerRef, progressHeartbeatRef, progressFlushTimeoutRef)
+
+    if (cameraRecorderRef.current?.state === 'recording') {
+      cameraRecorderRef.current.stop()
+    }
+
+    if (screenRecorderRef.current?.state === 'recording') {
+      screenRecorderRef.current.stop()
+    }
+
+    setRecording(false)
+  }
 
   function resetInterviewSetup(message: string) {
     discardRecordingRef.current = true
