@@ -1,4 +1,5 @@
 import type { MutableRefObject } from 'react';
+import { canRequestVersionAction, transitionLabelForAction } from './session-machine';
 
 type PendingVersionAction = 'submit' | 'rerecord' | null;
 
@@ -45,16 +46,12 @@ export function useTakeRecordingControls({
   }
 
   function requestVersionAction(action: PendingVersionAction) {
-    if (!action || uploading || !recording) {
+    if (!action || !canRequestVersionAction({ action, uploading, recording })) {
       return;
     }
 
     pendingVersionActionRef.current = action;
-    setTransitionLabel(
-      action === 'submit'
-        ? 'Submitting answer and moving to the next question...'
-        : 'Saving this version and starting a new recording...',
-    );
+    setTransitionLabel(transitionLabelForAction(action));
     setStage('transition');
     scheduleProgressFlush('stop');
     stopRecording();
