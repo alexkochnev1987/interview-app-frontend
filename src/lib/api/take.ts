@@ -1,3 +1,5 @@
+import { request, requestVoid } from './client';
+
 type CaptureTarget = 'camera' | 'screen';
 
 interface ProgressBehaviorSignals {
@@ -72,43 +74,42 @@ export async function getTakeInterview(
   id: string,
   token?: string,
 ): Promise<TakeInterviewData> {
-  const apiUrl = token ? `/api/take/${id}?token=${encodeURIComponent(token)}` : `/api/take/${id}`;
-  const response = await fetch(apiUrl);
-  if (!response.ok) {
+  try {
+    const query = token ? `?token=${encodeURIComponent(token)}` : '';
+    return await request<TakeInterviewData>(`/take/${id}${query}`);
+  } catch {
     throw new Error('Invalid or expired interview link');
   }
-  return (await response.json()) as TakeInterviewData;
 }
 
 export async function startMultipartUpload(
   questionIndex: number,
   mediaType: CaptureTarget,
 ): Promise<MultipartUploadSessionResponse> {
-  const response = await fetch('/api/upload/multipart/start', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      questionIndex,
-      contentType: 'video/webm',
-      mediaType,
-    }),
-  });
-  if (!response.ok) {
+  try {
+    return await request<MultipartUploadSessionResponse>('/upload/multipart/start', {
+      method: 'POST',
+      body: JSON.stringify({
+        questionIndex,
+        contentType: 'video/webm',
+        mediaType,
+      }),
+    });
+  } catch {
     throw new Error(`Failed to initialize ${mediaType} upload for this answer version.`);
   }
-  return (await response.json()) as MultipartUploadSessionResponse;
 }
 
 export async function sendTakeAnswerProgress(
   id: string,
   payload: TakeProgressPayload,
 ): Promise<void> {
-  const response = await fetch(`/api/take/${id}/answer/progress`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
-  if (!response.ok) {
+  try {
+    await requestVoid(`/take/${id}/answer/progress`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  } catch {
     throw new Error('Failed to save interview progress.');
   }
 }
@@ -119,20 +120,19 @@ export async function presignMultipartPart(
   uploadId: string,
   partNumber: number,
 ): Promise<MultipartUploadPartResponse> {
-  const response = await fetch('/api/upload/multipart/part', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      questionIndex,
-      mediaKey,
-      uploadId,
-      partNumber,
-    }),
-  });
-  if (!response.ok) {
+  try {
+    return await request<MultipartUploadPartResponse>('/upload/multipart/part', {
+      method: 'POST',
+      body: JSON.stringify({
+        questionIndex,
+        mediaKey,
+        uploadId,
+        partNumber,
+      }),
+    });
+  } catch {
     throw new Error(`Failed to prepare upload chunk ${partNumber}.`);
   }
-  return (await response.json()) as MultipartUploadPartResponse;
 }
 
 export async function uploadMultipartPart(uploadUrl: string, partBlob: Blob): Promise<void> {
@@ -151,16 +151,16 @@ export async function completeMultipartUpload(
   mediaKey: string,
   uploadId: string,
 ): Promise<void> {
-  const response = await fetch('/api/upload/multipart/complete', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      questionIndex,
-      mediaKey,
-      uploadId,
-    }),
-  });
-  if (!response.ok) {
+  try {
+    await requestVoid('/upload/multipart/complete', {
+      method: 'POST',
+      body: JSON.stringify({
+        questionIndex,
+        mediaKey,
+        uploadId,
+      }),
+    });
+  } catch {
     throw new Error('Failed to finalize upload.');
   }
 }
@@ -170,9 +170,8 @@ export async function abortMultipartUpload(
   mediaKey: string,
   uploadId: string,
 ): Promise<void> {
-  await fetch('/api/upload/multipart/abort', {
+  await requestVoid('/upload/multipart/abort', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       questionIndex,
       mediaKey,
@@ -185,12 +184,12 @@ export async function submitTakeAnswer(
   id: string,
   payload: SubmitTakeAnswerPayload,
 ): Promise<void> {
-  const response = await fetch(`/api/take/${id}/answer`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
-  if (!response.ok) {
+  try {
+    await requestVoid(`/take/${id}/answer`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  } catch {
     throw new Error(payload.submitAnswer ? 'Answer submission failed.' : 'Re-record version could not be saved.');
   }
 }

@@ -25,10 +25,22 @@ export function useInterviewDetail(id: string) {
   const [completing, setCompleting] = useState(false);
   const [uploadStates, setUploadStates] = useState<QuestionUploadState[]>([]);
   const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const isMountedRef = useRef(true);
+  const pollIntervalRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+      if (pollIntervalRef.current !== null) {
+        window.clearInterval(pollIntervalRef.current);
+      }
+    };
+  }, []);
 
   const loadInterview = useCallback(async () => {
     try {
       const data = await getInterview(id);
+      if (!isMountedRef.current) return;
       setInterview(data);
       setUploadStates(
         data.questions.map((_, qi) => {
@@ -40,15 +52,22 @@ export function useInterviewDetail(id: string) {
       if (data.status === 'completed') {
         try {
           const nextResults = await getResults(id);
-          setResults(nextResults);
-        } catch {
+          if (isMountedRef.current) {
+            setResults(nextResults);
+          }
+        } catch (resultsError) {
           // Results may still be processing even after completion.
+          void resultsError;
         }
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load interview.');
+      if (isMountedRef.current) {
+        setError(err instanceof Error ? err.message : 'Failed to load interview.');
+      }
     } finally {
-      setLoading(false);
+      if (isMountedRef.current) {
+        setLoading(false);
+      }
     }
   }, [id]);
 
@@ -86,6 +105,7 @@ export function useInterviewDetail(id: string) {
       }
 
       const updatedInterview = await completeUpload(interview.id, questionIndex, mediaKey);
+      if (!isMountedRef.current) return;
       setInterview(updatedInterview);
       setUploadStates((current) =>
         current.map((state, index) => (index === questionIndex ? { status: 'uploaded' } : state)),
@@ -119,34 +139,53 @@ export function useInterviewDetail(id: string) {
       if (updatedInterview.status === 'completed') {
         try {
           const nextResults = await getResults(interview.id);
-          setResults(nextResults);
-        } catch {
+          if (isMountedRef.current) {
+            setResults(nextResults);
+          }
+        } catch (resultsError) {
           // Results may still be processing after completion.
+          void resultsError;
         }
       }
 
       if (updatedInterview.status === 'processing') {
-        const pollId = window.setInterval(async () => {
+        pollIntervalRef.current = window.setInterval(async () => {
           try {
             const refreshedInterview = await getInterview(interview.id);
+            if (!isMountedRef.current) return;
             setInterview(refreshedInterview);
 
             if (refreshedInterview.status === 'completed') {
-              window.clearInterval(pollId);
+              if (pollIntervalRef.current !== null) {
+                window.clearInterval(pollIntervalRef.current);
+                pollIntervalRef.current = null;
+              }
               const nextResults = await getResults(interview.id);
-              setResults(nextResults);
+              if (isMountedRef.current) {
+                setResults(nextResults);
+              }
             } else if (refreshedInterview.status === 'failed') {
-              window.clearInterval(pollId);
+              if (pollIntervalRef.current !== null) {
+                window.clearInterval(pollIntervalRef.current);
+                pollIntervalRef.current = null;
+              }
             }
           } catch {
-            window.clearInterval(pollId);
+            if (pollIntervalRef.current !== null) {
+              window.clearInterval(pollIntervalRef.current);
+              pollIntervalRef.current = null;
+            }
           }
         }, 2000);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to complete interview.');
+      if (isMountedRef.current) {
+        setError(err instanceof Error ? err.message : 'Failed to complete interview.');
+      }
     } finally {
-      setCompleting(false);
+      if (isMountedRef.current) {
+        setCompleting(false);
+      }
     }
   }
 
