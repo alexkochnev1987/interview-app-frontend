@@ -9,4 +9,5 @@ export * from './use-take-begin-recording';
 export * from './use-take-interview-loader';
 export * from './use-take-permissions';
 export * from './use-take-recording-controls';
+export * from './use-take-session-controller';
 export * from './utils';

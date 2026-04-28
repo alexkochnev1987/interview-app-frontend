@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+import { fetchFeedback } from '@/lib/api';
+
 import type { Feedback } from './types';
 
 interface UseFeedbackResult {
@@ -12,15 +14,16 @@ export function useFeedback(id: string, token: string): UseFeedbackResult {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetch(`/api/feedback/${id}?token=${token}`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error('Invalid or expired feedback link');
-        }
-        return res.json();
-      })
+    fetchFeedback(id, token)
       .then((data) => setFeedback(data))
-      .catch((err) => setError(err instanceof Error ? err.message : 'Failed to load'));
+      .catch((err) => {
+        const message = err instanceof Error ? err.message : 'Failed to load';
+        if (message.includes('API error 404') || message.includes('API error 401')) {
+          setError('Invalid or expired feedback link');
+          return;
+        }
+        setError(message);
+      });
   }, [id, token]);
 
   return { feedback, error };
