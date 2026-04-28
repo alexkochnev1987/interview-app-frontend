@@ -38,6 +38,7 @@ interface UseTakeBeginRecordingParams {
   handleRecordedChunk: (target: CaptureTarget, blob: Blob) => void;
   onRecordersStopped: () => void;
   requestVersionAction: (action: PendingVersionAction) => void;
+  startBrowserTranscript: () => void;
 }
 
 interface BeginRecordingInput {
@@ -77,6 +78,7 @@ export function useTakeBeginRecording({
   handleRecordedChunk,
   onRecordersStopped,
   requestVersionAction,
+  startBrowserTranscript,
 }: UseTakeBeginRecordingParams) {
   function handleRecorderStopped() {
     stoppedRecordersRef.current += 1;
@@ -158,6 +160,7 @@ export function useTakeBeginRecording({
     screenRecorderRef.current = screenRecorder;
     cameraRecorder.start(1000);
     screenRecorder.start(1000);
+    startBrowserTranscript();
 
     setRecording(true);
     setTimeLeft(240);

@@ -6,6 +6,7 @@ import { LoadingStateCard } from '@/components/app/state-card'
 import { TakeCompleteScreen } from '@/components/take/take-complete-screen'
 import { TakeConsentScreen } from '@/components/take/take-consent-screen'
 import { TakeRecordingScreen } from '@/components/take/take-recording-screen'
+import { useBrowserTranscript } from '@/lib/use-browser-transcript'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import {
   getMultipartSession,
@@ -50,6 +51,16 @@ export default function TakeInterviewPage() {
   const searchParams = useSearchParams()
   const id = params.id as string
   const candidateToken = searchParams.get('token')?.trim() ?? ''
+  const {
+    isSupported: isBrowserTranscriptSupported,
+    interimTranscript,
+    finalTranscript,
+    warning: browserTranscriptWarning,
+    start: startBrowserTranscript,
+    stop: stopBrowserTranscript,
+    reset: resetBrowserTranscript,
+    getSnapshot: getBrowserTranscriptSnapshot,
+  } = useBrowserTranscript()
 
   const [stage, setStage] = useState<Stage>('loading')
   const [interview, setInterview] = useState<InterviewData | null>(null)
@@ -119,6 +130,7 @@ export default function TakeInterviewPage() {
       camera: null,
       screen: null,
     }
+    resetBrowserTranscript()
   }
 
   function stopActiveRecorders() {
@@ -224,6 +236,7 @@ export default function TakeInterviewPage() {
     multipartUploadsRef,
     progressHeartbeatMs: PROGRESS_HEARTBEAT_MS,
     progressDebounceMs: PROGRESS_DEBOUNCE_MS,
+    getBrowserTranscriptSnapshot,
   })
 
   async function persistCurrentVersion(action: Exclude<PendingVersionAction, null>) {
@@ -240,6 +253,10 @@ export default function TakeInterviewPage() {
 
       const cameraUpload = getMultipartSession(multipartUploadsRef.current, 'camera')
       const screenUpload = getMultipartSession(multipartUploadsRef.current, 'screen')
+      const transcriptSnapshot =
+        action === 'submit'
+          ? await stopBrowserTranscript({ finalize: true, timeoutMs: 700 })
+          : null
 
       await submitTakeAnswer(id, {
         questionIndex: interview.currentQuestionIndex,
@@ -254,6 +271,17 @@ export default function TakeInterviewPage() {
         screenFileSizeBytes: screenUpload.recordedBytes,
         behaviorSignals: behaviorSignalsRef.current,
         behaviorEvents: behaviorEventsRef.current,
+        ...(transcriptSnapshot?.text.trim()
+          ? {
+              clientTranscript: {
+                text: transcriptSnapshot.text,
+                language: transcriptSnapshot.language,
+                provider: transcriptSnapshot.provider,
+                generatedAt: transcriptSnapshot.generatedAt,
+                isFinal: true,
+              },
+            }
+          : {}),
       })
 
       clearRecordingArtifacts()
@@ -370,6 +398,7 @@ export default function TakeInterviewPage() {
     handleRecordedChunk,
     onRecordersStopped,
     requestVersionAction,
+    startBrowserTranscript,
   })
 
   beginRecordingRef.current = async (nextVersionNumber: number) => {
@@ -441,6 +470,10 @@ export default function TakeInterviewPage() {
       timeLeft={timeLeft}
       transitionLabel={transitionLabel}
       uploading={uploading}
+      isBrowserTranscriptSupported={isBrowserTranscriptSupported}
+      finalTranscript={finalTranscript}
+      interimTranscript={interimTranscript}
+      browserTranscriptWarning={browserTranscriptWarning}
       videoRef={videoRef}
       formatTime={formatTime}
       onRerecord={() => requestVersionAction('rerecord')}

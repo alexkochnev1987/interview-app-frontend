@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import { getTakeInterview, type TakeInterviewData } from '@/lib/api';
 
@@ -17,25 +17,35 @@ export function useTakeInterviewLoader({
   onError,
   onCleanup,
 }: UseTakeInterviewLoaderParams) {
+  const onDataRef = useRef(onData);
+  const onErrorRef = useRef(onError);
+  const onCleanupRef = useRef(onCleanup);
+
+  useEffect(() => {
+    onDataRef.current = onData;
+    onErrorRef.current = onError;
+    onCleanupRef.current = onCleanup;
+  }, [onData, onError, onCleanup]);
+
   const loadInterview = useCallback(
     async (mode: 'initial' | 'resume' = 'initial', tokenOverride?: string) => {
       try {
         const data = await getTakeInterview(id, tokenOverride);
-        onData(data, mode, tokenOverride);
+        onDataRef.current(data, mode, tokenOverride);
       } catch (err) {
-        onError(err instanceof Error ? err.message : 'Failed to load interview');
+        onErrorRef.current(err instanceof Error ? err.message : 'Failed to load interview');
       }
     },
-    [id, onData, onError],
+    [id],
   );
 
   useEffect(() => {
     void loadInterview('initial', candidateToken);
 
     return () => {
-      onCleanup();
+      onCleanupRef.current();
     };
-  }, [candidateToken, loadInterview, onCleanup]);
+  }, [candidateToken, loadInterview]);
 
   return { loadInterview };
 }

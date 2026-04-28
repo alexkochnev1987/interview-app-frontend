@@ -5,6 +5,7 @@ import { TakeRecordingGuidance } from '@/components/take/recording/take-recordin
 import { TakeRecordingHeader } from '@/components/take/recording/take-recording-header';
 import { TakeRecordingPreview } from '@/components/take/recording/take-recording-preview';
 import { TakeRecordingStatus } from '@/components/take/recording/take-recording-status';
+import { LiveTranscriptPanel } from '@/components/take/live-transcript-panel';
 import { Card, CardContent } from '@/components/ui/card';
 import type { InterviewDataView, TakeStage } from '@/components/take/types';
 
@@ -19,6 +20,10 @@ interface TakeRecordingScreenProps {
   timeLeft: number;
   transitionLabel: string;
   uploading: boolean;
+  isBrowserTranscriptSupported: boolean;
+  finalTranscript: string;
+  interimTranscript: string;
+  browserTranscriptWarning?: string;
   videoRef: RefObject<HTMLVideoElement>;
   formatTime: (seconds: number) => string;
   onRerecord: () => void;
@@ -36,6 +41,10 @@ export function TakeRecordingScreen({
   timeLeft,
   transitionLabel,
   uploading,
+  isBrowserTranscriptSupported,
+  finalTranscript,
+  interimTranscript,
+  browserTranscriptWarning,
   videoRef,
   formatTime,
   onRerecord,
@@ -72,6 +81,14 @@ export function TakeRecordingScreen({
               timeLeft={timeLeft}
               formatTime={formatTime}
               videoRef={videoRef}
+            />
+
+            <LiveTranscriptPanel
+              isSupported={isBrowserTranscriptSupported}
+              finalTranscript={finalTranscript}
+              interimTranscript={interimTranscript}
+              warning={browserTranscriptWarning}
+              stage={stage}
             />
 
             <TakeRecordingGuidance stage={stage} transitionLabel={transitionLabel} />

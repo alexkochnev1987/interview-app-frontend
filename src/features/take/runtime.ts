@@ -115,6 +115,13 @@ export interface ProgressPayloadArgs {
   screenFileSizeBytes?: number;
   behaviorSignals: TakeBehaviorSignals;
   behaviorEvents: AnswerBehaviorEvent[];
+  clientTranscript?: {
+    text: string;
+    language: string;
+    provider: string;
+    generatedAt: string;
+    isFinal: boolean;
+  };
 }
 
 export function buildProgressPayload(args: ProgressPayloadArgs) {
@@ -130,5 +137,6 @@ export function buildProgressPayload(args: ProgressPayloadArgs) {
     screenFileSizeBytes: args.screenFileSizeBytes || undefined,
     behaviorSignals: args.behaviorSignals,
     behaviorEvents: args.behaviorEvents,
+    clientTranscript: args.clientTranscript,
   };
 }

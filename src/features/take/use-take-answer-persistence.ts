@@ -47,6 +47,13 @@ interface UseTakeAnswerPersistenceParams {
   multipartUploadsRef: React.MutableRefObject<MultipartUploadState>;
   progressHeartbeatMs: number;
   progressDebounceMs: number;
+  getBrowserTranscriptSnapshot: () => {
+    text: string;
+    language: string;
+    provider: string;
+    generatedAt: string;
+    isFinal: boolean;
+  };
 }
 
 export function useTakeAnswerPersistence({
@@ -66,6 +73,7 @@ export function useTakeAnswerPersistence({
   multipartUploadsRef,
   progressHeartbeatMs,
   progressDebounceMs,
+  getBrowserTranscriptSnapshot,
 }: UseTakeAnswerPersistenceParams) {
   const startMultipartUploadSession = useCallback(
     async (questionIndex: number, mediaType: CaptureTarget): Promise<MultipartUploadSession> => {
@@ -92,6 +100,7 @@ export function useTakeAnswerPersistence({
         forceAllEvents,
         flushedBehaviorEventCount: flushedBehaviorEventCountRef.current,
       });
+      const transcriptSnapshot = getBrowserTranscriptSnapshot();
 
       await sendTakeAnswerProgress(
         id,
@@ -107,6 +116,16 @@ export function useTakeAnswerPersistence({
           screenFileSizeBytes: screenUpload?.recordedBytes,
           behaviorSignals: behaviorSignalsRef.current,
           behaviorEvents,
+          clientTranscript:
+            transcriptSnapshot?.text.trim()
+              ? {
+                  text: transcriptSnapshot.text,
+                  language: transcriptSnapshot.language,
+                  provider: transcriptSnapshot.provider,
+                  generatedAt: transcriptSnapshot.generatedAt,
+                  isFinal: transcriptSnapshot.isFinal,
+                }
+              : undefined,
         }),
       );
 
@@ -123,6 +142,7 @@ export function useTakeAnswerPersistence({
       answerStartedAtRef,
       answerStoppedAtMsRef,
       behaviorSignalsRef,
+      getBrowserTranscriptSnapshot,
     ],
   );
 

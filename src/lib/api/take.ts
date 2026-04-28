@@ -14,6 +14,14 @@ interface ProgressBehaviorEvent {
   versionNumber: number;
 }
 
+interface ClientTranscriptPayload {
+  text: string;
+  language: string;
+  provider: string;
+  generatedAt: string;
+  isFinal: boolean;
+}
+
 export interface TakeInterviewData {
   id: string;
   position: string;
@@ -53,6 +61,7 @@ export interface TakeProgressPayload {
   screenFileSizeBytes?: number;
   behaviorSignals: ProgressBehaviorSignals;
   behaviorEvents: ProgressBehaviorEvent[];
+  clientTranscript?: ClientTranscriptPayload;
 }
 
 export interface SubmitTakeAnswerPayload extends TakeProgressPayload {
