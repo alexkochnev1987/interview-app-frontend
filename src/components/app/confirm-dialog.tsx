@@ -61,7 +61,7 @@ export function ConfirmDialog({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/55 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-scrim/55 p-4 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       onClick={() => {
@@ -74,7 +74,7 @@ export function ConfirmDialog({
       >
         <CardHeader className="space-y-3">
           {destructive && (
-            <div className="flex size-12 items-center justify-center rounded-2xl bg-rose-50 text-rose-600 ring-1 ring-rose-200">
+            <div className="flex size-12 items-center justify-center rounded-2xl bg-danger-soft text-destructive ring-1 ring-danger-soft-border">
               <AlertTriangle className="size-5" />
             </div>
           )}

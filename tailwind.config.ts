@@ -35,6 +35,22 @@ const config: Config = {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
         },
+        "danger-soft": {
+          DEFAULT: "hsl(var(--danger-soft))",
+          border: "hsl(var(--danger-soft-border))",
+          foreground: "hsl(var(--danger-soft-foreground))",
+        },
+        "warning-soft": {
+          DEFAULT: "hsl(var(--warning-soft))",
+          border: "hsl(var(--warning-soft-border))",
+          foreground: "hsl(var(--warning-soft-foreground))",
+        },
+        "success-soft": {
+          DEFAULT: "hsl(var(--success-soft))",
+          border: "hsl(var(--success-soft-border))",
+          foreground: "hsl(var(--success-soft-foreground))",
+        },
+        scrim: "hsl(var(--scrim))",
         muted: {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",
