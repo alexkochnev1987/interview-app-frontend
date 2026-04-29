@@ -1,4 +1,4 @@
-import type { CaptureTarget, MultipartUploadState } from './runtime';
+import type { MultipartUploadState } from './runtime';
 
 interface EnqueueProgressFlushParams {
   progressRequestChainRef: { current: Promise<void> };
@@ -96,15 +96,3 @@ export function buildFlushBehaviorEvents({
   return behaviorEvents.slice(eventStartIndex);
 }
 
-interface BuildMultipartEntriesParams {
-  multipartUploads: MultipartUploadState;
-}
-
-export function buildMultipartEntries({ multipartUploads }: BuildMultipartEntriesParams) {
-  return (
-    [
-      ['camera', multipartUploads.camera],
-      ['screen', multipartUploads.screen],
-    ] as const
-  ).filter(([, session]) => Boolean(session)) as Array<[CaptureTarget, NonNullable<MultipartUploadState[CaptureTarget]>]>;
-}

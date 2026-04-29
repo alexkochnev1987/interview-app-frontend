@@ -127,7 +127,7 @@ export interface AnswerBehaviorEvent {
 export interface AnswerTranscript {
   text?: string;
   language?: string;
-  provider?: string;
+  provider?: 'browser-web-speech' | 'whisper';
   generatedAt?: string;
   isFinal?: boolean;
 }
@@ -135,7 +135,7 @@ export interface AnswerTranscript {
 export interface ClientTranscriptPayload {
   text: string;
   language: string;
-  provider: string;
+  provider: 'browser-web-speech' | 'whisper';
   generatedAt: string;
   isFinal: boolean;
 }

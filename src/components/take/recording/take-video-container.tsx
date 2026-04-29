@@ -7,4 +7,3 @@ interface TakeVideoContainerProps {
 export function TakeVideoContainer({ children }: TakeVideoContainerProps) {
   return <div className="video-container ring-1 ring-border/45">{children}</div>;
 }
-

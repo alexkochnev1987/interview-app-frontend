@@ -7,4 +7,3 @@ interface BoxMyIProps {
 export function BoxMyI({ children }: BoxMyIProps) {
   return <div className="flex flex-wrap items-center gap-2">{children}</div>;
 }
-

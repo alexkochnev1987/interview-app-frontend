@@ -1,4 +1,5 @@
 import type { TakeBehaviorSignals } from './utils';
+import type { ClientTranscriptPayload } from '@/lib/api';
 
 export type CaptureTarget = 'camera' | 'screen';
 
@@ -115,13 +116,7 @@ export interface ProgressPayloadArgs {
   screenFileSizeBytes?: number;
   behaviorSignals: TakeBehaviorSignals;
   behaviorEvents: AnswerBehaviorEvent[];
-  clientTranscript?: {
-    text: string;
-    language: string;
-    provider: string;
-    generatedAt: string;
-    isFinal: boolean;
-  };
+  clientTranscript?: ClientTranscriptPayload;
 }
 
 export function buildProgressPayload(args: ProgressPayloadArgs) {

@@ -1,6 +1,7 @@
 import type { TakeInterviewData } from '@/lib/api';
+import type { TakeStage } from '@/components/take/types';
 
-export type Stage = 'loading' | 'consent' | 'interview' | 'recording' | 'transition' | 'complete';
+export type Stage = TakeStage;
 export type PendingVersionAction = 'submit' | 'rerecord' | null;
 type LoadMode = 'initial' | 'resume';
 

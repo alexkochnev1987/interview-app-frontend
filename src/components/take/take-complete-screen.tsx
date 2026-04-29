@@ -2,7 +2,6 @@ import { SurfaceCard } from '@/components/app/surface-card';
 import { BodyMutedSm, HeroDescription, HeroTitle } from '@/components/layout/content-presets';
 import { MaxWidth4xl, PageMainCompact } from '@/components/layout/page-shell';
 import { CardContent } from '@/components/ui/card';
-
 import { TakeSubmissionIconBox } from './take-submission-icon-box';
 
 interface TakeCompleteScreenProps {

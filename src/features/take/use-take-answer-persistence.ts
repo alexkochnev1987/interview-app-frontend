@@ -8,11 +8,11 @@ import {
   startMultipartUpload,
   uploadMultipartPart,
   type MultipartUploadPartResponse,
+  type ClientTranscriptPayload,
   type TakeInterviewData,
 } from '@/lib/api';
 
 import {
-  clearProgressTimers,
   createMultipartUploadSession,
   buildProgressPayload,
   type AnswerBehaviorEvent,
@@ -43,14 +43,13 @@ interface UseTakeAnswerPersistenceParams {
   progressRequestChainRef: React.MutableRefObject<Promise<void>>;
   progressHeartbeatRef: React.MutableRefObject<ReturnType<typeof setInterval> | null>;
   progressFlushTimeoutRef: React.MutableRefObject<ReturnType<typeof setTimeout> | null>;
-  timerRef: React.MutableRefObject<ReturnType<typeof setInterval> | null>;
   multipartUploadsRef: React.MutableRefObject<MultipartUploadState>;
   progressHeartbeatMs: number;
   progressDebounceMs: number;
   getBrowserTranscriptSnapshot: () => {
     text: string;
     language: string;
-    provider: string;
+    provider: ClientTranscriptPayload['provider'];
     generatedAt: string;
     isFinal: boolean;
   };
@@ -69,7 +68,6 @@ export function useTakeAnswerPersistence({
   progressRequestChainRef,
   progressHeartbeatRef,
   progressFlushTimeoutRef,
-  timerRef,
   multipartUploadsRef,
   progressHeartbeatMs,
   progressDebounceMs,
@@ -251,10 +249,6 @@ export function useTakeAnswerPersistence({
     });
   }, [multipartUploadsRef, interview]);
 
-  const clearProgressTracking = useCallback(() => {
-    clearProgressTimers(timerRef, progressHeartbeatRef, progressFlushTimeoutRef);
-  }, [timerRef, progressHeartbeatRef, progressFlushTimeoutRef]);
-
   return {
     startMultipartUploadSession,
     flushAnswerProgress,
@@ -265,6 +259,5 @@ export function useTakeAnswerPersistence({
     handleRecordedChunk,
     completeMultipartUpload,
     abortMultipartUploads,
-    clearProgressTracking,
   };
 }

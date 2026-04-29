@@ -1,5 +1,4 @@
 import type { RefObject } from 'react';
-
 import { TakeVideoContainer } from './take-video-container';
 
 interface TakeRecordingPreviewProps {

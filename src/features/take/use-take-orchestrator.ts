@@ -28,7 +28,6 @@ import {
   progressValueForStage,
 } from '@/features/take';
 
-type InterviewData = TakeInterviewData;
 type PendingVersionAction = 'submit' | 'rerecord' | null;
 type AnswerBehaviorSignals = TakeBehaviorSignals;
 
@@ -53,7 +52,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
   } = useBrowserTranscript();
 
   const [stage, setStage] = useState<Stage>('loading');
-  const [interview, setInterview] = useState<InterviewData | null>(null);
+  const [interview, setInterview] = useState<TakeInterviewData | null>(null);
   const [error, setError] = useState('');
   const [consent, setConsent] = useState(false);
   const [recording, setRecording] = useState(false);
@@ -90,6 +89,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
   const pendingVersionActionRef = useRef<PendingVersionAction>(null);
   const multipartUploadsRef = useRef<MultipartUploadState>({ camera: null, screen: null });
   const beginRecordingRef = useRef<(nextVersionNumber: number) => Promise<void>>(async () => undefined);
+  const requestVersionActionRef = useRef<(action: PendingVersionAction) => void>(() => undefined);
   const autoStartedQuestionKeyRef = useRef('');
 
   function attachCameraPreview(stream: MediaStream) {
@@ -199,7 +199,6 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     progressRequestChainRef,
     progressHeartbeatRef,
     progressFlushTimeoutRef,
-    timerRef,
     multipartUploadsRef,
     progressHeartbeatMs: PROGRESS_HEARTBEAT_MS,
     progressDebounceMs: PROGRESS_DEBOUNCE_MS,
@@ -324,6 +323,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     scheduleProgressFlush,
     stopActiveRecorders,
   });
+  requestVersionActionRef.current = requestVersionAction;
 
   const { beginRecording } = useTakeBeginRecording({
     cameraStreamRef,
@@ -340,6 +340,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     answerStoppedAtMsRef,
     autoStartedQuestionKeyRef,
     multipartUploadsRef,
+    requestVersionActionRef,
     setCurrentVersionNumber,
     setRetakeCount,
     setRecording,
@@ -355,7 +356,6 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     abortMultipartUploads,
     handleRecordedChunk,
     onRecordersStopped,
-    requestVersionAction,
     startBrowserTranscript,
   });
 

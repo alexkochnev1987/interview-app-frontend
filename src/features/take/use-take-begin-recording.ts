@@ -19,6 +19,7 @@ interface UseTakeBeginRecordingParams {
   answerStoppedAtMsRef: MutableRefObject<number | null>;
   autoStartedQuestionKeyRef: MutableRefObject<string>;
   multipartUploadsRef: MutableRefObject<MultipartUploadState>;
+  requestVersionActionRef: MutableRefObject<(action: PendingVersionAction) => void>;
   setCurrentVersionNumber: (value: number) => void;
   setRetakeCount: (value: number) => void;
   setRecording: (value: boolean) => void;
@@ -37,7 +38,6 @@ interface UseTakeBeginRecordingParams {
   abortMultipartUploads: () => Promise<void>;
   handleRecordedChunk: (target: CaptureTarget, blob: Blob) => void;
   onRecordersStopped: () => void;
-  requestVersionAction: (action: PendingVersionAction) => void;
   startBrowserTranscript: () => void;
 }
 
@@ -62,6 +62,7 @@ export function useTakeBeginRecording({
   answerStoppedAtMsRef,
   autoStartedQuestionKeyRef,
   multipartUploadsRef,
+  requestVersionActionRef,
   setCurrentVersionNumber,
   setRetakeCount,
   setRecording,
@@ -77,7 +78,6 @@ export function useTakeBeginRecording({
   abortMultipartUploads,
   handleRecordedChunk,
   onRecordersStopped,
-  requestVersionAction,
   startBrowserTranscript,
 }: UseTakeBeginRecordingParams) {
   function handleRecorderStopped() {
@@ -171,7 +171,7 @@ export function useTakeBeginRecording({
     timerRef.current = setInterval(() => {
       setTimeLeft((current) => {
         if (current <= 1) {
-          requestVersionAction('submit');
+          requestVersionActionRef.current('submit');
           return 0;
         }
         return current - 1;
