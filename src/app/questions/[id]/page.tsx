@@ -69,6 +69,7 @@ export default function EditQuestionPage() {
     const updated = await updateQuestion(id, value);
     setQuestion(updated);
     router.refresh();
+    return updated;
   }
 
   async function performRestore() {

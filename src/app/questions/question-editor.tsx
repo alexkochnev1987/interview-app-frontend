@@ -37,7 +37,7 @@ interface QuestionEditorProps {
   title: string
   initialValue?: QuestionInput
   submitLabel: string
-  onSubmit: (value: QuestionInput) => Promise<void>
+  onSubmit: (value: QuestionInput) => Promise<QuestionInput>
 }
 
 export function QuestionEditor({
@@ -171,11 +171,11 @@ export function QuestionEditor({
 
     setSubmitting(true)
     try {
-      await onSubmit(payload)
-      const normalizedMetadataText = formatMetadata(payload.metadata)
-      setValue(payload)
+      const persisted = normalizeInitialValue(await onSubmit(payload))
+      const normalizedMetadataText = formatMetadata(persisted.metadata)
+      setValue(persisted)
       setMetadataText(normalizedMetadataText)
-      markSaved(payload, normalizedMetadataText)
+      markSaved(persisted, normalizedMetadataText)
       setSubmitting(false)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save question.')
