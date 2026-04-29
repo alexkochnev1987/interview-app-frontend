@@ -1,58 +1,53 @@
 import { Camera, Mic, ShieldCheck, Video } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import type { ReactNode } from 'react';
 
 import { SurfaceCard } from '@/components/app/surface-card';
-import { CardContentCompact } from '@/components/layout/content-presets';
+import { BodyMutedSm, CardContentCompact, LabelSmStrong } from '@/components/layout/content-presets';
+
+interface CapabilityCardProps {
+  icon: LucideIcon;
+  title: string;
+  description: ReactNode;
+}
+
+const iconClassName = 'size-5 text-[hsl(var(--primary))]';
+
+function CapabilityCard({ icon: Icon, title, description }: CapabilityCardProps) {
+  return (
+    <SurfaceCard tone="mutedSoft">
+      <CardContentCompact>
+        <Icon className={iconClassName} />
+        <div className="space-y-1">
+          <LabelSmStrong>{title}</LabelSmStrong>
+          <BodyMutedSm>{description}</BodyMutedSm>
+        </div>
+      </CardContentCompact>
+    </SurfaceCard>
+  );
+}
 
 export function TakeCapabilityCards() {
+  const items: CapabilityCardProps[] = [
+    { icon: Camera, title: 'Camera', description: 'Recorded separately for every answer.' },
+    { icon: Mic, title: 'Microphone', description: 'Captured together with your camera feed.' },
+    {
+      icon: Video,
+      title: 'Entire screen',
+      description: (
+        <>
+          Must be shared as <strong>Entire screen</strong>, not a tab or app window.
+        </>
+      ),
+    },
+    { icon: ShieldCheck, title: 'Fairness checks', description: 'Session and browser activity may be stored for evaluation integrity.' },
+  ];
+
   return (
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-      <SurfaceCard tone="mutedSoft">
-        <CardContentCompact>
-          <Camera className="size-5 text-[hsl(var(--primary))]" />
-          <div className="space-y-1">
-            <div className="text-sm font-semibold text-foreground">Camera</div>
-            <p className="text-sm leading-6 text-muted-foreground">
-              Recorded separately for every answer.
-            </p>
-          </div>
-        </CardContentCompact>
-      </SurfaceCard>
-
-      <SurfaceCard tone="mutedSoft">
-        <CardContentCompact>
-          <Mic className="size-5 text-[hsl(var(--primary))]" />
-          <div className="space-y-1">
-            <div className="text-sm font-semibold text-foreground">Microphone</div>
-            <p className="text-sm leading-6 text-muted-foreground">
-              Captured together with your camera feed.
-            </p>
-          </div>
-        </CardContentCompact>
-      </SurfaceCard>
-
-      <SurfaceCard tone="mutedSoft">
-        <CardContentCompact>
-          <Video className="size-5 text-[hsl(var(--primary))]" />
-          <div className="space-y-1">
-            <div className="text-sm font-semibold text-foreground">Entire screen</div>
-            <p className="text-sm leading-6 text-muted-foreground">
-              Must be shared as <strong>Entire screen</strong>, not a tab or app window.
-            </p>
-          </div>
-        </CardContentCompact>
-      </SurfaceCard>
-
-      <SurfaceCard tone="mutedSoft">
-        <CardContentCompact>
-          <ShieldCheck className="size-5 text-[hsl(var(--primary))]" />
-          <div className="space-y-1">
-            <div className="text-sm font-semibold text-foreground">Fairness checks</div>
-            <p className="text-sm leading-6 text-muted-foreground">
-              Session and browser activity may be stored for evaluation integrity.
-            </p>
-          </div>
-        </CardContentCompact>
-      </SurfaceCard>
+      {items.map((item) => (
+        <CapabilityCard key={item.title} icon={item.icon} title={item.title} description={item.description} />
+      ))}
     </div>
   );
 }

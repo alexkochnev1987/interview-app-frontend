@@ -1,5 +1,7 @@
 import type { RefObject } from 'react';
 
+import { TakeVideoContainer } from './take-video-container';
+
 interface TakeRecordingPreviewProps {
   isRecording: boolean;
   timeLeft: number;
@@ -14,7 +16,7 @@ export function TakeRecordingPreview({
   videoRef,
 }: TakeRecordingPreviewProps) {
   return (
-    <div className="video-container ring-1 ring-border/45">
+    <TakeVideoContainer>
       <video ref={videoRef} autoPlay muted playsInline className="video-preview" />
 
       {isRecording ? (
@@ -22,6 +24,6 @@ export function TakeRecordingPreview({
           <span className="rec-dot">●</span> {formatTime(timeLeft)}
         </div>
       ) : null}
-    </div>
+    </TakeVideoContainer>
   );
 }

@@ -1,4 +1,5 @@
-import { BodyMutedSm, EyebrowLabel } from '@/components/layout/content-presets';
+import { BodyMutedSm, CaptionMutedXs, CaptionWarningXs, EyebrowLabel } from '@/components/layout/content-presets';
+import { TakePanel } from '@/components/take/take-panel';
 import type { TakeStage } from '@/components/take/types';
 
 interface LiveTranscriptPanelProps {
@@ -17,7 +18,7 @@ export function LiveTranscriptPanel({
   stage,
 }: LiveTranscriptPanelProps) {
   return (
-    <div className="min-h-[130px] rounded-[1.25rem] bg-[hsl(var(--surface-low)/0.85)] p-4 ring-1 ring-border/45">
+    <TakePanel className="min-h-[130px]">
       <EyebrowLabel>Live transcript</EyebrowLabel>
       {!isSupported ? (
         <div className="mt-2">
@@ -38,13 +39,15 @@ export function LiveTranscriptPanel({
         </p>
       )}
       {stage === 'transition' ? (
-        <p className="mt-2 text-xs leading-5 text-muted-foreground">
-          Updating transcript for the next question...
-        </p>
+        <div className="mt-2">
+          <CaptionMutedXs>Updating transcript for the next question...</CaptionMutedXs>
+        </div>
       ) : null}
       {warning ? (
-        <p className="mt-2 text-xs leading-5 text-[var(--color-status-pending-fg)]">{warning}</p>
+        <div className="mt-2">
+          <CaptionWarningXs>{warning}</CaptionWarningXs>
+        </div>
       ) : null}
-    </div>
+    </TakePanel>
   );
 }

@@ -5,6 +5,8 @@ import { MetricPanel } from '@/components/app/metric-panel';
 import { StatusPill } from '@/components/app/status-pill';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
+import { BodyMutedSm, SectionHeroTitle } from '@/components/layout/content-presets';
+import { TakePanel } from '@/components/take/take-panel';
 import type { InterviewDataView } from '@/components/take/types';
 
 interface TakeRecordingHeaderProps {
@@ -28,15 +30,13 @@ export function TakeRecordingHeader({
     <div className="space-y-6">
       <div className="space-y-3">
         <EyebrowBadge icon={<Video className="size-3.5" />}>Live session</EyebrowBadge>
-        <h1 className="text-3xl font-semibold tracking-[-0.04em] text-foreground md:text-4xl">
-          {interview.position}
-        </h1>
-        <p className="text-sm leading-6 text-muted-foreground">
+        <SectionHeroTitle>{interview.position}</SectionHeroTitle>
+        <BodyMutedSm>
           Answer clearly and keep your camera plus entire-screen share active while recording.
-        </p>
+        </BodyMutedSm>
       </div>
 
-      <div className="space-y-3 rounded-[1.5rem] bg-[hsl(var(--surface-low)/0.9)] p-5 ring-1 ring-border/45">
+      <TakePanel tone="surfaceStrong" radius="lg" padding="lg" className="space-y-3">
         <div className="flex items-center justify-between gap-3">
           <div className="text-sm font-medium text-foreground">
             Question {interview.currentQuestionIndex + 1} of {interview.totalQuestions}
@@ -44,7 +44,7 @@ export function TakeRecordingHeader({
           <StatusPill tone="neutral">{progressValue}%</StatusPill>
         </div>
         <Progress value={progressValue} className="h-2.5 rounded-full bg-white" />
-      </div>
+      </TakePanel>
 
       <div className="grid gap-3">
         <div className="flex flex-wrap gap-2">

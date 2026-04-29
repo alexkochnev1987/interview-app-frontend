@@ -1,5 +1,7 @@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { BodyMutedSm, LabelSmStrong } from '@/components/layout/content-presets';
+import { TakePanel } from '@/components/take/take-panel';
 
 interface TakeConsentCheckboxBlockProps {
   consent: boolean;
@@ -11,7 +13,7 @@ export function TakeConsentCheckboxBlock({
   onConsentChange,
 }: TakeConsentCheckboxBlockProps) {
   return (
-    <div className="flex items-start gap-3 rounded-[1.25rem] bg-white/85 p-4 ring-1 ring-border/45">
+    <TakePanel tone="white" className="flex items-start gap-3">
       <Checkbox
         id="consent"
         checked={consent}
@@ -19,13 +21,13 @@ export function TakeConsentCheckboxBlock({
         className="mt-1"
       />
       <div className="space-y-2">
-        <Label htmlFor="consent" className="text-sm font-semibold text-foreground">
-          I agree to the recording and data collection terms.
+        <Label htmlFor="consent">
+          <LabelSmStrong>I agree to the recording and data collection terms.</LabelSmStrong>
         </Label>
-        <p className="text-sm leading-6 text-muted-foreground">
+        <BodyMutedSm>
           Data is used only for interview evaluation and is stored for 90 days.
-        </p>
+        </BodyMutedSm>
       </div>
-    </div>
+    </TakePanel>
   );
 }

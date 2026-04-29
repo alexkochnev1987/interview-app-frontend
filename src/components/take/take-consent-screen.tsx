@@ -1,15 +1,16 @@
 import { Sparkles } from 'lucide-react';
 
 import { EyebrowBadge } from '@/components/app/eyebrow-badge';
-import { SurfaceCardMax5xl } from '@/components/app/surface-card';
-import { HeroTitle, SectionCardTitle } from '@/components/layout/content-presets';
+import { SurfaceCard, SurfaceCardMax5xl } from '@/components/app/surface-card';
+import { BodyMutedSm, EyebrowLabel, HeroDescription, HeroTitle, SectionCardTitle } from '@/components/layout/content-presets';
 import { PageMain } from '@/components/layout/page-shell';
 import { TakeCapabilityCards } from '@/components/take/consent/take-capability-cards';
 import { TakeConsentCheckboxBlock } from '@/components/take/consent/take-consent-checkbox-block';
 import { TakePermissionStatusList } from '@/components/take/consent/take-permission-status-list';
+import { TakePanel } from '@/components/take/take-panel';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
+import { CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import type { InterviewDataView, PermissionStatus } from '@/components/take/types';
 
 interface TakeConsentScreenProps {
@@ -48,16 +49,16 @@ export function TakeConsentScreen({
 
             <div className="space-y-3">
               <HeroTitle>Interview for {interview.position}</HeroTitle>
-              <p className="text-base leading-7 text-muted-foreground md:text-lg">
+              <HeroDescription>
                 Welcome, {interview.candidateName}. You will answer {interview.totalQuestions}{' '}
                 questions, with up to four minutes for each response.
-              </p>
+              </HeroDescription>
             </div>
 
             <TakeCapabilityCards />
           </div>
 
-          <Card className="border-white/70 bg-white/90 shadow-soft">
+          <SurfaceCard tone="glassSoft">
             <CardHeader className="space-y-2">
               <SectionCardTitle>Before you start</SectionCardTitle>
               <CardDescription className="text-sm leading-6">
@@ -65,17 +66,23 @@ export function TakeConsentScreen({
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-5">
-              <div className="space-y-3 rounded-[1.5rem] bg-[hsl(var(--surface-low)/0.85)] p-5 ring-1 ring-border/45">
-                <div className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  Data collected
-                </div>
-                <ul className="space-y-2 text-sm leading-6 text-muted-foreground">
-                  <li>Camera video and microphone audio for each answer</li>
-                  <li>Full-monitor screen recording in parallel with each answer</li>
-                  <li>Browser activity such as tab switches</li>
-                  <li>Session metadata including answer timing</li>
+              <TakePanel radius="lg" padding="lg" className="space-y-3">
+                <EyebrowLabel>Data collected</EyebrowLabel>
+                <ul className="space-y-2">
+                  <li>
+                    <BodyMutedSm>Camera video and microphone audio for each answer</BodyMutedSm>
+                  </li>
+                  <li>
+                    <BodyMutedSm>Full-monitor screen recording in parallel with each answer</BodyMutedSm>
+                  </li>
+                  <li>
+                    <BodyMutedSm>Browser activity such as tab switches</BodyMutedSm>
+                  </li>
+                  <li>
+                    <BodyMutedSm>Session metadata including answer timing</BodyMutedSm>
+                  </li>
                 </ul>
-              </div>
+              </TakePanel>
 
               <TakePermissionStatusList
                 cameraStatus={cameraStatus}
@@ -104,7 +111,7 @@ export function TakeConsentScreen({
                 {setupBusy ? 'Requesting access...' : 'Allow Camera, Mic & Entire Screen'}
               </Button>
             </CardContent>
-          </Card>
+          </SurfaceCard>
         </CardContent>
       </SurfaceCardMax5xl>
     </PageMain>

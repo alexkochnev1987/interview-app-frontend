@@ -1,6 +1,7 @@
 import { CircleDot } from 'lucide-react';
 
 import { StatusPill } from '@/components/app/status-pill';
+import { BoxMyI } from '@/components/take/box-my-i';
 import type { TakeStage } from '@/components/take/types';
 
 interface TakeRecordingStatusProps {
@@ -11,7 +12,7 @@ interface TakeRecordingStatusProps {
 
 export function TakeRecordingStatus({ stage, timeLeft, formatTime }: TakeRecordingStatusProps) {
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <BoxMyI>
       <StatusPill tone={stage === 'recording' ? 'processing' : 'neutral'}>
         {stage === 'recording'
           ? 'Recording'
@@ -25,6 +26,6 @@ export function TakeRecordingStatus({ stage, timeLeft, formatTime }: TakeRecordi
           {formatTime(timeLeft)}
         </StatusPill>
       ) : null}
-    </div>
+    </BoxMyI>
   );
 }

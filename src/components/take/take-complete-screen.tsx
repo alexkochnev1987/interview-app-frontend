@@ -1,9 +1,9 @@
-import { CheckCircle2 } from 'lucide-react';
-
 import { SurfaceCard } from '@/components/app/surface-card';
-import { HeroTitle } from '@/components/layout/content-presets';
+import { BodyMutedSm, HeroDescription, HeroTitle } from '@/components/layout/content-presets';
 import { MaxWidth4xl, PageMainCompact } from '@/components/layout/page-shell';
 import { CardContent } from '@/components/ui/card';
+
+import { TakeSubmissionIconBox } from './take-submission-icon-box';
 
 interface TakeCompleteScreenProps {
   candidateName: string;
@@ -16,18 +16,16 @@ export function TakeCompleteScreen({ candidateName, position }: TakeCompleteScre
       <MaxWidth4xl>
         <SurfaceCard tone="glassFloat">
           <CardContent className="space-y-6 px-8 py-10 text-center">
-            <div className="mx-auto flex size-16 items-center justify-center rounded-[1.4rem] bg-[hsl(var(--primary-fixed)/0.85)] text-[hsl(var(--primary))]">
-              <CheckCircle2 className="size-8" />
-            </div>
+            <TakeSubmissionIconBox />
             <div className="space-y-3">
               <HeroTitle>Thank you, {candidateName}</HeroTitle>
-              <p className="text-base leading-7 text-muted-foreground md:text-lg">
+              <HeroDescription>
                 Your interview for <strong>{position}</strong> has been submitted.
-              </p>
-              <p className="text-sm leading-6 text-muted-foreground">
+              </HeroDescription>
+              <BodyMutedSm>
                 Camera and full-screen recordings for each answer have been stored for reviewer
                 evaluation.
-              </p>
+              </BodyMutedSm>
             </div>
           </CardContent>
         </SurfaceCard>

@@ -46,6 +46,22 @@ interface EyebrowLabelProps {
   children: ReactNode;
 }
 
+interface LabelSmStrongProps {
+  children: ReactNode;
+}
+
+interface CaptionMutedXsProps {
+  children: ReactNode;
+}
+
+interface SectionHeroTitleProps {
+  children: ReactNode;
+}
+
+interface CaptionWarningXsProps {
+  children: ReactNode;
+}
+
 export function CardContentSpacious({ children }: CardContentSpaciousProps) {
   return <CardContent className="space-y-6 px-8 py-8">{children}</CardContent>;
 }
@@ -88,4 +104,20 @@ export function BodyMutedSm({ children }: BodyMutedSmProps) {
 
 export function EyebrowLabel({ children }: EyebrowLabelProps) {
   return <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">{children}</div>;
+}
+
+export function LabelSmStrong({ children }: LabelSmStrongProps) {
+  return <div className="text-sm font-semibold text-foreground">{children}</div>;
+}
+
+export function CaptionMutedXs({ children }: CaptionMutedXsProps) {
+  return <p className="text-xs leading-5 text-muted-foreground">{children}</p>;
+}
+
+export function SectionHeroTitle({ children }: SectionHeroTitleProps) {
+  return <h1 className="text-3xl font-semibold tracking-[-0.04em] text-foreground md:text-4xl">{children}</h1>;
+}
+
+export function CaptionWarningXs({ children }: CaptionWarningXsProps) {
+  return <p className="text-xs leading-5 text-[var(--color-status-pending-fg)]">{children}</p>;
 }
