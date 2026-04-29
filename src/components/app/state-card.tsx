@@ -4,7 +4,9 @@ import {
   SURFACE_PRIMARY_ELEVATED_BG,
   SURFACE_PRIMARY_SOFT_TEXT,
 } from '@/components/app/style-tokens'
+import { Heading } from '@/components/ui/heading'
 import { Card, CardContent } from '@/components/ui/card'
+import { Text } from '@/components/ui/text'
 import { cn } from '@/lib/utils'
 
 interface LoadingStateCardProps {
@@ -47,8 +49,10 @@ export function EmptyStateCard({
             </div>
           ) : null}
           <div className="space-y-2">
-            <h2 className="text-2xl font-semibold tracking-[-0.03em] text-foreground">{title}</h2>
-            <p className="max-w-md text-sm leading-6 text-muted-foreground">{description}</p>
+            <Heading variant="questionTitle">{title}</Heading>
+            <div className="max-w-md">
+              <Text variant="bodyMutedSm">{description}</Text>
+            </div>
           </div>
           {action}
         </CardContent>

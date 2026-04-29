@@ -8,6 +8,8 @@ const textVariants = cva('', {
       bodyMutedSm: 'text-sm leading-6 text-muted-foreground',
       bodySm: 'text-sm leading-6 text-foreground',
       eyebrowLabel: 'text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground',
+      metricLabel: 'text-[0.72rem] font-semibold uppercase tracking-[0.2em]',
+      metricLabelCompact: 'text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground',
       labelSmStrong: 'text-sm font-semibold text-foreground',
       captionMutedXs: 'text-xs leading-5 text-muted-foreground',
       captionWarningXs: 'text-xs leading-5 text-[var(--color-status-pending-fg)]',

@@ -5,6 +5,7 @@ import {
   SURFACE_LOW_BG,
   SURFACE_LOW_STRONG_BG,
 } from '@/components/app/style-tokens'
+import { Text } from '@/components/ui/text'
 import { cn } from '@/lib/utils'
 
 type MetricPanelTone = 'surface' | 'elevated' | 'compact'
@@ -19,7 +20,6 @@ interface MetricPanelProps {
   description?: ReactNode
   icon?: ReactNode
   label: ReactNode
-  labelClassName?: string
   tone?: MetricPanelTone
   unstyledLabel?: boolean
   unstyledValue?: boolean
@@ -31,7 +31,6 @@ export function MetricPanel({
   description,
   icon,
   label,
-  labelClassName,
   tone = 'surface',
   unstyledLabel = false,
   unstyledValue = false,
@@ -46,26 +45,20 @@ export function MetricPanel({
       {hasIcon ? (
         <div className="flex items-center gap-3 text-muted-foreground">
           <span className="shrink-0">{icon}</span>
-          <span
-            className={cn(
-              'text-[0.72rem] font-semibold uppercase tracking-[0.2em]',
-              labelClassName
-            )}
-          >
+          <Text as="span" variant="metricLabel">
             {label}
-          </span>
+          </Text>
         </div>
       ) : (
-        <div
-          className={cn(
-            !unstyledLabel &&
-              'text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground',
-            labelClassName,
-            unstyledLabel && 'text-inherit'
+        <>
+          {unstyledLabel ? (
+            <div className="text-inherit">{label}</div>
+          ) : (
+            <Text as="span" variant="metricLabelCompact">
+              {label}
+            </Text>
           )}
-        >
-          {label}
-        </div>
+        </>
       )}
 
       {hasValue ? (
@@ -84,7 +77,9 @@ export function MetricPanel({
       ) : null}
 
       {description ? (
-        <p className="mt-2 text-sm leading-6 text-muted-foreground">{description}</p>
+        <div className="mt-2">
+          <Text variant="bodyMutedSm">{description}</Text>
+        </div>
       ) : null}
     </div>
   )

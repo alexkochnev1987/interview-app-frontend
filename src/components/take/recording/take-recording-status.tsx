@@ -22,7 +22,7 @@ export function TakeRecordingStatus({ stage, timeLeft, formatTime }: TakeRecordi
       </StatusPill>
       {stage === 'recording' ? (
         <StatusPill tone="failed">
-          <CircleDot className="size-3" />
+          <CircleDot size={12} />
           {formatTime(timeLeft)}
         </StatusPill>
       ) : null}
