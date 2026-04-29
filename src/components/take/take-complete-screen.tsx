@@ -1,7 +1,8 @@
 import { SurfaceCard } from '@/components/app/surface-card';
-import { BodyMutedSm, HeroDescription, HeroTitle } from '@/components/layout/content-presets';
 import { MaxWidth4xl, PageMainCompact } from '@/components/layout/page-shell';
 import { CardContent } from '@/components/ui/card';
+import { Heading } from '@/components/ui/heading';
+import { Text } from '@/components/ui/text';
 import { TakeSubmissionIconBox } from './take-submission-icon-box';
 
 interface TakeCompleteScreenProps {
@@ -18,14 +19,14 @@ export function TakeCompleteScreen({ candidateName, position }: TakeCompleteScre
             <div className="space-y-6 px-8 py-10 text-center">
               <TakeSubmissionIconBox />
               <div className="space-y-3">
-                <HeroTitle>Thank you, {candidateName}</HeroTitle>
-                <HeroDescription>
+                <Heading variant="heroTitle">Thank you, {candidateName}</Heading>
+                <Text variant="heroDescription">
                   Your interview for <strong>{position}</strong> has been submitted.
-                </HeroDescription>
-                <BodyMutedSm>
+                </Text>
+                <Text variant="bodyMutedSm">
                   Camera and full-screen recordings for each answer have been stored for reviewer
                   evaluation.
-                </BodyMutedSm>
+                </Text>
               </div>
             </div>
           </CardContent>

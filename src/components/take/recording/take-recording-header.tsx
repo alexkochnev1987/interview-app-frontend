@@ -5,9 +5,10 @@ import { MetricPanel } from '@/components/app/metric-panel';
 import { StatusPill } from '@/components/app/status-pill';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
-import { BodyMutedSm, SectionHeroTitle } from '@/components/layout/content-presets';
 import { TakePanel } from '@/components/take/take-panel';
 import type { InterviewDataView } from '@/components/take/types';
+import { Heading } from '@/components/ui/heading';
+import { Text } from '@/components/ui/text';
 
 interface TakeRecordingHeaderProps {
   interview: InterviewDataView;
@@ -30,10 +31,10 @@ export function TakeRecordingHeader({
     <div className="space-y-6">
       <div className="space-y-3">
         <EyebrowBadge icon={<Video className="size-3.5" />}>Live session</EyebrowBadge>
-        <SectionHeroTitle>{interview.position}</SectionHeroTitle>
-        <BodyMutedSm>
+        <Heading variant="sectionHeroTitle">{interview.position}</Heading>
+        <Text variant="bodyMutedSm">
           Answer clearly and keep your camera plus entire-screen share active while recording.
-        </BodyMutedSm>
+        </Text>
       </div>
 
       <TakePanel tone="surfaceStrong" radius="lg" padding="lg">

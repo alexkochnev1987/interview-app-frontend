@@ -1,5 +1,4 @@
 import { StatusPill } from '@/components/app/status-pill';
-import { ActionRow } from '@/components/layout/content-presets';
 import { Button } from '@/components/ui/button';
 import type { TakeStage } from '@/components/take/types';
 
@@ -19,7 +18,7 @@ export function TakeRecordingActions({
   onSubmit,
 }: TakeRecordingActionsProps) {
   return (
-    <ActionRow>
+    <div className="flex flex-wrap gap-3">
       {stage === 'interview' ? <StatusPill tone="neutral">Preparing recording...</StatusPill> : null}
 
       {stage === 'recording' ? (
@@ -46,6 +45,6 @@ export function TakeRecordingActions({
       {stage === 'transition' ? (
         <StatusPill tone="processing">{transitionLabel || 'Saving current version'}</StatusPill>
       ) : null}
-    </ActionRow>
+    </div>
   );
 }

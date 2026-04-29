@@ -1,7 +1,6 @@
 import type { RefObject } from 'react';
 
 import { SurfaceCard } from '@/components/app/surface-card';
-import { CardContentSpacious } from '@/components/layout/content-presets';
 import { PageMain } from '@/components/layout/page-shell';
 import { TakeRecordingActions } from '@/components/take/recording/take-recording-actions';
 import { TakeRecordingGuidance } from '@/components/take/recording/take-recording-guidance';
@@ -10,6 +9,8 @@ import { TakeRecordingPreview } from '@/components/take/recording/take-recording
 import { TakeRecordingStatus } from '@/components/take/recording/take-recording-status';
 import { LiveTranscriptPanel } from '@/components/take/live-transcript-panel';
 import type { InterviewDataView, TakeStage } from '@/components/take/types';
+import { CardContent } from '@/components/ui/card';
+import { Heading } from '@/components/ui/heading';
 
 interface TakeRecordingScreenProps {
   interview: InterviewDataView;
@@ -56,7 +57,7 @@ export function TakeRecordingScreen({
     <PageMain>
       <section className="mx-auto grid max-w-6xl gap-6 xl:grid-cols-[0.84fr_1.16fr]">
         <SurfaceCard tone="glassSoft">
-          <CardContentSpacious>
+          <CardContent layout="spacious">
             <TakeRecordingHeader
               interview={interview}
               progressValue={progressValue}
@@ -65,17 +66,15 @@ export function TakeRecordingScreen({
               currentVersionNumber={currentVersionNumber}
               retakeCount={retakeCount}
             />
-          </CardContentSpacious>
+          </CardContent>
         </SurfaceCard>
 
         <SurfaceCard tone="glassFloat">
-          <CardContentSpacious>
+          <CardContent layout="spacious">
             <div className="space-y-3">
               <TakeRecordingStatus stage={stage} timeLeft={timeLeft} formatTime={formatTime} />
 
-              <h2 className="text-2xl font-semibold leading-9 tracking-[-0.03em] text-foreground">
-                {interview.currentQuestion?.text}
-              </h2>
+              <Heading variant="questionTitle">{interview.currentQuestion?.text}</Heading>
             </div>
 
             <TakeRecordingPreview
@@ -101,7 +100,7 @@ export function TakeRecordingScreen({
               onRerecord={onRerecord}
               onSubmit={onSubmit}
             />
-          </CardContentSpacious>
+          </CardContent>
         </SurfaceCard>
       </section>
     </PageMain>

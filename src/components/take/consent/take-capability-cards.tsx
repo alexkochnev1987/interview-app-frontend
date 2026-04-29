@@ -3,7 +3,8 @@ import type { LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 import { SurfaceCard } from '@/components/app/surface-card';
-import { BodyMutedSm, CardContentCompact, LabelSmStrong } from '@/components/layout/content-presets';
+import { CardContent } from '@/components/ui/card';
+import { Text } from '@/components/ui/text';
 
 interface CapabilityCardProps {
   icon: LucideIcon;
@@ -16,13 +17,15 @@ const iconClassName = 'size-5 text-[hsl(var(--primary))]';
 function CapabilityCard({ icon: Icon, title, description }: CapabilityCardProps) {
   return (
     <SurfaceCard tone="mutedSoft">
-      <CardContentCompact>
+      <CardContent layout="compact">
         <Icon className={iconClassName} />
         <div className="space-y-1">
-          <LabelSmStrong>{title}</LabelSmStrong>
-          <BodyMutedSm>{description}</BodyMutedSm>
+          <Text as="span" variant="labelSmStrong">
+            {title}
+          </Text>
+          <Text variant="bodyMutedSm">{description}</Text>
         </div>
-      </CardContentCompact>
+      </CardContent>
     </SurfaceCard>
   );
 }

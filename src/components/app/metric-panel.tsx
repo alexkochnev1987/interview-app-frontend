@@ -16,7 +16,6 @@ const toneClasses: Record<MetricPanelTone, string> = {
 }
 
 interface MetricPanelProps {
-  className?: string
   description?: ReactNode
   icon?: ReactNode
   label: ReactNode
@@ -29,7 +28,6 @@ interface MetricPanelProps {
 }
 
 export function MetricPanel({
-  className,
   description,
   icon,
   label,
@@ -44,7 +42,7 @@ export function MetricPanel({
   const hasValue = value !== null && value !== undefined && value !== false
 
   return (
-    <div className={cn(toneClasses[tone], className)}>
+    <div className={toneClasses[tone]}>
       {hasIcon ? (
         <div className="flex items-center gap-3 text-muted-foreground">
           <span className="shrink-0">{icon}</span>

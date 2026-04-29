@@ -37,8 +37,8 @@ const takePanelVariants = cva(RING_BORDER_SOFT, {
   },
 });
 
-type TakePanelProps = ComponentProps<'div'> & VariantProps<typeof takePanelVariants>;
+type TakePanelProps = Omit<ComponentProps<'div'>, 'className'> & VariantProps<typeof takePanelVariants>;
 
-export function TakePanel({ tone, radius, padding, minHeight, className, ...props }: TakePanelProps) {
-  return <div className={cn(takePanelVariants({ tone, radius, padding, minHeight }), className)} {...props} />;
+export function TakePanel({ tone, radius, padding, minHeight, ...props }: TakePanelProps) {
+  return <div className={cn(takePanelVariants({ tone, radius, padding, minHeight }))} {...props} />;
 }

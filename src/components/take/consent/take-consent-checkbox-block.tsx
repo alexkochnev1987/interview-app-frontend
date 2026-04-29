@@ -1,7 +1,7 @@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { BodyMutedSm, LabelSmStrong } from '@/components/layout/content-presets';
 import { TakePanel } from '@/components/take/take-panel';
+import { Text } from '@/components/ui/text';
 
 interface TakeConsentCheckboxBlockProps {
   consent: boolean;
@@ -23,11 +23,11 @@ export function TakeConsentCheckboxBlock({
         />
         <div className="space-y-2">
           <Label htmlFor="consent">
-            <LabelSmStrong>I agree to the recording and data collection terms.</LabelSmStrong>
+            <Text as="span" variant="labelSmStrong">
+              I agree to the recording and data collection terms.
+            </Text>
           </Label>
-          <BodyMutedSm>
-            Data is used only for interview evaluation and is stored for 90 days.
-          </BodyMutedSm>
+          <Text variant="bodyMutedSm">Data is used only for interview evaluation and is stored for 90 days.</Text>
         </div>
       </div>
     </TakePanel>

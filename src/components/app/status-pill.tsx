@@ -57,10 +57,7 @@ export function StatusPill({
   return (
     <Badge
       variant="secondary"
-      className={cn(
-        statusPillVariants({ tone }),
-        className
-      )}
+      className={cn(statusPillVariants({ tone }), className)}
       {...props}
     >
       {children}

@@ -1,4 +1,4 @@
-import { BodyMutedSm, CaptionMutedXs, CaptionWarningXs, EyebrowLabel } from '@/components/layout/content-presets';
+import { Text } from '@/components/ui/text';
 import { TakePanel } from '@/components/take/take-panel';
 import type { TakeStage } from '@/components/take/types';
 
@@ -20,33 +20,41 @@ export function LiveTranscriptPanel({
   return (
     <TakePanel minHeight="transcript">
       <div>
-        <EyebrowLabel>Live transcript</EyebrowLabel>
+        <Text as="span" variant="eyebrowLabel">
+          Live transcript
+        </Text>
         {!isSupported ? (
           <div className="mt-2">
-            <BodyMutedSm>Live transcript is unavailable in this browser. Recording continues as usual.</BodyMutedSm>
+            <Text variant="bodyMutedSm">
+              Live transcript is unavailable in this browser. Recording continues as usual.
+            </Text>
           </div>
         ) : (
-          <p className="mt-2 text-sm leading-6 text-foreground">
-            {finalTranscript || interimTranscript ? (
-              <>
-                {finalTranscript}
-                {interimTranscript ? (
-                  <span className="ml-1 italic text-muted-foreground">{interimTranscript} (draft)</span>
-                ) : null}
-              </>
-            ) : (
-              'Transcript will appear while you speak...'
-            )}
-          </p>
+          <div className="mt-2">
+            <Text variant="bodySm">
+              {finalTranscript || interimTranscript ? (
+                <>
+                  {finalTranscript}
+                  {interimTranscript ? (
+                    <Text as="span" variant="transcriptDraft">
+                      {interimTranscript} (draft)
+                    </Text>
+                  ) : null}
+                </>
+              ) : (
+                'Transcript will appear while you speak...'
+              )}
+            </Text>
+          </div>
         )}
         {stage === 'transition' ? (
           <div className="mt-2">
-            <CaptionMutedXs>Updating transcript for the next question...</CaptionMutedXs>
+            <Text variant="captionMutedXs">Updating transcript for the next question...</Text>
           </div>
         ) : null}
         {warning ? (
           <div className="mt-2">
-            <CaptionWarningXs>{warning}</CaptionWarningXs>
+            <Text variant="captionWarningXs">{warning}</Text>
           </div>
         ) : null}
       </div>

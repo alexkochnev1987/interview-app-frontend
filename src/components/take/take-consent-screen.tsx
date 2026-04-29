@@ -3,7 +3,6 @@ import { Sparkles } from 'lucide-react';
 import { EyebrowBadge } from '@/components/app/eyebrow-badge';
 import { SurfaceCard, SurfaceCardMax5xl } from '@/components/app/surface-card';
 import type { StatusTone } from '@/components/app/status-pill';
-import { BodyMutedSm, CardContentSpacious, EyebrowLabel, HeroDescription, HeroTitle, SectionCardTitle } from '@/components/layout/content-presets';
 import { PageMain } from '@/components/layout/page-shell';
 import { TakeCapabilityCards } from '@/components/take/consent/take-capability-cards';
 import { TakeConsentCheckboxBlock } from '@/components/take/consent/take-consent-checkbox-block';
@@ -11,7 +10,9 @@ import { TakePermissionStatusList } from '@/components/take/consent/take-permiss
 import { TakePanel } from '@/components/take/take-panel';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { CardContent, CardHeader } from '@/components/ui/card';
+import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Heading } from '@/components/ui/heading';
+import { Text } from '@/components/ui/text';
 import type { InterviewDataView, PermissionStatus } from '@/components/take/types';
 
 interface TakeConsentScreenProps {
@@ -44,17 +45,17 @@ export function TakeConsentScreen({
   return (
     <PageMain>
       <SurfaceCardMax5xl tone="glassFloat">
-        <CardContentSpacious>
+        <CardContent layout="spacious">
           <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
             <div className="space-y-5">
               <EyebrowBadge icon={<Sparkles className="size-3.5" />}>Candidate interview</EyebrowBadge>
 
               <div className="space-y-3">
-                <HeroTitle>Interview for {interview.position}</HeroTitle>
-                <HeroDescription>
+                <Heading variant="heroTitle">Interview for {interview.position}</Heading>
+                <Text variant="heroDescription">
                   Welcome, {interview.candidateName}. You will answer {interview.totalQuestions}{' '}
                   questions, with up to four minutes for each response.
-                </HeroDescription>
+                </Text>
               </div>
 
               <TakeCapabilityCards />
@@ -63,29 +64,33 @@ export function TakeConsentScreen({
             <SurfaceCard tone="glassSoft">
               <CardHeader>
                 <div className="space-y-2">
-                  <SectionCardTitle>Before you start</SectionCardTitle>
-                  <BodyMutedSm>
+                  <CardTitle size="section">Before you start</CardTitle>
+                  <Text variant="bodyMutedSm">
                     One button will request camera, microphone, and then full-screen sharing.
-                  </BodyMutedSm>
+                  </Text>
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-5">
                   <TakePanel radius="lg" padding="lg">
                     <div className="space-y-3">
-                      <EyebrowLabel>Data collected</EyebrowLabel>
+                      <Text as="span" variant="eyebrowLabel">
+                        Data collected
+                      </Text>
                       <ul className="space-y-2">
                         <li>
-                          <BodyMutedSm>Camera video and microphone audio for each answer</BodyMutedSm>
+                          <Text variant="bodyMutedSm">Camera video and microphone audio for each answer</Text>
                         </li>
                         <li>
-                          <BodyMutedSm>Full-monitor screen recording in parallel with each answer</BodyMutedSm>
+                          <Text variant="bodyMutedSm">
+                            Full-monitor screen recording in parallel with each answer
+                          </Text>
                         </li>
                         <li>
-                          <BodyMutedSm>Browser activity such as tab switches</BodyMutedSm>
+                          <Text variant="bodyMutedSm">Browser activity such as tab switches</Text>
                         </li>
                         <li>
-                          <BodyMutedSm>Session metadata including answer timing</BodyMutedSm>
+                          <Text variant="bodyMutedSm">Session metadata including answer timing</Text>
                         </li>
                       </ul>
                     </div>
@@ -121,7 +126,7 @@ export function TakeConsentScreen({
               </CardContent>
             </SurfaceCard>
           </div>
-        </CardContentSpacious>
+        </CardContent>
       </SurfaceCardMax5xl>
     </PageMain>
   );

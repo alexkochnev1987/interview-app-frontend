@@ -23,7 +23,7 @@ const sizeClasses: Record<EyebrowSize, string> = {
   sm: 'px-3 py-1 text-[0.68rem] tracking-[0.18em]',
 }
 
-interface EyebrowBadgeProps extends HTMLAttributes<HTMLDivElement> {
+interface EyebrowBadgeProps extends Omit<HTMLAttributes<HTMLDivElement>, 'className'> {
   icon?: ReactNode
   size?: EyebrowSize
   tone?: EyebrowTone
@@ -31,7 +31,6 @@ interface EyebrowBadgeProps extends HTMLAttributes<HTMLDivElement> {
 
 export function EyebrowBadge({
   children,
-  className,
   icon,
   size = 'default',
   tone = 'default',
@@ -42,8 +41,7 @@ export function EyebrowBadge({
       className={cn(
         'inline-flex w-fit items-center gap-2 rounded-full font-semibold uppercase',
         toneClasses[tone],
-        sizeClasses[size],
-        className
+        sizeClasses[size]
       )}
       {...props}
     >
