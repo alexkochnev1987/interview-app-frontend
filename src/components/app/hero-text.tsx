@@ -4,7 +4,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const heroTitleVariants = cva(
-  'font-semibold tracking-[-0.04em] text-foreground',
+  'font-semibold tracking-display-tight text-foreground',
   {
     variants: {
       size: {

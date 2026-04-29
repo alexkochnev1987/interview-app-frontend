@@ -46,7 +46,7 @@ export function QuestionEditorSaveBar({
               </span>
             )}
           </div>
-          <h3 className="text-lg font-semibold tracking-[-0.02em] text-foreground">
+          <h3 className="text-lg font-semibold tracking-display-loose text-foreground">
             {isDirty ? 'Save your edits' : 'Nothing to save right now'}
           </h3>
           <p className="text-sm leading-6 text-muted-foreground">

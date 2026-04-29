@@ -33,7 +33,7 @@ export function AiDraftPanel({
       <CardHeader className="space-y-5">
         <div className="space-y-1.5">
           <div className="flex items-start justify-between gap-3">
-            <CardTitle className="text-2xl tracking-[-0.03em]">AI draft</CardTitle>
+            <CardTitle className="text-2xl tracking-display">AI draft</CardTitle>
             {hasPendingDraft ? (
               <StatusPill tone="neutral">{pendingCount} pending</StatusPill>
             ) : null}

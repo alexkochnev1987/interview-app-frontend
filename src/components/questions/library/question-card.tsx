@@ -70,13 +70,13 @@ export function QuestionCard({
               ) : null}
               <StatusPill tone={question.difficulty}>{question.difficulty}</StatusPill>
               {question.category ? (
-                <StatusPill tone="neutral" className="normal-case tracking-[0.08em]">
+                <StatusPill tone="neutral" className="normal-case tracking-chip">
                   {question.category}
                 </StatusPill>
               ) : null}
             </div>
             <div className="space-y-2">
-              <CardTitle className="line-clamp-3 text-lg leading-7 tracking-[-0.03em]">
+              <CardTitle className="line-clamp-3 text-lg leading-7 tracking-display">
                 {truncateText(question.questionText)}
               </CardTitle>
               <CardDescription>
@@ -91,13 +91,13 @@ export function QuestionCard({
                 tone="compact"
                 label="Concepts"
                 value={question.expectedConcepts.length}
-                valueClassName="mt-2 text-xl font-semibold tracking-[-0.03em] text-foreground"
+                valueClassName="mt-2 text-xl font-semibold tracking-display text-foreground"
               />
               <MetricPanel
                 tone="compact"
                 label="Red flags"
                 value={question.redFlags.length}
-                valueClassName="mt-2 text-xl font-semibold tracking-[-0.03em] text-foreground"
+                valueClassName="mt-2 text-xl font-semibold tracking-display text-foreground"
               />
             </div>
 

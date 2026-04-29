@@ -80,7 +80,7 @@ export function ConfirmDialog({
               <AlertTriangle className="size-5" />
             </IconBadge>
           )}
-          <CardTitle className="text-2xl tracking-[-0.03em]">{title}</CardTitle>
+          <CardTitle className="text-2xl tracking-display">{title}</CardTitle>
           {description && (
             <CardDescription className="text-sm leading-6">
               {description}

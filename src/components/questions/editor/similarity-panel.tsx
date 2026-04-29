@@ -50,7 +50,7 @@ export function SimilarityPanel({
     <Card variant="surface">
       <CardHeader className="space-y-5">
         <div className="space-y-1.5">
-          <CardTitle className="text-2xl tracking-[-0.03em]">Similar questions</CardTitle>
+          <CardTitle className="text-2xl tracking-display">Similar questions</CardTitle>
           <CardDescription className="text-sm leading-6">
             Check for duplicates and near-duplicates against the current library
             before you save a new prompt or update an old one.
@@ -121,7 +121,7 @@ function SignalTile({ label, value }: { label: string; value: number }) {
   return (
     <SurfaceTile tone="elevated" rounded="xl" padding="sm">
       <EyebrowLabel>{label}</EyebrowLabel>
-      <div className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-foreground">
+      <div className="mt-2 text-2xl font-semibold tracking-display-tight text-foreground">
         {value}
       </div>
     </SurfaceTile>

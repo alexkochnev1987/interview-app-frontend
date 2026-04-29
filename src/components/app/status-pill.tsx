@@ -46,7 +46,7 @@ export function StatusPill({
     <Badge
       variant="secondary"
       className={cn(
-        "rounded-full border-0 px-3 py-1 text-[0.68rem] font-semibold tracking-[0.16em] uppercase shadow-none",
+        "rounded-full border-0 px-3 py-1 text-[0.68rem] font-semibold tracking-eyebrow uppercase shadow-none",
         toneClasses[tone],
         className
       )}

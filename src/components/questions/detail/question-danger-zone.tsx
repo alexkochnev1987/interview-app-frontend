@@ -30,7 +30,7 @@ export function QuestionDangerZone({
         className="border-danger-soft-border bg-danger-soft"
       >
         <CardHeader className="space-y-2">
-          <CardTitle className="text-xl tracking-[-0.03em] text-danger-soft-foreground">
+          <CardTitle className="text-xl tracking-display text-danger-soft-foreground">
             Danger zone
           </CardTitle>
           <CardDescription className="text-sm leading-6 text-danger-soft-foreground/80">

@@ -45,7 +45,7 @@ export function MetricPanel({
           <span className="shrink-0">{icon}</span>
           <span
             className={cn(
-              'text-[0.72rem] font-semibold uppercase tracking-[0.2em]',
+              'text-[0.72rem] font-semibold uppercase tracking-eyebrow-wider',
               labelClassName
             )}
           >
@@ -56,7 +56,7 @@ export function MetricPanel({
         <div
           className={cn(
             !unstyledLabel &&
-              'text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground',
+              'text-[0.68rem] font-semibold uppercase tracking-eyebrow-wide text-muted-foreground',
             labelClassName,
             unstyledLabel && 'text-inherit'
           )}
@@ -70,8 +70,8 @@ export function MetricPanel({
           className={cn(
             !unstyledValue &&
               (hasIcon
-                ? 'mt-4 text-4xl font-semibold tracking-[-0.04em] text-foreground'
-                : 'mt-3 text-3xl font-semibold tracking-[-0.04em] text-foreground'),
+                ? 'mt-4 text-4xl font-semibold tracking-display-tight text-foreground'
+                : 'mt-3 text-3xl font-semibold tracking-display-tight text-foreground'),
             unstyledValue && (hasIcon ? 'mt-4' : 'mt-3'),
             valueClassName
           )}

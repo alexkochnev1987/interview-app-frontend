@@ -115,7 +115,7 @@ export function EditorIdentitySection({
             }
             disabled={submitting}
           >
-            <SelectTrigger className="h-11 w-full rounded-2xl border border-hairline-strong bg-surface-low-soft px-4">
+            <SelectTrigger variant="surface" size="md" shape="rounded">
               <SelectValue placeholder="Select difficulty" />
             </SelectTrigger>
             <SelectContent>

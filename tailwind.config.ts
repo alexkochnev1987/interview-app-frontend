@@ -86,6 +86,18 @@ const config: Config = {
         soft: "var(--shadow-soft)",
         float: "var(--shadow-float)",
       },
+      letterSpacing: {
+        "display-loose": "-0.02em",
+        display: "-0.03em",
+        "display-tight": "-0.04em",
+        "display-tightest": "-0.05em",
+        "display-hero": "-0.06em",
+        chip: "0.08em",
+        eyebrow: "0.16em",
+        "eyebrow-wide": "0.18em",
+        "eyebrow-wider": "0.2em",
+        "eyebrow-widest": "0.24em",
+      },
       backgroundImage: {
         "primary-gradient": "linear-gradient(135deg, hsl(var(--primary-container)), hsl(var(--primary)))",
         "hero-glow":

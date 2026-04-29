@@ -309,17 +309,17 @@ export default function InterviewDetailPage() {
               <MetricPanel
                 label="Questions"
                 value={totalQuestions}
-                valueClassName="mt-3 text-4xl font-semibold tracking-[-0.04em] text-foreground"
+                valueClassName="mt-3 text-4xl font-semibold tracking-display-tight text-foreground"
               />
               <MetricPanel
                 label="Uploaded"
                 value={answeredCount}
-                valueClassName="mt-3 text-4xl font-semibold tracking-[-0.04em] text-foreground"
+                valueClassName="mt-3 text-4xl font-semibold tracking-display-tight text-foreground"
               />
               <MetricPanel
                 label="Overall score"
                 value={results ? results.overallScore : '--'}
-                valueClassName="mt-3 text-4xl font-semibold tracking-[-0.04em] text-foreground"
+                valueClassName="mt-3 text-4xl font-semibold tracking-display-tight text-foreground"
               />
             </div>
           </CardContent>
@@ -330,7 +330,7 @@ export default function InterviewDetailPage() {
             <EyebrowBadge icon={<Sparkles className="size-3.5" />} tone="muted">
               Interview progress
             </EyebrowBadge>
-            <CardTitle className="text-2xl tracking-[-0.03em]">Answer packet status</CardTitle>
+            <CardTitle className="text-2xl tracking-display">Answer packet status</CardTitle>
             <CardDescription className="text-sm leading-6">
               Recruiter-side review stays anchored to upload completion first, then shifts into
               scoring once the packet is fully assembled.
@@ -411,7 +411,7 @@ export default function InterviewDetailPage() {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div className="space-y-2">
             <EyebrowLabel size="lg">Candidate packet</EyebrowLabel>
-            <h2 className="text-2xl font-semibold tracking-[-0.03em] text-foreground">
+            <h2 className="text-2xl font-semibold tracking-display text-foreground">
               Questions and uploads
             </h2>
           </div>
@@ -439,13 +439,13 @@ export default function InterviewDetailPage() {
                         <StatusPill tone="neutral">Q{questionIndex + 1}</StatusPill>
                         <StatusPill tone={question.difficulty}>{question.difficulty}</StatusPill>
                         {question.category ? (
-                          <StatusPill tone="neutral" className="normal-case tracking-[0.08em]">
+                          <StatusPill tone="neutral" className="normal-case tracking-chip">
                             {question.category}
                           </StatusPill>
                         ) : null}
                         <StatusPill tone="neutral">weight {question.weight}</StatusPill>
                       </div>
-                      <CardTitle className="max-w-4xl text-xl tracking-[-0.03em]">
+                      <CardTitle className="max-w-4xl text-xl tracking-display">
                         {question.questionText}
                       </CardTitle>
                     </div>
@@ -560,7 +560,7 @@ export default function InterviewDetailPage() {
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div className="space-y-2">
               <EyebrowLabel size="lg">Scorecard</EyebrowLabel>
-              <h2 className="text-2xl font-semibold tracking-[-0.03em] text-foreground">
+              <h2 className="text-2xl font-semibold tracking-display text-foreground">
                 Interview results
               </h2>
             </div>
@@ -575,7 +575,7 @@ export default function InterviewDetailPage() {
                 <EyebrowBadge icon={<FileVideo2 className="size-3.5" />} tone="primary">
                   Overall score
                 </EyebrowBadge>
-                <div className="text-6xl font-semibold tracking-[-0.06em] text-[hsl(var(--primary))]">
+                <div className="text-6xl font-semibold tracking-display-hero text-[hsl(var(--primary))]">
                   {results.overallScore}
                 </div>
                 <p className="text-sm leading-7 text-muted-foreground">{results.summary}</p>
@@ -603,7 +603,7 @@ export default function InterviewDetailPage() {
                 <Card key={category} variant="surface">
                   <CardContent className="space-y-3 px-6 py-6 text-center">
                     <EyebrowLabel>{category}</EyebrowLabel>
-                    <div className="text-4xl font-semibold tracking-[-0.05em] text-[hsl(var(--primary))]">
+                    <div className="text-4xl font-semibold tracking-display-tightest text-[hsl(var(--primary))]">
                       {score}
                     </div>
                     <p className="text-sm text-muted-foreground">out of 100</p>

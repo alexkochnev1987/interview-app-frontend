@@ -24,8 +24,8 @@ const casingClasses: Record<EyebrowCasing, string> = {
 }
 
 const trackingClasses: Record<`${EyebrowSize}-${EyebrowCasing}`, string> = {
-  'default-uppercase': 'tracking-[0.24em]',
-  'sm-uppercase': 'tracking-[0.18em]',
+  'default-uppercase': 'tracking-eyebrow-widest',
+  'sm-uppercase': 'tracking-eyebrow-wide',
   'default-normal': 'leading-5',
   'sm-normal': 'leading-5',
 }

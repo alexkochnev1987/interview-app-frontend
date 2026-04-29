@@ -48,7 +48,7 @@ export function QuestionUnavailableCard({ message }: QuestionUnavailableCardProp
             <AlertTriangle className="size-5" />
           </IconBadge>
           <div className="space-y-2">
-            <CardTitle className="text-3xl tracking-[-0.04em]">
+            <CardTitle className="text-3xl tracking-display-tight">
               Question unavailable
             </CardTitle>
             <CardDescription className="max-w-2xl text-sm leading-6">

@@ -257,21 +257,21 @@ export default function DashboardPage() {
                 icon={<CircleDashed className="size-4" />}
                 label="Active"
                 value={activeCount}
-                valueClassName="mt-4 text-4xl font-semibold tracking-[-0.04em] text-foreground"
+                valueClassName="mt-4 text-4xl font-semibold tracking-display-tight text-foreground"
                 description="Interviews currently waiting on answers, uploads, or scoring."
               />
               <MetricPanel
                 icon={<Users className="size-4" />}
                 label="Candidates"
                 value={interviews.length}
-                valueClassName="mt-4 text-4xl font-semibold tracking-[-0.04em] text-foreground"
+                valueClassName="mt-4 text-4xl font-semibold tracking-display-tight text-foreground"
                 description="Total candidate records visible in the current workspace."
               />
               <MetricPanel
                 icon={<Layers3 className="size-4" />}
                 label="Question Load"
                 value={questionVolume}
-                valueClassName="mt-4 text-4xl font-semibold tracking-[-0.04em] text-foreground"
+                valueClassName="mt-4 text-4xl font-semibold tracking-display-tight text-foreground"
                 description="Questions currently attached across all visible interviews."
               />
             </div>
@@ -283,7 +283,7 @@ export default function DashboardPage() {
             <EyebrowBadge icon={<BriefcaseBusiness className="size-3.5" />} tone="muted">
               Snapshot
             </EyebrowBadge>
-            <CardTitle className="text-2xl tracking-[-0.03em]">Today&apos;s pipeline</CardTitle>
+            <CardTitle className="text-2xl tracking-display">Today&apos;s pipeline</CardTitle>
             <CardDescription className="max-w-sm text-sm leading-6">
               The redesigned shell uses tonal layers instead of hard separators, so activity stays
               readable even when the data density grows.
@@ -361,7 +361,7 @@ export default function DashboardPage() {
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div className="space-y-2">
               <EyebrowLabel size="lg">Active records</EyebrowLabel>
-              <h2 className="text-2xl font-semibold tracking-[-0.03em] text-foreground">
+              <h2 className="text-2xl font-semibold tracking-display text-foreground">
                 Recent interviews
               </h2>
             </div>
@@ -388,7 +388,7 @@ export default function DashboardPage() {
                           {getCandidateInitials(interview.candidateName)}
                         </IconBadge>
                         <div>
-                          <CardTitle className="text-lg tracking-[-0.03em]">
+                          <CardTitle className="text-lg tracking-display">
                             {interview.candidateName}
                           </CardTitle>
                           <CardDescription>{interview.position}</CardDescription>
@@ -403,13 +403,13 @@ export default function DashboardPage() {
                     <div className="grid grid-cols-2 gap-3 text-sm">
                       <SurfaceTile rounded="lg" padding="sm">
                         <EyebrowLabel>Questions</EyebrowLabel>
-                        <div className="mt-2 text-xl font-semibold tracking-[-0.03em] text-foreground">
+                        <div className="mt-2 text-xl font-semibold tracking-display text-foreground">
                           {interview.questions.length}
                         </div>
                       </SurfaceTile>
                       <SurfaceTile rounded="lg" padding="sm">
                         <EyebrowLabel>Uploaded</EyebrowLabel>
-                        <div className="mt-2 text-xl font-semibold tracking-[-0.03em] text-foreground">
+                        <div className="mt-2 text-xl font-semibold tracking-display text-foreground">
                           {interview.answers.filter((answer) => answer.status === 'submitted').length}
                         </div>
                       </SurfaceTile>

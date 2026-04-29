@@ -62,7 +62,12 @@ export function QuestionsLibraryToolbar({
           value={difficulty}
           onValueChange={(value) => onDifficultyChange(value as DifficultyFilter)}
         >
-          <SelectTrigger className="h-12 w-full rounded-full border border-hairline-strong bg-surface-low-soft px-4 shadow-none">
+          <SelectTrigger
+            variant="surface"
+            size="lg"
+            shape="pill"
+            className="shadow-none"
+          >
             <SelectValue placeholder="All difficulties" />
           </SelectTrigger>
           <SelectContent>

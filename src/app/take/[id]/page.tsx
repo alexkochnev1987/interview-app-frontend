@@ -1174,7 +1174,7 @@ export default function TakeInterviewPage() {
 
             <Card variant="surface">
               <CardHeader className="space-y-2">
-                <CardTitle className="text-2xl tracking-[-0.03em]">Before you start</CardTitle>
+                <CardTitle className="text-2xl tracking-display">Before you start</CardTitle>
                 <CardDescription className="text-sm leading-6">
                   One button will request camera, microphone, and then full-screen sharing.
                 </CardDescription>
@@ -1328,7 +1328,7 @@ export default function TakeInterviewPage() {
                 ) : null}
               </div>
 
-              <h2 className="text-2xl font-semibold leading-9 tracking-[-0.03em] text-foreground">
+              <h2 className="text-2xl font-semibold leading-9 tracking-display text-foreground">
                 {interview.currentQuestion?.text}
               </h2>
             </div>

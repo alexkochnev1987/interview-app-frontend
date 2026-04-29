@@ -61,7 +61,7 @@ export function QuestionsLibraryHeader({
             Overview
           </EyebrowBadge>
           <div className="space-y-3">
-            <CardTitle className="text-2xl tracking-[-0.03em]">
+            <CardTitle className="text-2xl tracking-display">
               Library health
             </CardTitle>
             <CardDescription className="text-sm leading-6">

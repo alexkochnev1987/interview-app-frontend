@@ -29,7 +29,7 @@ export function EditorSectionCard({
             {icon}
           </IconBadge>
           <div className="space-y-1">
-            <h2 className="text-xl font-semibold tracking-[-0.03em] text-foreground">
+            <h2 className="text-xl font-semibold tracking-display text-foreground">
               {title}
             </h2>
             <p className="text-sm leading-6 text-muted-foreground">

@@ -56,7 +56,7 @@ export default function LoginPage() {
         </EyebrowBadge>
 
         <div className="space-y-4">
-          <HeroTitle className="max-w-3xl tracking-[-0.05em] md:text-6xl">
+          <HeroTitle className="max-w-3xl tracking-display-tightest md:text-6xl">
             Review candidate performance with the calm of an editorial workspace.
           </HeroTitle>
           <HeroLead className="max-w-2xl">
@@ -115,7 +115,7 @@ export default function LoginPage() {
           <EyebrowBadge size="sm">
             Recruiter access
           </EyebrowBadge>
-          <CardTitle className="text-3xl font-semibold tracking-[-0.04em] text-foreground">
+          <CardTitle className="text-3xl font-semibold tracking-display-tight text-foreground">
             Sign in
           </CardTitle>
         </CardHeader>
@@ -165,7 +165,7 @@ export default function LoginPage() {
 
             <div className="relative">
               <Separator />
-              <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-3 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+              <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-3 text-xs font-medium uppercase tracking-eyebrow-wide text-muted-foreground">
                 Or
               </span>
             </div>

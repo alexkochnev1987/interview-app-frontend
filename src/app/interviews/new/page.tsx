@@ -129,7 +129,7 @@ export default function NewInterviewPage() {
 
         <Card variant="tinted">
           <CardHeader>
-            <CardTitle className="text-2xl tracking-[-0.03em]">Selection summary</CardTitle>
+            <CardTitle className="text-2xl tracking-display">Selection summary</CardTitle>
             <CardDescription className="text-sm leading-6">
               Keep the prompt set tight. Dense but intentional interviews score better than generic
               long-form sessions.
@@ -156,7 +156,7 @@ export default function NewInterviewPage() {
       <form onSubmit={handleSubmit} className="grid gap-6 xl:grid-cols-[0.72fr_1.28fr]">
         <Card variant="surface">
           <CardHeader>
-            <CardTitle className="text-2xl tracking-[-0.03em]">Candidate brief</CardTitle>
+            <CardTitle className="text-2xl tracking-display">Candidate brief</CardTitle>
             <CardDescription className="text-sm leading-6">
               This metadata will anchor the scoring context once answers arrive.
             </CardDescription>
@@ -215,7 +215,7 @@ export default function NewInterviewPage() {
         <Card variant="surface">
           <CardHeader className="flex flex-row items-start justify-between gap-4">
             <div className="space-y-1.5">
-              <CardTitle className="text-2xl tracking-[-0.03em]">Question selection</CardTitle>
+              <CardTitle className="text-2xl tracking-display">Question selection</CardTitle>
               <CardDescription className="text-sm leading-6">
                 Pick the prompts that actually differentiate the candidate.
               </CardDescription>
@@ -265,14 +265,14 @@ export default function NewInterviewPage() {
                         <div className="flex flex-wrap items-center gap-2">
                           <StatusPill tone={question.difficulty}>{question.difficulty}</StatusPill>
                           {question.category ? (
-                            <StatusPill tone="neutral" className="normal-case tracking-[0.08em]">
+                            <StatusPill tone="neutral" className="normal-case tracking-chip">
                               {question.category}
                             </StatusPill>
                           ) : null}
                         </div>
 
                         <div className="space-y-1.5">
-                          <div className="text-base font-semibold tracking-[-0.02em] text-foreground">
+                          <div className="text-base font-semibold tracking-display-loose text-foreground">
                             {question.questionText}
                           </div>
                           <div className="text-sm text-muted-foreground">

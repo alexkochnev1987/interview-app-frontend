@@ -41,7 +41,7 @@ export function EmptyStateCard({
           </IconBadge>
         ) : null}
         <div className="space-y-2">
-          <h2 className="text-2xl font-semibold tracking-[-0.03em] text-foreground">{title}</h2>
+          <h2 className="text-2xl font-semibold tracking-display text-foreground">{title}</h2>
           <p className="max-w-md text-sm leading-6 text-muted-foreground">{description}</p>
         </div>
         {action}
