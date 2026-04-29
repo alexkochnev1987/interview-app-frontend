@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 
 import { EyebrowBadge } from '@/components/app/eyebrow-badge'
+import { EyebrowLabel } from '@/components/app/eyebrow-label'
 import { HeroLead, HeroTitle } from '@/components/app/hero-text'
 import { IconBadge } from '@/components/app/icon-badge'
 import { MetricPanel } from '@/components/app/metric-panel'
@@ -359,9 +360,7 @@ export default function DashboardPage() {
         <section className="space-y-4">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div className="space-y-2">
-              <div className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-                Active records
-              </div>
+              <EyebrowLabel size="lg">Active records</EyebrowLabel>
               <h2 className="text-2xl font-semibold tracking-[-0.03em] text-foreground">
                 Recent interviews
               </h2>
@@ -403,17 +402,13 @@ export default function DashboardPage() {
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-3 text-sm">
                       <SurfaceTile rounded="lg" padding="sm">
-                        <div className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                          Questions
-                        </div>
+                        <EyebrowLabel>Questions</EyebrowLabel>
                         <div className="mt-2 text-xl font-semibold tracking-[-0.03em] text-foreground">
                           {interview.questions.length}
                         </div>
                       </SurfaceTile>
                       <SurfaceTile rounded="lg" padding="sm">
-                        <div className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                          Uploaded
-                        </div>
+                        <EyebrowLabel>Uploaded</EyebrowLabel>
                         <div className="mt-2 text-xl font-semibold tracking-[-0.03em] text-foreground">
                           {interview.answers.filter((answer) => answer.status === 'submitted').length}
                         </div>

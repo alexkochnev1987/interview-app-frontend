@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Search } from 'lucide-react'
 
 import { EyebrowBadge } from '@/components/app/eyebrow-badge'
+import { EyebrowLabel } from '@/components/app/eyebrow-label'
 import { StatusPill } from '@/components/app/status-pill'
 import { SurfaceTile } from '@/components/app/surface-tile'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -119,9 +120,7 @@ export function SimilarityPanel({
 function SignalTile({ label, value }: { label: string; value: number }) {
   return (
     <SurfaceTile tone="elevated" rounded="xl" padding="sm">
-      <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-        {label}
-      </div>
+      <EyebrowLabel>{label}</EyebrowLabel>
       <div className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-foreground">
         {value}
       </div>

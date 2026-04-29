@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 
 import { EyebrowBadge } from '@/components/app/eyebrow-badge'
+import { EyebrowLabel } from '@/components/app/eyebrow-label'
 import { HeroLead, HeroTitle } from '@/components/app/hero-text'
 import { IconBadge } from '@/components/app/icon-badge'
 import { MetricPanel } from '@/components/app/metric-panel'
@@ -1180,9 +1181,7 @@ export default function TakeInterviewPage() {
               </CardHeader>
               <CardContent className="space-y-5">
                 <SurfaceTile padding="lg" className="space-y-3">
-                  <div className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                    Data collected
-                  </div>
+                  <EyebrowLabel size="md">Data collected</EyebrowLabel>
                   <ul className="space-y-2 text-sm leading-6 text-muted-foreground">
                     <li>Camera video and microphone audio for each answer</li>
                     <li>Full-monitor screen recording in parallel with each answer</li>
@@ -1360,9 +1359,7 @@ export default function TakeInterviewPage() {
             </div>
 
             <SurfaceTile tone="soft" rounded="xl" className="px-4 py-4">
-              <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                Guidance
-              </div>
+              <EyebrowLabel>Guidance</EyebrowLabel>
               <p className="mt-3 text-sm leading-6 text-muted-foreground">
                 {stage === 'transition'
                   ? transitionLabel || 'Saving the current answer version.'

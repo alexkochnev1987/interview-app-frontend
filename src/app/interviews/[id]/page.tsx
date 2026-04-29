@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 
 import { EyebrowBadge } from '@/components/app/eyebrow-badge'
+import { EyebrowLabel } from '@/components/app/eyebrow-label'
 import { HeroLead, HeroTitle } from '@/components/app/hero-text'
 import { IconBadge } from '@/components/app/icon-badge'
 import { MetricPanel } from '@/components/app/metric-panel'
@@ -409,9 +410,7 @@ export default function InterviewDetailPage() {
       <section className="space-y-4">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div className="space-y-2">
-            <div className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-              Candidate packet
-            </div>
+            <EyebrowLabel size="lg">Candidate packet</EyebrowLabel>
             <h2 className="text-2xl font-semibold tracking-[-0.03em] text-foreground">
               Questions and uploads
             </h2>
@@ -494,9 +493,7 @@ export default function InterviewDetailPage() {
                   {answer ? (
                     <div className="grid gap-4 md:grid-cols-2">
                       <SurfaceTile rounded="xl">
-                        <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                          Recorded answer
-                        </div>
+                        <EyebrowLabel>Recorded answer</EyebrowLabel>
                         <p className="mt-3 text-sm leading-6 text-muted-foreground">
                           Duration {formatAnswerDuration(answer.durationSeconds)} • retakes {answer.retakeCount ?? 0}
                         </p>
@@ -511,9 +508,7 @@ export default function InterviewDetailPage() {
                         </p>
                       </SurfaceTile>
                       <SurfaceTile rounded="xl">
-                        <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                          Evaluation signals
-                        </div>
+                        <EyebrowLabel>Evaluation signals</EyebrowLabel>
                         <p className="mt-3 text-sm leading-6 text-muted-foreground">
                           Hidden tabs {answer.behaviorSignals?.tabHiddenCount ?? 0} • blur {answer.behaviorSignals?.windowBlurCount ?? 0} • paste {answer.behaviorSignals?.pasteCount ?? 0}
                         </p>
@@ -529,9 +524,7 @@ export default function InterviewDetailPage() {
 
                   <div className="grid gap-4 md:grid-cols-2">
                     <SurfaceTile rounded="xl">
-                      <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                        Expected concepts
-                      </div>
+                      <EyebrowLabel>Expected concepts</EyebrowLabel>
                       <p className="mt-3 text-sm leading-6 text-muted-foreground">
                         {question.expectedConcepts.length > 0
                           ? question.expectedConcepts.map((item) => item.label).join(', ')
@@ -539,9 +532,7 @@ export default function InterviewDetailPage() {
                       </p>
                     </SurfaceTile>
                     <SurfaceTile rounded="xl">
-                      <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                        Red flags
-                      </div>
+                      <EyebrowLabel>Red flags</EyebrowLabel>
                       <p className="mt-3 text-sm leading-6 text-muted-foreground">
                         {question.redFlags.length > 0
                           ? question.redFlags.map((item) => item.label).join(', ')
@@ -568,9 +559,7 @@ export default function InterviewDetailPage() {
         <section className="space-y-4">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div className="space-y-2">
-              <div className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-                Scorecard
-              </div>
+              <EyebrowLabel size="lg">Scorecard</EyebrowLabel>
               <h2 className="text-2xl font-semibold tracking-[-0.03em] text-foreground">
                 Interview results
               </h2>
@@ -613,9 +602,7 @@ export default function InterviewDetailPage() {
               {Object.entries(results.categoryScores).map(([category, score]) => (
                 <Card key={category} variant="surface">
                   <CardContent className="space-y-3 px-6 py-6 text-center">
-                    <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                      {category}
-                    </div>
+                    <EyebrowLabel>{category}</EyebrowLabel>
                     <div className="text-4xl font-semibold tracking-[-0.05em] text-[hsl(var(--primary))]">
                       {score}
                     </div>

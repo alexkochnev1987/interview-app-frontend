@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/auth-context'
 import { usePathname } from 'next/navigation'
 import { Sparkles, LogOut, Plus, LayoutDashboard, LibraryBig } from 'lucide-react'
 
+import { EyebrowLabel } from '@/components/app/eyebrow-label'
 import { IconBadge } from '@/components/app/icon-badge'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -42,9 +43,7 @@ export function NavHeader() {
             <Sparkles className="size-5" />
           </IconBadge>
           <div className="space-y-0.5">
-            <div className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-              Intelligent Conductor
-            </div>
+            <EyebrowLabel size="lg">Intelligent Conductor</EyebrowLabel>
             <div className="text-sm font-semibold text-foreground md:text-base">
               AI Interview Architect
             </div>
@@ -77,9 +76,9 @@ export function NavHeader() {
             <>
               <div className="hidden rounded-full bg-[hsl(var(--surface-low))] px-3 py-2 text-right ring-1 ring-hairline sm:block">
                 <div className="text-xs font-medium text-foreground">{user.name}</div>
-                <div className="text-[0.68rem] uppercase tracking-[0.18em] text-muted-foreground">
+                <EyebrowLabel size="md" className="font-normal">
                   {user.role}
-                </div>
+                </EyebrowLabel>
               </div>
               <Button
                 type="button"

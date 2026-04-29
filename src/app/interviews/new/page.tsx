@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { ArrowRight, BriefcaseBusiness, CirclePlus, Sparkles, UserRound } from 'lucide-react'
 
 import { EyebrowBadge } from '@/components/app/eyebrow-badge'
+import { EyebrowLabel } from '@/components/app/eyebrow-label'
 import { HeroLead, HeroTitle } from '@/components/app/hero-text'
 import { MetricPanel } from '@/components/app/metric-panel'
 import { StatusPill } from '@/components/app/status-pill'
@@ -282,9 +283,7 @@ export default function NewInterviewPage() {
 
                         <div className="grid gap-3 text-sm md:grid-cols-2">
                           <div>
-                            <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                              Concepts
-                            </div>
+                            <EyebrowLabel>Concepts</EyebrowLabel>
                             <p className="mt-2 leading-6 text-muted-foreground">
                               {question.expectedConcepts.length > 0
                                 ? question.expectedConcepts.map((item) => item.label).join(', ')
@@ -292,9 +291,7 @@ export default function NewInterviewPage() {
                             </p>
                           </div>
                           <div>
-                            <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                              Red flags
-                            </div>
+                            <EyebrowLabel>Red flags</EyebrowLabel>
                             <p className="mt-2 leading-6 text-muted-foreground">
                               {question.redFlags.length > 0
                                 ? question.redFlags.map((item) => item.label).join(', ')
@@ -311,9 +308,7 @@ export default function NewInterviewPage() {
 
             {selectedQuestions.length > 0 ? (
               <SurfaceTile>
-                <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                  Current packet
-                </div>
+                <EyebrowLabel>Current packet</EyebrowLabel>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">
                   {selectedQuestions.map((question) => question.questionText).join(' · ')}
                 </p>

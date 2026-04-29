@@ -1,5 +1,6 @@
 'use client'
 
+import { EyebrowLabel } from '@/components/app/eyebrow-label'
 import { Button } from '@/components/ui/button'
 import { type QuestionInput } from '@/lib/api'
 import { previewValue, type DraftFieldKey } from '@/lib/question-editor/parsers'
@@ -18,9 +19,7 @@ export function AiSuggestionRow({
   return (
     <div className="mt-3 rounded-xl-2 bg-[hsl(var(--primary-fixed)/0.55)] p-4 ring-1 ring-[hsl(var(--primary)/0.15)]">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-[hsl(var(--primary))]">
-          AI suggestion
-        </div>
+        <EyebrowLabel tone="primary">AI suggestion</EyebrowLabel>
         <div className="flex flex-wrap gap-2">
           <Button type="button" size="sm" variant="gradient" onClick={onApply}>
             Use AI value

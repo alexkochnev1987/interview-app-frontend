@@ -1,3 +1,4 @@
+import { EyebrowLabel } from '@/components/app/eyebrow-label'
 import { SurfaceTile } from '@/components/app/surface-tile'
 
 type TakeStage = 'loading' | 'consent' | 'interview' | 'recording' | 'transition' | 'complete'
@@ -19,9 +20,7 @@ export function LiveTranscriptPanel({
 }: LiveTranscriptPanelProps) {
   return (
     <SurfaceTile rounded="xl" className="min-h-[130px]">
-      <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-        Live transcript
-      </div>
+      <EyebrowLabel>Live transcript</EyebrowLabel>
       {!isSupported ? (
         <p className="mt-2 text-sm leading-6 text-muted-foreground">
           Live transcript is unavailable in this browser. Recording continues as usual.

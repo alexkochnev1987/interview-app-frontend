@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 
+import { EyebrowLabel } from '@/components/app/eyebrow-label'
 import { MetricPanel } from '@/components/app/metric-panel'
 import { StatusPill } from '@/components/app/status-pill'
 import {
@@ -102,9 +103,7 @@ export function QuestionCard({
 
             <div className="space-y-3">
               <div>
-                <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                  Expected concepts
-                </div>
+                <EyebrowLabel>Expected concepts</EyebrowLabel>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">
                   {question.expectedConcepts.length > 0
                     ? question.expectedConcepts
@@ -115,9 +114,7 @@ export function QuestionCard({
                 </p>
               </div>
               <div>
-                <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                  Red flag signals
-                </div>
+                <EyebrowLabel>Red flag signals</EyebrowLabel>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">
                   {question.redFlags.length > 0
                     ? question.redFlags
