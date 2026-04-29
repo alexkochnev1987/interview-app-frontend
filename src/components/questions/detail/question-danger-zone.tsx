@@ -25,21 +25,16 @@ export function QuestionDangerZone({
 }: QuestionDangerZoneProps) {
   return (
     <section className="container pb-12">
-      <Card
-        variant="surface"
-        className="border-danger-soft-border bg-danger-soft"
-      >
-        <CardHeader className="space-y-2">
-          <CardTitle className="text-xl tracking-display text-danger-soft-foreground">
-            Danger zone
-          </CardTitle>
-          <CardDescription className="text-sm leading-6 text-danger-soft-foreground/80">
+      <Card variant="danger-soft">
+        <CardHeader spacing="xs">
+          <CardTitle size="md">Danger zone</CardTitle>
+          <CardDescription>
             Deleting hides this question from the library and from new
             interviews. Past interviews keep their snapshot. Active interviews
             block deletion.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent spacing="md">
           {deleteError && (
             <Alert variant="danger">
               <AlertTitle>Cannot delete</AlertTitle>

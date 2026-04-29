@@ -184,7 +184,7 @@ export function QuestionEditor({
   }
 
   return (
-    <PageShell className="space-y-6 md:space-y-8">
+    <PageShell spacing="tight">
       <QuestionEditorHeader
         title={title}
         difficulty={value.difficulty}

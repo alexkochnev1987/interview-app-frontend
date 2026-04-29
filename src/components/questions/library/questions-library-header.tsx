@@ -29,8 +29,8 @@ export function QuestionsLibraryHeader({
   return (
     <HeroGrid
       primary={(
-      <Card variant="floating">
-        <CardContent className="flex h-full flex-col gap-6 px-8 py-8">
+      <Card variant="floating" size="lg">
+        <CardContent layout="fill-column" spacing="xl">
           <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
             Question Library
           </EyebrowBadge>
@@ -38,13 +38,13 @@ export function QuestionsLibraryHeader({
             <HeroTitle>
               Curate the question bank before AI scoring ever sees a candidate.
             </HeroTitle>
-            <HeroLead className="max-w-2xl">
+            <HeroLead width="prose">
               Store reusable prompts, codify expected concepts and red flags,
               and keep your evaluation rubric visible instead of buried in JSON.
             </HeroLead>
           </div>
           <div>
-            <Button asChild variant="gradient" className="h-14 px-8 text-base font-semibold">
+            <Button asChild variant="gradient" size="hero">
               <Link href="/questions/new">
                 <Plus className="size-5" />
                 New Question
@@ -55,16 +55,16 @@ export function QuestionsLibraryHeader({
       </Card>
       )}
       secondary={(
-      <Card variant="tinted">
-        <CardContent className="flex h-full flex-col gap-6 px-8 py-8">
+      <Card variant="tinted" size="lg">
+        <CardContent layout="fill-column" spacing="xl">
           <EyebrowBadge icon={<Filter className="size-3.5" />} tone="muted">
             Overview
           </EyebrowBadge>
           <div className="space-y-3">
-            <CardTitle className="text-2xl tracking-display">
+            <CardTitle size="lg">
               Library health
             </CardTitle>
-            <CardDescription className="text-sm leading-6">
+            <CardDescription>
               The new surface emphasizes utility metadata and evaluation depth
               rather than generic admin cards.
             </CardDescription>

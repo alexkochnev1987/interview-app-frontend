@@ -18,8 +18,8 @@ import {
 export function QuestionLoadingCard() {
   return (
     <main className="container py-10 md:py-12">
-      <Card variant="floating">
-        <CardContent className="flex min-h-[300px] flex-col items-center justify-center gap-5 px-8 py-12 text-center">
+      <Card variant="floating" size="state">
+        <CardContent layout="stack-center" spacing="lg">
           <IconBadge tone="surface" size="lg">
             <LoaderCircle className="size-5 animate-spin" />
           </IconBadge>
@@ -43,21 +43,21 @@ export function QuestionUnavailableCard({ message }: QuestionUnavailableCardProp
   return (
     <main className="container py-10 md:py-12">
       <Card variant="floating">
-        <CardHeader className="space-y-4">
+        <CardHeader spacing="md">
           <IconBadge tone="danger" size="lg">
             <AlertTriangle className="size-5" />
           </IconBadge>
           <div className="space-y-2">
-            <CardTitle className="text-3xl tracking-display-tight">
+            <CardTitle size="xl">
               Question unavailable
             </CardTitle>
-            <CardDescription className="max-w-2xl text-sm leading-6">
+            <CardDescription className="max-w-2xl">
               The editor could not load this question, so the route stops here
               instead of rendering a partially broken form.
             </CardDescription>
           </div>
         </CardHeader>
-        <CardContent className="space-y-5">
+        <CardContent spacing="lg">
           <Alert variant="danger">
             <AlertTitle>Load failed</AlertTitle>
             <AlertDescription>{message}</AlertDescription>

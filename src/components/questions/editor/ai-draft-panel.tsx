@@ -30,15 +30,15 @@ export function AiDraftPanel({
 }: AiDraftPanelProps) {
   return (
     <Card variant="surface">
-      <CardHeader className="space-y-5">
+      <CardHeader spacing="lg">
         <div className="space-y-1.5">
           <div className="flex items-start justify-between gap-3">
-            <CardTitle className="text-2xl tracking-display">AI draft</CardTitle>
+            <CardTitle size="lg">AI draft</CardTitle>
             {hasPendingDraft ? (
               <StatusPill tone="neutral">{pendingCount} pending</StatusPill>
             ) : null}
           </div>
-          <CardDescription className="text-sm leading-6">
+          <CardDescription>
             Let AI propose category, follow-up probes, expected concepts, red flags,
             and tags based on your question text. Each change shows up as a
             reviewable diff before anything is applied.

@@ -3,7 +3,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '@/lib/utils'
 
-const eyebrowLabelVariants = cva('font-semibold uppercase', {
+const eyebrowLabelVariants = cva('uppercase', {
   variants: {
     size: {
       sm: 'text-[0.68rem] tracking-eyebrow',
@@ -14,10 +14,15 @@ const eyebrowLabelVariants = cva('font-semibold uppercase', {
       muted: 'text-muted-foreground',
       primary: 'text-[hsl(var(--primary))]',
     },
+    weight: {
+      normal: 'font-normal',
+      semibold: 'font-semibold',
+    },
   },
   defaultVariants: {
     size: 'sm',
     tone: 'muted',
+    weight: 'semibold',
   },
 })
 
@@ -29,11 +34,12 @@ export function EyebrowLabel({
   className,
   size,
   tone,
+  weight,
   ...props
 }: EyebrowLabelProps) {
   return (
     <div
-      className={cn(eyebrowLabelVariants({ size, tone }), className)}
+      className={cn(eyebrowLabelVariants({ size, tone, weight }), className)}
       {...props}
     />
   )

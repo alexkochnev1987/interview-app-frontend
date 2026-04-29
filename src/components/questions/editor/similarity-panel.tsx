@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { Search } from 'lucide-react'
 
 import { EyebrowBadge } from '@/components/app/eyebrow-badge'
-import { EyebrowLabel } from '@/components/app/eyebrow-label'
+import { MetricPanel } from '@/components/app/metric-panel'
 import { StatusPill } from '@/components/app/status-pill'
 import { SurfaceTile } from '@/components/app/surface-tile'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -48,10 +48,10 @@ export function SimilarityPanel({
 }: SimilarityPanelProps) {
   return (
     <Card variant="surface">
-      <CardHeader className="space-y-5">
+      <CardHeader spacing="lg">
         <div className="space-y-1.5">
-          <CardTitle className="text-2xl tracking-display">Similar questions</CardTitle>
-          <CardDescription className="text-sm leading-6">
+          <CardTitle size="lg">Similar questions</CardTitle>
+          <CardDescription>
             Check for duplicates and near-duplicates against the current library
             before you save a new prompt or update an old one.
           </CardDescription>
@@ -80,7 +80,7 @@ export function SimilarityPanel({
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent spacing="md">
         {status === 'idle' ? (
           <PanelMessage>
             Search uses prompt text, taxonomy, tags, and rubric concepts. The library
@@ -119,19 +119,14 @@ export function SimilarityPanel({
 
 function SignalTile({ label, value }: { label: string; value: number }) {
   return (
-    <SurfaceTile tone="elevated" rounded="xl" padding="sm">
-      <EyebrowLabel>{label}</EyebrowLabel>
-      <div className="mt-2 text-2xl font-semibold tracking-display-tight text-foreground">
-        {value}
-      </div>
-    </SurfaceTile>
+    <MetricPanel tone="elevated" label={label} value={value} valueSize="default" />
   )
 }
 
 function PanelMessage({ children }: { children: React.ReactNode }) {
   return (
-    <SurfaceTile padding="lg" className="text-sm leading-6 text-muted-foreground">
-      {children}
+    <SurfaceTile padding="lg">
+      <p className="text-sm leading-6 text-muted-foreground">{children}</p>
     </SurfaceTile>
   )
 }

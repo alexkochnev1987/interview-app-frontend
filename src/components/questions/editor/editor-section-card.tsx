@@ -2,7 +2,6 @@ import type { ReactNode } from 'react'
 
 import { IconBadge } from '@/components/app/icon-badge'
 import { Card, CardContent } from '@/components/ui/card'
-import { cn } from '@/lib/utils'
 
 interface EditorSectionCardProps {
   title: string
@@ -10,7 +9,6 @@ interface EditorSectionCardProps {
   icon: ReactNode
   children: ReactNode
   className?: string
-  contentClassName?: string
 }
 
 export function EditorSectionCard({
@@ -19,11 +17,10 @@ export function EditorSectionCard({
   icon,
   children,
   className,
-  contentClassName,
 }: EditorSectionCardProps) {
   return (
-    <Card variant="surface" className={className}>
-      <CardContent className={cn('space-y-6 px-8 py-8', contentClassName)}>
+    <Card variant="surface" size="lg" className={className}>
+      <CardContent spacing="xl">
         <div className="flex items-start gap-3">
           <IconBadge tone="primary" size="sm">
             {icon}

@@ -5,7 +5,6 @@ import { Save } from 'lucide-react'
 import { StatusPill } from '@/components/app/status-pill'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { cn } from '@/lib/utils'
 
 interface QuestionEditorSaveBarProps {
   isDirty: boolean
@@ -28,13 +27,8 @@ export function QuestionEditorSaveBar({
 }: QuestionEditorSaveBarProps) {
   const fieldCount = dirtyFieldLabels.length
   return (
-    <Card
-      variant="surface"
-      className={cn(
-        isDirty && 'border-warning-soft-border bg-warning-soft',
-      )}
-    >
-      <CardContent className="flex flex-col gap-4 px-8 py-6 sm:flex-row sm:items-center sm:justify-between">
+    <Card variant={isDirty ? 'warning' : 'surface'} size="lg">
+      <CardContent layout="split-row" spacing="md">
         <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-2">
             <StatusPill tone={isDirty ? 'pending' : 'completed'}>
@@ -58,8 +52,9 @@ export function QuestionEditorSaveBar({
         <Button
           type="submit"
           variant="gradient"
+          size="xl"
           disabled={submitting || !isDirty}
-          className="h-11 shrink-0 px-6 font-semibold"
+          className="shrink-0"
         >
           <Save className="size-4" />
           {submitting ? 'Saving...' : submitLabel}

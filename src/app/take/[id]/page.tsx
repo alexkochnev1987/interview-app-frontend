@@ -1083,9 +1083,10 @@ export default function TakeInterviewPage() {
   if (stage === 'complete') {
     return (
       <main className="container py-12">
-        <Card variant="floating" className="mx-auto max-w-4xl">
-          <CardContent className="space-y-6 px-8 py-10 text-center">
-            <IconBadge tone="primary" size="lg" className="mx-auto size-16">
+        <div className="mx-auto max-w-4xl">
+        <Card variant="floating" size="lg">
+          <CardContent layout="stack-center" spacing="xl">
+            <IconBadge tone="primary" size="xl" className="mx-auto">
               <CheckCircle2 className="size-8" />
             </IconBadge>
             <div className="space-y-3">
@@ -1099,6 +1100,7 @@ export default function TakeInterviewPage() {
             </div>
           </CardContent>
         </Card>
+        </div>
       </main>
     )
   }
@@ -1106,9 +1108,11 @@ export default function TakeInterviewPage() {
   if (stage === 'consent') {
     return (
       <main className="container space-y-8 py-10 md:py-12">
-        <Card variant="floating" className="mx-auto max-w-5xl">
-          <CardContent className="grid gap-8 px-8 py-8 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="space-y-5">
+        <div className="mx-auto max-w-5xl">
+        <Card variant="floating" size="lg">
+          <CardContent>
+            <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+              <div className="space-y-5">
               <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
                 Candidate interview
               </EyebrowBadge>
@@ -1122,8 +1126,8 @@ export default function TakeInterviewPage() {
               </div>
 
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                <Card variant="tinted">
-                  <CardContent className="space-y-3 px-5 py-5">
+                <Card variant="tinted" size="md">
+                  <CardContent spacing="sm">
                     <Camera className="size-5 text-[hsl(var(--primary))]" />
                     <div className="space-y-1">
                       <div className="text-sm font-semibold text-foreground">Camera</div>
@@ -1134,8 +1138,8 @@ export default function TakeInterviewPage() {
                   </CardContent>
                 </Card>
 
-                <Card variant="tinted">
-                  <CardContent className="space-y-3 px-5 py-5">
+                <Card variant="tinted" size="md">
+                  <CardContent spacing="sm">
                     <Mic className="size-5 text-[hsl(var(--primary))]" />
                     <div className="space-y-1">
                       <div className="text-sm font-semibold text-foreground">Microphone</div>
@@ -1146,8 +1150,8 @@ export default function TakeInterviewPage() {
                   </CardContent>
                 </Card>
 
-                <Card variant="tinted">
-                  <CardContent className="space-y-3 px-5 py-5">
+                <Card variant="tinted" size="md">
+                  <CardContent spacing="sm">
                     <Video className="size-5 text-[hsl(var(--primary))]" />
                     <div className="space-y-1">
                       <div className="text-sm font-semibold text-foreground">Entire screen</div>
@@ -1158,8 +1162,8 @@ export default function TakeInterviewPage() {
                   </CardContent>
                 </Card>
 
-                <Card variant="tinted">
-                  <CardContent className="space-y-3 px-5 py-5">
+                <Card variant="tinted" size="md">
+                  <CardContent spacing="sm">
                     <ShieldCheck className="size-5 text-[hsl(var(--primary))]" />
                     <div className="space-y-1">
                       <div className="text-sm font-semibold text-foreground">Fairness checks</div>
@@ -1173,14 +1177,14 @@ export default function TakeInterviewPage() {
             </div>
 
             <Card variant="surface">
-              <CardHeader className="space-y-2">
-                <CardTitle className="text-2xl tracking-display">Before you start</CardTitle>
-                <CardDescription className="text-sm leading-6">
+              <CardHeader spacing="xs">
+                <CardTitle size="lg">Before you start</CardTitle>
+                <CardDescription>
                   One button will request camera, microphone, and then full-screen sharing.
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-5">
-                <SurfaceTile padding="lg" className="space-y-3">
+              <CardContent spacing="lg">
+                <SurfaceTile padding="lg" spacing="sm">
                   <EyebrowLabel size="md">Data collected</EyebrowLabel>
                   <ul className="space-y-2 text-sm leading-6 text-muted-foreground">
                     <li>Camera video and microphone audio for each answer</li>
@@ -1191,8 +1195,8 @@ export default function TakeInterviewPage() {
                   </ul>
                 </SurfaceTile>
 
-                <SurfaceTile tone="glass" padding="lg" className="space-y-3">
-                  <SurfaceTile rounded="lg" className="flex items-center justify-between gap-3 px-4 py-3">
+                <SurfaceTile tone="glass" padding="lg" spacing="sm">
+                  <SurfaceTile rounded="lg" padding="md-tight" layout="row-between">
                     <div className="space-y-1">
                       <div className="text-sm font-semibold text-foreground">Camera and microphone</div>
                       <p className="text-xs leading-5 text-muted-foreground">
@@ -1202,7 +1206,7 @@ export default function TakeInterviewPage() {
                     <PermissionPill status={cameraStatus} />
                   </SurfaceTile>
 
-                  <SurfaceTile rounded="lg" className="flex items-center justify-between gap-3 px-4 py-3">
+                  <SurfaceTile rounded="lg" padding="md-tight" layout="row-between">
                     <div className="space-y-1">
                       <div className="text-sm font-semibold text-foreground">Entire screen share</div>
                       <p className="text-xs leading-5 text-muted-foreground">
@@ -1222,7 +1226,7 @@ export default function TakeInterviewPage() {
                   </Alert>
                 ) : null}
 
-                <SurfaceTile tone="glass" rounded="xl" className="flex items-start gap-3">
+                <SurfaceTile tone="glass" rounded="xl" layout="row-start">
                   <Checkbox
                     id="consent"
                     checked={consent}
@@ -1230,7 +1234,7 @@ export default function TakeInterviewPage() {
                     className="mt-1"
                   />
                   <div className="space-y-2">
-                    <Label htmlFor="consent" className="text-sm font-semibold text-foreground">
+                    <Label htmlFor="consent" weight="semibold">
                       I agree to the recording and data collection terms.
                     </Label>
                     <p className="text-sm leading-6 text-muted-foreground">
@@ -1242,16 +1246,19 @@ export default function TakeInterviewPage() {
                 <Button
                   type="button"
                   variant="gradient"
+                  size="xl"
                   disabled={!consent || setupBusy}
                   onClick={handleStartInterview}
-                  className="h-11 w-full"
+                  className="w-full"
                 >
                   {setupBusy ? 'Requesting access...' : 'Allow Camera, Mic & Entire Screen'}
                 </Button>
               </CardContent>
             </Card>
+            </div>
           </CardContent>
         </Card>
+        </div>
       </main>
     )
   }
@@ -1259,8 +1266,8 @@ export default function TakeInterviewPage() {
   return (
     <main className="container space-y-8 py-10 md:py-12">
       <section className="mx-auto grid max-w-6xl gap-6 xl:grid-cols-[0.84fr_1.16fr]">
-        <Card variant="surface">
-          <CardContent className="space-y-6 px-8 py-8">
+        <Card variant="surface" size="lg">
+          <CardContent spacing="xl">
             <div className="space-y-3">
               <EyebrowBadge icon={<Video className="size-3.5" />}>
                 Live session
@@ -1271,7 +1278,7 @@ export default function TakeInterviewPage() {
               </p>
             </div>
 
-            <SurfaceTile tone="elevated" padding="lg" className="space-y-3">
+            <SurfaceTile tone="elevated" padding="lg" spacing="sm">
               <div className="flex items-center justify-between gap-3">
                 <div className="text-sm font-medium text-foreground">
                   Question {interview.currentQuestionIndex + 1} of {interview.totalQuestions}
@@ -1302,15 +1309,15 @@ export default function TakeInterviewPage() {
                 tone="elevated"
                 label="Answer version"
                 value={`v${currentVersionNumber}`}
-                valueClassName="mt-3 text-sm leading-6 text-foreground"
+                valueSize="sm"
                 description={`Previous versions kept: ${retakeCount}`}
               />
             </div>
           </CardContent>
         </Card>
 
-        <Card variant="floating">
-          <CardContent className="space-y-6 px-8 py-8">
+        <Card variant="floating" size="lg">
+          <CardContent spacing="xl">
             <div className="space-y-3">
               <div className="flex flex-wrap items-center gap-2">
                 <StatusPill tone={stage === 'recording' ? 'processing' : 'neutral'}>
@@ -1358,7 +1365,7 @@ export default function TakeInterviewPage() {
               ) : null}
             </div>
 
-            <SurfaceTile tone="soft" rounded="xl" className="px-4 py-4">
+            <SurfaceTile tone="soft" rounded="xl">
               <EyebrowLabel>Guidance</EyebrowLabel>
               <p className="mt-3 text-sm leading-6 text-muted-foreground">
                 {stage === 'transition'
@@ -1388,7 +1395,6 @@ export default function TakeInterviewPage() {
                     variant="gradient"
                     onClick={() => requestVersionAction('submit')}
                     disabled={uploading}
-                    className="px-5"
                   >
                     Submit & Next
                   </Button>

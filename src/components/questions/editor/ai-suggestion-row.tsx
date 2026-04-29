@@ -1,6 +1,7 @@
 'use client'
 
 import { EyebrowLabel } from '@/components/app/eyebrow-label'
+import { SurfaceTile } from '@/components/app/surface-tile'
 import { Button } from '@/components/ui/button'
 import { type QuestionInput } from '@/lib/api'
 import { previewValue, type DraftFieldKey } from '@/lib/question-editor/parsers'
@@ -17,7 +18,7 @@ export function AiSuggestionRow({
   onKeep,
 }: AiSuggestionRowProps) {
   return (
-    <div className="mt-3 rounded-xl-2 bg-[hsl(var(--primary-fixed)/0.55)] p-4 ring-1 ring-[hsl(var(--primary)/0.15)]">
+    <SurfaceTile tone="primary-soft" rounded="xl" padding="md" className="mt-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <EyebrowLabel tone="primary">AI suggestion</EyebrowLabel>
         <div className="flex flex-wrap gap-2">
@@ -38,6 +39,6 @@ export function AiSuggestionRow({
       <pre className="mt-3 whitespace-pre-wrap break-words font-mono text-sm leading-6 text-foreground">
         {previewValue(value)}
       </pre>
-    </div>
+    </SurfaceTile>
   )
 }

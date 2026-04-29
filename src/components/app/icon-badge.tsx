@@ -14,16 +14,31 @@ const iconBadgeVariants = cva(
           'bg-surface-low-glass text-[hsl(var(--primary))] ring-1 ring-hairline',
         danger:
           'bg-danger-soft text-destructive ring-1 ring-danger-soft-border',
+        gradient:
+          'bg-primary-gradient text-primary-foreground shadow-soft',
       },
       size: {
         sm: 'size-10 rounded-2xl',
         md: 'size-12 rounded-2xl',
         lg: 'size-14 rounded-xl-4',
+        xl: 'size-16 rounded-xl-4',
+      },
+      shape: {
+        default: '',
+        circle: 'rounded-full',
+      },
+      textSize: {
+        default: '',
+        sm: 'text-sm font-semibold',
+        md: 'text-base font-semibold',
+        lg: 'text-lg font-semibold',
       },
     },
     defaultVariants: {
       tone: 'primary',
       size: 'sm',
+      shape: 'default',
+      textSize: 'default',
     },
   },
 )
@@ -33,9 +48,16 @@ interface IconBadgeProps extends VariantProps<typeof iconBadgeVariants> {
   className?: string
 }
 
-export function IconBadge({ children, className, tone, size }: IconBadgeProps) {
+export function IconBadge({
+  children,
+  className,
+  tone,
+  size,
+  shape,
+  textSize,
+}: IconBadgeProps) {
   return (
-    <span className={cn(iconBadgeVariants({ tone, size }), className)}>
+    <span className={cn(iconBadgeVariants({ tone, size, shape, textSize }), className)}>
       {children}
     </span>
   )

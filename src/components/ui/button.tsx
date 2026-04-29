@@ -30,6 +30,9 @@ const buttonVariants = cva(
         xs: "h-6 gap-1 px-2 text-xs has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
         sm: "h-7 gap-1 px-2.5 text-[0.8rem] has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5",
         lg: "h-9 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
+        xl: "h-11 gap-2 px-5 font-semibold has-data-[icon=inline-end]:pr-4 has-data-[icon=inline-start]:pl-4",
+        "2xl": "h-12 gap-2 px-5 font-semibold has-data-[icon=inline-end]:pr-4 has-data-[icon=inline-start]:pl-4",
+        hero: "h-14 gap-2 px-8 text-base font-semibold has-data-[icon=inline-end]:pr-6 has-data-[icon=inline-start]:pl-6",
         icon: "size-8",
         "icon-xs":
           "size-6 [&_svg:not([class*='size-'])]:size-3",
@@ -39,6 +42,11 @@ const buttonVariants = cva(
       shape: {
         rounded: "rounded-lg",
         pill: "rounded-full",
+      },
+      effects: {
+        none: "",
+        blur: "backdrop-blur-sm",
+        "blur-strong": "backdrop-blur-xl",
       },
     },
     compoundVariants: [
@@ -64,6 +72,11 @@ const buttonVariants = cva(
       },
       {
         variant: "gradient",
+        size: "default",
+        className: "px-5",
+      },
+      {
+        variant: "gradient",
         className: "rounded-full",
       },
       {
@@ -75,6 +88,7 @@ const buttonVariants = cva(
       variant: "default",
       size: "default",
       shape: "rounded",
+      effects: "none",
     },
   }
 )
@@ -84,6 +98,7 @@ function Button({
   variant = "default",
   size = "default",
   shape,
+  effects,
   asChild = false,
   ...props
 }: React.ComponentProps<"button"> &
@@ -97,7 +112,7 @@ function Button({
       data-slot="button"
       data-variant={variant}
       data-size={size}
-      className={cn(buttonVariants({ variant, size, shape, className }))}
+      className={cn(buttonVariants({ variant, size, shape, effects, className }))}
       {...props}
     />
   )

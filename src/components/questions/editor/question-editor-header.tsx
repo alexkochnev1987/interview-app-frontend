@@ -23,15 +23,15 @@ export function QuestionEditorHeader({
   pendingDraftCount,
 }: QuestionEditorHeaderProps) {
   return (
-    <Card variant="floating">
-      <CardContent className="flex flex-col gap-6 px-8 py-8">
+    <Card variant="floating" size="lg">
+      <CardContent spacing="xl">
         <div className="space-y-4">
           <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
             Unified Question Editor
           </EyebrowBadge>
           <div className="space-y-3">
             <HeroTitle>{title}</HeroTitle>
-            <HeroLead className="max-w-2xl">
+            <HeroLead width="prose">
               Shape the prompt, define the rubric, and keep AI-generated draft
               suggestions visible as explicit diffs instead of invisible background
               mutations.
@@ -43,7 +43,8 @@ export function QuestionEditorHeader({
           <MetricPanel
             label="Difficulty"
             value={<StatusPill tone={difficulty}>{difficulty}</StatusPill>}
-            unstyledValue
+            valueSize="raw"
+            valueTone="none"
           />
           <MetricPanel label="Weight" value={weight} />
           <MetricPanel label="Pending AI diffs" value={pendingDraftCount} />

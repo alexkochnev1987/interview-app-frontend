@@ -169,7 +169,7 @@ export default function QuestionsPage() {
               : 'Try widening the search or reset the difficulty filter to bring more prompts back in.'
           }
           action={
-            <Button asChild variant="gradient" className="px-5">
+            <Button asChild variant="gradient">
               <Link href="/questions/new">Create Question</Link>
             </Button>
           }

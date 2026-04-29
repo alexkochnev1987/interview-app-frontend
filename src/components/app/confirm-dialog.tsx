@@ -71,23 +71,23 @@ export function ConfirmDialog({
     >
       <Card
         variant="floating"
-        className="w-full max-w-md bg-card"
+        className="w-full max-w-md"
         onClick={(e) => e.stopPropagation()}
       >
-        <CardHeader className="space-y-3">
+        <CardHeader spacing="sm">
           {destructive && (
             <IconBadge tone="danger" size="md">
               <AlertTriangle className="size-5" />
             </IconBadge>
           )}
-          <CardTitle className="text-2xl tracking-display">{title}</CardTitle>
+          <CardTitle size="lg">{title}</CardTitle>
           {description && (
-            <CardDescription className="text-sm leading-6">
+            <CardDescription>
               {description}
             </CardDescription>
           )}
         </CardHeader>
-        <CardContent className="flex flex-wrap justify-end gap-3">
+        <CardContent layout="row-end" spacing="sm">
           <Button
             type="button"
             variant="outline"

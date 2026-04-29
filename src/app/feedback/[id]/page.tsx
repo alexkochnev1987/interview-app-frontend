@@ -84,8 +84,8 @@ export default function FeedbackPage() {
   return (
     <main className="container space-y-8 py-10 md:py-12">
       <section className="mx-auto grid max-w-6xl gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-        <Card variant="floating">
-          <CardContent className="space-y-6 px-8 py-8">
+        <Card variant="floating" size="lg">
+          <CardContent spacing="xl">
             <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
               Interview feedback
             </EyebrowBadge>
@@ -113,26 +113,28 @@ export default function FeedbackPage() {
 
         <Card variant="tinted">
           <CardHeader>
-            <CardTitle className="text-2xl tracking-display">Snapshot</CardTitle>
-            <CardDescription className="text-sm leading-6">
+            <CardTitle size="lg">Snapshot</CardTitle>
+            <CardDescription>
               A compact overview of your current outcome and when this shared link expires.
             </CardDescription>
           </CardHeader>
-          <CardContent className="grid gap-4 sm:grid-cols-2">
-            <MetricPanel
-              tone="elevated"
-              icon={<BadgeCheck className="size-4" />}
-              label="Overall score"
-              value={feedback.overallScore ?? '--'}
-              valueClassName="mt-3 text-4xl font-semibold tracking-display-tight text-[hsl(var(--primary))]"
-            />
-            <MetricPanel
-              tone="elevated"
-              icon={<Clock3 className="size-4" />}
-              label="Link expiry"
-              value={new Date(feedback.expiresAt).toLocaleDateString()}
-              valueClassName="mt-3 text-sm leading-6 text-foreground"
-            />
+          <CardContent>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <MetricPanel
+                tone="elevated"
+                icon={<BadgeCheck className="size-4" />}
+                label="Overall score"
+                value={feedback.overallScore ?? '--'}
+                valueTone="primary"
+              />
+              <MetricPanel
+                tone="elevated"
+                icon={<Clock3 className="size-4" />}
+                label="Link expiry"
+                value={new Date(feedback.expiresAt).toLocaleDateString()}
+                valueSize="sm"
+              />
+            </div>
           </CardContent>
         </Card>
       </section>
@@ -144,19 +146,22 @@ export default function FeedbackPage() {
               <EyebrowBadge icon={<ChartColumnBig className="size-3.5" />} tone="primary">
                 Category scores
               </EyebrowBadge>
-              <CardTitle className="text-2xl tracking-display">Breakdown</CardTitle>
+              <CardTitle size="lg">Breakdown</CardTitle>
             </CardHeader>
-            <CardContent className="grid gap-4 sm:grid-cols-2">
-              {Object.entries(feedback.categoryScores).map(([category, score]) => (
-                <MetricPanel
-                  key={category}
-                  tone="surface"
-                  label={category}
-                  value={score}
-                  valueClassName="mt-3 text-4xl font-semibold tracking-display-tightest text-[hsl(var(--primary))]"
-                  description="out of 100"
-                />
-              ))}
+            <CardContent>
+              <div className="grid gap-4 sm:grid-cols-2">
+                {Object.entries(feedback.categoryScores).map(([category, score]) => (
+                  <MetricPanel
+                    key={category}
+                    tone="surface"
+                    label={category}
+                    value={score}
+                    valueSize="hero"
+                    valueTone="primary"
+                    description="out of 100"
+                  />
+                ))}
+              </div>
             </CardContent>
           </Card>
         ) : null}
@@ -168,7 +173,7 @@ export default function FeedbackPage() {
                 <EyebrowBadge icon={<BadgeCheck className="size-3.5" />}>
                   Feedback
                 </EyebrowBadge>
-                <CardTitle className="text-2xl tracking-display">What went well</CardTitle>
+                <CardTitle size="lg">What went well</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm leading-7 text-muted-foreground">{feedback.generalFeedback}</p>
@@ -182,7 +187,7 @@ export default function FeedbackPage() {
                 <EyebrowBadge icon={<Target className="size-3.5" />}>
                   Recommendations
                 </EyebrowBadge>
-                <CardTitle className="text-2xl tracking-display">What to improve next</CardTitle>
+                <CardTitle size="lg">What to improve next</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm leading-7 text-muted-foreground">{feedback.improvements}</p>

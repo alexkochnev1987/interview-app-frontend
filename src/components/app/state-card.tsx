@@ -2,11 +2,13 @@ import type { ReactNode } from 'react'
 
 import { IconBadge } from '@/components/app/icon-badge'
 import { Card, CardContent } from '@/components/ui/card'
-import { cn } from '@/lib/utils'
+
+type StateCardTone = 'default' | 'ghost'
 
 interface LoadingStateCardProps {
   className?: string
   label: ReactNode
+  tone?: StateCardTone
 }
 
 interface EmptyStateCardProps {
@@ -15,12 +17,15 @@ interface EmptyStateCardProps {
   description: ReactNode
   icon?: ReactNode
   title: ReactNode
+  tone?: StateCardTone
 }
 
-export function LoadingStateCard({ className, label }: LoadingStateCardProps) {
+export function LoadingStateCard({ className, label, tone = 'default' }: LoadingStateCardProps) {
   return (
-    <Card variant="surface" className={className}>
-      <CardContent className="py-16 text-center text-sm text-muted-foreground">{label}</CardContent>
+    <Card variant={tone === 'ghost' ? 'ghost' : 'surface'} size="state" className={className}>
+      <CardContent layout="stack-center">
+        <span className="text-sm text-muted-foreground">{label}</span>
+      </CardContent>
     </Card>
   )
 }
@@ -31,12 +36,13 @@ export function EmptyStateCard({
   description,
   icon,
   title,
+  tone = 'default',
 }: EmptyStateCardProps) {
   return (
-    <Card variant="surface" className={cn(className)}>
-      <CardContent className="flex flex-col items-center gap-4 py-16 text-center">
+    <Card variant={tone === 'ghost' ? 'ghost' : 'surface'} size="state" className={className}>
+      <CardContent layout="stack-center" spacing="md">
         {icon ? (
-          <IconBadge tone="primary" className="rounded-full">
+          <IconBadge tone="primary" shape="circle">
             {icon}
           </IconBadge>
         ) : null}

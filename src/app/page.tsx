@@ -19,7 +19,6 @@ import { IconBadge } from '@/components/app/icon-badge'
 import { MetricPanel } from '@/components/app/metric-panel'
 import { StatusPill } from '@/components/app/status-pill'
 import { EmptyStateCard, LoadingStateCard } from '@/components/app/state-card'
-import { SurfaceTile } from '@/components/app/surface-tile'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {
@@ -221,18 +220,18 @@ export default function DashboardPage() {
   return (
     <main className="container space-y-8 py-10 md:space-y-10 md:py-12">
       <section className="grid gap-6 xl:grid-cols-[1.3fr_0.7fr]">
-        <Card variant="floating" className="overflow-hidden backdrop-blur-xl">
-          <CardContent className="flex h-full flex-col gap-8 px-8 py-8">
+        <Card variant="floating" size="lg" effects="blur-strong">
+          <CardContent layout="fill-column" spacing="2xl">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div className="max-w-2xl space-y-4">
                 <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
                   Recruiter Dashboard
                 </EyebrowBadge>
                 <div className="space-y-3">
-                  <HeroTitle className="max-w-3xl">
+                  <HeroTitle width="prose">
                     Run your interview pipeline from one editorial command surface.
                   </HeroTitle>
-                  <HeroLead className="max-w-2xl">
+                  <HeroLead width="prose">
                     Monitor active sessions, spot stalled candidates, and keep scoring flows moving
                     without dropping into separate admin tools.
                   </HeroLead>
@@ -240,13 +239,13 @@ export default function DashboardPage() {
               </div>
 
               <div className="flex flex-wrap gap-3">
-                <Button asChild variant="gradient" className="px-5">
+                <Button asChild variant="gradient">
                   <Link href="/interviews/new">
                     New Interview
                     <ArrowRight className="size-4" />
                   </Link>
                 </Button>
-                <Button asChild variant="outline-pill" shape="pill" className="backdrop-blur-sm">
+                <Button asChild variant="outline-pill" shape="pill" effects="blur">
                   <Link href="/questions">Question Bank</Link>
                 </Button>
               </div>
@@ -257,21 +256,18 @@ export default function DashboardPage() {
                 icon={<CircleDashed className="size-4" />}
                 label="Active"
                 value={activeCount}
-                valueClassName="mt-4 text-4xl font-semibold tracking-display-tight text-foreground"
                 description="Interviews currently waiting on answers, uploads, or scoring."
               />
               <MetricPanel
                 icon={<Users className="size-4" />}
                 label="Candidates"
                 value={interviews.length}
-                valueClassName="mt-4 text-4xl font-semibold tracking-display-tight text-foreground"
                 description="Total candidate records visible in the current workspace."
               />
               <MetricPanel
                 icon={<Layers3 className="size-4" />}
                 label="Question Load"
                 value={questionVolume}
-                valueClassName="mt-4 text-4xl font-semibold tracking-display-tight text-foreground"
                 description="Questions currently attached across all visible interviews."
               />
             </div>
@@ -279,19 +275,20 @@ export default function DashboardPage() {
         </Card>
 
         <Card variant="tinted">
-          <CardHeader className="space-y-3">
+          <CardHeader spacing="sm">
             <EyebrowBadge icon={<BriefcaseBusiness className="size-3.5" />} tone="muted">
               Snapshot
             </EyebrowBadge>
-            <CardTitle className="text-2xl tracking-display">Today&apos;s pipeline</CardTitle>
-            <CardDescription className="max-w-sm text-sm leading-6">
+            <CardTitle size="lg">Today&apos;s pipeline</CardTitle>
+            <CardDescription className="max-w-sm">
               The redesigned shell uses tonal layers instead of hard separators, so activity stays
               readable even when the data density grows.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-5">
+          <CardContent spacing="lg">
             <MetricPanel
               tone="elevated"
+              labelVariant="raw"
               label={
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-sm font-medium text-foreground">
@@ -300,14 +297,11 @@ export default function DashboardPage() {
                   <StatusPill tone="completed">{completedCount}</StatusPill>
                 </div>
               }
-              unstyledLabel
-              unstyledValue
-              value={null}
-              valueClassName="mt-0"
               description="Finished sessions with scorecards ready for review and handoff."
             />
             <MetricPanel
               tone="elevated"
+              labelVariant="raw"
               label={
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-sm font-medium text-foreground">
@@ -319,10 +313,6 @@ export default function DashboardPage() {
                   </StatusPill>
                 </div>
               }
-              unstyledLabel
-              unstyledValue
-              value={null}
-              valueClassName="mt-0"
               description={
                 loading
                   ? 'Waiting for the interview feed.'
@@ -351,7 +341,7 @@ export default function DashboardPage() {
           title="No interviews yet"
           description="Start with a candidate, attach questions from the bank, and this dashboard becomes your operating surface."
           action={
-            <Button asChild variant="gradient" className="px-5">
+            <Button asChild variant="gradient">
               <Link href="/interviews/new">Create your first interview</Link>
             </Button>
           }
@@ -365,7 +355,7 @@ export default function DashboardPage() {
                 Recent interviews
               </h2>
             </div>
-            <Button asChild variant="outline-pill" shape="pill" className="backdrop-blur-sm">
+            <Button asChild variant="outline-pill" shape="pill" effects="blur">
               <Link href="/questions/new">Create a new question</Link>
             </Button>
           </div>
@@ -381,14 +371,14 @@ export default function DashboardPage() {
                   variant="surface"
                   className="h-full transition-transform duration-200 hover:-translate-y-1 hover:shadow-float"
                 >
-                  <CardHeader className="gap-4">
+                  <CardHeader spacing="md">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-center gap-3">
-                        <IconBadge tone="primary" size="md" className="text-sm font-semibold">
+                        <IconBadge tone="primary" size="md" textSize="sm">
                           {getCandidateInitials(interview.candidateName)}
                         </IconBadge>
                         <div>
-                          <CardTitle className="text-lg tracking-display">
+                          <CardTitle size="list">
                             {interview.candidateName}
                           </CardTitle>
                           <CardDescription>{interview.position}</CardDescription>
@@ -399,20 +389,20 @@ export default function DashboardPage() {
                       </StatusPill>
                     </div>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent spacing="md">
                     <div className="grid grid-cols-2 gap-3 text-sm">
-                      <SurfaceTile rounded="lg" padding="sm">
-                        <EyebrowLabel>Questions</EyebrowLabel>
-                        <div className="mt-2 text-xl font-semibold tracking-display text-foreground">
-                          {interview.questions.length}
-                        </div>
-                      </SurfaceTile>
-                      <SurfaceTile rounded="lg" padding="sm">
-                        <EyebrowLabel>Uploaded</EyebrowLabel>
-                        <div className="mt-2 text-xl font-semibold tracking-display text-foreground">
-                          {interview.answers.filter((answer) => answer.status === 'submitted').length}
-                        </div>
-                      </SurfaceTile>
+                      <MetricPanel
+                        tone="elevated"
+                        label="Questions"
+                        value={interview.questions.length}
+                        valueSize="md"
+                      />
+                      <MetricPanel
+                        tone="elevated"
+                        label="Uploaded"
+                        value={interview.answers.filter((answer) => answer.status === 'submitted').length}
+                        valueSize="md"
+                      />
                     </div>
 
                     <div className="flex items-center justify-between text-sm text-muted-foreground">

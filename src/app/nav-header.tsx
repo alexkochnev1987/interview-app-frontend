@@ -1,14 +1,38 @@
 'use client'
 
 import Link from 'next/link'
+import type { ComponentProps } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { usePathname } from 'next/navigation'
 import { Sparkles, LogOut, Plus, LayoutDashboard, LibraryBig } from 'lucide-react'
+import { cva, type VariantProps } from 'class-variance-authority'
 
 import { EyebrowLabel } from '@/components/app/eyebrow-label'
 import { IconBadge } from '@/components/app/icon-badge'
+import { SurfaceTile } from '@/components/app/surface-tile'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+
+const navLinkVariants = cva(
+  'inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium no-underline transition-colors',
+  {
+    variants: {
+      active: {
+        true: 'bg-[hsl(var(--surface-low))] text-foreground ring-1 ring-border/60',
+        false: 'text-muted-foreground hover:bg-surface-low-soft hover:text-foreground',
+      },
+    },
+    defaultVariants: { active: false },
+  },
+)
+
+interface NavLinkProps
+  extends ComponentProps<typeof Link>,
+    VariantProps<typeof navLinkVariants> {}
+
+function NavLink({ active, className, ...props }: NavLinkProps) {
+  return <Link className={cn(navLinkVariants({ active }), className)} {...props} />
+}
 
 export function NavHeader() {
   const { user, loading, logout } = useAuth()
@@ -35,11 +59,7 @@ export function NavHeader() {
     <header className="sticky top-0 z-40 border-b border-border/50 bg-background/80 backdrop-blur-xl">
       <div className="container flex min-h-20 flex-wrap items-center justify-between gap-4 py-4">
         <Link href="/" className="flex items-center gap-3 no-underline">
-          <IconBadge
-            tone="primary"
-            size="md"
-            className="bg-primary-gradient text-primary-foreground shadow-soft"
-          >
+          <IconBadge tone="gradient" size="md">
             <Sparkles className="size-5" />
           </IconBadge>
           <div className="space-y-0.5">
@@ -55,37 +75,33 @@ export function NavHeader() {
             ? null
             : user &&
               links.map(({ href, label, icon: Icon }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  className={cn(
-                    'inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium no-underline transition-colors',
-                    isActive(href)
-                      ? 'bg-[hsl(var(--surface-low))] text-foreground ring-1 ring-border/60'
-                      : 'text-muted-foreground hover:bg-surface-low-soft hover:text-foreground',
-                  )}
-                >
+                <NavLink key={href} href={href} active={isActive(href)}>
                   <Icon className="size-4" />
                   {label}
-                </Link>
+                </NavLink>
               ))}
         </nav>
 
         <div className="order-2 flex items-center gap-2 md:order-3">
           {loading ? null : user ? (
             <>
-              <div className="hidden rounded-full bg-[hsl(var(--surface-low))] px-3 py-2 text-right ring-1 ring-hairline sm:block">
+              <SurfaceTile
+                tone="soft"
+                rounded="pill"
+                padding="sm"
+                className="hidden text-right sm:block"
+              >
                 <div className="text-xs font-medium text-foreground">{user.name}</div>
-                <EyebrowLabel size="md" className="font-normal">
+                <EyebrowLabel size="md" weight="normal">
                   {user.role}
                 </EyebrowLabel>
-              </div>
+              </SurfaceTile>
               <Button
                 type="button"
                 variant="outline-pill"
                 shape="pill"
                 size="sm"
-                className="backdrop-blur-sm"
+                effects="blur"
                 onClick={logout}
               >
                 <LogOut className="size-4" />

@@ -50,15 +50,18 @@ export function QuestionCard({
       )}
       <Link href={`/questions/${question.id}`} className="no-underline">
         <Card
-          variant="surface"
-          className={cn(
-            'h-full transition-transform duration-200 group-hover:-translate-y-1 group-hover:shadow-float',
-            question.deleted &&
-              'border-danger-soft-border bg-danger-soft opacity-80',
-            selected && selectable && 'ring-2 ring-destructive/70',
-          )}
+          variant={question.deleted ? 'danger-soft' : 'surface'}
+          height="full"
+          interaction="hover"
+          state={
+            question.deleted
+              ? 'deleted'
+              : selected && selectable
+                ? 'selected'
+                : 'default'
+          }
         >
-          <CardHeader className="space-y-4">
+          <CardHeader spacing="md">
             <div
               className={cn(
                 'flex flex-wrap items-center gap-2',
@@ -70,13 +73,13 @@ export function QuestionCard({
               ) : null}
               <StatusPill tone={question.difficulty}>{question.difficulty}</StatusPill>
               {question.category ? (
-                <StatusPill tone="neutral" className="normal-case tracking-chip">
+                <StatusPill tone="neutral" casing="chip">
                   {question.category}
                 </StatusPill>
               ) : null}
             </div>
             <div className="space-y-2">
-              <CardTitle className="line-clamp-3 text-lg leading-7 tracking-display">
+              <CardTitle size="list-clamp">
                 {truncateText(question.questionText)}
               </CardTitle>
               <CardDescription>
@@ -85,19 +88,19 @@ export function QuestionCard({
               </CardDescription>
             </div>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent spacing="md">
             <div className="grid grid-cols-2 gap-3 text-sm">
               <MetricPanel
                 tone="compact"
                 label="Concepts"
                 value={question.expectedConcepts.length}
-                valueClassName="mt-2 text-xl font-semibold tracking-display text-foreground"
+                valueSize="md"
               />
               <MetricPanel
                 tone="compact"
                 label="Red flags"
                 value={question.redFlags.length}
-                valueClassName="mt-2 text-xl font-semibold tracking-display text-foreground"
+                valueSize="md"
               />
             </div>
 

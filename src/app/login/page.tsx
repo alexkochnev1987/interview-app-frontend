@@ -56,18 +56,18 @@ export default function LoginPage() {
         </EyebrowBadge>
 
         <div className="space-y-4">
-          <HeroTitle className="max-w-3xl tracking-display-tightest md:text-6xl">
+          <HeroTitle size="xl" width="prose">
             Review candidate performance with the calm of an editorial workspace.
           </HeroTitle>
-          <HeroLead className="max-w-2xl">
+          <HeroLead width="prose">
             The new design system trades brittle admin chrome for layered surfaces, sharper
             hierarchy, and faster decision-making during interview review.
           </HeroLead>
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
-          <Card variant="surface">
-            <CardContent className="space-y-3 px-5 py-5">
+          <Card variant="surface" size="md">
+            <CardContent spacing="sm">
               <IconBadge tone="primary" size="sm">
                 <ShieldCheck className="size-4" />
               </IconBadge>
@@ -80,8 +80,8 @@ export default function LoginPage() {
             </CardContent>
           </Card>
 
-          <Card variant="surface">
-            <CardContent className="space-y-3 px-5 py-5">
+          <Card variant="surface" size="md">
+            <CardContent spacing="sm">
               <IconBadge tone="primary" size="sm">
                 <LockKeyhole className="size-4" />
               </IconBadge>
@@ -94,8 +94,8 @@ export default function LoginPage() {
             </CardContent>
           </Card>
 
-          <Card variant="surface">
-            <CardContent className="space-y-3 px-5 py-5">
+          <Card variant="surface" size="md">
+            <CardContent spacing="sm">
               <IconBadge tone="primary" size="sm">
                 <ArrowRight className="size-4" />
               </IconBadge>
@@ -110,16 +110,16 @@ export default function LoginPage() {
         </div>
       </section>
 
-      <Card variant="floating" className="backdrop-blur-xl">
-        <CardHeader className="space-y-3 px-8 pt-8">
+      <Card variant="floating" size="lg" effects="blur-strong">
+        <CardHeader spacing="sm">
           <EyebrowBadge size="sm">
             Recruiter access
           </EyebrowBadge>
-          <CardTitle className="text-3xl font-semibold tracking-display-tight text-foreground">
+          <CardTitle size="xl">
             Sign in
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-8 pb-8">
+        <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             {error ? (
               <Alert variant="danger">
@@ -157,8 +157,9 @@ export default function LoginPage() {
             <Button
               type="submit"
               variant="gradient"
+              size="xl"
               disabled={loading}
-              className="h-11 w-full"
+              className="w-full"
             >
               {loading ? 'Signing in...' : 'Sign In'}
             </Button>
@@ -173,7 +174,8 @@ export default function LoginPage() {
             <Button
               asChild
               variant="outline-pill"
-              className="h-11 w-full"
+              size="xl"
+              className="w-full"
             >
               <a href="/api/auth/google">Sign in with Google</a>
             </Button>

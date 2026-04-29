@@ -256,8 +256,8 @@ export default function InterviewDetailPage() {
   return (
     <main className="container space-y-8 py-10 md:space-y-10 md:py-12">
       <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-        <Card variant="floating">
-          <CardContent className="space-y-8 px-8 py-8">
+        <Card variant="floating" size="lg">
+          <CardContent spacing="2xl">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div className="space-y-4">
                 <a href="/" className="inline-block no-underline">
@@ -267,7 +267,7 @@ export default function InterviewDetailPage() {
                 </a>
 
                 <div className="flex items-center gap-4">
-                  <IconBadge tone="primary" size="lg" className="text-lg font-semibold">
+                  <IconBadge tone="primary" size="lg" textSize="lg">
                     {getCandidateInitials(interview.candidateName)}
                   </IconBadge>
                   <div className="space-y-1.5">
@@ -293,7 +293,6 @@ export default function InterviewDetailPage() {
                     variant="gradient"
                     onClick={handleComplete}
                     disabled={!canComplete || completing}
-                    className="px-5"
                   >
                     {completing
                       ? 'Completing...'
@@ -306,20 +305,12 @@ export default function InterviewDetailPage() {
             </div>
 
             <div className="grid gap-4 md:grid-cols-3">
-              <MetricPanel
-                label="Questions"
-                value={totalQuestions}
-                valueClassName="mt-3 text-4xl font-semibold tracking-display-tight text-foreground"
-              />
-              <MetricPanel
-                label="Uploaded"
-                value={answeredCount}
-                valueClassName="mt-3 text-4xl font-semibold tracking-display-tight text-foreground"
-              />
+              <MetricPanel label="Questions" value={totalQuestions} valueSize="lg" />
+              <MetricPanel label="Uploaded" value={answeredCount} valueSize="lg" />
               <MetricPanel
                 label="Overall score"
                 value={results ? results.overallScore : '--'}
-                valueClassName="mt-3 text-4xl font-semibold tracking-display-tight text-foreground"
+                valueSize="lg"
               />
             </div>
           </CardContent>
@@ -330,14 +321,14 @@ export default function InterviewDetailPage() {
             <EyebrowBadge icon={<Sparkles className="size-3.5" />} tone="muted">
               Interview progress
             </EyebrowBadge>
-            <CardTitle className="text-2xl tracking-display">Answer packet status</CardTitle>
-            <CardDescription className="text-sm leading-6">
+            <CardTitle size="lg">Answer packet status</CardTitle>
+            <CardDescription>
               Recruiter-side review stays anchored to upload completion first, then shifts into
               scoring once the packet is fully assembled.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <SurfaceTile tone="glass" padding="lg" className="space-y-3">
+          <CardContent spacing="xl">
+            <SurfaceTile tone="glass" padding="lg" spacing="sm">
               <div className="flex items-center justify-between gap-3">
                 <span className="text-sm font-medium text-foreground">Completion</span>
                 <StatusPill tone="neutral">{progressValue}%</StatusPill>
@@ -348,7 +339,7 @@ export default function InterviewDetailPage() {
               </p>
             </SurfaceTile>
 
-            <SurfaceTile tone="glass" padding="lg" className="space-y-3">
+            <SurfaceTile tone="glass" padding="lg" spacing="sm">
               <div className="flex items-center gap-2 text-foreground">
                 {canComplete ? (
                   <CheckCircle2 className="size-4 text-success-soft-foreground" />
@@ -365,7 +356,7 @@ export default function InterviewDetailPage() {
             </SurfaceTile>
 
             {results ? (
-              <SurfaceTile tone="glass" padding="lg" className="space-y-3">
+              <SurfaceTile tone="glass" padding="lg" spacing="sm">
                 <div className="flex items-center gap-2 text-foreground">
                   <Layers3 className="size-4 text-[hsl(var(--primary))]" />
                   <span className="text-sm font-medium">Results summary</span>
@@ -375,7 +366,7 @@ export default function InterviewDetailPage() {
             ) : null}
 
             {interview.workflow ? (
-              <SurfaceTile tone="glass" padding="lg" className="space-y-3">
+              <SurfaceTile tone="glass" padding="lg" spacing="sm">
                 <div className="flex items-center gap-2 text-foreground">
                   <Layers3 className="size-4 text-[hsl(var(--primary))]" />
                   <span className="text-sm font-medium">Workflow</span>
@@ -432,20 +423,20 @@ export default function InterviewDetailPage() {
                 variant="surface"
                 className="transition-transform duration-200 hover:-translate-y-0.5"
               >
-                <CardHeader className="gap-4">
+                <CardHeader spacing="md">
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div className="space-y-3">
                       <div className="flex flex-wrap items-center gap-2">
                         <StatusPill tone="neutral">Q{questionIndex + 1}</StatusPill>
                         <StatusPill tone={question.difficulty}>{question.difficulty}</StatusPill>
                         {question.category ? (
-                          <StatusPill tone="neutral" className="normal-case tracking-chip">
+                          <StatusPill tone="neutral" casing="chip">
                             {question.category}
                           </StatusPill>
                         ) : null}
                         <StatusPill tone="neutral">weight {question.weight}</StatusPill>
                       </div>
-                      <CardTitle className="max-w-4xl text-xl tracking-display">
+                      <CardTitle size="md" className="max-w-4xl">
                         {question.questionText}
                       </CardTitle>
                     </div>
@@ -489,7 +480,7 @@ export default function InterviewDetailPage() {
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent spacing="md">
                   {answer ? (
                     <div className="grid gap-4 md:grid-cols-2">
                       <SurfaceTile rounded="xl">
@@ -570,8 +561,8 @@ export default function InterviewDetailPage() {
           </div>
 
           <div className="grid gap-4 xl:grid-cols-[0.85fr_1.15fr]">
-            <Card variant="surface">
-              <CardContent className="space-y-5 px-8 py-8">
+            <Card variant="surface" size="lg">
+              <CardContent spacing="lg">
                 <EyebrowBadge icon={<FileVideo2 className="size-3.5" />} tone="primary">
                   Overall score
                 </EyebrowBadge>
@@ -600,15 +591,15 @@ export default function InterviewDetailPage() {
 
             <div className="grid gap-4 md:grid-cols-3">
               {Object.entries(results.categoryScores).map(([category, score]) => (
-                <Card key={category} variant="surface">
-                  <CardContent className="space-y-3 px-6 py-6 text-center">
-                    <EyebrowLabel>{category}</EyebrowLabel>
-                    <div className="text-4xl font-semibold tracking-display-tightest text-[hsl(var(--primary))]">
-                      {score}
-                    </div>
-                    <p className="text-sm text-muted-foreground">out of 100</p>
-                  </CardContent>
-                </Card>
+                <MetricPanel
+                  key={category}
+                  tone="surface"
+                  label={category}
+                  value={score}
+                  description="out of 100"
+                  valueSize="hero"
+                  valueTone="primary"
+                />
               ))}
             </div>
           </div>

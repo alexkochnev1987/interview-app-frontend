@@ -38,16 +38,17 @@ export function QuestionsLibraryToolbar({
   onRequestBulkDelete,
 }: QuestionsLibraryToolbarProps) {
   return (
-    <Card variant="surface" className="py-2">
-      <CardContent
-        className={cn(
-          'grid items-center gap-4 px-6',
-          canBulkDelete
-            ? 'md:grid-cols-[1fr_220px_auto]'
-            : 'md:grid-cols-[1fr_220px]',
-        )}
-      >
-        <div className="relative">
+    <Card variant="surface" size="xs">
+      <CardContent>
+        <div
+          className={cn(
+            'grid items-center gap-4',
+            canBulkDelete
+              ? 'md:grid-cols-[1fr_220px_auto]'
+              : 'md:grid-cols-[1fr_220px]',
+          )}
+        >
+          <div className="relative">
           <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             size="lg"
@@ -55,7 +56,7 @@ export function QuestionsLibraryToolbar({
             value={query}
             onChange={(event) => onQueryChange(event.target.value)}
             placeholder="Search by prompt, role, category, concept, or red flag"
-            className="pl-11 shadow-none"
+            className="pl-11"
           />
         </div>
         <Select
@@ -66,7 +67,6 @@ export function QuestionsLibraryToolbar({
             variant="surface"
             size="lg"
             shape="pill"
-            className="shadow-none"
           >
             <SelectValue placeholder="All difficulties" />
           </SelectTrigger>
@@ -82,7 +82,8 @@ export function QuestionsLibraryToolbar({
             type="button"
             variant="destructive"
             shape="pill"
-            className="h-12 px-5 md:shrink-0"
+            size="2xl"
+            className="md:shrink-0"
             disabled={selectedCount === 0 || bulkDeleting}
             onClick={onRequestBulkDelete}
           >
@@ -98,6 +99,7 @@ export function QuestionsLibraryToolbar({
                 : 'Delete selected'}
           </Button>
         )}
+        </div>
       </CardContent>
     </Card>
   )
