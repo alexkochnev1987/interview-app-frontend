@@ -1,13 +1,18 @@
 import type { ReactNode } from 'react'
 
+import {
+  RING_BORDER_SOFT,
+  SURFACE_LOW_BG,
+  SURFACE_LOW_STRONG_BG,
+} from '@/components/app/style-tokens'
 import { cn } from '@/lib/utils'
 
 type MetricPanelTone = 'surface' | 'elevated' | 'compact'
 
 const toneClasses: Record<MetricPanelTone, string> = {
-  surface: 'rounded-[1.5rem] bg-[hsl(var(--surface-low)/0.9)] p-5 ring-1 ring-border/45',
-  elevated: 'rounded-[1.25rem] bg-white/80 p-4 ring-1 ring-border/45',
-  compact: 'rounded-[1rem] bg-[hsl(var(--surface-low)/0.85)] p-3 ring-1 ring-border/45',
+  surface: `rounded-[1.5rem] ${SURFACE_LOW_STRONG_BG} p-5 ${RING_BORDER_SOFT}`,
+  elevated: `rounded-[1.25rem] bg-white/80 p-4 ${RING_BORDER_SOFT}`,
+  compact: `rounded-[1rem] ${SURFACE_LOW_BG} p-3 ${RING_BORDER_SOFT}`,
 }
 
 interface MetricPanelProps {

@@ -1,15 +1,21 @@
 import type { HTMLAttributes, ReactNode } from 'react'
 
+import {
+  RING_BORDER_LIGHT,
+  RING_BORDER_SUBTLE,
+  SURFACE_LOW_STRONG_BG,
+  SURFACE_PRIMARY_SOFT_BG,
+  SURFACE_PRIMARY_SOFT_TEXT,
+} from '@/components/app/style-tokens'
 import { cn } from '@/lib/utils'
 
 type EyebrowTone = 'default' | 'muted' | 'primary'
 type EyebrowSize = 'default' | 'sm'
 
 const toneClasses: Record<EyebrowTone, string> = {
-  default:
-    'bg-[hsl(var(--surface-low)/0.9)] text-muted-foreground ring-1 ring-border/50',
-  muted: 'bg-white/70 text-muted-foreground ring-1 ring-border/40',
-  primary: 'bg-[hsl(var(--primary-fixed)/0.8)] text-[hsl(var(--primary))]',
+  default: `${SURFACE_LOW_STRONG_BG} text-muted-foreground ${RING_BORDER_SUBTLE}`,
+  muted: `bg-white/70 text-muted-foreground ${RING_BORDER_LIGHT}`,
+  primary: `${SURFACE_PRIMARY_SOFT_BG} ${SURFACE_PRIMARY_SOFT_TEXT}`,
 }
 
 const sizeClasses: Record<EyebrowSize, string> = {

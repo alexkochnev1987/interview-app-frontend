@@ -11,6 +11,15 @@ export const SURFACE_SHADOW_SOFT = 'shadow-soft';
 export const SURFACE_SHADOW_FLOAT = 'shadow-float';
 
 export const RING_BORDER_SOFT = 'ring-1 ring-border/45';
+export const RING_BORDER_SUBTLE = 'ring-1 ring-border/50';
+export const RING_BORDER_LIGHT = 'ring-1 ring-border/40';
+
+export const SURFACE_PRIMARY_SOFT_BG = 'bg-[hsl(var(--primary-fixed)/0.8)]';
+export const SURFACE_PRIMARY_SOFT_TEXT = 'text-[hsl(var(--primary))]';
+export const SURFACE_PRIMARY_ELEVATED_BG = 'bg-[hsl(var(--primary-fixed)/0.85)]';
+
+export const SURFACE_CARD_BASE_SOFT =
+  `${SURFACE_WHITE_SOFT_BORDER} ${SURFACE_WHITE_SOFT_BG} ${SURFACE_SHADOW_SOFT}`;
 
 export const STATUS_NEUTRAL_SURFACE =
   'bg-[hsl(var(--surface-low))] text-[hsl(var(--muted-foreground))] ring-1 ring-[hsl(var(--border)/0.55)]';

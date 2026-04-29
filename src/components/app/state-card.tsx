@@ -1,5 +1,10 @@
 import type { ReactNode } from 'react'
 
+import {
+  SURFACE_CARD_BASE_SOFT,
+  SURFACE_PRIMARY_ELEVATED_BG,
+  SURFACE_PRIMARY_SOFT_TEXT,
+} from '@/components/app/style-tokens'
 import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 
@@ -18,7 +23,7 @@ interface EmptyStateCardProps {
 
 export function LoadingStateCard({ className, label }: LoadingStateCardProps) {
   return (
-    <Card className={cn('border-white/65 bg-white/86 shadow-soft', className)}>
+    <Card className={cn(SURFACE_CARD_BASE_SOFT, className)}>
       <CardContent className="py-16 text-center text-sm text-muted-foreground">{label}</CardContent>
     </Card>
   )
@@ -32,10 +37,10 @@ export function EmptyStateCard({
   title,
 }: EmptyStateCardProps) {
   return (
-    <Card className={cn('border-white/65 bg-white/86 shadow-soft', className)}>
+    <Card className={cn(SURFACE_CARD_BASE_SOFT, className)}>
       <CardContent className="flex flex-col items-center gap-4 py-16 text-center">
         {icon ? (
-          <div className="rounded-full bg-[hsl(var(--primary-fixed)/0.85)] p-3 text-[hsl(var(--primary))]">
+          <div className={cn('rounded-full p-3', SURFACE_PRIMARY_ELEVATED_BG, SURFACE_PRIMARY_SOFT_TEXT)}>
             {icon}
           </div>
         ) : null}
