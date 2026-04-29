@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { AlertTriangle, LoaderCircle } from 'lucide-react'
 
+import { IconBadge } from '@/components/app/icon-badge'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -69,14 +70,15 @@ export function ConfirmDialog({
       }}
     >
       <Card
-        className="w-full max-w-md border-white/70 bg-white shadow-float"
+        variant="floating"
+        className="w-full max-w-md bg-card"
         onClick={(e) => e.stopPropagation()}
       >
         <CardHeader className="space-y-3">
           {destructive && (
-            <div className="flex size-12 items-center justify-center rounded-2xl bg-danger-soft text-destructive ring-1 ring-danger-soft-border">
+            <IconBadge tone="danger" size="md">
               <AlertTriangle className="size-5" />
-            </div>
+            </IconBadge>
           )}
           <CardTitle className="text-2xl tracking-[-0.03em]">{title}</CardTitle>
           {description && (
@@ -89,7 +91,7 @@ export function ConfirmDialog({
           <Button
             type="button"
             variant="outline"
-            className="rounded-full"
+            shape="pill"
             disabled={loading}
             onClick={onCancel}
           >
@@ -98,7 +100,7 @@ export function ConfirmDialog({
           <Button
             type="button"
             variant={destructive ? 'destructive' : 'default'}
-            className="rounded-full"
+            shape="pill"
             disabled={loading}
             onClick={onConfirm}
           >

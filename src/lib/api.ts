@@ -1,5 +1,3 @@
-// In production, requests go to /api/* which Next.js rewrites to the backend.
-// This avoids Mixed Content (HTTPS frontend → HTTP backend).
 const API_URL = '/api';
 
 export type QuestionDifficulty = 'easy' | 'medium' | 'hard';

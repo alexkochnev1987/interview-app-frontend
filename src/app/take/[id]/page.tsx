@@ -14,9 +14,16 @@ import {
 } from 'lucide-react'
 
 import { EyebrowBadge } from '@/components/app/eyebrow-badge'
+import { HeroLead, HeroTitle } from '@/components/app/hero-text'
+import { IconBadge } from '@/components/app/icon-badge'
 import { MetricPanel } from '@/components/app/metric-panel'
+import {
+  PermissionPill,
+  type PermissionStatus,
+} from '@/components/app/permission-pill'
 import { StatusPill } from '@/components/app/status-pill'
 import { LoadingStateCard } from '@/components/app/state-card'
+import { SurfaceTile } from '@/components/app/surface-tile'
 import { LiveTranscriptPanel } from '@/components/take/live-transcript-panel'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -42,7 +49,6 @@ interface InterviewData {
 }
 
 type Stage = 'loading' | 'consent' | 'interview' | 'recording' | 'transition' | 'complete'
-type PermissionStatus = 'idle' | 'pending' | 'granted' | 'denied'
 type CaptureTarget = 'camera' | 'screen'
 type PendingVersionAction = 'submit' | 'rerecord' | null
 type ScreenTrackSettings = MediaTrackSettings & { displaySurface?: string }
@@ -107,32 +113,6 @@ function createEmptyBehaviorSignals(): AnswerBehaviorSignals {
     pasteCount: 0,
     keydownCount: 0,
     resizeCount: 0,
-  }
-}
-
-function permissionLabel(status: PermissionStatus) {
-  switch (status) {
-    case 'pending':
-      return 'Pending'
-    case 'granted':
-      return 'Ready'
-    case 'denied':
-      return 'Blocked'
-    default:
-      return 'Idle'
-  }
-}
-
-function permissionClasses(status: PermissionStatus) {
-  switch (status) {
-    case 'pending':
-      return 'bg-blue-100 text-blue-800 ring-blue-200/80'
-    case 'granted':
-      return 'bg-emerald-100 text-emerald-800 ring-emerald-200/80'
-    case 'denied':
-      return 'bg-rose-100 text-rose-800 ring-rose-200/80'
-    default:
-      return 'bg-[hsl(var(--surface-high)/0.9)] text-muted-foreground ring-border/50'
   }
 }
 
@@ -1075,7 +1055,7 @@ export default function TakeInterviewPage() {
   if (error && !interview) {
     return (
       <main className="container py-12">
-        <Alert variant="destructive" className="border-rose-200/70 bg-rose-50/85">
+        <Alert variant="danger">
           <AlertTitle>Interview unavailable</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
@@ -1102,18 +1082,16 @@ export default function TakeInterviewPage() {
   if (stage === 'complete') {
     return (
       <main className="container py-12">
-        <Card className="mx-auto max-w-4xl border-white/65 bg-white/88 shadow-float">
+        <Card variant="floating" className="mx-auto max-w-4xl">
           <CardContent className="space-y-6 px-8 py-10 text-center">
-            <div className="mx-auto flex size-16 items-center justify-center rounded-[1.4rem] bg-[hsl(var(--primary-fixed)/0.85)] text-[hsl(var(--primary))]">
+            <IconBadge tone="primary" size="lg" className="mx-auto size-16">
               <CheckCircle2 className="size-8" />
-            </div>
+            </IconBadge>
             <div className="space-y-3">
-              <h1 className="text-4xl font-semibold tracking-[-0.04em] text-foreground md:text-5xl">
-                Thank you, {interview.candidateName}
-              </h1>
-              <p className="text-base leading-7 text-muted-foreground md:text-lg">
+              <HeroTitle>Thank you, {interview.candidateName}</HeroTitle>
+              <HeroLead>
                 Your interview for <strong>{interview.position}</strong> has been submitted.
-              </p>
+              </HeroLead>
               <p className="text-sm leading-6 text-muted-foreground">
                 Camera and full-screen recordings for each answer have been stored for reviewer evaluation.
               </p>
@@ -1127,7 +1105,7 @@ export default function TakeInterviewPage() {
   if (stage === 'consent') {
     return (
       <main className="container space-y-8 py-10 md:py-12">
-        <Card className="mx-auto max-w-5xl border-white/65 bg-white/88 shadow-float">
+        <Card variant="floating" className="mx-auto max-w-5xl">
           <CardContent className="grid gap-8 px-8 py-8 lg:grid-cols-[1.1fr_0.9fr]">
             <div className="space-y-5">
               <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
@@ -1135,17 +1113,15 @@ export default function TakeInterviewPage() {
               </EyebrowBadge>
 
               <div className="space-y-3">
-                <h1 className="text-4xl font-semibold tracking-[-0.04em] text-foreground md:text-5xl">
-                  Interview for {interview.position}
-                </h1>
-                <p className="text-base leading-7 text-muted-foreground md:text-lg">
+                <HeroTitle>Interview for {interview.position}</HeroTitle>
+                <HeroLead>
                   Welcome, {interview.candidateName}. You will answer {interview.totalQuestions}{' '}
                   questions, with up to four minutes for each response.
-                </p>
+                </HeroLead>
               </div>
 
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                <Card className="border-white/60 bg-[hsl(var(--surface-low)/0.9)] shadow-soft">
+                <Card variant="tinted">
                   <CardContent className="space-y-3 px-5 py-5">
                     <Camera className="size-5 text-[hsl(var(--primary))]" />
                     <div className="space-y-1">
@@ -1157,7 +1133,7 @@ export default function TakeInterviewPage() {
                   </CardContent>
                 </Card>
 
-                <Card className="border-white/60 bg-[hsl(var(--surface-low)/0.9)] shadow-soft">
+                <Card variant="tinted">
                   <CardContent className="space-y-3 px-5 py-5">
                     <Mic className="size-5 text-[hsl(var(--primary))]" />
                     <div className="space-y-1">
@@ -1169,7 +1145,7 @@ export default function TakeInterviewPage() {
                   </CardContent>
                 </Card>
 
-                <Card className="border-white/60 bg-[hsl(var(--surface-low)/0.9)] shadow-soft">
+                <Card variant="tinted">
                   <CardContent className="space-y-3 px-5 py-5">
                     <Video className="size-5 text-[hsl(var(--primary))]" />
                     <div className="space-y-1">
@@ -1181,7 +1157,7 @@ export default function TakeInterviewPage() {
                   </CardContent>
                 </Card>
 
-                <Card className="border-white/60 bg-[hsl(var(--surface-low)/0.9)] shadow-soft">
+                <Card variant="tinted">
                   <CardContent className="space-y-3 px-5 py-5">
                     <ShieldCheck className="size-5 text-[hsl(var(--primary))]" />
                     <div className="space-y-1">
@@ -1195,7 +1171,7 @@ export default function TakeInterviewPage() {
               </div>
             </div>
 
-            <Card className="border-white/70 bg-white/90 shadow-soft">
+            <Card variant="surface">
               <CardHeader className="space-y-2">
                 <CardTitle className="text-2xl tracking-[-0.03em]">Before you start</CardTitle>
                 <CardDescription className="text-sm leading-6">
@@ -1203,7 +1179,7 @@ export default function TakeInterviewPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-5">
-                <div className="space-y-3 rounded-[1.5rem] bg-[hsl(var(--surface-low)/0.85)] p-5 ring-1 ring-border/45">
+                <SurfaceTile padding="lg" className="space-y-3">
                   <div className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                     Data collected
                   </div>
@@ -1214,24 +1190,20 @@ export default function TakeInterviewPage() {
                     <li>Browser activity such as tab switches</li>
                     <li>Session metadata including answer timing</li>
                   </ul>
-                </div>
+                </SurfaceTile>
 
-                <div className="space-y-3 rounded-[1.5rem] bg-white/85 p-5 ring-1 ring-border/45">
-                  <div className="flex items-center justify-between gap-3 rounded-[1rem] bg-[hsl(var(--surface-low)/0.8)] px-4 py-3">
+                <SurfaceTile tone="glass" padding="lg" className="space-y-3">
+                  <SurfaceTile rounded="lg" className="flex items-center justify-between gap-3 px-4 py-3">
                     <div className="space-y-1">
                       <div className="text-sm font-semibold text-foreground">Camera and microphone</div>
                       <p className="text-xs leading-5 text-muted-foreground">
                         Required before recording can begin.
                       </p>
                     </div>
-                    <span
-                      className={`rounded-full px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.16em] ring-1 ${permissionClasses(cameraStatus)}`}
-                    >
-                      {permissionLabel(cameraStatus)}
-                    </span>
-                  </div>
+                    <PermissionPill status={cameraStatus} />
+                  </SurfaceTile>
 
-                  <div className="flex items-center justify-between gap-3 rounded-[1rem] bg-[hsl(var(--surface-low)/0.8)] px-4 py-3">
+                  <SurfaceTile rounded="lg" className="flex items-center justify-between gap-3 px-4 py-3">
                     <div className="space-y-1">
                       <div className="text-sm font-semibold text-foreground">Entire screen share</div>
                       <p className="text-xs leading-5 text-muted-foreground">
@@ -1240,22 +1212,18 @@ export default function TakeInterviewPage() {
                           : 'In the share picker, choose Entire screen / Screen.'}
                       </p>
                     </div>
-                    <span
-                      className={`rounded-full px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.16em] ring-1 ${permissionClasses(screenStatus)}`}
-                    >
-                      {permissionLabel(screenStatus)}
-                    </span>
-                  </div>
-                </div>
+                    <PermissionPill status={screenStatus} />
+                  </SurfaceTile>
+                </SurfaceTile>
 
                 {setupError ? (
-                  <Alert variant="destructive" className="border-rose-200/70 bg-rose-50/85">
+                  <Alert variant="danger">
                     <AlertTitle>Setup incomplete</AlertTitle>
                     <AlertDescription>{setupError}</AlertDescription>
                   </Alert>
                 ) : null}
 
-                <div className="flex items-start gap-3 rounded-[1.25rem] bg-white/85 p-4 ring-1 ring-border/45">
+                <SurfaceTile tone="glass" rounded="xl" className="flex items-start gap-3">
                   <Checkbox
                     id="consent"
                     checked={consent}
@@ -1270,13 +1238,14 @@ export default function TakeInterviewPage() {
                       Data is used only for interview evaluation and is stored for 90 days.
                     </p>
                   </div>
-                </div>
+                </SurfaceTile>
 
                 <Button
                   type="button"
+                  variant="gradient"
                   disabled={!consent || setupBusy}
                   onClick={handleStartInterview}
-                  className="h-11 w-full rounded-2xl bg-primary-gradient shadow-soft hover:brightness-105"
+                  className="h-11 w-full"
                 >
                   {setupBusy ? 'Requesting access...' : 'Allow Camera, Mic & Entire Screen'}
                 </Button>
@@ -1291,29 +1260,27 @@ export default function TakeInterviewPage() {
   return (
     <main className="container space-y-8 py-10 md:py-12">
       <section className="mx-auto grid max-w-6xl gap-6 xl:grid-cols-[0.84fr_1.16fr]">
-        <Card className="border-white/65 bg-white/88 shadow-soft">
+        <Card variant="surface">
           <CardContent className="space-y-6 px-8 py-8">
             <div className="space-y-3">
               <EyebrowBadge icon={<Video className="size-3.5" />}>
                 Live session
               </EyebrowBadge>
-              <h1 className="text-3xl font-semibold tracking-[-0.04em] text-foreground md:text-4xl">
-                {interview.position}
-              </h1>
+              <HeroTitle size="md">{interview.position}</HeroTitle>
               <p className="text-sm leading-6 text-muted-foreground">
                 Answer clearly and keep your camera plus entire-screen share active while recording.
               </p>
             </div>
 
-            <div className="space-y-3 rounded-[1.5rem] bg-[hsl(var(--surface-low)/0.9)] p-5 ring-1 ring-border/45">
+            <SurfaceTile tone="elevated" padding="lg" className="space-y-3">
               <div className="flex items-center justify-between gap-3">
                 <div className="text-sm font-medium text-foreground">
                   Question {interview.currentQuestionIndex + 1} of {interview.totalQuestions}
                 </div>
                 <StatusPill tone="neutral">{progressValue}%</StatusPill>
               </div>
-              <Progress value={progressValue} className="h-2.5 rounded-full bg-white" />
-            </div>
+              <Progress value={progressValue} className="h-2.5 rounded-full bg-card" />
+            </SurfaceTile>
 
             <div className="grid gap-3">
               <div className="flex flex-wrap gap-2">
@@ -1323,7 +1290,7 @@ export default function TakeInterviewPage() {
                 </StatusPill>
               </div>
               {setupError ? (
-                <Alert variant="destructive" className="border-rose-200/70 bg-rose-50/85">
+                <Alert variant="danger">
                   <AlertTitle>Capture interrupted</AlertTitle>
                   <AlertDescription>{setupError}</AlertDescription>
                 </Alert>
@@ -1343,19 +1310,11 @@ export default function TakeInterviewPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-white/65 bg-white/88 shadow-float">
+        <Card variant="floating">
           <CardContent className="space-y-6 px-8 py-8">
             <div className="space-y-3">
               <div className="flex flex-wrap items-center gap-2">
-                <StatusPill
-                  tone={
-                    stage === 'recording'
-                      ? 'processing'
-                      : stage === 'transition'
-                        ? 'neutral'
-                        : 'neutral'
-                  }
-                >
+                <StatusPill tone={stage === 'recording' ? 'processing' : 'neutral'}>
                   {stage === 'recording'
                     ? 'Recording'
                     : stage === 'transition'
@@ -1383,17 +1342,24 @@ export default function TakeInterviewPage() {
               stage={stage}
             />
 
-            <div className="video-container ring-1 ring-border/45">
-              <video ref={videoRef} autoPlay muted playsInline className="video-preview" />
+            <div className="relative my-4 overflow-hidden rounded-3xl bg-black ring-1 ring-hairline">
+              <video
+                ref={videoRef}
+                autoPlay
+                muted
+                playsInline
+                className="block max-h-[400px] w-full"
+              />
 
               {stage === 'recording' ? (
-                <div className="timer">
-                  <span className="rec-dot">●</span> {formatTime(timeLeft)}
+                <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-scrim/70 px-3 py-1 text-sm font-semibold text-card">
+                  <span className="animate-[blink_1s_infinite] text-destructive">●</span>
+                  {formatTime(timeLeft)}
                 </div>
               ) : null}
             </div>
 
-            <div className="rounded-[1.25rem] bg-[hsl(var(--surface-low)/0.85)] p-4 ring-1 ring-border/45">
+            <SurfaceTile tone="soft" rounded="xl" className="px-4 py-4">
               <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                 Guidance
               </div>
@@ -1402,7 +1368,7 @@ export default function TakeInterviewPage() {
                   ? transitionLabel || 'Saving the current answer version.'
                   : 'Recording starts automatically for each question. Use Submit when the answer is ready, or Re-record to create a new version for the same question.'}
               </p>
-            </div>
+            </SurfaceTile>
 
             <div className="flex flex-wrap gap-3">
               {stage === 'interview' ? (
@@ -1413,18 +1379,19 @@ export default function TakeInterviewPage() {
                 <>
                   <Button
                     type="button"
-                    variant="outline"
+                    variant="outline-pill"
+                    shape="pill"
                     onClick={() => requestVersionAction('rerecord')}
                     disabled={uploading}
-                    className="rounded-full bg-white/80"
                   >
                     Re-record as new version
                   </Button>
                   <Button
                     type="button"
+                    variant="gradient"
                     onClick={() => requestVersionAction('submit')}
                     disabled={uploading}
-                    className="rounded-full bg-primary-gradient px-5 shadow-soft hover:brightness-105"
+                    className="px-5"
                   >
                     Submit & Next
                   </Button>

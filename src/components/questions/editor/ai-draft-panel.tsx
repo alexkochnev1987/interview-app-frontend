@@ -29,7 +29,7 @@ export function AiDraftPanel({
   onApplyAll,
 }: AiDraftPanelProps) {
   return (
-    <Card className="border-white/65 bg-white/88 shadow-soft">
+    <Card variant="surface">
       <CardHeader className="space-y-5">
         <div className="space-y-1.5">
           <div className="flex items-start justify-between gap-3">
@@ -49,9 +49,9 @@ export function AiDraftPanel({
           {hasPendingDraft ? (
             <Button
               type="button"
-              variant="outline"
+              variant="outline-pill"
+              shape="pill"
               onClick={onApplyAll}
-              className="rounded-full bg-white/80"
             >
               Apply all
             </Button>

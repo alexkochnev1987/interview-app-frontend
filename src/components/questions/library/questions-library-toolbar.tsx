@@ -38,7 +38,7 @@ export function QuestionsLibraryToolbar({
   onRequestBulkDelete,
 }: QuestionsLibraryToolbarProps) {
   return (
-    <Card className="border-white/60 bg-white/86 py-2 shadow-soft">
+    <Card variant="surface" className="py-2">
       <CardContent
         className={cn(
           'grid items-center gap-4 px-6',
@@ -50,17 +50,19 @@ export function QuestionsLibraryToolbar({
         <div className="relative">
           <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
+            size="lg"
+            shape="pill"
             value={query}
             onChange={(event) => onQueryChange(event.target.value)}
             placeholder="Search by prompt, role, category, concept, or red flag"
-            className="h-12 rounded-full border-white/70 bg-[hsl(var(--surface-low)/0.8)] pl-11 shadow-none"
+            className="pl-11 shadow-none"
           />
         </div>
         <Select
           value={difficulty}
           onValueChange={(value) => onDifficultyChange(value as DifficultyFilter)}
         >
-          <SelectTrigger className="h-12 w-full rounded-full border-white/70 bg-[hsl(var(--surface-low)/0.8)] px-4 shadow-none">
+          <SelectTrigger className="h-12 w-full rounded-full border border-hairline-strong bg-surface-low-soft px-4 shadow-none">
             <SelectValue placeholder="All difficulties" />
           </SelectTrigger>
           <SelectContent>
@@ -74,7 +76,8 @@ export function QuestionsLibraryToolbar({
           <Button
             type="button"
             variant="destructive"
-            className="h-12 rounded-full px-5 md:shrink-0"
+            shape="pill"
+            className="h-12 px-5 md:shrink-0"
             disabled={selectedCount === 0 || bulkDeleting}
             onClick={onRequestBulkDelete}
           >

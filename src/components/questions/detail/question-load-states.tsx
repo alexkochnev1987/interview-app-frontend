@@ -3,6 +3,8 @@
 import Link from 'next/link'
 import { AlertTriangle, ArrowLeft, LoaderCircle, PenSquare } from 'lucide-react'
 
+import { HeroTitle } from '@/components/app/hero-text'
+import { IconBadge } from '@/components/app/icon-badge'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {
@@ -16,15 +18,13 @@ import {
 export function QuestionLoadingCard() {
   return (
     <main className="container py-10 md:py-12">
-      <Card className="border-white/65 bg-white/88 shadow-float">
+      <Card variant="floating">
         <CardContent className="flex min-h-[300px] flex-col items-center justify-center gap-5 px-8 py-12 text-center">
-          <div className="flex size-14 items-center justify-center rounded-[1.6rem] bg-[hsl(var(--surface-low)/0.95)] text-[hsl(var(--primary))] ring-1 ring-border/45">
+          <IconBadge tone="surface" size="lg">
             <LoaderCircle className="size-5 animate-spin" />
-          </div>
+          </IconBadge>
           <div className="space-y-2">
-            <h1 className="text-3xl font-semibold tracking-[-0.04em] text-foreground">
-              Loading question
-            </h1>
+            <HeroTitle size="sm">Loading question</HeroTitle>
             <p className="max-w-xl text-sm leading-6 text-muted-foreground">
               Pulling the saved prompt, rubric, and metadata into the unified editor.
             </p>
@@ -42,11 +42,11 @@ interface QuestionUnavailableCardProps {
 export function QuestionUnavailableCard({ message }: QuestionUnavailableCardProps) {
   return (
     <main className="container py-10 md:py-12">
-      <Card className="border-white/65 bg-white/88 shadow-float">
+      <Card variant="floating">
         <CardHeader className="space-y-4">
-          <div className="flex size-14 items-center justify-center rounded-[1.6rem] bg-danger-soft text-destructive ring-1 ring-danger-soft-border">
+          <IconBadge tone="danger" size="lg">
             <AlertTriangle className="size-5" />
-          </div>
+          </IconBadge>
           <div className="space-y-2">
             <CardTitle className="text-3xl tracking-[-0.04em]">
               Question unavailable
@@ -70,7 +70,7 @@ export function QuestionUnavailableCard({ message }: QuestionUnavailableCardProp
                 Back to Question Library
               </Link>
             </Button>
-            <Button asChild variant="outline" className="rounded-full bg-white/80">
+            <Button asChild variant="outline-pill" shape="pill">
               <Link href="/questions/new">
                 <PenSquare className="size-4" />
                 Create New Question

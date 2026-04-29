@@ -48,7 +48,6 @@ export function useDirtyTracking({
     if (!isDirty) return
     const handler = (event: BeforeUnloadEvent) => {
       event.preventDefault()
-      // Required by Safari and older Chrome to actually show the prompt; deprecated in spec but still load-bearing.
       event.returnValue = ''
     }
     window.addEventListener('beforeunload', handler)

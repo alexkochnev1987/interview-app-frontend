@@ -16,7 +16,7 @@ export function AiSuggestionRow({
   onKeep,
 }: AiSuggestionRowProps) {
   return (
-    <div className="mt-3 rounded-[1.25rem] bg-[hsl(var(--primary-fixed)/0.55)] p-4 ring-1 ring-[hsl(var(--primary)/0.15)]">
+    <div className="mt-3 rounded-xl-2 bg-[hsl(var(--primary-fixed)/0.55)] p-4 ring-1 ring-[hsl(var(--primary)/0.15)]">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-[hsl(var(--primary))]">
           AI suggestion
@@ -28,9 +28,9 @@ export function AiSuggestionRow({
           <Button
             type="button"
             size="sm"
-            variant="outline"
+            variant="outline-pill"
+            shape="pill"
             onClick={onKeep}
-            className="rounded-full bg-white/80"
           >
             Keep current
           </Button>

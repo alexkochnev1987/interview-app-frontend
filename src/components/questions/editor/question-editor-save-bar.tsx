@@ -14,16 +14,23 @@ interface QuestionEditorSaveBarProps {
   submitLabel: string
 }
 
+const formatter = new Intl.PluralRules('en-US')
+
+function pluralize(count: number, singular: string, plural: string) {
+  return formatter.select(count) === 'one' ? singular : plural
+}
+
 export function QuestionEditorSaveBar({
   isDirty,
   dirtyFieldLabels,
   submitting,
   submitLabel,
 }: QuestionEditorSaveBarProps) {
+  const fieldCount = dirtyFieldLabels.length
   return (
     <Card
+      variant="surface"
       className={cn(
-        'border-white/65 bg-white/88 shadow-soft',
         isDirty && 'border-warning-soft-border bg-warning-soft',
       )}
     >
@@ -35,8 +42,7 @@ export function QuestionEditorSaveBar({
             </StatusPill>
             {isDirty && (
               <span className="text-xs font-medium text-muted-foreground">
-                {dirtyFieldLabels.length} field
-                {dirtyFieldLabels.length === 1 ? '' : 's'} changed
+                {fieldCount} {pluralize(fieldCount, 'field', 'fields')} changed
               </span>
             )}
           </div>

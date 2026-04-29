@@ -5,9 +5,9 @@ import { cn } from '@/lib/utils'
 type MetricPanelTone = 'surface' | 'elevated' | 'compact'
 
 const toneClasses: Record<MetricPanelTone, string> = {
-  surface: 'rounded-[1.5rem] bg-[hsl(var(--surface-low)/0.9)] p-5 ring-1 ring-border/45',
-  elevated: 'rounded-[1.25rem] bg-white/80 p-4 ring-1 ring-border/45',
-  compact: 'rounded-[1rem] bg-[hsl(var(--surface-low)/0.85)] p-3 ring-1 ring-border/45',
+  surface: 'rounded-3xl bg-surface-low-glass p-5 ring-1 ring-hairline',
+  elevated: 'rounded-xl-2 bg-surface-glass-soft p-4 ring-1 ring-hairline',
+  compact: 'rounded-2xl bg-surface-low-soft p-3 ring-1 ring-hairline',
 }
 
 interface MetricPanelProps {

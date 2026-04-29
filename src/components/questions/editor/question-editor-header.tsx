@@ -3,6 +3,7 @@
 import { Sparkles } from 'lucide-react'
 
 import { EyebrowBadge } from '@/components/app/eyebrow-badge'
+import { HeroLead, HeroTitle } from '@/components/app/hero-text'
 import { MetricPanel } from '@/components/app/metric-panel'
 import { StatusPill } from '@/components/app/status-pill'
 import { Card, CardContent } from '@/components/ui/card'
@@ -22,21 +23,19 @@ export function QuestionEditorHeader({
   pendingDraftCount,
 }: QuestionEditorHeaderProps) {
   return (
-    <Card className="border-white/65 bg-white/88 shadow-float">
+    <Card variant="floating">
       <CardContent className="flex flex-col gap-6 px-8 py-8">
         <div className="space-y-4">
           <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
             Unified Question Editor
           </EyebrowBadge>
           <div className="space-y-3">
-            <h1 className="text-4xl font-semibold tracking-[-0.04em] text-foreground md:text-5xl">
-              {title}
-            </h1>
-            <p className="max-w-2xl text-base leading-7 text-muted-foreground md:text-lg">
+            <HeroTitle>{title}</HeroTitle>
+            <HeroLead className="max-w-2xl">
               Shape the prompt, define the rubric, and keep AI-generated draft
               suggestions visible as explicit diffs instead of invisible background
               mutations.
-            </p>
+            </HeroLead>
           </div>
         </div>
 

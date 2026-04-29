@@ -5,6 +5,7 @@ import { useParams, useSearchParams } from 'next/navigation'
 import { BadgeCheck, ChartColumnBig, Clock3, Sparkles, Target } from 'lucide-react'
 
 import { EyebrowBadge } from '@/components/app/eyebrow-badge'
+import { HeroLead, HeroTitle } from '@/components/app/hero-text'
 import { MetricPanel } from '@/components/app/metric-panel'
 import { StatusPill } from '@/components/app/status-pill'
 import { LoadingStateCard } from '@/components/app/state-card'
@@ -64,7 +65,7 @@ export default function FeedbackPage() {
   if (error) {
     return (
       <main className="container py-12">
-        <Alert variant="destructive" className="mx-auto max-w-4xl border-rose-200/70 bg-rose-50/85">
+        <Alert variant="danger" className="mx-auto max-w-4xl">
           <AlertTitle>Feedback unavailable</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
@@ -83,20 +84,18 @@ export default function FeedbackPage() {
   return (
     <main className="container space-y-8 py-10 md:py-12">
       <section className="mx-auto grid max-w-6xl gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-        <Card className="border-white/65 bg-white/88 shadow-float">
+        <Card variant="floating">
           <CardContent className="space-y-6 px-8 py-8">
             <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
               Interview feedback
             </EyebrowBadge>
 
             <div className="space-y-3">
-              <h1 className="text-4xl font-semibold tracking-[-0.04em] text-foreground md:text-5xl">
-                Your interview summary
-              </h1>
-              <p className="text-base leading-7 text-muted-foreground md:text-lg">
+              <HeroTitle>Your interview summary</HeroTitle>
+              <HeroLead>
                 This page shares the reviewed outcome for the <strong>{feedback.position}</strong>{' '}
                 interview and highlights both strengths and next areas to improve.
-              </p>
+              </HeroLead>
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
@@ -112,7 +111,7 @@ export default function FeedbackPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-white/60 bg-[hsl(var(--surface-low)/0.9)] shadow-soft">
+        <Card variant="tinted">
           <CardHeader>
             <CardTitle className="text-2xl tracking-[-0.03em]">Snapshot</CardTitle>
             <CardDescription className="text-sm leading-6">
@@ -140,7 +139,7 @@ export default function FeedbackPage() {
 
       <section className="mx-auto grid max-w-6xl gap-6 xl:grid-cols-[0.85fr_1.15fr]">
         {feedback.categoryScores ? (
-          <Card className="border-white/65 bg-white/88 shadow-soft">
+          <Card variant="surface">
             <CardHeader>
               <EyebrowBadge icon={<ChartColumnBig className="size-3.5" />} tone="primary">
                 Category scores
@@ -164,7 +163,7 @@ export default function FeedbackPage() {
 
         <div className="space-y-6">
           {feedback.generalFeedback ? (
-            <Card className="border-white/65 bg-white/88 shadow-soft">
+            <Card variant="surface">
               <CardHeader>
                 <EyebrowBadge icon={<BadgeCheck className="size-3.5" />}>
                   Feedback
@@ -178,7 +177,7 @@ export default function FeedbackPage() {
           ) : null}
 
           {feedback.improvements ? (
-            <Card className="border-white/65 bg-white/88 shadow-soft">
+            <Card variant="surface">
               <CardHeader>
                 <EyebrowBadge icon={<Target className="size-3.5" />}>
                   Recommendations

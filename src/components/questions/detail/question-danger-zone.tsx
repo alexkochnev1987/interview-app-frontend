@@ -25,7 +25,10 @@ export function QuestionDangerZone({
 }: QuestionDangerZoneProps) {
   return (
     <section className="container pb-12">
-      <Card className="border-danger-soft-border bg-danger-soft shadow-soft">
+      <Card
+        variant="surface"
+        className="border-danger-soft-border bg-danger-soft"
+      >
         <CardHeader className="space-y-2">
           <CardTitle className="text-xl tracking-[-0.03em] text-danger-soft-foreground">
             Danger zone
@@ -46,7 +49,7 @@ export function QuestionDangerZone({
           <Button
             type="button"
             variant="destructive"
-            className="rounded-full"
+            shape="pill"
             disabled={deleting}
             onClick={onRequestDelete}
           >

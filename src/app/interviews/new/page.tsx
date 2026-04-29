@@ -6,9 +6,11 @@ import { useRouter } from 'next/navigation'
 import { ArrowRight, BriefcaseBusiness, CirclePlus, Sparkles, UserRound } from 'lucide-react'
 
 import { EyebrowBadge } from '@/components/app/eyebrow-badge'
+import { HeroLead, HeroTitle } from '@/components/app/hero-text'
 import { MetricPanel } from '@/components/app/metric-panel'
 import { StatusPill } from '@/components/app/status-pill'
 import { EmptyStateCard, LoadingStateCard } from '@/components/app/state-card'
+import { SurfaceTile } from '@/components/app/surface-tile'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -96,42 +98,35 @@ export default function NewInterviewPage() {
   return (
     <main className="container space-y-8 py-10 md:space-y-10 md:py-12">
       <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-        <Card className="border-white/65 bg-white/88 shadow-float">
+        <Card variant="floating">
           <CardContent className="space-y-6 px-8 py-8">
             <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
               Create Interview Flow
             </EyebrowBadge>
             <div className="space-y-3">
-              <h1 className="text-4xl font-semibold tracking-[-0.04em] text-foreground md:text-5xl">
+              <HeroTitle>
                 Assemble the candidate packet before you send the interview link.
-              </h1>
-              <p className="max-w-2xl text-base leading-7 text-muted-foreground md:text-lg">
+              </HeroTitle>
+              <HeroLead className="max-w-2xl">
                 Capture the role, choose only the questions that matter, and keep the decision
                 criteria explicit before the recording session starts.
-              </p>
+              </HeroLead>
             </div>
             <div className="flex flex-wrap gap-3">
-              <Button
-                asChild
-                className="rounded-full bg-primary-gradient px-5 shadow-soft hover:brightness-105"
-              >
+              <Button asChild variant="gradient" className="px-5">
                 <Link href="/questions/new">
                   <CirclePlus className="size-4" />
                   Create Question
                 </Link>
               </Button>
-              <Button
-                asChild
-                variant="outline"
-                className="rounded-full bg-white/70 backdrop-blur-sm"
-              >
+              <Button asChild variant="outline-pill" shape="pill">
                 <Link href="/questions">Open Question Bank</Link>
               </Button>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-white/60 bg-[hsl(var(--surface-low)/0.9)] shadow-soft">
+        <Card variant="tinted">
           <CardHeader>
             <CardTitle className="text-2xl tracking-[-0.03em]">Selection summary</CardTitle>
             <CardDescription className="text-sm leading-6">
@@ -151,14 +146,14 @@ export default function NewInterviewPage() {
       </section>
 
       {error ? (
-        <Alert variant="destructive" className="border-rose-200/70 bg-rose-50/85">
+        <Alert variant="danger">
           <AlertTitle>Interview setup blocked</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       ) : null}
 
       <form onSubmit={handleSubmit} className="grid gap-6 xl:grid-cols-[0.72fr_1.28fr]">
-        <Card className="border-white/65 bg-white/88 shadow-soft">
+        <Card variant="surface">
           <CardHeader>
             <CardTitle className="text-2xl tracking-[-0.03em]">Candidate brief</CardTitle>
             <CardDescription className="text-sm leading-6">
@@ -176,7 +171,7 @@ export default function NewInterviewPage() {
                   onChange={(event) => setCandidateName(event.target.value)}
                   placeholder="e.g. Jane Doe"
                   disabled={submitting}
-                  className="h-11 rounded-2xl border-white/70 bg-[hsl(var(--surface-low)/0.8)] pl-11"
+                  className="pl-11"
                 />
               </div>
             </div>
@@ -191,7 +186,7 @@ export default function NewInterviewPage() {
                   onChange={(event) => setPosition(event.target.value)}
                   placeholder="e.g. Senior Frontend Engineer"
                   disabled={submitting}
-                  className="h-11 rounded-2xl border-white/70 bg-[hsl(var(--surface-low)/0.8)] pl-11"
+                  className="pl-11"
                 />
               </div>
             </div>
@@ -205,8 +200,9 @@ export default function NewInterviewPage() {
             <div>
               <Button
                 type="submit"
+                variant="gradient"
                 disabled={submitting || loadingQuestions || questions.length === 0}
-                className="mt-5 w-full rounded-2xl bg-primary-gradient shadow-soft hover:brightness-105"
+                className="mt-5 w-full"
               >
                 {submitting ? 'Creating...' : 'Create Interview'}
                 <ArrowRight className="size-4" />
@@ -215,7 +211,7 @@ export default function NewInterviewPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-white/65 bg-white/88 shadow-soft">
+        <Card variant="surface">
           <CardHeader className="flex flex-row items-start justify-between gap-4">
             <div className="space-y-1.5">
               <CardTitle className="text-2xl tracking-[-0.03em]">Question selection</CardTitle>
@@ -237,10 +233,7 @@ export default function NewInterviewPage() {
                 title="No saved questions yet"
                 description="Create the first reusable prompt before you assemble an interview packet."
                 action={
-                  <Button
-                    asChild
-                    className="rounded-full bg-primary-gradient px-5 shadow-soft hover:brightness-105"
-                  >
+                  <Button asChild variant="gradient" className="px-5">
                     <Link href="/questions/new">Create your first question</Link>
                   </Button>
                 }
@@ -254,10 +247,10 @@ export default function NewInterviewPage() {
                     <label
                       key={question.id}
                       className={cn(
-                        "flex cursor-pointer gap-4 rounded-[1.5rem] p-4 transition-all ring-1",
+                        'flex cursor-pointer gap-4 rounded-3xl p-4 ring-1 transition-all',
                         selected
-                          ? "bg-[hsl(var(--primary-fixed)/0.86)] ring-[hsl(var(--primary)/0.24)] shadow-soft"
-                          : "bg-[hsl(var(--surface-low)/0.75)] ring-border/45 hover:bg-[hsl(var(--surface-low))]"
+                          ? 'bg-[hsl(var(--primary-fixed)/0.86)] shadow-soft ring-[hsl(var(--primary)/0.24)]'
+                          : 'bg-surface-low-soft ring-hairline hover:bg-surface-low-glass',
                       )}
                     >
                       <Checkbox
@@ -317,14 +310,14 @@ export default function NewInterviewPage() {
             )}
 
             {selectedQuestions.length > 0 ? (
-              <div className="rounded-[1.5rem] bg-[hsl(var(--surface-low)/0.85)] p-4 ring-1 ring-border/45">
+              <SurfaceTile>
                 <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                   Current packet
                 </div>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">
                   {selectedQuestions.map((question) => question.questionText).join(' · ')}
                 </p>
-              </div>
+              </SurfaceTile>
             ) : null}
           </CardContent>
         </Card>

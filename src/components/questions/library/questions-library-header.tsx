@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Filter, Plus, Sparkles } from 'lucide-react'
 
 import { EyebrowBadge } from '@/components/app/eyebrow-badge'
+import { HeroLead, HeroTitle } from '@/components/app/hero-text'
 import { MetricPanel } from '@/components/app/metric-panel'
 import { HeroGrid } from '@/components/layout/hero-grid'
 import { Button } from '@/components/ui/button'
@@ -28,19 +29,19 @@ export function QuestionsLibraryHeader({
   return (
     <HeroGrid
       primary={(
-      <Card className="border-white/65 bg-white/88 shadow-float">
+      <Card variant="floating">
         <CardContent className="flex h-full flex-col gap-6 px-8 py-8">
           <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
             Question Library
           </EyebrowBadge>
           <div className="space-y-3">
-            <h1 className="text-4xl font-semibold tracking-[-0.04em] text-foreground md:text-5xl">
+            <HeroTitle>
               Curate the question bank before AI scoring ever sees a candidate.
-            </h1>
-            <p className="max-w-2xl text-base leading-7 text-muted-foreground md:text-lg">
+            </HeroTitle>
+            <HeroLead className="max-w-2xl">
               Store reusable prompts, codify expected concepts and red flags,
               and keep your evaluation rubric visible instead of buried in JSON.
-            </p>
+            </HeroLead>
           </div>
           <div>
             <Button asChild variant="gradient" className="h-14 px-8 text-base font-semibold">
@@ -54,7 +55,7 @@ export function QuestionsLibraryHeader({
       </Card>
       )}
       secondary={(
-      <Card className="border-white/60 bg-[hsl(var(--surface-low)/0.9)] shadow-soft">
+      <Card variant="tinted">
         <CardContent className="flex h-full flex-col gap-6 px-8 py-8">
           <EyebrowBadge icon={<Filter className="size-3.5" />} tone="muted">
             Overview

@@ -3,7 +3,9 @@
 import Link from 'next/link'
 import { Search } from 'lucide-react'
 
+import { EyebrowBadge } from '@/components/app/eyebrow-badge'
 import { StatusPill } from '@/components/app/status-pill'
+import { SurfaceTile } from '@/components/app/surface-tile'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {
@@ -44,7 +46,7 @@ export function SimilarityPanel({
   onRunSearch,
 }: SimilarityPanelProps) {
   return (
-    <Card className="border-white/65 bg-white/88 shadow-soft">
+    <Card variant="surface">
       <CardHeader className="space-y-5">
         <div className="space-y-1.5">
           <CardTitle className="text-2xl tracking-[-0.03em]">Similar questions</CardTitle>
@@ -65,11 +67,12 @@ export function SimilarityPanel({
           {isEditMode ? <StatusPill tone="neutral">Edit mode</StatusPill> : null}
           <Button
             type="button"
-            variant="outline"
+            variant="outline-pill"
+            shape="pill"
             size="sm"
             onClick={onRunSearch}
             disabled={disabled || status === 'loading' || !hasInput}
-            className="ml-auto rounded-full bg-white/80"
+            className="ml-auto"
           >
             <Search className="size-3.5" />
             {status === 'loading' ? 'Searching...' : 'Run search'}
@@ -115,22 +118,22 @@ export function SimilarityPanel({
 
 function SignalTile({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-[1.2rem] bg-[hsl(var(--surface-low)/0.9)] p-3 ring-1 ring-border/45">
-      <div className="text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+    <SurfaceTile tone="elevated" rounded="xl" padding="sm">
+      <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
         {label}
       </div>
       <div className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-foreground">
         {value}
       </div>
-    </div>
+    </SurfaceTile>
   )
 }
 
 function PanelMessage({ children }: { children: React.ReactNode }) {
   return (
-    <div className="rounded-[1.5rem] bg-[hsl(var(--surface-low)/0.82)] p-5 text-sm leading-6 text-muted-foreground ring-1 ring-border/45">
+    <SurfaceTile padding="lg" className="text-sm leading-6 text-muted-foreground">
       {children}
-    </div>
+    </SurfaceTile>
   )
 }
 
@@ -144,7 +147,7 @@ function SimilarMatchRow({ match }: { match: SimilarQuestionMatch }) {
     .join(' / ')
 
   return (
-    <div className="rounded-[1.5rem] bg-[hsl(var(--surface-low)/0.82)] p-4 ring-1 ring-border/45">
+    <SurfaceTile>
       <div className="flex items-start justify-between gap-3">
         <div className="space-y-3">
           <div className="flex flex-wrap gap-2">
@@ -168,10 +171,10 @@ function SimilarMatchRow({ match }: { match: SimilarQuestionMatch }) {
 
         <Button
           type="button"
-          variant="outline"
+          variant="outline-pill"
+          shape="pill"
           size="sm"
           asChild
-          className="rounded-full bg-white/80"
         >
           <Link href={`/questions/${match.question.id}`}>Open</Link>
         </Button>
@@ -180,15 +183,12 @@ function SimilarMatchRow({ match }: { match: SimilarQuestionMatch }) {
       {match.reasons.length > 0 ? (
         <div className="mt-4 flex flex-wrap gap-2">
           {match.reasons.map((reason) => (
-            <span
-              key={reason}
-              className="inline-flex rounded-full bg-white/85 px-3 py-1 text-[0.72rem] font-medium leading-5 text-muted-foreground ring-1 ring-border/50"
-            >
+            <EyebrowBadge key={reason} tone="muted" casing="normal">
               {reason}
-            </span>
+            </EyebrowBadge>
           ))}
         </div>
       ) : null}
-    </div>
+    </SurfaceTile>
   )
 }

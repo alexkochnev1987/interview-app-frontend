@@ -1,3 +1,5 @@
+import { SurfaceTile } from '@/components/app/surface-tile'
+
 type TakeStage = 'loading' | 'consent' | 'interview' | 'recording' | 'transition' | 'complete'
 
 interface LiveTranscriptPanelProps {
@@ -16,7 +18,7 @@ export function LiveTranscriptPanel({
   stage,
 }: LiveTranscriptPanelProps) {
   return (
-    <div className="min-h-[130px] rounded-[1.25rem] bg-[hsl(var(--surface-low)/0.85)] p-4 ring-1 ring-border/45">
+    <SurfaceTile rounded="xl" className="min-h-[130px]">
       <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
         Live transcript
       </div>
@@ -45,7 +47,7 @@ export function LiveTranscriptPanel({
           Updating transcript for the next question...
         </p>
       ) : null}
-      {warning ? <p className="mt-2 text-xs leading-5 text-amber-700">{warning}</p> : null}
-    </div>
+      {warning ? <p className="mt-2 text-xs leading-5 text-warning-soft-foreground">{warning}</p> : null}
+    </SurfaceTile>
   )
 }

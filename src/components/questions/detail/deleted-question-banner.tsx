@@ -33,7 +33,8 @@ export function DeletedQuestionBanner({
         <Button
           type="button"
           variant="destructive"
-          className="rounded-full md:shrink-0"
+          shape="pill"
+          className="md:shrink-0"
           disabled={restoring}
           onClick={onRestore}
         >

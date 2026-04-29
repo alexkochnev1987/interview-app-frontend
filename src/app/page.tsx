@@ -13,9 +13,12 @@ import {
 } from 'lucide-react'
 
 import { EyebrowBadge } from '@/components/app/eyebrow-badge'
+import { HeroLead, HeroTitle } from '@/components/app/hero-text'
+import { IconBadge } from '@/components/app/icon-badge'
 import { MetricPanel } from '@/components/app/metric-panel'
 import { StatusPill } from '@/components/app/status-pill'
 import { EmptyStateCard, LoadingStateCard } from '@/components/app/state-card'
+import { SurfaceTile } from '@/components/app/surface-tile'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {
@@ -81,7 +84,7 @@ const MOCK_INTERVIEWS: Interview[] = [
         ['relevant experience', 'clear structure'],
         ['too generic'],
         'easy',
-        1
+        1,
       ),
       mockQuestion(
         'mock-1-q2',
@@ -89,7 +92,7 @@ const MOCK_INTERVIEWS: Interview[] = [
         ['ownership', 'trade-offs', 'result'],
         ['no measurable outcome'],
         'medium',
-        2
+        2,
       ),
     ],
     answers: [],
@@ -108,7 +111,7 @@ const MOCK_INTERVIEWS: Interview[] = [
         ['motivation', 'role alignment'],
         ['generic motivation'],
         'easy',
-        1
+        1,
       ),
       mockQuestion(
         'mock-2-q2',
@@ -116,7 +119,7 @@ const MOCK_INTERVIEWS: Interview[] = [
         ['scalability', 'trade-offs'],
         ['no constraints discussion'],
         'hard',
-        3
+        3,
       ),
     ],
     answers: [
@@ -144,7 +147,7 @@ const MOCK_INTERVIEWS: Interview[] = [
         ['self-awareness', 'evidence'],
         ['buzzwords only'],
         'easy',
-        1
+        1,
       ),
       mockQuestion(
         'mock-3-q2',
@@ -152,7 +155,7 @@ const MOCK_INTERVIEWS: Interview[] = [
         ['reflection', 'improvement plan'],
         ['fake weakness'],
         'easy',
-        1
+        1,
       ),
       mockQuestion(
         'mock-3-q3',
@@ -160,7 +163,7 @@ const MOCK_INTERVIEWS: Interview[] = [
         ['career direction', 'role fit'],
         ['no alignment with role'],
         'easy',
-        1
+        1,
       ),
     ],
     answers: [],
@@ -209,7 +212,7 @@ export default function DashboardPage() {
   }, [])
 
   const activeCount = interviews.filter((interview) =>
-    ['pending', 'in_progress', 'processing'].includes(interview.status)
+    ['pending', 'in_progress', 'processing'].includes(interview.status),
   ).length
   const completedCount = interviews.filter((interview) => interview.status === 'completed').length
   const questionVolume = interviews.reduce((sum, interview) => sum + interview.questions.length, 0)
@@ -217,7 +220,7 @@ export default function DashboardPage() {
   return (
     <main className="container space-y-8 py-10 md:space-y-10 md:py-12">
       <section className="grid gap-6 xl:grid-cols-[1.3fr_0.7fr]">
-        <Card className="overflow-hidden border-white/65 bg-white/86 shadow-float backdrop-blur-xl">
+        <Card variant="floating" className="overflow-hidden backdrop-blur-xl">
           <CardContent className="flex h-full flex-col gap-8 px-8 py-8">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div className="max-w-2xl space-y-4">
@@ -225,31 +228,24 @@ export default function DashboardPage() {
                   Recruiter Dashboard
                 </EyebrowBadge>
                 <div className="space-y-3">
-                  <h1 className="max-w-3xl text-4xl font-semibold tracking-[-0.04em] text-foreground md:text-5xl">
+                  <HeroTitle className="max-w-3xl">
                     Run your interview pipeline from one editorial command surface.
-                  </h1>
-                  <p className="max-w-2xl text-base leading-7 text-muted-foreground md:text-lg">
+                  </HeroTitle>
+                  <HeroLead className="max-w-2xl">
                     Monitor active sessions, spot stalled candidates, and keep scoring flows moving
                     without dropping into separate admin tools.
-                  </p>
+                  </HeroLead>
                 </div>
               </div>
 
               <div className="flex flex-wrap gap-3">
-                <Button
-                  asChild
-                  className="rounded-full bg-primary-gradient px-5 shadow-soft hover:brightness-105"
-                >
+                <Button asChild variant="gradient" className="px-5">
                   <Link href="/interviews/new">
                     New Interview
                     <ArrowRight className="size-4" />
                   </Link>
                 </Button>
-                <Button
-                  asChild
-                  variant="outline"
-                  className="rounded-full bg-white/70 backdrop-blur-sm"
-                >
+                <Button asChild variant="outline-pill" shape="pill" className="backdrop-blur-sm">
                   <Link href="/questions">Question Bank</Link>
                 </Button>
               </div>
@@ -281,7 +277,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-white/60 bg-[hsl(var(--surface-low)/0.9)] shadow-soft">
+        <Card variant="tinted">
           <CardHeader className="space-y-3">
             <EyebrowBadge icon={<BriefcaseBusiness className="size-3.5" />} tone="muted">
               Snapshot
@@ -337,7 +333,7 @@ export default function DashboardPage() {
       </section>
 
       {usingMock && (
-        <Alert className="border-amber-200/70 bg-amber-50/80 text-amber-950">
+        <Alert variant="warning">
           <Sparkles className="size-4" />
           <AlertTitle>Demo data enabled</AlertTitle>
           <AlertDescription>
@@ -354,10 +350,7 @@ export default function DashboardPage() {
           title="No interviews yet"
           description="Start with a candidate, attach questions from the bank, and this dashboard becomes your operating surface."
           action={
-            <Button
-              asChild
-              className="rounded-full bg-primary-gradient px-5 shadow-soft hover:brightness-105"
-            >
+            <Button asChild variant="gradient" className="px-5">
               <Link href="/interviews/new">Create your first interview</Link>
             </Button>
           }
@@ -373,11 +366,7 @@ export default function DashboardPage() {
                 Recent interviews
               </h2>
             </div>
-            <Button
-              asChild
-              variant="outline"
-              className="rounded-full bg-white/70 backdrop-blur-sm"
-            >
+            <Button asChild variant="outline-pill" shape="pill" className="backdrop-blur-sm">
               <Link href="/questions/new">Create a new question</Link>
             </Button>
           </div>
@@ -389,13 +378,16 @@ export default function DashboardPage() {
                 href={`/interviews/${interview.id}`}
                 className="group no-underline"
               >
-                <Card className="h-full border-white/65 bg-white/88 transition-transform duration-200 hover:-translate-y-1 hover:shadow-float">
+                <Card
+                  variant="surface"
+                  className="h-full transition-transform duration-200 hover:-translate-y-1 hover:shadow-float"
+                >
                   <CardHeader className="gap-4">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-center gap-3">
-                        <div className="flex size-12 items-center justify-center rounded-[1.2rem] bg-[hsl(var(--primary-fixed)/0.9)] text-sm font-semibold text-[hsl(var(--primary))]">
+                        <IconBadge tone="primary" size="md" className="text-sm font-semibold">
                           {getCandidateInitials(interview.candidateName)}
-                        </div>
+                        </IconBadge>
                         <div>
                           <CardTitle className="text-lg tracking-[-0.03em]">
                             {interview.candidateName}
@@ -410,22 +402,22 @@ export default function DashboardPage() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-3 text-sm">
-                      <div className="rounded-[1rem] bg-[hsl(var(--surface-low)/0.85)] p-3 ring-1 ring-border/45">
+                      <SurfaceTile rounded="lg" padding="sm">
                         <div className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                           Questions
                         </div>
                         <div className="mt-2 text-xl font-semibold tracking-[-0.03em] text-foreground">
                           {interview.questions.length}
                         </div>
-                      </div>
-                      <div className="rounded-[1rem] bg-[hsl(var(--surface-low)/0.85)] p-3 ring-1 ring-border/45">
+                      </SurfaceTile>
+                      <SurfaceTile rounded="lg" padding="sm">
                         <div className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                           Uploaded
                         </div>
                         <div className="mt-2 text-xl font-semibold tracking-[-0.03em] text-foreground">
                           {interview.answers.filter((answer) => answer.status === 'submitted').length}
                         </div>
-                      </div>
+                      </SurfaceTile>
                     </div>
 
                     <div className="flex items-center justify-between text-sm text-muted-foreground">

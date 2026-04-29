@@ -244,7 +244,6 @@ export function useBrowserTranscript() {
         setInterimTranscriptValue('');
       };
 
-      // Ensure a previous pending stop cannot remain unresolved.
       if (pendingStopResolveRef.current) {
         const pendingStopResolve = pendingStopResolveRef.current;
         pendingStopResolveRef.current = null;

@@ -43,14 +43,15 @@ export function QuestionCard({
             checked={selected}
             onCheckedChange={() => onToggleSelected(question.id)}
             aria-label="Select question for bulk delete"
-            className="size-5 bg-white"
+            className="size-5 bg-card"
           />
         </span>
       )}
       <Link href={`/questions/${question.id}`} className="no-underline">
         <Card
+          variant="surface"
           className={cn(
-            'h-full border-white/65 bg-white/88 transition-transform duration-200 group-hover:-translate-y-1 group-hover:shadow-float',
+            'h-full transition-transform duration-200 group-hover:-translate-y-1 group-hover:shadow-float',
             question.deleted &&
               'border-danger-soft-border bg-danger-soft opacity-80',
             selected && selectable && 'ring-2 ring-destructive/70',

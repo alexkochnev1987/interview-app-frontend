@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 
+import { IconBadge } from '@/components/app/icon-badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 
@@ -18,7 +19,7 @@ interface EmptyStateCardProps {
 
 export function LoadingStateCard({ className, label }: LoadingStateCardProps) {
   return (
-    <Card className={cn('border-white/65 bg-white/86 shadow-soft', className)}>
+    <Card variant="surface" className={className}>
       <CardContent className="py-16 text-center text-sm text-muted-foreground">{label}</CardContent>
     </Card>
   )
@@ -32,12 +33,12 @@ export function EmptyStateCard({
   title,
 }: EmptyStateCardProps) {
   return (
-    <Card className={cn('border-white/65 bg-white/86 shadow-soft', className)}>
+    <Card variant="surface" className={cn(className)}>
       <CardContent className="flex flex-col items-center gap-4 py-16 text-center">
         {icon ? (
-          <div className="rounded-full bg-[hsl(var(--primary-fixed)/0.85)] p-3 text-[hsl(var(--primary))]">
+          <IconBadge tone="primary" className="rounded-full">
             {icon}
-          </div>
+          </IconBadge>
         ) : null}
         <div className="space-y-2">
           <h2 className="text-2xl font-semibold tracking-[-0.03em] text-foreground">{title}</h2>
