@@ -19,6 +19,7 @@ import { IconBadge } from '@/components/app/icon-badge'
 import { MetricPanel } from '@/components/app/metric-panel'
 import { StatusPill } from '@/components/app/status-pill'
 import { EmptyStateCard, LoadingStateCard } from '@/components/app/state-card'
+import { PageShell } from '@/components/layout/page-shell'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {
@@ -218,7 +219,7 @@ export default function DashboardPage() {
   const questionVolume = interviews.reduce((sum, interview) => sum + interview.questions.length, 0)
 
   return (
-    <main className="container space-y-8 py-10 md:space-y-10 md:py-12">
+    <PageShell>
       <section className="grid gap-6 xl:grid-cols-[1.3fr_0.7fr]">
         <Card variant="floating" size="lg" effects="blur-strong">
           <CardContent layout="fill-column" spacing="2xl">
@@ -362,14 +363,15 @@ export default function DashboardPage() {
 
           <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
             {interviews.map((interview) => (
-              <Link
-                key={interview.id}
-                href={`/interviews/${interview.id}`}
-                className="group no-underline"
-              >
+              <div key={interview.id} className="group">
+                <Link
+                  href={`/interviews/${interview.id}`}
+                  className="no-underline"
+                >
                 <Card
                   variant="surface"
-                  className="h-full transition-transform duration-200 hover:-translate-y-1 hover:shadow-float"
+                  height="full"
+                  interaction="hover"
                 >
                   <CardHeader spacing="md">
                     <div className="flex items-start justify-between gap-4">
@@ -414,11 +416,12 @@ export default function DashboardPage() {
                     </div>
                   </CardContent>
                 </Card>
-              </Link>
+                </Link>
+              </div>
             ))}
           </div>
         </section>
       )}
-    </main>
+    </PageShell>
   )
 }

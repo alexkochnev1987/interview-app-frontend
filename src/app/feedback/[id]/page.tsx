@@ -9,6 +9,7 @@ import { HeroLead, HeroTitle } from '@/components/app/hero-text'
 import { MetricPanel } from '@/components/app/metric-panel'
 import { StatusPill } from '@/components/app/status-pill'
 import { LoadingStateCard } from '@/components/app/state-card'
+import { PageShell } from '@/components/layout/page-shell'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -64,25 +65,25 @@ export default function FeedbackPage() {
 
   if (error) {
     return (
-      <main className="container py-12">
+      <PageShell>
         <Alert variant="danger" className="mx-auto max-w-4xl">
           <AlertTitle>Feedback unavailable</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
-      </main>
+      </PageShell>
     )
   }
 
   if (!feedback) {
     return (
-      <main className="container py-12">
+      <PageShell>
         <LoadingStateCard className="mx-auto max-w-4xl" label="Loading feedback..." />
-      </main>
+      </PageShell>
     )
   }
 
   return (
-    <main className="container space-y-8 py-10 md:py-12">
+    <PageShell>
       <section className="mx-auto grid max-w-6xl gap-6 xl:grid-cols-[1.05fr_0.95fr]">
         <Card variant="floating" size="lg">
           <CardContent spacing="xl">
@@ -112,7 +113,7 @@ export default function FeedbackPage() {
         </Card>
 
         <Card variant="tinted">
-          <CardHeader>
+          <CardHeader spacing="xs">
             <CardTitle size="lg">Snapshot</CardTitle>
             <CardDescription>
               A compact overview of your current outcome and when this shared link expires.
@@ -142,7 +143,7 @@ export default function FeedbackPage() {
       <section className="mx-auto grid max-w-6xl gap-6 xl:grid-cols-[0.85fr_1.15fr]">
         {feedback.categoryScores ? (
           <Card variant="surface">
-            <CardHeader>
+            <CardHeader spacing="xs">
               <EyebrowBadge icon={<ChartColumnBig className="size-3.5" />} tone="primary">
                 Category scores
               </EyebrowBadge>
@@ -169,7 +170,7 @@ export default function FeedbackPage() {
         <div className="space-y-6">
           {feedback.generalFeedback ? (
             <Card variant="surface">
-              <CardHeader>
+              <CardHeader spacing="xs">
                 <EyebrowBadge icon={<BadgeCheck className="size-3.5" />}>
                   Feedback
                 </EyebrowBadge>
@@ -183,7 +184,7 @@ export default function FeedbackPage() {
 
           {feedback.improvements ? (
             <Card variant="surface">
-              <CardHeader>
+              <CardHeader spacing="xs">
                 <EyebrowBadge icon={<Target className="size-3.5" />}>
                   Recommendations
                 </EyebrowBadge>
@@ -196,6 +197,6 @@ export default function FeedbackPage() {
           ) : null}
         </div>
       </section>
-    </main>
+    </PageShell>
   )
 }

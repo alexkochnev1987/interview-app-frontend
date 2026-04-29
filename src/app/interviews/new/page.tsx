@@ -12,6 +12,7 @@ import { MetricPanel } from '@/components/app/metric-panel'
 import { StatusPill } from '@/components/app/status-pill'
 import { EmptyStateCard, LoadingStateCard } from '@/components/app/state-card'
 import { SurfaceTile } from '@/components/app/surface-tile'
+import { PageShell } from '@/components/layout/page-shell'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -97,7 +98,7 @@ export default function NewInterviewPage() {
   const selectedQuestions = questions.filter((question) => selectedQuestionIds.includes(question.id))
 
   return (
-    <main className="container space-y-8 py-10 md:space-y-10 md:py-12">
+    <PageShell>
       <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         <Card variant="floating" size="lg">
           <CardContent spacing="xl">
@@ -128,7 +129,7 @@ export default function NewInterviewPage() {
         </Card>
 
         <Card variant="tinted">
-          <CardHeader>
+          <CardHeader spacing="xs">
             <CardTitle size="lg">Selection summary</CardTitle>
             <CardDescription>
               Keep the prompt set tight. Dense but intentional interviews score better than generic
@@ -157,7 +158,7 @@ export default function NewInterviewPage() {
 
       <form onSubmit={handleSubmit} className="grid gap-6 xl:grid-cols-[0.72fr_1.28fr]">
         <Card variant="surface">
-          <CardHeader>
+          <CardHeader spacing="xs">
             <CardTitle size="lg">Candidate brief</CardTitle>
             <CardDescription>
               This metadata will anchor the scoring context once answers arrive.
@@ -213,7 +214,7 @@ export default function NewInterviewPage() {
         </Card>
 
         <Card variant="surface">
-          <CardHeader>
+          <CardHeader spacing="xs">
             <div className="flex flex-row items-start justify-between gap-4">
               <div className="space-y-1.5">
                 <CardTitle size="lg">Question selection</CardTitle>
@@ -319,6 +320,6 @@ export default function NewInterviewPage() {
           </CardContent>
         </Card>
       </form>
-    </main>
+    </PageShell>
   )
 }

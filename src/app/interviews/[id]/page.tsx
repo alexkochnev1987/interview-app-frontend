@@ -21,6 +21,7 @@ import { MetricPanel } from '@/components/app/metric-panel'
 import { StatusPill } from '@/components/app/status-pill'
 import { LoadingStateCard } from '@/components/app/state-card'
 import { SurfaceTile } from '@/components/app/surface-tile'
+import { PageShell } from '@/components/layout/page-shell'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -217,15 +218,15 @@ export default function InterviewDetailPage() {
 
   if (loading) {
     return (
-      <main className="container py-12">
+      <PageShell>
         <LoadingStateCard label="Loading interview..." />
-      </main>
+      </PageShell>
     )
   }
 
   if (error && !interview) {
     return (
-      <main className="container space-y-6 py-12">
+      <PageShell spacing="tight">
         <Alert variant="danger">
           <AlertTitle>Interview unavailable</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
@@ -236,7 +237,7 @@ export default function InterviewDetailPage() {
             Back to dashboard
           </a>
         </Button>
-      </main>
+      </PageShell>
     )
   }
 
@@ -254,7 +255,7 @@ export default function InterviewDetailPage() {
   const canComplete = allAnswered && !isTerminal && interview.status !== 'processing'
 
   return (
-    <main className="container space-y-8 py-10 md:space-y-10 md:py-12">
+    <PageShell>
       <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
         <Card variant="floating" size="lg">
           <CardContent spacing="2xl">
@@ -317,7 +318,7 @@ export default function InterviewDetailPage() {
         </Card>
 
         <Card variant="tinted">
-          <CardHeader>
+          <CardHeader spacing="sm">
             <EyebrowBadge icon={<Sparkles className="size-3.5" />} tone="muted">
               Interview progress
             </EyebrowBadge>
@@ -418,11 +419,11 @@ export default function InterviewDetailPage() {
             const uploadState = uploadStates[questionIndex] ?? { status: 'idle' }
 
             return (
-              <Card
-                key={question.id}
-                variant="surface"
-                className="transition-transform duration-200 hover:-translate-y-0.5"
-              >
+              <div key={question.id} className="group">
+                <Card
+                  variant="surface"
+                  interaction="hover"
+                >
                 <CardHeader spacing="md">
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div className="space-y-3">
@@ -540,7 +541,8 @@ export default function InterviewDetailPage() {
                     </Alert>
                   ) : null}
                 </CardContent>
-              </Card>
+                </Card>
+              </div>
             )
           })}
         </div>
@@ -605,6 +607,6 @@ export default function InterviewDetailPage() {
           </div>
         </section>
       ) : null}
-    </main>
+    </PageShell>
   )
 }

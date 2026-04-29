@@ -25,6 +25,7 @@ import {
 import { StatusPill } from '@/components/app/status-pill'
 import { LoadingStateCard } from '@/components/app/state-card'
 import { SurfaceTile } from '@/components/app/surface-tile'
+import { PageShell } from '@/components/layout/page-shell'
 import { LiveTranscriptPanel } from '@/components/take/live-transcript-panel'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -1055,20 +1056,20 @@ export default function TakeInterviewPage() {
 
   if (error && !interview) {
     return (
-      <main className="container py-12">
+      <PageShell>
         <Alert variant="danger">
           <AlertTitle>Interview unavailable</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
-      </main>
+      </PageShell>
     )
   }
 
   if (stage === 'loading' || !interview) {
     return (
-      <main className="container py-12">
+      <PageShell>
         <LoadingStateCard className="mx-auto max-w-4xl" label="Loading interview..." />
-      </main>
+      </PageShell>
     )
   }
 
@@ -1082,7 +1083,7 @@ export default function TakeInterviewPage() {
 
   if (stage === 'complete') {
     return (
-      <main className="container py-12">
+      <PageShell>
         <div className="mx-auto max-w-4xl">
         <Card variant="floating" size="lg">
           <CardContent layout="stack-center" spacing="xl">
@@ -1101,13 +1102,13 @@ export default function TakeInterviewPage() {
           </CardContent>
         </Card>
         </div>
-      </main>
+      </PageShell>
     )
   }
 
   if (stage === 'consent') {
     return (
-      <main className="container space-y-8 py-10 md:py-12">
+      <PageShell>
         <div className="mx-auto max-w-5xl">
         <Card variant="floating" size="lg">
           <CardContent>
@@ -1259,12 +1260,12 @@ export default function TakeInterviewPage() {
           </CardContent>
         </Card>
         </div>
-      </main>
+      </PageShell>
     )
   }
 
   return (
-    <main className="container space-y-8 py-10 md:py-12">
+    <PageShell>
       <section className="mx-auto grid max-w-6xl gap-6 xl:grid-cols-[0.84fr_1.16fr]">
         <Card variant="surface" size="lg">
           <CardContent spacing="xl">
@@ -1410,6 +1411,6 @@ export default function TakeInterviewPage() {
           </CardContent>
         </Card>
       </section>
-    </main>
+    </PageShell>
   )
 }
