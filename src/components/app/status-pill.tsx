@@ -1,9 +1,20 @@
 import type { ComponentProps } from "react"
+import { cva, type VariantProps } from "class-variance-authority"
 
+import {
+  STATUS_COMPLETED_SURFACE,
+  STATUS_DESTRUCTIVE_SURFACE,
+  STATUS_FAILED_SURFACE,
+  STATUS_IN_PROGRESS_SURFACE,
+  STATUS_NEUTRAL_SURFACE,
+  STATUS_PENDING_SURFACE,
+  STATUS_PILL_BASE,
+  STATUS_PROCESSING_SURFACE,
+} from "@/components/app/style-tokens"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 
-type StatusTone =
+export type StatusTone =
   | "neutral"
   | "neutral_meta"
   | "pending"
@@ -15,32 +26,30 @@ type StatusTone =
   | "medium"
   | "hard"
 
-const toneClasses: Record<StatusTone, string> = {
-  neutral:
-    "bg-[hsl(var(--surface-low))] text-[hsl(var(--muted-foreground))] ring-1 ring-[hsl(var(--border)/0.55)]",
-  neutral_meta:
-    "bg-[hsl(var(--surface-low))] text-[hsl(var(--muted-foreground))] normal-case tracking-[0.08em] ring-1 ring-[hsl(var(--border)/0.55)]",
-  pending:
-    "bg-[var(--color-status-pending-bg)] text-[var(--color-status-pending-fg)] ring-1 ring-[var(--color-status-pending-ring)]",
-  in_progress:
-    "bg-[var(--color-status-in-progress-bg)] text-[var(--color-status-in-progress-fg)] ring-1 ring-[var(--color-status-in-progress-ring)]",
-  processing:
-    "bg-[var(--color-status-processing-bg)] text-[var(--color-status-processing-fg)] ring-1 ring-[var(--color-status-processing-ring)]",
-  completed:
-    "bg-[var(--color-status-completed-bg)] text-[var(--color-status-completed-fg)] ring-1 ring-[var(--color-status-completed-ring)]",
-  failed:
-    "bg-destructive/10 text-destructive ring-1 ring-destructive/30",
-  easy: "bg-[var(--color-status-completed-bg)] text-[var(--color-status-completed-fg)] ring-1 ring-[var(--color-status-completed-ring)]",
-  medium: "bg-[var(--color-status-pending-bg)] text-[var(--color-status-pending-fg)] ring-1 ring-[var(--color-status-pending-ring)]",
-  hard: "bg-[var(--color-status-failed-bg)] text-[var(--color-status-failed-fg)] ring-1 ring-[var(--color-status-failed-ring)]",
-}
+const statusPillVariants = cva(STATUS_PILL_BASE, {
+  variants: {
+    tone: {
+      neutral: STATUS_NEUTRAL_SURFACE,
+      neutral_meta: `${STATUS_NEUTRAL_SURFACE} normal-case tracking-[0.08em]`,
+      pending: STATUS_PENDING_SURFACE,
+      in_progress: STATUS_IN_PROGRESS_SURFACE,
+      processing: STATUS_PROCESSING_SURFACE,
+      completed: STATUS_COMPLETED_SURFACE,
+      failed: STATUS_DESTRUCTIVE_SURFACE,
+      easy: STATUS_COMPLETED_SURFACE,
+      medium: STATUS_PENDING_SURFACE,
+      hard: STATUS_FAILED_SURFACE,
+    },
+  },
+  defaultVariants: {
+    tone: "neutral",
+  },
+})
 
-interface StatusPillProps extends ComponentProps<"span"> {
-  tone?: StatusTone
-}
+interface StatusPillProps extends ComponentProps<"span">, VariantProps<typeof statusPillVariants> {}
 
 export function StatusPill({
-  tone = "neutral",
+  tone,
   className,
   children,
   ...props
@@ -49,8 +58,7 @@ export function StatusPill({
     <Badge
       variant="secondary"
       className={cn(
-        "rounded-full border-0 px-3 py-1 text-[0.68rem] font-semibold tracking-[0.16em] uppercase shadow-none",
-        toneClasses[tone],
+        statusPillVariants({ tone }),
         className
       )}
       {...props}

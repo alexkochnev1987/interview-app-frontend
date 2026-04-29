@@ -39,7 +39,7 @@ export default function TakeInterviewPage() {
     handleStartInterview,
     requestVersionAction,
     permissionLabel,
-    permissionClasses,
+    permissionTone,
     formatTime,
   } = useTakeOrchestrator({ id, candidateToken })
 
@@ -83,7 +83,7 @@ export default function TakeInterviewPage() {
         onConsentChange={setConsent}
         onStartInterview={handleStartInterview}
         permissionLabel={permissionLabel}
-        permissionClasses={permissionClasses}
+        permissionTone={permissionTone}
       />
     )
   }

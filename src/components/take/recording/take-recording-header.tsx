@@ -36,14 +36,16 @@ export function TakeRecordingHeader({
         </BodyMutedSm>
       </div>
 
-      <TakePanel tone="surfaceStrong" radius="lg" padding="lg" className="space-y-3">
-        <div className="flex items-center justify-between gap-3">
-          <div className="text-sm font-medium text-foreground">
-            Question {interview.currentQuestionIndex + 1} of {interview.totalQuestions}
+      <TakePanel tone="surfaceStrong" radius="lg" padding="lg">
+        <div className="space-y-3">
+          <div className="flex items-center justify-between gap-3">
+            <div className="text-sm font-medium text-foreground">
+              Question {interview.currentQuestionIndex + 1} of {interview.totalQuestions}
+            </div>
+            <StatusPill tone="neutral">{progressValue}%</StatusPill>
           </div>
-          <StatusPill tone="neutral">{progressValue}%</StatusPill>
+          <Progress value={progressValue} className="h-2.5 rounded-full bg-white" />
         </div>
-        <Progress value={progressValue} className="h-2.5 rounded-full bg-white" />
       </TakePanel>
 
       <div className="grid gap-3">

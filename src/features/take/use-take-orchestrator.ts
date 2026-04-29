@@ -9,7 +9,7 @@ import {
   formatTime,
   getMultipartSession,
   getPermissionErrorMessage,
-  permissionClasses,
+  permissionTone,
   permissionLabel,
   releaseCaptureStreams,
   stageAfterInterviewLoad,
@@ -392,7 +392,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     handleStartInterview,
     requestVersionAction,
     permissionLabel,
-    permissionClasses,
+    permissionTone,
     formatTime,
     progressValue:
       interview ? progressValueForStage({ interview, stage }) : 0,

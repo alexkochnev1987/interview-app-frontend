@@ -1,15 +1,27 @@
 import { cva, type VariantProps } from 'class-variance-authority';
 import type { ComponentProps } from 'react';
 
+import {
+  SURFACE_LOW_STRONG_BG,
+  SURFACE_SHADOW_FLOAT,
+  SURFACE_SHADOW_SOFT,
+  SURFACE_WHITE_MUTED_BORDER,
+  SURFACE_WHITE_SOFT_BG,
+  SURFACE_WHITE_SOFT_BORDER,
+} from '@/components/app/style-tokens';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+
+const SURFACE_GLASS_SOFT = `${SURFACE_WHITE_SOFT_BORDER} ${SURFACE_WHITE_SOFT_BG} ${SURFACE_SHADOW_SOFT}`;
+const SURFACE_GLASS_FLOAT = `${SURFACE_WHITE_SOFT_BORDER} ${SURFACE_WHITE_SOFT_BG} ${SURFACE_SHADOW_FLOAT}`;
+const SURFACE_MUTED_SOFT = `${SURFACE_WHITE_MUTED_BORDER} ${SURFACE_LOW_STRONG_BG} ${SURFACE_SHADOW_SOFT}`;
 
 const surfaceCardVariants = cva('', {
   variants: {
     tone: {
-      glassSoft: 'border-white/65 bg-white/88 shadow-soft',
-      glassFloat: 'border-white/65 bg-white/88 shadow-float',
-      mutedSoft: 'border-white/60 bg-[hsl(var(--surface-low)/0.9)] shadow-soft',
+      glassSoft: SURFACE_GLASS_SOFT,
+      glassFloat: SURFACE_GLASS_FLOAT,
+      mutedSoft: SURFACE_MUTED_SOFT,
     },
   },
   defaultVariants: {
@@ -28,17 +40,19 @@ export function SurfaceCard({ tone, className, ...props }: SurfaceCardProps) {
 interface SurfaceCardMax5xlProps extends Omit<SurfaceCardProps, 'className'> {}
 
 export function SurfaceCardMax5xl({ tone, ...props }: SurfaceCardMax5xlProps) {
-  return <SurfaceCard tone={tone} className="mx-auto max-w-5xl" {...props} />;
+  return (
+    <div className="mx-auto max-w-5xl">
+      <SurfaceCard tone={tone} {...props} />
+    </div>
+  );
 }
 
 interface SurfaceCardLiftProps extends Omit<SurfaceCardProps, 'className'> {}
 
 export function SurfaceCardLift({ tone, ...props }: SurfaceCardLiftProps) {
   return (
-    <SurfaceCard
-      tone={tone}
-      className="transition-transform duration-200 hover:-translate-y-0.5"
-      {...props}
-    />
+    <div className="transition-transform duration-200 hover:-translate-y-0.5">
+      <SurfaceCard tone={tone} {...props} />
+    </div>
   );
 }

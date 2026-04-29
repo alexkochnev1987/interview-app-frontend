@@ -26,10 +26,9 @@ export function TakeRecordingActions({
         <>
           <Button
             type="button"
-            variant="outline"
+            variant="outline-soft-strong"
             onClick={onRerecord}
             disabled={uploading}
-            className="rounded-full bg-white/80"
           >
             Re-record as new version
           </Button>

@@ -13,20 +13,22 @@ export function TakeConsentCheckboxBlock({
   onConsentChange,
 }: TakeConsentCheckboxBlockProps) {
   return (
-    <TakePanel tone="white" className="flex items-start gap-3">
-      <Checkbox
-        id="consent"
-        checked={consent}
-        onCheckedChange={(checked) => onConsentChange(Boolean(checked))}
-        className="mt-1"
-      />
-      <div className="space-y-2">
-        <Label htmlFor="consent">
-          <LabelSmStrong>I agree to the recording and data collection terms.</LabelSmStrong>
-        </Label>
-        <BodyMutedSm>
-          Data is used only for interview evaluation and is stored for 90 days.
-        </BodyMutedSm>
+    <TakePanel tone="white">
+      <div className="flex items-start gap-3">
+        <Checkbox
+          id="consent"
+          checked={consent}
+          onCheckedChange={(checked) => onConsentChange(Boolean(checked))}
+          className="mt-1"
+        />
+        <div className="space-y-2">
+          <Label htmlFor="consent">
+            <LabelSmStrong>I agree to the recording and data collection terms.</LabelSmStrong>
+          </Label>
+          <BodyMutedSm>
+            Data is used only for interview evaluation and is stored for 90 days.
+          </BodyMutedSm>
+        </div>
       </div>
     </TakePanel>
   );

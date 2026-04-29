@@ -1,4 +1,5 @@
 import type { PermissionStatus } from '@/components/take/types';
+import type { StatusTone } from '@/components/app/status-pill';
 
 export interface TakeBehaviorSignals {
   tabHiddenCount: number;
@@ -31,16 +32,16 @@ export function permissionLabel(status: PermissionStatus) {
   }
 }
 
-export function permissionClasses(status: PermissionStatus) {
+export function permissionTone(status: PermissionStatus): StatusTone {
   switch (status) {
     case 'pending':
-      return 'bg-[var(--color-status-pending-bg)] text-[var(--color-status-pending-fg)] ring-[var(--color-status-pending-ring)]/80';
+      return 'pending';
     case 'granted':
-      return 'bg-[var(--color-status-completed-bg)] text-[var(--color-status-completed-fg)] ring-[var(--color-status-completed-ring)]/80';
+      return 'completed';
     case 'denied':
-      return 'bg-destructive/10 text-destructive ring-destructive/30';
+      return 'failed';
     default:
-      return 'bg-[hsl(var(--surface-high)/0.9)] text-muted-foreground ring-border/50';
+      return 'neutral_meta';
   }
 }
 
