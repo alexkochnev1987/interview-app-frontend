@@ -17,36 +17,40 @@ export function useTakeInterviewLoader({
   onError,
   onCleanup,
 }: UseTakeInterviewLoaderParams) {
+  const candidateTokenRef = useRef(candidateToken);
   const onDataRef = useRef(onData);
   const onErrorRef = useRef(onError);
   const onCleanupRef = useRef(onCleanup);
 
   useEffect(() => {
+    if (candidateToken) {
+      candidateTokenRef.current = candidateToken;
+    }
     onDataRef.current = onData;
     onErrorRef.current = onError;
     onCleanupRef.current = onCleanup;
-  }, [onData, onError, onCleanup]);
+  }, [candidateToken, onData, onError, onCleanup]);
 
   const loadInterview = useCallback(
     async (mode: 'initial' | 'resume' = 'initial', tokenOverride?: string) => {
       try {
-        const effectiveToken = tokenOverride ?? candidateToken;
+        const effectiveToken = tokenOverride ?? candidateTokenRef.current;
         const data = await getTakeInterview(id, effectiveToken);
         onDataRef.current(data, mode, tokenOverride);
       } catch (err) {
         onErrorRef.current(err instanceof Error ? err.message : 'Failed to load interview');
       }
     },
-    [id, candidateToken],
+    [id],
   );
 
   useEffect(() => {
-    void loadInterview('initial', candidateToken);
+    void loadInterview('initial', candidateTokenRef.current);
 
     return () => {
       onCleanupRef.current();
     };
-  }, [candidateToken, loadInterview]);
+  }, [loadInterview]);
 
   return { loadInterview };
 }
