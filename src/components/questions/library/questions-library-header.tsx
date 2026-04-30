@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/card'
 import { Grid } from '@/components/ui/layout/grid'
 import { HeroGrid } from '@/components/ui/layout/hero-grid'
+import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 
 interface QuestionsLibraryHeaderProps {
@@ -45,14 +46,14 @@ export function QuestionsLibraryHeader({
                 and keep your evaluation rubric visible instead of buried in JSON.
               </HeroLead>
             </Stack>
-            <Stack>
+            <Inline>
               <Button asChild variant="gradient" size="hero">
                 <Link href="/questions/new">
                   <Plus className="size-5" />
                   New Question
                 </Link>
               </Button>
-            </Stack>
+            </Inline>
           </CardContent>
         </Card>
       }
