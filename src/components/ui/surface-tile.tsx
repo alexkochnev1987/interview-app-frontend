@@ -36,6 +36,10 @@ const surfaceTileVariants = cva('ring-1 ring-hairline', {
       'row-between': 'flex items-center justify-between gap-3',
       'row-start': 'flex items-start gap-3',
     },
+    minHeight: {
+      none: '',
+      transcript: 'min-h-[130px]',
+    },
   },
   defaultVariants: {
     tone: 'soft',
@@ -43,6 +47,7 @@ const surfaceTileVariants = cva('ring-1 ring-hairline', {
     rounded: '2xl',
     spacing: 'none',
     layout: 'default',
+    minHeight: 'none',
   },
 })
 
@@ -57,12 +62,13 @@ export function SurfaceTile({
   rounded,
   spacing,
   layout,
+  minHeight,
   ...props
 }: SurfaceTileProps) {
   return (
     <div
       className={cn(
-        surfaceTileVariants({ tone, padding, rounded, spacing, layout }),
+        surfaceTileVariants({ tone, padding, rounded, spacing, layout, minHeight }),
         className,
       )}
       {...props}

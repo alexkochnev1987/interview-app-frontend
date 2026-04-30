@@ -1,5 +1,5 @@
-import { EyebrowLabel } from '@/components/app/eyebrow-label'
-import { SurfaceTile } from '@/components/app/surface-tile'
+import { EyebrowLabel } from '@/components/ui/eyebrow-label'
+import { SurfaceTile } from '@/components/ui/surface-tile'
 
 type TakeStage = 'loading' | 'consent' | 'interview' | 'recording' | 'transition' | 'complete'
 

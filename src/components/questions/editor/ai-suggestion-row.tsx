@@ -1,7 +1,7 @@
 'use client'
 
-import { EyebrowLabel } from '@/components/app/eyebrow-label'
-import { SurfaceTile } from '@/components/app/surface-tile'
+import { EyebrowLabel } from '@/components/ui/eyebrow-label'
+import { SurfaceTile } from '@/components/ui/surface-tile'
 import { Button } from '@/components/ui/button'
 import { type QuestionInput } from '@/lib/api'
 import { previewValue, type DraftFieldKey } from '@/lib/question-editor/parsers'

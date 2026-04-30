@@ -3,7 +3,7 @@
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import { ConfirmDialog } from '@/components/app/confirm-dialog';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { DeletedQuestionBanner } from '@/components/questions/detail/deleted-question-banner';
 import {
   QuestionLoadingCard,

@@ -2,9 +2,9 @@
 
 import Link from 'next/link'
 
-import { EyebrowLabel } from '@/components/app/eyebrow-label'
-import { MetricPanel } from '@/components/app/metric-panel'
-import { StatusPill } from '@/components/app/status-pill'
+import { EyebrowLabel } from '@/components/ui/eyebrow-label'
+import { MetricPanel } from '@/components/ui/metric-panel'
+import { StatusPill } from '@/components/ui/status-pill'
 import {
   Card,
   CardContent,

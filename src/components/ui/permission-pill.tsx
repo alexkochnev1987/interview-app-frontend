@@ -1,4 +1,4 @@
-import { StatusPill } from '@/components/app/status-pill'
+import { StatusPill } from '@/components/ui/status-pill'
 
 export type PermissionStatus = 'idle' | 'pending' | 'granted' | 'denied'
 

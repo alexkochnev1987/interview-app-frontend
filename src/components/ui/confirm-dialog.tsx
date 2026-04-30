@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { AlertTriangle, LoaderCircle } from 'lucide-react'
 
-import { IconBadge } from '@/components/app/icon-badge'
+import { IconBadge } from '@/components/ui/icon-badge'
 import { Button } from '@/components/ui/button'
 import {
   Card,

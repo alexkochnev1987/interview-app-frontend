@@ -2,10 +2,10 @@
 
 import { Sparkles } from 'lucide-react'
 
-import { EyebrowBadge } from '@/components/app/eyebrow-badge'
-import { HeroLead, HeroTitle } from '@/components/app/hero-text'
-import { MetricPanel } from '@/components/app/metric-panel'
-import { StatusPill } from '@/components/app/status-pill'
+import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
+import { HeroLead, HeroTitle } from '@/components/ui/hero-text'
+import { MetricPanel } from '@/components/ui/metric-panel'
+import { StatusPill } from '@/components/ui/status-pill'
 import { Card, CardContent } from '@/components/ui/card'
 import { type QuestionInput } from '@/lib/api'
 

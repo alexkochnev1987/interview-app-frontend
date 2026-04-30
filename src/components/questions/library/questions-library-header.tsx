@@ -3,10 +3,10 @@
 import Link from 'next/link'
 import { Filter, Plus, Sparkles } from 'lucide-react'
 
-import { EyebrowBadge } from '@/components/app/eyebrow-badge'
-import { HeroLead, HeroTitle } from '@/components/app/hero-text'
-import { MetricPanel } from '@/components/app/metric-panel'
-import { HeroGrid } from '@/components/layout/hero-grid'
+import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
+import { HeroLead, HeroTitle } from '@/components/ui/hero-text'
+import { MetricPanel } from '@/components/ui/metric-panel'
+import { HeroGrid } from '@/components/ui/layout/hero-grid'
 import { Button } from '@/components/ui/button'
 import {
   Card,

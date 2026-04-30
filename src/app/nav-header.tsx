@@ -7,9 +7,9 @@ import { usePathname } from 'next/navigation'
 import { Sparkles, LogOut, Plus, LayoutDashboard, LibraryBig } from 'lucide-react'
 import { cva, type VariantProps } from 'class-variance-authority'
 
-import { EyebrowLabel } from '@/components/app/eyebrow-label'
-import { IconBadge } from '@/components/app/icon-badge'
-import { SurfaceTile } from '@/components/app/surface-tile'
+import { EyebrowLabel } from '@/components/ui/eyebrow-label'
+import { IconBadge } from '@/components/ui/icon-badge'
+import { SurfaceTile } from '@/components/ui/surface-tile'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 

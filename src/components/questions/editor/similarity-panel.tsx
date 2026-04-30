@@ -3,10 +3,10 @@
 import Link from 'next/link'
 import { Search } from 'lucide-react'
 
-import { EyebrowBadge } from '@/components/app/eyebrow-badge'
-import { MetricPanel } from '@/components/app/metric-panel'
-import { StatusPill } from '@/components/app/status-pill'
-import { SurfaceTile } from '@/components/app/surface-tile'
+import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
+import { MetricPanel } from '@/components/ui/metric-panel'
+import { StatusPill } from '@/components/ui/status-pill'
+import { SurfaceTile } from '@/components/ui/surface-tile'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {

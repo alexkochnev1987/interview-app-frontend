@@ -2,7 +2,7 @@
 
 import { WandSparkles } from 'lucide-react'
 
-import { StatusPill } from '@/components/app/status-pill'
+import { StatusPill } from '@/components/ui/status-pill'
 import { Button } from '@/components/ui/button'
 import {
   Card,

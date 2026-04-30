@@ -3,8 +3,8 @@
 import Link from 'next/link'
 import { AlertTriangle, ArrowLeft, LoaderCircle, PenSquare } from 'lucide-react'
 
-import { HeroTitle } from '@/components/app/hero-text'
-import { IconBadge } from '@/components/app/icon-badge'
+import { HeroTitle } from '@/components/ui/hero-text'
+import { IconBadge } from '@/components/ui/icon-badge'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {

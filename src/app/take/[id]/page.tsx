@@ -13,19 +13,19 @@ import {
   Video,
 } from 'lucide-react'
 
-import { EyebrowBadge } from '@/components/app/eyebrow-badge'
-import { EyebrowLabel } from '@/components/app/eyebrow-label'
-import { HeroLead, HeroTitle } from '@/components/app/hero-text'
-import { IconBadge } from '@/components/app/icon-badge'
-import { MetricPanel } from '@/components/app/metric-panel'
+import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
+import { EyebrowLabel } from '@/components/ui/eyebrow-label'
+import { HeroLead, HeroTitle } from '@/components/ui/hero-text'
+import { IconBadge } from '@/components/ui/icon-badge'
+import { MetricPanel } from '@/components/ui/metric-panel'
 import {
   PermissionPill,
   type PermissionStatus,
-} from '@/components/app/permission-pill'
-import { StatusPill } from '@/components/app/status-pill'
-import { LoadingStateCard } from '@/components/app/state-card'
-import { SurfaceTile } from '@/components/app/surface-tile'
-import { PageShell } from '@/components/layout/page-shell'
+} from '@/components/ui/permission-pill'
+import { StatusPill } from '@/components/ui/status-pill'
+import { LoadingStateCard } from '@/components/ui/state-card'
+import { SurfaceTile } from '@/components/ui/surface-tile'
+import { PageShell } from '@/components/ui/layout/page-shell'
 import { LiveTranscriptPanel } from '@/components/take/live-transcript-panel'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'

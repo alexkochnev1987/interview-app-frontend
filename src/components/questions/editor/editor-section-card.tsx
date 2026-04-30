@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-import { IconBadge } from '@/components/app/icon-badge'
+import { IconBadge } from '@/components/ui/icon-badge'
 import { Card, CardContent } from '@/components/ui/card'
 
 interface EditorSectionCardProps {

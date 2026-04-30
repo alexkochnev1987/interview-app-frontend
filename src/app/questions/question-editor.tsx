@@ -2,8 +2,8 @@
 
 import { useMemo, useState, type FormEvent } from 'react'
 
-import { PageShell } from '@/components/layout/page-shell'
-import { TwoColumnLayout } from '@/components/layout/two-column-layout'
+import { PageShell } from '@/components/ui/layout/page-shell'
+import { TwoColumnLayout } from '@/components/ui/layout/two-column-layout'
 import { AiDraftPanel } from '@/components/questions/editor/ai-draft-panel'
 import { AiSuggestionRow } from '@/components/questions/editor/ai-suggestion-row'
 import { EditorIdentitySection } from '@/components/questions/editor/editor-identity-section'
