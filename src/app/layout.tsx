@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 
+import { AppBody, AppShellRoot } from "@/components/ui/app-shell"
 import { AuthProvider } from "@/lib/auth-context"
 
 import "./globals.css"
@@ -17,14 +18,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-background text-foreground antialiased">
+      <AppBody>
         <AuthProvider>
-          <div className="relative min-h-screen overflow-x-clip">
+          <AppShellRoot>
             <NavHeader />
             {children}
-          </div>
+          </AppShellRoot>
         </AuthProvider>
-      </body>
+      </AppBody>
     </html>
   )
 }

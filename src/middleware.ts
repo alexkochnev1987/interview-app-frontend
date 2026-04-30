@@ -5,8 +5,6 @@ export function middleware(request: NextRequest) {
   const session = request.cookies.get('session');
   const path = request.nextUrl.pathname;
 
-  // Always let API proxy to the backend (rewrites in next.config). Some hosts
-  // still invoke middleware for /api even when the matcher should skip it.
   if (path.startsWith('/api')) {
     return NextResponse.next();
   }

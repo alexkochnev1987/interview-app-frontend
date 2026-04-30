@@ -1,33 +1,45 @@
-import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
+import * as React from 'react'
+import { cva, type VariantProps } from 'class-variance-authority'
 
-const containerVariants = cva("", {
+import { cn } from '@/lib/utils'
+
+const containerVariants = cva('container', {
   variants: {
     width: {
-      container: "container",
-      "4xl": "max-w-4xl",
-      "5xl": "max-w-5xl",
-      "6xl": "max-w-6xl",
+      default: '',
+      prose: 'max-w-4xl',
+      reading: 'max-w-5xl',
+      wide: 'max-w-6xl',
     },
-    centered: {
-      false: "",
-      true: "mx-auto",
+    align: {
+      start: '',
+      center: 'mx-auto',
     },
   },
   defaultVariants: {
-    width: "container",
-    centered: false,
+    width: 'default',
+    align: 'start',
   },
 })
 
-type ContainerProps = Omit<React.ComponentPropsWithoutRef<"div">, "className"> &
+type ContainerProps = Omit<React.ComponentProps<'div'>, 'color'> &
   VariantProps<typeof containerVariants> & {
-    as?: "div" | "main" | "section"
+    as?: keyof React.JSX.IntrinsicElements
   }
 
-function Container({ as, width, centered, ...props }: ContainerProps) {
-  const Comp = as ?? "div"
-  return <Comp {...props} className={containerVariants({ width, centered })} />
-}
+export function Container({
+  as,
+  className,
+  width,
+  align,
+  ...props
+}: ContainerProps) {
+  const Comp = (as ?? 'div') as React.ElementType
 
-export { Container }
+  return (
+    <Comp
+      className={cn(containerVariants({ width, align }), className)}
+      {...props}
+    />
+  )
+}

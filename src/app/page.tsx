@@ -12,10 +12,16 @@ import {
   Users,
 } from 'lucide-react'
 
-import { EyebrowBadge } from '@/components/app/eyebrow-badge'
-import { MetricPanel } from '@/components/app/metric-panel'
-import { StatusPill } from '@/components/app/status-pill'
-import { EmptyStateCard, LoadingStateCard } from '@/components/app/state-card'
+import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
+import { EyebrowLabel } from '@/components/ui/eyebrow-label'
+import { HeroLead, HeroTitle } from '@/components/ui/hero-text'
+import { HoverCue } from '@/components/ui/hover-cue'
+import { HoverGroup } from '@/components/ui/hover-group'
+import { IconBadge } from '@/components/ui/icon-badge'
+import { MetricPanel } from '@/components/ui/metric-panel'
+import { StatusPill } from '@/components/ui/status-pill'
+import { EmptyStateCard, LoadingStateCard } from '@/components/ui/state-card'
+import { PageShell } from '@/components/ui/layout/page-shell'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {
@@ -25,6 +31,12 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { Grid } from '@/components/ui/layout/grid'
+import { Inline } from '@/components/ui/layout/inline'
+import { Section } from '@/components/ui/layout/section'
+import { Stack } from '@/components/ui/layout/stack'
+import { BodyText, SectionHeading } from '@/components/ui/text'
+import { UnstyledLink } from '@/components/ui/unstyled-link'
 import { fetchInterviews, type Interview } from '@/lib/api'
 import {
   formatInterviewDate,
@@ -81,7 +93,7 @@ const MOCK_INTERVIEWS: Interview[] = [
         ['relevant experience', 'clear structure'],
         ['too generic'],
         'easy',
-        1
+        1,
       ),
       mockQuestion(
         'mock-1-q2',
@@ -89,7 +101,7 @@ const MOCK_INTERVIEWS: Interview[] = [
         ['ownership', 'trade-offs', 'result'],
         ['no measurable outcome'],
         'medium',
-        2
+        2,
       ),
     ],
     answers: [],
@@ -108,7 +120,7 @@ const MOCK_INTERVIEWS: Interview[] = [
         ['motivation', 'role alignment'],
         ['generic motivation'],
         'easy',
-        1
+        1,
       ),
       mockQuestion(
         'mock-2-q2',
@@ -116,7 +128,7 @@ const MOCK_INTERVIEWS: Interview[] = [
         ['scalability', 'trade-offs'],
         ['no constraints discussion'],
         'hard',
-        3
+        3,
       ),
     ],
     answers: [
@@ -144,7 +156,7 @@ const MOCK_INTERVIEWS: Interview[] = [
         ['self-awareness', 'evidence'],
         ['buzzwords only'],
         'easy',
-        1
+        1,
       ),
       mockQuestion(
         'mock-3-q2',
@@ -152,7 +164,7 @@ const MOCK_INTERVIEWS: Interview[] = [
         ['reflection', 'improvement plan'],
         ['fake weakness'],
         'easy',
-        1
+        1,
       ),
       mockQuestion(
         'mock-3-q3',
@@ -160,7 +172,7 @@ const MOCK_INTERVIEWS: Interview[] = [
         ['career direction', 'role fit'],
         ['no alignment with role'],
         'easy',
-        1
+        1,
       ),
     ],
     answers: [],
@@ -209,123 +221,107 @@ export default function DashboardPage() {
   }, [])
 
   const activeCount = interviews.filter((interview) =>
-    ['pending', 'in_progress', 'processing'].includes(interview.status)
+    ['pending', 'in_progress', 'processing'].includes(interview.status),
   ).length
   const completedCount = interviews.filter((interview) => interview.status === 'completed').length
   const questionVolume = interviews.reduce((sum, interview) => sum + interview.questions.length, 0)
 
   return (
-    <main className="container space-y-8 py-10 md:space-y-10 md:py-12">
-      <section className="grid gap-6 xl:grid-cols-[1.3fr_0.7fr]">
-        <Card className="overflow-hidden border-white/65 bg-white/86 shadow-float backdrop-blur-xl">
-          <CardContent className="flex h-full flex-col gap-8 px-8 py-8">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div className="max-w-2xl space-y-4">
+    <PageShell>
+      <Grid as="section" columns="split-13-7" gap={6}>
+        <Card variant="floating" size="lg" effects="blur-strong">
+          <CardContent layout="fill-column" spacing="2xl">
+            <Inline gap={4} align="start" justify="between" wrap="wrap">
+              <Stack gap={4} width="lg">
                 <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
                   Recruiter Dashboard
                 </EyebrowBadge>
-                <div className="space-y-3">
-                  <h1 className="max-w-3xl text-4xl font-semibold tracking-[-0.04em] text-foreground md:text-5xl">
+                <Stack gap={3}>
+                  <HeroTitle width="prose">
                     Run your interview pipeline from one editorial command surface.
-                  </h1>
-                  <p className="max-w-2xl text-base leading-7 text-muted-foreground md:text-lg">
+                  </HeroTitle>
+                  <HeroLead width="prose">
                     Monitor active sessions, spot stalled candidates, and keep scoring flows moving
                     without dropping into separate admin tools.
-                  </p>
-                </div>
-              </div>
+                  </HeroLead>
+                </Stack>
+              </Stack>
 
-              <div className="flex flex-wrap gap-3">
-                <Button
-                  asChild
-                  className="rounded-full bg-primary-gradient px-5 shadow-soft hover:brightness-105"
-                >
+              <Inline gap={3} wrap="wrap">
+                <Button asChild variant="gradient">
                   <Link href="/interviews/new">
                     New Interview
                     <ArrowRight className="size-4" />
                   </Link>
                 </Button>
-                <Button
-                  asChild
-                  variant="outline"
-                  className="rounded-full bg-white/70 backdrop-blur-sm"
-                >
+                <Button asChild variant="outline-pill" shape="pill" effects="blur">
                   <Link href="/questions">Question Bank</Link>
                 </Button>
-              </div>
-            </div>
+              </Inline>
+            </Inline>
 
-            <div className="grid gap-4 md:grid-cols-3">
+            <Grid columns="metrics-3" gap={4}>
               <MetricPanel
                 icon={<CircleDashed className="size-4" />}
                 label="Active"
                 value={activeCount}
-                valueClassName="mt-4 text-4xl font-semibold tracking-[-0.04em] text-foreground"
                 description="Interviews currently waiting on answers, uploads, or scoring."
               />
               <MetricPanel
                 icon={<Users className="size-4" />}
                 label="Candidates"
                 value={interviews.length}
-                valueClassName="mt-4 text-4xl font-semibold tracking-[-0.04em] text-foreground"
                 description="Total candidate records visible in the current workspace."
               />
               <MetricPanel
                 icon={<Layers3 className="size-4" />}
                 label="Question Load"
                 value={questionVolume}
-                valueClassName="mt-4 text-4xl font-semibold tracking-[-0.04em] text-foreground"
                 description="Questions currently attached across all visible interviews."
               />
-            </div>
+            </Grid>
           </CardContent>
         </Card>
 
-        <Card className="border-white/60 bg-[hsl(var(--surface-low)/0.9)] shadow-soft">
-          <CardHeader className="space-y-3">
+        <Card variant="tinted">
+          <CardHeader spacing="sm">
             <EyebrowBadge icon={<BriefcaseBusiness className="size-3.5" />} tone="muted">
               Snapshot
             </EyebrowBadge>
-            <CardTitle className="text-2xl tracking-[-0.03em]">Today&apos;s pipeline</CardTitle>
-            <CardDescription className="max-w-sm text-sm leading-6">
+            <CardTitle size="lg">Today&apos;s pipeline</CardTitle>
+            <CardDescription width="sm">
               The redesigned shell uses tonal layers instead of hard separators, so activity stays
               readable even when the data density grows.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-5">
+          <CardContent spacing="lg">
             <MetricPanel
               tone="elevated"
+              labelVariant="raw"
               label={
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-sm font-medium text-foreground">
+                <Inline gap={3} align="center" justify="between">
+                  <BodyText as="span" size="sm-tight" tone="foreground">
                     Completed interviews
-                  </span>
+                  </BodyText>
                   <StatusPill tone="completed">{completedCount}</StatusPill>
-                </div>
+                </Inline>
               }
-              unstyledLabel
-              unstyledValue
-              value={null}
-              valueClassName="mt-0"
               description="Finished sessions with scorecards ready for review and handoff."
             />
             <MetricPanel
               tone="elevated"
+              labelVariant="raw"
               label={
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-sm font-medium text-foreground">
+                <Inline gap={3} align="center" justify="between">
+                  <BodyText as="span" size="sm-tight" tone="foreground">
                     Last sync
-                  </span>
+                  </BodyText>
                   <StatusPill tone="neutral">
                     <Clock3 className="size-3" />
                     {loading ? 'Loading' : 'Live'}
                   </StatusPill>
-                </div>
+                </Inline>
               }
-              unstyledLabel
-              unstyledValue
-              value={null}
-              valueClassName="mt-0"
               description={
                 loading
                   ? 'Waiting for the interview feed.'
@@ -334,10 +330,10 @@ export default function DashboardPage() {
             />
           </CardContent>
         </Card>
-      </section>
+      </Grid>
 
       {usingMock && (
-        <Alert className="border-amber-200/70 bg-amber-50/80 text-amber-950">
+        <Alert variant="warning">
           <Sparkles className="size-4" />
           <AlertTitle>Demo data enabled</AlertTitle>
           <AlertDescription>
@@ -354,94 +350,81 @@ export default function DashboardPage() {
           title="No interviews yet"
           description="Start with a candidate, attach questions from the bank, and this dashboard becomes your operating surface."
           action={
-            <Button
-              asChild
-              className="rounded-full bg-primary-gradient px-5 shadow-soft hover:brightness-105"
-            >
+            <Button asChild variant="gradient">
               <Link href="/interviews/new">Create your first interview</Link>
             </Button>
           }
         />
       ) : (
-        <section className="space-y-4">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div className="space-y-2">
-              <div className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-                Active records
-              </div>
-              <h2 className="text-2xl font-semibold tracking-[-0.03em] text-foreground">
-                Recent interviews
-              </h2>
-            </div>
-            <Button
-              asChild
-              variant="outline"
-              className="rounded-full bg-white/70 backdrop-blur-sm"
-            >
+        <Section gap={4}>
+          <Inline gap={4} align="end" justify="between" wrap="wrap">
+            <Stack gap={2}>
+              <EyebrowLabel size="lg">Active records</EyebrowLabel>
+              <SectionHeading>Recent interviews</SectionHeading>
+            </Stack>
+            <Button asChild variant="outline-pill" shape="pill" effects="blur">
               <Link href="/questions/new">Create a new question</Link>
             </Button>
-          </div>
+          </Inline>
 
-          <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
+          <Grid columns="cards-2-3" gap={4}>
             {interviews.map((interview) => (
-              <Link
-                key={interview.id}
-                href={`/interviews/${interview.id}`}
-                className="group no-underline"
-              >
-                <Card className="h-full border-white/65 bg-white/88 transition-transform duration-200 hover:-translate-y-1 hover:shadow-float">
-                  <CardHeader className="gap-4">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex items-center gap-3">
-                        <div className="flex size-12 items-center justify-center rounded-[1.2rem] bg-[hsl(var(--primary-fixed)/0.9)] text-sm font-semibold text-[hsl(var(--primary))]">
-                          {getCandidateInitials(interview.candidateName)}
-                        </div>
-                        <div>
-                          <CardTitle className="text-lg tracking-[-0.03em]">
-                            {interview.candidateName}
-                          </CardTitle>
-                          <CardDescription>{interview.position}</CardDescription>
-                        </div>
-                      </div>
-                      <StatusPill tone={interview.status}>
-                        {formatInterviewStatusLabel(interview.status)}
-                      </StatusPill>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-3 text-sm">
-                      <div className="rounded-[1rem] bg-[hsl(var(--surface-low)/0.85)] p-3 ring-1 ring-border/45">
-                        <div className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                          Questions
-                        </div>
-                        <div className="mt-2 text-xl font-semibold tracking-[-0.03em] text-foreground">
-                          {interview.questions.length}
-                        </div>
-                      </div>
-                      <div className="rounded-[1rem] bg-[hsl(var(--surface-low)/0.85)] p-3 ring-1 ring-border/45">
-                        <div className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                          Uploaded
-                        </div>
-                        <div className="mt-2 text-xl font-semibold tracking-[-0.03em] text-foreground">
-                          {interview.answers.filter((answer) => answer.status === 'submitted').length}
-                        </div>
-                      </div>
-                    </div>
+              <HoverGroup key={interview.id}>
+                <UnstyledLink href={`/interviews/${interview.id}`}>
+                  <Card variant="surface" height="full" interaction="hover">
+                    <CardHeader spacing="md">
+                      <Inline gap={4} align="start" justify="between">
+                        <Inline gap={3} align="center">
+                          <IconBadge tone="primary" size="md" textSize="sm">
+                            {getCandidateInitials(interview.candidateName)}
+                          </IconBadge>
+                          <Stack gap={0}>
+                            <CardTitle size="list">{interview.candidateName}</CardTitle>
+                            <CardDescription>{interview.position}</CardDescription>
+                          </Stack>
+                        </Inline>
+                        <StatusPill tone={interview.status}>
+                          {formatInterviewStatusLabel(interview.status)}
+                        </StatusPill>
+                      </Inline>
+                    </CardHeader>
+                    <CardContent spacing="md">
+                      <Grid columns={2} gap={3}>
+                        <MetricPanel
+                          tone="elevated"
+                          label="Questions"
+                          value={interview.questions.length}
+                          valueSize="md"
+                        />
+                        <MetricPanel
+                          tone="elevated"
+                          label="Uploaded"
+                          value={
+                            interview.answers.filter(
+                              (answer) => answer.status === 'submitted',
+                            ).length
+                          }
+                          valueSize="md"
+                        />
+                      </Grid>
 
-                    <div className="flex items-center justify-between text-sm text-muted-foreground">
-                      <span>Updated {formatInterviewDate(interview.updatedAt)}</span>
-                      <span className="inline-flex items-center gap-1 font-medium text-foreground transition-transform group-hover:translate-x-0.5">
-                        Open
-                        <ArrowRight className="size-4" />
-                      </span>
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
+                      <Inline gap={3} align="center" justify="between">
+                        <BodyText as="span" size="sm">
+                          Updated {formatInterviewDate(interview.updatedAt)}
+                        </BodyText>
+                        <HoverCue>
+                          Open
+                          <ArrowRight className="size-4" />
+                        </HoverCue>
+                      </Inline>
+                    </CardContent>
+                  </Card>
+                </UnstyledLink>
+              </HoverGroup>
             ))}
-          </div>
-        </section>
+          </Grid>
+        </Section>
       )}
-    </main>
+    </PageShell>
   )
 }

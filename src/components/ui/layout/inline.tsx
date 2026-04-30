@@ -1,49 +1,76 @@
-import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
+import * as React from 'react'
+import { cva, type VariantProps } from 'class-variance-authority'
 
-const inlineVariants = cva("flex flex-row", {
+import { cn } from '@/lib/utils'
+
+const inlineVariants = cva('flex flex-row', {
   variants: {
     gap: {
-      0: "gap-0",
-      1: "gap-1",
-      2: "gap-2",
-      3: "gap-3",
-      4: "gap-4",
-      6: "gap-6",
+      0: 'gap-0',
+      1: 'gap-1',
+      2: 'gap-2',
+      3: 'gap-3',
+      4: 'gap-4',
+      5: 'gap-5',
+      6: 'gap-6',
+      8: 'gap-8',
     },
     align: {
-      stretch: "items-stretch",
-      start: "items-start",
-      center: "items-center",
-      end: "items-end",
+      stretch: 'items-stretch',
+      start: 'items-start',
+      center: 'items-center',
+      end: 'items-end',
+      baseline: 'items-baseline',
     },
     justify: {
-      start: "justify-start",
-      center: "justify-center",
-      end: "justify-end",
-      between: "justify-between",
+      start: 'justify-start',
+      center: 'justify-center',
+      end: 'justify-end',
+      between: 'justify-between',
+      around: 'justify-around',
     },
     wrap: {
-      false: "flex-nowrap",
-      true: "flex-wrap",
+      nowrap: 'flex-nowrap',
+      wrap: 'flex-wrap',
+    },
+    width: {
+      auto: '',
+      full: 'w-full',
     },
   },
   defaultVariants: {
-    gap: 0,
-    align: "stretch",
-    justify: "start",
-    wrap: false,
+    gap: 4,
+    align: 'center',
+    justify: 'start',
+    wrap: 'nowrap',
+    width: 'auto',
   },
 })
 
-type InlineProps = Omit<React.ComponentPropsWithoutRef<"div">, "className"> &
+type InlineProps = Omit<React.ComponentProps<'div'>, 'color'> &
   VariantProps<typeof inlineVariants> & {
-    as?: "div" | "span"
+    as?: keyof React.JSX.IntrinsicElements
   }
 
-function Inline({ as, gap, align, justify, wrap, ...props }: InlineProps) {
-  const Comp = as ?? "div"
-  return <Comp {...props} className={inlineVariants({ gap, align, justify, wrap })} />
-}
+export function Inline({
+  as,
+  className,
+  gap,
+  align,
+  justify,
+  wrap,
+  width,
+  ...props
+}: InlineProps) {
+  const Comp = (as ?? 'div') as React.ElementType
 
-export { Inline }
+  return (
+    <Comp
+      className={cn(
+        inlineVariants({ gap, align, justify, wrap, width }),
+        className,
+      )}
+      {...props}
+    />
+  )
+}

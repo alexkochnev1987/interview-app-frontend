@@ -1,87 +1,99 @@
-'use client';
+'use client'
 
-import Link from 'next/link';
-import { useAuth } from '@/lib/auth-context';
-import { usePathname } from 'next/navigation';
-import { Sparkles, LogOut, Plus, LayoutDashboard, LibraryBig } from 'lucide-react';
+import { useAuth } from '@/lib/auth-context'
+import { usePathname } from 'next/navigation'
+import { Sparkles, LogOut, Plus, LayoutDashboard, LibraryBig } from 'lucide-react'
 
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { AppHeader, AppHeaderInner } from '@/components/ui/app-header'
+import { EyebrowLabel } from '@/components/ui/eyebrow-label'
+import { IconBadge } from '@/components/ui/icon-badge'
+import { SurfaceTile } from '@/components/ui/surface-tile'
+import { Button } from '@/components/ui/button'
+import { Inline } from '@/components/ui/layout/inline'
+import { Stack } from '@/components/ui/layout/stack'
+import { NavLink } from '@/components/ui/nav-link'
+import { BodyText } from '@/components/ui/text'
+import { UnstyledLink } from '@/components/ui/unstyled-link'
 
 export function NavHeader() {
-  const { user, loading, logout } = useAuth();
-  const pathname = usePathname();
+  const { user, loading, logout } = useAuth()
+  const pathname = usePathname()
 
-  // Hide nav on candidate/feedback pages
   if (pathname.startsWith('/take') || pathname.startsWith('/feedback')) {
-    return null;
+    return null
   }
 
   const links = [
     { href: '/', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/questions', label: 'Questions', icon: LibraryBig },
     { href: '/interviews/new', label: 'New Interview', icon: Plus },
-  ];
+  ]
 
   function isActive(href: string) {
     if (href === '/') {
-      return pathname === '/';
+      return pathname === '/'
     }
-    return pathname === href || pathname.startsWith(`${href}/`);
+    return pathname === href || pathname.startsWith(`${href}/`)
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/50 bg-background/80 backdrop-blur-xl">
-      <div className="container flex min-h-20 flex-wrap items-center justify-between gap-4 py-4">
-        <Link href="/" className="flex items-center gap-3 no-underline">
-          <div className="flex size-12 items-center justify-center rounded-[1.25rem] bg-primary-gradient text-primary-foreground shadow-soft">
-            <Sparkles className="size-5" />
-          </div>
-          <div className="space-y-0.5">
-            <div className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-              Intelligent Conductor
-            </div>
-            <div className="text-sm font-semibold text-foreground md:text-base">
-              AI Interview Architect
-            </div>
-          </div>
-        </Link>
-
-        <nav className="order-3 flex w-full flex-wrap items-center gap-2 md:order-2 md:w-auto md:justify-center">
-          {loading
-            ? null
-            : user &&
-              links.map(({ href, label, icon: Icon }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  className={cn(
-                    "inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium no-underline transition-colors",
-                    isActive(href)
-                      ? "bg-[hsl(var(--surface-low))] text-foreground ring-1 ring-border/60"
-                      : "text-muted-foreground hover:bg-[hsl(var(--surface-low)/0.75)] hover:text-foreground"
-                  )}
+    <AppHeader>
+      <AppHeaderInner
+        brand={
+          <UnstyledLink href="/">
+            <Inline gap={3} align="center">
+              <IconBadge tone="gradient" size="md">
+                <Sparkles className="size-5" />
+              </IconBadge>
+              <Stack gap={0}>
+                <EyebrowLabel size="lg">Intelligent Conductor</EyebrowLabel>
+                <BodyText
+                  as="span"
+                  size="responsive-sm"
+                  weight="semibold"
+                  tone="foreground"
                 >
-                  <Icon className="size-4" />
-                  {label}
-                </Link>
-              ))}
-        </nav>
-
-        <div className="order-2 flex items-center gap-2 md:order-3">
-          {loading ? null : user ? (
+                  AI Interview Architect
+                </BodyText>
+              </Stack>
+            </Inline>
+          </UnstyledLink>
+        }
+        nav={
+          loading
+            ? null
+            : user
+              ? links.map(({ href, label, icon: Icon }) => (
+                  <NavLink key={href} href={href} active={isActive(href)}>
+                    <Icon className="size-4" />
+                    {label}
+                  </NavLink>
+                ))
+              : null
+        }
+        actions={
+          loading ? null : user ? (
             <>
-              <div className="hidden rounded-full bg-[hsl(var(--surface-low))] px-3 py-2 text-right ring-1 ring-border/50 sm:block">
-                <div className="text-xs font-medium text-foreground">{user.name}</div>
-                <div className="text-[0.68rem] uppercase tracking-[0.18em] text-muted-foreground">
+              <SurfaceTile
+                tone="soft"
+                rounded="pill"
+                padding="sm"
+                visibility="sm-only"
+                textAlign="end"
+              >
+                <BodyText as="span" size="xs" weight="medium" tone="foreground">
+                  {user.name}
+                </BodyText>
+                <EyebrowLabel size="md" weight="normal">
                   {user.role}
-                </div>
-              </div>
+                </EyebrowLabel>
+              </SurfaceTile>
               <Button
                 type="button"
-                variant="outline"
+                variant="outline-pill"
+                shape="pill"
                 size="sm"
-                className="rounded-full bg-white/70 backdrop-blur-sm"
+                effects="blur"
                 onClick={logout}
               >
                 <LogOut className="size-4" />
@@ -89,12 +101,12 @@ export function NavHeader() {
               </Button>
             </>
           ) : (
-            <Button asChild size="sm" className="rounded-full bg-primary-gradient shadow-soft hover:brightness-105">
-              <Link href="/login">Sign In</Link>
+            <Button asChild variant="gradient" size="sm">
+              <UnstyledLink href="/login">Sign In</UnstyledLink>
             </Button>
-          )}
-        </div>
-      </div>
-    </header>
-  );
+          )
+        }
+      />
+    </AppHeader>
+  )
 }

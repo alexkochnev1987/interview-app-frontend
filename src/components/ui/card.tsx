@@ -4,83 +4,79 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const cardVariants = cva(
-  "group/card flex flex-col gap-4 overflow-hidden rounded-xl bg-card py-4 text-sm text-card-foreground ring-1 ring-foreground/10 has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
+  "group/card flex flex-col overflow-hidden rounded-xl text-sm text-card-foreground has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
   {
     variants: {
-      tone: {
+      variant: {
+        default: "bg-card ring-1 ring-foreground/10",
+        surface:
+          "border border-hairline-strong bg-surface-glass shadow-soft",
+        floating:
+          "border border-hairline-strong bg-surface-glass shadow-float",
+        tinted:
+          "border border-hairline-strong bg-surface-low-glass shadow-soft",
+        warning:
+          "border border-warning-soft-border bg-warning-soft shadow-soft",
+        "danger-soft":
+          "border border-danger-soft-border bg-danger-soft text-danger-soft-foreground shadow-soft [&_[data-slot=card-title]]:text-danger-soft-foreground [&_[data-slot=card-description]]:text-danger-soft-foreground/80",
+        ghost: "bg-transparent",
+      },
+      size: {
+        xs: "gap-2 py-2",
+        sm: "gap-3 py-3",
+        default: "gap-4 py-4",
+        md: "gap-5 py-5",
+        lg: "gap-6 py-8",
+        state: "gap-4 py-16 min-h-[300px]",
+      },
+      effects: {
+        none: "",
+        blur: "backdrop-blur-sm",
+        "blur-strong": "backdrop-blur-xl",
+      },
+      interaction: {
+        none: "",
+        hover:
+          "transition-transform duration-200 group-hover:-translate-y-1 group-hover:shadow-float",
+      },
+      state: {
         default: "",
-        surfaceGlassSoft: "border-white/65 bg-white/88 text-card-foreground shadow-soft",
-        surfaceGlassFloat: "border-white/65 bg-white/88 text-card-foreground shadow-float",
-        surfaceMutedSoft:
-          "border-white/60 bg-[hsl(var(--surface-low)/0.9)] text-card-foreground shadow-soft",
+        selected: "ring-2 ring-destructive/70",
+        deleted: "opacity-80",
+      },
+      height: {
+        auto: "",
+        full: "h-full",
       },
     },
     defaultVariants: {
-      tone: "default",
+      variant: "default",
+      size: "default",
+      effects: "none",
+      interaction: "none",
+      state: "default",
+      height: "auto",
     },
-  }
+  },
 )
-
-const cardHeaderVariants = cva(
-  "group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-xl px-4 group-data-[size=sm]/card:px-3 has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3",
-  {
-    variants: {
-      layout: {
-        default: "",
-        form: "space-y-3 px-8 pt-8",
-      },
-    },
-    defaultVariants: {
-      layout: "default",
-    },
-  }
-)
-
-const cardTitleVariants = cva("font-heading text-base leading-snug font-medium group-data-[size=sm]/card:text-sm", {
-  variants: {
-    size: {
-      default: "",
-      section: "text-2xl tracking-[-0.03em]",
-    },
-  },
-  defaultVariants: {
-    size: "default",
-  },
-})
-
-const cardContentVariants = cva("px-4 group-data-[size=sm]/card:px-3", {
-  variants: {
-    layout: {
-      default: "",
-      spacious: "space-y-6 px-8 py-8",
-      hero: "flex h-full flex-col gap-6 px-8 py-8",
-      form: "px-8 pb-8",
-      compact: "space-y-3 px-5 py-5",
-      takeComplete: "space-y-6 px-8 py-10 text-center",
-      stateLoading: "py-16 text-center text-sm text-muted-foreground",
-      stateEmpty: "flex flex-col items-center gap-4 py-16 text-center",
-    },
-  },
-  defaultVariants: {
-    layout: "default",
-  },
-})
 
 function Card({
   className,
-  size = "default",
-  tone = "default",
+  variant,
+  size,
+  effects,
+  interaction,
+  state,
+  height,
   ...props
-}: React.ComponentProps<"div"> &
-  { size?: "default" | "sm" } &
-  VariantProps<typeof cardVariants>) {
+}: React.ComponentProps<"div"> & VariantProps<typeof cardVariants>) {
   return (
     <div
       data-slot="card"
-      data-size={size}
-      data-tone={tone}
+      data-size={size ?? "default"}
+      data-variant={variant ?? "default"}
       className={cn(
-        cardVariants({ tone }),
+        cardVariants({ variant, size, effects, interaction, state, height }),
         className
       )}
       {...props}
@@ -88,39 +84,148 @@ function Card({
   )
 }
 
+const cardHeaderSpacingVariants = cva("", {
+  variants: {
+    spacing: {
+      none: "gap-0",
+      xs: "gap-2",
+      sm: "gap-3",
+      md: "gap-4",
+      lg: "gap-5",
+      xl: "gap-6",
+      "2xl": "gap-8",
+    },
+  },
+  defaultVariants: {
+    spacing: "none",
+  },
+})
+
+const cardContentVariants = cva("", {
+  variants: {
+    spacing: {
+      none: "",
+      xs: "space-y-2",
+      sm: "space-y-3",
+      md: "space-y-4",
+      lg: "space-y-5",
+      xl: "space-y-6",
+      "2xl": "space-y-8",
+    },
+    layout: {
+      default: "",
+      "fill-column": "flex h-full flex-col",
+      "row-end": "flex flex-wrap justify-end",
+      "split-row": "flex flex-col sm:flex-row sm:items-center sm:justify-between",
+      "stack-center": "flex flex-1 flex-col items-center justify-center text-center",
+    },
+  },
+  compoundVariants: [
+    { layout: "fill-column", spacing: "none", className: "gap-0" },
+    { layout: "fill-column", spacing: "xs", className: "space-y-0 gap-2" },
+    { layout: "fill-column", spacing: "sm", className: "space-y-0 gap-3" },
+    { layout: "fill-column", spacing: "md", className: "space-y-0 gap-4" },
+    { layout: "fill-column", spacing: "lg", className: "space-y-0 gap-5" },
+    { layout: "fill-column", spacing: "xl", className: "space-y-0 gap-6" },
+    { layout: "fill-column", spacing: "2xl", className: "space-y-0 gap-8" },
+    { layout: "row-end", spacing: "sm", className: "space-y-0 gap-3" },
+    { layout: "row-end", spacing: "md", className: "space-y-0 gap-4" },
+    { layout: "split-row", spacing: "md", className: "space-y-0 gap-4" },
+    { layout: "split-row", spacing: "sm", className: "space-y-0 gap-3" },
+    { layout: "stack-center", spacing: "md", className: "space-y-0 gap-4" },
+    { layout: "stack-center", spacing: "lg", className: "space-y-0 gap-5" },
+    { layout: "stack-center", spacing: "xl", className: "space-y-0 gap-6" },
+  ],
+  defaultVariants: {
+    spacing: "none",
+    layout: "default",
+  },
+})
+
 function CardHeader({
   className,
-  layout = "default",
+  spacing,
   ...props
-}: React.ComponentProps<"div"> & VariantProps<typeof cardHeaderVariants>) {
+}: React.ComponentProps<"div"> &
+  VariantProps<typeof cardHeaderSpacingVariants>) {
   return (
     <div
       data-slot="card-header"
-      className={cn(cardHeaderVariants({ layout }), className)}
+      className={cn(
+        "group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-xl px-4 group-data-[size=xs]/card:px-6 group-data-[size=sm]/card:px-3 group-data-[size=md]/card:px-5 group-data-[size=lg]/card:px-8 group-data-[size=state]/card:px-8 has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3",
+        cardHeaderSpacingVariants({ spacing }),
+        className
+      )}
       {...props}
     />
   )
 }
 
+const cardTitleVariants = cva(
+  "font-heading font-medium group-data-[size=sm]/card:text-sm",
+  {
+    variants: {
+      size: {
+        default: "text-base leading-snug",
+        list: "text-lg tracking-display leading-snug",
+        "list-clamp": "text-lg tracking-display leading-7 line-clamp-3",
+        md: "text-xl tracking-display leading-snug",
+        lg: "text-2xl tracking-display leading-snug",
+        xl: "text-3xl font-semibold tracking-display-tight leading-snug",
+      },
+      width: {
+        auto: "",
+        sm: "max-w-sm",
+        md: "max-w-md",
+        lg: "max-w-2xl",
+        xl: "max-w-4xl",
+      },
+    },
+    defaultVariants: {
+      size: "default",
+      width: "auto",
+    },
+  },
+)
+
 function CardTitle({
   className,
-  size = "default",
+  size,
+  width,
   ...props
 }: React.ComponentProps<"div"> & VariantProps<typeof cardTitleVariants>) {
   return (
     <div
       data-slot="card-title"
-      className={cn(cardTitleVariants({ size }), className)}
+      className={cn(cardTitleVariants({ size, width }), className)}
       {...props}
     />
   )
 }
 
-function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
+const cardDescriptionVariants = cva("text-sm leading-6 text-muted-foreground", {
+  variants: {
+    width: {
+      auto: "",
+      sm: "max-w-sm",
+      md: "max-w-md",
+      lg: "max-w-2xl",
+    },
+  },
+  defaultVariants: {
+    width: "auto",
+  },
+})
+
+function CardDescription({
+  className,
+  width,
+  ...props
+}: React.ComponentProps<"div"> & VariantProps<typeof cardDescriptionVariants>) {
   return (
     <div
       data-slot="card-description"
-      className={cn("text-sm text-muted-foreground", className)}
+      className={cn(cardDescriptionVariants({ width }), className)}
       {...props}
     />
   )
@@ -141,13 +246,18 @@ function CardAction({ className, ...props }: React.ComponentProps<"div">) {
 
 function CardContent({
   className,
-  layout = "default",
+  spacing,
+  layout,
   ...props
 }: React.ComponentProps<"div"> & VariantProps<typeof cardContentVariants>) {
   return (
     <div
       data-slot="card-content"
-      className={cn(cardContentVariants({ layout }), className)}
+      className={cn(
+        "px-4 group-data-[size=xs]/card:px-6 group-data-[size=sm]/card:px-3 group-data-[size=md]/card:px-5 group-data-[size=lg]/card:px-8 group-data-[size=state]/card:px-8",
+        cardContentVariants({ spacing, layout }),
+        className
+      )}
       {...props}
     />
   )
@@ -174,4 +284,5 @@ export {
   CardAction,
   CardDescription,
   CardContent,
+  cardVariants,
 }

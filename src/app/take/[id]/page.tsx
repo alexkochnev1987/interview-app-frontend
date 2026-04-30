@@ -1,13 +1,130 @@
 'use client'
 
+import { useEffect, useRef, useState } from 'react'
 import { useParams, useSearchParams } from 'next/navigation'
-import { LoadingStateCard } from '@/components/app/state-card'
-import { PageContent, PageMainLayout } from '@/components/layout/page-shell'
-import { TakeCompleteScreen } from '@/components/take/take-complete-screen'
-import { TakeConsentScreen } from '@/components/take/take-consent-screen'
-import { TakeRecordingScreen } from '@/components/take/take-recording-screen'
+import {
+  Camera,
+  CheckCircle2,
+  CircleAlert,
+  CircleDot,
+  Mic,
+  ShieldCheck,
+  Sparkles,
+  Video,
+} from 'lucide-react'
+
+import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
+import { EyebrowLabel } from '@/components/ui/eyebrow-label'
+import { HeroLead, HeroTitle } from '@/components/ui/hero-text'
+import { IconBadge } from '@/components/ui/icon-badge'
+import { InfoCard } from '@/components/ui/info-card'
+import { MetricPanel } from '@/components/ui/metric-panel'
+import {
+  PermissionPill,
+  type PermissionStatus,
+} from '@/components/ui/permission-pill'
+import { RecordingBadge } from '@/components/ui/recording-badge'
+import { StatusPill } from '@/components/ui/status-pill'
+import { LoadingStateCard } from '@/components/ui/state-card'
+import { SurfaceTile } from '@/components/ui/surface-tile'
+import { PageShell } from '@/components/ui/layout/page-shell'
+import { LiveTranscriptPanel } from '@/components/take/live-transcript-panel'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { useTakeOrchestrator } from '@/features/take'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Grid } from '@/components/ui/layout/grid'
+import { Inline } from '@/components/ui/layout/inline'
+import { Section } from '@/components/ui/layout/section'
+import { Stack } from '@/components/ui/layout/stack'
+import { Label } from '@/components/ui/label'
+import { Progress } from '@/components/ui/progress'
+import { BodyText, SectionHeading } from '@/components/ui/text'
+import { VideoFrame, VideoSurface } from '@/components/ui/video-frame'
+import { useBrowserTranscript } from '@/lib/use-browser-transcript'
+
+interface InterviewData {
+  id: string
+  position: string
+  candidateName: string
+  totalQuestions: number
+  currentQuestion: { text: string } | null
+  currentQuestionIndex: number
+  currentAnswerMeta: {
+    status: 'recording' | 'submitted'
+    versionCount: number
+    selectedVersionNumber: number
+  } | null
+  completed: boolean
+}
+
+type Stage = 'loading' | 'consent' | 'interview' | 'recording' | 'transition' | 'complete'
+type CaptureTarget = 'camera' | 'screen'
+type PendingVersionAction = 'submit' | 'rerecord' | null
+type ScreenTrackSettings = MediaTrackSettings & { displaySurface?: string }
+type InterviewDisplayMediaOptions = DisplayMediaStreamOptions & {
+  monitorTypeSurfaces?: 'include' | 'exclude'
+  selfBrowserSurface?: 'include' | 'exclude'
+  surfaceSwitching?: 'include' | 'exclude'
+  systemAudio?: 'include' | 'exclude'
+}
+
+interface AnswerBehaviorSignals {
+  tabHiddenCount: number
+  windowBlurCount: number
+  pasteCount: number
+  keydownCount: number
+  resizeCount: number
+}
+
+interface AnswerBehaviorEvent {
+  eventType: 'tab_hidden' | 'window_blur' | 'paste' | 'keydown' | 'resize'
+  occurredAt: string
+  versionNumber: number
+}
+
+interface MultipartUploadSessionResponse {
+  mediaKey: string
+  uploadId: string
+}
+
+interface MultipartUploadPartResponse {
+  mediaKey: string
+  uploadId: string
+  partNumber: number
+  uploadUrl: string
+}
+
+interface MultipartUploadSession {
+  mediaKey: string
+  uploadId: string
+  nextPartNumber: number
+  bufferedChunks: Blob[]
+  bufferedBytes: number
+  recordedBytes: number
+  uploadChain: Promise<void>
+  completed: boolean
+  aborted: boolean
+}
+
+interface MultipartUploadState {
+  camera: MultipartUploadSession | null
+  screen: MultipartUploadSession | null
+}
+
+const MULTIPART_PART_SIZE_BYTES = 6 * 1024 * 1024
+const PROGRESS_HEARTBEAT_MS = 3000
+const PROGRESS_DEBOUNCE_MS = 400
+
+function createEmptyBehaviorSignals(): AnswerBehaviorSignals {
+  return {
+    tabHiddenCount: 0,
+    windowBlurCount: 0,
+    pasteCount: 0,
+    keydownCount: 0,
+    resizeCount: 0,
+  }
+}
 
 export default function TakeInterviewPage() {
   const params = useParams()
@@ -15,99 +132,1291 @@ export default function TakeInterviewPage() {
   const id = params.id as string
   const candidateToken = searchParams.get('token')?.trim() ?? ''
   const {
-    stage,
-    interview,
-    error,
-    consent,
+    isSupported: isBrowserTranscriptSupported,
+    interimTranscript,
+    finalTranscript,
+    warning: browserTranscriptWarning,
+    start: startBrowserTranscript,
+    stop: stopBrowserTranscript,
+    reset: resetBrowserTranscript,
+    getSnapshot: getBrowserTranscriptSnapshot,
+  } = useBrowserTranscript()
+
+  const [stage, setStage] = useState<Stage>('loading')
+  const [interview, setInterview] = useState<InterviewData | null>(null)
+  const [error, setError] = useState('')
+  const [consent, setConsent] = useState(false)
+  const [recording, setRecording] = useState(false)
+  const [timeLeft, setTimeLeft] = useState(240)
+  const [retakeCount, setRetakeCount] = useState(0)
+  const [currentVersionNumber, setCurrentVersionNumber] = useState(1)
+  const [uploading, setUploading] = useState(false)
+  const [cameraStatus, setCameraStatus] = useState<PermissionStatus>('idle')
+  const [screenStatus, setScreenStatus] = useState<PermissionStatus>('idle')
+  const [screenSurface, setScreenSurface] = useState('')
+  const [setupBusy, setSetupBusy] = useState(false)
+  const [setupError, setSetupError] = useState('')
+  const [transitionLabel, setTransitionLabel] = useState('')
+
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const cameraRecorderRef = useRef<MediaRecorder | null>(null)
+  const screenRecorderRef = useRef<MediaRecorder | null>(null)
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const progressHeartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const progressFlushTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const cameraStreamRef = useRef<MediaStream | null>(null)
+  const screenStreamRef = useRef<MediaStream | null>(null)
+  const discardRecordingRef = useRef(false)
+  const answerStartedAtRef = useRef<string | null>(null)
+  const answerStartedAtMsRef = useRef<number | null>(null)
+  const answerStoppedAtMsRef = useRef<number | null>(null)
+  const answerDurationSecondsRef = useRef<number>(0)
+  const stoppedRecordersRef = useRef(0)
+  const currentVersionNumberRef = useRef(1)
+  const behaviorSignalsRef = useRef<AnswerBehaviorSignals>(createEmptyBehaviorSignals())
+  const behaviorEventsRef = useRef<AnswerBehaviorEvent[]>([])
+  const flushedBehaviorEventCountRef = useRef(0)
+  const progressRequestChainRef = useRef(Promise.resolve())
+  const pendingVersionActionRef = useRef<PendingVersionAction>(null)
+  const multipartUploadsRef = useRef<MultipartUploadState>({
+    camera: null,
+    screen: null,
+  })
+  const beginRecordingRef = useRef<(nextVersionNumber: number) => Promise<void>>(
+    async () => undefined,
+  )
+  const autoStartedQuestionKeyRef = useRef('')
+
+  useEffect(() => {
+    if (!recording) {
+      return
+    }
+
+    const recordBehaviorEvent = (
+      eventType: AnswerBehaviorEvent['eventType'],
+      signalKey: keyof AnswerBehaviorSignals,
+    ) => {
+      behaviorSignalsRef.current = {
+        ...behaviorSignalsRef.current,
+        [signalKey]: behaviorSignalsRef.current[signalKey] + 1,
+      }
+
+      behaviorEventsRef.current = [
+        ...behaviorEventsRef.current,
+        {
+          eventType,
+          occurredAt: new Date().toISOString(),
+          versionNumber: currentVersionNumberRef.current,
+        },
+      ]
+
+      scheduleProgressFlush('event')
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        recordBehaviorEvent('tab_hidden', 'tabHiddenCount')
+      }
+    }
+
+    const handleWindowBlur = () => {
+      recordBehaviorEvent('window_blur', 'windowBlurCount')
+    }
+
+    const handlePaste = () => {
+      recordBehaviorEvent('paste', 'pasteCount')
+    }
+
+    const handleResize = () => {
+      recordBehaviorEvent('resize', 'resizeCount')
+    }
+
+    const handleKeydown = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey) {
+        return
+      }
+
+      if (event.key === 'Shift' || event.key === 'CapsLock') {
+        return
+      }
+
+      recordBehaviorEvent('keydown', 'keydownCount')
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    window.addEventListener('blur', handleWindowBlur)
+    document.addEventListener('paste', handlePaste)
+    window.addEventListener('resize', handleResize)
+    window.addEventListener('keydown', handleKeydown, true)
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      window.removeEventListener('blur', handleWindowBlur)
+      document.removeEventListener('paste', handlePaste)
+      window.removeEventListener('resize', handleResize)
+      window.removeEventListener('keydown', handleKeydown, true)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [recording])
+
+  function stopMediaStream(stream: MediaStream | null) {
+    if (!stream) {
+      return
+    }
+
+    stream.getTracks().forEach((track) => {
+      track.onended = null
+      track.stop()
+    })
+  }
+
+  function releaseCaptureStreams() {
+    stopMediaStream(cameraStreamRef.current)
+    stopMediaStream(screenStreamRef.current)
+    cameraStreamRef.current = null
+    screenStreamRef.current = null
+
+    if (videoRef.current) {
+      videoRef.current.srcObject = null
+    }
+  }
+
+  function attachCameraPreview(stream: MediaStream) {
+    cameraStreamRef.current = stream
+    if (videoRef.current) {
+      videoRef.current.srcObject = stream
+      void videoRef.current.play().catch(() => undefined)
+    }
+  }
+
+  function clearProgressTimers() {
+    if (timerRef.current) {
+      clearInterval(timerRef.current)
+      timerRef.current = null
+    }
+
+    if (progressHeartbeatRef.current) {
+      clearInterval(progressHeartbeatRef.current)
+      progressHeartbeatRef.current = null
+    }
+
+    if (progressFlushTimeoutRef.current) {
+      clearTimeout(progressFlushTimeoutRef.current)
+      progressFlushTimeoutRef.current = null
+    }
+  }
+
+  function clearRecordingArtifacts() {
+    clearProgressTimers()
+    answerStartedAtRef.current = null
+    answerStartedAtMsRef.current = null
+    answerStoppedAtMsRef.current = null
+    answerDurationSecondsRef.current = 0
+    stoppedRecordersRef.current = 0
+    behaviorSignalsRef.current = createEmptyBehaviorSignals()
+    behaviorEventsRef.current = []
+    flushedBehaviorEventCountRef.current = 0
+    progressRequestChainRef.current = Promise.resolve()
+    multipartUploadsRef.current = {
+      camera: null,
+      screen: null,
+    }
+  }
+
+  function stopActiveRecorders() {
+    clearProgressTimers()
+
+    if (cameraRecorderRef.current?.state === 'recording') {
+      cameraRecorderRef.current.stop()
+    }
+
+    if (screenRecorderRef.current?.state === 'recording') {
+      screenRecorderRef.current.stop()
+    }
+
+    setRecording(false)
+  }
+
+  function resetInterviewSetup(message: string) {
+    discardRecordingRef.current = true
+    pendingVersionActionRef.current = null
+    stopActiveRecorders()
+    void abortMultipartUploads()
+    clearRecordingArtifacts()
+    setCameraStatus('idle')
+    setScreenStatus('denied')
+    setScreenSurface('')
+    setSetupBusy(false)
+    setSetupError(message)
+    setTransitionLabel('')
+    autoStartedQuestionKeyRef.current = ''
+    releaseCaptureStreams()
+    setStage('consent')
+  }
+
+  function getPermissionErrorMessage(error: unknown, requiresEntireScreen = false) {
+    if (requiresEntireScreen) {
+      return 'Choose Entire screen / Screen in the share picker. Browser tabs and app windows are not accepted.'
+    }
+
+    if (error instanceof DOMException) {
+      if (error.name === 'NotAllowedError') {
+        return 'Camera, microphone, and screen sharing must be allowed to continue.'
+      }
+      if (error.name === 'NotFoundError') {
+        return 'A camera, microphone, or shareable display source was not found on this device.'
+      }
+      if (error.name === 'AbortError') {
+        return 'Permission setup was interrupted. Please try again.'
+      }
+    }
+
+    if (error instanceof Error && error.message) {
+      return error.message
+    }
+
+    return 'Camera, microphone, and screen sharing must be enabled before the interview can start.'
+  }
+
+  async function loadInterview(
+    mode: 'initial' | 'resume' = 'initial',
+    tokenOverride?: string,
+  ) {
+    try {
+      const apiUrl = tokenOverride
+        ? `/api/take/${id}?token=${encodeURIComponent(tokenOverride)}`
+        : `/api/take/${id}`
+      const response = await fetch(apiUrl)
+      if (!response.ok) {
+        throw new Error('Invalid or expired interview link')
+      }
+      const data: InterviewData = await response.json()
+      setInterview(data)
+
+      if (mode === 'initial' && tokenOverride && typeof window !== 'undefined') {
+        window.history.replaceState(null, '', `/take/${id}`)
+      }
+
+      if (data.completed) {
+        releaseCaptureStreams()
+        setStage('complete')
+      } else if (mode === 'initial') {
+        setStage('consent')
+      } else {
+        setStage('interview')
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load interview')
+    }
+  }
+
+  useEffect(() => {
+    void loadInterview('initial', candidateToken)
+
+    return () => {
+      clearProgressTimers()
+      void abortMultipartUploads()
+      releaseCaptureStreams()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  async function handleStartInterview() {
+    if (!navigator.mediaDevices?.getUserMedia || !navigator.mediaDevices?.getDisplayMedia) {
+      setSetupError('This browser must support camera, microphone, and full-screen sharing.')
+      return
+    }
+
+    let cameraGranted = false
+
+    try {
+      setSetupBusy(true)
+      setSetupError('')
+      setCameraStatus('pending')
+      setScreenStatus('idle')
+      setScreenSurface('')
+      clearRecordingArtifacts()
+      releaseCaptureStreams()
+
+      const cameraStream = await navigator.mediaDevices.getUserMedia({
+        video: { width: 854, height: 480 },
+        audio: true,
+      })
+      attachCameraPreview(cameraStream)
+      cameraGranted = true
+      setCameraStatus('granted')
+      setScreenStatus('pending')
+
+      const displayMediaOptions: InterviewDisplayMediaOptions = {
+        video: true,
+        audio: true,
+        monitorTypeSurfaces: 'include',
+        selfBrowserSurface: 'exclude',
+        surfaceSwitching: 'include',
+        systemAudio: 'include',
+      }
+
+      const screenStream = await navigator.mediaDevices.getDisplayMedia(displayMediaOptions)
+
+      const screenTrack = screenStream.getVideoTracks()[0]
+      if (!screenTrack) {
+        stopMediaStream(screenStream)
+        throw new Error('Screen sharing did not provide a video track.')
+      }
+
+      const displaySurface = (screenTrack.getSettings() as ScreenTrackSettings).displaySurface ?? 'unknown'
+      if (displaySurface !== 'monitor') {
+        setScreenStatus('denied')
+        setScreenSurface(displaySurface)
+        stopMediaStream(screenStream)
+        releaseCaptureStreams()
+        setSetupError(getPermissionErrorMessage(new Error('wrong-surface'), true))
+        return
+      }
+
+      screenTrack.onended = () => {
+        resetInterviewSetup('Screen sharing stopped. Start the setup again to continue the interview.')
+      }
+
+      screenStreamRef.current = screenStream
+      setScreenSurface(displaySurface)
+      setScreenStatus('granted')
+      setStage('interview')
+    } catch (err) {
+      setCameraStatus(cameraGranted ? 'granted' : 'denied')
+      setScreenStatus('denied')
+      setScreenSurface('')
+      releaseCaptureStreams()
+      setSetupError(getPermissionErrorMessage(err))
+    } finally {
+      setSetupBusy(false)
+    }
+  }
+
+  async function startMultipartUploadSession(
+    questionIndex: number,
+    mediaType: CaptureTarget,
+  ): Promise<MultipartUploadSession> {
+    const response = await fetch('/api/upload/multipart/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        questionIndex,
+        contentType: 'video/webm',
+        mediaType,
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to initialize ${mediaType} upload for this answer version.`)
+    }
+
+    const session = (await response.json()) as MultipartUploadSessionResponse
+    return {
+      mediaKey: session.mediaKey,
+      uploadId: session.uploadId,
+      nextPartNumber: 1,
+      bufferedChunks: [],
+      bufferedBytes: 0,
+      recordedBytes: 0,
+      uploadChain: Promise.resolve(),
+      completed: false,
+      aborted: false,
+    }
+  }
+
+  function getMultipartSession(target: CaptureTarget): MultipartUploadSession {
+    const session = multipartUploadsRef.current[target]
+    if (!session) {
+      throw new Error(`${target} upload session is not initialized.`)
+    }
+
+    return session
+  }
+
+  async function flushAnswerProgress(forceAllEvents = false) {
+    if (!interview) {
+      return
+    }
+
+    const cameraUpload = multipartUploadsRef.current.camera
+    if (!cameraUpload) {
+      return
+    }
+
+    const screenUpload = multipartUploadsRef.current.screen
+    const eventStartIndex = forceAllEvents ? 0 : flushedBehaviorEventCountRef.current
+    const behaviorEvents = behaviorEventsRef.current.slice(eventStartIndex)
+    const transcriptSnapshot = forceAllEvents ? getBrowserTranscriptSnapshot() : null
+
+    const response = await fetch(`/api/take/${id}/answer/progress`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        questionIndex: interview.currentQuestionIndex,
+        versionNumber: currentVersionNumberRef.current,
+        mediaKey: cameraUpload.mediaKey,
+        screenMediaKey: screenUpload?.mediaKey,
+        durationSeconds: answerDurationSecondsRef.current || undefined,
+        startedAt: answerStartedAtRef.current ?? undefined,
+        submittedAt: answerStoppedAtMsRef.current
+          ? new Date(answerStoppedAtMsRef.current).toISOString()
+          : undefined,
+        cameraFileSizeBytes: cameraUpload.recordedBytes || undefined,
+        screenFileSizeBytes: screenUpload?.recordedBytes || undefined,
+        behaviorSignals: behaviorSignalsRef.current,
+        behaviorEvents,
+        ...(transcriptSnapshot?.text.trim()
+          ? {
+              clientTranscript: {
+                text: transcriptSnapshot.text,
+                language: transcriptSnapshot.language,
+                provider: transcriptSnapshot.provider,
+                generatedAt: transcriptSnapshot.generatedAt,
+                isFinal: transcriptSnapshot.isFinal,
+              },
+            }
+          : {}),
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to save interview progress.')
+    }
+
+    flushedBehaviorEventCountRef.current = behaviorEventsRef.current.length
+  }
+
+  function enqueueProgressFlush(forceAllEvents = false) {
+    progressRequestChainRef.current = progressRequestChainRef.current
+      .catch(() => undefined)
+      .then(() => flushAnswerProgress(forceAllEvents))
+
+    return progressRequestChainRef.current
+  }
+
+  function scheduleProgressFlush(reason: 'event' | 'heartbeat' | 'start' | 'stop') {
+    if (!multipartUploadsRef.current.camera) {
+      return
+    }
+
+    if (reason === 'start' || reason === 'stop') {
+      if (progressFlushTimeoutRef.current) {
+        clearTimeout(progressFlushTimeoutRef.current)
+        progressFlushTimeoutRef.current = null
+      }
+
+      void enqueueProgressFlush(true).catch(() => undefined)
+      return
+    }
+
+    if (progressFlushTimeoutRef.current) {
+      return
+    }
+
+    progressFlushTimeoutRef.current = setTimeout(() => {
+      progressFlushTimeoutRef.current = null
+      void enqueueProgressFlush(false).catch(() => undefined)
+    }, PROGRESS_DEBOUNCE_MS)
+  }
+
+  function startProgressHeartbeat() {
+    if (progressHeartbeatRef.current) {
+      clearInterval(progressHeartbeatRef.current)
+    }
+
+    progressHeartbeatRef.current = setInterval(() => {
+      scheduleProgressFlush('heartbeat')
+    }, PROGRESS_HEARTBEAT_MS)
+  }
+
+  async function presignMultipartPartUpload(
+    target: CaptureTarget,
+    session: MultipartUploadSession,
+    questionIndex: number,
+    partNumber: number,
+  ): Promise<MultipartUploadPartResponse> {
+    const response = await fetch('/api/upload/multipart/part', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        questionIndex,
+        mediaKey: session.mediaKey,
+        uploadId: session.uploadId,
+        partNumber,
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to prepare ${target} upload chunk ${partNumber}.`)
+    }
+
+    return (await response.json()) as MultipartUploadPartResponse
+  }
+
+  function queueBufferedUpload(target: CaptureTarget, forceFinal = false) {
+    const session = multipartUploadsRef.current[target]
+    if (!session) {
+      return Promise.resolve()
+    }
+
+    session.uploadChain = session.uploadChain.then(async () => {
+      let activeSession = multipartUploadsRef.current[target]
+
+      while (
+        activeSession &&
+        !activeSession.aborted &&
+        !activeSession.completed &&
+        (activeSession.bufferedBytes >= MULTIPART_PART_SIZE_BYTES ||
+          (forceFinal && activeSession.bufferedBytes > 0))
+      ) {
+        const partBlob = new Blob(activeSession.bufferedChunks, { type: 'video/webm' })
+        activeSession.bufferedChunks = []
+        activeSession.bufferedBytes = 0
+
+        const partNumber = activeSession.nextPartNumber
+        activeSession.nextPartNumber += 1
+
+        const partUpload = await presignMultipartPartUpload(
+          target,
+          activeSession,
+          interview?.currentQuestionIndex ?? 0,
+          partNumber,
+        )
+
+        const uploadResponse = await fetch(partUpload.uploadUrl, {
+          method: 'PUT',
+          body: partBlob,
+          headers: { 'Content-Type': 'video/webm' },
+        })
+
+        if (!uploadResponse.ok) {
+          throw new Error(`Chunk upload failed for ${target} recording.`)
+        }
+
+        activeSession = multipartUploadsRef.current[target]
+        scheduleProgressFlush('heartbeat')
+      }
+    })
+
+    return session.uploadChain
+  }
+
+  function handleRecordedChunk(target: CaptureTarget, blob: Blob) {
+    if (blob.size < 1) {
+      return
+    }
+
+    const session = multipartUploadsRef.current[target]
+    if (!session || session.aborted || session.completed) {
+      return
+    }
+
+    session.bufferedChunks.push(blob)
+    session.bufferedBytes += blob.size
+    session.recordedBytes += blob.size
+
+    if (session.bufferedBytes >= MULTIPART_PART_SIZE_BYTES) {
+      void queueBufferedUpload(target).catch(() => undefined)
+    }
+
+    scheduleProgressFlush('heartbeat')
+  }
+
+  async function completeMultipartUpload(target: CaptureTarget) {
+    const session = getMultipartSession(target)
+    if (session.completed || session.aborted) {
+      return
+    }
+
+    const response = await fetch('/api/upload/multipart/complete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        questionIndex: interview?.currentQuestionIndex ?? 0,
+        mediaKey: session.mediaKey,
+        uploadId: session.uploadId,
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to finalize ${target} upload.`)
+    }
+
+    session.completed = true
+  }
+
+  async function abortMultipartUploads() {
+    const uploadsSnapshot = multipartUploadsRef.current
+    const entries = (
+      [
+        ['camera', uploadsSnapshot.camera],
+        ['screen', uploadsSnapshot.screen],
+      ] as const
+    ).filter(([, session]) => Boolean(session))
+
+    await Promise.all(
+      entries.map(async ([target, session]) => {
+        if (!session || session.aborted || session.completed) {
+          return
+        }
+
+        session.aborted = true
+
+        try {
+          await session.uploadChain.catch(() => undefined)
+          await fetch('/api/upload/multipart/abort', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              questionIndex: interview?.currentQuestionIndex ?? 0,
+              mediaKey: session.mediaKey,
+              uploadId: session.uploadId,
+            }),
+          })
+        } catch {
+          console.error(`Failed to abort ${target} multipart upload.`)
+        }
+      }),
+    )
+  }
+
+  function handleRecorderStopped() {
+    stoppedRecordersRef.current += 1
+    if (stoppedRecordersRef.current < 2) {
+      return
+    }
+
+    const shouldDiscard = discardRecordingRef.current
+    discardRecordingRef.current = false
+
+    if (shouldDiscard) {
+      clearRecordingArtifacts()
+      return
+    }
+
+    const pendingAction = pendingVersionActionRef.current
+    if (!pendingAction) {
+      clearRecordingArtifacts()
+      setSetupError('Recording stopped without a follow-up action. Start a new version for this answer.')
+      setStage('interview')
+      return
+    }
+
+    void persistCurrentVersion(pendingAction)
+  }
+
+  async function beginRecording(nextVersionNumber: number) {
+    if (!cameraStreamRef.current || !screenStreamRef.current) {
+      resetInterviewSetup('Camera, microphone, and entire-screen sharing must stay active before recording.')
+      return
+    }
+
+    if (!interview?.currentQuestion) {
+      return
+    }
+
+    resetBrowserTranscript()
+    clearRecordingArtifacts()
+    discardRecordingRef.current = false
+    pendingVersionActionRef.current = null
+    currentVersionNumberRef.current = nextVersionNumber
+    setCurrentVersionNumber(nextVersionNumber)
+    setRetakeCount(Math.max(nextVersionNumber - 1, 0))
+    answerStartedAtRef.current = new Date().toISOString()
+    answerStartedAtMsRef.current = Date.now()
+    answerStoppedAtMsRef.current = null
+    stoppedRecordersRef.current = 0
+
+    try {
+      const [cameraUpload, screenUpload] = await Promise.all([
+        startMultipartUploadSession(interview.currentQuestionIndex, 'camera'),
+        startMultipartUploadSession(interview.currentQuestionIndex, 'screen'),
+      ])
+
+      multipartUploadsRef.current = {
+        camera: cameraUpload,
+        screen: screenUpload,
+      }
+
+      await flushAnswerProgress(true)
+      startProgressHeartbeat()
+    } catch (err) {
+      await abortMultipartUploads()
+      clearRecordingArtifacts()
+      setSetupError(err instanceof Error ? err.message : 'Failed to start recording.')
+      autoStartedQuestionKeyRef.current = ''
+      setStage('interview')
+      return
+    }
+
+    const recorderOptions: MediaRecorderOptions = {
+      mimeType: 'video/webm',
+      videoBitsPerSecond: 1_500_000,
+    }
+
+    const cameraRecorder = new MediaRecorder(cameraStreamRef.current, recorderOptions)
+    cameraRecorder.ondataavailable = (event) => {
+      handleRecordedChunk('camera', event.data)
+    }
+    cameraRecorder.onstop = () => {
+      handleRecorderStopped()
+    }
+
+    const screenRecorder = new MediaRecorder(screenStreamRef.current, recorderOptions)
+    screenRecorder.ondataavailable = (event) => {
+      handleRecordedChunk('screen', event.data)
+    }
+    screenRecorder.onstop = () => {
+      handleRecorderStopped()
+    }
+
+    cameraRecorderRef.current = cameraRecorder
+    screenRecorderRef.current = screenRecorder
+    cameraRecorder.start(1000)
+    screenRecorder.start(1000)
+    startBrowserTranscript()
+
+    setRecording(true)
+    setTimeLeft(240)
+    setSetupError('')
+    setStage('recording')
+    setTransitionLabel('')
+
+    timerRef.current = setInterval(() => {
+      setTimeLeft((current) => {
+        if (current <= 1) {
+          requestVersionAction('submit')
+          return 0
+        }
+        return current - 1
+      })
+    }, 1000)
+  }
+
+  beginRecordingRef.current = beginRecording
+
+  useEffect(() => {
+    const readyForAutoStart =
+      stage === 'interview' &&
+      !recording &&
+      !uploading &&
+      Boolean(interview?.currentQuestion) &&
+      cameraStatus === 'granted' &&
+      screenStatus === 'granted' &&
+      screenSurface === 'monitor'
+
+    if (!readyForAutoStart || !interview) {
+      return
+    }
+
+    const questionKey = `${interview.id}:${interview.currentQuestionIndex}:${interview.currentAnswerMeta?.versionCount ?? 0}:${stage}`
+    if (autoStartedQuestionKeyRef.current === questionKey) {
+      return
+    }
+
+    autoStartedQuestionKeyRef.current = questionKey
+    const nextVersionNumber = (interview.currentAnswerMeta?.versionCount ?? 0) + 1
+    void beginRecordingRef.current(nextVersionNumber)
+  }, [
     cameraStatus,
+    interview,
+    recording,
     screenStatus,
     screenSurface,
-    setupBusy,
-    setupError,
-    currentVersionNumber,
-    retakeCount,
-    timeLeft,
-    transitionLabel,
+    stage,
     uploading,
-    isBrowserTranscriptSupported,
-    finalTranscript,
-    interimTranscript,
-    browserTranscriptWarning,
-    videoRef,
-    progressValue,
-    setConsent,
-    handleStartInterview,
-    requestVersionAction,
-    permissionLabel,
-    permissionTone,
-    formatTime,
-  } = useTakeOrchestrator({ id, candidateToken })
+  ])
+
+  function stopRecording() {
+    const stopTimestamp = Date.now()
+
+    if (!answerStoppedAtMsRef.current) {
+      answerStoppedAtMsRef.current = stopTimestamp
+    }
+
+    if (answerStartedAtMsRef.current) {
+      answerDurationSecondsRef.current = Math.max(
+        1,
+        Math.round((answerStoppedAtMsRef.current - answerStartedAtMsRef.current) / 1000),
+      )
+    }
+
+    stopActiveRecorders()
+  }
+
+  function requestVersionAction(action: PendingVersionAction) {
+    if (!action || uploading || !recording) {
+      return
+    }
+
+    pendingVersionActionRef.current = action
+    setTransitionLabel(
+      action === 'submit'
+        ? 'Submitting answer and moving to the next question...'
+        : 'Saving this version and starting a new recording...'
+    )
+    setStage('transition')
+    scheduleProgressFlush('stop')
+    stopRecording()
+  }
+
+  async function persistCurrentVersion(
+    action: Exclude<PendingVersionAction, null>,
+  ) {
+    if (!interview) {
+      return
+    }
+
+    setUploading(true)
+
+    try {
+      await enqueueProgressFlush(true)
+      await Promise.all([
+        queueBufferedUpload('camera', true),
+        queueBufferedUpload('screen', true),
+      ])
+      await Promise.all([
+        completeMultipartUpload('camera'),
+        completeMultipartUpload('screen'),
+      ])
+
+      const cameraUpload = getMultipartSession('camera')
+      const screenUpload = getMultipartSession('screen')
+      const transcriptSnapshot =
+        action === 'submit'
+          ? await stopBrowserTranscript({ finalize: true, timeoutMs: 700 })
+          : null
+      const answerPayload = {
+        questionIndex: interview.currentQuestionIndex,
+        versionNumber: currentVersionNumberRef.current,
+        submitAnswer: action === 'submit',
+        mediaKey: cameraUpload.mediaKey,
+        screenMediaKey: screenUpload.mediaKey,
+        durationSeconds: answerDurationSecondsRef.current || 1,
+        startedAt:
+          answerStartedAtRef.current ?? new Date(Date.now() - 1000).toISOString(),
+        submittedAt: new Date().toISOString(),
+        cameraFileSizeBytes: cameraUpload.recordedBytes,
+        screenFileSizeBytes: screenUpload.recordedBytes,
+        behaviorSignals: behaviorSignalsRef.current,
+        behaviorEvents: behaviorEventsRef.current,
+        ...(transcriptSnapshot?.text.trim()
+          ? {
+              clientTranscript: {
+                text: transcriptSnapshot.text,
+                language: transcriptSnapshot.language,
+                provider: transcriptSnapshot.provider,
+                generatedAt: transcriptSnapshot.generatedAt,
+                isFinal: true as const,
+              },
+            }
+          : {}),
+      }
+
+      const answerResponse = await fetch(`/api/take/${id}/answer`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(answerPayload),
+      })
+
+      if (!answerResponse.ok) {
+        throw new Error(
+          action === 'submit'
+            ? 'Answer submission failed.'
+            : 'Re-record version could not be saved.',
+        )
+      }
+
+      clearRecordingArtifacts()
+      pendingVersionActionRef.current = null
+
+      if (action === 'submit') {
+        setCurrentVersionNumber(1)
+        currentVersionNumberRef.current = 1
+        setRetakeCount(0)
+        resetBrowserTranscript()
+        await loadInterview('resume')
+      } else {
+        const nextVersionNumber = currentVersionNumberRef.current + 1
+        setCurrentVersionNumber(nextVersionNumber)
+        currentVersionNumberRef.current = nextVersionNumber
+        setRetakeCount(nextVersionNumber - 1)
+        resetBrowserTranscript()
+        await beginRecording(nextVersionNumber)
+      }
+    } catch (err) {
+      await abortMultipartUploads()
+      setSetupError(err instanceof Error ? err.message : 'Upload failed')
+      autoStartedQuestionKeyRef.current = ''
+      setStage('interview')
+    } finally {
+      setTransitionLabel('')
+      setUploading(false)
+    }
+  }
+
+  function formatTime(seconds: number) {
+    const minutes = Math.floor(seconds / 60)
+    const remainder = seconds % 60
+    return `${minutes}:${remainder.toString().padStart(2, '0')}`
+  }
 
   if (error && !interview) {
     return (
-      <PageMainLayout>
-        <PageContent>
-          <Alert variant="destructive">
-            <AlertTitle>Interview unavailable</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        </PageContent>
-      </PageMainLayout>
+      <PageShell>
+        <Alert variant="danger">
+          <AlertTitle>Interview unavailable</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      </PageShell>
     )
   }
 
   if (stage === 'loading' || !interview) {
     return (
-      <PageMainLayout>
-        <PageContent>
+      <PageShell>
+        <Section width="prose">
           <LoadingStateCard label="Loading interview..." />
-        </PageContent>
-      </PageMainLayout>
+        </Section>
+      </PageShell>
     )
   }
 
+  const progressValue =
+    interview.totalQuestions === 0
+      ? 0
+      : Math.round(
+          ((interview.currentQuestionIndex + (stage === 'complete' ? 1 : 0)) / interview.totalQuestions) *
+            100,
+        )
+
   if (stage === 'complete') {
-    return <TakeCompleteScreen candidateName={interview.candidateName} position={interview.position} />
+    return (
+      <PageShell>
+        <Section width="prose">
+          <Card variant="floating" size="lg">
+            <CardContent layout="stack-center" spacing="xl">
+              <IconBadge tone="primary" size="xl" align="center">
+                <CheckCircle2 className="size-8" />
+              </IconBadge>
+              <Stack gap={3}>
+                <HeroTitle>Thank you, {interview.candidateName}</HeroTitle>
+                <HeroLead>
+                  Your interview for <strong>{interview.position}</strong> has been submitted.
+                </HeroLead>
+                <BodyText size="sm">
+                  Camera and full-screen recordings for each answer have been stored for reviewer evaluation.
+                </BodyText>
+              </Stack>
+            </CardContent>
+          </Card>
+        </Section>
+      </PageShell>
+    )
   }
 
   if (stage === 'consent') {
     return (
-      <TakeConsentScreen
-        interview={interview}
-        cameraStatus={cameraStatus}
-        screenStatus={screenStatus}
-        screenSurface={screenSurface}
-        consent={consent}
-        setupBusy={setupBusy}
-        setupError={setupError}
-        onConsentChange={setConsent}
-        onStartInterview={handleStartInterview}
-        permissionLabel={permissionLabel}
-        permissionTone={permissionTone}
-      />
+      <PageShell>
+        <Section width="reading">
+          <Card variant="floating" size="lg">
+            <CardContent>
+              <Grid columns="consent-shell" gap={8}>
+                <Stack gap={5}>
+                  <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
+                    Candidate interview
+                  </EyebrowBadge>
+
+                  <Stack gap={3}>
+                    <HeroTitle>Interview for {interview.position}</HeroTitle>
+                    <HeroLead>
+                      Welcome, {interview.candidateName}. You will answer {interview.totalQuestions}{' '}
+                      questions, with up to four minutes for each response.
+                    </HeroLead>
+                  </Stack>
+
+                  <Grid columns="consent-info-4" gap={4}>
+                    <InfoCard
+                      icon={<Camera className="size-5 text-[hsl(var(--primary))]" />}
+                      title="Camera"
+                    >
+                      Recorded separately for every answer.
+                    </InfoCard>
+                    <InfoCard
+                      icon={<Mic className="size-5 text-[hsl(var(--primary))]" />}
+                      title="Microphone"
+                    >
+                      Captured together with your camera feed.
+                    </InfoCard>
+                    <InfoCard
+                      icon={<Video className="size-5 text-[hsl(var(--primary))]" />}
+                      title="Entire screen"
+                    >
+                      Must be shared as <strong>Entire screen</strong>, not a tab or app window.
+                    </InfoCard>
+                    <InfoCard
+                      icon={<ShieldCheck className="size-5 text-[hsl(var(--primary))]" />}
+                      title="Fairness checks"
+                    >
+                      Session and browser activity may be stored for evaluation integrity.
+                    </InfoCard>
+                  </Grid>
+                </Stack>
+
+                <Card variant="surface">
+                  <CardHeader spacing="xs">
+                    <CardTitle size="lg">Before you start</CardTitle>
+                    <CardDescription>
+                      One button will request camera, microphone, and then full-screen sharing.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent spacing="lg">
+                    <SurfaceTile padding="lg">
+                      <Stack gap={3}>
+                        <EyebrowLabel size="md">Data collected</EyebrowLabel>
+                        <Stack as="ul" gap={2}>
+                          <BodyText as="li" size="sm">
+                            Camera video and microphone audio for each answer
+                          </BodyText>
+                          <BodyText as="li" size="sm">
+                            Full-monitor screen recording in parallel with each answer
+                          </BodyText>
+                          <BodyText as="li" size="sm">
+                            Speech transcript snippets and metadata for answer quality analysis
+                          </BodyText>
+                          <BodyText as="li" size="sm">
+                            Browser activity such as tab switches
+                          </BodyText>
+                          <BodyText as="li" size="sm">
+                            Session metadata including answer timing
+                          </BodyText>
+                        </Stack>
+                      </Stack>
+                    </SurfaceTile>
+
+                    <SurfaceTile tone="glass" padding="lg">
+                      <Stack gap={3}>
+                        <SurfaceTile rounded="lg" padding="md-tight">
+                          <Inline gap={3} align="center" justify="between">
+                            <Stack gap={1}>
+                              <BodyText size="sm" weight="semibold" tone="foreground">
+                                Camera and microphone
+                              </BodyText>
+                              <BodyText size="xs">
+                                Required before recording can begin.
+                              </BodyText>
+                            </Stack>
+                            <PermissionPill status={cameraStatus} />
+                          </Inline>
+                        </SurfaceTile>
+
+                        <SurfaceTile rounded="lg" padding="md-tight">
+                          <Inline gap={3} align="center" justify="between">
+                            <Stack gap={1}>
+                              <BodyText size="sm" weight="semibold" tone="foreground">
+                                Entire screen share
+                              </BodyText>
+                              <BodyText size="xs">
+                                {screenSurface === 'monitor'
+                                  ? 'Entire screen is confirmed and ready.'
+                                  : 'In the share picker, choose Entire screen / Screen.'}
+                              </BodyText>
+                            </Stack>
+                            <PermissionPill status={screenStatus} />
+                          </Inline>
+                        </SurfaceTile>
+                      </Stack>
+                    </SurfaceTile>
+
+                    {setupError ? (
+                      <Alert variant="danger">
+                        <AlertTitle>Setup incomplete</AlertTitle>
+                        <AlertDescription>{setupError}</AlertDescription>
+                      </Alert>
+                    ) : null}
+
+                    <SurfaceTile tone="glass" rounded="xl">
+                      <Inline gap={3} align="start">
+                        <Checkbox
+                          id="consent"
+                          align="top"
+                          checked={consent}
+                          onCheckedChange={(checked) => setConsent(Boolean(checked))}
+                        />
+                        <Stack gap={2}>
+                          <Label htmlFor="consent" weight="semibold">
+                            I agree to the recording and data collection terms.
+                          </Label>
+                          <BodyText size="sm">
+                            Data is used only for interview evaluation and is stored for 90 days.
+                          </BodyText>
+                        </Stack>
+                      </Inline>
+                    </SurfaceTile>
+
+                    <Button
+                      type="button"
+                      variant="gradient"
+                      size="xl"
+                      width="full"
+                      disabled={!consent || setupBusy}
+                      onClick={handleStartInterview}
+                    >
+                      {setupBusy ? 'Requesting access...' : 'Allow Camera, Mic & Entire Screen'}
+                    </Button>
+                  </CardContent>
+                </Card>
+              </Grid>
+            </CardContent>
+          </Card>
+        </Section>
+      </PageShell>
     )
   }
 
   return (
-    <TakeRecordingScreen
-      interview={interview}
-      stage={stage}
-      progressValue={progressValue}
-      screenSurface={screenSurface}
-      setupError={setupError}
-      currentVersionNumber={currentVersionNumber}
-      retakeCount={retakeCount}
-      timeLeft={timeLeft}
-      transitionLabel={transitionLabel}
-      uploading={uploading}
-      isBrowserTranscriptSupported={isBrowserTranscriptSupported}
-      finalTranscript={finalTranscript}
-      interimTranscript={interimTranscript}
-      browserTranscriptWarning={browserTranscriptWarning}
-      videoRef={videoRef}
-      formatTime={formatTime}
-      onRerecord={() => requestVersionAction('rerecord')}
-      onSubmit={() => requestVersionAction('submit')}
-    />
+    <PageShell>
+      <Section width="wide">
+        <Grid columns="split-84-116" gap={6}>
+          <Card variant="surface" size="lg">
+            <CardContent spacing="xl">
+              <Stack gap={3}>
+                <EyebrowBadge icon={<Video className="size-3.5" />}>
+                  Live session
+                </EyebrowBadge>
+                <HeroTitle size="md">{interview.position}</HeroTitle>
+                <BodyText size="sm">
+                  Answer clearly and keep your camera plus entire-screen share active while recording.
+                </BodyText>
+              </Stack>
+
+              <SurfaceTile tone="elevated" padding="lg">
+                <Stack gap={3}>
+                  <Inline gap={3} align="center" justify="between">
+                    <BodyText as="span" size="sm-tight" tone="foreground">
+                      Question {interview.currentQuestionIndex + 1} of {interview.totalQuestions}
+                    </BodyText>
+                    <StatusPill tone="neutral">{progressValue}%</StatusPill>
+                  </Inline>
+                  <Progress value={progressValue} density="thick" />
+                </Stack>
+              </SurfaceTile>
+
+              <Stack gap={3}>
+                <Inline gap={2} wrap="wrap">
+                  <StatusPill tone="completed">Camera + mic active</StatusPill>
+                  <StatusPill tone="completed">
+                    {screenSurface === 'monitor' ? 'Entire screen shared' : 'Screen share pending'}
+                  </StatusPill>
+                </Inline>
+                {setupError ? (
+                  <Alert variant="danger">
+                    <AlertTitle>Capture interrupted</AlertTitle>
+                    <AlertDescription>{setupError}</AlertDescription>
+                  </Alert>
+                ) : null}
+              </Stack>
+
+              <Grid columns="metrics-2-md" gap={4}>
+                <MetricPanel tone="elevated" label="Recording limit" value="4:00" />
+                <MetricPanel
+                  tone="elevated"
+                  label="Answer version"
+                  value={`v${currentVersionNumber}`}
+                  valueSize="sm"
+                  description={`Previous versions kept: ${retakeCount}`}
+                />
+              </Grid>
+            </CardContent>
+          </Card>
+
+          <Card variant="floating" size="lg">
+            <CardContent spacing="xl">
+              <Stack gap={3}>
+                <Inline gap={2} align="center" wrap="wrap">
+                  <StatusPill tone={stage === 'recording' ? 'processing' : 'neutral'}>
+                    {stage === 'recording'
+                      ? 'Recording'
+                      : stage === 'transition'
+                        ? 'Saving version'
+                        : 'Awaiting response'}
+                  </StatusPill>
+                  {stage === 'recording' ? (
+                    <StatusPill tone="failed">
+                      <CircleDot className="size-3" />
+                      {formatTime(timeLeft)}
+                    </StatusPill>
+                  ) : null}
+                </Inline>
+
+                <SectionHeading>{interview.currentQuestion?.text}</SectionHeading>
+              </Stack>
+
+              <LiveTranscriptPanel
+                isSupported={isBrowserTranscriptSupported}
+                finalTranscript={finalTranscript}
+                interimTranscript={interimTranscript}
+                warning={browserTranscriptWarning}
+                stage={stage}
+              />
+
+              <VideoFrame>
+                <VideoSurface ref={videoRef} autoPlay muted playsInline />
+
+                {stage === 'recording' ? (
+                  <RecordingBadge>{formatTime(timeLeft)}</RecordingBadge>
+                ) : null}
+              </VideoFrame>
+
+              <SurfaceTile tone="soft" rounded="xl">
+                <Stack gap={3}>
+                  <EyebrowLabel>Guidance</EyebrowLabel>
+                  <BodyText size="sm">
+                    {stage === 'transition'
+                      ? transitionLabel || 'Saving the current answer version.'
+                      : 'Recording starts automatically for each question. Use Submit when the answer is ready, or Re-record to create a new version for the same question.'}
+                  </BodyText>
+                </Stack>
+              </SurfaceTile>
+
+              <Inline gap={3} wrap="wrap">
+                {stage === 'interview' ? (
+                  <StatusPill tone="neutral">Preparing recording...</StatusPill>
+                ) : null}
+
+                {stage === 'recording' ? (
+                  <>
+                    <Button
+                      type="button"
+                      variant="outline-pill"
+                      shape="pill"
+                      onClick={() => requestVersionAction('rerecord')}
+                      disabled={uploading}
+                    >
+                      Re-record as new version
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="gradient"
+                      onClick={() => requestVersionAction('submit')}
+                      disabled={uploading}
+                    >
+                      Submit & Next
+                    </Button>
+                  </>
+                ) : null}
+
+                {stage === 'transition' ? (
+                  <StatusPill tone="processing">
+                    {transitionLabel || 'Saving current version'}
+                  </StatusPill>
+                ) : null}
+              </Inline>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Section>
+    </PageShell>
   )
 }

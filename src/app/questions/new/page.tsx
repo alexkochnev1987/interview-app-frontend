@@ -10,6 +10,7 @@ export default function NewQuestionPage() {
   async function handleSubmit(value: QuestionInput) {
     const question = await createQuestion(value);
     router.push(`/questions/${question.id}`);
+    return question;
   }
 
   return (

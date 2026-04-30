@@ -4,13 +4,19 @@ import { type FormEvent, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowRight, LockKeyhole, ShieldCheck, Sparkles } from 'lucide-react'
 
-import { EyebrowBadge } from '@/components/app/eyebrow-badge'
+import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
+import { HeroLead, HeroTitle } from '@/components/ui/hero-text'
+import { IconBadge } from '@/components/ui/icon-badge'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { DividerLabel } from '@/components/ui/divider-label'
+import { FormField } from '@/components/ui/form-field'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Separator } from '@/components/ui/separator'
+import { Grid } from '@/components/ui/layout/grid'
+import { PageShell } from '@/components/ui/layout/page-shell'
+import { Stack } from '@/components/ui/layout/stack'
+import { BodyText, SectionHeading } from '@/components/ui/text'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -47,138 +53,133 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="container grid min-h-[calc(100vh-6rem)] gap-8 py-10 lg:grid-cols-[1.1fr_420px] lg:items-center lg:py-14">
-      <section className="space-y-6">
-        <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
-          Conductor AI
-        </EyebrowBadge>
-
-        <div className="space-y-4">
-          <h1 className="max-w-3xl text-4xl font-semibold tracking-[-0.05em] text-foreground md:text-6xl">
-            Review candidate performance with the calm of an editorial workspace.
-          </h1>
-          <p className="max-w-2xl text-base leading-7 text-muted-foreground md:text-lg">
-            The new design system trades brittle admin chrome for layered surfaces, sharper
-            hierarchy, and faster decision-making during interview review.
-          </p>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-3">
-          <Card className="border-white/60 bg-white/82 shadow-soft">
-            <CardContent className="space-y-3 px-5 py-5">
-              <div className="flex size-10 items-center justify-center rounded-2xl bg-[hsl(var(--primary-fixed)/0.85)] text-[hsl(var(--primary))]">
-                <ShieldCheck className="size-4" />
-              </div>
-              <div className="space-y-1">
-                <h2 className="text-sm font-semibold text-foreground">Protected access</h2>
-                <p className="text-sm leading-6 text-muted-foreground">
-                  Session-based auth for recruiter-only workflows.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-white/60 bg-white/82 shadow-soft">
-            <CardContent className="space-y-3 px-5 py-5">
-              <div className="flex size-10 items-center justify-center rounded-2xl bg-[hsl(var(--primary-fixed)/0.85)] text-[hsl(var(--primary))]">
-                <LockKeyhole className="size-4" />
-              </div>
-              <div className="space-y-1">
-                <h2 className="text-sm font-semibold text-foreground">Unified shell</h2>
-                <p className="text-sm leading-6 text-muted-foreground">
-                  Shared tokens across dashboard, library, and interview flows.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-white/60 bg-white/82 shadow-soft">
-            <CardContent className="space-y-3 px-5 py-5">
-              <div className="flex size-10 items-center justify-center rounded-2xl bg-[hsl(var(--primary-fixed)/0.85)] text-[hsl(var(--primary))]">
-                <ArrowRight className="size-4" />
-              </div>
-              <div className="space-y-1">
-                <h2 className="text-sm font-semibold text-foreground">Fast triage</h2>
-                <p className="text-sm leading-6 text-muted-foreground">
-                  Move from sign-in straight into active interviews and scorecards.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      <Card className="border-white/70 bg-white/92 shadow-float backdrop-blur-xl">
-        <CardHeader className="space-y-3 px-8 pt-8">
-          <EyebrowBadge size="sm">
-            Recruiter access
+    <PageShell align="center">
+      <Grid columns="login-shell" gap={8} align="center">
+        <Stack as="section" gap={6}>
+          <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
+            Conductor AI
           </EyebrowBadge>
-          <CardTitle className="text-3xl font-semibold tracking-[-0.04em] text-foreground">
-            Sign in
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="px-8 pb-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {error ? (
-              <Alert variant="destructive" className="border-rose-200/70 bg-rose-50/85">
-                <AlertTitle>Authentication failed</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            ) : null}
 
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@interview-app.com"
-                  required
-                  className="h-11 rounded-2xl border-white/70 bg-[hsl(var(--surface-low)/0.8)]"
-                />
-              </div>
+          <Stack gap={4}>
+            <HeroTitle size="xl" width="prose">
+              Review candidate performance with the calm of an editorial workspace.
+            </HeroTitle>
+            <HeroLead width="prose">
+              The new design system trades brittle admin chrome for layered surfaces, sharper
+              hierarchy, and faster decision-making during interview review.
+            </HeroLead>
+          </Stack>
 
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Password"
-                  required
-                  className="h-11 rounded-2xl border-white/70 bg-[hsl(var(--surface-low)/0.8)]"
-                />
-              </div>
-            </div>
+          <Grid columns="metrics-3" gap={4}>
+            <Card variant="surface" size="md">
+              <CardContent spacing="sm">
+                <IconBadge tone="primary" size="sm">
+                  <ShieldCheck className="size-4" />
+                </IconBadge>
+                <Stack gap={1}>
+                  <SectionHeading size="sm" as="h2">
+                    Protected access
+                  </SectionHeading>
+                  <BodyText size="sm">
+                    Session-based auth for recruiter-only workflows.
+                  </BodyText>
+                </Stack>
+              </CardContent>
+            </Card>
 
-            <Button
-              type="submit"
-              disabled={loading}
-              className="h-11 w-full rounded-2xl bg-primary-gradient shadow-soft hover:brightness-105"
-            >
-              {loading ? 'Signing in...' : 'Sign In'}
-            </Button>
+            <Card variant="surface" size="md">
+              <CardContent spacing="sm">
+                <IconBadge tone="primary" size="sm">
+                  <LockKeyhole className="size-4" />
+                </IconBadge>
+                <Stack gap={1}>
+                  <SectionHeading size="sm" as="h2">
+                    Unified shell
+                  </SectionHeading>
+                  <BodyText size="sm">
+                    Shared tokens across dashboard, library, and interview flows.
+                  </BodyText>
+                </Stack>
+              </CardContent>
+            </Card>
 
-            <div className="relative">
-              <Separator />
-              <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-3 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                Or
-              </span>
-            </div>
+            <Card variant="surface" size="md">
+              <CardContent spacing="sm">
+                <IconBadge tone="primary" size="sm">
+                  <ArrowRight className="size-4" />
+                </IconBadge>
+                <Stack gap={1}>
+                  <SectionHeading size="sm" as="h2">
+                    Fast triage
+                  </SectionHeading>
+                  <BodyText size="sm">
+                    Move from sign-in straight into active interviews and scorecards.
+                  </BodyText>
+                </Stack>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Stack>
 
-            <Button
-              asChild
-              variant="outline"
-              className="h-11 w-full rounded-2xl border-white/70 bg-white/75"
-            >
-              <a href="/api/auth/google">Sign in with Google</a>
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-    </main>
+        <Card variant="floating" size="lg" effects="blur-strong">
+          <CardHeader spacing="sm">
+            <EyebrowBadge size="sm">Recruiter access</EyebrowBadge>
+            <CardTitle size="xl">Sign in</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit}>
+              <Stack gap={6}>
+                {error ? (
+                <Alert variant="danger">
+                  <AlertTitle>Authentication failed</AlertTitle>
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              ) : null}
+
+              <Stack gap={4}>
+                <FormField htmlFor="email" label="Email">
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="admin@interview-app.com"
+                    required
+                  />
+                </FormField>
+
+                <FormField htmlFor="password" label="Password">
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Password"
+                    required
+                  />
+                </FormField>
+              </Stack>
+
+              <Button
+                type="submit"
+                variant="gradient"
+                size="xl"
+                width="full"
+                disabled={loading}
+              >
+                {loading ? 'Signing in...' : 'Sign In'}
+              </Button>
+
+              <DividerLabel>Or</DividerLabel>
+
+                <Button asChild variant="outline-pill" size="xl" width="full">
+                  <a href="/api/auth/google">Sign in with Google</a>
+                </Button>
+              </Stack>
+            </form>
+          </CardContent>
+        </Card>
+      </Grid>
+    </PageShell>
   )
 }

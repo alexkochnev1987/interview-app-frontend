@@ -1,5 +1,3 @@
-// In production, requests go to /api/* which Next.js rewrites to the backend.
-// This avoids Mixed Content (HTTPS frontend → HTTP backend).
 const API_URL = '/api';
 
 export type QuestionDifficulty = 'easy' | 'medium' | 'hard';
@@ -60,6 +58,7 @@ export interface Question extends QuestionInput {
   id: string;
   createdAt: string;
   updatedAt: string;
+  deleted: boolean;
 }
 
 export interface InterviewQuestion {
@@ -286,6 +285,59 @@ export async function updateQuestion(
   return request<Question>(`/questions/${id}`, {
     method: 'PATCH',
     body: JSON.stringify(data),
+  });
+}
+
+export class QuestionInUseError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'QuestionInUseError';
+  }
+}
+
+export async function deleteQuestion(
+  id: string,
+): Promise<{ id: string; deleted: true }> {
+  const res = await fetch(`${API_URL}/questions/${id}`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+  });
+
+  if (res.status === 409) {
+    const body = await res.text();
+    let message = 'Question is used by an active interview.';
+    try {
+      const parsed = JSON.parse(body) as { message?: string };
+      if (parsed.message) message = parsed.message;
+    } catch {}
+    throw new QuestionInUseError(message);
+  }
+
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`API error ${res.status}: ${body}`);
+  }
+
+  return res.json() as Promise<{ id: string; deleted: true }>;
+}
+
+export async function restoreQuestion(id: string): Promise<Question> {
+  return request<Question>(`/questions/${id}/restore`, {
+    method: 'PATCH',
+  });
+}
+
+export interface BulkDeleteResult {
+  deleted: string[];
+  blocked: Array<{ id: string; questionText: string; reason: string }>;
+}
+
+export async function deleteQuestionsBulk(
+  ids: string[],
+): Promise<BulkDeleteResult> {
+  return request<BulkDeleteResult>('/questions/bulk-delete', {
+    method: 'POST',
+    body: JSON.stringify({ ids }),
   });
 }
 
