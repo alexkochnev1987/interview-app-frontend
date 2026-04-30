@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 
 import { useBrowserTranscript } from '@/lib/use-browser-transcript';
 import { submitTakeAnswer, type TakeInterviewData } from '@/lib/api';
-import type { PermissionStatus } from '@/components/take/types';
+import type { PermissionStatus, TakeStage } from '@/components/take/types';
 import {
   clearProgressTimers,
   createEmptyBehaviorSignals,
@@ -23,13 +23,11 @@ import {
   useTakeRecordingControls,
   type AnswerBehaviorEvent,
   type MultipartUploadState,
-  type Stage,
   type TakeBehaviorSignals,
   progressValueForStage,
 } from '@/features/take';
 
 type PendingVersionAction = 'submit' | 'rerecord' | null;
-type AnswerBehaviorSignals = TakeBehaviorSignals;
 
 const PROGRESS_HEARTBEAT_MS = 3000;
 const PROGRESS_DEBOUNCE_MS = 400;
@@ -51,7 +49,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     getSnapshot: getBrowserTranscriptSnapshot,
   } = useBrowserTranscript();
 
-  const [stage, setStage] = useState<Stage>('loading');
+  const [stage, setStage] = useState<TakeStage>('loading');
   const [interview, setInterview] = useState<TakeInterviewData | null>(null);
   const [error, setError] = useState('');
   const [consent, setConsent] = useState(false);
@@ -82,7 +80,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
   const answerDurationSecondsRef = useRef<number>(0);
   const stoppedRecordersRef = useRef(0);
   const currentVersionNumberRef = useRef(1);
-  const behaviorSignalsRef = useRef<AnswerBehaviorSignals>(createEmptyBehaviorSignals());
+  const behaviorSignalsRef = useRef<TakeBehaviorSignals>(createEmptyBehaviorSignals());
   const behaviorEventsRef = useRef<AnswerBehaviorEvent[]>([]);
   const flushedBehaviorEventCountRef = useRef(0);
   const progressRequestChainRef = useRef(Promise.resolve());

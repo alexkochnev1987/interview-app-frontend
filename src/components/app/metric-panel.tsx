@@ -1,10 +1,5 @@
 import type { ReactNode } from 'react'
 
-import {
-  METRIC_PANEL_COMPACT,
-  METRIC_PANEL_ELEVATED,
-  METRIC_PANEL_SURFACE,
-} from '@/components/app/style-tokens'
 import { Inline, Stack } from '@/components/ui/layout'
 import { Text } from '@/components/ui/text'
 import { cn } from '@/lib/utils'
@@ -12,9 +7,9 @@ import { cn } from '@/lib/utils'
 type MetricPanelTone = 'surface' | 'elevated' | 'compact'
 
 const toneClasses: Record<MetricPanelTone, string> = {
-  surface: METRIC_PANEL_SURFACE,
-  elevated: METRIC_PANEL_ELEVATED,
-  compact: METRIC_PANEL_COMPACT,
+  surface: 'rounded-[1.5rem] bg-[hsl(var(--surface-low)/0.9)] p-5 ring-1 ring-border/45',
+  elevated: 'rounded-[1.25rem] bg-white/80 p-4 ring-1 ring-border/45',
+  compact: 'rounded-[1rem] bg-[hsl(var(--surface-low)/0.85)] p-3 ring-1 ring-border/45',
 }
 
 interface MetricPanelProps {

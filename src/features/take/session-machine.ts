@@ -1,14 +1,13 @@
 import type { TakeInterviewData } from '@/lib/api';
 import type { TakeStage } from '@/components/take/types';
 
-export type Stage = TakeStage;
 export type PendingVersionAction = 'submit' | 'rerecord' | null;
 type LoadMode = 'initial' | 'resume';
 
 export function stageAfterInterviewLoad(
   interview: TakeInterviewData,
   mode: LoadMode,
-): Stage {
+): TakeStage {
   if (interview.completed) {
     return 'complete';
   }
@@ -32,7 +31,7 @@ export function transitionLabelForAction(action: Exclude<PendingVersionAction, n
 
 export function progressValueForStage(params: {
   interview: TakeInterviewData;
-  stage: Stage;
+  stage: TakeStage;
 }) {
   const { interview, stage } = params;
   if (interview.totalQuestions === 0) return 0;

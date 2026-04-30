@@ -5,15 +5,15 @@ import { Badge } from '@/components/ui/badge'
 type EyebrowTone = 'default' | 'muted' | 'primary'
 type EyebrowSize = 'default' | 'sm'
 
-const toneMap: Record<EyebrowTone, 'eyebrowDefault' | 'eyebrowMuted' | 'eyebrowPrimary'> = {
-  default: 'eyebrowDefault',
-  muted: 'eyebrowMuted',
-  primary: 'eyebrowPrimary',
+const toneMap: Record<EyebrowTone, 'capsLabelDefault' | 'capsLabelMuted' | 'capsLabelPrimary'> = {
+  default: 'capsLabelDefault',
+  muted: 'capsLabelMuted',
+  primary: 'capsLabelPrimary',
 }
 
-const sizeMap: Record<EyebrowSize, 'eyebrow' | 'eyebrowSm'> = {
-  default: 'eyebrow',
-  sm: 'eyebrowSm',
+const sizeMap: Record<EyebrowSize, 'capsLabel' | 'capsLabelSm'> = {
+  default: 'capsLabel',
+  sm: 'capsLabelSm',
 }
 
 interface EyebrowBadgeProps extends Omit<HTMLAttributes<HTMLDivElement>, 'className'> {

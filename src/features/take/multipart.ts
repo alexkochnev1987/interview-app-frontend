@@ -75,7 +75,6 @@ interface HandleRecordedChunkParams {
   target: CaptureTarget;
   blob: Blob;
   multipartUploadsRef: { current: MultipartUploadState };
-  questionIndex: number;
   queueBufferedUpload: (target: CaptureTarget, forceFinal?: boolean) => Promise<void>;
   scheduleProgressFlush: (reason: 'heartbeat') => void;
 }
@@ -84,7 +83,6 @@ export function handleRecordedChunk({
   target,
   blob,
   multipartUploadsRef,
-  questionIndex,
   queueBufferedUpload,
   scheduleProgressFlush,
 }: HandleRecordedChunkParams) {
@@ -105,6 +103,5 @@ export function handleRecordedChunk({
     void queueBufferedUpload(target).catch(() => undefined);
   }
 
-  void questionIndex;
   scheduleProgressFlush('heartbeat');
 }

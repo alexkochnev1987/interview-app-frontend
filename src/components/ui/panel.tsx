@@ -1,20 +1,14 @@
 import { cva, type VariantProps } from "class-variance-authority"
 import type { ComponentProps } from "react"
 
-import {
-  RING_BORDER_SOFT,
-  SURFACE_LOW_BG,
-  SURFACE_LOW_STRONG_BG,
-  SURFACE_WHITE_PANEL_BG,
-} from "@/components/ui/style-tokens"
 import { cn } from "@/lib/utils"
 
-const panelVariants = cva(RING_BORDER_SOFT, {
+const panelVariants = cva("ring-1 ring-border/45", {
   variants: {
     tone: {
-      surface: SURFACE_LOW_BG,
-      surfaceStrong: SURFACE_LOW_STRONG_BG,
-      white: SURFACE_WHITE_PANEL_BG,
+      surface: "bg-[hsl(var(--surface-low)/0.85)]",
+      surfaceStrong: "bg-[hsl(var(--surface-low)/0.9)]",
+      white: "bg-white/85",
     },
     radius: {
       md: "rounded-[1.25rem]",

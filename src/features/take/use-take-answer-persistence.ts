@@ -220,13 +220,12 @@ export function useTakeAnswerPersistence({
         target,
         blob,
         multipartUploadsRef,
-        questionIndex: interview?.currentQuestionIndex ?? 0,
         queueBufferedUpload: (nextTarget, nextForceFinal = false) =>
           queueBufferedUpload(nextTarget, nextForceFinal),
         scheduleProgressFlush: (reason) => scheduleProgressFlush(reason),
       });
     },
-    [multipartUploadsRef, interview, queueBufferedUpload, scheduleProgressFlush],
+    [multipartUploadsRef, queueBufferedUpload, scheduleProgressFlush],
   );
 
   const completeMultipartUpload = useCallback(

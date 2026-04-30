@@ -10,7 +10,7 @@ const alertVariants = cva(
       variant: {
         default: "bg-card text-card-foreground",
         warning:
-          "border-[var(--color-status-pending-ring)] bg-[var(--color-status-pending-bg)] text-[var(--color-status-pending-fg)] *:data-[slot=alert-description]:text-[color:color-mix(in_oklab,var(--color-status-pending-fg),black_18%)] *:[svg]:text-current",
+          "border-[var(--color-status-pending-ring)] bg-[var(--color-status-pending-bg)] text-[var(--color-status-pending-fg)] *:[svg]:text-current",
         destructive:
           "bg-card text-destructive *:data-[slot=alert-description]:text-destructive/90 *:[svg]:text-current",
       },

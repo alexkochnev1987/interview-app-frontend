@@ -10,7 +10,7 @@ interface PageMainWideGapProps {
   children: ReactNode;
 }
 
-interface PageMainCompactProps {
+interface PageMainLayoutProps {
   children: ReactNode;
 }
 
@@ -54,13 +54,15 @@ export function PageMainWideGap({ children }: PageMainWideGapProps) {
   );
 }
 
-export function PageMainCompact({ children }: PageMainCompactProps) {
+export function PageMainLayout({ children }: PageMainLayoutProps) {
   return (
     <PageFrame as="main" spacing="compact">
       <Container width="container">{children}</Container>
     </PageFrame>
   );
 }
+
+export const PageMainCompact = PageMainLayout;
 
 export function PageMainEditor({ children }: PageMainEditorProps) {
   return (

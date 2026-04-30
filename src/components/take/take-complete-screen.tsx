@@ -1,5 +1,5 @@
 import { SurfaceCard } from '@/components/app/surface-card';
-import { MaxWidth4xl, PageMainCompact } from '@/components/layout/page-shell';
+import { MaxWidth4xl, PageMainLayout } from '@/components/layout/page-shell';
 import { CardContent } from '@/components/ui/card';
 import { Heading } from '@/components/ui/heading';
 import { Stack } from '@/components/ui/layout';
@@ -13,7 +13,7 @@ interface TakeCompleteScreenProps {
 
 export function TakeCompleteScreen({ candidateName, position }: TakeCompleteScreenProps) {
   return (
-    <PageMainCompact>
+    <PageMainLayout>
       <MaxWidth4xl>
         <SurfaceCard tone="glassFloat">
           <CardContent layout="takeComplete">
@@ -33,6 +33,6 @@ export function TakeCompleteScreen({ candidateName, position }: TakeCompleteScre
           </CardContent>
         </SurfaceCard>
       </MaxWidth4xl>
-    </PageMainCompact>
+    </PageMainLayout>
   );
 }

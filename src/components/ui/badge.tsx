@@ -2,13 +2,6 @@ import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 import { Slot } from "radix-ui"
 
-import {
-  RING_BORDER_LIGHT,
-  RING_BORDER_SUBTLE,
-  SURFACE_LOW_STRONG_BG,
-  SURFACE_PRIMARY_SOFT_BG,
-  SURFACE_PRIMARY_SOFT_TEXT,
-} from "@/components/ui/style-tokens"
 import { cn } from "@/lib/utils"
 
 const badgeVariants = cva(
@@ -26,14 +19,17 @@ const badgeVariants = cva(
         ghost:
           "hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50",
         link: "text-primary underline-offset-4 hover:underline",
-        eyebrowDefault: `rounded-full border-0 font-semibold uppercase ${SURFACE_LOW_STRONG_BG} text-muted-foreground ${RING_BORDER_SUBTLE}`,
-        eyebrowMuted: `rounded-full border-0 font-semibold uppercase bg-white/70 text-muted-foreground ${RING_BORDER_LIGHT}`,
-        eyebrowPrimary: `rounded-full border-0 font-semibold uppercase ${SURFACE_PRIMARY_SOFT_BG} ${SURFACE_PRIMARY_SOFT_TEXT}`,
+        capsLabelDefault:
+          "rounded-full border-0 bg-[hsl(var(--surface-low)/0.9)] font-semibold uppercase text-muted-foreground ring-1 ring-border/50",
+        capsLabelMuted:
+          "rounded-full border-0 bg-white/70 font-semibold uppercase text-muted-foreground ring-1 ring-border/40",
+        capsLabelPrimary:
+          "rounded-full border-0 bg-[hsl(var(--primary-fixed)/0.8)] font-semibold uppercase text-[hsl(var(--primary))]",
       },
       size: {
         default: "",
-        eyebrow: "px-3 py-1 text-[0.72rem] tracking-[0.24em]",
-        eyebrowSm: "px-3 py-1 text-[0.68rem] tracking-[0.18em]",
+        capsLabel: "px-3 py-1 text-[0.72rem] tracking-[0.24em]",
+        capsLabelSm: "px-3 py-1 text-[0.68rem] tracking-[0.18em]",
       },
     },
     defaultVariants: {

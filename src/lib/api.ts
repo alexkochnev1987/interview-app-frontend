@@ -259,19 +259,9 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     throw new Error(`API error ${res.status}: ${body}`);
   }
 
-  return res.json() as Promise<T>;
-}
-
-async function requestVoid(path: string, options?: RequestInit): Promise<void> {
-  const res = await fetch(`${API_URL}${path}`, {
-    headers: { 'Content-Type': 'application/json' },
-    ...options,
-  });
-
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`API error ${res.status}: ${body}`);
-  }
+  const body = await res.text();
+  if (!body) return undefined as T;
+  return JSON.parse(body) as T;
 }
 
 export async function fetchQuestions(): Promise<Question[]> {
@@ -458,7 +448,7 @@ export async function sendTakeAnswerProgress(
   id: string,
   payload: TakeProgressPayload,
 ): Promise<void> {
-  await requestVoid(`/take/${id}/answer/progress`, {
+  await request<void>(`/take/${id}/answer/progress`, {
     method: 'POST',
     body: JSON.stringify(payload),
   });
@@ -497,7 +487,7 @@ export async function completeMultipartUpload(
   mediaKey: string,
   uploadId: string,
 ): Promise<void> {
-  await requestVoid('/upload/multipart/complete', {
+  await request<void>('/upload/multipart/complete', {
     method: 'POST',
     body: JSON.stringify({
       questionIndex,
@@ -512,7 +502,7 @@ export async function abortMultipartUpload(
   mediaKey: string,
   uploadId: string,
 ): Promise<void> {
-  await requestVoid('/upload/multipart/abort', {
+  await request<void>('/upload/multipart/abort', {
     method: 'POST',
     body: JSON.stringify({
       questionIndex,
@@ -526,7 +516,7 @@ export async function submitTakeAnswer(
   id: string,
   payload: SubmitTakeAnswerPayload,
 ): Promise<void> {
-  await requestVoid(`/take/${id}/answer`, {
+  await request<void>(`/take/${id}/answer`, {
     method: 'POST',
     body: JSON.stringify(payload),
   });

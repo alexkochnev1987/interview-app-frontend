@@ -1,14 +1,6 @@
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
-import {
-  SURFACE_LOW_STRONG_BG,
-  SURFACE_SHADOW_FLOAT,
-  SURFACE_SHADOW_SOFT,
-  SURFACE_WHITE_MUTED_BORDER,
-  SURFACE_WHITE_SOFT_BG,
-  SURFACE_WHITE_SOFT_BORDER,
-} from "@/components/app/style-tokens"
 import { cn } from "@/lib/utils"
 
 const cardVariants = cva(
@@ -17,9 +9,10 @@ const cardVariants = cva(
     variants: {
       tone: {
         default: "",
-        surfaceGlassSoft: `${SURFACE_WHITE_SOFT_BORDER} ${SURFACE_WHITE_SOFT_BG} text-card-foreground ${SURFACE_SHADOW_SOFT}`,
-        surfaceGlassFloat: `${SURFACE_WHITE_SOFT_BORDER} ${SURFACE_WHITE_SOFT_BG} text-card-foreground ${SURFACE_SHADOW_FLOAT}`,
-        surfaceMutedSoft: `${SURFACE_WHITE_MUTED_BORDER} ${SURFACE_LOW_STRONG_BG} text-card-foreground ${SURFACE_SHADOW_SOFT}`,
+        surfaceGlassSoft: "border-white/65 bg-white/88 text-card-foreground shadow-soft",
+        surfaceGlassFloat: "border-white/65 bg-white/88 text-card-foreground shadow-float",
+        surfaceMutedSoft:
+          "border-white/60 bg-[hsl(var(--surface-low)/0.9)] text-card-foreground shadow-soft",
       },
     },
     defaultVariants: {
