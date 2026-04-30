@@ -30,13 +30,14 @@ export function useTakeInterviewLoader({
   const loadInterview = useCallback(
     async (mode: 'initial' | 'resume' = 'initial', tokenOverride?: string) => {
       try {
-        const data = await getTakeInterview(id, tokenOverride);
+        const effectiveToken = tokenOverride ?? candidateToken;
+        const data = await getTakeInterview(id, effectiveToken);
         onDataRef.current(data, mode, tokenOverride);
       } catch (err) {
         onErrorRef.current(err instanceof Error ? err.message : 'Failed to load interview');
       }
     },
-    [id],
+    [id, candidateToken],
   );
 
   useEffect(() => {
