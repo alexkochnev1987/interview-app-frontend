@@ -30,7 +30,7 @@ interface LoginPageShellProps {
   children: ReactNode;
 }
 
-interface MaxWidth4xlProps {
+interface PageContentProps {
   children: ReactNode;
 }
 
@@ -104,10 +104,12 @@ export function LoginPageShell({ children }: LoginPageShellProps) {
   );
 }
 
-export function MaxWidth4xl({ children }: MaxWidth4xlProps) {
+export function PageContent({ children }: PageContentProps) {
   return (
     <Container width="4xl" centered>
       {children}
     </Container>
   );
 }
+
+export const MaxWidth4xl = PageContent;

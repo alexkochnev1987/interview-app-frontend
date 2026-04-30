@@ -2,7 +2,7 @@
 
 import { useParams, useSearchParams } from 'next/navigation'
 import { LoadingStateCard } from '@/components/app/state-card'
-import { MaxWidth4xl, PageMainLayout } from '@/components/layout/page-shell'
+import { PageContent, PageMainLayout } from '@/components/layout/page-shell'
 import { TakeCompleteScreen } from '@/components/take/take-complete-screen'
 import { TakeConsentScreen } from '@/components/take/take-consent-screen'
 import { TakeRecordingScreen } from '@/components/take/take-recording-screen'
@@ -46,12 +46,12 @@ export default function TakeInterviewPage() {
   if (error && !interview) {
     return (
       <PageMainLayout>
-        <MaxWidth4xl>
+        <PageContent>
           <Alert variant="destructive">
             <AlertTitle>Interview unavailable</AlertTitle>
             <AlertDescription>{error}</AlertDescription>
           </Alert>
-        </MaxWidth4xl>
+        </PageContent>
       </PageMainLayout>
     )
   }
@@ -59,9 +59,9 @@ export default function TakeInterviewPage() {
   if (stage === 'loading' || !interview) {
     return (
       <PageMainLayout>
-        <MaxWidth4xl>
+        <PageContent>
           <LoadingStateCard label="Loading interview..." />
-        </MaxWidth4xl>
+        </PageContent>
       </PageMainLayout>
     )
   }
