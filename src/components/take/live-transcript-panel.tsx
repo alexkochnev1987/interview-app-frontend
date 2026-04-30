@@ -1,5 +1,6 @@
 import { Text } from '@/components/ui/text';
 import { TakePanel } from '@/components/take/take-panel';
+import { Stack } from '@/components/ui/layout';
 import type { TakeStage } from '@/components/take/types';
 
 interface LiveTranscriptPanelProps {
@@ -19,45 +20,37 @@ export function LiveTranscriptPanel({
 }: LiveTranscriptPanelProps) {
   return (
     <TakePanel minHeight="transcript">
-      <div>
+      <Stack gap={2}>
         <Text as="span" variant="eyebrowLabel">
           Live transcript
         </Text>
         {!isSupported ? (
-          <div className="mt-2">
-            <Text variant="bodyMutedSm">
-              Live transcript is unavailable in this browser. Recording continues as usual.
-            </Text>
-          </div>
+          <Text variant="bodyMutedSm">
+            Live transcript is unavailable in this browser. Recording continues as usual.
+          </Text>
         ) : (
-          <div className="mt-2">
-            <Text variant="bodySm">
-              {finalTranscript || interimTranscript ? (
-                <>
-                  {finalTranscript}
-                  {interimTranscript ? (
-                    <Text as="span" variant="transcriptDraft">
-                      {interimTranscript} (draft)
-                    </Text>
-                  ) : null}
-                </>
-              ) : (
-                'Transcript will appear while you speak...'
-              )}
-            </Text>
-          </div>
+          <Text variant="bodySm">
+            {finalTranscript || interimTranscript ? (
+              <>
+                {finalTranscript}
+                {interimTranscript ? (
+                  <Text as="span" variant="transcriptDraft">
+                    {interimTranscript} (draft)
+                  </Text>
+                ) : null}
+              </>
+            ) : (
+              'Transcript will appear while you speak...'
+            )}
+          </Text>
         )}
         {stage === 'transition' ? (
-          <div className="mt-2">
-            <Text variant="captionMutedXs">Updating transcript for the next question...</Text>
-          </div>
+          <Text variant="captionMutedXs">Updating transcript for the next question...</Text>
         ) : null}
         {warning ? (
-          <div className="mt-2">
-            <Text variant="captionWarningXs">{warning}</Text>
-          </div>
+          <Text variant="captionWarningXs">{warning}</Text>
         ) : null}
-      </div>
+      </Stack>
     </TakePanel>
   );
 }

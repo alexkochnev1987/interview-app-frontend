@@ -4,6 +4,7 @@ import { EyebrowBadge } from '@/components/app/eyebrow-badge';
 import { MetricPanel } from '@/components/app/metric-panel';
 import { StatusPill } from '@/components/app/status-pill';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Grid, Inline, Stack } from '@/components/ui/layout';
 import { Progress } from '@/components/ui/progress';
 import { TakePanel } from '@/components/take/take-panel';
 import type { InterviewDataView } from '@/components/take/types';
@@ -28,52 +29,52 @@ export function TakeRecordingHeader({
   retakeCount,
 }: TakeRecordingHeaderProps) {
   return (
-    <div className="space-y-6">
-      <div className="space-y-3">
-        <EyebrowBadge icon={<Video className="size-3.5" />}>Live session</EyebrowBadge>
+    <Stack gap={6}>
+      <Stack gap={3}>
+        <EyebrowBadge icon={<Video size={14} />}>Live session</EyebrowBadge>
         <Heading variant="sectionHeroTitle">{interview.position}</Heading>
         <Text variant="bodyMutedSm">
           Answer clearly and keep your camera plus entire-screen share active while recording.
         </Text>
-      </div>
+      </Stack>
 
       <TakePanel tone="surfaceStrong" radius="lg" padding="lg">
-        <div className="space-y-3">
-          <div className="flex items-center justify-between gap-3">
-            <div className="text-sm font-medium text-foreground">
+        <Stack gap={3}>
+          <Inline align="center" justify="between" gap={3}>
+            <Text as="span" variant="labelSm">
               Question {interview.currentQuestionIndex + 1} of {interview.totalQuestions}
-            </div>
+            </Text>
             <StatusPill tone="neutral">{progressValue}%</StatusPill>
-          </div>
-          <Progress value={progressValue} className="h-2.5 rounded-full bg-white" />
-        </div>
+          </Inline>
+          <Progress value={progressValue} size="md" tone="softLight" />
+        </Stack>
       </TakePanel>
 
-      <div className="grid gap-3">
-        <div className="flex flex-wrap gap-2">
+      <Stack gap={3}>
+        <Inline wrap gap={2}>
           <StatusPill tone="completed">Camera + mic active</StatusPill>
           <StatusPill tone="completed">
             {screenSurface === 'monitor' ? 'Entire screen shared' : 'Screen share pending'}
           </StatusPill>
-        </div>
+        </Inline>
         {setupError ? (
           <Alert variant="destructive">
             <AlertTitle>Capture interrupted</AlertTitle>
             <AlertDescription>{setupError}</AlertDescription>
           </Alert>
         ) : null}
-      </div>
+      </Stack>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <Grid columns="2-md" gap={4}>
         <MetricPanel tone="elevated" label="Recording limit" value="4:00" />
         <MetricPanel
           tone="elevated"
           label="Answer version"
           value={`v${currentVersionNumber}`}
-          valueClassName="mt-3 text-sm leading-6 text-foreground"
+          valueVariant="bodySm"
           description={`Previous versions kept: ${retakeCount}`}
         />
-      </div>
-    </div>
+      </Grid>
+    </Stack>
   );
 }

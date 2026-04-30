@@ -63,6 +63,7 @@ const cardContentVariants = cva("px-4 group-data-[size=sm]/card:px-3", {
       hero: "flex h-full flex-col gap-6 px-8 py-8",
       form: "px-8 pb-8",
       compact: "space-y-3 px-5 py-5",
+      takeComplete: "space-y-6 px-8 py-10 text-center",
       stateLoading: "py-16 text-center text-sm text-muted-foreground",
       stateEmpty: "flex flex-col items-center gap-4 py-16 text-center",
     },

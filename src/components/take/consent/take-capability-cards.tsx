@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 
 import { SurfaceCard } from '@/components/app/surface-card';
 import { CardContent } from '@/components/ui/card';
+import { Grid, Stack } from '@/components/ui/layout';
 import { Text } from '@/components/ui/text';
 
 interface CapabilityCardProps {
@@ -12,19 +13,19 @@ interface CapabilityCardProps {
   description: ReactNode;
 }
 
-const iconClassName = 'size-5 text-[hsl(var(--primary))]';
-
 function CapabilityCard({ icon: Icon, title, description }: CapabilityCardProps) {
   return (
     <SurfaceCard tone="mutedSoft">
       <CardContent layout="compact">
-        <Icon className={iconClassName} />
-        <div className="space-y-1">
+        <Text as="span" variant="iconPrimary">
+          <Icon size={20} />
+        </Text>
+        <Stack gap={1}>
           <Text as="span" variant="labelSmStrong">
             {title}
           </Text>
           <Text variant="bodyMutedSm">{description}</Text>
-        </div>
+        </Stack>
       </CardContent>
     </SurfaceCard>
   );
@@ -47,10 +48,10 @@ export function TakeCapabilityCards() {
   ];
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+    <Grid columns="2-md-4-xl" gap={4}>
       {items.map((item) => (
         <CapabilityCard key={item.title} icon={item.icon} title={item.title} description={item.description} />
       ))}
-    </div>
+    </Grid>
   );
 }

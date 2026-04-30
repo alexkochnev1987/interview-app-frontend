@@ -1,4 +1,6 @@
 import type { ReactNode } from 'react';
+import { Container, Grid, Stack } from '@/components/ui/layout';
+import { PageFrame } from '@/components/ui/page-frame';
 
 interface PageMainProps {
   children: ReactNode;
@@ -33,37 +35,77 @@ interface MaxWidth4xlProps {
 }
 
 export function PageMain({ children }: PageMainProps) {
-  return <main className="container space-y-8 py-10 md:py-12">{children}</main>;
+  return (
+    <PageFrame as="main" spacing="page">
+      <Container width="container">
+        <Stack gap={8}>{children}</Stack>
+      </Container>
+    </PageFrame>
+  );
 }
 
 export function PageMainWideGap({ children }: PageMainWideGapProps) {
-  return <main className="container space-y-8 py-10 md:space-y-10 md:py-12">{children}</main>;
+  return (
+    <PageFrame as="main" spacing="page">
+      <Container width="container">
+        <Stack gap="8-md-10">{children}</Stack>
+      </Container>
+    </PageFrame>
+  );
 }
 
 export function PageMainCompact({ children }: PageMainCompactProps) {
-  return <main className="container py-12">{children}</main>;
+  return (
+    <PageFrame as="main" spacing="compact">
+      <Container width="container">{children}</Container>
+    </PageFrame>
+  );
 }
 
 export function PageMainEditor({ children }: PageMainEditorProps) {
-  return <main className="container space-y-6 py-10 md:space-y-8 md:py-12">{children}</main>;
+  return (
+    <PageFrame as="main" spacing="page">
+      <Container width="container">
+        <Stack gap="6-md-8">{children}</Stack>
+      </Container>
+    </PageFrame>
+  );
 }
 
 export function PageMainTight({ children }: PageMainTightProps) {
-  return <main className="container py-10 md:py-12">{children}</main>;
+  return (
+    <PageFrame as="main" spacing="page">
+      <Container width="container">{children}</Container>
+    </PageFrame>
+  );
 }
 
 export function PageMainCompactStack({ children }: PageMainCompactStackProps) {
-  return <main className="container space-y-6 py-12">{children}</main>;
+  return (
+    <PageFrame as="main" spacing="compact">
+      <Container width="container">
+        <Stack gap={6}>{children}</Stack>
+      </Container>
+    </PageFrame>
+  );
 }
 
 export function LoginPageShell({ children }: LoginPageShellProps) {
   return (
-    <main className="container grid min-h-[calc(100vh-6rem)] gap-8 py-10 lg:grid-cols-[1.1fr_420px] lg:items-center lg:py-14">
-      {children}
-    </main>
+    <PageFrame as="main" spacing="login">
+      <Container width="container">
+        <Grid columns="login" gap={8} align="center" height="interview">
+          {children}
+        </Grid>
+      </Container>
+    </PageFrame>
   );
 }
 
 export function MaxWidth4xl({ children }: MaxWidth4xlProps) {
-  return <div className="mx-auto max-w-4xl">{children}</div>;
+  return (
+    <Container width="4xl" centered>
+      {children}
+    </Container>
+  );
 }

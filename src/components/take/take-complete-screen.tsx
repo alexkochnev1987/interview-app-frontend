@@ -2,6 +2,7 @@ import { SurfaceCard } from '@/components/app/surface-card';
 import { MaxWidth4xl, PageMainCompact } from '@/components/layout/page-shell';
 import { CardContent } from '@/components/ui/card';
 import { Heading } from '@/components/ui/heading';
+import { Stack } from '@/components/ui/layout';
 import { Text } from '@/components/ui/text';
 import { TakeSubmissionIconBox } from './take-submission-icon-box';
 
@@ -15,10 +16,10 @@ export function TakeCompleteScreen({ candidateName, position }: TakeCompleteScre
     <PageMainCompact>
       <MaxWidth4xl>
         <SurfaceCard tone="glassFloat">
-          <CardContent>
-            <div className="space-y-6 px-8 py-10 text-center">
+          <CardContent layout="takeComplete">
+            <Stack gap={6} align="center">
               <TakeSubmissionIconBox />
-              <div className="space-y-3">
+              <Stack gap={3} align="center">
                 <Heading variant="heroTitle">Thank you, {candidateName}</Heading>
                 <Text variant="heroDescription">
                   Your interview for <strong>{position}</strong> has been submitted.
@@ -27,8 +28,8 @@ export function TakeCompleteScreen({ candidateName, position }: TakeCompleteScre
                   Camera and full-screen recordings for each answer have been stored for reviewer
                   evaluation.
                 </Text>
-              </div>
-            </div>
+              </Stack>
+            </Stack>
           </CardContent>
         </SurfaceCard>
       </MaxWidth4xl>

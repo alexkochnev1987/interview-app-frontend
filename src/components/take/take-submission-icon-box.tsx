@@ -1,9 +1,10 @@
 import { CheckCircle2 } from 'lucide-react';
+import { IconBox } from '@/components/ui/icon-box';
 
 export function TakeSubmissionIconBox() {
   return (
-    <div className="mx-auto flex size-16 items-center justify-center rounded-[1.4rem] bg-[hsl(var(--primary-fixed)/0.85)] text-[hsl(var(--primary))]">
+    <IconBox centered>
       <CheckCircle2 size={32} />
-    </div>
+    </IconBox>
   );
 }

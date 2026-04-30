@@ -11,6 +11,7 @@ import { LiveTranscriptPanel } from '@/components/take/live-transcript-panel';
 import type { InterviewDataView, TakeStage } from '@/components/take/types';
 import { CardContent } from '@/components/ui/card';
 import { Heading } from '@/components/ui/heading';
+import { Container, Grid, Stack } from '@/components/ui/layout';
 
 interface TakeRecordingScreenProps {
   interview: InterviewDataView;
@@ -55,54 +56,56 @@ export function TakeRecordingScreen({
 }: TakeRecordingScreenProps) {
   return (
     <PageMain>
-      <section className="mx-auto grid max-w-6xl gap-6 xl:grid-cols-[0.84fr_1.16fr]">
-        <SurfaceCard tone="glassSoft">
-          <CardContent layout="spacious">
-            <TakeRecordingHeader
-              interview={interview}
-              progressValue={progressValue}
-              screenSurface={screenSurface}
-              setupError={setupError}
-              currentVersionNumber={currentVersionNumber}
-              retakeCount={retakeCount}
-            />
-          </CardContent>
-        </SurfaceCard>
+      <Container width="6xl" centered>
+        <Grid as="section" columns="recording" gap={6}>
+          <SurfaceCard tone="glassSoft">
+            <CardContent layout="spacious">
+              <TakeRecordingHeader
+                interview={interview}
+                progressValue={progressValue}
+                screenSurface={screenSurface}
+                setupError={setupError}
+                currentVersionNumber={currentVersionNumber}
+                retakeCount={retakeCount}
+              />
+            </CardContent>
+          </SurfaceCard>
 
-        <SurfaceCard tone="glassFloat">
-          <CardContent layout="spacious">
-            <div className="space-y-3">
-              <TakeRecordingStatus stage={stage} timeLeft={timeLeft} formatTime={formatTime} />
+          <SurfaceCard tone="glassFloat">
+            <CardContent layout="spacious">
+              <Stack gap={3}>
+                <TakeRecordingStatus stage={stage} timeLeft={timeLeft} formatTime={formatTime} />
 
-              <Heading variant="questionTitle">{interview.currentQuestion?.text}</Heading>
-            </div>
+                <Heading variant="questionTitle">{interview.currentQuestion?.text}</Heading>
+              </Stack>
 
-            <TakeRecordingPreview
-              isRecording={stage === 'recording'}
-              timeLeft={timeLeft}
-              formatTime={formatTime}
-              videoRef={videoRef}
-            />
+              <TakeRecordingPreview
+                isRecording={stage === 'recording'}
+                timeLeft={timeLeft}
+                formatTime={formatTime}
+                videoRef={videoRef}
+              />
 
-            <LiveTranscriptPanel
-              isSupported={isBrowserTranscriptSupported}
-              finalTranscript={finalTranscript}
-              interimTranscript={interimTranscript}
-              warning={browserTranscriptWarning}
-              stage={stage}
-            />
+              <LiveTranscriptPanel
+                isSupported={isBrowserTranscriptSupported}
+                finalTranscript={finalTranscript}
+                interimTranscript={interimTranscript}
+                warning={browserTranscriptWarning}
+                stage={stage}
+              />
 
-            <TakeRecordingGuidance stage={stage} transitionLabel={transitionLabel} />
-            <TakeRecordingActions
-              stage={stage}
-              uploading={uploading}
-              transitionLabel={transitionLabel}
-              onRerecord={onRerecord}
-              onSubmit={onSubmit}
-            />
-          </CardContent>
-        </SurfaceCard>
-      </section>
+              <TakeRecordingGuidance stage={stage} transitionLabel={transitionLabel} />
+              <TakeRecordingActions
+                stage={stage}
+                uploading={uploading}
+                transitionLabel={transitionLabel}
+                onRerecord={onRerecord}
+                onSubmit={onSubmit}
+              />
+            </CardContent>
+          </SurfaceCard>
+        </Grid>
+      </Container>
     </PageMain>
   );
 }

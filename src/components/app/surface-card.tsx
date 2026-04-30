@@ -1,6 +1,8 @@
 import type { ComponentProps } from 'react';
 
 import { Card } from '@/components/ui/card';
+import { Container } from '@/components/ui/layout';
+import { HoverLift } from '@/components/ui/hover-lift';
 
 type SurfaceCardTone = 'glassSoft' | 'glassFloat' | 'mutedSoft';
 
@@ -23,9 +25,9 @@ interface SurfaceCardMax5xlProps extends Omit<SurfaceCardProps, 'className'> {}
 
 export function SurfaceCardMax5xl({ tone, ...props }: SurfaceCardMax5xlProps) {
   return (
-    <div className="mx-auto max-w-5xl">
+    <Container width="5xl" centered>
       <SurfaceCard tone={tone} {...props} />
-    </div>
+    </Container>
   );
 }
 
@@ -33,8 +35,8 @@ interface SurfaceCardLiftProps extends Omit<SurfaceCardProps, 'className'> {}
 
 export function SurfaceCardLift({ tone, ...props }: SurfaceCardLiftProps) {
   return (
-    <div className="transition-transform duration-200 hover:-translate-y-0.5">
+    <HoverLift>
       <SurfaceCard tone={tone} {...props} />
-    </div>
+    </HoverLift>
   );
 }

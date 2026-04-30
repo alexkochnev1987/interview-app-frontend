@@ -12,6 +12,8 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Heading } from '@/components/ui/heading';
+import { Grid, Stack } from '@/components/ui/layout';
+import { TextList, TextListItem } from '@/components/ui/text-list';
 import { Text } from '@/components/ui/text';
 import type { InterviewDataView, PermissionStatus } from '@/components/take/types';
 
@@ -46,54 +48,54 @@ export function TakeConsentScreen({
     <PageMain>
       <SurfaceCardMax5xl tone="glassFloat">
         <CardContent layout="spacious">
-          <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="space-y-5">
-              <EyebrowBadge icon={<Sparkles className="size-3.5" />}>Candidate interview</EyebrowBadge>
+          <Grid columns="consent" gap={8}>
+            <Stack gap={5}>
+              <EyebrowBadge icon={<Sparkles size={14} />}>Candidate interview</EyebrowBadge>
 
-              <div className="space-y-3">
+              <Stack gap={3}>
                 <Heading variant="heroTitle">Interview for {interview.position}</Heading>
                 <Text variant="heroDescription">
                   Welcome, {interview.candidateName}. You will answer {interview.totalQuestions}{' '}
                   questions, with up to four minutes for each response.
                 </Text>
-              </div>
+              </Stack>
 
               <TakeCapabilityCards />
-            </div>
+            </Stack>
 
             <SurfaceCard tone="glassSoft">
               <CardHeader>
-                <div className="space-y-2">
+                <Stack gap={2}>
                   <CardTitle size="section">Before you start</CardTitle>
                   <Text variant="bodyMutedSm">
                     One button will request camera, microphone, and then full-screen sharing.
                   </Text>
-                </div>
+                </Stack>
               </CardHeader>
               <CardContent>
-                <div className="space-y-5">
+                <Stack gap={5}>
                   <TakePanel radius="lg" padding="lg">
-                    <div className="space-y-3">
+                    <Stack gap={3}>
                       <Text as="span" variant="eyebrowLabel">
                         Data collected
                       </Text>
-                      <ul className="space-y-2">
-                        <li>
+                      <TextList>
+                        <TextListItem>
                           <Text variant="bodyMutedSm">Camera video and microphone audio for each answer</Text>
-                        </li>
-                        <li>
+                        </TextListItem>
+                        <TextListItem>
                           <Text variant="bodyMutedSm">
                             Full-monitor screen recording in parallel with each answer
                           </Text>
-                        </li>
-                        <li>
+                        </TextListItem>
+                        <TextListItem>
                           <Text variant="bodyMutedSm">Browser activity such as tab switches</Text>
-                        </li>
-                        <li>
+                        </TextListItem>
+                        <TextListItem>
                           <Text variant="bodyMutedSm">Session metadata including answer timing</Text>
-                        </li>
-                      </ul>
-                    </div>
+                        </TextListItem>
+                      </TextList>
+                    </Stack>
                   </TakePanel>
 
                   <TakePermissionStatusList
@@ -122,10 +124,10 @@ export function TakeConsentScreen({
                   >
                     {setupBusy ? 'Requesting access...' : 'Allow Camera, Mic & Entire Screen'}
                   </Button>
-                </div>
+                </Stack>
               </CardContent>
             </SurfaceCard>
-          </div>
+          </Grid>
         </CardContent>
       </SurfaceCardMax5xl>
     </PageMain>

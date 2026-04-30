@@ -7,6 +7,7 @@ import {
   STATUS_FAILED_SURFACE,
   STATUS_IN_PROGRESS_SURFACE,
   STATUS_NEUTRAL_SURFACE,
+  STATUS_NEUTRAL_META_SURFACE,
   STATUS_PENDING_SURFACE,
   STATUS_PILL_BASE,
   STATUS_PROCESSING_SURFACE,
@@ -30,7 +31,7 @@ const statusPillVariants = cva(STATUS_PILL_BASE, {
   variants: {
     tone: {
       neutral: STATUS_NEUTRAL_SURFACE,
-      neutral_meta: `${STATUS_NEUTRAL_SURFACE} normal-case tracking-[0.08em]`,
+      neutral_meta: STATUS_NEUTRAL_META_SURFACE,
       pending: STATUS_PENDING_SURFACE,
       in_progress: STATUS_IN_PROGRESS_SURFACE,
       processing: STATUS_PROCESSING_SURFACE,

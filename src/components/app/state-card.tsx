@@ -1,13 +1,10 @@
 import type { ReactNode } from 'react'
 
-import {
-  SURFACE_PRIMARY_ELEVATED_BG,
-  SURFACE_PRIMARY_SOFT_TEXT,
-} from '@/components/app/style-tokens'
 import { Heading } from '@/components/ui/heading'
 import { Card, CardContent } from '@/components/ui/card'
+import { IconBox } from '@/components/ui/icon-box'
+import { Container, Stack } from '@/components/ui/layout'
 import { Text } from '@/components/ui/text'
-import { cn } from '@/lib/utils'
 
 interface LoadingStateCardProps {
   className?: string
@@ -44,16 +41,16 @@ export function EmptyStateCard({
       <Card tone="surfaceGlassSoft">
         <CardContent layout="stateEmpty">
           {icon ? (
-            <div className={cn('rounded-full p-3', SURFACE_PRIMARY_ELEVATED_BG, SURFACE_PRIMARY_SOFT_TEXT)}>
+            <IconBox tone="primarySoft" size="sm" shape="pill">
               {icon}
-            </div>
+            </IconBox>
           ) : null}
-          <div className="space-y-2">
+          <Stack gap={2}>
             <Heading variant="questionTitle">{title}</Heading>
-            <div className="max-w-md">
+            <Container width="4xl">
               <Text variant="bodyMutedSm">{description}</Text>
-            </div>
-          </div>
+            </Container>
+          </Stack>
           {action}
         </CardContent>
       </Card>

@@ -1,11 +1,8 @@
 import type { PermissionStatus } from '@/components/take/types';
-import { SURFACE_LOW_SOFT_BG } from '@/components/app/style-tokens';
 import { StatusPill, type StatusTone } from '@/components/app/status-pill';
 import { TakePanel } from '@/components/take/take-panel';
+import { Inline, Stack } from '@/components/ui/layout';
 import { Text } from '@/components/ui/text';
-
-const PERMISSION_ROW_SURFACE = `rounded-[1rem] ${SURFACE_LOW_SOFT_BG}`;
-const PERMISSION_ROW_LAYOUT = 'flex items-center justify-between gap-3 px-4 py-3';
 
 interface TakePermissionStatusListProps {
   cameraStatus: PermissionStatus;
@@ -31,17 +28,19 @@ function PermissionRow({
   permissionTone,
 }: PermissionRowProps) {
   return (
-    <div className={`${PERMISSION_ROW_LAYOUT} ${PERMISSION_ROW_SURFACE}`}>
-      <div className="space-y-1">
-        <Text as="span" variant="labelSmStrong">
-          {title}
-        </Text>
-        <Text variant="captionMutedXs">{description}</Text>
-      </div>
-      <StatusPill tone={permissionTone(status)}>
-        {permissionLabel(status)}
-      </StatusPill>
-    </div>
+    <TakePanel tone="surface" radius="lg">
+      <Inline align="center" justify="between" gap={3}>
+        <Stack gap={1}>
+          <Text as="span" variant="labelSmStrong">
+            {title}
+          </Text>
+          <Text variant="captionMutedXs">{description}</Text>
+        </Stack>
+        <StatusPill tone={permissionTone(status)}>
+          {permissionLabel(status)}
+        </StatusPill>
+      </Inline>
+    </TakePanel>
   );
 }
 
@@ -54,7 +53,7 @@ export function TakePermissionStatusList({
 }: TakePermissionStatusListProps) {
   return (
     <TakePanel tone="white" radius="lg" padding="lg">
-      <div className="space-y-3">
+      <Stack gap={3}>
         <PermissionRow
           title="Camera and microphone"
           description="Required before recording can begin."
@@ -73,7 +72,7 @@ export function TakePermissionStatusList({
           permissionLabel={permissionLabel}
           permissionTone={permissionTone}
         />
-      </div>
+      </Stack>
     </TakePanel>
   );
 }
