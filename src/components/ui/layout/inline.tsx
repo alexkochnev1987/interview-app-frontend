@@ -43,7 +43,7 @@ type InlineProps = Omit<React.ComponentPropsWithoutRef<"div">, "className"> &
 
 function Inline({ as, gap, align, justify, wrap, ...props }: InlineProps) {
   const Comp = as ?? "div"
-  return <Comp className={inlineVariants({ gap, align, justify, wrap })} {...props} />
+  return <Comp {...props} className={inlineVariants({ gap, align, justify, wrap })} />
 }
 
 export { Inline }

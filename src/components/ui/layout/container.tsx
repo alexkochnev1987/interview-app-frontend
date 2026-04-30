@@ -27,7 +27,7 @@ type ContainerProps = Omit<React.ComponentPropsWithoutRef<"div">, "className"> &
 
 function Container({ as, width, centered, ...props }: ContainerProps) {
   const Comp = as ?? "div"
-  return <Comp className={containerVariants({ width, centered })} {...props} />
+  return <Comp {...props} className={containerVariants({ width, centered })} />
 }
 
 export { Container }

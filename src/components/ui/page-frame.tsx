@@ -21,7 +21,7 @@ type PageFrameProps = Omit<ComponentProps<"div">, "className"> &
 
 function PageFrame({ as, spacing, ...props }: PageFrameProps) {
   const Comp = as ?? "div"
-  return <Comp className={pageFrameVariants({ spacing })} {...props} />
+  return <Comp {...props} className={pageFrameVariants({ spacing })} />
 }
 
 export { PageFrame }

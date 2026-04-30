@@ -46,7 +46,7 @@ type GridProps = Omit<React.ComponentPropsWithoutRef<"div">, "className"> &
 
 function Grid({ as, gap, columns, align, height, ...props }: GridProps) {
   const Comp = as ?? "div"
-  return <Comp className={gridVariants({ gap, columns, align, height })} {...props} />
+  return <Comp {...props} className={gridVariants({ gap, columns, align, height })} />
 }
 
 export { Grid }

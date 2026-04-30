@@ -42,7 +42,7 @@ type StackProps = Omit<React.ComponentPropsWithoutRef<"div">, "className"> &
 
 function Stack({ as, gap, align, justify, ...props }: StackProps) {
   const Comp = as ?? "div"
-  return <Comp className={stackVariants({ gap, align, justify })} {...props} />
+  return <Comp {...props} className={stackVariants({ gap, align, justify })} />
 }
 
 export { Stack }
