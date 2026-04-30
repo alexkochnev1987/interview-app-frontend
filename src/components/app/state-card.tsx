@@ -1,7 +1,10 @@
 import type { ReactNode } from 'react'
 
+import { Heading } from '@/components/ui/heading'
 import { Card, CardContent } from '@/components/ui/card'
-import { cn } from '@/lib/utils'
+import { IconBox } from '@/components/ui/icon-box'
+import { Container, Stack } from '@/components/ui/layout'
+import { Text } from '@/components/ui/text'
 
 interface LoadingStateCardProps {
   className?: string
@@ -18,9 +21,11 @@ interface EmptyStateCardProps {
 
 export function LoadingStateCard({ className, label }: LoadingStateCardProps) {
   return (
-    <Card className={cn('border-white/65 bg-white/86 shadow-soft', className)}>
-      <CardContent className="py-16 text-center text-sm text-muted-foreground">{label}</CardContent>
-    </Card>
+    <div className={className}>
+      <Card tone="surfaceGlassSoft">
+        <CardContent layout="stateLoading">{label}</CardContent>
+      </Card>
+    </div>
   )
 }
 
@@ -32,19 +37,23 @@ export function EmptyStateCard({
   title,
 }: EmptyStateCardProps) {
   return (
-    <Card className={cn('border-white/65 bg-white/86 shadow-soft', className)}>
-      <CardContent className="flex flex-col items-center gap-4 py-16 text-center">
-        {icon ? (
-          <div className="rounded-full bg-[hsl(var(--primary-fixed)/0.85)] p-3 text-[hsl(var(--primary))]">
-            {icon}
-          </div>
-        ) : null}
-        <div className="space-y-2">
-          <h2 className="text-2xl font-semibold tracking-[-0.03em] text-foreground">{title}</h2>
-          <p className="max-w-md text-sm leading-6 text-muted-foreground">{description}</p>
-        </div>
-        {action}
-      </CardContent>
-    </Card>
+    <div className={className}>
+      <Card tone="surfaceGlassSoft">
+        <CardContent layout="stateEmpty">
+          {icon ? (
+            <IconBox tone="primarySoft" size="sm" shape="pill">
+              {icon}
+            </IconBox>
+          ) : null}
+          <Stack gap={2}>
+            <Heading variant="questionTitle">{title}</Heading>
+            <Container width="4xl">
+              <Text variant="bodyMutedSm">{description}</Text>
+            </Container>
+          </Stack>
+          {action}
+        </CardContent>
+      </Card>
+    </div>
   )
 }

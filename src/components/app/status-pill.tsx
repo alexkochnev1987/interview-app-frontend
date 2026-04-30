@@ -1,10 +1,12 @@
 import type { ComponentProps } from "react"
+import { cva, type VariantProps } from "class-variance-authority"
 
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 
-type StatusTone =
+export type StatusTone =
   | "neutral"
+  | "neutral_meta"
   | "pending"
   | "in_progress"
   | "processing"
@@ -14,30 +16,40 @@ type StatusTone =
   | "medium"
   | "hard"
 
-const toneClasses: Record<StatusTone, string> = {
-  neutral:
-    "bg-[hsl(var(--surface-low))] text-[hsl(var(--muted-foreground))] ring-1 ring-[hsl(var(--border)/0.55)]",
-  pending:
-    "bg-amber-100 text-amber-800 ring-1 ring-amber-200",
-  in_progress:
-    "bg-sky-100 text-sky-800 ring-1 ring-sky-200",
-  processing:
-    "bg-orange-100 text-orange-800 ring-1 ring-orange-200",
-  completed:
-    "bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200",
-  failed:
-    "bg-rose-100 text-rose-800 ring-1 ring-rose-200",
-  easy: "bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200",
-  medium: "bg-amber-100 text-amber-800 ring-1 ring-amber-200",
-  hard: "bg-violet-100 text-violet-800 ring-1 ring-violet-200",
-}
+const statusPillVariants = cva(
+  "rounded-full border-0 px-3 py-1 text-[0.68rem] font-semibold tracking-[0.16em] uppercase shadow-none",
+  {
+  variants: {
+    tone: {
+      neutral:
+        "bg-[hsl(var(--surface-low))] text-[hsl(var(--muted-foreground))] ring-1 ring-[hsl(var(--border)/0.55)]",
+      neutral_meta:
+        "bg-[hsl(var(--surface-low))] text-[hsl(var(--muted-foreground))] ring-1 ring-[hsl(var(--border)/0.55)] normal-case tracking-[0.08em]",
+      pending:
+        "bg-[var(--color-status-pending-bg)] text-[var(--color-status-pending-fg)] ring-1 ring-[var(--color-status-pending-ring)]",
+      in_progress:
+        "bg-[var(--color-status-in-progress-bg)] text-[var(--color-status-in-progress-fg)] ring-1 ring-[var(--color-status-in-progress-ring)]",
+      processing:
+        "bg-[var(--color-status-processing-bg)] text-[var(--color-status-processing-fg)] ring-1 ring-[var(--color-status-processing-ring)]",
+      completed:
+        "bg-[var(--color-status-completed-bg)] text-[var(--color-status-completed-fg)] ring-1 ring-[var(--color-status-completed-ring)]",
+      failed: "bg-destructive/10 text-destructive ring-1 ring-destructive/30",
+      easy:
+        "bg-[var(--color-status-completed-bg)] text-[var(--color-status-completed-fg)] ring-1 ring-[var(--color-status-completed-ring)]",
+      medium:
+        "bg-[var(--color-status-pending-bg)] text-[var(--color-status-pending-fg)] ring-1 ring-[var(--color-status-pending-ring)]",
+      hard: "bg-[var(--color-status-failed-bg)] text-[var(--color-status-failed-fg)] ring-1 ring-[var(--color-status-failed-ring)]",
+    },
+  },
+  defaultVariants: {
+    tone: "neutral",
+  },
+})
 
-interface StatusPillProps extends ComponentProps<"span"> {
-  tone?: StatusTone
-}
+interface StatusPillProps extends ComponentProps<"span">, VariantProps<typeof statusPillVariants> {}
 
 export function StatusPill({
-  tone = "neutral",
+  tone,
   className,
   children,
   ...props
@@ -45,11 +57,7 @@ export function StatusPill({
   return (
     <Badge
       variant="secondary"
-      className={cn(
-        "rounded-full border-0 px-3 py-1 text-[0.68rem] font-semibold tracking-[0.16em] uppercase shadow-none",
-        toneClasses[tone],
-        className
-      )}
+      className={cn(statusPillVariants({ tone }), className)}
       {...props}
     >
       {children}

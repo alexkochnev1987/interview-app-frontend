@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react'
 
+import { Inline, Stack } from '@/components/ui/layout'
+import { Text } from '@/components/ui/text'
 import { cn } from '@/lib/utils'
 
 type MetricPanelTone = 'surface' | 'elevated' | 'compact'
@@ -11,78 +13,73 @@ const toneClasses: Record<MetricPanelTone, string> = {
 }
 
 interface MetricPanelProps {
-  className?: string
   description?: ReactNode
   icon?: ReactNode
   label: ReactNode
-  labelClassName?: string
   tone?: MetricPanelTone
   unstyledLabel?: boolean
   unstyledValue?: boolean
   value: ReactNode
   valueClassName?: string
+  valueVariant?: 'bodySm' | 'metricValueLg' | 'metricValueXl'
 }
 
 export function MetricPanel({
-  className,
   description,
   icon,
   label,
-  labelClassName,
   tone = 'surface',
   unstyledLabel = false,
   unstyledValue = false,
   value,
   valueClassName,
+  valueVariant,
 }: MetricPanelProps) {
   const hasIcon = icon !== undefined
   const hasValue = value !== null && value !== undefined && value !== false
 
   return (
-    <div className={cn(toneClasses[tone], className)}>
-      {hasIcon ? (
-        <div className="flex items-center gap-3 text-muted-foreground">
-          <span className="shrink-0">{icon}</span>
-          <span
-            className={cn(
-              'text-[0.72rem] font-semibold uppercase tracking-[0.2em]',
-              labelClassName
+    <div className={toneClasses[tone]}>
+      <Stack gap={hasIcon ? 4 : 3}>
+        {hasIcon ? (
+          <Inline align="center" gap={3}>
+            <Text as="span" variant="iconPrimary">
+              {icon}
+            </Text>
+            <Text as="span" variant="metricLabel">
+              {label}
+            </Text>
+          </Inline>
+        ) : (
+          <>
+            {unstyledLabel ? (
+              <span>{label}</span>
+            ) : (
+              <Text as="span" variant="metricLabelCompact">
+                {label}
+              </Text>
             )}
-          >
-            {label}
-          </span>
-        </div>
-      ) : (
-        <div
-          className={cn(
-            !unstyledLabel &&
-              'text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground',
-            labelClassName,
-            unstyledLabel && 'text-inherit'
-          )}
-        >
-          {label}
-        </div>
-      )}
+          </>
+        )}
 
-      {hasValue ? (
-        <div
-          className={cn(
-            !unstyledValue &&
-              (hasIcon
-                ? 'mt-4 text-4xl font-semibold tracking-[-0.04em] text-foreground'
-                : 'mt-3 text-3xl font-semibold tracking-[-0.04em] text-foreground'),
-            unstyledValue && (hasIcon ? 'mt-4' : 'mt-3'),
-            valueClassName
-          )}
-        >
-          {value}
-        </div>
-      ) : null}
+        {hasValue ? (
+          unstyledValue ? (
+            <div className={valueClassName}>{value}</div>
+          ) : (
+            <Text
+              as="span"
+              variant={valueVariant ?? (hasIcon ? 'metricValueXl' : 'metricValueLg')}
+              className={cn(valueClassName)}
+            >
+              {value}
+            </Text>
+          )
+        ) : null}
 
-      {description ? (
-        <p className="mt-2 text-sm leading-6 text-muted-foreground">{description}</p>
-      ) : null}
+        {description ? (
+          <Text variant="bodyMutedSm">{description}</Text>
+        ) : null}
+      </Stack>
     </div>
   )
 }
