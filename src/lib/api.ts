@@ -126,7 +126,7 @@ export interface AnswerBehaviorEvent {
 export interface AnswerTranscript {
   text?: string;
   language?: string;
-  provider?: string;
+  provider?: 'browser-web-speech' | 'whisper';
   generatedAt?: string;
   isFinal?: boolean;
 }
@@ -134,7 +134,7 @@ export interface AnswerTranscript {
 export interface ClientTranscriptPayload {
   text: string;
   language: string;
-  provider: 'browser-web-speech';
+  provider: 'browser-web-speech' | 'whisper';
   generatedAt: string;
   isFinal: boolean;
 }
@@ -258,7 +258,9 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     throw new Error(`API error ${res.status}: ${body}`);
   }
 
-  return res.json() as Promise<T>;
+  const body = await res.text();
+  if (!body) return undefined as T;
+  return JSON.parse(body) as T;
 }
 
 export async function fetchQuestions(): Promise<Question[]> {
@@ -422,4 +424,152 @@ export async function completeInterview(id: string): Promise<Interview> {
 
 export async function getResults(id: string): Promise<InterviewResult> {
   return request<InterviewResult>(`/interviews/${id}/results`);
+}
+
+type CaptureTarget = 'camera' | 'screen';
+
+export interface TakeInterviewData {
+  id: string;
+  position: string;
+  candidateName: string;
+  totalQuestions: number;
+  currentQuestion: { text: string } | null;
+  currentQuestionIndex: number;
+  currentAnswerMeta: {
+    status: 'recording' | 'submitted';
+    versionCount: number;
+    selectedVersionNumber: number;
+  } | null;
+  completed: boolean;
+}
+
+export interface MultipartUploadSessionResponse {
+  mediaKey: string;
+  uploadId: string;
+}
+
+export interface MultipartUploadPartResponse {
+  mediaKey: string;
+  uploadId: string;
+  partNumber: number;
+  uploadUrl: string;
+}
+
+export interface TakeProgressPayload {
+  questionIndex: number;
+  versionNumber: number;
+  mediaKey: string;
+  screenMediaKey?: string;
+  durationSeconds?: number;
+  startedAt?: string;
+  submittedAt?: string;
+  cameraFileSizeBytes?: number;
+  screenFileSizeBytes?: number;
+  behaviorSignals: AnswerBehaviorSignals;
+  behaviorEvents: AnswerBehaviorEvent[];
+  clientTranscript?: ClientTranscriptPayload;
+}
+
+export interface SubmitTakeAnswerPayload extends TakeProgressPayload {
+  submitAnswer: boolean;
+}
+
+export async function getTakeInterview(
+  id: string,
+  token?: string,
+): Promise<TakeInterviewData> {
+  const query = token ? `?token=${encodeURIComponent(token)}` : '';
+  return request<TakeInterviewData>(`/take/${id}${query}`);
+}
+
+export async function startMultipartUpload(
+  questionIndex: number,
+  mediaType: CaptureTarget,
+): Promise<MultipartUploadSessionResponse> {
+  return request<MultipartUploadSessionResponse>('/upload/multipart/start', {
+    method: 'POST',
+    body: JSON.stringify({
+      questionIndex,
+      contentType: 'video/webm',
+      mediaType,
+    }),
+  });
+}
+
+export async function sendTakeAnswerProgress(
+  id: string,
+  payload: TakeProgressPayload,
+): Promise<void> {
+  await request<void>(`/take/${id}/answer/progress`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function presignMultipartPart(
+  questionIndex: number,
+  mediaKey: string,
+  uploadId: string,
+  partNumber: number,
+): Promise<MultipartUploadPartResponse> {
+  return request<MultipartUploadPartResponse>('/upload/multipart/part', {
+    method: 'POST',
+    body: JSON.stringify({
+      questionIndex,
+      mediaKey,
+      uploadId,
+      partNumber,
+    }),
+  });
+}
+
+export async function uploadMultipartPart(uploadUrl: string, partBlob: Blob): Promise<void> {
+  const uploadResponse = await fetch(uploadUrl, {
+    method: 'PUT',
+    body: partBlob,
+    headers: { 'Content-Type': 'video/webm' },
+  });
+  if (!uploadResponse.ok) {
+    throw new Error('Chunk upload failed for recording.');
+  }
+}
+
+export async function completeMultipartUpload(
+  questionIndex: number,
+  mediaKey: string,
+  uploadId: string,
+): Promise<void> {
+  await request<void>('/upload/multipart/complete', {
+    method: 'POST',
+    body: JSON.stringify({
+      questionIndex,
+      mediaKey,
+      uploadId,
+    }),
+  });
+}
+
+export async function abortMultipartUpload(
+  questionIndex: number,
+  mediaKey: string,
+  uploadId: string,
+): Promise<void> {
+  await request<void>('/upload/multipart/abort', {
+    method: 'POST',
+    body: JSON.stringify({
+      questionIndex,
+      mediaKey,
+      uploadId,
+    }),
+  });
+}
+
+export async function submitTakeAnswer(
+  id: string,
+  payload: SubmitTakeAnswerPayload,
+): Promise<void> {
+  await request<void>(`/take/${id}/answer`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
 }
