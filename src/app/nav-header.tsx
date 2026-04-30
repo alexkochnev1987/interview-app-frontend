@@ -1,38 +1,19 @@
 'use client'
 
-import Link from 'next/link'
-import type { ComponentProps } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { usePathname } from 'next/navigation'
 import { Sparkles, LogOut, Plus, LayoutDashboard, LibraryBig } from 'lucide-react'
-import { cva, type VariantProps } from 'class-variance-authority'
 
+import { AppHeader, AppHeaderInner } from '@/components/ui/app-header'
 import { EyebrowLabel } from '@/components/ui/eyebrow-label'
 import { IconBadge } from '@/components/ui/icon-badge'
 import { SurfaceTile } from '@/components/ui/surface-tile'
 import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
-
-const navLinkVariants = cva(
-  'inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium no-underline transition-colors',
-  {
-    variants: {
-      active: {
-        true: 'bg-[hsl(var(--surface-low))] text-foreground ring-1 ring-border/60',
-        false: 'text-muted-foreground hover:bg-surface-low-soft hover:text-foreground',
-      },
-    },
-    defaultVariants: { active: false },
-  },
-)
-
-interface NavLinkProps
-  extends ComponentProps<typeof Link>,
-    VariantProps<typeof navLinkVariants> {}
-
-function NavLink({ active, className, ...props }: NavLinkProps) {
-  return <Link className={cn(navLinkVariants({ active }), className)} {...props} />
-}
+import { Inline } from '@/components/ui/layout/inline'
+import { Stack } from '@/components/ui/layout/stack'
+import { NavLink } from '@/components/ui/nav-link'
+import { BodyText } from '@/components/ui/text'
+import { UnstyledLink } from '@/components/ui/unstyled-link'
 
 export function NavHeader() {
   const { user, loading, logout } = useAuth()
@@ -56,42 +37,53 @@ export function NavHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/50 bg-background/80 backdrop-blur-xl">
-      <div className="container flex min-h-20 flex-wrap items-center justify-between gap-4 py-4">
-        <Link href="/" className="flex items-center gap-3 no-underline">
-          <IconBadge tone="gradient" size="md">
-            <Sparkles className="size-5" />
-          </IconBadge>
-          <div className="space-y-0.5">
-            <EyebrowLabel size="lg">Intelligent Conductor</EyebrowLabel>
-            <div className="text-sm font-semibold text-foreground md:text-base">
-              AI Interview Architect
-            </div>
-          </div>
-        </Link>
-
-        <nav className="order-3 flex w-full flex-wrap items-center gap-2 md:order-2 md:w-auto md:justify-center">
-          {loading
+    <AppHeader>
+      <AppHeaderInner
+        brand={
+          <UnstyledLink href="/">
+            <Inline gap={3} align="center">
+              <IconBadge tone="gradient" size="md">
+                <Sparkles className="size-5" />
+              </IconBadge>
+              <Stack gap={0}>
+                <EyebrowLabel size="lg">Intelligent Conductor</EyebrowLabel>
+                <BodyText
+                  as="span"
+                  size="responsive-sm"
+                  weight="semibold"
+                  tone="foreground"
+                >
+                  AI Interview Architect
+                </BodyText>
+              </Stack>
+            </Inline>
+          </UnstyledLink>
+        }
+        nav={
+          loading
             ? null
-            : user &&
-              links.map(({ href, label, icon: Icon }) => (
-                <NavLink key={href} href={href} active={isActive(href)}>
-                  <Icon className="size-4" />
-                  {label}
-                </NavLink>
-              ))}
-        </nav>
-
-        <div className="order-2 flex items-center gap-2 md:order-3">
-          {loading ? null : user ? (
+            : user
+              ? links.map(({ href, label, icon: Icon }) => (
+                  <NavLink key={href} href={href} active={isActive(href)}>
+                    <Icon className="size-4" />
+                    {label}
+                  </NavLink>
+                ))
+              : null
+        }
+        actions={
+          loading ? null : user ? (
             <>
               <SurfaceTile
                 tone="soft"
                 rounded="pill"
                 padding="sm"
-                className="hidden text-right sm:block"
+                visibility="sm-only"
+                textAlign="end"
               >
-                <div className="text-xs font-medium text-foreground">{user.name}</div>
+                <BodyText as="span" size="xs" weight="medium" tone="foreground">
+                  {user.name}
+                </BodyText>
                 <EyebrowLabel size="md" weight="normal">
                   {user.role}
                 </EyebrowLabel>
@@ -110,11 +102,11 @@ export function NavHeader() {
             </>
           ) : (
             <Button asChild variant="gradient" size="sm">
-              <Link href="/login">Sign In</Link>
+              <UnstyledLink href="/login">Sign In</UnstyledLink>
             </Button>
-          )}
-        </div>
-      </div>
-    </header>
+          )
+        }
+      />
+    </AppHeader>
   )
 }

@@ -17,11 +17,13 @@ import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
 import { EyebrowLabel } from '@/components/ui/eyebrow-label'
 import { HeroLead, HeroTitle } from '@/components/ui/hero-text'
 import { IconBadge } from '@/components/ui/icon-badge'
+import { InfoCard } from '@/components/ui/info-card'
 import { MetricPanel } from '@/components/ui/metric-panel'
 import {
   PermissionPill,
   type PermissionStatus,
 } from '@/components/ui/permission-pill'
+import { RecordingBadge } from '@/components/ui/recording-badge'
 import { StatusPill } from '@/components/ui/status-pill'
 import { LoadingStateCard } from '@/components/ui/state-card'
 import { SurfaceTile } from '@/components/ui/surface-tile'
@@ -31,8 +33,14 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Grid } from '@/components/ui/layout/grid'
+import { Inline } from '@/components/ui/layout/inline'
+import { Section } from '@/components/ui/layout/section'
+import { Stack } from '@/components/ui/layout/stack'
 import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
+import { BodyText, SectionHeading } from '@/components/ui/text'
+import { VideoFrame, VideoSurface } from '@/components/ui/video-frame'
 import { useBrowserTranscript } from '@/lib/use-browser-transcript'
 
 interface InterviewData {
@@ -1068,7 +1076,9 @@ export default function TakeInterviewPage() {
   if (stage === 'loading' || !interview) {
     return (
       <PageShell>
-        <LoadingStateCard className="mx-auto max-w-4xl" label="Loading interview..." />
+        <Section width="prose">
+          <LoadingStateCard label="Loading interview..." />
+        </Section>
       </PageShell>
     )
   }
@@ -1084,24 +1094,24 @@ export default function TakeInterviewPage() {
   if (stage === 'complete') {
     return (
       <PageShell>
-        <div className="mx-auto max-w-4xl">
-        <Card variant="floating" size="lg">
-          <CardContent layout="stack-center" spacing="xl">
-            <IconBadge tone="primary" size="xl" className="mx-auto">
-              <CheckCircle2 className="size-8" />
-            </IconBadge>
-            <div className="space-y-3">
-              <HeroTitle>Thank you, {interview.candidateName}</HeroTitle>
-              <HeroLead>
-                Your interview for <strong>{interview.position}</strong> has been submitted.
-              </HeroLead>
-              <p className="text-sm leading-6 text-muted-foreground">
-                Camera and full-screen recordings for each answer have been stored for reviewer evaluation.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-        </div>
+        <Section width="prose">
+          <Card variant="floating" size="lg">
+            <CardContent layout="stack-center" spacing="xl">
+              <IconBadge tone="primary" size="xl" align="center">
+                <CheckCircle2 className="size-8" />
+              </IconBadge>
+              <Stack gap={3}>
+                <HeroTitle>Thank you, {interview.candidateName}</HeroTitle>
+                <HeroLead>
+                  Your interview for <strong>{interview.position}</strong> has been submitted.
+                </HeroLead>
+                <BodyText size="sm">
+                  Camera and full-screen recordings for each answer have been stored for reviewer evaluation.
+                </BodyText>
+              </Stack>
+            </CardContent>
+          </Card>
+        </Section>
       </PageShell>
     )
   }
@@ -1109,308 +1119,304 @@ export default function TakeInterviewPage() {
   if (stage === 'consent') {
     return (
       <PageShell>
-        <div className="mx-auto max-w-5xl">
-        <Card variant="floating" size="lg">
-          <CardContent>
-            <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-              <div className="space-y-5">
-              <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
-                Candidate interview
-              </EyebrowBadge>
+        <Section width="reading">
+          <Card variant="floating" size="lg">
+            <CardContent>
+              <Grid columns="consent-shell" gap={8}>
+                <Stack gap={5}>
+                  <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
+                    Candidate interview
+                  </EyebrowBadge>
 
-              <div className="space-y-3">
-                <HeroTitle>Interview for {interview.position}</HeroTitle>
-                <HeroLead>
-                  Welcome, {interview.candidateName}. You will answer {interview.totalQuestions}{' '}
-                  questions, with up to four minutes for each response.
-                </HeroLead>
-              </div>
+                  <Stack gap={3}>
+                    <HeroTitle>Interview for {interview.position}</HeroTitle>
+                    <HeroLead>
+                      Welcome, {interview.candidateName}. You will answer {interview.totalQuestions}{' '}
+                      questions, with up to four minutes for each response.
+                    </HeroLead>
+                  </Stack>
 
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                <Card variant="tinted" size="md">
-                  <CardContent spacing="sm">
-                    <Camera className="size-5 text-[hsl(var(--primary))]" />
-                    <div className="space-y-1">
-                      <div className="text-sm font-semibold text-foreground">Camera</div>
-                      <p className="text-sm leading-6 text-muted-foreground">
-                        Recorded separately for every answer.
-                      </p>
-                    </div>
+                  <Grid columns="consent-info-4" gap={4}>
+                    <InfoCard
+                      icon={<Camera className="size-5 text-[hsl(var(--primary))]" />}
+                      title="Camera"
+                    >
+                      Recorded separately for every answer.
+                    </InfoCard>
+                    <InfoCard
+                      icon={<Mic className="size-5 text-[hsl(var(--primary))]" />}
+                      title="Microphone"
+                    >
+                      Captured together with your camera feed.
+                    </InfoCard>
+                    <InfoCard
+                      icon={<Video className="size-5 text-[hsl(var(--primary))]" />}
+                      title="Entire screen"
+                    >
+                      Must be shared as <strong>Entire screen</strong>, not a tab or app window.
+                    </InfoCard>
+                    <InfoCard
+                      icon={<ShieldCheck className="size-5 text-[hsl(var(--primary))]" />}
+                      title="Fairness checks"
+                    >
+                      Session and browser activity may be stored for evaluation integrity.
+                    </InfoCard>
+                  </Grid>
+                </Stack>
+
+                <Card variant="surface">
+                  <CardHeader spacing="xs">
+                    <CardTitle size="lg">Before you start</CardTitle>
+                    <CardDescription>
+                      One button will request camera, microphone, and then full-screen sharing.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent spacing="lg">
+                    <SurfaceTile padding="lg">
+                      <Stack gap={3}>
+                        <EyebrowLabel size="md">Data collected</EyebrowLabel>
+                        <Stack as="ul" gap={2}>
+                          <BodyText as="li" size="sm">
+                            Camera video and microphone audio for each answer
+                          </BodyText>
+                          <BodyText as="li" size="sm">
+                            Full-monitor screen recording in parallel with each answer
+                          </BodyText>
+                          <BodyText as="li" size="sm">
+                            Speech transcript snippets and metadata for answer quality analysis
+                          </BodyText>
+                          <BodyText as="li" size="sm">
+                            Browser activity such as tab switches
+                          </BodyText>
+                          <BodyText as="li" size="sm">
+                            Session metadata including answer timing
+                          </BodyText>
+                        </Stack>
+                      </Stack>
+                    </SurfaceTile>
+
+                    <SurfaceTile tone="glass" padding="lg">
+                      <Stack gap={3}>
+                        <SurfaceTile rounded="lg" padding="md-tight">
+                          <Inline gap={3} align="center" justify="between">
+                            <Stack gap={1}>
+                              <BodyText size="sm" weight="semibold" tone="foreground">
+                                Camera and microphone
+                              </BodyText>
+                              <BodyText size="xs">
+                                Required before recording can begin.
+                              </BodyText>
+                            </Stack>
+                            <PermissionPill status={cameraStatus} />
+                          </Inline>
+                        </SurfaceTile>
+
+                        <SurfaceTile rounded="lg" padding="md-tight">
+                          <Inline gap={3} align="center" justify="between">
+                            <Stack gap={1}>
+                              <BodyText size="sm" weight="semibold" tone="foreground">
+                                Entire screen share
+                              </BodyText>
+                              <BodyText size="xs">
+                                {screenSurface === 'monitor'
+                                  ? 'Entire screen is confirmed and ready.'
+                                  : 'In the share picker, choose Entire screen / Screen.'}
+                              </BodyText>
+                            </Stack>
+                            <PermissionPill status={screenStatus} />
+                          </Inline>
+                        </SurfaceTile>
+                      </Stack>
+                    </SurfaceTile>
+
+                    {setupError ? (
+                      <Alert variant="danger">
+                        <AlertTitle>Setup incomplete</AlertTitle>
+                        <AlertDescription>{setupError}</AlertDescription>
+                      </Alert>
+                    ) : null}
+
+                    <SurfaceTile tone="glass" rounded="xl">
+                      <Inline gap={3} align="start">
+                        <Checkbox
+                          id="consent"
+                          align="top"
+                          checked={consent}
+                          onCheckedChange={(checked) => setConsent(Boolean(checked))}
+                        />
+                        <Stack gap={2}>
+                          <Label htmlFor="consent" weight="semibold">
+                            I agree to the recording and data collection terms.
+                          </Label>
+                          <BodyText size="sm">
+                            Data is used only for interview evaluation and is stored for 90 days.
+                          </BodyText>
+                        </Stack>
+                      </Inline>
+                    </SurfaceTile>
+
+                    <Button
+                      type="button"
+                      variant="gradient"
+                      size="xl"
+                      width="full"
+                      disabled={!consent || setupBusy}
+                      onClick={handleStartInterview}
+                    >
+                      {setupBusy ? 'Requesting access...' : 'Allow Camera, Mic & Entire Screen'}
+                    </Button>
                   </CardContent>
                 </Card>
-
-                <Card variant="tinted" size="md">
-                  <CardContent spacing="sm">
-                    <Mic className="size-5 text-[hsl(var(--primary))]" />
-                    <div className="space-y-1">
-                      <div className="text-sm font-semibold text-foreground">Microphone</div>
-                      <p className="text-sm leading-6 text-muted-foreground">
-                        Captured together with your camera feed.
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card variant="tinted" size="md">
-                  <CardContent spacing="sm">
-                    <Video className="size-5 text-[hsl(var(--primary))]" />
-                    <div className="space-y-1">
-                      <div className="text-sm font-semibold text-foreground">Entire screen</div>
-                      <p className="text-sm leading-6 text-muted-foreground">
-                        Must be shared as <strong>Entire screen</strong>, not a tab or app window.
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card variant="tinted" size="md">
-                  <CardContent spacing="sm">
-                    <ShieldCheck className="size-5 text-[hsl(var(--primary))]" />
-                    <div className="space-y-1">
-                      <div className="text-sm font-semibold text-foreground">Fairness checks</div>
-                      <p className="text-sm leading-6 text-muted-foreground">
-                        Session and browser activity may be stored for evaluation integrity.
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-
-            <Card variant="surface">
-              <CardHeader spacing="xs">
-                <CardTitle size="lg">Before you start</CardTitle>
-                <CardDescription>
-                  One button will request camera, microphone, and then full-screen sharing.
-                </CardDescription>
-              </CardHeader>
-              <CardContent spacing="lg">
-                <SurfaceTile padding="lg" spacing="sm">
-                  <EyebrowLabel size="md">Data collected</EyebrowLabel>
-                  <ul className="space-y-2 text-sm leading-6 text-muted-foreground">
-                    <li>Camera video and microphone audio for each answer</li>
-                    <li>Full-monitor screen recording in parallel with each answer</li>
-                    <li>Speech transcript snippets and metadata for answer quality analysis</li>
-                    <li>Browser activity such as tab switches</li>
-                    <li>Session metadata including answer timing</li>
-                  </ul>
-                </SurfaceTile>
-
-                <SurfaceTile tone="glass" padding="lg" spacing="sm">
-                  <SurfaceTile rounded="lg" padding="md-tight" layout="row-between">
-                    <div className="space-y-1">
-                      <div className="text-sm font-semibold text-foreground">Camera and microphone</div>
-                      <p className="text-xs leading-5 text-muted-foreground">
-                        Required before recording can begin.
-                      </p>
-                    </div>
-                    <PermissionPill status={cameraStatus} />
-                  </SurfaceTile>
-
-                  <SurfaceTile rounded="lg" padding="md-tight" layout="row-between">
-                    <div className="space-y-1">
-                      <div className="text-sm font-semibold text-foreground">Entire screen share</div>
-                      <p className="text-xs leading-5 text-muted-foreground">
-                        {screenSurface === 'monitor'
-                          ? 'Entire screen is confirmed and ready.'
-                          : 'In the share picker, choose Entire screen / Screen.'}
-                      </p>
-                    </div>
-                    <PermissionPill status={screenStatus} />
-                  </SurfaceTile>
-                </SurfaceTile>
-
-                {setupError ? (
-                  <Alert variant="danger">
-                    <AlertTitle>Setup incomplete</AlertTitle>
-                    <AlertDescription>{setupError}</AlertDescription>
-                  </Alert>
-                ) : null}
-
-                <SurfaceTile tone="glass" rounded="xl" layout="row-start">
-                  <Checkbox
-                    id="consent"
-                    checked={consent}
-                    onCheckedChange={(checked) => setConsent(Boolean(checked))}
-                    className="mt-1"
-                  />
-                  <div className="space-y-2">
-                    <Label htmlFor="consent" weight="semibold">
-                      I agree to the recording and data collection terms.
-                    </Label>
-                    <p className="text-sm leading-6 text-muted-foreground">
-                      Data is used only for interview evaluation and is stored for 90 days.
-                    </p>
-                  </div>
-                </SurfaceTile>
-
-                <Button
-                  type="button"
-                  variant="gradient"
-                  size="xl"
-                  disabled={!consent || setupBusy}
-                  onClick={handleStartInterview}
-                  className="w-full"
-                >
-                  {setupBusy ? 'Requesting access...' : 'Allow Camera, Mic & Entire Screen'}
-                </Button>
-              </CardContent>
-            </Card>
-            </div>
-          </CardContent>
-        </Card>
-        </div>
+              </Grid>
+            </CardContent>
+          </Card>
+        </Section>
       </PageShell>
     )
   }
 
   return (
     <PageShell>
-      <section className="mx-auto grid max-w-6xl gap-6 xl:grid-cols-[0.84fr_1.16fr]">
-        <Card variant="surface" size="lg">
-          <CardContent spacing="xl">
-            <div className="space-y-3">
-              <EyebrowBadge icon={<Video className="size-3.5" />}>
-                Live session
-              </EyebrowBadge>
-              <HeroTitle size="md">{interview.position}</HeroTitle>
-              <p className="text-sm leading-6 text-muted-foreground">
-                Answer clearly and keep your camera plus entire-screen share active while recording.
-              </p>
-            </div>
+      <Section width="wide">
+        <Grid columns="split-84-116" gap={6}>
+          <Card variant="surface" size="lg">
+            <CardContent spacing="xl">
+              <Stack gap={3}>
+                <EyebrowBadge icon={<Video className="size-3.5" />}>
+                  Live session
+                </EyebrowBadge>
+                <HeroTitle size="md">{interview.position}</HeroTitle>
+                <BodyText size="sm">
+                  Answer clearly and keep your camera plus entire-screen share active while recording.
+                </BodyText>
+              </Stack>
 
-            <SurfaceTile tone="elevated" padding="lg" spacing="sm">
-              <div className="flex items-center justify-between gap-3">
-                <div className="text-sm font-medium text-foreground">
-                  Question {interview.currentQuestionIndex + 1} of {interview.totalQuestions}
-                </div>
-                <StatusPill tone="neutral">{progressValue}%</StatusPill>
-              </div>
-              <Progress value={progressValue} className="h-2.5 rounded-full bg-card" />
-            </SurfaceTile>
+              <SurfaceTile tone="elevated" padding="lg">
+                <Stack gap={3}>
+                  <Inline gap={3} align="center" justify="between">
+                    <BodyText as="span" size="sm-tight" tone="foreground">
+                      Question {interview.currentQuestionIndex + 1} of {interview.totalQuestions}
+                    </BodyText>
+                    <StatusPill tone="neutral">{progressValue}%</StatusPill>
+                  </Inline>
+                  <Progress value={progressValue} density="thick" />
+                </Stack>
+              </SurfaceTile>
 
-            <div className="grid gap-3">
-              <div className="flex flex-wrap gap-2">
-                <StatusPill tone="completed">Camera + mic active</StatusPill>
-                <StatusPill tone="completed">
-                  {screenSurface === 'monitor' ? 'Entire screen shared' : 'Screen share pending'}
-                </StatusPill>
-              </div>
-              {setupError ? (
-                <Alert variant="danger">
-                  <AlertTitle>Capture interrupted</AlertTitle>
-                  <AlertDescription>{setupError}</AlertDescription>
-                </Alert>
-              ) : null}
-            </div>
+              <Stack gap={3}>
+                <Inline gap={2} wrap="wrap">
+                  <StatusPill tone="completed">Camera + mic active</StatusPill>
+                  <StatusPill tone="completed">
+                    {screenSurface === 'monitor' ? 'Entire screen shared' : 'Screen share pending'}
+                  </StatusPill>
+                </Inline>
+                {setupError ? (
+                  <Alert variant="danger">
+                    <AlertTitle>Capture interrupted</AlertTitle>
+                    <AlertDescription>{setupError}</AlertDescription>
+                  </Alert>
+                ) : null}
+              </Stack>
 
-            <div className="grid gap-4 md:grid-cols-2">
-              <MetricPanel tone="elevated" label="Recording limit" value="4:00" />
-              <MetricPanel
-                tone="elevated"
-                label="Answer version"
-                value={`v${currentVersionNumber}`}
-                valueSize="sm"
-                description={`Previous versions kept: ${retakeCount}`}
+              <Grid columns="metrics-2-md" gap={4}>
+                <MetricPanel tone="elevated" label="Recording limit" value="4:00" />
+                <MetricPanel
+                  tone="elevated"
+                  label="Answer version"
+                  value={`v${currentVersionNumber}`}
+                  valueSize="sm"
+                  description={`Previous versions kept: ${retakeCount}`}
+                />
+              </Grid>
+            </CardContent>
+          </Card>
+
+          <Card variant="floating" size="lg">
+            <CardContent spacing="xl">
+              <Stack gap={3}>
+                <Inline gap={2} align="center" wrap="wrap">
+                  <StatusPill tone={stage === 'recording' ? 'processing' : 'neutral'}>
+                    {stage === 'recording'
+                      ? 'Recording'
+                      : stage === 'transition'
+                        ? 'Saving version'
+                        : 'Awaiting response'}
+                  </StatusPill>
+                  {stage === 'recording' ? (
+                    <StatusPill tone="failed">
+                      <CircleDot className="size-3" />
+                      {formatTime(timeLeft)}
+                    </StatusPill>
+                  ) : null}
+                </Inline>
+
+                <SectionHeading>{interview.currentQuestion?.text}</SectionHeading>
+              </Stack>
+
+              <LiveTranscriptPanel
+                isSupported={isBrowserTranscriptSupported}
+                finalTranscript={finalTranscript}
+                interimTranscript={interimTranscript}
+                warning={browserTranscriptWarning}
+                stage={stage}
               />
-            </div>
-          </CardContent>
-        </Card>
 
-        <Card variant="floating" size="lg">
-          <CardContent spacing="xl">
-            <div className="space-y-3">
-              <div className="flex flex-wrap items-center gap-2">
-                <StatusPill tone={stage === 'recording' ? 'processing' : 'neutral'}>
-                  {stage === 'recording'
-                    ? 'Recording'
-                    : stage === 'transition'
-                      ? 'Saving version'
-                      : 'Awaiting response'}
-                </StatusPill>
+              <VideoFrame>
+                <VideoSurface ref={videoRef} autoPlay muted playsInline />
+
                 {stage === 'recording' ? (
-                  <StatusPill tone="failed">
-                    <CircleDot className="size-3" />
-                    {formatTime(timeLeft)}
+                  <RecordingBadge>{formatTime(timeLeft)}</RecordingBadge>
+                ) : null}
+              </VideoFrame>
+
+              <SurfaceTile tone="soft" rounded="xl">
+                <Stack gap={3}>
+                  <EyebrowLabel>Guidance</EyebrowLabel>
+                  <BodyText size="sm">
+                    {stage === 'transition'
+                      ? transitionLabel || 'Saving the current answer version.'
+                      : 'Recording starts automatically for each question. Use Submit when the answer is ready, or Re-record to create a new version for the same question.'}
+                  </BodyText>
+                </Stack>
+              </SurfaceTile>
+
+              <Inline gap={3} wrap="wrap">
+                {stage === 'interview' ? (
+                  <StatusPill tone="neutral">Preparing recording...</StatusPill>
+                ) : null}
+
+                {stage === 'recording' ? (
+                  <>
+                    <Button
+                      type="button"
+                      variant="outline-pill"
+                      shape="pill"
+                      onClick={() => requestVersionAction('rerecord')}
+                      disabled={uploading}
+                    >
+                      Re-record as new version
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="gradient"
+                      onClick={() => requestVersionAction('submit')}
+                      disabled={uploading}
+                    >
+                      Submit & Next
+                    </Button>
+                  </>
+                ) : null}
+
+                {stage === 'transition' ? (
+                  <StatusPill tone="processing">
+                    {transitionLabel || 'Saving current version'}
                   </StatusPill>
                 ) : null}
-              </div>
-
-              <h2 className="text-2xl font-semibold leading-9 tracking-display text-foreground">
-                {interview.currentQuestion?.text}
-              </h2>
-            </div>
-
-            <LiveTranscriptPanel
-              isSupported={isBrowserTranscriptSupported}
-              finalTranscript={finalTranscript}
-              interimTranscript={interimTranscript}
-              warning={browserTranscriptWarning}
-              stage={stage}
-            />
-
-            <div className="relative my-4 overflow-hidden rounded-3xl bg-black ring-1 ring-hairline">
-              <video
-                ref={videoRef}
-                autoPlay
-                muted
-                playsInline
-                className="block max-h-[400px] w-full"
-              />
-
-              {stage === 'recording' ? (
-                <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-scrim/70 px-3 py-1 text-sm font-semibold text-card">
-                  <span className="animate-[blink_1s_infinite] text-destructive">●</span>
-                  {formatTime(timeLeft)}
-                </div>
-              ) : null}
-            </div>
-
-            <SurfaceTile tone="soft" rounded="xl">
-              <EyebrowLabel>Guidance</EyebrowLabel>
-              <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                {stage === 'transition'
-                  ? transitionLabel || 'Saving the current answer version.'
-                  : 'Recording starts automatically for each question. Use Submit when the answer is ready, or Re-record to create a new version for the same question.'}
-              </p>
-            </SurfaceTile>
-
-            <div className="flex flex-wrap gap-3">
-              {stage === 'interview' ? (
-                <StatusPill tone="neutral">Preparing recording...</StatusPill>
-              ) : null}
-
-              {stage === 'recording' ? (
-                <>
-                  <Button
-                    type="button"
-                    variant="outline-pill"
-                    shape="pill"
-                    onClick={() => requestVersionAction('rerecord')}
-                    disabled={uploading}
-                  >
-                    Re-record as new version
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="gradient"
-                    onClick={() => requestVersionAction('submit')}
-                    disabled={uploading}
-                  >
-                    Submit & Next
-                  </Button>
-                </>
-              ) : null}
-
-              {stage === 'transition' ? (
-                <StatusPill tone="processing">
-                  {transitionLabel || 'Saving current version'}
-                </StatusPill>
-              ) : null}
-            </div>
-          </CardContent>
-        </Card>
-      </section>
+              </Inline>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Section>
     </PageShell>
   )
 }

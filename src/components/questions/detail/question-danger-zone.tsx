@@ -11,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { PageShell } from '@/components/ui/layout/page-shell'
 
 interface QuestionDangerZoneProps {
   deleting: boolean
@@ -24,7 +25,7 @@ export function QuestionDangerZone({
   onRequestDelete,
 }: QuestionDangerZoneProps) {
   return (
-    <section className="container pb-12">
+    <PageShell as="section" spacing="compact" padding="bottom">
       <Card variant="danger-soft">
         <CardHeader spacing="xs">
           <CardTitle size="md">Danger zone</CardTitle>
@@ -57,6 +58,6 @@ export function QuestionDangerZone({
           </Button>
         </CardContent>
       </Card>
-    </section>
+    </PageShell>
   )
 }

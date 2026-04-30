@@ -5,6 +5,9 @@ import { Save } from 'lucide-react'
 import { StatusPill } from '@/components/ui/status-pill'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { Inline } from '@/components/ui/layout/inline'
+import { Stack } from '@/components/ui/layout/stack'
+import { BodyText, SectionHeading } from '@/components/ui/text'
 
 interface QuestionEditorSaveBarProps {
   isDirty: boolean
@@ -29,32 +32,31 @@ export function QuestionEditorSaveBar({
   return (
     <Card variant={isDirty ? 'warning' : 'surface'} size="lg">
       <CardContent layout="split-row" spacing="md">
-        <div className="space-y-2">
-          <div className="flex flex-wrap items-center gap-2">
+        <Stack gap={2}>
+          <Inline gap={2} align="center" wrap="wrap">
             <StatusPill tone={isDirty ? 'pending' : 'completed'}>
               {isDirty ? 'Unsaved changes' : 'All changes saved'}
             </StatusPill>
             {isDirty && (
-              <span className="text-xs font-medium text-muted-foreground">
+              <BodyText as="span" size="xs" weight="medium">
                 {fieldCount} {pluralize(fieldCount, 'field', 'fields')} changed
-              </span>
+              </BodyText>
             )}
-          </div>
-          <h3 className="text-lg font-semibold tracking-display-loose text-foreground">
+          </Inline>
+          <SectionHeading size="sm" as="h3">
             {isDirty ? 'Save your edits' : 'Nothing to save right now'}
-          </h3>
-          <p className="text-sm leading-6 text-muted-foreground">
+          </SectionHeading>
+          <BodyText size="sm">
             {isDirty
               ? `Modified: ${dirtyFieldLabels.join(', ')}.`
               : 'Editor matches the saved version. Make a change to enable Save.'}
-          </p>
-        </div>
+          </BodyText>
+        </Stack>
         <Button
           type="submit"
           variant="gradient"
           size="xl"
           disabled={submitting || !isDirty}
-          className="shrink-0"
         >
           <Save className="size-4" />
           {submitting ? 'Saving...' : submitLabel}

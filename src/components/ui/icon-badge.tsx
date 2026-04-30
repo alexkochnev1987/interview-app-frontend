@@ -33,12 +33,17 @@ const iconBadgeVariants = cva(
         md: 'text-base font-semibold',
         lg: 'text-lg font-semibold',
       },
+      align: {
+        default: '',
+        center: 'mx-auto',
+      },
     },
     defaultVariants: {
       tone: 'primary',
       size: 'sm',
       shape: 'default',
       textSize: 'default',
+      align: 'default',
     },
   },
 )
@@ -55,9 +60,10 @@ export function IconBadge({
   size,
   shape,
   textSize,
+  align,
 }: IconBadgeProps) {
   return (
-    <span className={cn(iconBadgeVariants({ tone, size, shape, textSize }), className)}>
+    <span className={cn(iconBadgeVariants({ tone, size, shape, textSize, align }), className)}>
       {children}
     </span>
   )

@@ -1,13 +1,15 @@
 import { type ReactNode } from 'react'
 
+import { Grid } from '@/components/ui/layout/grid'
+
 interface CardGridProps {
   children: ReactNode
 }
 
 export function CardGrid({ children }: CardGridProps) {
   return (
-    <section className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
+    <Grid as="section" columns="cards-2-3" gap={4}>
       {children}
-    </section>
+    </Grid>
   )
 }

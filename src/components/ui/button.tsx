@@ -48,6 +48,10 @@ const buttonVariants = cva(
         blur: "backdrop-blur-sm",
         "blur-strong": "backdrop-blur-xl",
       },
+      width: {
+        auto: "",
+        full: "w-full",
+      },
     },
     compoundVariants: [
       {
@@ -89,6 +93,7 @@ const buttonVariants = cva(
       size: "default",
       shape: "rounded",
       effects: "none",
+      width: "auto",
     },
   }
 )
@@ -99,6 +104,7 @@ function Button({
   size = "default",
   shape,
   effects,
+  width,
   asChild = false,
   ...props
 }: React.ComponentProps<"button"> &
@@ -112,7 +118,7 @@ function Button({
       data-slot="button"
       data-variant={variant}
       data-size={size}
-      className={cn(buttonVariants({ variant, size, shape, effects, className }))}
+      className={cn(buttonVariants({ variant, size, shape, effects, width, className }))}
       {...props}
     />
   )

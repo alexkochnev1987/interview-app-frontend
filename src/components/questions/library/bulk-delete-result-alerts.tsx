@@ -1,6 +1,9 @@
 'use client'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { BulletList } from '@/components/ui/bullet-list'
+import { Stack } from '@/components/ui/layout/stack'
+import { BodyText } from '@/components/ui/text'
 import { type BulkDeleteResult } from '@/lib/api'
 import { truncateText } from '@/lib/text'
 
@@ -31,20 +34,24 @@ export function BulkDeleteResultAlerts({
           Deleted {result.deleted.length}, blocked {result.blocked.length}
         </AlertTitle>
         <AlertDescription>
-          <p className="mb-2">
-            These questions are used in active interviews and were not deleted:
-          </p>
-          <ul className="list-disc space-y-1 pl-5">
-            {result.blocked.map((item) => (
-              <li key={item.id}>
-                <span className="font-medium">
-                  {truncateText(item.questionText, 80)}
-                </span>
-                {' — '}
-                <span className="opacity-80">{item.reason}</span>
-              </li>
-            ))}
-          </ul>
+          <Stack gap={2}>
+            <BodyText size="sm">
+              These questions are used in active interviews and were not deleted:
+            </BodyText>
+            <BulletList>
+              {result.blocked.map((item) => (
+                <li key={item.id}>
+                  <BodyText as="span" size="sm" weight="medium" tone="foreground">
+                    {truncateText(item.questionText, 80)}
+                  </BodyText>
+                  {' — '}
+                  <BodyText as="span" size="sm">
+                    {item.reason}
+                  </BodyText>
+                </li>
+              ))}
+            </BulletList>
+          </Stack>
         </AlertDescription>
       </Alert>
     )

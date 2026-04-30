@@ -1,5 +1,7 @@
 import { type ReactNode } from 'react'
 
+import { Grid } from '@/components/ui/layout/grid'
+
 interface HeroGridProps {
   primary: ReactNode
   secondary: ReactNode
@@ -7,9 +9,9 @@ interface HeroGridProps {
 
 export function HeroGrid({ primary, secondary }: HeroGridProps) {
   return (
-    <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+    <Grid as="section" columns="split-12-8" gap={6}>
       {primary}
       {secondary}
-    </section>
+    </Grid>
   )
 }

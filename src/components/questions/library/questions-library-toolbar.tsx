@@ -4,7 +4,9 @@ import { LoaderCircle, Search, Trash2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { IconAffix } from '@/components/ui/icon-affix'
 import { Input } from '@/components/ui/input'
+import { Grid } from '@/components/ui/layout/grid'
 import {
   Select,
   SelectContent,
@@ -12,7 +14,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { cn } from '@/lib/utils'
 
 export type DifficultyFilter = 'all' | 'easy' | 'medium' | 'hard'
 
@@ -40,66 +41,57 @@ export function QuestionsLibraryToolbar({
   return (
     <Card variant="surface" size="xs">
       <CardContent>
-        <div
-          className={cn(
-            'grid items-center gap-4',
-            canBulkDelete
-              ? 'md:grid-cols-[1fr_220px_auto]'
-              : 'md:grid-cols-[1fr_220px]',
+        <Grid
+          columns={canBulkDelete ? 'toolbar-3' : 'toolbar-2'}
+          gap={4}
+          align="center"
+        >
+          <IconAffix icon={<Search className="size-4" />}>
+            <Input
+              size="lg"
+              shape="pill"
+              iconAffix="leading"
+              value={query}
+              onChange={(event) => onQueryChange(event.target.value)}
+              placeholder="Search by prompt, role, category, concept, or red flag"
+            />
+          </IconAffix>
+          <Select
+            value={difficulty}
+            onValueChange={(value) => onDifficultyChange(value as DifficultyFilter)}
+          >
+            <SelectTrigger variant="surface" size="lg" shape="pill">
+              <SelectValue placeholder="All difficulties" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All difficulties</SelectItem>
+              <SelectItem value="easy">Easy</SelectItem>
+              <SelectItem value="medium">Medium</SelectItem>
+              <SelectItem value="hard">Hard</SelectItem>
+            </SelectContent>
+          </Select>
+          {canBulkDelete && (
+            <Button
+              type="button"
+              variant="destructive"
+              shape="pill"
+              size="2xl"
+              disabled={selectedCount === 0 || bulkDeleting}
+              onClick={onRequestBulkDelete}
+            >
+              {bulkDeleting ? (
+                <LoaderCircle className="size-4 animate-spin" />
+              ) : (
+                <Trash2 className="size-4" />
+              )}
+              {bulkDeleting
+                ? 'Deleting...'
+                : selectedCount > 0
+                  ? `Delete selected (${selectedCount})`
+                  : 'Delete selected'}
+            </Button>
           )}
-        >
-          <div className="relative">
-          <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            size="lg"
-            shape="pill"
-            value={query}
-            onChange={(event) => onQueryChange(event.target.value)}
-            placeholder="Search by prompt, role, category, concept, or red flag"
-            className="pl-11"
-          />
-        </div>
-        <Select
-          value={difficulty}
-          onValueChange={(value) => onDifficultyChange(value as DifficultyFilter)}
-        >
-          <SelectTrigger
-            variant="surface"
-            size="lg"
-            shape="pill"
-          >
-            <SelectValue placeholder="All difficulties" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All difficulties</SelectItem>
-            <SelectItem value="easy">Easy</SelectItem>
-            <SelectItem value="medium">Medium</SelectItem>
-            <SelectItem value="hard">Hard</SelectItem>
-          </SelectContent>
-        </Select>
-        {canBulkDelete && (
-          <Button
-            type="button"
-            variant="destructive"
-            shape="pill"
-            size="2xl"
-            className="md:shrink-0"
-            disabled={selectedCount === 0 || bulkDeleting}
-            onClick={onRequestBulkDelete}
-          >
-            {bulkDeleting ? (
-              <LoaderCircle className="size-4 animate-spin" />
-            ) : (
-              <Trash2 className="size-4" />
-            )}
-            {bulkDeleting
-              ? 'Deleting...'
-              : selectedCount > 0
-                ? `Delete selected (${selectedCount})`
-                : 'Delete selected'}
-          </Button>
-        )}
-        </div>
+        </Grid>
       </CardContent>
     </Card>
   )

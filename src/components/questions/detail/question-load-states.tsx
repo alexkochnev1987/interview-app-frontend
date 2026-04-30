@@ -14,24 +14,28 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { Inline } from '@/components/ui/layout/inline'
+import { PageShell } from '@/components/ui/layout/page-shell'
+import { Stack } from '@/components/ui/layout/stack'
+import { BodyText } from '@/components/ui/text'
 
 export function QuestionLoadingCard() {
   return (
-    <main className="container py-10 md:py-12">
+    <PageShell>
       <Card variant="floating" size="state">
         <CardContent layout="stack-center" spacing="lg">
           <IconBadge tone="surface" size="lg">
             <LoaderCircle className="size-5 animate-spin" />
           </IconBadge>
-          <div className="space-y-2">
+          <Stack gap={2}>
             <HeroTitle size="sm">Loading question</HeroTitle>
-            <p className="max-w-xl text-sm leading-6 text-muted-foreground">
+            <BodyText size="sm" width="lg">
               Pulling the saved prompt, rubric, and metadata into the unified editor.
-            </p>
-          </div>
+            </BodyText>
+          </Stack>
         </CardContent>
       </Card>
-    </main>
+    </PageShell>
   )
 }
 
@@ -41,21 +45,19 @@ interface QuestionUnavailableCardProps {
 
 export function QuestionUnavailableCard({ message }: QuestionUnavailableCardProps) {
   return (
-    <main className="container py-10 md:py-12">
+    <PageShell>
       <Card variant="floating">
         <CardHeader spacing="md">
           <IconBadge tone="danger" size="lg">
             <AlertTriangle className="size-5" />
           </IconBadge>
-          <div className="space-y-2">
-            <CardTitle size="xl">
-              Question unavailable
-            </CardTitle>
-            <CardDescription className="max-w-2xl">
+          <Stack gap={2}>
+            <CardTitle size="xl">Question unavailable</CardTitle>
+            <CardDescription width="lg">
               The editor could not load this question, so the route stops here
               instead of rendering a partially broken form.
             </CardDescription>
-          </div>
+          </Stack>
         </CardHeader>
         <CardContent spacing="lg">
           <Alert variant="danger">
@@ -63,7 +65,7 @@ export function QuestionUnavailableCard({ message }: QuestionUnavailableCardProp
             <AlertDescription>{message}</AlertDescription>
           </Alert>
 
-          <div className="flex flex-wrap gap-3">
+          <Inline gap={3} wrap="wrap">
             <Button asChild variant="gradient">
               <Link href="/questions">
                 <ArrowLeft className="size-4" />
@@ -76,9 +78,9 @@ export function QuestionUnavailableCard({ message }: QuestionUnavailableCardProp
                 Create New Question
               </Link>
             </Button>
-          </div>
+          </Inline>
         </CardContent>
       </Card>
-    </main>
+    </PageShell>
   )
 }

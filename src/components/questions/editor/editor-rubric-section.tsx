@@ -3,6 +3,7 @@
 import { WandSparkles } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 
+import { Grid } from '@/components/ui/layout/grid'
 import { Textarea } from '@/components/ui/textarea'
 import {
   type QuestionExpectedConcept,
@@ -38,7 +39,7 @@ export function EditorRubricSection({
       description="Define what a good answer must cover and which signals should reduce confidence."
       icon={<WandSparkles className="size-4" />}
     >
-      <div className="grid gap-6 xl:grid-cols-2">
+      <Grid columns="editor-2" gap={6}>
         <QuestionEditorField
           htmlFor="expectedConcepts"
           label="Expected concepts"
@@ -72,7 +73,7 @@ export function EditorRubricSection({
           />
           {renderAiSuggestion('redFlags')}
         </QuestionEditorField>
-      </div>
+      </Grid>
     </EditorSectionCard>
   )
 }

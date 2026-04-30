@@ -173,9 +173,17 @@ const cardTitleVariants = cva(
         lg: "text-2xl tracking-display leading-snug",
         xl: "text-3xl font-semibold tracking-display-tight leading-snug",
       },
+      width: {
+        auto: "",
+        sm: "max-w-sm",
+        md: "max-w-md",
+        lg: "max-w-2xl",
+        xl: "max-w-4xl",
+      },
     },
     defaultVariants: {
       size: "default",
+      width: "auto",
     },
   },
 )
@@ -183,22 +191,41 @@ const cardTitleVariants = cva(
 function CardTitle({
   className,
   size,
+  width,
   ...props
 }: React.ComponentProps<"div"> & VariantProps<typeof cardTitleVariants>) {
   return (
     <div
       data-slot="card-title"
-      className={cn(cardTitleVariants({ size }), className)}
+      className={cn(cardTitleVariants({ size, width }), className)}
       {...props}
     />
   )
 }
 
-function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
+const cardDescriptionVariants = cva("text-sm leading-6 text-muted-foreground", {
+  variants: {
+    width: {
+      auto: "",
+      sm: "max-w-sm",
+      md: "max-w-md",
+      lg: "max-w-2xl",
+    },
+  },
+  defaultVariants: {
+    width: "auto",
+  },
+})
+
+function CardDescription({
+  className,
+  width,
+  ...props
+}: React.ComponentProps<"div"> & VariantProps<typeof cardDescriptionVariants>) {
   return (
     <div
       data-slot="card-description"
-      className={cn("text-sm leading-6 text-muted-foreground", className)}
+      className={cn(cardDescriptionVariants({ width }), className)}
       {...props}
     />
   )

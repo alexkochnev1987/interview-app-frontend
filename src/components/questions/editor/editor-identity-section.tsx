@@ -4,6 +4,7 @@ import { BrainCircuit } from 'lucide-react'
 import { type ReactNode } from 'react'
 
 import { Input } from '@/components/ui/input'
+import { Grid } from '@/components/ui/layout/grid'
 import {
   Select,
   SelectContent,
@@ -38,7 +39,7 @@ export function EditorIdentitySection({
       description="Anchor the prompt in the role and taxonomy you expect recruiters to search later."
       icon={<BrainCircuit className="size-4" />}
     >
-      <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-4">
+      <Grid columns="identity-4" gap={5}>
         <QuestionEditorField
           htmlFor="externalId"
           label="External ID"
@@ -82,9 +83,9 @@ export function EditorIdentitySection({
             disabled={submitting}
           />
         </QuestionEditorField>
-      </div>
+      </Grid>
 
-      <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-5">
+      <Grid columns="identity-5" gap={5}>
         <QuestionEditorField htmlFor="category" label="Category">
           <Input
             id="category"
@@ -163,7 +164,7 @@ export function EditorIdentitySection({
           />
           {renderAiSuggestion('minimumPassScore')}
         </QuestionEditorField>
-      </div>
+      </Grid>
     </EditorSectionCard>
   )
 }

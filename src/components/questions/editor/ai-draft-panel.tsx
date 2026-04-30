@@ -10,6 +10,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { Inline } from '@/components/ui/layout/inline'
+import { Stack } from '@/components/ui/layout/stack'
 
 interface AiDraftPanelProps {
   hasPendingDraft: boolean
@@ -31,21 +33,21 @@ export function AiDraftPanel({
   return (
     <Card variant="surface">
       <CardHeader spacing="lg">
-        <div className="space-y-1.5">
-          <div className="flex items-start justify-between gap-3">
+        <Stack gap={1.5}>
+          <Inline gap={3} align="start" justify="between">
             <CardTitle size="lg">AI draft</CardTitle>
             {hasPendingDraft ? (
               <StatusPill tone="neutral">{pendingCount} pending</StatusPill>
             ) : null}
-          </div>
+          </Inline>
           <CardDescription>
             Let AI propose category, follow-up probes, expected concepts, red flags,
             and tags based on your question text. Each change shows up as a
             reviewable diff before anything is applied.
           </CardDescription>
-        </div>
+        </Stack>
 
-        <div className="flex flex-wrap items-center justify-end gap-2">
+        <Inline gap={2} align="center" justify="end" wrap="wrap">
           {hasPendingDraft ? (
             <Button
               type="button"
@@ -65,7 +67,7 @@ export function AiDraftPanel({
             <WandSparkles className="size-4" />
             {loading ? 'Generating...' : 'Generate AI Draft'}
           </Button>
-        </div>
+        </Inline>
       </CardHeader>
     </Card>
   )

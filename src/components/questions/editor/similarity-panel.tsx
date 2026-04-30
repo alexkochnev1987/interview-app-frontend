@@ -16,6 +16,10 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { Grid } from '@/components/ui/layout/grid'
+import { Inline } from '@/components/ui/layout/inline'
+import { Stack } from '@/components/ui/layout/stack'
+import { BodyText } from '@/components/ui/text'
 import { type SimilarQuestionMatch } from '@/lib/api'
 import {
   type SimilarStatus,
@@ -49,23 +53,25 @@ export function SimilarityPanel({
   return (
     <Card variant="surface">
       <CardHeader spacing="lg">
-        <div className="space-y-1.5">
+        <Stack gap={1.5}>
           <CardTitle size="lg">Similar questions</CardTitle>
           <CardDescription>
             Check for duplicates and near-duplicates against the current library
             before you save a new prompt or update an old one.
           </CardDescription>
-        </div>
+        </Stack>
 
-        <div className="grid grid-cols-3 gap-3">
+        <Grid columns={3} gap={3}>
           <SignalTile label="Prompt" value={signalSummary.textTokenCount} />
           <SignalTile label="Tags" value={signalSummary.tagCount} />
           <SignalTile label="Rubric" value={signalSummary.conceptCount} />
-        </div>
+        </Grid>
 
-        <div className="flex flex-wrap items-center gap-2">
-          {resultsStale ? <StatusPill tone="neutral">Needs refresh</StatusPill> : null}
-          {isEditMode ? <StatusPill tone="neutral">Edit mode</StatusPill> : null}
+        <Inline gap={2} align="center" justify="between" wrap="wrap">
+          <Inline gap={2} align="center" wrap="wrap">
+            {resultsStale ? <StatusPill tone="neutral">Needs refresh</StatusPill> : null}
+            {isEditMode ? <StatusPill tone="neutral">Edit mode</StatusPill> : null}
+          </Inline>
           <Button
             type="button"
             variant="outline-pill"
@@ -73,12 +79,11 @@ export function SimilarityPanel({
             size="sm"
             onClick={onRunSearch}
             disabled={disabled || status === 'loading' || !hasInput}
-            className="ml-auto"
           >
             <Search className="size-3.5" />
             {status === 'loading' ? 'Searching...' : 'Run search'}
           </Button>
-        </div>
+        </Inline>
       </CardHeader>
       <CardContent spacing="md">
         {status === 'idle' ? (
@@ -126,7 +131,7 @@ function SignalTile({ label, value }: { label: string; value: number }) {
 function PanelMessage({ children }: { children: React.ReactNode }) {
   return (
     <SurfaceTile padding="lg">
-      <p className="text-sm leading-6 text-muted-foreground">{children}</p>
+      <BodyText size="sm">{children}</BodyText>
     </SurfaceTile>
   )
 }
@@ -142,47 +147,47 @@ function SimilarMatchRow({ match }: { match: SimilarQuestionMatch }) {
 
   return (
     <SurfaceTile>
-      <div className="flex items-start justify-between gap-3">
-        <div className="space-y-3">
-          <div className="flex flex-wrap gap-2">
-            <StatusPill tone={match.question.difficulty}>
-              {match.question.difficulty}
-            </StatusPill>
-            <StatusPill tone="neutral">
-              {Math.round(match.score * 100)}% match
-            </StatusPill>
-          </div>
+      <Stack gap={4}>
+        <Inline gap={3} align="start" justify="between">
+          <Stack gap={3}>
+            <Inline gap={2} wrap="wrap">
+              <StatusPill tone={match.question.difficulty}>
+                {match.question.difficulty}
+              </StatusPill>
+              <StatusPill tone="neutral">
+                {Math.round(match.score * 100)}% match
+              </StatusPill>
+            </Inline>
 
-          <div className="space-y-1.5">
-            <p className="text-sm font-semibold leading-6 text-foreground">
-              {truncateText(match.question.questionText)}
-            </p>
-            <p className="text-sm leading-6 text-muted-foreground">
-              {taxonomy || 'No taxonomy attached'}
-            </p>
-          </div>
-        </div>
+            <Stack gap={1.5}>
+              <BodyText size="sm" weight="semibold" tone="foreground">
+                {truncateText(match.question.questionText)}
+              </BodyText>
+              <BodyText size="sm">{taxonomy || 'No taxonomy attached'}</BodyText>
+            </Stack>
+          </Stack>
 
-        <Button
-          type="button"
-          variant="outline-pill"
-          shape="pill"
-          size="sm"
-          asChild
-        >
-          <Link href={`/questions/${match.question.id}`}>Open</Link>
-        </Button>
-      </div>
+          <Button
+            type="button"
+            variant="outline-pill"
+            shape="pill"
+            size="sm"
+            asChild
+          >
+            <Link href={`/questions/${match.question.id}`}>Open</Link>
+          </Button>
+        </Inline>
 
-      {match.reasons.length > 0 ? (
-        <div className="mt-4 flex flex-wrap gap-2">
-          {match.reasons.map((reason) => (
-            <EyebrowBadge key={reason} tone="muted" casing="normal">
-              {reason}
-            </EyebrowBadge>
-          ))}
-        </div>
-      ) : null}
+        {match.reasons.length > 0 ? (
+          <Inline gap={2} wrap="wrap">
+            {match.reasons.map((reason) => (
+              <EyebrowBadge key={reason} tone="muted" casing="normal">
+                {reason}
+              </EyebrowBadge>
+            ))}
+          </Inline>
+        ) : null}
+      </Stack>
     </SurfaceTile>
   )
 }

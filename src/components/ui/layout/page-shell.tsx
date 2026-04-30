@@ -1,28 +1,53 @@
+import * as React from 'react'
 import { type HTMLAttributes } from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '@/lib/utils'
 
-const pageShellVariants = cva('container py-10 md:py-12', {
+const pageShellVariants = cva('container flex flex-col', {
   variants: {
     spacing: {
-      default: 'space-y-8 md:space-y-10',
-      tight: 'space-y-6 md:space-y-8',
+      default: 'gap-8 md:gap-10',
+      tight: 'gap-6 md:gap-8',
+      compact: 'gap-3',
+    },
+    padding: {
+      default: 'py-10 md:py-12',
+      top: 'pt-6',
+      bottom: 'pb-12',
+      none: '',
+    },
+    align: {
+      stretch: '',
+      center: 'min-h-[calc(100vh-6rem)] justify-center',
     },
   },
   defaultVariants: {
     spacing: 'default',
+    padding: 'default',
+    align: 'stretch',
   },
 })
 
 interface PageShellProps
   extends HTMLAttributes<HTMLElement>,
-    VariantProps<typeof pageShellVariants> {}
+    VariantProps<typeof pageShellVariants> {
+  as?: 'main' | 'section' | 'div'
+}
 
-export function PageShell({ className, spacing, ...props }: PageShellProps) {
+export function PageShell({
+  as,
+  className,
+  spacing,
+  padding,
+  align,
+  ...props
+}: PageShellProps) {
+  const Comp = (as ?? 'main') as React.ElementType
+
   return (
-    <main
-      className={cn(pageShellVariants({ spacing }), className)}
+    <Comp
+      className={cn(pageShellVariants({ spacing, padding, align }), className)}
       {...props}
     />
   )

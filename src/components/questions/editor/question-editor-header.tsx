@@ -7,6 +7,8 @@ import { HeroLead, HeroTitle } from '@/components/ui/hero-text'
 import { MetricPanel } from '@/components/ui/metric-panel'
 import { StatusPill } from '@/components/ui/status-pill'
 import { Card, CardContent } from '@/components/ui/card'
+import { Grid } from '@/components/ui/layout/grid'
+import { Stack } from '@/components/ui/layout/stack'
 import { type QuestionInput } from '@/lib/api'
 
 interface QuestionEditorHeaderProps {
@@ -25,21 +27,21 @@ export function QuestionEditorHeader({
   return (
     <Card variant="floating" size="lg">
       <CardContent spacing="xl">
-        <div className="space-y-4">
+        <Stack gap={4}>
           <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
             Unified Question Editor
           </EyebrowBadge>
-          <div className="space-y-3">
+          <Stack gap={3}>
             <HeroTitle>{title}</HeroTitle>
             <HeroLead width="prose">
               Shape the prompt, define the rubric, and keep AI-generated draft
               suggestions visible as explicit diffs instead of invisible background
               mutations.
             </HeroLead>
-          </div>
-        </div>
+          </Stack>
+        </Stack>
 
-        <div className="grid gap-4 md:grid-cols-3">
+        <Grid columns="metrics-3" gap={4}>
           <MetricPanel
             label="Difficulty"
             value={<StatusPill tone={difficulty}>{difficulty}</StatusPill>}
@@ -48,7 +50,7 @@ export function QuestionEditorHeader({
           />
           <MetricPanel label="Weight" value={weight} />
           <MetricPanel label="Pending AI diffs" value={pendingDraftCount} />
-        </div>
+        </Grid>
       </CardContent>
     </Card>
   )

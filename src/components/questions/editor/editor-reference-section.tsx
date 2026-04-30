@@ -3,6 +3,8 @@
 import { Save } from 'lucide-react'
 import { type ReactNode } from 'react'
 
+import { Grid } from '@/components/ui/layout/grid'
+import { Stack } from '@/components/ui/layout/stack'
 import { Textarea } from '@/components/ui/textarea'
 import { type QuestionInput } from '@/lib/api'
 import {
@@ -36,7 +38,7 @@ export function EditorReferenceSection({
       description="Store extra context for future reviewers, exports, and scoring experiments."
       icon={<Save className="size-4" />}
     >
-      <div className="grid gap-6 xl:grid-cols-2">
+      <Grid columns="editor-2" gap={6}>
         <QuestionEditorField
           htmlFor="sampleGoodAnswer"
           label="Sample good answer"
@@ -53,7 +55,7 @@ export function EditorReferenceSection({
           {renderAiSuggestion('sampleGoodAnswer')}
         </QuestionEditorField>
 
-        <div className="space-y-6">
+        <Stack gap={6}>
           <QuestionEditorField
             htmlFor="tags"
             label="Tags"
@@ -85,8 +87,8 @@ export function EditorReferenceSection({
               disabled={submitting}
             />
           </QuestionEditorField>
-        </div>
-      </div>
+        </Stack>
+      </Grid>
     </EditorSectionCard>
   )
 }

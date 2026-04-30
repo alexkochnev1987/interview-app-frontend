@@ -5,6 +5,9 @@ import { LoaderCircle, RotateCcw } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { PageShell } from '@/components/ui/layout/page-shell'
+import { Stack } from '@/components/ui/layout/stack'
+import { BodyText } from '@/components/ui/text'
 
 interface DeletedQuestionBannerProps {
   restoring: boolean
@@ -18,22 +21,23 @@ export function DeletedQuestionBanner({
   onRestore,
 }: DeletedQuestionBannerProps) {
   return (
-    <section className="container space-y-3 pt-6">
+    <PageShell as="section" spacing="compact" padding="top">
       <Card variant="danger-soft" size="sm" role="alert">
         <CardContent layout="split-row" spacing="sm">
-          <div className="space-y-1 text-sm">
-            <div className="font-medium">This question is deleted</div>
-            <div className="opacity-80">
+          <Stack gap={1}>
+            <BodyText size="sm" tone="foreground" weight="medium">
+              This question is deleted
+            </BodyText>
+            <BodyText size="sm" tone="foreground">
               Only super admins can see deleted questions. It is hidden from the
               library for everyone else and excluded from new interviews and
               similarity search. Restore it to make it visible again.
-            </div>
-          </div>
+            </BodyText>
+          </Stack>
           <Button
             type="button"
             variant="destructive"
             shape="pill"
-            className="md:shrink-0"
             disabled={restoring}
             onClick={onRestore}
           >
@@ -52,6 +56,6 @@ export function DeletedQuestionBanner({
           <AlertDescription>{restoreError}</AlertDescription>
         </Alert>
       )}
-    </section>
+    </PageShell>
   )
 }

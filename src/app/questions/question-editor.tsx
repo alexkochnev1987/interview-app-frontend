@@ -3,6 +3,7 @@
 import { useMemo, useState, type FormEvent } from 'react'
 
 import { PageShell } from '@/components/ui/layout/page-shell'
+import { Stack } from '@/components/ui/layout/stack'
 import { TwoColumnLayout } from '@/components/ui/layout/two-column-layout'
 import { AiDraftPanel } from '@/components/questions/editor/ai-draft-panel'
 import { AiSuggestionRow } from '@/components/questions/editor/ai-suggestion-row'
@@ -201,7 +202,8 @@ export function QuestionEditor({
 
       <TwoColumnLayout
         main={(
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit}>
+            <Stack gap={6}>
             <EditorPromptSection
               value={value}
               submitting={submitting}
@@ -234,6 +236,7 @@ export function QuestionEditor({
               submitting={submitting}
               submitLabel={submitLabel}
             />
+            </Stack>
           </form>
         )}
         aside={(
