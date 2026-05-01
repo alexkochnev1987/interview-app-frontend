@@ -10,6 +10,7 @@ import {
   CircleDashed,
   FileVideo2,
   Layers3,
+  LoaderCircle,
   Sparkles,
   Upload,
 } from 'lucide-react'
@@ -37,13 +38,15 @@ import { Section } from '@/components/ui/layout/section'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText, SectionHeading } from '@/components/ui/text'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
+import { VideoFrame, VideoSurface } from '@/components/ui/video-frame'
 import {
-  completeInterview,
   completeUpload,
   generateCandidateLink,
   getInterview,
+  getInterviewAnswerMedia,
   getPresignedUrl,
   getResults,
+  validateInterview,
   type Interview,
   type InterviewResult,
 } from '@/lib/api'
@@ -57,6 +60,13 @@ type UploadStatus = 'idle' | 'uploading' | 'uploaded' | 'error'
 
 interface QuestionUploadState {
   status: UploadStatus
+  errorMessage?: string
+}
+
+interface AnswerMediaState {
+  loading: boolean
+  cameraUrl?: string
+  screenUrl?: string
   errorMessage?: string
 }
 
@@ -90,6 +100,27 @@ function formatWorkflowStage(stage?: string) {
   return stage.replaceAll('_', ' ')
 }
 
+function formatValidationStatusLabel(status?: string) {
+  if (!status) {
+    return 'idle'
+  }
+
+  return status.replaceAll('_', ' ')
+}
+
+function getValidationTone(status?: string): 'neutral' | 'processing' | 'completed' | 'failed' {
+  if (status === 'queued' || status === 'processing') {
+    return 'processing'
+  }
+  if (status === 'completed') {
+    return 'completed'
+  }
+  if (status === 'failed') {
+    return 'failed'
+  }
+  return 'neutral'
+}
+
 function formatCandidateLinkPreview(candidateLink: string) {
   if (!candidateLink) {
     return ''
@@ -120,8 +151,9 @@ export default function InterviewDetailPage() {
   const [results, setResults] = useState<InterviewResult | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [completing, setCompleting] = useState(false)
+  const [validating, setValidating] = useState(false)
   const [uploadStates, setUploadStates] = useState<QuestionUploadState[]>([])
+  const [mediaByQuestion, setMediaByQuestion] = useState<Record<number, AnswerMediaState>>({})
   const [candidateLink, setCandidateLink] = useState('')
   const [candidateLinkStatus, setCandidateLinkStatus] = useState<
     'idle' | 'loading' | 'ready' | 'error'
@@ -129,6 +161,7 @@ export default function InterviewDetailPage() {
   const [candidateLinkError, setCandidateLinkError] = useState('')
   const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'error'>('idle')
   const fileInputRefs = useRef<(HTMLInputElement | null)[]>([])
+  const validationPollRef = useRef<number | null>(null)
 
   const buildCandidateUrl = useCallback((relativeLink: string) => {
     if (typeof window === 'undefined') {
@@ -164,6 +197,7 @@ export default function InterviewDetailPage() {
     try {
       const data = await getInterview(id)
       setInterview(data)
+      setResults(data.result ?? null)
       setUploadStates(
         data.questions.map((_, qi) => {
           const hasAnswer = data.answers.some((answer) => answer.questionIndex === qi)
@@ -197,6 +231,111 @@ export default function InterviewDetailPage() {
   function setFileInputRef(index: number, element: HTMLInputElement | null) {
     fileInputRefs.current[index] = element
   }
+
+  const stopValidationPolling = useCallback(() => {
+    if (validationPollRef.current !== null) {
+      window.clearInterval(validationPollRef.current)
+      validationPollRef.current = null
+    }
+    setValidating(false)
+  }, [])
+
+  const startValidationPolling = useCallback(() => {
+    if (validationPollRef.current !== null) {
+      return
+    }
+
+    validationPollRef.current = window.setInterval(async () => {
+      try {
+        const refreshedInterview = await getInterview(id)
+        setInterview(refreshedInterview)
+        setResults(refreshedInterview.result ?? null)
+
+        const hasActiveValidation = refreshedInterview.answers.some(
+          (answer) =>
+            answer.validation?.status === 'queued' ||
+            answer.validation?.status === 'processing',
+        )
+
+        if (refreshedInterview.status === 'completed') {
+          stopValidationPolling()
+          try {
+            const nextResults = await getResults(id)
+            setResults(nextResults)
+          } catch (resultsError) {
+            console.warn('Results not yet available after validation', resultsError)
+          }
+          return
+        }
+
+        if (!hasActiveValidation) {
+          stopValidationPolling()
+        }
+      } catch (pollError) {
+        console.warn('Validation polling stopped', pollError)
+        stopValidationPolling()
+      }
+    }, 2500)
+  }, [id, stopValidationPolling])
+
+  useEffect(() => {
+    return () => {
+      if (validationPollRef.current !== null) {
+        window.clearInterval(validationPollRef.current)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!interview) {
+      return
+    }
+
+    const answersWithMedia = interview.answers.filter(
+      (answer) => answer.mediaKey || answer.screenMediaKey,
+    )
+    if (answersWithMedia.length === 0) {
+      return
+    }
+
+    answersWithMedia.forEach((answer) => {
+      const existing = mediaByQuestion[answer.questionIndex]
+      if (existing?.loading || existing?.cameraUrl || existing?.screenUrl) {
+        return
+      }
+
+      setMediaByQuestion((current) => ({
+        ...current,
+        [answer.questionIndex]: {
+          ...current[answer.questionIndex],
+          loading: true,
+          errorMessage: undefined,
+        },
+      }))
+
+      void getInterviewAnswerMedia(id, answer.questionIndex)
+        .then((media) => {
+          setMediaByQuestion((current) => ({
+            ...current,
+            [answer.questionIndex]: {
+              loading: false,
+              cameraUrl: media.cameraUrl,
+              screenUrl: media.screenUrl,
+            },
+          }))
+        })
+        .catch((mediaError) => {
+          setMediaByQuestion((current) => ({
+            ...current,
+            [answer.questionIndex]: {
+              loading: false,
+              errorMessage:
+                mediaError instanceof Error ? mediaError.message : 'Failed to load media.',
+            },
+          }))
+        })
+    })
+  }, [id, interview, mediaByQuestion])
 
   async function handleCopyCandidateLink() {
     if (!candidateLink) {
@@ -257,49 +396,23 @@ export default function InterviewDetailPage() {
     }
   }
 
-  async function handleComplete() {
+  async function handleValidate() {
     if (!interview) {
       return
     }
 
-    setCompleting(true)
+    setValidating(true)
     setError(null)
 
     try {
-      const updatedInterview = await completeInterview(interview.id)
-      setInterview(updatedInterview)
-
-      if (updatedInterview.status === 'completed') {
-        try {
-          const nextResults = await getResults(interview.id)
-          setResults(nextResults)
-        } catch (resultsError) {
-          console.warn('Results not yet available after completion', resultsError)
-        }
-      }
-
-      if (updatedInterview.status === 'processing') {
-        const pollId = window.setInterval(async () => {
-          try {
-            const refreshedInterview = await getInterview(interview.id)
-            setInterview(refreshedInterview)
-
-            if (refreshedInterview.status === 'completed') {
-              window.clearInterval(pollId)
-              const nextResults = await getResults(interview.id)
-              setResults(nextResults)
-            } else if (refreshedInterview.status === 'failed') {
-              window.clearInterval(pollId)
-            }
-          } catch {
-            window.clearInterval(pollId)
-          }
-        }, 2000)
-      }
+      await validateInterview(interview.id)
+      const refreshedInterview = await getInterview(interview.id)
+      setInterview(refreshedInterview)
+      setResults(refreshedInterview.result ?? null)
+      startValidationPolling()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to complete interview.')
-    } finally {
-      setCompleting(false)
+      setError(err instanceof Error ? err.message : 'Failed to validate interview answers.')
+      setValidating(false)
     }
   }
 
@@ -333,13 +446,21 @@ export default function InterviewDetailPage() {
   }
 
   const answeredCount = interview.answers.filter((answer) => answer.status === 'submitted').length
+  const validatedCount = interview.answers.filter(
+    (answer) => answer.validation?.status === 'completed',
+  ).length
+  const hasActiveValidation = interview.answers.some(
+    (answer) =>
+      answer.validation?.status === 'queued' || answer.validation?.status === 'processing',
+  )
   const totalQuestions = interview.questions.length
-  const progressValue = totalQuestions === 0 ? 0 : Math.round((answeredCount / totalQuestions) * 100)
+  const progressValue =
+    answeredCount === 0 ? 0 : Math.round((validatedCount / answeredCount) * 100)
   const allAnswered = interview.questions.every((_, qi) =>
     interview.answers.some((answer) => answer.questionIndex === qi && answer.status === 'submitted'),
   )
   const isTerminal = interview.status === 'completed' || interview.status === 'failed'
-  const canComplete = allAnswered && !isTerminal && interview.status !== 'processing'
+  const canValidate = allAnswered && !hasActiveValidation && interview.status !== 'completed'
   const candidateLinkPreview = formatCandidateLinkPreview(candidateLink)
 
   return (
@@ -376,18 +497,14 @@ export default function InterviewDetailPage() {
               </Stack>
 
               <Inline gap={3} wrap="wrap">
-                {!isTerminal ? (
+                {interview.status !== 'completed' ? (
                   <Button
                     type="button"
                     variant="gradient"
-                    onClick={handleComplete}
-                    disabled={!canComplete || completing}
+                    onClick={handleValidate}
+                    disabled={!canValidate || validating || hasActiveValidation}
                   >
-                    {completing
-                      ? 'Completing...'
-                      : interview.status === 'processing'
-                        ? 'Processing...'
-                        : 'Complete Interview'}
+                    {validating || hasActiveValidation ? 'Validating...' : 'Validate'}
                   </Button>
                 ) : null}
               </Inline>
@@ -470,7 +587,7 @@ export default function InterviewDetailPage() {
               <Stack gap={3}>
                 <IconLabel
                   icon={
-                    canComplete ? (
+                    canValidate ? (
                       <CheckCircle2 className="size-4 text-success-soft-foreground" />
                     ) : (
                       <CircleDashed className="size-4 text-muted-foreground" />
@@ -480,9 +597,11 @@ export default function InterviewDetailPage() {
                   Ready state
                 </IconLabel>
                 <BodyText size="sm">
-                  {canComplete
-                    ? 'All answers are in place. You can send the packet for scoring now.'
-                    : 'Scoring stays locked until every question has an uploaded answer.'}
+                  {hasActiveValidation
+                    ? 'Validation is running. Re-submit is blocked until the current pass finishes.'
+                    : canValidate
+                      ? 'All submitted answers are ready for one-click validation.'
+                      : 'Validation stays locked until every question has a submitted answer.'}
                 </BodyText>
               </Stack>
             </SurfaceTile>
@@ -491,13 +610,13 @@ export default function InterviewDetailPage() {
               <Stack gap={3}>
                 <Inline gap={3} align="center" justify="between">
                   <BodyText as="span" size="sm-tight" tone="foreground">
-                    Completion
+                    Validation progress
                   </BodyText>
                   <StatusPill tone="neutral">{progressValue}%</StatusPill>
                 </Inline>
                 <Progress value={progressValue} density="thick" />
                 <BodyText size="sm">
-                  {answeredCount} of {totalQuestions} answers uploaded.
+                  {validatedCount} of {answeredCount} submitted answers validated.
                 </BodyText>
               </Stack>
             </SurfaceTile>
@@ -563,6 +682,7 @@ export default function InterviewDetailPage() {
             const answer = interview.answers.find((item) => item.questionIndex === questionIndex)
             const hasAnswer = Boolean(answer)
             const uploadState = uploadStates[questionIndex] ?? { status: 'idle' }
+            const media = mediaByQuestion[questionIndex]
 
             return (
               <HoverGroup key={question.id}>
@@ -597,8 +717,13 @@ export default function InterviewDetailPage() {
                         ) : (
                           <StatusPill tone="pending">Pending</StatusPill>
                         )}
+                        {answer?.validation ? (
+                          <StatusPill tone={getValidationTone(answer.validation.status)}>
+                            {formatValidationStatusLabel(answer.validation.status)}
+                          </StatusPill>
+                        ) : null}
 
-                        {!isTerminal && interview.status !== 'processing' ? (
+                        {!isTerminal && !hasActiveValidation && !validating ? (
                           <>
                             <HiddenFileInput
                               accept="video/*,audio/*"
@@ -642,11 +767,22 @@ export default function InterviewDetailPage() {
                             <BodyText size="sm">
                               Uploaded {new Date(answer.uploadedAt).toLocaleString()}
                             </BodyText>
+                            {media?.loading ? (
+                              <Inline gap={2} align="center">
+                                <LoaderCircle className="size-4 animate-spin text-muted-foreground" />
+                                <BodyText size="sm">Loading candidate media...</BodyText>
+                              </Inline>
+                            ) : null}
+                            {media?.errorMessage ? (
+                              <BodyText size="sm" tone="danger">
+                                {media.errorMessage}
+                              </BodyText>
+                            ) : null}
                           </Stack>
                         </SurfaceTile>
                         <SurfaceTile rounded="xl">
                           <Stack gap={3}>
-                            <EyebrowLabel>Evaluation signals</EyebrowLabel>
+                            <EyebrowLabel>Validation status</EyebrowLabel>
                             <BodyText size="sm">
                               Hidden tabs {answer.behaviorSignals?.tabHiddenCount ?? 0} • blur{' '}
                               {answer.behaviorSignals?.windowBlurCount ?? 0} • paste{' '}
@@ -657,12 +793,123 @@ export default function InterviewDetailPage() {
                               {answer.behaviorSignals?.resizeCount ?? 0}
                             </BodyText>
                             <BodyText size="sm">
-                              Transcript {answer.transcript?.text ? 'ready' : 'pending'} •
-                              evaluation{' '}
+                              Transcript {answer.transcript?.text ? 'ready' : 'pending'} • evaluation{' '}
                               {answer.evaluation?.overallScore !== undefined ? 'ready' : 'pending'}
+                            </BodyText>
+                            {answer.validation?.errorMessage ? (
+                              <BodyText size="sm" tone="danger">
+                                {answer.validation.errorMessage}
+                              </BodyText>
+                            ) : null}
+                          </Stack>
+                        </SurfaceTile>
+                      </Grid>
+                    ) : null}
+
+                    {answer?.evaluation ? (
+                      <Grid columns="metrics-2-md" gap={4}>
+                        <SurfaceTile rounded="xl">
+                          <Stack gap={3}>
+                            <EyebrowLabel>Short result</EyebrowLabel>
+                            <Inline gap={2} align="center" wrap="wrap">
+                              {answer.evaluation.overallScore !== undefined ? (
+                                <StatusPill tone="neutral">
+                                  score {answer.evaluation.overallScore}
+                                </StatusPill>
+                              ) : null}
+                              {answer.evaluation.decisionHint ? (
+                                <StatusPill tone="neutral">
+                                  {answer.evaluation.decisionHint}
+                                </StatusPill>
+                              ) : null}
+                              {answer.evaluation.behaviorRisk ? (
+                                <StatusPill tone="neutral">
+                                  risk {answer.evaluation.behaviorRisk}
+                                </StatusPill>
+                              ) : null}
+                            </Inline>
+                            <BodyText size="sm">
+                              {answer.evaluation.summary ?? 'Summary is not available yet.'}
+                            </BodyText>
+                            {answer.evaluation.categoryScores &&
+                            Object.keys(answer.evaluation.categoryScores).length > 0 ? (
+                              <BodyText size="sm">
+                                {Object.entries(answer.evaluation.categoryScores)
+                                  .map(([category, score]) => `${category}: ${score}`)
+                                  .join(' • ')}
+                              </BodyText>
+                            ) : null}
+                          </Stack>
+                        </SurfaceTile>
+                        <SurfaceTile rounded="xl">
+                          <Stack gap={3}>
+                            <EyebrowLabel>Detailed rubric result</EyebrowLabel>
+                            <BodyText size="sm">
+                              Covered:{' '}
+                              {answer.evaluation.coveredConceptIds?.length
+                                ? answer.evaluation.coveredConceptIds.join(', ')
+                                : 'none'}
+                            </BodyText>
+                            <BodyText size="sm">
+                              Missed:{' '}
+                              {answer.evaluation.missedConceptIds?.length
+                                ? answer.evaluation.missedConceptIds.join(', ')
+                                : 'none'}
+                            </BodyText>
+                            <BodyText size="sm">
+                              Red flags:{' '}
+                              {answer.evaluation.redFlagIds?.length
+                                ? answer.evaluation.redFlagIds.join(', ')
+                                : 'none'}
                             </BodyText>
                           </Stack>
                         </SurfaceTile>
+                      </Grid>
+                    ) : null}
+
+                    {answer?.transcript?.text ? (
+                      <SurfaceTile rounded="xl">
+                        <Stack gap={3}>
+                          <EyebrowLabel>Full result</EyebrowLabel>
+                          <BodyText size="sm">
+                            {answer.transcript.text}
+                          </BodyText>
+                        </Stack>
+                      </SurfaceTile>
+                    ) : null}
+
+                    {media?.cameraUrl || media?.screenUrl ? (
+                      <Grid columns="metrics-2-md" gap={4}>
+                        {media.cameraUrl ? (
+                          <SurfaceTile rounded="xl">
+                            <Stack gap={3}>
+                              <EyebrowLabel>Candidate camera</EyebrowLabel>
+                              <VideoFrame className="my-0 rounded-2xl">
+                                <VideoSurface
+                                  controls
+                                  preload="metadata"
+                                  playsInline
+                                  src={media.cameraUrl}
+                                />
+                              </VideoFrame>
+                            </Stack>
+                          </SurfaceTile>
+                        ) : null}
+                        {media.screenUrl ? (
+                          <SurfaceTile rounded="xl">
+                            <Stack gap={3}>
+                              <EyebrowLabel>Candidate screen</EyebrowLabel>
+                              <VideoFrame className="my-0 rounded-2xl">
+                                <VideoSurface
+                                  controls
+                                  preload="metadata"
+                                  playsInline
+                                  src={media.screenUrl}
+                                />
+                              </VideoFrame>
+                            </Stack>
+                          </SurfaceTile>
+                        ) : null}
                       </Grid>
                     ) : null}
 

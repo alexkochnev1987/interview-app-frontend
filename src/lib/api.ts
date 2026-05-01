@@ -89,6 +89,7 @@ export type InterviewBehaviorRisk = 'low' | 'medium' | 'high';
 export type InterviewDecision = 'proceed' | 'review' | 'reject';
 export type AnswerDecisionHint = 'pass' | 'review' | 'fail';
 export type AnswerStatus = 'recording' | 'submitted';
+export type AnswerValidationStatus = 'idle' | 'queued' | 'processing' | 'completed' | 'failed';
 export type InterviewWorkflowStatus =
   | 'idle'
   | 'queued'
@@ -151,6 +152,16 @@ export interface AnswerEvaluation {
   evaluatedAt?: string;
 }
 
+export interface AnswerValidation {
+  status: AnswerValidationStatus;
+  executionArn?: string;
+  sourceVersionNumber?: number;
+  requestedAt?: string;
+  startedAt?: string;
+  completedAt?: string;
+  errorMessage?: string;
+}
+
 export interface Answer {
   questionIndex: number;
   questionId: string;
@@ -170,6 +181,7 @@ export interface Answer {
   behaviorEvents?: AnswerBehaviorEvent[];
   transcript?: AnswerTranscript;
   evaluation?: AnswerEvaluation;
+  validation?: AnswerValidation;
 }
 
 export interface AnswerVersion {
@@ -234,6 +246,27 @@ export interface Interview {
   workflow?: InterviewWorkflow;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ValidateAllAnswersResponse {
+  ok: true;
+  interviewId: string;
+  requestedCount: number;
+  queuedCount: number;
+  reusedCount: number;
+  skippedCount: number;
+  answers: Array<{
+    status: AnswerValidationStatus;
+    questionIndex: number;
+    sourceVersionNumber: number;
+    reused: boolean;
+  }>;
+}
+
+export interface InterviewAnswerMediaResponse {
+  questionIndex: number;
+  cameraUrl?: string;
+  screenUrl?: string;
 }
 
 export interface CandidateLinkResponse {
@@ -432,6 +465,21 @@ export async function completeInterview(id: string): Promise<Interview> {
   return request<Interview>(`/interviews/${id}/complete`, {
     method: 'PATCH',
   });
+}
+
+export async function validateInterview(id: string): Promise<ValidateAllAnswersResponse> {
+  return request<ValidateAllAnswersResponse>(`/interviews/${id}/validate`, {
+    method: 'POST',
+  });
+}
+
+export async function getInterviewAnswerMedia(
+  interviewId: string,
+  questionIndex: number,
+): Promise<InterviewAnswerMediaResponse> {
+  return request<InterviewAnswerMediaResponse>(
+    `/interviews/${interviewId}/questions/${questionIndex}/media`,
+  );
 }
 
 export async function getResults(id: string): Promise<InterviewResult> {
