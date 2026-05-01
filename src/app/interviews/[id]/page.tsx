@@ -4,15 +4,16 @@ import { useParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ArrowLeft,
+  ChartColumnBig,
   CheckCircle2,
   Copy,
   CircleAlert,
   CircleDashed,
   FileVideo2,
-  Layers3,
   LoaderCircle,
   Sparkles,
   Upload,
+  Workflow,
 } from "lucide-react";
 
 import { EyebrowBadge } from "@/components/ui/eyebrow-badge";
@@ -705,11 +706,7 @@ export default function InterviewDetailPage() {
             {interview.workflow ? (
               <SurfaceTile tone="glass" padding="lg">
                 <Stack gap={3}>
-                  <IconLabel
-                    icon={
-                      <Layers3 className="size-4 text-[hsl(var(--primary))]" />
-                    }
-                  >
+                  <IconLabel icon={<Workflow className="size-4" />} tone="primary">
                     Workflow
                   </IconLabel>
                   <BodyText size="sm">
@@ -1101,7 +1098,7 @@ export default function InterviewDetailPage() {
                 <Stack gap={5}>
                   <Stack gap={3}>
                     <EyebrowBadge
-                      icon={<Layers3 className="size-3.5" />}
+                      icon={<ChartColumnBig className="size-3.5" />}
                       tone="primary"
                     >
                       Results summary
@@ -1133,11 +1130,7 @@ export default function InterviewDetailPage() {
 
                   {results.questionResults?.length ? (
                     <Stack gap={4}>
-                      <IconLabel
-                        icon={
-                          <FileVideo2 className="size-4 text-[hsl(var(--primary))]" />
-                        }
-                      >
+                      <IconLabel icon={<FileVideo2 className="size-4" />} tone="primary">
                         Question breakdown
                       </IconLabel>
                       <Stack gap={3}>

@@ -41,7 +41,7 @@ function getDefaultLanguage(): string {
 }
 
 export function useBrowserTranscript() {
-  const [isSupported, setIsSupported] = useState(false);
+  const [isSupported] = useState(() => Boolean(getRecognitionConstructor()));
   const [isListening, setIsListening] = useState(false);
   const [interimTranscript, setInterimTranscript] = useState('');
   const [finalTranscript, setFinalTranscript] = useState('');
@@ -57,7 +57,6 @@ export function useBrowserTranscript() {
   const restartAttemptsRef = useRef(0);
 
   useEffect(() => {
-    setIsSupported(Boolean(getRecognitionConstructor()));
     languageRef.current = getDefaultLanguage();
   }, []);
 
@@ -204,7 +203,6 @@ export function useBrowserTranscript() {
 
     const recognition = ensureRecognition();
     if (!recognition) {
-      setIsSupported(false);
       setIsListening(false);
       isSessionActiveRef.current = false;
       setWarning('Web Speech API is not supported in this browser');

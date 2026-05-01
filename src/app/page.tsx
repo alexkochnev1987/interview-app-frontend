@@ -7,7 +7,7 @@ import {
   BriefcaseBusiness,
   CircleDashed,
   Clock3,
-  Layers3,
+  ListChecks,
   Sparkles,
   Users,
 } from 'lucide-react'
@@ -274,7 +274,7 @@ export default function DashboardPage() {
                 description="Total candidate records visible in the current workspace."
               />
               <MetricPanel
-                icon={<Layers3 className="size-4" />}
+                icon={<ListChecks className="size-4" />}
                 label="Question Load"
                 value={questionVolume}
                 description="Questions currently attached across all visible interviews."

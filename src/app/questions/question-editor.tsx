@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState, type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
 
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { Stack } from '@/components/ui/layout/stack'
@@ -115,13 +115,12 @@ export function QuestionEditor({
     })
   }
 
-  const pendingDraftFields = useMemo(() => {
-    if (!aiDraft) return []
-    return DRAFT_FIELDS.filter(
-      ({ key }) =>
-        !dismissedDraftFields.includes(key) && !areEqual(value[key], aiDraft[key]),
-    )
-  }, [aiDraft, dismissedDraftFields, value])
+  const pendingDraftFields = !aiDraft
+    ? []
+    : DRAFT_FIELDS.filter(
+        ({ key }) =>
+          !dismissedDraftFields.includes(key) && !areEqual(value[key], aiDraft[key]),
+      )
 
   function renderAiSuggestion(field: DraftFieldKey) {
     if (!aiDraft || !pendingDraftFields.some((p) => p.key === field)) return null
