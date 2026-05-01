@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   ArrowLeft,
   CheckCircle2,
+  Copy,
   CircleAlert,
   CircleDashed,
   FileVideo2,
@@ -39,6 +40,7 @@ import { UnstyledLink } from '@/components/ui/unstyled-link'
 import {
   completeInterview,
   completeUpload,
+  generateCandidateLink,
   getInterview,
   getPresignedUrl,
   getResults,
@@ -98,7 +100,43 @@ export default function InterviewDetailPage() {
   const [error, setError] = useState<string | null>(null)
   const [completing, setCompleting] = useState(false)
   const [uploadStates, setUploadStates] = useState<QuestionUploadState[]>([])
+  const [candidateLink, setCandidateLink] = useState('')
+  const [candidateLinkStatus, setCandidateLinkStatus] = useState<
+    'idle' | 'loading' | 'ready' | 'error'
+  >('idle')
+  const [candidateLinkError, setCandidateLinkError] = useState('')
+  const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'error'>('idle')
   const fileInputRefs = useRef<(HTMLInputElement | null)[]>([])
+
+  const buildCandidateUrl = useCallback((relativeLink: string) => {
+    if (typeof window === 'undefined') {
+      return relativeLink
+    }
+
+    return new URL(relativeLink, window.location.origin).toString()
+  }, [])
+
+  const loadCandidateLink = useCallback(
+    async (mode: 'initial' | 'refresh' = 'refresh') => {
+      try {
+        setCandidateLinkStatus('loading')
+        setCandidateLinkError('')
+        const data = await generateCandidateLink(id)
+        setCandidateLink(buildCandidateUrl(data.candidateLink))
+        setCandidateLinkStatus('ready')
+        if (mode === 'refresh') {
+          setCopyStatus('idle')
+        }
+      } catch (err) {
+        setCandidateLink('')
+        setCandidateLinkStatus('error')
+        setCandidateLinkError(
+          err instanceof Error ? err.message : 'Failed to generate candidate link.',
+        )
+      }
+    },
+    [buildCandidateUrl, id],
+  )
 
   const loadInterview = useCallback(async () => {
     try {
@@ -130,8 +168,25 @@ export default function InterviewDetailPage() {
     loadInterview()
   }, [loadInterview])
 
+  useEffect(() => {
+    void loadCandidateLink('initial')
+  }, [loadCandidateLink])
+
   function setFileInputRef(index: number, element: HTMLInputElement | null) {
     fileInputRefs.current[index] = element
+  }
+
+  async function handleCopyCandidateLink() {
+    if (!candidateLink) {
+      return
+    }
+
+    try {
+      await navigator.clipboard.writeText(candidateLink)
+      setCopyStatus('copied')
+    } catch {
+      setCopyStatus('error')
+    }
   }
 
   async function handleUpload(questionIndex: number) {
@@ -330,24 +385,55 @@ export default function InterviewDetailPage() {
         <Card variant="tinted">
           <CardHeader spacing="sm">
             <EyebrowBadge icon={<Sparkles className="size-3.5" />} tone="muted">
-              Interview progress
+              Candidate access
             </EyebrowBadge>
-            <CardTitle size="lg">Answer packet status</CardTitle>
+            <CardTitle size="lg">Interview link</CardTitle>
             <CardDescription>
-              Recruiter-side review stays anchored to upload completion first, then shifts into
-              scoring once the packet is fully assembled.
+              Share this link with the candidate to start the recording flow without recruiter
+              sign-in.
             </CardDescription>
           </CardHeader>
           <CardContent spacing="xl">
             <SurfaceTile tone="glass" padding="lg">
               <Stack gap={3}>
-                <Inline gap={3} align="center" justify="between">
-                  <BodyText as="span" size="sm-tight" tone="foreground">Completion</BodyText>
-                  <StatusPill tone="neutral">{progressValue}%</StatusPill>
+                <Inline gap={3} align="center" justify="between" wrap="wrap">
+                  <BodyText as="span" size="sm-tight" tone="foreground">
+                    Candidate link
+                  </BodyText>
+                  <Inline gap={2} wrap="wrap">
+                    <Button
+                      type="button"
+                      variant="outline-pill"
+                      shape="pill"
+                      size="sm"
+                      onClick={() => void loadCandidateLink('refresh')}
+                      disabled={candidateLinkStatus === 'loading'}
+                    >
+                      {candidateLinkStatus === 'loading' ? 'Generating...' : 'Refresh link'}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="gradient"
+                      size="sm"
+                      onClick={handleCopyCandidateLink}
+                      disabled={candidateLinkStatus !== 'ready' || !candidateLink}
+                    >
+                      <Copy className="size-4" />
+                      {copyStatus === 'copied'
+                        ? 'Copied'
+                        : copyStatus === 'error'
+                          ? 'Copy failed'
+                          : 'Copy link'}
+                    </Button>
+                  </Inline>
                 </Inline>
-                <Progress value={progressValue} density="thick" />
+
                 <BodyText size="sm">
-                  {answeredCount} of {totalQuestions} answers uploaded.
+                  {candidateLinkStatus === 'loading'
+                    ? 'Generating a fresh candidate link...'
+                    : candidateLinkStatus === 'error'
+                      ? candidateLinkError
+                      : candidateLink || 'Candidate link is not available yet.'}
                 </BodyText>
               </Stack>
             </SurfaceTile>
@@ -369,6 +455,21 @@ export default function InterviewDetailPage() {
                   {canComplete
                     ? 'All answers are in place. You can send the packet for scoring now.'
                     : 'Scoring stays locked until every question has an uploaded answer.'}
+                </BodyText>
+              </Stack>
+            </SurfaceTile>
+
+            <SurfaceTile tone="glass" padding="lg">
+              <Stack gap={3}>
+                <Inline gap={3} align="center" justify="between">
+                  <BodyText as="span" size="sm-tight" tone="foreground">
+                    Completion
+                  </BodyText>
+                  <StatusPill tone="neutral">{progressValue}%</StatusPill>
+                </Inline>
+                <Progress value={progressValue} density="thick" />
+                <BodyText size="sm">
+                  {answeredCount} of {totalQuestions} answers uploaded.
                 </BodyText>
               </Stack>
             </SurfaceTile>

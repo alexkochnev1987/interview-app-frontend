@@ -236,6 +236,10 @@ export interface Interview {
   updatedAt: string;
 }
 
+export interface CandidateLinkResponse {
+  candidateLink: string;
+}
+
 export interface CreateInterviewPayload {
   candidateName: string;
   position: string;
@@ -377,8 +381,8 @@ export async function fetchInterviews(): Promise<Interview[]> {
 
 export async function createInterview(
   data: CreateInterviewPayload,
-): Promise<Interview> {
-  return request<Interview>('/interviews', {
+): Promise<Interview & CandidateLinkResponse> {
+  return request<Interview & CandidateLinkResponse>('/interviews', {
     method: 'POST',
     body: JSON.stringify(data),
   });
@@ -386,6 +390,14 @@ export async function createInterview(
 
 export async function getInterview(id: string): Promise<Interview> {
   return request<Interview>(`/interviews/${id}`);
+}
+
+export async function generateCandidateLink(
+  id: string,
+): Promise<CandidateLinkResponse> {
+  return request<CandidateLinkResponse>(`/interviews/${id}/candidate-link`, {
+    method: 'POST',
+  });
 }
 
 export async function getPresignedUrl(
