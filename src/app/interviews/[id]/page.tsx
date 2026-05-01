@@ -90,6 +90,28 @@ function formatWorkflowStage(stage?: string) {
   return stage.replaceAll('_', ' ')
 }
 
+function formatCandidateLinkPreview(candidateLink: string) {
+  if (!candidateLink) {
+    return ''
+  }
+
+  try {
+    const url = new URL(candidateLink)
+    const token = url.searchParams.get('token')
+    const shortToken = token
+      ? `${token.slice(0, 12)}...${token.slice(-8)}`
+      : null
+
+    return `${url.origin}${url.pathname}${shortToken ? `?token=${shortToken}` : ''}`
+  } catch {
+    if (candidateLink.length <= 96) {
+      return candidateLink
+    }
+
+    return `${candidateLink.slice(0, 72)}...${candidateLink.slice(-20)}`
+  }
+}
+
 export default function InterviewDetailPage() {
   const params = useParams<{ id: string }>()
   const id = params.id
@@ -318,6 +340,7 @@ export default function InterviewDetailPage() {
   )
   const isTerminal = interview.status === 'completed' || interview.status === 'failed'
   const canComplete = allAnswered && !isTerminal && interview.status !== 'processing'
+  const candidateLinkPreview = formatCandidateLinkPreview(candidateLink)
 
   return (
     <PageShell>
@@ -433,8 +456,13 @@ export default function InterviewDetailPage() {
                     ? 'Generating a fresh candidate link...'
                     : candidateLinkStatus === 'error'
                       ? candidateLinkError
-                      : candidateLink || 'Candidate link is not available yet.'}
+                      : candidateLinkPreview || 'Candidate link is not available yet.'}
                 </BodyText>
+                {candidateLinkStatus === 'ready' && candidateLink ? (
+                  <BodyText size="xs" title={candidateLink}>
+                    Showing a shortened preview here. `Copy link` copies the full secure URL.
+                  </BodyText>
+                ) : null}
               </Stack>
             </SurfaceTile>
 
