@@ -1,7 +1,7 @@
-'use client'
+"use client";
 
-import { useParams } from 'next/navigation'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useParams } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -13,32 +13,38 @@ import {
   LoaderCircle,
   Sparkles,
   Upload,
-} from 'lucide-react'
+} from "lucide-react";
 
-import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
-import { EyebrowLabel } from '@/components/ui/eyebrow-label'
-import { HeroLead, HeroTitle } from '@/components/ui/hero-text'
-import { HeroNumber } from '@/components/ui/hero-number'
-import { IconBadge } from '@/components/ui/icon-badge'
-import { IconLabel } from '@/components/ui/icon-label'
-import { MetricPanel } from '@/components/ui/metric-panel'
-import { StatusPill } from '@/components/ui/status-pill'
-import { LoadingStateCard } from '@/components/ui/state-card'
-import { SurfaceTile } from '@/components/ui/surface-tile'
-import { PageShell } from '@/components/ui/layout/page-shell'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Grid } from '@/components/ui/layout/grid'
-import { HiddenFileInput } from '@/components/ui/hidden-file-input'
-import { HoverGroup } from '@/components/ui/hover-group'
-import { Inline } from '@/components/ui/layout/inline'
-import { Progress } from '@/components/ui/progress'
-import { Section } from '@/components/ui/layout/section'
-import { Stack } from '@/components/ui/layout/stack'
-import { BodyText, SectionHeading } from '@/components/ui/text'
-import { UnstyledLink } from '@/components/ui/unstyled-link'
-import { VideoFrame, VideoSurface } from '@/components/ui/video-frame'
+import { EyebrowBadge } from "@/components/ui/eyebrow-badge";
+import { EyebrowLabel } from "@/components/ui/eyebrow-label";
+import { HeroLead, HeroTitle } from "@/components/ui/hero-text";
+import { HeroNumber } from "@/components/ui/hero-number";
+import { IconBadge } from "@/components/ui/icon-badge";
+import { IconLabel } from "@/components/ui/icon-label";
+import { MetricPanel } from "@/components/ui/metric-panel";
+import { StatusPill } from "@/components/ui/status-pill";
+import { LoadingStateCard } from "@/components/ui/state-card";
+import { SurfaceTile } from "@/components/ui/surface-tile";
+import { PageShell } from "@/components/ui/layout/page-shell";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Grid } from "@/components/ui/layout/grid";
+import { HiddenFileInput } from "@/components/ui/hidden-file-input";
+import { HoverGroup } from "@/components/ui/hover-group";
+import { Inline } from "@/components/ui/layout/inline";
+import { Progress } from "@/components/ui/progress";
+import { Section } from "@/components/ui/layout/section";
+import { Stack } from "@/components/ui/layout/stack";
+import { BodyText, SectionHeading } from "@/components/ui/text";
+import { UnstyledLink } from "@/components/ui/unstyled-link";
+import { VideoFrame, VideoSurface } from "@/components/ui/video-frame";
 import {
   completeUpload,
   generateCandidateLink,
@@ -49,259 +55,288 @@ import {
   validateInterview,
   type Interview,
   type InterviewResult,
-} from '@/lib/api'
+} from "@/lib/api";
 import {
   formatInterviewDate,
   formatInterviewStatusLabel,
   getCandidateInitials,
-} from '@/lib/interview-formatters'
+} from "@/lib/interview-formatters";
 
-type UploadStatus = 'idle' | 'uploading' | 'uploaded' | 'error'
+type UploadStatus = "idle" | "uploading" | "uploaded" | "error";
 
 interface QuestionUploadState {
-  status: UploadStatus
-  errorMessage?: string
+  status: UploadStatus;
+  errorMessage?: string;
 }
 
 interface AnswerMediaState {
-  loading: boolean
-  cameraUrl?: string
-  screenUrl?: string
-  errorMessage?: string
+  loading: boolean;
+  cameraUrl?: string;
+  screenUrl?: string;
+  errorMessage?: string;
 }
 
 function formatAnswerDuration(seconds?: number) {
   if (!seconds || seconds < 1) {
-    return 'n/a'
+    return "n/a";
   }
 
-  const minutes = Math.floor(seconds / 60)
-  const remainder = seconds % 60
-  return `${minutes}:${remainder.toString().padStart(2, '0')}`
+  const minutes = Math.floor(seconds / 60);
+  const remainder = seconds % 60;
+  return `${minutes}:${remainder.toString().padStart(2, "0")}`;
 }
 
 function formatFileSize(bytes?: number) {
   if (!bytes || bytes < 1) {
-    return 'n/a'
+    return "n/a";
   }
 
   if (bytes < 1024 * 1024) {
-    return `${Math.round(bytes / 1024)} KB`
+    return `${Math.round(bytes / 1024)} KB`;
   }
 
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 function formatWorkflowStage(stage?: string) {
   if (!stage) {
-    return 'idle'
+    return "idle";
   }
 
-  return stage.replaceAll('_', ' ')
+  return stage.replaceAll("_", " ");
 }
 
 function formatValidationStatusLabel(status?: string) {
   if (!status) {
-    return 'idle'
+    return "idle";
   }
 
-  return status.replaceAll('_', ' ')
+  return status.replaceAll("_", " ");
 }
 
-function getValidationTone(status?: string): 'neutral' | 'processing' | 'completed' | 'failed' {
-  if (status === 'queued' || status === 'processing') {
-    return 'processing'
+function formatMetricLabel(value: string) {
+  return value
+    .replaceAll("_", " ")
+    .split(" ")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function getValidationTone(
+  status?: string,
+): "neutral" | "processing" | "completed" | "failed" {
+  if (status === "queued" || status === "processing") {
+    return "processing";
   }
-  if (status === 'completed') {
-    return 'completed'
+  if (status === "completed") {
+    return "completed";
   }
-  if (status === 'failed') {
-    return 'failed'
+  if (status === "failed") {
+    return "failed";
   }
-  return 'neutral'
+  return "neutral";
 }
 
 function formatCandidateLinkPreview(candidateLink: string) {
   if (!candidateLink) {
-    return ''
+    return "";
   }
 
   try {
-    const url = new URL(candidateLink)
-    const token = url.searchParams.get('token')
+    const url = new URL(candidateLink);
+    const token = url.searchParams.get("token");
     const shortToken = token
       ? `${token.slice(0, 12)}...${token.slice(-8)}`
-      : null
+      : null;
 
-    return `${url.origin}${url.pathname}${shortToken ? `?token=${shortToken}` : ''}`
+    return `${url.origin}${url.pathname}${shortToken ? `?token=${shortToken}` : ""}`;
   } catch {
     if (candidateLink.length <= 96) {
-      return candidateLink
+      return candidateLink;
     }
 
-    return `${candidateLink.slice(0, 72)}...${candidateLink.slice(-20)}`
+    return `${candidateLink.slice(0, 72)}...${candidateLink.slice(-20)}`;
   }
 }
 
 export default function InterviewDetailPage() {
-  const params = useParams<{ id: string }>()
-  const id = params.id
+  const params = useParams<{ id: string }>();
+  const id = params.id;
 
-  const [interview, setInterview] = useState<Interview | null>(null)
-  const [results, setResults] = useState<InterviewResult | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [validating, setValidating] = useState(false)
-  const [uploadStates, setUploadStates] = useState<QuestionUploadState[]>([])
-  const [mediaByQuestion, setMediaByQuestion] = useState<Record<number, AnswerMediaState>>({})
-  const [candidateLink, setCandidateLink] = useState('')
+  const [interview, setInterview] = useState<Interview | null>(null);
+  const [results, setResults] = useState<InterviewResult | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [validating, setValidating] = useState(false);
+  const [uploadStates, setUploadStates] = useState<QuestionUploadState[]>([]);
+  const [mediaByQuestion, setMediaByQuestion] = useState<
+    Record<number, AnswerMediaState>
+  >({});
+  const [candidateLink, setCandidateLink] = useState("");
   const [candidateLinkStatus, setCandidateLinkStatus] = useState<
-    'idle' | 'loading' | 'ready' | 'error'
-  >('idle')
-  const [candidateLinkError, setCandidateLinkError] = useState('')
-  const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'error'>('idle')
-  const fileInputRefs = useRef<(HTMLInputElement | null)[]>([])
-  const validationPollRef = useRef<number | null>(null)
+    "idle" | "loading" | "ready" | "error"
+  >("idle");
+  const [candidateLinkError, setCandidateLinkError] = useState("");
+  const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "error">(
+    "idle",
+  );
+  const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const validationPollRef = useRef<number | null>(null);
 
   const buildCandidateUrl = useCallback((relativeLink: string) => {
-    if (typeof window === 'undefined') {
-      return relativeLink
+    if (typeof window === "undefined") {
+      return relativeLink;
     }
 
-    return new URL(relativeLink, window.location.origin).toString()
-  }, [])
+    return new URL(relativeLink, window.location.origin).toString();
+  }, []);
 
   const loadCandidateLink = useCallback(
-    async (mode: 'initial' | 'refresh' = 'refresh') => {
+    async (mode: "initial" | "refresh" = "refresh") => {
       try {
-        setCandidateLinkStatus('loading')
-        setCandidateLinkError('')
-        const data = await generateCandidateLink(id)
-        setCandidateLink(buildCandidateUrl(data.candidateLink))
-        setCandidateLinkStatus('ready')
-        if (mode === 'refresh') {
-          setCopyStatus('idle')
+        setCandidateLinkStatus("loading");
+        setCandidateLinkError("");
+        const data = await generateCandidateLink(id);
+        setCandidateLink(buildCandidateUrl(data.candidateLink));
+        setCandidateLinkStatus("ready");
+        if (mode === "refresh") {
+          setCopyStatus("idle");
         }
       } catch (err) {
-        setCandidateLink('')
-        setCandidateLinkStatus('error')
+        setCandidateLink("");
+        setCandidateLinkStatus("error");
         setCandidateLinkError(
-          err instanceof Error ? err.message : 'Failed to generate candidate link.',
-        )
+          err instanceof Error
+            ? err.message
+            : "Failed to generate candidate link.",
+        );
       }
     },
     [buildCandidateUrl, id],
-  )
+  );
 
   const loadInterview = useCallback(async () => {
     try {
-      const data = await getInterview(id)
-      setInterview(data)
-      setResults(data.result ?? null)
+      const data = await getInterview(id);
+      setInterview(data);
+      setResults(data.result ?? null);
       setUploadStates(
         data.questions.map((_, qi) => {
-          const hasAnswer = data.answers.some((answer) => answer.questionIndex === qi)
-          return { status: hasAnswer ? 'uploaded' : 'idle' } as QuestionUploadState
+          const hasAnswer = data.answers.some(
+            (answer) => answer.questionIndex === qi,
+          );
+          return {
+            status: hasAnswer ? "uploaded" : "idle",
+          } as QuestionUploadState;
         }),
-      )
+      );
 
-      if (data.status === 'completed') {
+      if (data.status === "completed") {
         try {
-          const nextResults = await getResults(id)
-          setResults(nextResults)
+          const nextResults = await getResults(id);
+          setResults(nextResults);
         } catch (resultsError) {
-          console.warn('Results not yet available for completed interview', resultsError)
+          console.warn(
+            "Results not yet available for completed interview",
+            resultsError,
+          );
         }
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load interview.')
+      setError(
+        err instanceof Error ? err.message : "Failed to load interview.",
+      );
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [id])
+  }, [id]);
 
   useEffect(() => {
-    loadInterview()
-  }, [loadInterview])
+    loadInterview();
+  }, [loadInterview]);
 
   useEffect(() => {
-    void loadCandidateLink('initial')
-  }, [loadCandidateLink])
+    void loadCandidateLink("initial");
+  }, [loadCandidateLink]);
 
   function setFileInputRef(index: number, element: HTMLInputElement | null) {
-    fileInputRefs.current[index] = element
+    fileInputRefs.current[index] = element;
   }
 
   const stopValidationPolling = useCallback(() => {
     if (validationPollRef.current !== null) {
-      window.clearInterval(validationPollRef.current)
-      validationPollRef.current = null
+      window.clearInterval(validationPollRef.current);
+      validationPollRef.current = null;
     }
-    setValidating(false)
-  }, [])
+    setValidating(false);
+  }, []);
 
   const startValidationPolling = useCallback(() => {
     if (validationPollRef.current !== null) {
-      return
+      return;
     }
 
     validationPollRef.current = window.setInterval(async () => {
       try {
-        const refreshedInterview = await getInterview(id)
-        setInterview(refreshedInterview)
-        setResults(refreshedInterview.result ?? null)
+        const refreshedInterview = await getInterview(id);
+        setInterview(refreshedInterview);
+        setResults(refreshedInterview.result ?? null);
 
         const hasActiveValidation = refreshedInterview.answers.some(
           (answer) =>
-            answer.validation?.status === 'queued' ||
-            answer.validation?.status === 'processing',
-        )
+            answer.validation?.status === "queued" ||
+            answer.validation?.status === "processing",
+        );
 
-        if (refreshedInterview.status === 'completed') {
-          stopValidationPolling()
+        if (refreshedInterview.status === "completed") {
+          stopValidationPolling();
           try {
-            const nextResults = await getResults(id)
-            setResults(nextResults)
+            const nextResults = await getResults(id);
+            setResults(nextResults);
           } catch (resultsError) {
-            console.warn('Results not yet available after validation', resultsError)
+            console.warn(
+              "Results not yet available after validation",
+              resultsError,
+            );
           }
-          return
+          return;
         }
 
         if (!hasActiveValidation) {
-          stopValidationPolling()
+          stopValidationPolling();
         }
       } catch (pollError) {
-        console.warn('Validation polling stopped', pollError)
-        stopValidationPolling()
+        console.warn("Validation polling stopped", pollError);
+        stopValidationPolling();
       }
-    }, 2500)
-  }, [id, stopValidationPolling])
+    }, 2500);
+  }, [id, stopValidationPolling]);
 
   useEffect(() => {
     return () => {
       if (validationPollRef.current !== null) {
-        window.clearInterval(validationPollRef.current)
+        window.clearInterval(validationPollRef.current);
       }
-    }
-  }, [])
+    };
+  }, []);
 
   useEffect(() => {
     if (!interview) {
-      return
+      return;
     }
 
     const answersWithMedia = interview.answers.filter(
       (answer) => answer.mediaKey || answer.screenMediaKey,
-    )
+    );
     if (answersWithMedia.length === 0) {
-      return
+      return;
     }
 
     answersWithMedia.forEach((answer) => {
-      const existing = mediaByQuestion[answer.questionIndex]
+      const existing = mediaByQuestion[answer.questionIndex];
       if (existing?.loading || existing?.cameraUrl || existing?.screenUrl) {
-        return
+        return;
       }
 
       setMediaByQuestion((current) => ({
@@ -311,7 +346,7 @@ export default function InterviewDetailPage() {
           loading: true,
           errorMessage: undefined,
         },
-      }))
+      }));
 
       void getInterviewAnswerMedia(id, answer.questionIndex)
         .then((media) => {
@@ -322,7 +357,7 @@ export default function InterviewDetailPage() {
               cameraUrl: media.cameraUrl,
               screenUrl: media.screenUrl,
             },
-          }))
+          }));
         })
         .catch((mediaError) => {
           setMediaByQuestion((current) => ({
@@ -330,89 +365,106 @@ export default function InterviewDetailPage() {
             [answer.questionIndex]: {
               loading: false,
               errorMessage:
-                mediaError instanceof Error ? mediaError.message : 'Failed to load media.',
+                mediaError instanceof Error
+                  ? mediaError.message
+                  : "Failed to load media.",
             },
-          }))
-        })
-    })
-  }, [id, interview, mediaByQuestion])
+          }));
+        });
+    });
+  }, [id, interview, mediaByQuestion]);
 
   async function handleCopyCandidateLink() {
     if (!candidateLink) {
-      return
+      return;
     }
 
     try {
-      await navigator.clipboard.writeText(candidateLink)
-      setCopyStatus('copied')
+      await navigator.clipboard.writeText(candidateLink);
+      setCopyStatus("copied");
     } catch {
-      setCopyStatus('error')
+      setCopyStatus("error");
     }
   }
 
   async function handleUpload(questionIndex: number) {
-    const fileInput = fileInputRefs.current[questionIndex]
+    const fileInput = fileInputRefs.current[questionIndex];
     if (!fileInput?.files?.length || !interview) {
-      return
+      return;
     }
 
-    const file = fileInput.files[0]
+    const file = fileInput.files[0];
 
     setUploadStates((current) =>
-      current.map((state, index) => (index === questionIndex ? { status: 'uploading' } : state)),
-    )
+      current.map((state, index) =>
+        index === questionIndex ? { status: "uploading" } : state,
+      ),
+    );
 
     try {
-      const { uploadUrl, mediaKey } = await getPresignedUrl(interview.id, questionIndex, file.type)
+      const { uploadUrl, mediaKey } = await getPresignedUrl(
+        interview.id,
+        questionIndex,
+        file.type,
+      );
 
       const uploadResponse = await fetch(uploadUrl, {
-        method: 'PUT',
-        headers: { 'Content-Type': file.type },
+        method: "PUT",
+        headers: { "Content-Type": file.type },
         body: file,
-      })
+      });
 
       if (!uploadResponse.ok) {
-        throw new Error('Upload to storage failed')
+        throw new Error("Upload to storage failed");
       }
 
-      const updatedInterview = await completeUpload(interview.id, questionIndex, mediaKey)
-      setInterview(updatedInterview)
+      const updatedInterview = await completeUpload(
+        interview.id,
+        questionIndex,
+        mediaKey,
+      );
+      setInterview(updatedInterview);
       setUploadStates((current) =>
         current.map((state, index) =>
-          index === questionIndex ? { status: 'uploaded' } : state,
+          index === questionIndex ? { status: "uploaded" } : state,
         ),
-      )
+      );
     } catch (err) {
       setUploadStates((current) =>
         current.map((state, index) =>
           index === questionIndex
             ? {
-                status: 'error',
-                errorMessage: err instanceof Error ? err.message : 'Upload failed',
+                status: "error",
+                errorMessage:
+                  err instanceof Error ? err.message : "Upload failed",
               }
             : state,
         ),
-      )
+      );
     }
   }
 
   async function handleValidate() {
     if (!interview) {
-      return
+      return;
     }
 
-    setValidating(true)
-    setError(null)
+    setValidating(true);
+    setError(null);
 
     try {
-      await validateInterview(interview.id)
-      const refreshedInterview = await getInterview(interview.id)
-      setInterview(refreshedInterview)
-      setResults(refreshedInterview.result ?? null)
-      startValidationPolling()
+      await validateInterview(interview.id);
+      const refreshedInterview = await getInterview(interview.id);
+      setInterview(refreshedInterview);
+      setResults(refreshedInterview.result ?? null);
+      startValidationPolling();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to validate interview answers.')
-      setValidating(false)
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to validate interview answers.",
+      );
+      setValidating(false);
     }
   }
 
@@ -421,7 +473,7 @@ export default function InterviewDetailPage() {
       <PageShell>
         <LoadingStateCard label="Loading interview..." />
       </PageShell>
-    )
+    );
   }
 
   if (error && !interview) {
@@ -438,30 +490,39 @@ export default function InterviewDetailPage() {
           </UnstyledLink>
         </Button>
       </PageShell>
-    )
+    );
   }
 
   if (!interview) {
-    return null
+    return null;
   }
 
-  const answeredCount = interview.answers.filter((answer) => answer.status === 'submitted').length
+  const answeredCount = interview.answers.filter(
+    (answer) => answer.status === "submitted",
+  ).length;
   const validatedCount = interview.answers.filter(
-    (answer) => answer.validation?.status === 'completed',
-  ).length
+    (answer) => answer.validation?.status === "completed",
+  ).length;
   const hasActiveValidation = interview.answers.some(
     (answer) =>
-      answer.validation?.status === 'queued' || answer.validation?.status === 'processing',
-  )
-  const totalQuestions = interview.questions.length
+      answer.validation?.status === "queued" ||
+      answer.validation?.status === "processing",
+  );
+  const totalQuestions = interview.questions.length;
   const progressValue =
-    answeredCount === 0 ? 0 : Math.round((validatedCount / answeredCount) * 100)
+    answeredCount === 0
+      ? 0
+      : Math.round((validatedCount / answeredCount) * 100);
   const allAnswered = interview.questions.every((_, qi) =>
-    interview.answers.some((answer) => answer.questionIndex === qi && answer.status === 'submitted'),
-  )
-  const isTerminal = interview.status === 'completed' || interview.status === 'failed'
-  const canValidate = allAnswered && !hasActiveValidation && interview.status !== 'completed'
-  const candidateLinkPreview = formatCandidateLinkPreview(candidateLink)
+    interview.answers.some(
+      (answer) => answer.questionIndex === qi && answer.status === "submitted",
+    ),
+  );
+  const isTerminal =
+    interview.status === "completed" || interview.status === "failed";
+  const canValidate =
+    allAnswered && !hasActiveValidation && interview.status !== "completed";
+  const candidateLinkPreview = formatCandidateLinkPreview(candidateLink);
 
   return (
     <PageShell>
@@ -471,7 +532,10 @@ export default function InterviewDetailPage() {
             <Inline gap={4} align="start" justify="between" wrap="wrap">
               <Stack gap={4}>
                 <UnstyledLink href="/">
-                  <EyebrowBadge tone="default" icon={<ArrowLeft className="size-3.5" />}>
+                  <EyebrowBadge
+                    tone="default"
+                    icon={<ArrowLeft className="size-3.5" />}
+                  >
                     Back to dashboard
                   </EyebrowBadge>
                 </UnstyledLink>
@@ -497,25 +561,35 @@ export default function InterviewDetailPage() {
               </Stack>
 
               <Inline gap={3} wrap="wrap">
-                {interview.status !== 'completed' ? (
+                {interview.status !== "completed" ? (
                   <Button
                     type="button"
                     variant="gradient"
                     onClick={handleValidate}
                     disabled={!canValidate || validating || hasActiveValidation}
                   >
-                    {validating || hasActiveValidation ? 'Validating...' : 'Validate'}
+                    {validating || hasActiveValidation
+                      ? "Validating..."
+                      : "Validate"}
                   </Button>
                 ) : null}
               </Inline>
             </Inline>
 
             <Grid columns="metrics-3" gap={4}>
-              <MetricPanel label="Questions" value={totalQuestions} valueSize="lg" />
-              <MetricPanel label="Uploaded" value={answeredCount} valueSize="lg" />
+              <MetricPanel
+                label="Questions"
+                value={totalQuestions}
+                valueSize="lg"
+              />
+              <MetricPanel
+                label="Uploaded"
+                value={answeredCount}
+                valueSize="lg"
+              />
               <MetricPanel
                 label="Overall score"
-                value={results ? results.overallScore : '--'}
+                value={results ? results.overallScore : "--"}
                 valueSize="lg"
               />
             </Grid>
@@ -529,8 +603,8 @@ export default function InterviewDetailPage() {
             </EyebrowBadge>
             <CardTitle size="lg">Interview link</CardTitle>
             <CardDescription>
-              Share this link with the candidate to start the recording flow without recruiter
-              sign-in.
+              Share this link with the candidate to start the recording flow
+              without recruiter sign-in.
             </CardDescription>
           </CardHeader>
           <CardContent spacing="xl">
@@ -546,38 +620,44 @@ export default function InterviewDetailPage() {
                       variant="outline-pill"
                       shape="pill"
                       size="sm"
-                      onClick={() => void loadCandidateLink('refresh')}
-                      disabled={candidateLinkStatus === 'loading'}
+                      onClick={() => void loadCandidateLink("refresh")}
+                      disabled={candidateLinkStatus === "loading"}
                     >
-                      {candidateLinkStatus === 'loading' ? 'Generating...' : 'Refresh link'}
+                      {candidateLinkStatus === "loading"
+                        ? "Generating..."
+                        : "Refresh link"}
                     </Button>
                     <Button
                       type="button"
                       variant="gradient"
                       size="sm"
                       onClick={handleCopyCandidateLink}
-                      disabled={candidateLinkStatus !== 'ready' || !candidateLink}
+                      disabled={
+                        candidateLinkStatus !== "ready" || !candidateLink
+                      }
                     >
                       <Copy className="size-4" />
-                      {copyStatus === 'copied'
-                        ? 'Copied'
-                        : copyStatus === 'error'
-                          ? 'Copy failed'
-                          : 'Copy link'}
+                      {copyStatus === "copied"
+                        ? "Copied"
+                        : copyStatus === "error"
+                          ? "Copy failed"
+                          : "Copy link"}
                     </Button>
                   </Inline>
                 </Inline>
 
                 <BodyText size="sm">
-                  {candidateLinkStatus === 'loading'
-                    ? 'Generating a fresh candidate link...'
-                    : candidateLinkStatus === 'error'
+                  {candidateLinkStatus === "loading"
+                    ? "Generating a fresh candidate link..."
+                    : candidateLinkStatus === "error"
                       ? candidateLinkError
-                      : candidateLinkPreview || 'Candidate link is not available yet.'}
+                      : candidateLinkPreview ||
+                        "Candidate link is not available yet."}
                 </BodyText>
-                {candidateLinkStatus === 'ready' && candidateLink ? (
+                {candidateLinkStatus === "ready" && candidateLink ? (
                   <BodyText size="xs" title={candidateLink}>
-                    Showing a shortened preview here. `Copy link` copies the full secure URL.
+                    Showing a shortened preview here. `Copy link` copies the
+                    full secure URL.
                   </BodyText>
                 ) : null}
               </Stack>
@@ -598,10 +678,10 @@ export default function InterviewDetailPage() {
                 </IconLabel>
                 <BodyText size="sm">
                   {hasActiveValidation
-                    ? 'Validation is running. Re-submit is blocked until the current pass finishes.'
+                    ? "Validation is running. Re-submit is blocked until the current pass finishes."
                     : canValidate
-                      ? 'All submitted answers are ready for one-click validation.'
-                      : 'Validation stays locked until every question has a submitted answer.'}
+                      ? "All submitted answers are ready for one-click validation."
+                      : "Validation stays locked until every question has a submitted answer."}
                 </BodyText>
               </Stack>
             </SurfaceTile>
@@ -616,36 +696,36 @@ export default function InterviewDetailPage() {
                 </Inline>
                 <Progress value={progressValue} density="thick" />
                 <BodyText size="sm">
-                  {validatedCount} of {answeredCount} submitted answers validated.
+                  {validatedCount} of {answeredCount} submitted answers
+                  validated.
                 </BodyText>
               </Stack>
             </SurfaceTile>
 
-            {results ? (
-              <SurfaceTile tone="glass" padding="lg">
-                <Stack gap={3}>
-                  <IconLabel icon={<Layers3 className="size-4 text-[hsl(var(--primary))]" />}>
-                    Results summary
-                  </IconLabel>
-                  <BodyText size="sm">{results.summary}</BodyText>
-                </Stack>
-              </SurfaceTile>
-            ) : null}
-
             {interview.workflow ? (
               <SurfaceTile tone="glass" padding="lg">
                 <Stack gap={3}>
-                  <IconLabel icon={<Layers3 className="size-4 text-[hsl(var(--primary))]" />}>
+                  <IconLabel
+                    icon={
+                      <Layers3 className="size-4 text-[hsl(var(--primary))]" />
+                    }
+                  >
                     Workflow
                   </IconLabel>
                   <BodyText size="sm">
-                    Status: <strong>{interview.workflow.status.replace('_', ' ')}</strong>
+                    Status:{" "}
+                    <strong>
+                      {interview.workflow.status.replace("_", " ")}
+                    </strong>
                     {interview.workflow.currentStage
                       ? ` • stage: ${formatWorkflowStage(interview.workflow.currentStage)}`
-                      : ''}
+                      : ""}
                   </BodyText>
                   <BodyText size="sm">
-                    Last update {new Date(interview.workflow.lastUpdatedAt).toLocaleString()}
+                    Last update{" "}
+                    {new Date(
+                      interview.workflow.lastUpdatedAt,
+                    ).toLocaleString()}
                   </BodyText>
                   {interview.workflow.errorMessage ? (
                     <BodyText size="sm" tone="danger">
@@ -673,16 +753,21 @@ export default function InterviewDetailPage() {
             <SectionHeading>Questions and uploads</SectionHeading>
           </Stack>
           <BodyText size="sm">
-            Upload audio/video manually if the candidate flow was completed outside the browser.
+            Upload audio/video manually if the candidate flow was completed
+            outside the browser.
           </BodyText>
         </Inline>
 
         <Stack gap={4}>
           {interview.questions.map((question, questionIndex) => {
-            const answer = interview.answers.find((item) => item.questionIndex === questionIndex)
-            const hasAnswer = Boolean(answer)
-            const uploadState = uploadStates[questionIndex] ?? { status: 'idle' }
-            const media = mediaByQuestion[questionIndex]
+            const answer = interview.answers.find(
+              (item) => item.questionIndex === questionIndex,
+            );
+            const hasAnswer = Boolean(answer);
+            const uploadState = uploadStates[questionIndex] ?? {
+              status: "idle",
+            };
+            const media = mediaByQuestion[questionIndex];
 
             return (
               <HoverGroup key={question.id}>
@@ -691,14 +776,20 @@ export default function InterviewDetailPage() {
                     <Inline gap={4} align="start" justify="between" wrap="wrap">
                       <Stack gap={3}>
                         <Inline gap={2} align="center" wrap="wrap">
-                          <StatusPill tone="neutral">Q{questionIndex + 1}</StatusPill>
-                          <StatusPill tone={question.difficulty}>{question.difficulty}</StatusPill>
+                          <StatusPill tone="neutral">
+                            Q{questionIndex + 1}
+                          </StatusPill>
+                          <StatusPill tone={question.difficulty}>
+                            {question.difficulty}
+                          </StatusPill>
                           {question.category ? (
                             <StatusPill tone="neutral" casing="chip">
                               {question.category}
                             </StatusPill>
                           ) : null}
-                          <StatusPill tone="neutral">weight {question.weight}</StatusPill>
+                          <StatusPill tone="neutral">
+                            weight {question.weight}
+                          </StatusPill>
                         </Inline>
                         <CardTitle size="md" width="xl">
                           {question.questionText}
@@ -706,20 +797,24 @@ export default function InterviewDetailPage() {
                       </Stack>
 
                       <Stack gap={2} align="end">
-                        {answer?.status === 'submitted' ? (
+                        {answer?.status === "submitted" ? (
                           <StatusPill tone="completed">Submitted</StatusPill>
-                        ) : hasAnswer || uploadState.status === 'uploaded' ? (
+                        ) : hasAnswer || uploadState.status === "uploaded" ? (
                           <StatusPill tone="processing">Draft saved</StatusPill>
-                        ) : uploadState.status === 'uploading' ? (
+                        ) : uploadState.status === "uploading" ? (
                           <StatusPill tone="processing">Uploading</StatusPill>
-                        ) : uploadState.status === 'error' ? (
+                        ) : uploadState.status === "error" ? (
                           <StatusPill tone="failed">Upload failed</StatusPill>
                         ) : (
                           <StatusPill tone="pending">Pending</StatusPill>
                         )}
                         {answer?.validation ? (
-                          <StatusPill tone={getValidationTone(answer.validation.status)}>
-                            {formatValidationStatusLabel(answer.validation.status)}
+                          <StatusPill
+                            tone={getValidationTone(answer.validation.status)}
+                          >
+                            {formatValidationStatusLabel(
+                              answer.validation.status,
+                            )}
                           </StatusPill>
                         ) : null}
 
@@ -727,20 +822,28 @@ export default function InterviewDetailPage() {
                           <>
                             <HiddenFileInput
                               accept="video/*,audio/*"
-                              ref={(element) => setFileInputRef(questionIndex, element)}
+                              ref={(element) =>
+                                setFileInputRef(questionIndex, element)
+                              }
                               onChange={() => handleUpload(questionIndex)}
                             />
                             <Button
                               type="button"
                               variant={
-                                uploadState.status === 'error' ? 'destructive' : 'outline-pill'
+                                uploadState.status === "error"
+                                  ? "destructive"
+                                  : "outline-pill"
                               }
                               shape="pill"
                               size="sm"
-                              onClick={() => fileInputRefs.current[questionIndex]?.click()}
+                              onClick={() =>
+                                fileInputRefs.current[questionIndex]?.click()
+                              }
                             >
                               <Upload className="size-4" />
-                              {uploadState.status === 'error' ? 'Retry upload' : 'Upload file'}
+                              {uploadState.status === "error"
+                                ? "Retry upload"
+                                : "Upload file"}
                             </Button>
                           </>
                         ) : null}
@@ -754,23 +857,30 @@ export default function InterviewDetailPage() {
                           <Stack gap={3}>
                             <EyebrowLabel>Recorded answer</EyebrowLabel>
                             <BodyText size="sm">
-                              Duration {formatAnswerDuration(answer.durationSeconds)} • retakes{' '}
-                              {answer.retakeCount ?? 0}
+                              Duration{" "}
+                              {formatAnswerDuration(answer.durationSeconds)} •
+                              retakes {answer.retakeCount ?? 0}
                             </BodyText>
                             <BodyText size="sm">
-                              Camera {formatFileSize(answer.camera?.fileSizeBytes)} • screen{' '}
+                              Camera{" "}
+                              {formatFileSize(answer.camera?.fileSizeBytes)} •
+                              screen{" "}
                               {formatFileSize(answer.screen?.fileSizeBytes)}
                             </BodyText>
                             <BodyText size="sm">
-                              Status {answer.status} • versions {answer.versions?.length ?? 1}
+                              Status {answer.status} • versions{" "}
+                              {answer.versions?.length ?? 1}
                             </BodyText>
                             <BodyText size="sm">
-                              Uploaded {new Date(answer.uploadedAt).toLocaleString()}
+                              Uploaded{" "}
+                              {new Date(answer.uploadedAt).toLocaleString()}
                             </BodyText>
                             {media?.loading ? (
                               <Inline gap={2} align="center">
                                 <LoaderCircle className="size-4 animate-spin text-muted-foreground" />
-                                <BodyText size="sm">Loading candidate media...</BodyText>
+                                <BodyText size="sm">
+                                  Loading candidate media...
+                                </BodyText>
                               </Inline>
                             ) : null}
                             {media?.errorMessage ? (
@@ -784,17 +894,24 @@ export default function InterviewDetailPage() {
                           <Stack gap={3}>
                             <EyebrowLabel>Validation status</EyebrowLabel>
                             <BodyText size="sm">
-                              Hidden tabs {answer.behaviorSignals?.tabHiddenCount ?? 0} • blur{' '}
-                              {answer.behaviorSignals?.windowBlurCount ?? 0} • paste{' '}
-                              {answer.behaviorSignals?.pasteCount ?? 0}
+                              Hidden tabs{" "}
+                              {answer.behaviorSignals?.tabHiddenCount ?? 0} •
+                              blur{" "}
+                              {answer.behaviorSignals?.windowBlurCount ?? 0} •
+                              paste {answer.behaviorSignals?.pasteCount ?? 0}
                             </BodyText>
                             <BodyText size="sm">
-                              Keydown {answer.behaviorSignals?.keydownCount ?? 0} • resize{' '}
-                              {answer.behaviorSignals?.resizeCount ?? 0}
+                              Keydown{" "}
+                              {answer.behaviorSignals?.keydownCount ?? 0} •
+                              resize {answer.behaviorSignals?.resizeCount ?? 0}
                             </BodyText>
                             <BodyText size="sm">
-                              Transcript {answer.transcript?.text ? 'ready' : 'pending'} • evaluation{' '}
-                              {answer.evaluation?.overallScore !== undefined ? 'ready' : 'pending'}
+                              Transcript{" "}
+                              {answer.transcript?.text ? "ready" : "pending"} •
+                              evaluation{" "}
+                              {answer.evaluation?.overallScore !== undefined
+                                ? "ready"
+                                : "pending"}
                             </BodyText>
                             {answer.validation?.errorMessage ? (
                               <BodyText size="sm" tone="danger">
@@ -829,14 +946,21 @@ export default function InterviewDetailPage() {
                               ) : null}
                             </Inline>
                             <BodyText size="sm">
-                              {answer.evaluation.summary ?? 'Summary is not available yet.'}
+                              {answer.evaluation.summary ??
+                                "Summary is not available yet."}
                             </BodyText>
                             {answer.evaluation.categoryScores &&
-                            Object.keys(answer.evaluation.categoryScores).length > 0 ? (
+                            Object.keys(answer.evaluation.categoryScores)
+                              .length > 0 ? (
                               <BodyText size="sm">
-                                {Object.entries(answer.evaluation.categoryScores)
-                                  .map(([category, score]) => `${category}: ${score}`)
-                                  .join(' • ')}
+                                {Object.entries(
+                                  answer.evaluation.categoryScores,
+                                )
+                                  .map(
+                                    ([category, score]) =>
+                                      `${category}: ${score}`,
+                                  )
+                                  .join(" • ")}
                               </BodyText>
                             ) : null}
                           </Stack>
@@ -845,22 +969,22 @@ export default function InterviewDetailPage() {
                           <Stack gap={3}>
                             <EyebrowLabel>Detailed rubric result</EyebrowLabel>
                             <BodyText size="sm">
-                              Covered:{' '}
+                              Covered:{" "}
                               {answer.evaluation.coveredConceptIds?.length
-                                ? answer.evaluation.coveredConceptIds.join(', ')
-                                : 'none'}
+                                ? answer.evaluation.coveredConceptIds.join(", ")
+                                : "none"}
                             </BodyText>
                             <BodyText size="sm">
-                              Missed:{' '}
+                              Missed:{" "}
                               {answer.evaluation.missedConceptIds?.length
-                                ? answer.evaluation.missedConceptIds.join(', ')
-                                : 'none'}
+                                ? answer.evaluation.missedConceptIds.join(", ")
+                                : "none"}
                             </BodyText>
                             <BodyText size="sm">
-                              Red flags:{' '}
+                              Red flags:{" "}
                               {answer.evaluation.redFlagIds?.length
-                                ? answer.evaluation.redFlagIds.join(', ')
-                                : 'none'}
+                                ? answer.evaluation.redFlagIds.join(", ")
+                                : "none"}
                             </BodyText>
                           </Stack>
                         </SurfaceTile>
@@ -919,8 +1043,10 @@ export default function InterviewDetailPage() {
                           <EyebrowLabel>Expected concepts</EyebrowLabel>
                           <BodyText size="sm">
                             {question.expectedConcepts.length > 0
-                              ? question.expectedConcepts.map((item) => item.label).join(', ')
-                              : 'Not specified'}
+                              ? question.expectedConcepts
+                                  .map((item) => item.label)
+                                  .join(", ")
+                              : "Not specified"}
                           </BodyText>
                         </Stack>
                       </SurfaceTile>
@@ -929,24 +1055,29 @@ export default function InterviewDetailPage() {
                           <EyebrowLabel>Red flags</EyebrowLabel>
                           <BodyText size="sm">
                             {question.redFlags.length > 0
-                              ? question.redFlags.map((item) => item.label).join(', ')
-                              : 'Not specified'}
+                              ? question.redFlags
+                                  .map((item) => item.label)
+                                  .join(", ")
+                              : "Not specified"}
                           </BodyText>
                         </Stack>
                       </SurfaceTile>
                     </Grid>
 
-                    {uploadState.status === 'error' && uploadState.errorMessage ? (
+                    {uploadState.status === "error" &&
+                    uploadState.errorMessage ? (
                       <Alert variant="danger">
                         <CircleAlert className="size-4" />
                         <AlertTitle>Upload error</AlertTitle>
-                        <AlertDescription>{uploadState.errorMessage}</AlertDescription>
+                        <AlertDescription>
+                          {uploadState.errorMessage}
+                        </AlertDescription>
                       </Alert>
                     ) : null}
                   </CardContent>
                 </Card>
               </HoverGroup>
-            )
+            );
           })}
         </Stack>
       </Section>
@@ -959,51 +1090,156 @@ export default function InterviewDetailPage() {
               <SectionHeading>Interview results</SectionHeading>
             </Stack>
             <BodyText size="sm">
-              Candidate feedback remains a tokenized route shared separately from the recruiter UI.
+              Candidate feedback remains a tokenized route shared separately
+              from the recruiter UI.
             </BodyText>
           </Inline>
 
-          <Grid columns="split-85-115" gap={4}>
+          <Grid columns="split-115-85" gap={4}>
             <Card variant="surface" size="lg">
               <CardContent spacing="lg">
-                <EyebrowBadge icon={<FileVideo2 className="size-3.5" />} tone="primary">
-                  Overall score
-                </EyebrowBadge>
-                <HeroNumber>{results.overallScore}</HeroNumber>
-                <BodyText size="lead">{results.summary}</BodyText>
-                <Inline gap={2} wrap="wrap">
-                  {results.decision ? (
-                    <StatusPill tone="neutral">{results.decision}</StatusPill>
+                <Stack gap={5}>
+                  <Stack gap={3}>
+                    <EyebrowBadge
+                      icon={<Layers3 className="size-3.5" />}
+                      tone="primary"
+                    >
+                      Results summary
+                    </EyebrowBadge>
+                    <BodyText size="lead">{results.summary}</BodyText>
+                    <Inline gap={2} wrap="wrap">
+                      {results.decision ? (
+                        <StatusPill tone="neutral">
+                          {results.decision}
+                        </StatusPill>
+                      ) : null}
+                      {results.trustScore !== undefined ? (
+                        <StatusPill tone="neutral">
+                          trust {results.trustScore}
+                        </StatusPill>
+                      ) : null}
+                      {results.rubricVersion ? (
+                        <StatusPill tone="neutral">
+                          {results.rubricVersion}
+                        </StatusPill>
+                      ) : null}
+                    </Inline>
+                    {results.trustFlags?.length ? (
+                      <BodyText size="lead">
+                        Flags: {results.trustFlags.join(", ")}
+                      </BodyText>
+                    ) : null}
+                  </Stack>
+
+                  {results.questionResults?.length ? (
+                    <Stack gap={4}>
+                      <IconLabel
+                        icon={
+                          <FileVideo2 className="size-4 text-[hsl(var(--primary))]" />
+                        }
+                      >
+                        Question breakdown
+                      </IconLabel>
+                      <Stack gap={3}>
+                        {results.questionResults.map((questionResult) => (
+                          <SurfaceTile
+                            key={questionResult.questionId}
+                            tone="elevated"
+                            padding="lg"
+                            rounded="xl"
+                          >
+                            <Stack gap={4}>
+                              <Inline
+                                gap={3}
+                                align="center"
+                                justify="between"
+                                wrap="wrap"
+                              >
+                                <Stack gap={1}>
+                                  <EyebrowLabel>
+                                    Question {questionResult.questionIndex + 1}
+                                  </EyebrowLabel>
+                                  {questionResult.summary ? (
+                                    <BodyText size="sm">
+                                      {questionResult.summary}
+                                    </BodyText>
+                                  ) : null}
+                                </Stack>
+                                <Inline gap={2} align="center" wrap="wrap">
+                                  {questionResult.decisionHint ? (
+                                    <StatusPill tone="neutral">
+                                      {questionResult.decisionHint}
+                                    </StatusPill>
+                                  ) : null}
+                                  {questionResult.score !== undefined ? (
+                                    <StatusPill tone="completed">
+                                      score {questionResult.score}
+                                    </StatusPill>
+                                  ) : null}
+                                </Inline>
+                              </Inline>
+
+                              {questionResult.categoryScores &&
+                              Object.keys(questionResult.categoryScores)
+                                .length > 0 ? (
+                                <Grid columns={3} gap={3}>
+                                  {Object.entries(
+                                    questionResult.categoryScores,
+                                  ).map(([category, score]) => (
+                                    <MetricPanel
+                                      key={`${questionResult.questionId}-${category}`}
+                                      tone="compact"
+                                      label={formatMetricLabel(category)}
+                                      value={score}
+                                      valueSize="md"
+                                      valueTone="primary"
+                                      description="out of 100"
+                                    />
+                                  ))}
+                                </Grid>
+                              ) : null}
+                            </Stack>
+                          </SurfaceTile>
+                        ))}
+                      </Stack>
+                    </Stack>
                   ) : null}
-                  {results.trustScore !== undefined ? (
-                    <StatusPill tone="neutral">trust {results.trustScore}</StatusPill>
-                  ) : null}
-                  {results.rubricVersion ? (
-                    <StatusPill tone="neutral">{results.rubricVersion}</StatusPill>
-                  ) : null}
-                </Inline>
-                {results.trustFlags?.length ? (
-                  <BodyText size="lead">Flags: {results.trustFlags.join(', ')}</BodyText>
-                ) : null}
+                </Stack>
               </CardContent>
             </Card>
 
-            <Grid columns="metrics-3" gap={4}>
-              {Object.entries(results.categoryScores).map(([category, score]) => (
-                <MetricPanel
-                  key={category}
-                  tone="surface"
-                  label={category}
-                  value={score}
-                  description="out of 100"
-                  valueSize="hero"
-                  valueTone="primary"
-                />
-              ))}
-            </Grid>
+            <Stack gap={4}>
+              <Card variant="surface" size="lg">
+                <CardContent spacing="lg">
+                  <EyebrowBadge
+                    icon={<FileVideo2 className="size-3.5" />}
+                    tone="primary"
+                  >
+                    Overall score
+                  </EyebrowBadge>
+                  <HeroNumber>{results.overallScore}</HeroNumber>
+                </CardContent>
+              </Card>
+
+              <Grid columns={1} gap={4}>
+                {Object.entries(results.categoryScores).map(
+                  ([category, score]) => (
+                    <MetricPanel
+                      key={category}
+                      tone="surface"
+                      label={formatMetricLabel(category)}
+                      value={score}
+                      description="out of 100"
+                      valueSize="hero"
+                      valueTone="primary"
+                    />
+                  ),
+                )}
+              </Grid>
+            </Stack>
           </Grid>
         </Section>
       ) : null}
     </PageShell>
-  )
+  );
 }
