@@ -95,7 +95,7 @@ export function MetricPanel({
     <div className={metricPanelVariants({ tone })}>
       {hasIcon ? (
         <div className="flex items-center gap-3 text-muted-foreground">
-          <span className="shrink-0">{icon}</span>
+          <span className="shrink-0 [&_svg]:size-4">{icon}</span>
           <span className={labelVariants({ variant: resolvedLabelVariant })}>
             {label}
           </span>

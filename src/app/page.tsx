@@ -262,19 +262,19 @@ export default function DashboardPage() {
 
             <Grid columns="metrics-3" gap={4}>
               <MetricPanel
-                icon={<CircleDashed className="size-4" />}
+                icon={<CircleDashed />}
                 label="Active"
                 value={activeCount}
                 description="Interviews currently waiting on answers, uploads, or scoring."
               />
               <MetricPanel
-                icon={<Users className="size-4" />}
+                icon={<Users />}
                 label="Candidates"
                 value={interviews.length}
                 description="Total candidate records visible in the current workspace."
               />
               <MetricPanel
-                icon={<ListChecks className="size-4" />}
+                icon={<ListChecks />}
                 label="Question Load"
                 value={questionVolume}
                 description="Questions currently attached across all visible interviews."
