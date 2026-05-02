@@ -411,9 +411,12 @@ export default function TakeInterviewPage() {
   }
 
   useEffect(() => {
-    void loadInterview('initial', candidateToken)
+    const loadTimer = window.setTimeout(() => {
+      void loadInterview('initial', candidateToken)
+    }, 0)
 
     return () => {
+      window.clearTimeout(loadTimer)
       clearProgressTimers()
       void abortMultipartUploads()
       releaseCaptureStreams()

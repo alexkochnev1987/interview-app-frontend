@@ -47,6 +47,7 @@ const bodyTextVariants = cva('', {
       'sm-tight': 'text-sm font-medium',
     },
     tone: {
+      inherit: 'text-inherit',
       foreground: 'text-foreground',
       muted: 'text-muted-foreground',
       danger: 'text-danger-soft-foreground',

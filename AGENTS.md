@@ -7,6 +7,16 @@ Keep Tailwind and `shadcn/ui` maintainable by preserving a strict UI boundary.
 Raw Tailwind utility classes belong only in `src/components/ui/**`.
 Application and feature files must consume semantic UI components, layout primitives, and variant APIs instead of embedding utility strings.
 
+## App Router Architecture Rules
+- Default to Server Components in `src/app/**`.
+- `page.tsx`, `layout.tsx`, and route-level composition should stay server-side unless they require browser-only APIs or live client interaction.
+- Initial data fetching must happen on the server whenever the data can be loaded during render.
+- Prefer passing server-fetched data into small client islands instead of making the whole page client-side.
+- Use `"use client"` only when the component needs browser APIs such as `window`, `document`, `navigator`, file inputs, media devices, clipboard, timers, or client-only hooks like `useState`, `useEffect`, and `useRef`.
+- If a page needs polling, uploads, optimistic UI, or event-driven local state, isolate that behavior into the smallest practical client component.
+- Do not move fetch logic to the client by default. Client-side fetching is the exception and must be justified by live updates, browser-only context, or user-triggered interactions.
+- When reviewing or refactoring a page, first ask whether the server can own the initial fetch and static shell before introducing or keeping `"use client"`.
+
 ## Layer Boundaries
 - `src/components/ui/**` owns Tailwind classes, `cva` variants, slots, tokens, typography, colors, radius, borders, shadows, and interactive states.
 - `src/components/ui/layout/**` owns layout primitives such as `Stack`, `Inline`, `Cluster`, `Grid`, `Container`, and `Section`.
