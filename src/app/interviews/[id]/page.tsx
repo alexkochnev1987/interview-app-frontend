@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { unstable_noStore as noStore } from "next/cache";
 
 import InterviewDetailClient from "./interview-detail-client";
@@ -16,12 +16,25 @@ interface InterviewDetailPageProps {
   }>;
 }
 
-function getBackendUrl() {
-  return process.env.BACKEND_URL || "http://localhost:3000";
+function getRequestOrigin(headerStore: Headers) {
+  const forwardedProto = headerStore.get("x-forwarded-proto");
+  const forwardedHost = headerStore.get("x-forwarded-host");
+  const host = forwardedHost ?? headerStore.get("host");
+  const protocol = forwardedProto ?? (host?.includes("localhost") ? "http" : "https");
+
+  if (!host) {
+    throw new Error("Unable to resolve request host for server API fetch.");
+  }
+
+  return `${protocol}://${host}`;
 }
 
-async function requestServer<T>(path: string, cookieHeader: string) {
-  const res = await fetch(`${getBackendUrl()}${path}`, {
+async function requestServer<T>(
+  path: string,
+  cookieHeader: string,
+  origin: string,
+) {
+  const res = await fetch(`${origin}/api${path}`, {
     headers: {
       "Content-Type": "application/json",
       cookie: cookieHeader,
@@ -39,13 +52,25 @@ async function requestServer<T>(path: string, cookieHeader: string) {
     return undefined as T;
   }
 
+  const contentType = res.headers.get("content-type") ?? "";
+  if (!contentType.includes("application/json")) {
+    throw new Error(
+      `Expected JSON from /api${path}, got ${contentType || "unknown content type"}.`,
+    );
+  }
+
   return JSON.parse(body) as T;
 }
 
-async function loadInterviewPageData(id: string, cookieHeader: string) {
+async function loadInterviewPageData(
+  id: string,
+  cookieHeader: string,
+  origin: string,
+) {
   const interview = await requestServer<Interview>(
     `/interviews/${id}`,
     cookieHeader,
+    origin,
   );
 
   let results: InterviewResult | null = interview.result ?? null;
@@ -55,6 +80,7 @@ async function loadInterviewPageData(id: string, cookieHeader: string) {
       results = await requestServer<InterviewResult>(
         `/interviews/${id}/results`,
         cookieHeader,
+        origin,
       );
     } catch {
       results = interview.result ?? null;
@@ -74,16 +100,22 @@ export default async function InterviewDetailPage({
 
   const { id } = await params;
   const cookieStore = await cookies();
+  const headerStore = await headers();
   const cookieHeader = cookieStore
     .getAll()
     .map(({ name, value }) => `${name}=${value}`)
     .join("; ");
+  const origin = getRequestOrigin(headerStore);
 
   let interview: Interview;
   let results: InterviewResult | null;
 
   try {
-    ({ interview, results } = await loadInterviewPageData(id, cookieHeader));
+    ({ interview, results } = await loadInterviewPageData(
+      id,
+      cookieHeader,
+      origin,
+    ));
   } catch (error) {
     return (
       <PageShell spacing="tight">
