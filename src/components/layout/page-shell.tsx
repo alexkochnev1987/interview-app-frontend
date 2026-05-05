@@ -3,39 +3,11 @@ import type { ReactNode } from 'react'
 import { Container, Grid, Stack } from '@/components/ui/layout'
 import { PageFrame } from '@/components/ui/page-frame'
 
-interface PageMainProps {
+type ChildrenProps = {
   children: ReactNode
 }
 
-interface PageMainWideGapProps {
-  children: ReactNode
-}
-
-interface PageMainLayoutProps {
-  children: ReactNode
-}
-
-interface PageMainEditorProps {
-  children: ReactNode
-}
-
-interface PageMainTightProps {
-  children: ReactNode
-}
-
-interface PageMainCompactStackProps {
-  children: ReactNode
-}
-
-interface LoginPageShellProps {
-  children: ReactNode
-}
-
-interface PageContentProps {
-  children: ReactNode
-}
-
-export function PageMain({ children }: PageMainProps) {
+export function PageMain({ children }: ChildrenProps) {
   return (
     <PageFrame as="main" spacing="page">
       <Container width="default">
@@ -45,7 +17,7 @@ export function PageMain({ children }: PageMainProps) {
   )
 }
 
-export function PageMainWideGap({ children }: PageMainWideGapProps) {
+export function PageMainWideGap({ children }: ChildrenProps) {
   return (
     <PageFrame as="main" spacing="page">
       <Container width="default">
@@ -55,7 +27,7 @@ export function PageMainWideGap({ children }: PageMainWideGapProps) {
   )
 }
 
-export function PageMainLayout({ children }: PageMainLayoutProps) {
+export function PageMainLayout({ children }: ChildrenProps) {
   return (
     <PageFrame as="main" spacing="compact">
       <Container width="default">{children}</Container>
@@ -65,7 +37,7 @@ export function PageMainLayout({ children }: PageMainLayoutProps) {
 
 export const PageMainCompact = PageMainLayout
 
-export function PageMainEditor({ children }: PageMainEditorProps) {
+export function PageMainEditor({ children }: ChildrenProps) {
   return (
     <PageFrame as="main" spacing="page">
       <Container width="default">
@@ -75,7 +47,7 @@ export function PageMainEditor({ children }: PageMainEditorProps) {
   )
 }
 
-export function PageMainTight({ children }: PageMainTightProps) {
+export function PageMainTight({ children }: ChildrenProps) {
   return (
     <PageFrame as="main" spacing="page">
       <Container width="default">{children}</Container>
@@ -83,7 +55,7 @@ export function PageMainTight({ children }: PageMainTightProps) {
   )
 }
 
-export function PageMainCompactStack({ children }: PageMainCompactStackProps) {
+export function PageMainCompactStack({ children }: ChildrenProps) {
   return (
     <PageFrame as="main" spacing="compact">
       <Container width="default">
@@ -93,7 +65,7 @@ export function PageMainCompactStack({ children }: PageMainCompactStackProps) {
   )
 }
 
-export function LoginPageShell({ children }: LoginPageShellProps) {
+export function LoginPageShell({ children }: ChildrenProps) {
   return (
     <PageFrame as="main" spacing="login">
       <Container width="default">
@@ -105,7 +77,7 @@ export function LoginPageShell({ children }: LoginPageShellProps) {
   )
 }
 
-export function PageContent({ children }: PageContentProps) {
+export function PageContent({ children }: ChildrenProps) {
   return (
     <Container width="prose" align="center">
       {children}

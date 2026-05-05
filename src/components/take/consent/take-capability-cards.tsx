@@ -13,6 +13,25 @@ interface CapabilityCardProps {
   description: ReactNode;
 }
 
+const CAPABILITY_ITEMS: CapabilityCardProps[] = [
+  { icon: Camera, title: 'Camera', description: 'Recorded separately for every answer.' },
+  { icon: Mic, title: 'Microphone', description: 'Captured together with your camera feed.' },
+  {
+    icon: Video,
+    title: 'Entire screen',
+    description: (
+      <>
+        Must be shared as <strong>Entire screen</strong>, not a tab or app window.
+      </>
+    ),
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Fairness checks',
+    description: 'Session and browser activity may be stored for evaluation integrity.',
+  },
+];
+
 function CapabilityCard({ icon: Icon, title, description }: CapabilityCardProps) {
   return (
     <SurfaceCard tone="mutedSoft">
@@ -32,24 +51,9 @@ function CapabilityCard({ icon: Icon, title, description }: CapabilityCardProps)
 }
 
 export function TakeCapabilityCards() {
-  const items: CapabilityCardProps[] = [
-    { icon: Camera, title: 'Camera', description: 'Recorded separately for every answer.' },
-    { icon: Mic, title: 'Microphone', description: 'Captured together with your camera feed.' },
-    {
-      icon: Video,
-      title: 'Entire screen',
-      description: (
-        <>
-          Must be shared as <strong>Entire screen</strong>, not a tab or app window.
-        </>
-      ),
-    },
-    { icon: ShieldCheck, title: 'Fairness checks', description: 'Session and browser activity may be stored for evaluation integrity.' },
-  ];
-
   return (
     <Grid columns="consent-info-4" gap={4}>
-      {items.map((item) => (
+      {CAPABILITY_ITEMS.map((item) => (
         <CapabilityCard key={item.title} icon={item.icon} title={item.title} description={item.description} />
       ))}
     </Grid>
