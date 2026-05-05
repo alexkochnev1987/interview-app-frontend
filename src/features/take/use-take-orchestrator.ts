@@ -67,6 +67,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
   const [transitionLabel, setTransitionLabel] = useState('');
 
   const videoRef = useRef<HTMLVideoElement>(null);
+  const screenVideoRef = useRef<HTMLVideoElement>(null);
   const cameraRecorderRef = useRef<MediaRecorder | null>(null);
   const screenRecorderRef = useRef<MediaRecorder | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -98,6 +99,32 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
       void videoRef.current.play().catch(() => undefined);
     }
   }
+
+  useEffect(() => {
+    if (stage !== 'interview' && stage !== 'recording') {
+      return;
+    }
+
+    const cameraPreviewNode = videoRef.current;
+    const cameraStream = cameraStreamRef.current;
+    if (cameraPreviewNode && cameraStream) {
+      if (cameraPreviewNode.srcObject !== cameraStream) {
+        cameraPreviewNode.srcObject = cameraStream;
+      }
+
+      void cameraPreviewNode.play().catch(() => undefined);
+    }
+
+    const screenPreviewNode = screenVideoRef.current;
+    const screenStream = screenStreamRef.current;
+    if (screenPreviewNode && screenStream) {
+      if (screenPreviewNode.srcObject !== screenStream) {
+        screenPreviewNode.srcObject = screenStream;
+      }
+
+      void screenPreviewNode.play().catch(() => undefined);
+    }
+  }, [stage, recording]);
 
   function clearRecordingArtifacts() {
     clearProgressTimers(timerRef, progressHeartbeatRef, progressFlushTimeoutRef);
@@ -135,6 +162,9 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     setTransitionLabel('');
     autoStartedQuestionKeyRef.current = '';
     releaseCaptureStreams(cameraStreamRef, screenStreamRef, videoRef);
+    if (screenVideoRef.current) {
+      screenVideoRef.current.srcObject = null;
+    }
     setStage('consent');
   }
 
@@ -148,6 +178,9 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
       }
       if (data.completed) {
         releaseCaptureStreams(cameraStreamRef, screenStreamRef, videoRef);
+        if (screenVideoRef.current) {
+          screenVideoRef.current.srcObject = null;
+        }
       }
       setStage(stageAfterInterviewLoad(data, mode));
     },
@@ -156,6 +189,9 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
       clearProgressTimers(timerRef, progressHeartbeatRef, progressFlushTimeoutRef);
       void abortMultipartUploads();
       releaseCaptureStreams(cameraStreamRef, screenStreamRef, videoRef);
+      if (screenVideoRef.current) {
+        screenVideoRef.current.srcObject = null;
+      }
     },
   });
 
@@ -393,6 +429,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     setupError,
     transitionLabel,
     videoRef,
+    screenVideoRef,
     isBrowserTranscriptSupported,
     finalTranscript,
     interimTranscript,

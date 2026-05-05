@@ -34,6 +34,7 @@ export default function TakeInterviewPage() {
     interimTranscript,
     browserTranscriptWarning,
     videoRef,
+    screenVideoRef,
     progressValue,
     setConsent,
     handleStartInterview,
@@ -105,6 +106,7 @@ export default function TakeInterviewPage() {
       interimTranscript={interimTranscript}
       browserTranscriptWarning={browserTranscriptWarning}
       videoRef={videoRef}
+      screenVideoRef={screenVideoRef}
       formatTime={formatTime}
       onRerecord={() => requestVersionAction('rerecord')}
       onSubmit={() => requestVersionAction('submit')}

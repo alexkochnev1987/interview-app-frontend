@@ -29,6 +29,7 @@ interface TakeRecordingScreenProps {
   interimTranscript: string;
   browserTranscriptWarning?: string;
   videoRef: RefObject<HTMLVideoElement | null>;
+  screenVideoRef: RefObject<HTMLVideoElement | null>;
   formatTime: (seconds: number) => string;
   onRerecord: () => void;
   onSubmit: () => void;
@@ -50,6 +51,7 @@ export function TakeRecordingScreen({
   interimTranscript,
   browserTranscriptWarning,
   videoRef,
+  screenVideoRef,
   formatTime,
   onRerecord,
   onSubmit,
@@ -84,6 +86,7 @@ export function TakeRecordingScreen({
                 timeLeft={timeLeft}
                 formatTime={formatTime}
                 videoRef={videoRef}
+                screenVideoRef={screenVideoRef}
               />
 
               <LiveTranscriptPanel

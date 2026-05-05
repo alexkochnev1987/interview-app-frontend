@@ -6,6 +6,7 @@ interface TakeRecordingPreviewProps {
   timeLeft: number;
   formatTime: (seconds: number) => string;
   videoRef: RefObject<HTMLVideoElement | null>;
+  screenVideoRef: RefObject<HTMLVideoElement | null>;
 }
 
 export function TakeRecordingPreview({
@@ -13,10 +14,12 @@ export function TakeRecordingPreview({
   timeLeft,
   formatTime,
   videoRef,
+  screenVideoRef,
 }: TakeRecordingPreviewProps) {
   return (
     <TakeVideoContainer>
-      <video ref={videoRef} autoPlay muted playsInline className="video-preview" />
+      <video ref={screenVideoRef} autoPlay muted playsInline className="video-preview video-preview-screen" />
+      <video ref={videoRef} autoPlay muted playsInline className="video-preview video-preview-camera" />
 
       {isRecording ? (
         <div className="timer">
