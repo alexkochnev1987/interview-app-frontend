@@ -1,16 +1,14 @@
-import { EyebrowLabel } from '@/components/ui/eyebrow-label'
-import { Stack } from '@/components/ui/layout/stack'
-import { SurfaceTile } from '@/components/ui/surface-tile'
-import { BodyText } from '@/components/ui/text'
-
-type TakeStage = 'loading' | 'consent' | 'interview' | 'recording' | 'transition' | 'complete'
+import { Text } from '@/components/ui/text';
+import { TakePanel } from '@/components/take/take-panel';
+import { Stack } from '@/components/ui/layout';
+import type { TakeStage } from '@/components/take/types';
 
 interface LiveTranscriptPanelProps {
-  isSupported: boolean
-  finalTranscript: string
-  interimTranscript: string
-  warning?: string
-  stage: TakeStage
+  isSupported: boolean;
+  finalTranscript: string;
+  interimTranscript: string;
+  warning?: string;
+  stage: TakeStage;
 }
 
 export function LiveTranscriptPanel({
@@ -21,38 +19,38 @@ export function LiveTranscriptPanel({
   stage,
 }: LiveTranscriptPanelProps) {
   return (
-    <SurfaceTile rounded="xl" minHeight="transcript">
+    <TakePanel minHeight="transcript">
       <Stack gap={2}>
-        <EyebrowLabel>Live transcript</EyebrowLabel>
+        <Text as="span" variant="eyebrowLabel">
+          Live transcript
+        </Text>
         {!isSupported ? (
-          <BodyText size="sm">
+          <Text variant="bodyMutedSm">
             Live transcript is unavailable in this browser. Recording continues as usual.
-          </BodyText>
+          </Text>
         ) : (
-          <BodyText size="sm" tone="foreground">
+          <Text variant="bodySm">
             {finalTranscript || interimTranscript ? (
               <>
                 {finalTranscript}
                 {interimTranscript ? (
-                  <BodyText as="span" size="sm" tone="muted">
-                    <em> {interimTranscript} (draft)</em>
-                  </BodyText>
+                  <Text as="span" variant="transcriptDraft">
+                    {interimTranscript} (draft)
+                  </Text>
                 ) : null}
               </>
             ) : (
               'Transcript will appear while you speak...'
             )}
-          </BodyText>
+          </Text>
         )}
         {stage === 'transition' ? (
-          <BodyText size="xs">Updating transcript for the next question...</BodyText>
+          <Text variant="captionMutedXs">Updating transcript for the next question...</Text>
         ) : null}
         {warning ? (
-          <BodyText size="xs" tone="warning">
-            {warning}
-          </BodyText>
+          <Text variant="captionWarningXs">{warning}</Text>
         ) : null}
       </Stack>
-    </SurfaceTile>
-  )
+    </TakePanel>
+  );
 }
