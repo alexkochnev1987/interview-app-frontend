@@ -11,6 +11,8 @@ const statusPillVariants = cva(
       tone: {
         neutral:
           "bg-[hsl(var(--surface-low))] text-[hsl(var(--muted-foreground))] ring-1 ring-[hsl(var(--border)/0.55)]",
+        neutral_meta:
+          "bg-[hsl(var(--surface-low))] text-[hsl(var(--muted-foreground))] ring-1 ring-[hsl(var(--border)/0.55)] normal-case tracking-[0.08em]",
         pending: "bg-amber-100 text-amber-800 ring-1 ring-amber-200",
         in_progress: "bg-sky-100 text-sky-800 ring-1 ring-sky-200",
         processing: "bg-orange-100 text-orange-800 ring-1 ring-orange-200",
@@ -31,6 +33,8 @@ const statusPillVariants = cva(
     },
   },
 )
+
+export type StatusTone = NonNullable<VariantProps<typeof statusPillVariants>["tone"]>
 
 interface StatusPillProps
   extends Omit<ComponentProps<"span">, "color">,
