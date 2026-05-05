@@ -64,6 +64,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
   const [screenSurface, setScreenSurface] = useState('');
   const [setupBusy, setSetupBusy] = useState(false);
   const [setupError, setSetupError] = useState('');
+  const [submitError, setSubmitError] = useState('');
   const [transitionLabel, setTransitionLabel] = useState('');
 
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -87,6 +88,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
   const flushedBehaviorEventCountRef = useRef(0);
   const progressRequestChainRef = useRef(Promise.resolve());
   const pendingVersionActionRef = useRef<PendingVersionAction>(null);
+  const persistInFlightRef = useRef(false);
   const multipartUploadsRef = useRef<MultipartUploadState>({ camera: null, screen: null });
   const beginRecordingRef = useRef<
     (nextVersionNumber: number, currentQuestionIndex: number) => Promise<void>
@@ -251,8 +253,11 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
 
   async function persistCurrentVersion(action: Exclude<PendingVersionAction, null>) {
     if (!interview) return;
+    if (persistInFlightRef.current) return;
+    persistInFlightRef.current = true;
     setUploading(true);
     try {
+      setSubmitError('');
       await enqueueProgressFlush(true);
       await Promise.all([queueBufferedUpload('camera', true), queueBufferedUpload('screen', true)]);
       await Promise.all([completeMultipartUpload('camera'), completeMultipartUpload('screen')]);
@@ -268,7 +273,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
         : submittedAt;
 
       await submitTakeAnswer(id, {
-        questionIndex: interview.currentQuestionIndex,
+        questionIndex: cameraUpload.questionIndex,
         versionNumber: currentVersionNumberRef.current,
         submitAnswer: action === 'submit',
         mediaKey: cameraUpload.mediaKey,
@@ -297,7 +302,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
       pendingVersionActionRef.current = null;
 
       if (action === 'submit') {
-        lastSubmittedQuestionIndexRef.current = interview.currentQuestionIndex;
+        lastSubmittedQuestionIndexRef.current = cameraUpload.questionIndex;
         setCurrentVersionNumber(1);
         currentVersionNumberRef.current = 1;
         setRetakeCount(0);
@@ -315,12 +320,13 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
       }
     } catch (err) {
       await abortMultipartUploads();
-      setSetupError(err instanceof Error ? err.message : 'Upload failed');
+      setSubmitError(err instanceof Error ? err.message : 'Upload failed');
       autoStartedQuestionKeyRef.current = '';
       setStage('interview');
     } finally {
       setTransitionLabel('');
       setUploading(false);
+      persistInFlightRef.current = false;
     }
   }
 
@@ -374,6 +380,26 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     scheduleProgressFlush,
     stopActiveRecorders,
   });
+
+  const requestSubmitAction = () => {
+    setSubmitError('');
+    const activeCameraUpload = multipartUploadsRef.current.camera;
+    const activeScreenUpload = multipartUploadsRef.current.screen;
+    const currentQuestionIndex = interview?.currentQuestionIndex;
+
+    const isUploadSessionSynced =
+      currentQuestionIndex !== undefined &&
+      activeCameraUpload?.questionIndex === currentQuestionIndex &&
+      activeScreenUpload?.questionIndex === currentQuestionIndex;
+
+    if (!isUploadSessionSynced) {
+      setSubmitError('Recording is still syncing for this question. Try submitting again in a moment.');
+      return;
+    }
+
+    requestVersionAction('submit');
+  };
+
   useEffect(() => {
     requestVersionActionRef.current = requestVersionAction;
   }, [requestVersionAction]);
@@ -436,7 +462,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     screenStatus,
     screenSurface,
     setupBusy,
-    setupError,
+    setupError: submitError || setupError,
     transitionLabel,
     videoRef,
     screenVideoRef,
@@ -446,7 +472,14 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     browserTranscriptWarning,
     setConsent,
     handleStartInterview,
-    requestVersionAction,
+    requestVersionAction: (action: PendingVersionAction) => {
+      if (action === 'submit') {
+        requestSubmitAction();
+        return;
+      }
+      setSubmitError('');
+      requestVersionAction(action);
+    },
     permissionLabel,
     permissionTone,
     formatTime,
