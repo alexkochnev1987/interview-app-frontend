@@ -28,7 +28,7 @@ interface TakeRecordingScreenProps {
   finalTranscript: string;
   interimTranscript: string;
   browserTranscriptWarning?: string;
-  videoRef: RefObject<HTMLVideoElement>;
+  videoRef: RefObject<HTMLVideoElement | null>;
   formatTime: (seconds: number) => string;
   onRerecord: () => void;
   onSubmit: () => void;

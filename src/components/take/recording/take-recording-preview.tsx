@@ -5,7 +5,7 @@ interface TakeRecordingPreviewProps {
   isRecording: boolean;
   timeLeft: number;
   formatTime: (seconds: number) => string;
-  videoRef: RefObject<HTMLVideoElement>;
+  videoRef: RefObject<HTMLVideoElement | null>;
 }
 
 export function TakeRecordingPreview({
