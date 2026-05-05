@@ -4,7 +4,7 @@ import type { ClientTranscriptPayload } from '@/lib/api';
 export type CaptureTarget = 'camera' | 'screen';
 
 export interface AnswerBehaviorEvent {
-  eventType: 'tab_hidden' | 'window_blur' | 'paste' | 'keydown' | 'resize';
+  eventType: 'tab_hidden' | 'window_blur' | 'copy' | 'paste' | 'keydown' | 'resize';
   occurredAt: string;
   versionNumber: number;
 }
