@@ -31,6 +31,7 @@ type PendingVersionAction = 'submit' | 'rerecord' | null;
 
 const PROGRESS_HEARTBEAT_MS = 3000;
 const PROGRESS_DEBOUNCE_MS = 400;
+const PROGRESS_EVENT_DEBOUNCE_MS = 2000;
 
 interface UseTakeOrchestratorParams {
   id: string;
@@ -200,6 +201,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     multipartUploadsRef,
     progressHeartbeatMs: PROGRESS_HEARTBEAT_MS,
     progressDebounceMs: PROGRESS_DEBOUNCE_MS,
+    progressEventDebounceMs: PROGRESS_EVENT_DEBOUNCE_MS,
     getBrowserTranscriptSnapshot,
   });
 

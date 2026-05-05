@@ -8,25 +8,20 @@ interface QueueBufferedUploadParams {
   target: CaptureTarget;
   multipartUploadsRef: { current: MultipartUploadState };
   forceFinal?: boolean;
-  questionIndex: number;
-  presignMultipartPartUpload: (
+  preSignMultipartPartUpload: (
     target: CaptureTarget,
     session: MultipartUploadSession,
-    questionIndex: number,
     partNumber: number,
   ) => Promise<MultipartUploadPartResponse>;
   uploadMultipartPart: (uploadUrl: string, partBlob: Blob) => Promise<void>;
-  scheduleProgressFlush: (reason: 'heartbeat') => void;
 }
 
 export function queueBufferedUpload({
   target,
   multipartUploadsRef,
   forceFinal = false,
-  questionIndex,
-  presignMultipartPartUpload,
+  preSignMultipartPartUpload,
   uploadMultipartPart,
-  scheduleProgressFlush,
 }: QueueBufferedUploadParams) {
   const session = multipartUploadsRef.current[target];
   if (!session) {
@@ -50,10 +45,9 @@ export function queueBufferedUpload({
       const partNumber = activeSession.nextPartNumber;
       activeSession.nextPartNumber += 1;
 
-      const partUpload = await presignMultipartPartUpload(
+      const partUpload = await preSignMultipartPartUpload(
         target,
         activeSession,
-        questionIndex,
         partNumber,
       );
 
@@ -64,7 +58,6 @@ export function queueBufferedUpload({
       }
 
       activeSession = multipartUploadsRef.current[target];
-      scheduleProgressFlush('heartbeat');
     }
   });
 
@@ -76,7 +69,6 @@ interface HandleRecordedChunkParams {
   blob: Blob;
   multipartUploadsRef: { current: MultipartUploadState };
   queueBufferedUpload: (target: CaptureTarget, forceFinal?: boolean) => Promise<void>;
-  scheduleProgressFlush: (reason: 'heartbeat') => void;
 }
 
 export function handleRecordedChunk({
@@ -84,7 +76,6 @@ export function handleRecordedChunk({
   blob,
   multipartUploadsRef,
   queueBufferedUpload,
-  scheduleProgressFlush,
 }: HandleRecordedChunkParams) {
   if (blob.size < 1) {
     return;
@@ -103,5 +94,4 @@ export function handleRecordedChunk({
     void queueBufferedUpload(target).catch(() => undefined);
   }
 
-  scheduleProgressFlush('heartbeat');
 }

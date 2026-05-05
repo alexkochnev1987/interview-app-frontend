@@ -1,9 +1,9 @@
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 
 import {
   abortMultipartUpload,
   completeMultipartUpload as completeMultipartUploadRequest,
-  presignMultipartPart,
+  presignMultipartPart as preSignMultipartPart,
   sendTakeAnswerProgress,
   startMultipartUpload,
   uploadMultipartPart,
@@ -46,6 +46,7 @@ interface UseTakeAnswerPersistenceParams {
   multipartUploadsRef: React.MutableRefObject<MultipartUploadState>;
   progressHeartbeatMs: number;
   progressDebounceMs: number;
+  progressEventDebounceMs: number;
   getBrowserTranscriptSnapshot: () => {
     text: string;
     language: string;
@@ -71,22 +72,21 @@ export function useTakeAnswerPersistence({
   multipartUploadsRef,
   progressHeartbeatMs,
   progressDebounceMs,
+  progressEventDebounceMs,
   getBrowserTranscriptSnapshot,
 }: UseTakeAnswerPersistenceParams) {
+  const lastEventFlushQueuedAtMsRef = useRef(0);
+
   const startMultipartUploadSession = useCallback(
     async (questionIndex: number, mediaType: CaptureTarget): Promise<MultipartUploadSession> => {
       const session = await startMultipartUpload(questionIndex, mediaType);
-      return createMultipartUploadSession(session);
+      return createMultipartUploadSession({ ...session, questionIndex });
     },
     [],
   );
 
   const flushAnswerProgress = useCallback(
     async (forceAllEvents = false) => {
-      if (!interview) {
-        return;
-      }
-
       const cameraUpload = multipartUploadsRef.current.camera;
       if (!cameraUpload) {
         return;
@@ -103,7 +103,7 @@ export function useTakeAnswerPersistence({
       await sendTakeAnswerProgress(
         id,
         buildProgressPayload({
-          questionIndex: interview.currentQuestionIndex,
+          questionIndex: cameraUpload.questionIndex,
           versionNumber: currentVersionNumberRef.current,
           mediaKey: cameraUpload.mediaKey,
           screenMediaKey: screenUpload?.mediaKey,
@@ -130,7 +130,6 @@ export function useTakeAnswerPersistence({
       flushedBehaviorEventCountRef.current = behaviorEventsRef.current.length;
     },
     [
-      interview,
       multipartUploadsRef,
       behaviorEventsRef,
       flushedBehaviorEventCountRef,
@@ -156,6 +155,14 @@ export function useTakeAnswerPersistence({
 
   const scheduleProgressFlush = useCallback(
     (reason: 'event' | 'heartbeat' | 'start' | 'stop') => {
+      if (reason === 'event') {
+        const now = Date.now();
+        if (now - lastEventFlushQueuedAtMsRef.current < progressEventDebounceMs) {
+          return;
+        }
+        lastEventFlushQueuedAtMsRef.current = now;
+      }
+
       scheduleProgressFlushData({
         multipartUploadsRef,
         progressFlushTimeoutRef,
@@ -164,7 +171,13 @@ export function useTakeAnswerPersistence({
         progressDebounceMs,
       });
     },
-    [multipartUploadsRef, progressFlushTimeoutRef, enqueueProgressFlush, progressDebounceMs],
+    [
+      multipartUploadsRef,
+      progressFlushTimeoutRef,
+      enqueueProgressFlush,
+      progressDebounceMs,
+      progressEventDebounceMs,
+    ],
   );
 
   const startProgressHeartbeat = useCallback(() => {
@@ -175,16 +188,15 @@ export function useTakeAnswerPersistence({
     });
   }, [progressHeartbeatRef, progressHeartbeatMs, scheduleProgressFlush]);
 
-  const presignMultipartPartUpload = useCallback(
+  const preSignMultipartPartUpload = useCallback(
     async (
       target: CaptureTarget,
       session: MultipartUploadSession,
-      questionIndex: number,
       partNumber: number,
     ): Promise<MultipartUploadPartResponse> => {
       try {
-        return await presignMultipartPart(
-          questionIndex,
+        return await preSignMultipartPart(
+          session.questionIndex,
           session.mediaKey,
           session.uploadId,
           partNumber,
@@ -206,12 +218,10 @@ export function useTakeAnswerPersistence({
         target,
         multipartUploadsRef,
         forceFinal,
-        questionIndex: interview?.currentQuestionIndex ?? 0,
-        presignMultipartPartUpload,
+        preSignMultipartPartUpload,
         uploadMultipartPart,
-        scheduleProgressFlush: (reason) => scheduleProgressFlush(reason),
       }),
-    [multipartUploadsRef, interview, presignMultipartPartUpload, scheduleProgressFlush],
+    [multipartUploadsRef, preSignMultipartPartUpload],
   );
 
   const handleRecordedChunk = useCallback(
@@ -222,10 +232,9 @@ export function useTakeAnswerPersistence({
         multipartUploadsRef,
         queueBufferedUpload: (nextTarget, nextForceFinal = false) =>
           queueBufferedUpload(nextTarget, nextForceFinal),
-        scheduleProgressFlush: (reason) => scheduleProgressFlush(reason),
       });
     },
-    [multipartUploadsRef, queueBufferedUpload, scheduleProgressFlush],
+    [multipartUploadsRef, queueBufferedUpload],
   );
 
   const completeMultipartUpload = useCallback(
@@ -233,20 +242,18 @@ export function useTakeAnswerPersistence({
       await completeMultipartUploadData({
         target,
         multipartUploadsRef,
-        questionIndex: interview?.currentQuestionIndex ?? 0,
         completeMultipartUploadRequest,
       });
     },
-    [multipartUploadsRef, interview],
+    [multipartUploadsRef],
   );
 
   const abortMultipartUploads = useCallback(async () => {
     await abortMultipartUploadsData({
       multipartUploadsRef,
-      questionIndex: interview?.currentQuestionIndex ?? 0,
       abortMultipartUploadRequest: abortMultipartUpload,
     });
-  }, [multipartUploadsRef, interview]);
+  }, [multipartUploadsRef]);
 
   return {
     startMultipartUploadSession,

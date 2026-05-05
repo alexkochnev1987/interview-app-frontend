@@ -10,6 +10,7 @@ export interface AnswerBehaviorEvent {
 }
 
 export interface MultipartUploadSession {
+  questionIndex: number;
   mediaKey: string;
   uploadId: string;
   nextPartNumber: number;
@@ -27,6 +28,7 @@ export interface MultipartUploadState {
 }
 
 export interface MultipartSessionSeed {
+  questionIndex: number;
   mediaKey: string;
   uploadId: string;
 }
@@ -80,6 +82,7 @@ export function clearProgressTimers(
 
 export function createMultipartUploadSession(session: MultipartSessionSeed): MultipartUploadSession {
   return {
+    questionIndex: session.questionIndex,
     mediaKey: session.mediaKey,
     uploadId: session.uploadId,
     nextPartNumber: 1,
