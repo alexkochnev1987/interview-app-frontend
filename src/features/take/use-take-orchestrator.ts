@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { useBrowserTranscript } from '@/lib/use-browser-transcript';
 import { submitTakeAnswer, type TakeInterviewData } from '@/lib/api';
@@ -216,6 +216,11 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
       const transcriptSnapshot =
         action === 'submit' ? await stopBrowserTranscript({ finalize: true, timeoutMs: 700 }) : null;
 
+      const submittedAt = new Date().toISOString();
+      const fallbackStartedAt = answerStoppedAtMsRef.current
+        ? new Date(answerStoppedAtMsRef.current - 1000).toISOString()
+        : submittedAt;
+
       await submitTakeAnswer(id, {
         questionIndex: interview.currentQuestionIndex,
         versionNumber: currentVersionNumberRef.current,
@@ -223,8 +228,8 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
         mediaKey: cameraUpload.mediaKey,
         screenMediaKey: screenUpload.mediaKey,
         durationSeconds: answerDurationSecondsRef.current || 1,
-        startedAt: answerStartedAtRef.current ?? new Date(Date.now() - 1000).toISOString(),
-        submittedAt: new Date().toISOString(),
+        startedAt: answerStartedAtRef.current ?? fallbackStartedAt,
+        submittedAt,
         cameraFileSizeBytes: cameraUpload.recordedBytes,
         screenFileSizeBytes: screenUpload.recordedBytes,
         behaviorSignals: behaviorSignalsRef.current,
@@ -321,7 +326,9 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     scheduleProgressFlush,
     stopActiveRecorders,
   });
-  requestVersionActionRef.current = requestVersionAction;
+  useEffect(() => {
+    requestVersionActionRef.current = requestVersionAction;
+  }, [requestVersionAction]);
 
   const { beginRecording } = useTakeBeginRecording({
     cameraStreamRef,
@@ -357,13 +364,15 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     startBrowserTranscript,
   });
 
-  beginRecordingRef.current = async (nextVersionNumber: number) => {
-    await beginRecording({
-      nextVersionNumber,
-      hasCurrentQuestion: Boolean(interview?.currentQuestion),
-      currentQuestionIndex: interview?.currentQuestionIndex ?? 0,
-    });
-  };
+  useEffect(() => {
+    beginRecordingRef.current = async (nextVersionNumber: number) => {
+      await beginRecording({
+        nextVersionNumber,
+        hasCurrentQuestion: Boolean(interview?.currentQuestion),
+        currentQuestionIndex: interview?.currentQuestionIndex ?? 0,
+      });
+    };
+  }, [beginRecording, interview]);
 
   return {
     stage,
