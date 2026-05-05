@@ -88,9 +88,12 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
   const progressRequestChainRef = useRef(Promise.resolve());
   const pendingVersionActionRef = useRef<PendingVersionAction>(null);
   const multipartUploadsRef = useRef<MultipartUploadState>({ camera: null, screen: null });
-  const beginRecordingRef = useRef<(nextVersionNumber: number) => Promise<void>>(async () => undefined);
+  const beginRecordingRef = useRef<
+    (nextVersionNumber: number, currentQuestionIndex: number) => Promise<void>
+  >(async () => undefined);
   const requestVersionActionRef = useRef<(action: PendingVersionAction) => void>(() => undefined);
   const autoStartedQuestionKeyRef = useRef('');
+  const lastSubmittedQuestionIndexRef = useRef<number | null>(null);
 
   function attachCameraPreview(stream: MediaStream) {
     cameraStreamRef.current = stream;
@@ -173,6 +176,11 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     candidateToken,
     onData: (data, mode, tokenOverride) => {
       setInterview(data);
+      if (mode === 'resume' && lastSubmittedQuestionIndexRef.current !== null) {
+        if (data.currentQuestionIndex !== lastSubmittedQuestionIndexRef.current) {
+          lastSubmittedQuestionIndexRef.current = null;
+        }
+      }
       if (mode === 'initial' && tokenOverride && typeof window !== 'undefined') {
         window.history.replaceState(null, '', `/take/${id}`);
       }
@@ -289,6 +297,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
       pendingVersionActionRef.current = null;
 
       if (action === 'submit') {
+        lastSubmittedQuestionIndexRef.current = interview.currentQuestionIndex;
         setCurrentVersionNumber(1);
         currentVersionNumberRef.current = 1;
         setRetakeCount(0);
@@ -350,6 +359,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     screenSurface,
     autoStartedQuestionKeyRef,
     beginRecordingRef,
+    lastSubmittedQuestionIndexRef,
   });
 
   const { requestVersionAction } = useTakeRecordingControls({
@@ -403,14 +413,14 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
   });
 
   useEffect(() => {
-    beginRecordingRef.current = async (nextVersionNumber: number) => {
+    beginRecordingRef.current = async (nextVersionNumber: number, currentQuestionIndex: number) => {
       await beginRecording({
         nextVersionNumber,
-        hasCurrentQuestion: Boolean(interview?.currentQuestion),
-        currentQuestionIndex: interview?.currentQuestionIndex ?? 0,
+        hasCurrentQuestion: true,
+        currentQuestionIndex,
       });
     };
-  }, [beginRecording, interview]);
+  }, [beginRecording]);
 
   return {
     stage,

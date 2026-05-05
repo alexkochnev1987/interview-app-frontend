@@ -11,7 +11,8 @@ interface UseTakeAutoStartRecordingParams {
   screenStatus: 'idle' | 'pending' | 'granted' | 'denied';
   screenSurface: string;
   autoStartedQuestionKeyRef: { current: string };
-  beginRecordingRef: { current: (nextVersionNumber: number) => Promise<void> };
+  beginRecordingRef: { current: (nextVersionNumber: number, currentQuestionIndex: number) => Promise<void> };
+  lastSubmittedQuestionIndexRef: { current: number | null };
 }
 
 export function useTakeAutoStartRecording({
@@ -24,6 +25,7 @@ export function useTakeAutoStartRecording({
   screenSurface,
   autoStartedQuestionKeyRef,
   beginRecordingRef,
+  lastSubmittedQuestionIndexRef,
 }: UseTakeAutoStartRecordingParams) {
   useEffect(() => {
     const readyForAutoStart =
@@ -39,6 +41,10 @@ export function useTakeAutoStartRecording({
       return;
     }
 
+    if (lastSubmittedQuestionIndexRef.current === interview.currentQuestionIndex) {
+      return;
+    }
+
     const questionKey = `${interview.id}:${interview.currentQuestionIndex}:${interview.currentAnswerMeta?.versionCount ?? 0}:${stage}`;
     if (autoStartedQuestionKeyRef.current === questionKey) {
       return;
@@ -46,7 +52,7 @@ export function useTakeAutoStartRecording({
 
     autoStartedQuestionKeyRef.current = questionKey;
     const nextVersionNumber = (interview.currentAnswerMeta?.versionCount ?? 0) + 1;
-    void beginRecordingRef.current(nextVersionNumber);
+    void beginRecordingRef.current(nextVersionNumber, interview.currentQuestionIndex);
   }, [
     cameraStatus,
     interview,
@@ -57,5 +63,6 @@ export function useTakeAutoStartRecording({
     uploading,
     autoStartedQuestionKeyRef,
     beginRecordingRef,
+    lastSubmittedQuestionIndexRef,
   ]);
 }
