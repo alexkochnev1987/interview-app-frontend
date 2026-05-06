@@ -30,20 +30,26 @@ export type InterviewWorkflowStatus = Schemas['InterviewResponseDto']['workflow'
 export type InterviewWorkflowStage = Schemas['InterviewResponseDto']['workflow'] extends { currentStage?: infer S } ? S : string;
 
 export type MediaArtifact = Schemas['MediaArtifactDto'];
-export type AnswerBehaviorSignals = Schemas['BehaviorSignalsDto'];
-export type AnswerBehaviorEvent = Schemas['BehaviorEventDto'];
+export type AnswerBehaviorSignals = Schemas['BehaviorSignalsDto'] & { copyCount?: number };
+export type AnswerBehaviorEvent = Omit<Schemas['BehaviorEventDto'], 'eventType'> & { 
+  eventType: Schemas['BehaviorEventDto']['eventType'] | 'copy' 
+};
 export type AnswerTranscript = Schemas['AnswerTranscriptDto'];
 export type ClientTranscriptPayload = Schemas['ClientTranscriptDto'];
 export type AnswerEvaluation = Schemas['AnswerEvaluationDto'];
 export type AnswerValidation = Schemas['AnswerValidationDto'];
-export type Answer = Schemas['AnswerDto'];
+export type Answer = Omit<Schemas['AnswerDto'], 'behaviorSignals'> & {
+  behaviorSignals?: AnswerBehaviorSignals;
+};
 export type AnswerVersion = Schemas['AnswerVersionDto'];
 
 export type InterviewQuestionResult = Schemas['InterviewQuestionResultDto'];
 export type InterviewBehaviorSummary = Schemas['InterviewBehaviorSummaryDto'];
 export type InterviewResult = Schemas['InterviewResultResponseDto'];
 export type InterviewWorkflow = Schemas['InterviewWorkflowDto'];
-export type Interview = Schemas['InterviewResponseDto'];
+export type Interview = Omit<Schemas['InterviewResponseDto'], 'answers'> & {
+  answers: Answer[];
+};
 
 export type ValidateAllAnswersResponse = Schemas['StartAllAnswerValidationsResponseDto'];
 export type InterviewAnswerMediaResponse = Schemas['InterviewAnswerMediaResponseDto'];
@@ -264,9 +270,13 @@ export type MultipartUploadSessionResponse = Schemas['MultipartUploadSessionResp
 
 export type MultipartUploadPartResponse = Schemas['MultipartUploadPartResponseDto'];
 
-export type TakeProgressPayload = Schemas['SaveAnswerProgressDto'];
+export type TakeProgressPayload = Omit<Schemas['SaveAnswerProgressDto'], 'behaviorEvents'> & {
+  behaviorEvents: AnswerBehaviorEvent[];
+};
 
-export type SubmitTakeAnswerPayload = Schemas['SubmitAnswerDto'];
+export type SubmitTakeAnswerPayload = Omit<Schemas['SubmitAnswerDto'], 'behaviorEvents'> & {
+  behaviorEvents: AnswerBehaviorEvent[];
+};
 
 export async function getTakeInterview(
   id: string,
