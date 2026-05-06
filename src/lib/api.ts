@@ -1,3 +1,7 @@
+import { ApiError } from './api-error';
+
+export { ApiError, isForbiddenError } from './api-error';
+
 const API_URL = '/api';
 
 export type QuestionDifficulty = 'easy' | 'medium' | 'hard';
@@ -284,15 +288,38 @@ export interface PresignedUrlResponse {
   mediaKey: string;
 }
 
+export interface MeResponse {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+}
+
+function extractApiMessage(status: number, body: string): string {
+  const trimmed = body.trim();
+  if (!trimmed) return `API error ${status}`;
+  try {
+    const parsed = JSON.parse(trimmed) as { message?: unknown };
+    if (typeof parsed.message === 'string' && parsed.message.length > 0) {
+      return parsed.message;
+    }
+  } catch {}
+  return `API error ${status}: ${trimmed}`;
+}
+
+const REQUEST_TIMEOUT_MS = 30_000;
+
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
+  const { signal, headers, ...rest } = options ?? {};
   const res = await fetch(`${API_URL}${path}`, {
-    headers: { 'Content-Type': 'application/json' },
-    ...options,
+    ...rest,
+    headers: { 'Content-Type': 'application/json', ...headers },
+    signal: signal ?? AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
 
   if (!res.ok) {
     const body = await res.text();
-    throw new Error(`API error ${res.status}: ${body}`);
+    throw new ApiError(res.status, extractApiMessage(res.status, body), path, body);
   }
 
   const body = await res.text();
@@ -468,9 +495,20 @@ export async function completeInterview(id: string): Promise<Interview> {
 }
 
 export async function validateInterview(id: string): Promise<ValidateAllAnswersResponse> {
-  return request<ValidateAllAnswersResponse>(`/interviews/${id}/validate`, {
-    method: 'POST',
-  });
+  return request<ValidateAllAnswersResponse>(
+    `/interviews/${encodeURIComponent(id)}/validate`,
+    { method: 'POST' },
+  );
+}
+
+export async function validateInterviewQuestion(
+  id: string,
+  questionIndex: number,
+): Promise<ValidateAllAnswersResponse> {
+  return request<ValidateAllAnswersResponse>(
+    `/interviews/${encodeURIComponent(id)}/questions/${questionIndex}/validate`,
+    { method: 'POST' },
+  );
 }
 
 export async function getInterviewAnswerMedia(
