@@ -25,6 +25,7 @@ import {
   type MultipartUploadState,
   type TakeBehaviorSignals,
   progressValueForStage,
+  TAKE_MESSAGES,
 } from '@/features/take';
 
 type PendingVersionAction = 'submit' | 'rerecord' | null;
@@ -284,14 +285,10 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
       const hasUploadedAllParts = hasUploadedCameraParts && hasUploadedScreenParts;
 
       if (action === 'submit' && (!hasUploadedCameraParts || !hasUploadedScreenParts)) {
-        throw new Error('Recording is too short to submit yet. Please record a bit longer and try again.');
+        throw new Error(TAKE_MESSAGES.shortRecordingSubmit);
       }
 
-      if (action === 'rerecord' && !hasUploadedAllParts) {
-        await abortMultipartUploads();
-        clearRecordingArtifacts();
-        pendingVersionActionRef.current = null;
-
+      const startNextRerecordVersion = async () => {
         const nextVersionNumber = currentVersionNumberRef.current + 1;
         setCurrentVersionNumber(nextVersionNumber);
         currentVersionNumberRef.current = nextVersionNumber;
@@ -301,67 +298,89 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
           hasCurrentQuestion: Boolean(interview.currentQuestion),
           currentQuestionIndex: interview.currentQuestionIndex,
         });
-        return;
-      }
+      };
 
-      await Promise.all([completeMultipartUpload('camera'), completeMultipartUpload('screen')]);
+      const handleRerecord = async () => {
+        if (!hasUploadedAllParts) {
+          await abortMultipartUploads();
+          clearRecordingArtifacts();
+          pendingVersionActionRef.current = null;
+          await startNextRerecordVersion();
+          return;
+        }
 
-      const transcriptSnapshot =
-        action === 'submit' ? await stopBrowserTranscript({ finalize: true, timeoutMs: 700 }) : null;
+        await Promise.all([completeMultipartUpload('camera'), completeMultipartUpload('screen')]);
+        await submitTakeAnswer(id, {
+          questionIndex: cameraUpload.questionIndex,
+          versionNumber: currentVersionNumberRef.current,
+          submitAnswer: false,
+          mediaKey: cameraUpload.mediaKey,
+          screenMediaKey: screenUpload.mediaKey,
+          durationSeconds: answerDurationSecondsRef.current || 1,
+          startedAt: answerStartedAtRef.current ?? new Date().toISOString(),
+          submittedAt: new Date().toISOString(),
+          cameraFileSizeBytes: cameraUpload.recordedBytes,
+          screenFileSizeBytes: screenUpload.recordedBytes,
+          behaviorSignals: behaviorSignalsRef.current,
+          behaviorEvents: behaviorEventsRef.current,
+        });
 
-      const submittedAt = new Date().toISOString();
-      const fallbackStartedAt = answerStoppedAtMsRef.current
-        ? new Date(answerStoppedAtMsRef.current - 1000).toISOString()
-        : submittedAt;
+        clearRecordingArtifacts();
+        pendingVersionActionRef.current = null;
+        await startNextRerecordVersion();
+      };
 
-      await submitTakeAnswer(id, {
-        questionIndex: cameraUpload.questionIndex,
-        versionNumber: currentVersionNumberRef.current,
-        submitAnswer: action === 'submit',
-        mediaKey: cameraUpload.mediaKey,
-        screenMediaKey: screenUpload.mediaKey,
-        durationSeconds: answerDurationSecondsRef.current || 1,
-        startedAt: answerStartedAtRef.current ?? fallbackStartedAt,
-        submittedAt,
-        cameraFileSizeBytes: cameraUpload.recordedBytes,
-        screenFileSizeBytes: screenUpload.recordedBytes,
-        behaviorSignals: behaviorSignalsRef.current,
-        behaviorEvents: behaviorEventsRef.current,
-        ...(transcriptSnapshot?.text.trim()
-          ? {
-              clientTranscript: {
-                text: transcriptSnapshot.text,
-                language: transcriptSnapshot.language,
-                provider: transcriptSnapshot.provider,
-                generatedAt: transcriptSnapshot.generatedAt,
-                isFinal: true,
-              },
-            }
-          : {}),
-      });
+      const handleSubmit = async () => {
+        await Promise.all([completeMultipartUpload('camera'), completeMultipartUpload('screen')]);
 
-      clearRecordingArtifacts();
-      pendingVersionActionRef.current = null;
+        const transcriptSnapshot = await stopBrowserTranscript({ finalize: true, timeoutMs: 700 });
+        const submittedAt = new Date().toISOString();
+        const fallbackStartedAt = answerStoppedAtMsRef.current
+          ? new Date(answerStoppedAtMsRef.current - 1000).toISOString()
+          : submittedAt;
 
-      if (action === 'submit') {
+        await submitTakeAnswer(id, {
+          questionIndex: cameraUpload.questionIndex,
+          versionNumber: currentVersionNumberRef.current,
+          submitAnswer: true,
+          mediaKey: cameraUpload.mediaKey,
+          screenMediaKey: screenUpload.mediaKey,
+          durationSeconds: answerDurationSecondsRef.current || 1,
+          startedAt: answerStartedAtRef.current ?? fallbackStartedAt,
+          submittedAt,
+          cameraFileSizeBytes: cameraUpload.recordedBytes,
+          screenFileSizeBytes: screenUpload.recordedBytes,
+          behaviorSignals: behaviorSignalsRef.current,
+          behaviorEvents: behaviorEventsRef.current,
+          ...(transcriptSnapshot?.text.trim()
+            ? {
+                clientTranscript: {
+                  text: transcriptSnapshot.text,
+                  language: transcriptSnapshot.language,
+                  provider: transcriptSnapshot.provider,
+                  generatedAt: transcriptSnapshot.generatedAt,
+                  isFinal: true,
+                },
+              }
+            : {}),
+        });
+
+        clearRecordingArtifacts();
+        pendingVersionActionRef.current = null;
         setCurrentVersionNumber(1);
         currentVersionNumberRef.current = 1;
         setRetakeCount(0);
         await loadInterview('resume');
+      };
+
+      if (action === 'submit') {
+        await handleSubmit();
       } else {
-        const nextVersionNumber = currentVersionNumberRef.current + 1;
-        setCurrentVersionNumber(nextVersionNumber);
-        currentVersionNumberRef.current = nextVersionNumber;
-        setRetakeCount(nextVersionNumber - 1);
-        await beginRecording({
-          nextVersionNumber,
-          hasCurrentQuestion: Boolean(interview.currentQuestion),
-          currentQuestionIndex: interview.currentQuestionIndex,
-        });
+        await handleRerecord();
       }
     } catch (err) {
       await abortMultipartUploads();
-      setSubmitError(err instanceof Error ? err.message : 'Upload failed');
+      setSubmitError(err instanceof Error ? err.message : TAKE_MESSAGES.uploadFailedFallback);
       autoStartedQuestionKeyRef.current = '';
       setStage('interview');
     } finally {
@@ -381,7 +400,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     const pendingAction = pendingVersionActionRef.current;
     if (!pendingAction) {
       clearRecordingArtifacts();
-      setSetupError('Recording stopped without a follow-up action. Start a new version for this answer.');
+      setSetupError(TAKE_MESSAGES.recordingStoppedWithoutAction);
       setStage('interview');
       return;
     }
@@ -433,7 +452,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
       activeScreenUpload?.questionIndex === currentQuestionIndex;
 
     if (!isUploadSessionSynced) {
-      setSubmitError('Recording is still syncing for this question. Try submitting again in a moment.');
+      setSubmitError(TAKE_MESSAGES.syncingInProgress);
       return;
     }
 

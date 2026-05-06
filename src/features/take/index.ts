@@ -1,4 +1,5 @@
 export * from './multipart';
+export * from './messages';
 export * from './progress';
 export * from './runtime';
 export * from './session-machine';

@@ -1,5 +1,6 @@
 import type { MutableRefObject } from 'react';
 import type { PermissionStatus } from '@/components/take/types';
+import { TAKE_MESSAGES } from './messages';
 
 type ScreenTrackSettings = MediaTrackSettings & { displaySurface?: string };
 type InterviewDisplayMediaOptions = DisplayMediaStreamOptions & {
@@ -44,7 +45,7 @@ export function useTakePermissions({
 }: UseTakePermissionsParams) {
   async function handleStartInterview() {
     if (!navigator.mediaDevices?.getUserMedia || !navigator.mediaDevices?.getDisplayMedia) {
-      setSetupError('This browser must support camera, microphone, and full-screen sharing.');
+      setSetupError(TAKE_MESSAGES.browserUnsupported);
       return;
     }
 
@@ -96,9 +97,7 @@ export function useTakePermissions({
       }
 
       screenTrack.onended = () => {
-        handleScreenShareEnded(
-          'Screen sharing stopped. Reconnect camera and entire-screen sharing to continue this question.',
-        );
+        handleScreenShareEnded(TAKE_MESSAGES.screenShareStopped);
       };
 
       screenStreamRef.current = screenStream;
