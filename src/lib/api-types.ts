@@ -825,6 +825,7 @@ export interface components {
             windowBlurCount: number;
             pasteCount: number;
             keydownCount: number;
+            copyCount: number;
             resizeCount: number;
         };
         AnswerTranscriptDto: {
@@ -866,7 +867,7 @@ export interface components {
         };
         AnswerBehaviorEventDto: {
             /** @enum {string} */
-            eventType: "tab_hidden" | "window_blur" | "paste" | "keydown" | "resize";
+            eventType: "tab_hidden" | "window_blur" | "copy" | "paste" | "keydown" | "resize";
             /** Format: date-time */
             occurredAt: string;
             versionNumber: number;
@@ -1120,11 +1121,13 @@ export interface components {
             /** @default 0 */
             keydownCount: number;
             /** @default 0 */
+            copyCount: number;
+            /** @default 0 */
             resizeCount: number;
         };
         BehaviorEventDto: {
             /** @enum {string} */
-            eventType: "tab_hidden" | "window_blur" | "paste" | "keydown" | "resize";
+            eventType: "tab_hidden" | "window_blur" | "copy" | "paste" | "keydown" | "resize";
             /** Format: date-time */
             occurredAt: string;
             versionNumber: number;
@@ -2459,7 +2462,9 @@ export interface operations {
     };
     TakeController_getInterview: {
         parameters: {
-            query?: never;
+            query?: {
+                token?: string;
+            };
             header?: never;
             path: {
                 id: string;

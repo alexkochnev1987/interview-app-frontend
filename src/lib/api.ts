@@ -1,6 +1,12 @@
-import { components } from './api-types';
+import createClient from 'openapi-fetch';
+import { paths, components } from './api-types';
 
-const API_URL = '/api';
+const client = createClient<paths>({ 
+  baseUrl: '/api',
+  headers: {
+    'Content-Type': 'application/json',
+  }
+});
 
 type Schemas = components['schemas'];
 
@@ -62,46 +68,58 @@ export interface CreateInterviewPayload {
 }
 
 export type PresignedUrlResponse = Schemas['PresignedUrlResponseDto'];
+export type ConfirmUploadResponse = Schemas['ConfirmUploadResponseDto'];
 
-async function request<T>(path: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_URL}${path}`, {
-    headers: { 'Content-Type': 'application/json' },
-    ...options,
-  });
+export type TakeInterviewData = Schemas['TakeInterviewResponseDto'];
+export type MultipartUploadSessionResponse = Schemas['MultipartUploadSessionResponseDto'];
+export type MultipartUploadPartResponse = Schemas['MultipartUploadPartResponseDto'];
 
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`API error ${res.status}: ${body}`);
+export type TakeProgressPayload = Omit<Schemas['SaveAnswerProgressDto'], 'behaviorEvents'> & {
+  behaviorEvents: AnswerBehaviorEvent[];
+};
+
+export type SubmitTakeAnswerPayload = Omit<Schemas['SubmitAnswerDto'], 'behaviorEvents'> & {
+  behaviorEvents: AnswerBehaviorEvent[];
+};
+
+export type CaptureTarget = 'camera' | 'screen';
+
+/**
+ * Helper to handle openapi-fetch responses and throw errors on failure
+ */
+async function handle<T>(promise: Promise<{ data?: T; error?: any; response: Response }>): Promise<T> {
+  const { data, error, response } = await promise;
+  if (error) {
+    const message = typeof error === 'object' && error.message ? error.message : JSON.stringify(error);
+    throw new Error(`API error ${response.status}: ${message}`);
   }
-
-  const body = await res.text();
-  if (!body) return undefined as T;
-  return JSON.parse(body) as T;
+  return data as T;
 }
 
 export async function fetchQuestions(): Promise<Question[]> {
-  return request<Question[]>('/questions');
+  return handle(client.GET('/questions'));
 }
 
 export async function getQuestion(id: string): Promise<Question> {
-  return request<Question>(`/questions/${id}`);
+  return handle(client.GET('/questions/{id}', {
+    params: { path: { id } }
+  }));
 }
 
 export async function createQuestion(data: QuestionInput): Promise<Question> {
-  return request<Question>('/questions', {
-    method: 'POST',
-    body: JSON.stringify(data),
-  });
+  return handle(client.POST('/questions', {
+    body: data as any
+  }));
 }
 
 export async function updateQuestion(
   id: string,
   data: QuestionInput,
 ): Promise<Question> {
-  return request<Question>(`/questions/${id}`, {
-    method: 'PATCH',
-    body: JSON.stringify(data),
-  });
+  return handle(client.PATCH('/questions/{id}', {
+    params: { path: { id } },
+    body: data as any
+  }));
 }
 
 export class QuestionInUseError extends Error {
@@ -114,33 +132,29 @@ export class QuestionInUseError extends Error {
 export async function deleteQuestion(
   id: string,
 ): Promise<{ id: string; deleted: true }> {
-  const res = await fetch(`${API_URL}/questions/${id}`, {
-    method: 'DELETE',
-    headers: { 'Content-Type': 'application/json' },
+  const { data, error, response } = await client.DELETE('/questions/{id}', {
+    params: { path: { id } }
   });
 
-  if (res.status === 409) {
-    const body = await res.text();
+  if (response.status === 409) {
     let message = 'Question is used by an active interview.';
-    try {
-      const parsed = JSON.parse(body) as { message?: string };
-      if (parsed.message) message = parsed.message;
-    } catch {}
+    if (error && typeof error === 'object' && (error as any).message) {
+      message = (error as any).message;
+    }
     throw new QuestionInUseError(message);
   }
 
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`API error ${res.status}: ${body}`);
+  if (error) {
+    throw new Error(`API error ${response.status}: ${JSON.stringify(error)}`);
   }
 
-  return res.json() as Promise<{ id: string; deleted: true }>;
+  return data as { id: string; deleted: true };
 }
 
 export async function restoreQuestion(id: string): Promise<Question> {
-  return request<Question>(`/questions/${id}/restore`, {
-    method: 'PATCH',
-  });
+  return handle(client.PATCH('/questions/{id}/restore', {
+    params: { path: { id } }
+  }));
 }
 
 export type BulkDeleteResult = Schemas['BulkDeleteQuestionsResponseDto'];
@@ -148,19 +162,17 @@ export type BulkDeleteResult = Schemas['BulkDeleteQuestionsResponseDto'];
 export async function deleteQuestionsBulk(
   ids: string[],
 ): Promise<BulkDeleteResult> {
-  return request<BulkDeleteResult>('/questions/bulk-delete', {
-    method: 'POST',
-    body: JSON.stringify({ ids }),
-  });
+  return handle(client.POST('/questions/bulk-delete', {
+    body: { ids }
+  }));
 }
 
 export async function draftQuestion(
   question: Partial<QuestionInput>,
 ): Promise<QuestionDraft> {
-  return request<QuestionDraft>('/ai/question-draft', {
-    method: 'POST',
-    body: JSON.stringify({ question }),
-  });
+  return handle(client.POST('/ai/question-draft', {
+    body: { question } as any
+  }));
 }
 
 export interface SimilarQuestionMatch {
@@ -174,140 +186,118 @@ export async function findSimilarQuestions(
   excludeQuestionId?: string,
   limit = 5,
 ): Promise<SimilarQuestionMatch[]> {
-  const res = await request<{ matches: SimilarQuestionMatch[] }>(
-    '/questions/similar',
-    {
-      method: 'POST',
-      body: JSON.stringify({ draft, excludeQuestionId, limit }),
-    },
-  );
-  return res.matches;
+  const data = await handle(client.POST('/questions/similar', {
+    body: { draft, excludeQuestionId, limit } as any
+  }));
+  return (data as any).matches;
 }
 
 export async function fetchInterviews(): Promise<Interview[]> {
-  return request<Interview[]>('/interviews');
+  return handle(client.GET('/interviews')) as Promise<Interview[]>;
 }
 
 export async function createInterview(
   data: CreateInterviewPayload,
 ): Promise<Interview & CandidateLinkResponse> {
-  return request<Interview & CandidateLinkResponse>('/interviews', {
-    method: 'POST',
-    body: JSON.stringify(data),
-  });
+  return handle(client.POST('/interviews', {
+    body: data as any
+  })) as Promise<Interview & CandidateLinkResponse>;
 }
 
 export async function getInterview(id: string): Promise<Interview> {
-  return request<Interview>(`/interviews/${id}`);
+  return handle(client.GET('/interviews/{id}', {
+    params: { path: { id } }
+  })) as Promise<Interview>;
 }
 
 export async function generateCandidateLink(
   id: string,
 ): Promise<CandidateLinkResponse> {
-  return request<CandidateLinkResponse>(`/interviews/${id}/candidate-link`, {
-    method: 'POST',
-  });
+  return handle(client.POST('/interviews/{id}/candidate-link', {
+    params: { path: { id } }
+  }));
 }
 
 export async function getPresignedUrl(
-  interviewId: string,
   questionIndex: number,
-  contentType: string,
+  contentType: 'video/webm',
+  mediaType: CaptureTarget = 'camera'
 ): Promise<PresignedUrlResponse> {
-  return request<PresignedUrlResponse>(
-    `/interviews/${interviewId}/questions/${questionIndex}/upload-url`,
-    {
-      method: 'POST',
-      body: JSON.stringify({ contentType }),
-    },
-  );
+  return handle(client.POST('/upload/presign', {
+    body: { questionIndex, contentType, mediaType }
+  }));
 }
 
 export async function completeUpload(
-  interviewId: string,
   questionIndex: number,
   mediaKey: string,
-): Promise<Interview> {
-  return request<Interview>(
-    `/interviews/${interviewId}/questions/${questionIndex}/complete-upload`,
-    {
-      method: 'POST',
-      body: JSON.stringify({ mediaKey }),
-    },
-  );
+): Promise<ConfirmUploadResponse> {
+  return handle(client.POST('/upload/complete', {
+    body: { questionIndex, mediaKey }
+  }));
 }
 
 export async function completeInterview(id: string): Promise<Interview> {
-  return request<Interview>(`/interviews/${id}/complete`, {
-    method: 'PATCH',
-  });
+  return handle(client.PATCH('/interviews/{id}/complete', {
+    params: { path: { id } }
+  })) as Promise<Interview>;
 }
 
 export async function validateInterview(id: string): Promise<ValidateAllAnswersResponse> {
-  return request<ValidateAllAnswersResponse>(`/interviews/${id}/validate`, {
-    method: 'POST',
-  });
+  return handle(client.POST('/interviews/{id}/validate', {
+    params: { path: { id } }
+  }));
 }
 
 export async function getInterviewAnswerMedia(
   interviewId: string,
   questionIndex: number,
 ): Promise<InterviewAnswerMediaResponse> {
-  return request<InterviewAnswerMediaResponse>(
-    `/interviews/${interviewId}/questions/${questionIndex}/media`,
-  );
+  return handle(client.GET('/interviews/{id}/questions/{questionIndex}/media', {
+    params: { path: { id: interviewId, questionIndex } }
+  }));
 }
 
 export async function getResults(id: string): Promise<InterviewResult> {
-  return request<InterviewResult>(`/interviews/${id}/results`);
+  return handle(client.GET('/interviews/{id}/results', {
+    params: { path: { id } }
+  }));
 }
-
-type CaptureTarget = 'camera' | 'screen';
-
-export type TakeInterviewData = Schemas['TakeInterviewResponseDto'];
-
-export type MultipartUploadSessionResponse = Schemas['MultipartUploadSessionResponseDto'];
-
-export type MultipartUploadPartResponse = Schemas['MultipartUploadPartResponseDto'];
-
-export type TakeProgressPayload = Omit<Schemas['SaveAnswerProgressDto'], 'behaviorEvents'> & {
-  behaviorEvents: AnswerBehaviorEvent[];
-};
-
-export type SubmitTakeAnswerPayload = Omit<Schemas['SubmitAnswerDto'], 'behaviorEvents'> & {
-  behaviorEvents: AnswerBehaviorEvent[];
-};
 
 export async function getTakeInterview(
   id: string,
   token?: string,
 ): Promise<TakeInterviewData> {
-  const query = token ? `?token=${encodeURIComponent(token)}` : '';
-  return request<TakeInterviewData>(`/take/${id}${query}`);
+  return handle(client.GET('/take/{id}', {
+    params: { 
+      path: { id },
+      query: token ? { token } : undefined
+    }
+  }));
 }
 
 export async function startMultipartUpload(
   questionIndex: number,
   mediaType: CaptureTarget,
+  contentType: 'video/webm' = 'video/webm',
 ): Promise<MultipartUploadSessionResponse> {
-  return request<MultipartUploadSessionResponse>('/upload/multipart/start', {
-    method: 'POST',
-    body: JSON.stringify({
+  return handle(client.POST('/upload/multipart/start', {
+    body: {
       questionIndex,
-      contentType: 'video/webm',
+      contentType,
       mediaType,
-    }),
-  });
+    }
+  }));
 }
 
 export async function sendTakeAnswerProgress(
   id: string,
   payload: TakeProgressPayload,
 ): Promise<void> {
-  await request<void>(`/take/${id}/answer/progress`, {
-    method: 'POST',
-    body: JSON.stringify(payload),
-  });
+  await handle(client.POST('/take/{id}/answer/progress', {
+    params: { path: { id } },
+    body: payload as any
+  }));
 }
 
 export async function presignMultipartPart(
@@ -316,15 +306,14 @@ export async function presignMultipartPart(
   uploadId: string,
   partNumber: number,
 ): Promise<MultipartUploadPartResponse> {
-  return request<MultipartUploadPartResponse>('/upload/multipart/part', {
-    method: 'POST',
-    body: JSON.stringify({
+  return handle(client.POST('/upload/multipart/part', {
+    body: {
       questionIndex,
       mediaKey,
       uploadId,
       partNumber,
-    }),
-  });
+    }
+  }));
 }
 
 export async function uploadMultipartPart(uploadUrl: string, partBlob: Blob): Promise<void> {
@@ -343,14 +332,13 @@ export async function completeMultipartUpload(
   mediaKey: string,
   uploadId: string,
 ): Promise<void> {
-  await request<void>('/upload/multipart/complete', {
-    method: 'POST',
-    body: JSON.stringify({
+  await handle(client.POST('/upload/multipart/complete', {
+    body: {
       questionIndex,
       mediaKey,
       uploadId,
-    }),
-  });
+    }
+  }));
 }
 
 export async function abortMultipartUpload(
@@ -358,22 +346,21 @@ export async function abortMultipartUpload(
   mediaKey: string,
   uploadId: string,
 ): Promise<void> {
-  await request<void>('/upload/multipart/abort', {
-    method: 'POST',
-    body: JSON.stringify({
+  await handle(client.POST('/upload/multipart/abort', {
+    body: {
       questionIndex,
       mediaKey,
       uploadId,
-    }),
-  });
+    }
+  }));
 }
 
 export async function submitTakeAnswer(
   id: string,
   payload: SubmitTakeAnswerPayload,
 ): Promise<void> {
-  await request<void>(`/take/${id}/answer`, {
-    method: 'POST',
-    body: JSON.stringify(payload),
-  });
+  await handle(client.POST('/take/{id}/answer', {
+    params: { path: { id } },
+    body: payload as any
+  }));
 }
