@@ -220,7 +220,7 @@ export interface InterviewBehaviorSummary {
 export interface InterviewResult {
   overallScore: number;
   summary: string;
-  categoryScores: Record<string, number>;
+  categoryScores?: Record<string, number>;
   rubricVersion?: string;
   decision?: InterviewDecision;
   trustScore?: number;

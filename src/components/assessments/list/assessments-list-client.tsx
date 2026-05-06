@@ -31,16 +31,16 @@ export function AssessmentsListClient({
   const [query, setQuery] = useState('')
   const [status, setStatus] = useState<StatusFilter>('all')
   const deferredQuery = useDeferredValue(query)
-  const normalizedQuery = deferredQuery.trim().toLowerCase()
 
   const filtered = useMemo(() => {
+    const normalizedQuery = deferredQuery.trim().toLowerCase()
     return interviews.filter((interview) => {
       if (status !== 'all' && deriveReviewStatus(interview) !== status) {
         return false
       }
       return matchesQuery(interview, normalizedQuery)
     })
-  }, [interviews, status, normalizedQuery])
+  }, [interviews, status, deferredQuery])
 
   return (
     <Stack gap={6}>

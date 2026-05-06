@@ -49,8 +49,8 @@ export function ConceptList({
         </BodyText>
       ) : (
         <Inline gap={2} wrap="wrap">
-          {items.map((item) => (
-            <span key={item} className={cn(chipVariants({ tone }))}>
+          {items.map((item, index) => (
+            <span key={`${item}-${index}`} className={cn(chipVariants({ tone }))}>
               {item}
             </span>
           ))}

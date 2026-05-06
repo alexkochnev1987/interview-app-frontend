@@ -12,7 +12,6 @@ import { Inline } from '@/components/ui/layout/inline'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { Section } from '@/components/ui/layout/section'
 import { Stack } from '@/components/ui/layout/stack'
-import { ScoringPendingCard } from '@/components/ui/scoring-pending-card'
 import { SectionHeading } from '@/components/ui/text'
 import { type Interview, type MeResponse } from '@/lib/api'
 import { deriveReviewStatus } from '@/lib/assessment-status'
@@ -66,11 +65,11 @@ export default async function AssessmentDetailPage({
   } catch (err) {
     if (isForbiddenError(err)) {
       return (
-      <ForbiddenAccessPage
-        title={FORBIDDEN_TITLE}
-        description={FORBIDDEN_DESCRIPTION}
-      />
-    )
+        <ForbiddenAccessPage
+          title={FORBIDDEN_TITLE}
+          description={FORBIDDEN_DESCRIPTION}
+        />
+      )
     }
     error = err instanceof Error ? err.message : 'Failed to load assessment.'
   }
@@ -88,13 +87,11 @@ export default async function AssessmentDetailPage({
     )
   }
 
-  const results = interview.result ?? null
   const reviewStatus = deriveReviewStatus(interview)
   const validationInFlight = interview.answers.some(
     (a) =>
       a.validation?.status === 'queued' || a.validation?.status === 'processing',
   )
-  const isScoring = reviewStatus === 'scoring' && validationInFlight
   const isFailed = reviewStatus === 'failed'
   const canRerun = reviewStatus !== 'pending' && reviewStatus !== 'in_progress'
   const interviewId = interview.id
@@ -110,8 +107,6 @@ export default async function AssessmentDetailPage({
       <DetailHeader interview={interview} />
 
       <EvaluationProgressBanner interview={interview} />
-
-      {isScoring ? <ScoringPendingCard /> : null}
 
       {isFailed ? (
         <Alert variant="danger">
@@ -153,13 +148,13 @@ export default async function AssessmentDetailPage({
         </Stack>
       </Section>
 
-      {results ? (
+      {interview.result ? (
         <Section gap={4}>
           <Stack gap={2}>
             <EyebrowLabel size="lg">Scorecard</EyebrowLabel>
             <SectionHeading>Overall result</SectionHeading>
           </Stack>
-          <OverallPanel result={results} />
+          <OverallPanel result={interview.result} />
         </Section>
       ) : null}
     </PageShell>

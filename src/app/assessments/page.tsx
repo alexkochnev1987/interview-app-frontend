@@ -63,13 +63,24 @@ export default async function AssessmentsPage() {
   } catch (err) {
     if (isForbiddenError(err)) {
       return (
-      <ForbiddenAccessPage
-        title={FORBIDDEN_TITLE}
-        description={FORBIDDEN_DESCRIPTION}
-      />
-    )
+        <ForbiddenAccessPage
+          title={FORBIDDEN_TITLE}
+          description={FORBIDDEN_DESCRIPTION}
+        />
+      )
     }
     error = err instanceof Error ? err.message : 'Failed to load assessments.'
+  }
+
+  if (error) {
+    return (
+      <PageShell>
+        <Alert variant="danger">
+          <AlertTitle>Could not load assessments</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      </PageShell>
+    )
   }
 
   const sorted = interviews
@@ -79,15 +90,7 @@ export default async function AssessmentsPage() {
   return (
     <PageShell>
       <AssessmentsListHeader />
-
-      {error ? (
-        <Alert variant="danger">
-          <AlertTitle>Could not load assessments</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      ) : (
-        <AssessmentsListClient interviews={sorted} />
-      )}
+      <AssessmentsListClient interviews={sorted} />
     </PageShell>
   )
 }

@@ -31,7 +31,7 @@ function findSubmittedAt(interview: Interview): string | null {
   let latest: string | null = null
   for (const answer of interview.answers) {
     if (answer.status !== 'submitted' || !answer.submittedAt) continue
-    if (latest === null || answer.submittedAt > latest) {
+    if (latest === null || new Date(answer.submittedAt).getTime() > new Date(latest).getTime()) {
       latest = answer.submittedAt
     }
   }

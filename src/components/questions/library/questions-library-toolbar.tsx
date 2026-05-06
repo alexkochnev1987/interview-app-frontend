@@ -3,6 +3,7 @@
 import { LoaderCircle, Trash2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
+import { Icon } from '@/components/ui/icon'
 import { Card, CardContent } from '@/components/ui/card'
 import { Grid } from '@/components/ui/layout/grid'
 import { SearchInput } from '@/components/ui/search-input'
@@ -74,9 +75,9 @@ export function QuestionsLibraryToolbar({
               onClick={onRequestBulkDelete}
             >
               {bulkDeleting ? (
-                <LoaderCircle className="size-4 animate-spin" />
+                <Icon size="md" className="animate-spin"><LoaderCircle /></Icon>
               ) : (
-                <Trash2 className="size-4" />
+                <Icon size="md"><Trash2 /></Icon>
               )}
               {bulkDeleting
                 ? 'Deleting...'

@@ -1,7 +1,6 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import {
   ArrowLeft,
   ClipboardList,
@@ -81,16 +80,6 @@ export default function InterviewDetailClient({
 }: InterviewDetailClientProps) {
   const interview = initialInterview
   const id = interview.id
-  const router = useRouter()
-
-  useEffect(() => {
-    function handleVisibility() {
-      if (document.visibilityState === 'visible') router.refresh()
-    }
-    document.addEventListener('visibilitychange', handleVisibility)
-    return () =>
-      document.removeEventListener('visibilitychange', handleVisibility)
-  }, [router])
 
   const [candidateLink, setCandidateLink] = useState('')
   const [candidateLinkStatus, setCandidateLinkStatus] =
@@ -305,7 +294,7 @@ export default function InterviewDetailClient({
                   <BodyText size="sm">
                     Status:{' '}
                     <strong>
-                      {interview.workflow.status.replace('_', ' ')}
+                      {interview.workflow.status.replaceAll('_', ' ')}
                     </strong>
                     {interview.workflow.currentStage
                       ? ` • stage: ${formatWorkflowStage(interview.workflow.currentStage)}`

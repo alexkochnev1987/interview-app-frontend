@@ -31,7 +31,8 @@ type LoadState =
   | { phase: 'ready'; media: InterviewAnswerMediaResponse; loadedAt: number }
   | { phase: 'error'; message: string }
 
-const SIGNED_URL_REFRESH_THRESHOLD_MS = 55 * 60 * 1000
+const SIGNED_URL_LIFETIME_MS = 60 * 60 * 1000
+const SIGNED_URL_REFRESH_THRESHOLD_MS = SIGNED_URL_LIFETIME_MS - 5 * 60 * 1000
 
 export function LazyMediaPlayback({
   interviewId,
@@ -58,16 +59,6 @@ export function LazyMediaPlayback({
     return () => clearTimeout(id)
   }, [state])
 
-  if (!hasCamera && !hasScreen) {
-    return (
-      <SurfaceTile rounded="xl" padding="lg">
-        <BodyText size="sm" tone="muted" italic>
-          No recording was uploaded for this answer.
-        </BodyText>
-      </SurfaceTile>
-    )
-  }
-
   async function handleLoad() {
     setState({ phase: 'loading' })
     try {
@@ -80,6 +71,16 @@ export function LazyMediaPlayback({
           err instanceof Error ? err.message : 'Failed to load media URLs.',
       })
     }
+  }
+
+  if (!hasCamera && !hasScreen) {
+    return (
+      <SurfaceTile rounded="xl" padding="lg">
+        <BodyText size="sm" tone="muted" italic>
+          No recording was uploaded for this answer.
+        </BodyText>
+      </SurfaceTile>
+    )
   }
 
   if (state.phase === 'idle') {

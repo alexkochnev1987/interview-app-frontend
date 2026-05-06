@@ -53,7 +53,6 @@ export function useSimilaritySearch({
   const searchSeqRef = useRef(0)
   const mountedRef = useRef(true)
   useEffect(() => {
-    mountedRef.current = true
     return () => {
       mountedRef.current = false
     }

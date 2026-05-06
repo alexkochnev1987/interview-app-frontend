@@ -1,5 +1,14 @@
 import type { Interview } from '@/lib/api'
 
+export function formatMetricLabel(value: string) {
+  return value
+    .replaceAll('_', ' ')
+    .split(' ')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ')
+}
+
 export function formatInterviewDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', {
     month: 'short',

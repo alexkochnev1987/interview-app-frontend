@@ -20,18 +20,10 @@ import {
   decisionTone,
   isPlaceholderResult,
 } from '@/lib/assessment-status'
+import { formatMetricLabel } from '@/lib/interview-formatters'
 
 interface OverallPanelProps {
   result: InterviewResult
-}
-
-function formatMetricLabel(value: string) {
-  return value
-    .replaceAll('_', ' ')
-    .split(' ')
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ')
 }
 
 export function OverallPanel({ result }: OverallPanelProps) {
