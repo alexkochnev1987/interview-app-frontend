@@ -19,15 +19,15 @@ export type InterviewQuestion = Schemas['InterviewResponseDto']['questions'][num
 
 export type CandidateQuestionView = Schemas['CandidateQuestionViewDto'];
 
-export type InterviewBehaviorRisk = NonNullable<Schemas['InterviewResultResponseDto']['behaviorSummary']>['riskLevel'] & string;
+export type InterviewBehaviorRisk = NonNullable<Schemas['InterviewResultResponseDto']['behaviorSummary']>['riskLevel'];
 export type InterviewDecision = NonNullable<Schemas['InterviewResultResponseDto']['decision']>;
 export type AnswerDecisionHint = NonNullable<Schemas['InterviewQuestionResultDto']['decisionHint']>;
 
-export type AnswerStatus = Schemas['TakeInterviewResponseDto']['currentAnswerMeta'] extends { status: infer S } ? S : string;
+export type AnswerStatus = NonNullable<Schemas['TakeInterviewResponseDto']['currentAnswerMeta']>['status'];
 export type AnswerValidationStatus = Schemas['StartAllAnswerValidationsResponseDto']['answers'][number]['status'];
 
-export type InterviewWorkflowStatus = Schemas['InterviewResponseDto']['workflow'] extends { status: infer S } ? S : string;
-export type InterviewWorkflowStage = Schemas['InterviewResponseDto']['workflow'] extends { currentStage?: infer S } ? S : string;
+export type InterviewWorkflowStatus = NonNullable<Schemas['InterviewResponseDto']['workflow']>['status'];
+export type InterviewWorkflowStage = NonNullable<Schemas['InterviewResponseDto']['workflow']>['currentStage'];
 
 export type MediaArtifact = Schemas['MediaArtifactDto'];
 export type AnswerBehaviorSignals = Schemas['BehaviorSignalsDto'] & { copyCount?: number };

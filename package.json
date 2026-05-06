@@ -5,9 +5,9 @@
   "scripts": {
     "dev": "next dev -p 3001",
     "build": "next build --webpack",
-    "start": "next start -p 3001",
+    "start": "next start",
     "lint": "eslint .",
-    "openapi:generate": "openapi-typescript ../interview-app-backend/openapi/openapi.json -o src/lib/api-types.ts"
+    "openapi:generate": "openapi-typescript openapi/openapi.json -o src/lib/api-types.ts"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",
