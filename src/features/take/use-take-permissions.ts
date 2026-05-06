@@ -21,6 +21,7 @@ interface UseTakePermissionsParams {
   attachCameraPreview: (stream: MediaStream) => void;
   stopMediaStream: (stream: MediaStream | null) => void;
   resetInterviewSetup: (message: string) => void;
+  handleScreenShareEnded: (message: string) => void;
   getPermissionErrorMessage: (error: unknown, requiresEntireScreen?: boolean) => string;
   screenStreamRef: MutableRefObject<MediaStream | null>;
 }
@@ -37,6 +38,7 @@ export function useTakePermissions({
   attachCameraPreview,
   stopMediaStream,
   resetInterviewSetup,
+  handleScreenShareEnded,
   getPermissionErrorMessage,
   screenStreamRef,
 }: UseTakePermissionsParams) {
@@ -94,7 +96,9 @@ export function useTakePermissions({
       }
 
       screenTrack.onended = () => {
-        resetInterviewSetup('Screen sharing stopped. Start the setup again to continue the interview.');
+        handleScreenShareEnded(
+          'Screen sharing stopped. Reconnect camera and entire-screen sharing to continue this question.',
+        );
       };
 
       screenStreamRef.current = screenStream;

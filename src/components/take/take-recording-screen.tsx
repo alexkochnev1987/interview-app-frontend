@@ -11,6 +11,7 @@ import { LiveTranscriptPanel } from '@/components/take/live-transcript-panel';
 import type { InterviewDataView, TakeStage } from '@/components/take/types';
 import { CardContent } from '@/components/ui/card';
 import { Heading } from '@/components/ui/heading';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Container, Grid, Stack } from '@/components/ui/layout';
 
 interface TakeRecordingScreenProps {
@@ -19,6 +20,7 @@ interface TakeRecordingScreenProps {
   progressValue: number;
   screenSurface: string;
   setupError: string;
+  submitError: string;
   currentVersionNumber: number;
   retakeCount: number;
   timeLeft: number;
@@ -31,6 +33,7 @@ interface TakeRecordingScreenProps {
   videoRef: RefObject<HTMLVideoElement | null>;
   screenVideoRef: RefObject<HTMLVideoElement | null>;
   formatTime: (seconds: number) => string;
+  onReconnect: () => void;
   onRerecord: () => void;
   onSubmit: () => void;
 }
@@ -41,6 +44,7 @@ export function TakeRecordingScreen({
   progressValue,
   screenSurface,
   setupError,
+  submitError,
   currentVersionNumber,
   retakeCount,
   timeLeft,
@@ -53,6 +57,7 @@ export function TakeRecordingScreen({
   videoRef,
   screenVideoRef,
   formatTime,
+  onReconnect,
   onRerecord,
   onSubmit,
 }: TakeRecordingScreenProps) {
@@ -98,10 +103,18 @@ export function TakeRecordingScreen({
               />
 
               <TakeRecordingGuidance stage={stage} transitionLabel={transitionLabel} />
+              {submitError ? (
+                <Alert variant="destructive">
+                  <AlertTitle>Submit failed</AlertTitle>
+                  <AlertDescription>{submitError}</AlertDescription>
+                </Alert>
+              ) : null}
               <TakeRecordingActions
                 stage={stage}
                 uploading={uploading}
                 transitionLabel={transitionLabel}
+                setupError={setupError}
+                onReconnect={onReconnect}
                 onRerecord={onRerecord}
                 onSubmit={onSubmit}
               />

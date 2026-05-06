@@ -58,6 +58,9 @@ export function queueBufferedUpload({
       }
 
       activeSession = multipartUploadsRef.current[target];
+      if (activeSession) {
+        activeSession.uploadedPartCount += 1;
+      }
     }
   });
 

@@ -24,6 +24,7 @@ export default function TakeInterviewPage() {
     screenSurface,
     setupBusy,
     setupError,
+    submitError,
     currentVersionNumber,
     retakeCount,
     timeLeft,
@@ -96,6 +97,7 @@ export default function TakeInterviewPage() {
       progressValue={progressValue}
       screenSurface={screenSurface}
       setupError={setupError}
+      submitError={submitError}
       currentVersionNumber={currentVersionNumber}
       retakeCount={retakeCount}
       timeLeft={timeLeft}
@@ -108,6 +110,7 @@ export default function TakeInterviewPage() {
       videoRef={videoRef}
       screenVideoRef={screenVideoRef}
       formatTime={formatTime}
+      onReconnect={handleStartInterview}
       onRerecord={() => requestVersionAction('rerecord')}
       onSubmit={() => requestVersionAction('submit')}
     />

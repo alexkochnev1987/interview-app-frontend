@@ -14,6 +14,7 @@ export interface MultipartUploadSession {
   mediaKey: string;
   uploadId: string;
   nextPartNumber: number;
+  uploadedPartCount: number;
   bufferedChunks: Blob[];
   bufferedBytes: number;
   recordedBytes: number;
@@ -86,6 +87,7 @@ export function createMultipartUploadSession(session: MultipartSessionSeed): Mul
     mediaKey: session.mediaKey,
     uploadId: session.uploadId,
     nextPartNumber: 1,
+    uploadedPartCount: 0,
     bufferedChunks: [],
     bufferedBytes: 0,
     recordedBytes: 0,

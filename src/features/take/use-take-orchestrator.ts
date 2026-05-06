@@ -173,6 +173,26 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     setStage('consent');
   }
 
+  function handleScreenShareEnded(message: string) {
+    discardRecordingRef.current = true;
+    pendingVersionActionRef.current = null;
+    stopActiveRecorders();
+    void abortMultipartUploads();
+    clearRecordingArtifacts();
+    setScreenStatus('denied');
+    setScreenSurface('');
+    setSetupBusy(false);
+    setSetupError(message);
+    setTransitionLabel('');
+    autoStartedQuestionKeyRef.current = '';
+    stopMediaStream(screenStreamRef.current);
+    screenStreamRef.current = null;
+    if (screenVideoRef.current) {
+      screenVideoRef.current.srcObject = null;
+    }
+    setStage('interview');
+  }
+
   const { loadInterview } = useTakeInterviewLoader({
     id,
     candidateToken,
@@ -217,6 +237,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     attachCameraPreview,
     stopMediaStream,
     resetInterviewSetup,
+    handleScreenShareEnded,
     getPermissionErrorMessage,
     screenStreamRef,
   });
@@ -260,10 +281,18 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
       setSubmitError('');
       await enqueueProgressFlush(true);
       await Promise.all([queueBufferedUpload('camera', true), queueBufferedUpload('screen', true)]);
-      await Promise.all([completeMultipartUpload('camera'), completeMultipartUpload('screen')]);
 
       const cameraUpload = getMultipartSession(multipartUploadsRef.current, 'camera');
       const screenUpload = getMultipartSession(multipartUploadsRef.current, 'screen');
+
+      const hasUploadedCameraParts = cameraUpload.uploadedPartCount > 0;
+      const hasUploadedScreenParts = screenUpload.uploadedPartCount > 0;
+      if (!hasUploadedCameraParts || !hasUploadedScreenParts) {
+        throw new Error('Recording is too short to submit yet. Please record a bit longer and try again.');
+      }
+
+      await Promise.all([completeMultipartUpload('camera'), completeMultipartUpload('screen')]);
+
       const transcriptSnapshot =
         action === 'submit' ? await stopBrowserTranscript({ finalize: true, timeoutMs: 700 }) : null;
 
@@ -462,7 +491,8 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     screenStatus,
     screenSurface,
     setupBusy,
-    setupError: submitError || setupError,
+    setupError,
+    submitError,
     transitionLabel,
     videoRef,
     screenVideoRef,

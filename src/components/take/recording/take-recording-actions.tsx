@@ -7,6 +7,8 @@ interface TakeRecordingActionsProps {
   stage: TakeStage;
   uploading: boolean;
   transitionLabel: string;
+  setupError: string;
+  onReconnect: () => void;
   onRerecord: () => void;
   onSubmit: () => void;
 }
@@ -15,12 +17,19 @@ export function TakeRecordingActions({
   stage,
   uploading,
   transitionLabel,
+  setupError,
+  onReconnect,
   onRerecord,
   onSubmit,
 }: TakeRecordingActionsProps) {
   return (
     <Inline wrap="wrap" gap={3}>
       {stage === 'interview' ? <StatusPill tone="neutral">Preparing recording...</StatusPill> : null}
+      {stage === 'interview' && setupError ? (
+        <Button type="button" variant="outline" onClick={onReconnect} disabled={uploading}>
+          Reconnect camera + screen
+        </Button>
+      ) : null}
 
       {stage === 'recording' ? (
         <>

@@ -23,6 +23,11 @@ export async function completeMultipartUpload({
     return;
   }
 
+  if (session.uploadedPartCount === 0) {
+    session.completed = true;
+    return;
+  }
+
   try {
     await completeMultipartUploadRequest(session.questionIndex, session.mediaKey, session.uploadId);
   } catch {
