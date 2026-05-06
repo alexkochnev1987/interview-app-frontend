@@ -1,12 +1,11 @@
 'use client'
 
-import { LoaderCircle, Search, Trash2 } from 'lucide-react'
+import { LoaderCircle, Trash2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { IconAffix } from '@/components/ui/icon-affix'
-import { Input } from '@/components/ui/input'
 import { Grid } from '@/components/ui/layout/grid'
+import { SearchInput } from '@/components/ui/search-input'
 import {
   Select,
   SelectContent,
@@ -46,16 +45,11 @@ export function QuestionsLibraryToolbar({
           gap={4}
           align="center"
         >
-          <IconAffix icon={<Search className="size-4" />}>
-            <Input
-              size="lg"
-              shape="pill"
-              iconAffix="leading"
-              value={query}
-              onChange={(event) => onQueryChange(event.target.value)}
-              placeholder="Search by prompt, role, category, concept, or red flag"
-            />
-          </IconAffix>
+          <SearchInput
+            value={query}
+            onChange={(event) => onQueryChange(event.target.value)}
+            placeholder="Search by prompt, role, category, concept, or red flag"
+          />
           <Select
             value={difficulty}
             onValueChange={(value) => onDifficultyChange(value as DifficultyFilter)}
