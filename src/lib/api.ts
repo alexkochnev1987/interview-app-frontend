@@ -117,13 +117,14 @@ export interface MediaArtifact {
 export interface AnswerBehaviorSignals {
   tabHiddenCount: number;
   windowBlurCount: number;
+  copyCount: number;
   pasteCount: number;
   keydownCount: number;
   resizeCount: number;
 }
 
 export interface AnswerBehaviorEvent {
-  eventType: 'tab_hidden' | 'window_blur' | 'paste' | 'keydown' | 'resize';
+  eventType: 'tab_hidden' | 'window_blur' | 'copy' | 'paste' | 'keydown' | 'resize';
   occurredAt: string;
   versionNumber: number;
 }

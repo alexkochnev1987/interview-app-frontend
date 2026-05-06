@@ -4,15 +4,17 @@ import type { ClientTranscriptPayload } from '@/lib/api';
 export type CaptureTarget = 'camera' | 'screen';
 
 export interface AnswerBehaviorEvent {
-  eventType: 'tab_hidden' | 'window_blur' | 'paste' | 'keydown' | 'resize';
+  eventType: 'tab_hidden' | 'window_blur' | 'copy' | 'paste' | 'keydown' | 'resize';
   occurredAt: string;
   versionNumber: number;
 }
 
 export interface MultipartUploadSession {
+  questionIndex: number;
   mediaKey: string;
   uploadId: string;
   nextPartNumber: number;
+  uploadedPartCount: number;
   bufferedChunks: Blob[];
   bufferedBytes: number;
   recordedBytes: number;
@@ -27,6 +29,7 @@ export interface MultipartUploadState {
 }
 
 export interface MultipartSessionSeed {
+  questionIndex: number;
   mediaKey: string;
   uploadId: string;
 }
@@ -80,9 +83,11 @@ export function clearProgressTimers(
 
 export function createMultipartUploadSession(session: MultipartSessionSeed): MultipartUploadSession {
   return {
+    questionIndex: session.questionIndex,
     mediaKey: session.mediaKey,
     uploadId: session.uploadId,
     nextPartNumber: 1,
+    uploadedPartCount: 0,
     bufferedChunks: [],
     bufferedBytes: 0,
     recordedBytes: 0,

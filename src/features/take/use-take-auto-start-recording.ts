@@ -11,7 +11,7 @@ interface UseTakeAutoStartRecordingParams {
   screenStatus: 'idle' | 'pending' | 'granted' | 'denied';
   screenSurface: string;
   autoStartedQuestionKeyRef: { current: string };
-  beginRecordingRef: { current: (nextVersionNumber: number) => Promise<void> };
+  beginRecordingRef: { current: (nextVersionNumber: number, currentQuestionIndex: number) => Promise<void> };
 }
 
 export function useTakeAutoStartRecording({
@@ -46,7 +46,7 @@ export function useTakeAutoStartRecording({
 
     autoStartedQuestionKeyRef.current = questionKey;
     const nextVersionNumber = (interview.currentAnswerMeta?.versionCount ?? 0) + 1;
-    void beginRecordingRef.current(nextVersionNumber);
+    void beginRecordingRef.current(nextVersionNumber, interview.currentQuestionIndex);
   }, [
     cameraStatus,
     interview,

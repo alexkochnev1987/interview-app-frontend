@@ -82,7 +82,7 @@ export function useTakeBeginRecording({
 }: UseTakeBeginRecordingParams) {
   function handleRecorderStopped() {
     stoppedRecordersRef.current += 1;
-    if (stoppedRecordersRef.current < 2) {
+    if (stoppedRecordersRef.current !== 2) {
       return;
     }
     onRecordersStopped();
