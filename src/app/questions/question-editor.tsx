@@ -28,6 +28,9 @@ import {
   parseMetadata,
   type DraftFieldKey,
 } from '@/lib/question-editor/parsers'
+import { FEEDBACK_POLICY } from '@/lib/feedback-policy'
+import { runMutation } from '@/lib/run-mutation'
+import { TOAST_MESSAGES } from '@/lib/toast-messages'
 import { useDirtyTracking } from './use-dirty-tracking'
 import { useSimilaritySearch } from './use-similarity-search'
 
@@ -39,6 +42,11 @@ interface QuestionEditorProps {
   initialValue?: QuestionInput
   submitLabel: string
   onSubmit: (value: QuestionInput) => Promise<QuestionInput>
+  saveToastOptions?: {
+    enabled?: boolean
+    successMessage?: string
+    errorMessage?: string
+  }
 }
 
 export function QuestionEditor({
@@ -47,6 +55,7 @@ export function QuestionEditor({
   initialValue,
   submitLabel,
   onSubmit,
+  saveToastOptions,
 }: QuestionEditorProps) {
   const [value, setValue] = useState<QuestionInput>(normalizeInitialValue(initialValue))
   const [metadataText, setMetadataText] = useState(
@@ -88,7 +97,11 @@ export function QuestionEditor({
       setAiDraft(null)
       setDismissedDraftFields([])
       setAiStatus('error')
-      setError(err instanceof Error ? err.message : 'Failed to generate question draft.')
+      setError(
+        err instanceof Error
+          ? err.message
+          : FEEDBACK_POLICY.draftQuestion.inlineErrorFallback,
+      )
     }
   }
 
@@ -170,17 +183,29 @@ export function QuestionEditor({
     }
 
     setSubmitting(true)
+    let persisted: QuestionInput | null = null
+
     try {
-      const persisted = normalizeInitialValue(await onSubmit(payload))
+      persisted = normalizeInitialValue(
+        await runMutation(() => onSubmit(payload), {
+          showSuccessToast: saveToastOptions?.enabled ?? true,
+          successMessage: saveToastOptions?.successMessage ?? TOAST_MESSAGES.question.saveSuccess,
+          errorMessage: saveToastOptions?.errorMessage ?? TOAST_MESSAGES.question.saveError,
+        }),
+      )
+    } catch {
+      persisted = null
+    } finally {
+      setSubmitting(false)
+    }
+
+    if (persisted) {
       const normalizedMetadataText = formatMetadata(persisted.metadata)
       setValue(persisted)
       setMetadataText(normalizedMetadataText)
       markSaved(persisted, normalizedMetadataText)
-      setSubmitting(false)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save question.')
-      setSubmitting(false)
     }
+
   }
 
   return (

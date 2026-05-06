@@ -1,0 +1,32 @@
+export const TOAST_MESSAGES = {
+  question: {
+    createSuccess: "Question created",
+    createError: "Failed to create question",
+    saveSuccess: "Question saved",
+    saveError: "Failed to save question",
+    bulkDeleteSuccess: "Questions deleted",
+    bulkDeleteError: "Failed to delete questions",
+    restoreSuccess: "Question restored",
+    restoreError: "Failed to restore question",
+    deleteSuccess: "Question deleted",
+    deleteError: "Failed to delete question",
+  },
+  interview: {
+    createSuccess: "Interview created",
+    createError: "Failed to create interview",
+    refreshLinkSuccess: "Candidate link refreshed",
+    refreshLinkError: "Failed to refresh candidate link",
+    validationStartSuccess: "Validation started",
+    validationStartError: "Failed to start interview validation",
+    uploadSuccess: (questionNumber: number) => `Upload completed for question ${questionNumber}`,
+    uploadError: (questionNumber: number) => `Upload failed for question ${questionNumber}`,
+  },
+  auth: {
+    loginError: "Login failed",
+    logoutError: "Failed to log out",
+  },
+  take: {
+    submitSuccess: "Answer submitted",
+    submitError: "Failed to submit answer",
+  },
+} as const

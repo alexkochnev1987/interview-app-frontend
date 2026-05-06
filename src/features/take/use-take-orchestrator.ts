@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 
 import { useBrowserTranscript } from '@/lib/use-browser-transcript';
 import { submitTakeAnswer, type TakeInterviewData } from '@/lib/api';
+import { runMutation } from '@/lib/run-mutation';
+import { TOAST_MESSAGES } from '@/lib/toast-messages';
 import type { PermissionStatus, TakeStage } from '@/components/take/types';
 import {
   clearProgressTimers,
@@ -374,7 +376,14 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
       };
 
       if (action === 'submit') {
-        await handleSubmit();
+        await runMutation(
+          () => handleSubmit(),
+          {
+            successMessage: TOAST_MESSAGES.take.submitSuccess,
+            errorMessage: TOAST_MESSAGES.take.submitError,
+            getErrorMessage: () => 'Please review recording data and try again.',
+          }
+        );
       } else {
         await handleRerecord();
       }

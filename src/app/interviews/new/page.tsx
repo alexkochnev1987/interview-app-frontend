@@ -26,6 +26,8 @@ import { Stack } from '@/components/ui/layout/stack'
 import { Input } from '@/components/ui/input'
 import { BodyText, SectionHeading } from '@/components/ui/text'
 import { createInterview, fetchQuestions, type Question } from '@/lib/api'
+import { runMutation } from '@/lib/run-mutation'
+import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 export default function NewInterviewPage() {
   const router = useRouter()
@@ -87,17 +89,31 @@ export default function NewInterviewPage() {
     }
 
     setSubmitting(true)
+    let interview: Awaited<ReturnType<typeof createInterview>> | null = null
+
     try {
-      const interview = await createInterview({
-        candidateName: candidateName.trim(),
-        position: position.trim(),
-        questionIds: selectedQuestionIds,
-      })
-      router.push(`/interviews/${interview.id}`)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create interview.')
+      interview = await runMutation(
+        () =>
+          createInterview({
+            candidateName: candidateName.trim(),
+            position: position.trim(),
+            questionIds: selectedQuestionIds,
+          }),
+        {
+          successMessage: TOAST_MESSAGES.interview.createSuccess,
+          errorMessage: TOAST_MESSAGES.interview.createError,
+        }
+      )
+    } catch {
+      interview = null
+    } finally {
       setSubmitting(false)
     }
+
+    if (interview) {
+      router.push(`/interviews/${interview.id}`)
+    }
+
   }
 
   const selectedQuestions = questions.filter((question) => selectedQuestionIds.includes(question.id))

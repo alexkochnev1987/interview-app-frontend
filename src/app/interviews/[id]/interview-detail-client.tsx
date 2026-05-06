@@ -61,6 +61,8 @@ import {
   formatInterviewStatusLabel,
   getCandidateInitials,
 } from "@/lib/interview-formatters";
+import { runMutation } from "@/lib/run-mutation";
+import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
 type UploadStatus = "idle" | "uploading" | "uploaded" | "error";
 
@@ -213,7 +215,11 @@ export default function InterviewDetailClient({
       try {
         setCandidateLinkStatus("loading");
         setCandidateLinkError("");
-        const data = await generateCandidateLink(id);
+        const data = await runMutation(() => generateCandidateLink(id), {
+          showSuccessToast: mode === "refresh",
+          successMessage: TOAST_MESSAGES.interview.refreshLinkSuccess,
+          errorMessage: TOAST_MESSAGES.interview.refreshLinkError,
+        });
         setCandidateLink(buildCandidateUrl(data.candidateLink));
         setCandidateLinkStatus("ready");
         if (mode === "refresh") {
@@ -378,26 +384,30 @@ export default function InterviewDetailClient({
     );
 
     try {
-      const { uploadUrl, mediaKey } = await getPresignedUrl(
-        interview.id,
-        questionIndex,
-        file.type,
-      );
+      const updatedInterview = await runMutation(
+        async () => {
+          const { uploadUrl, mediaKey } = await getPresignedUrl(
+            interview.id,
+            questionIndex,
+            file.type,
+          );
 
-      const uploadResponse = await fetch(uploadUrl, {
-        method: "PUT",
-        headers: { "Content-Type": file.type },
-        body: file,
-      });
+          const uploadResponse = await fetch(uploadUrl, {
+            method: "PUT",
+            headers: { "Content-Type": file.type },
+            body: file,
+          });
 
-      if (!uploadResponse.ok) {
-        throw new Error("Upload to storage failed");
-      }
+          if (!uploadResponse.ok) {
+            throw new Error("Upload to storage failed");
+          }
 
-      const updatedInterview = await completeUpload(
-        interview.id,
-        questionIndex,
-        mediaKey,
+          return completeUpload(interview.id, questionIndex, mediaKey);
+        },
+        {
+          successMessage: TOAST_MESSAGES.interview.uploadSuccess(questionIndex + 1),
+          errorMessage: TOAST_MESSAGES.interview.uploadError(questionIndex + 1),
+        },
       );
       setInterview(updatedInterview);
       setUploadStates((current) =>
@@ -429,17 +439,15 @@ export default function InterviewDetailClient({
     setError(null);
 
     try {
-      await validateInterview(interview.id);
+      await runMutation(() => validateInterview(interview.id), {
+        successMessage: TOAST_MESSAGES.interview.validationStartSuccess,
+        errorMessage: TOAST_MESSAGES.interview.validationStartError,
+      });
       const refreshedInterview = await getInterview(interview.id);
       setInterview(refreshedInterview);
       setResults(refreshedInterview.result ?? null);
       startValidationPolling();
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to validate interview answers.",
-      );
+    } catch {
       setValidating(false);
     }
   }

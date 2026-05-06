@@ -7,7 +7,6 @@ import { ArrowRight, LockKeyhole, ShieldCheck, Sparkles } from 'lucide-react'
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
 import { HeroLead, HeroTitle } from '@/components/ui/hero-text'
 import { IconBadge } from '@/components/ui/icon-badge'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { DividerLabel } from '@/components/ui/divider-label'
@@ -17,39 +16,52 @@ import { Grid } from '@/components/ui/layout/grid'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText, SectionHeading } from '@/components/ui/text'
+import { runMutation } from '@/lib/run-mutation'
+import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 export default function LoginPage() {
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    setError('')
     setLoading(true)
+    let loginSucceeded = false
 
     try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ email, password }),
-      })
+      await runMutation(
+        async () => {
+          const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ email, password }),
+          })
 
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
-        throw new Error(data.message || 'Invalid credentials')
-      }
-
-      router.push('/')
-      router.refresh()
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed')
+          if (!res.ok) {
+            const data = await res.json().catch(() => ({}))
+            throw new Error(data.message || 'Invalid credentials')
+          }
+        },
+        {
+          showSuccessToast: false,
+          errorMessage: TOAST_MESSAGES.auth.loginError,
+        }
+      )
+      loginSucceeded = true
+    } catch {
+      loginSucceeded = false
     } finally {
       setLoading(false)
     }
+
+    if (loginSucceeded) {
+      router.push('/')
+      router.refresh()
+    }
+
   }
 
   return (
@@ -129,13 +141,6 @@ export default function LoginPage() {
           <CardContent>
             <form onSubmit={handleSubmit}>
               <Stack gap={6}>
-                {error ? (
-                <Alert variant="danger">
-                  <AlertTitle>Authentication failed</AlertTitle>
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              ) : null}
-
               <Stack gap={4}>
                 <FormField htmlFor="email" label="Email">
                   <Input
