@@ -45,6 +45,7 @@ export default function TakeInterviewPage() {
     formatTime,
   } = useTakeOrchestrator({ id, candidateToken })
 
+
   if (error && !interview) {
     return (
       <PageMainLayout>
