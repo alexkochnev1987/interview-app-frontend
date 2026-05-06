@@ -53,8 +53,8 @@ export function useSimilaritySearch({
   const signalSummary = useMemo<SimilaritySignalSummary>(() => {
     const textTokens = tokenize(value.questionText)
     return {
-      conceptCount: value.expectedConcepts.filter((item) => item.label || item.id).length,
-      tagCount: value.tags.filter((item) => item.trim()).length,
+      conceptCount: (value.expectedConcepts || []).filter((item) => item.label || item.id).length,
+      tagCount: (value.tags || []).filter((item) => item.trim()).length,
       taxonomyCount: [value.category, value.subcategory, value.role, value.focus].filter(
         (item) => item?.trim(),
       ).length,
@@ -80,7 +80,7 @@ export function useSimilaritySearch({
     () =>
       JSON.stringify({
         category: normalizeComparable(value.category),
-        concepts: value.expectedConcepts.map((item) => ({
+        concepts: (value.expectedConcepts || []).map((item) => ({
           description: normalizeComparable(item.description),
           id: normalizeComparable(item.id),
           label: normalizeComparable(item.label),
@@ -90,7 +90,7 @@ export function useSimilaritySearch({
         questionText: normalizeComparable(value.questionText),
         role: normalizeComparable(value.role),
         subcategory: normalizeComparable(value.subcategory),
-        tags: value.tags.map((item) => normalizeComparable(item)).filter(Boolean),
+        tags: (value.tags || []).map((item) => normalizeComparable(item)).filter(Boolean),
       }),
     [
       value.category,

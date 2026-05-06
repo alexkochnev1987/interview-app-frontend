@@ -47,7 +47,7 @@ export function EditorRubricSection({
         >
           <RawListTextarea
             id="expectedConcepts"
-            parsedValue={value.expectedConcepts}
+            parsedValue={value.expectedConcepts || []}
             format={formatExpectedConcepts}
             parse={parseExpectedConcepts}
             onParsedChange={(next) => onUpdate({ expectedConcepts: next })}
@@ -64,7 +64,7 @@ export function EditorRubricSection({
         >
           <RawListTextarea
             id="redFlags"
-            parsedValue={value.redFlags}
+            parsedValue={value.redFlags || []}
             format={formatRedFlags}
             parse={parseRedFlags}
             onParsedChange={(next) => onUpdate({ redFlags: next })}

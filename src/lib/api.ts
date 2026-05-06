@@ -1,278 +1,53 @@
+import { components } from './api-types';
+
 const API_URL = '/api';
 
-export type QuestionDifficulty = 'easy' | 'medium' | 'hard';
-export type QuestionRedFlagSeverity = 'low' | 'medium' | 'high';
+type Schemas = components['schemas'];
 
-export interface QuestionExpectedConcept {
-  id: string;
-  label: string;
-  weight: number;
-  description: string;
-}
+export type QuestionDifficulty = Schemas['QuestionResponseDto']['difficulty'];
+export type AuthUserResponseDto = Schemas['AuthUserResponseDto'];
+export type QuestionRedFlagSeverity = Schemas['QuestionRedFlagDto']['severity'];
 
-export interface QuestionRedFlag {
-  id: string;
-  label: string;
-  severity: QuestionRedFlagSeverity;
-}
+export type QuestionExpectedConcept = Schemas['QuestionExpectedConceptDto'];
+export type QuestionRedFlag = Schemas['QuestionRedFlagDto'];
 
-export interface QuestionDraft {
-  externalId?: string;
-  role?: string;
-  focus?: string;
-  outputLanguage: string;
-  category?: string;
-  subcategory?: string;
-  questionText: string;
-  followUpQuestions: string[];
-  expectedConcepts: QuestionExpectedConcept[];
-  redFlags: QuestionRedFlag[];
-  difficulty: QuestionDifficulty;
-  weight: number;
-  sampleGoodAnswer?: string;
-  minimumPassScore: number;
-  tags: string[];
-  metadata: Record<string, unknown>;
-}
+export type QuestionDraft = Schemas['QuestionDraftResponseDto'];
+export type QuestionInput = Schemas['CreateQuestionDto'];
+export type Question = Schemas['QuestionResponseDto'];
 
-export interface QuestionInput {
-  externalId?: string;
-  role?: string;
-  focus?: string;
-  outputLanguage: string;
-  category?: string;
-  subcategory?: string;
-  questionText: string;
-  followUpQuestions: string[];
-  expectedConcepts: QuestionExpectedConcept[];
-  redFlags: QuestionRedFlag[];
-  difficulty: QuestionDifficulty;
-  weight: number;
-  sampleGoodAnswer?: string;
-  minimumPassScore: number;
-  tags: string[];
-  metadata: Record<string, unknown>;
-}
+export type InterviewQuestion = Schemas['InterviewResponseDto']['questions'][number];
 
-export interface Question extends QuestionInput {
-  id: string;
-  createdAt: string;
-  updatedAt: string;
-  deleted: boolean;
-}
+export type CandidateQuestionView = Schemas['CandidateQuestionViewDto'];
 
-export interface InterviewQuestion {
-  id: string;
-  externalId?: string;
-  role?: string;
-  focus?: string;
-  outputLanguage: string;
-  category?: string;
-  subcategory?: string;
-  questionText: string;
-  followUpQuestions: string[];
-  expectedConcepts: QuestionExpectedConcept[];
-  redFlags: QuestionRedFlag[];
-  difficulty: QuestionDifficulty;
-  weight: number;
-  sampleGoodAnswer?: string;
-  minimumPassScore: number;
-  tags: string[];
-  metadata: Record<string, unknown>;
-}
+export type InterviewBehaviorRisk = NonNullable<Schemas['InterviewResultResponseDto']['behaviorSummary']>['riskLevel'] & string;
+export type InterviewDecision = NonNullable<Schemas['InterviewResultResponseDto']['decision']>;
+export type AnswerDecisionHint = NonNullable<Schemas['InterviewQuestionResultDto']['decisionHint']>;
 
-export interface CandidateQuestionView {
-  text: string;
-}
+export type AnswerStatus = Schemas['TakeInterviewResponseDto']['currentAnswerMeta'] extends { status: infer S } ? S : string;
+export type AnswerValidationStatus = Schemas['StartAllAnswerValidationsResponseDto']['answers'][number]['status'];
 
-export type InterviewBehaviorRisk = 'low' | 'medium' | 'high';
-export type InterviewDecision = 'proceed' | 'review' | 'reject';
-export type AnswerDecisionHint = 'pass' | 'review' | 'fail';
-export type AnswerStatus = 'recording' | 'submitted';
-export type AnswerValidationStatus = 'idle' | 'queued' | 'processing' | 'completed' | 'failed';
-export type InterviewWorkflowStatus =
-  | 'idle'
-  | 'queued'
-  | 'processing'
-  | 'completed'
-  | 'failed';
-export type InterviewWorkflowStage =
-  | 'validate_answers'
-  | 'transcribe_audio'
-  | 'analyze_answers'
-  | 'aggregate_result'
-  | 'store_result';
+export type InterviewWorkflowStatus = Schemas['InterviewResponseDto']['workflow'] extends { status: infer S } ? S : string;
+export type InterviewWorkflowStage = Schemas['InterviewResponseDto']['workflow'] extends { currentStage?: infer S } ? S : string;
 
-export interface MediaArtifact {
-  mediaKey: string;
-  contentType: string;
-  fileSizeBytes?: number;
-  uploadedAt: string;
-}
+export type MediaArtifact = Schemas['MediaArtifactDto'];
+export type AnswerBehaviorSignals = Schemas['BehaviorSignalsDto'];
+export type AnswerBehaviorEvent = Schemas['BehaviorEventDto'];
+export type AnswerTranscript = Schemas['AnswerTranscriptDto'];
+export type ClientTranscriptPayload = Schemas['ClientTranscriptDto'];
+export type AnswerEvaluation = Schemas['AnswerEvaluationDto'];
+export type AnswerValidation = Schemas['AnswerValidationDto'];
+export type Answer = Schemas['AnswerDto'];
+export type AnswerVersion = Schemas['AnswerVersionDto'];
 
-export interface AnswerBehaviorSignals {
-  tabHiddenCount: number;
-  windowBlurCount: number;
-  copyCount: number;
-  pasteCount: number;
-  keydownCount: number;
-  resizeCount: number;
-}
+export type InterviewQuestionResult = Schemas['InterviewQuestionResultDto'];
+export type InterviewBehaviorSummary = Schemas['InterviewBehaviorSummaryDto'];
+export type InterviewResult = Schemas['InterviewResultResponseDto'];
+export type InterviewWorkflow = Schemas['InterviewWorkflowDto'];
+export type Interview = Schemas['InterviewResponseDto'];
 
-export interface AnswerBehaviorEvent {
-  eventType: 'tab_hidden' | 'window_blur' | 'copy' | 'paste' | 'keydown' | 'resize';
-  occurredAt: string;
-  versionNumber: number;
-}
-
-export interface AnswerTranscript {
-  text?: string;
-  language?: string;
-  provider?: 'browser-web-speech' | 'whisper';
-  generatedAt?: string;
-  isFinal?: boolean;
-}
-
-export interface ClientTranscriptPayload {
-  text: string;
-  language: string;
-  provider: 'browser-web-speech' | 'whisper';
-  generatedAt: string;
-  isFinal: boolean;
-}
-
-export interface AnswerEvaluation {
-  overallScore?: number;
-  categoryScores?: Record<string, number>;
-  coveredConceptIds?: string[];
-  missedConceptIds?: string[];
-  redFlagIds?: string[];
-  behaviorRisk?: InterviewBehaviorRisk;
-  summary?: string;
-  decisionHint?: AnswerDecisionHint;
-  evaluatedAt?: string;
-}
-
-export interface AnswerValidation {
-  status: AnswerValidationStatus;
-  executionArn?: string;
-  sourceVersionNumber?: number;
-  requestedAt?: string;
-  startedAt?: string;
-  completedAt?: string;
-  errorMessage?: string;
-}
-
-export interface Answer {
-  questionIndex: number;
-  questionId: string;
-  status: AnswerStatus;
-  mediaKey: string;
-  screenMediaKey?: string;
-  uploadedAt: string;
-  durationSeconds?: number;
-  retakeCount?: number;
-  startedAt?: string;
-  submittedAt?: string;
-  camera?: MediaArtifact;
-  screen?: MediaArtifact;
-  behaviorSignals?: AnswerBehaviorSignals;
-  selectedVersionNumber?: number;
-  versions?: AnswerVersion[];
-  behaviorEvents?: AnswerBehaviorEvent[];
-  transcript?: AnswerTranscript;
-  evaluation?: AnswerEvaluation;
-  validation?: AnswerValidation;
-}
-
-export interface AnswerVersion {
-  versionNumber: number;
-  mediaKey: string;
-  screenMediaKey?: string;
-  uploadedAt: string;
-  durationSeconds?: number;
-  startedAt?: string;
-  submittedAt?: string;
-  camera?: MediaArtifact;
-  screen?: MediaArtifact;
-  behaviorSignals?: AnswerBehaviorSignals;
-  behaviorEvents?: AnswerBehaviorEvent[];
-}
-
-export interface InterviewQuestionResult {
-  questionIndex: number;
-  questionId: string;
-  score?: number;
-  categoryScores?: Record<string, number>;
-  summary?: string;
-  decisionHint?: AnswerDecisionHint;
-}
-
-export interface InterviewBehaviorSummary {
-  riskLevel?: InterviewBehaviorRisk;
-  notes: string[];
-}
-
-export interface InterviewResult {
-  overallScore: number;
-  summary: string;
-  categoryScores: Record<string, number>;
-  rubricVersion?: string;
-  decision?: InterviewDecision;
-  trustScore?: number;
-  trustFlags?: string[];
-  behaviorSummary?: InterviewBehaviorSummary;
-  questionResults?: InterviewQuestionResult[];
-  completedAt: string;
-}
-
-export interface InterviewWorkflow {
-  status: InterviewWorkflowStatus;
-  currentStage?: InterviewWorkflowStage;
-  executionId?: string;
-  startedAt?: string;
-  completedAt?: string;
-  lastUpdatedAt: string;
-  errorMessage?: string;
-}
-
-export interface Interview {
-  id: string;
-  candidateName: string;
-  position: string;
-  questions: InterviewQuestion[];
-  answers: Answer[];
-  status: 'pending' | 'in_progress' | 'processing' | 'completed' | 'failed';
-  result?: InterviewResult;
-  workflow?: InterviewWorkflow;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface ValidateAllAnswersResponse {
-  ok: true;
-  interviewId: string;
-  requestedCount: number;
-  queuedCount: number;
-  reusedCount: number;
-  skippedCount: number;
-  answers: Array<{
-    status: AnswerValidationStatus;
-    questionIndex: number;
-    sourceVersionNumber: number;
-    reused: boolean;
-  }>;
-}
-
-export interface InterviewAnswerMediaResponse {
-  questionIndex: number;
-  cameraUrl?: string;
-  screenUrl?: string;
-}
-
-export interface CandidateLinkResponse {
-  candidateLink: string;
-}
+export type ValidateAllAnswersResponse = Schemas['StartAllAnswerValidationsResponseDto'];
+export type InterviewAnswerMediaResponse = Schemas['InterviewAnswerMediaResponseDto'];
+export type CandidateLinkResponse = Schemas['CandidateLinkResponseDto'];
 
 export interface CreateInterviewPayload {
   candidateName: string;
@@ -280,10 +55,7 @@ export interface CreateInterviewPayload {
   questionIds: string[];
 }
 
-export interface PresignedUrlResponse {
-  uploadUrl: string;
-  mediaKey: string;
-}
+export type PresignedUrlResponse = Schemas['PresignedUrlResponseDto'];
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
@@ -365,10 +137,7 @@ export async function restoreQuestion(id: string): Promise<Question> {
   });
 }
 
-export interface BulkDeleteResult {
-  deleted: string[];
-  blocked: Array<{ id: string; questionText: string; reason: string }>;
-}
+export type BulkDeleteResult = Schemas['BulkDeleteQuestionsResponseDto'];
 
 export async function deleteQuestionsBulk(
   ids: string[],
@@ -489,51 +258,15 @@ export async function getResults(id: string): Promise<InterviewResult> {
 
 type CaptureTarget = 'camera' | 'screen';
 
-export interface TakeInterviewData {
-  id: string;
-  position: string;
-  candidateName: string;
-  totalQuestions: number;
-  currentQuestion: { text: string } | null;
-  currentQuestionIndex: number;
-  currentAnswerMeta: {
-    status: 'recording' | 'submitted';
-    versionCount: number;
-    selectedVersionNumber: number;
-  } | null;
-  completed: boolean;
-}
+export type TakeInterviewData = Schemas['TakeInterviewResponseDto'];
 
-export interface MultipartUploadSessionResponse {
-  mediaKey: string;
-  uploadId: string;
-}
+export type MultipartUploadSessionResponse = Schemas['MultipartUploadSessionResponseDto'];
 
-export interface MultipartUploadPartResponse {
-  mediaKey: string;
-  uploadId: string;
-  partNumber: number;
-  uploadUrl: string;
-}
+export type MultipartUploadPartResponse = Schemas['MultipartUploadPartResponseDto'];
 
-export interface TakeProgressPayload {
-  questionIndex: number;
-  versionNumber: number;
-  mediaKey: string;
-  screenMediaKey?: string;
-  durationSeconds?: number;
-  startedAt?: string;
-  submittedAt?: string;
-  cameraFileSizeBytes?: number;
-  screenFileSizeBytes?: number;
-  behaviorSignals: AnswerBehaviorSignals;
-  behaviorEvents: AnswerBehaviorEvent[];
-  clientTranscript?: ClientTranscriptPayload;
-}
+export type TakeProgressPayload = Schemas['SaveAnswerProgressDto'];
 
-export interface SubmitTakeAnswerPayload extends TakeProgressPayload {
-  submitAnswer: boolean;
-}
+export type SubmitTakeAnswerPayload = Schemas['SubmitAnswerDto'];
 
 export async function getTakeInterview(
   id: string,
