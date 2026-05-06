@@ -3,7 +3,6 @@ import type { CaptureTarget, MultipartUploadState } from './runtime';
 interface CompleteMultipartUploadParams {
   target: CaptureTarget;
   multipartUploadsRef: { current: MultipartUploadState };
-  questionIndex: number;
   completeMultipartUploadRequest: (
     questionIndex: number,
     mediaKey: string,
@@ -14,7 +13,6 @@ interface CompleteMultipartUploadParams {
 export async function completeMultipartUpload({
   target,
   multipartUploadsRef,
-  questionIndex,
   completeMultipartUploadRequest,
 }: CompleteMultipartUploadParams) {
   const session = multipartUploadsRef.current[target];
@@ -25,8 +23,13 @@ export async function completeMultipartUpload({
     return;
   }
 
+  if (session.uploadedPartCount === 0) {
+    session.completed = true;
+    return;
+  }
+
   try {
-    await completeMultipartUploadRequest(questionIndex, session.mediaKey, session.uploadId);
+    await completeMultipartUploadRequest(session.questionIndex, session.mediaKey, session.uploadId);
   } catch {
     throw new Error(`Failed to finalize ${target} upload.`);
   }
@@ -36,7 +39,6 @@ export async function completeMultipartUpload({
 
 interface AbortMultipartUploadsParams {
   multipartUploadsRef: { current: MultipartUploadState };
-  questionIndex: number;
   abortMultipartUploadRequest: (
     questionIndex: number,
     mediaKey: string,
@@ -46,7 +48,6 @@ interface AbortMultipartUploadsParams {
 
 export async function abortMultipartUploads({
   multipartUploadsRef,
-  questionIndex,
   abortMultipartUploadRequest,
 }: AbortMultipartUploadsParams) {
   const uploadsSnapshot = multipartUploadsRef.current;
@@ -67,7 +68,7 @@ export async function abortMultipartUploads({
 
       try {
         await session.uploadChain.catch(() => undefined);
-        await abortMultipartUploadRequest(questionIndex, session.mediaKey, session.uploadId);
+        await abortMultipartUploadRequest(session.questionIndex, session.mediaKey, session.uploadId);
       } catch {
         console.error(`Failed to abort ${target} multipart upload.`);
       }

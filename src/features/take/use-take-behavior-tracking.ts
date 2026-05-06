@@ -58,6 +58,10 @@ export function useTakeBehaviorTracking({
       recordBehaviorEvent('paste', 'pasteCount');
     };
 
+    const handleCopy = () => {
+      recordBehaviorEvent('copy', 'copyCount');
+    };
+
     const handleResize = () => {
       recordBehaviorEvent('resize', 'resizeCount');
     };
@@ -76,6 +80,7 @@ export function useTakeBehaviorTracking({
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('blur', handleWindowBlur);
+    document.addEventListener('copy', handleCopy);
     document.addEventListener('paste', handlePaste);
     window.addEventListener('resize', handleResize);
     window.addEventListener('keydown', handleKeydown, true);
@@ -83,6 +88,7 @@ export function useTakeBehaviorTracking({
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('blur', handleWindowBlur);
+      document.removeEventListener('copy', handleCopy);
       document.removeEventListener('paste', handlePaste);
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('keydown', handleKeydown, true);

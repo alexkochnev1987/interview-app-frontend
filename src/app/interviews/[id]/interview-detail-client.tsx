@@ -870,6 +870,7 @@ export default function InterviewDetailClient({
                               {answer.behaviorSignals?.tabHiddenCount ?? 0} •
                               blur{" "}
                               {answer.behaviorSignals?.windowBlurCount ?? 0} •
+                              copy {answer.behaviorSignals?.copyCount ?? 0} •
                               paste {answer.behaviorSignals?.pasteCount ?? 0}
                             </BodyText>
                             <BodyText size="sm">

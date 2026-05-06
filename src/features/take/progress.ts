@@ -79,7 +79,7 @@ export function startProgressHeartbeat({
 
 interface BuildFlushBehaviorEventsParams {
   behaviorEvents: Array<{
-    eventType: 'tab_hidden' | 'window_blur' | 'paste' | 'keydown' | 'resize';
+    eventType: 'tab_hidden' | 'window_blur' | 'copy' | 'paste' | 'keydown' | 'resize';
     occurredAt: string;
     versionNumber: number;
   }>;

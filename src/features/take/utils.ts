@@ -4,6 +4,7 @@ import type { StatusTone } from '@/components/ui/status-pill';
 export interface TakeBehaviorSignals {
   tabHiddenCount: number;
   windowBlurCount: number;
+  copyCount: number;
   pasteCount: number;
   keydownCount: number;
   resizeCount: number;
@@ -13,6 +14,7 @@ export function createEmptyBehaviorSignals(): TakeBehaviorSignals {
   return {
     tabHiddenCount: 0,
     windowBlurCount: 0,
+    copyCount: 0,
     pasteCount: 0,
     keydownCount: 0,
     resizeCount: 0,

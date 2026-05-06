@@ -1,11 +1,14 @@
 import type { RefObject } from 'react';
+import { RecordingCameraVideo, RecordingScreenVideo } from '@/components/ui/recording-preview';
 import { TakeVideoContainer } from './take-video-container';
+import { TakeRecordingTimer } from './take-recording-timer';
 
 interface TakeRecordingPreviewProps {
   isRecording: boolean;
   timeLeft: number;
   formatTime: (seconds: number) => string;
   videoRef: RefObject<HTMLVideoElement | null>;
+  screenVideoRef: RefObject<HTMLVideoElement | null>;
 }
 
 export function TakeRecordingPreview({
@@ -13,16 +16,14 @@ export function TakeRecordingPreview({
   timeLeft,
   formatTime,
   videoRef,
+  screenVideoRef,
 }: TakeRecordingPreviewProps) {
   return (
     <TakeVideoContainer>
-      <video ref={videoRef} autoPlay muted playsInline className="video-preview" />
+      <RecordingScreenVideo videoRef={screenVideoRef} />
+      <RecordingCameraVideo videoRef={videoRef} />
 
-      {isRecording ? (
-        <div className="timer">
-          <span className="rec-dot">●</span> {formatTime(timeLeft)}
-        </div>
-      ) : null}
+      {isRecording ? <TakeRecordingTimer timeLabel={formatTime(timeLeft)} /> : null}
     </TakeVideoContainer>
   );
 }
