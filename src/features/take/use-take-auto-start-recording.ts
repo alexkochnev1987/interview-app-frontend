@@ -12,7 +12,6 @@ interface UseTakeAutoStartRecordingParams {
   screenSurface: string;
   autoStartedQuestionKeyRef: { current: string };
   beginRecordingRef: { current: (nextVersionNumber: number, currentQuestionIndex: number) => Promise<void> };
-  lastSubmittedQuestionIndexRef: { current: number | null };
 }
 
 export function useTakeAutoStartRecording({
@@ -25,7 +24,6 @@ export function useTakeAutoStartRecording({
   screenSurface,
   autoStartedQuestionKeyRef,
   beginRecordingRef,
-  lastSubmittedQuestionIndexRef,
 }: UseTakeAutoStartRecordingParams) {
   useEffect(() => {
     const readyForAutoStart =
@@ -38,10 +36,6 @@ export function useTakeAutoStartRecording({
       screenSurface === 'monitor';
 
     if (!readyForAutoStart || !interview) {
-      return;
-    }
-
-    if (lastSubmittedQuestionIndexRef.current === interview.currentQuestionIndex) {
       return;
     }
 
@@ -63,6 +57,5 @@ export function useTakeAutoStartRecording({
     uploading,
     autoStartedQuestionKeyRef,
     beginRecordingRef,
-    lastSubmittedQuestionIndexRef,
   ]);
 }

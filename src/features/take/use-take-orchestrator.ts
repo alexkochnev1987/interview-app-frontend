@@ -95,7 +95,6 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
   >(async () => undefined);
   const requestVersionActionRef = useRef<(action: PendingVersionAction) => void>(() => undefined);
   const autoStartedQuestionKeyRef = useRef('');
-  const lastSubmittedQuestionIndexRef = useRef<number | null>(null);
 
   function attachCameraPreview(stream: MediaStream) {
     cameraStreamRef.current = stream;
@@ -198,11 +197,6 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     candidateToken,
     onData: (data, mode, tokenOverride) => {
       setInterview(data);
-      if (mode === 'resume' && lastSubmittedQuestionIndexRef.current !== null) {
-        if (data.currentQuestionIndex !== lastSubmittedQuestionIndexRef.current) {
-          lastSubmittedQuestionIndexRef.current = null;
-        }
-      }
       if (mode === 'initial' && tokenOverride && typeof window !== 'undefined') {
         window.history.replaceState(null, '', `/take/${id}`);
       }
@@ -287,8 +281,27 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
 
       const hasUploadedCameraParts = cameraUpload.uploadedPartCount > 0;
       const hasUploadedScreenParts = screenUpload.uploadedPartCount > 0;
-      if (!hasUploadedCameraParts || !hasUploadedScreenParts) {
+      const hasUploadedAllParts = hasUploadedCameraParts && hasUploadedScreenParts;
+
+      if (action === 'submit' && (!hasUploadedCameraParts || !hasUploadedScreenParts)) {
         throw new Error('Recording is too short to submit yet. Please record a bit longer and try again.');
+      }
+
+      if (action === 'rerecord' && !hasUploadedAllParts) {
+        await abortMultipartUploads();
+        clearRecordingArtifacts();
+        pendingVersionActionRef.current = null;
+
+        const nextVersionNumber = currentVersionNumberRef.current + 1;
+        setCurrentVersionNumber(nextVersionNumber);
+        currentVersionNumberRef.current = nextVersionNumber;
+        setRetakeCount(nextVersionNumber - 1);
+        await beginRecording({
+          nextVersionNumber,
+          hasCurrentQuestion: Boolean(interview.currentQuestion),
+          currentQuestionIndex: interview.currentQuestionIndex,
+        });
+        return;
       }
 
       await Promise.all([completeMultipartUpload('camera'), completeMultipartUpload('screen')]);
@@ -331,7 +344,6 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
       pendingVersionActionRef.current = null;
 
       if (action === 'submit') {
-        lastSubmittedQuestionIndexRef.current = cameraUpload.questionIndex;
         setCurrentVersionNumber(1);
         currentVersionNumberRef.current = 1;
         setRetakeCount(0);
@@ -394,7 +406,6 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     screenSurface,
     autoStartedQuestionKeyRef,
     beginRecordingRef,
-    lastSubmittedQuestionIndexRef,
   });
 
   const { requestVersionAction } = useTakeRecordingControls({
