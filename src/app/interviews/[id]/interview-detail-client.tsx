@@ -410,7 +410,9 @@ export default function InterviewDetailClient({
           errorMessage: TOAST_MESSAGES.interview.uploadError(questionIndex + 1),
         },
       );
-      setInterview(updatedInterview);
+
+      const refreshedInterview = await getInterview(interview.id);
+      setInterview(refreshedInterview);
       setUploadStates((current) =>
         current.map((state, index) =>
           index === questionIndex ? { status: "uploaded" } : state,
