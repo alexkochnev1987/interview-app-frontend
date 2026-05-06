@@ -2,6 +2,7 @@ import { StatusPill } from '@/components/ui/status-pill';
 import { Button } from '@/components/ui/button';
 import { Inline } from '@/components/ui/layout';
 import type { TakeStage } from '@/components/take/types';
+import { TAKE_MESSAGES } from '@/features/take';
 
 interface TakeRecordingActionsProps {
   stage: TakeStage;
@@ -24,10 +25,10 @@ export function TakeRecordingActions({
 }: TakeRecordingActionsProps) {
   return (
     <Inline wrap="wrap" gap={3}>
-      {stage === 'interview' ? <StatusPill tone="neutral">Preparing recording...</StatusPill> : null}
+      {stage === 'interview' ? <StatusPill tone="neutral">{TAKE_MESSAGES.preparingRecording}</StatusPill> : null}
       {stage === 'interview' && setupError ? (
         <Button type="button" variant="outline" onClick={onReconnect} disabled={uploading}>
-          Reconnect camera + screen
+          {TAKE_MESSAGES.reconnectCameraAndScreen}
         </Button>
       ) : null}
 
@@ -39,7 +40,7 @@ export function TakeRecordingActions({
             onClick={onRerecord}
             disabled={uploading}
           >
-            Re-record as new version
+            {TAKE_MESSAGES.rerecordAsNewVersion}
           </Button>
           <Button
             type="button"
@@ -47,13 +48,13 @@ export function TakeRecordingActions({
             disabled={uploading}
             variant="gradient"
           >
-            Submit & Next
+            {TAKE_MESSAGES.submitAndNext}
           </Button>
         </>
       ) : null}
 
       {stage === 'transition' ? (
-        <StatusPill tone="processing">{transitionLabel || 'Saving current version'}</StatusPill>
+        <StatusPill tone="processing">{transitionLabel || TAKE_MESSAGES.savingCurrentVersion}</StatusPill>
       ) : null}
     </Inline>
   );

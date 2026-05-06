@@ -13,6 +13,7 @@ import { CardContent } from '@/components/ui/card';
 import { Heading } from '@/components/ui/heading';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Container, Grid, Stack } from '@/components/ui/layout';
+import { TAKE_MESSAGES } from '@/features/take';
 
 interface TakeRecordingScreenProps {
   interview: InterviewDataView;
@@ -105,7 +106,7 @@ export function TakeRecordingScreen({
               <TakeRecordingGuidance stage={stage} transitionLabel={transitionLabel} />
               {submitError ? (
                 <Alert variant="destructive">
-                  <AlertTitle>Submit failed</AlertTitle>
+                  <AlertTitle>{TAKE_MESSAGES.submitFailedTitle}</AlertTitle>
                   <AlertDescription>{submitError}</AlertDescription>
                 </Alert>
               ) : null}
