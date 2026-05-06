@@ -50,6 +50,15 @@ export function useSimilaritySearch({
     valueRef.current = value
   })
 
+  const searchSeqRef = useRef(0)
+  const mountedRef = useRef(true)
+  useEffect(() => {
+    mountedRef.current = true
+    return () => {
+      mountedRef.current = false
+    }
+  }, [])
+
   const signalSummary = useMemo<SimilaritySignalSummary>(() => {
     const textTokens = tokenize(value.questionText)
     return {
@@ -113,17 +122,18 @@ export function useSimilaritySearch({
 
     let cancelled = false
     const timer = setTimeout(async () => {
+      const mySeq = ++searchSeqRef.current
       setError(null)
       setStatus('loading')
 
       try {
         const result = await findSimilarQuestions(valueRef.current, questionId)
-        if (cancelled) return
+        if (cancelled || !mountedRef.current || mySeq !== searchSeqRef.current) return
         setMatches(result)
         setStatus('success')
         setLastFetchedSignature(signature)
       } catch (err) {
-        if (cancelled) return
+        if (cancelled || !mountedRef.current || mySeq !== searchSeqRef.current) return
         setMatches([])
         setStatus('error')
         setError(err instanceof Error ? err.message : 'Failed to load similar questions.')
@@ -144,15 +154,18 @@ export function useSimilaritySearch({
       return
     }
 
+    const mySeq = ++searchSeqRef.current
     setError(null)
     setStatus('loading')
     setLastFetchedSignature(signature)
 
     try {
       const result = await findSimilarQuestions(valueRef.current, questionId)
+      if (!mountedRef.current || mySeq !== searchSeqRef.current) return
       setMatches(result)
       setStatus('success')
     } catch (err) {
+      if (!mountedRef.current || mySeq !== searchSeqRef.current) return
       setMatches([])
       setStatus('error')
       setError(err instanceof Error ? err.message : 'Failed to load similar questions.')
