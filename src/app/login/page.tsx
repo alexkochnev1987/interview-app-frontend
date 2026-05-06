@@ -1,6 +1,6 @@
 'use client'
 
-import { type FormEvent, useState } from 'react'
+import { type FormEvent, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowRight, LockKeyhole, ShieldCheck, Sparkles } from 'lucide-react'
 
@@ -16,6 +16,7 @@ import { Grid } from '@/components/ui/layout/grid'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText, SectionHeading } from '@/components/ui/text'
+import { notifyError } from '@/lib/toast'
 import { runMutation } from '@/lib/run-mutation'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
@@ -25,10 +26,23 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
 
+  useEffect(() => {
+    const hasLogoutError =
+      typeof window !== 'undefined' &&
+      window.sessionStorage.getItem('logoutError') === '1'
+    if (!hasLogoutError) {
+      return
+    }
+
+    notifyError(TOAST_MESSAGES.auth.logoutError, {
+      description: 'Session was not closed on the server. Please try again.',
+    })
+    window.sessionStorage.removeItem('logoutError')
+  }, [])
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setLoading(true)
-    let loginSucceeded = false
 
     try {
       await runMutation(
@@ -50,18 +64,13 @@ export default function LoginPage() {
           errorMessage: TOAST_MESSAGES.auth.loginError,
         }
       )
-      loginSucceeded = true
+      router.push('/')
+      router.refresh()
     } catch {
-      loginSucceeded = false
+      return
     } finally {
       setLoading(false)
     }
-
-    if (loginSucceeded) {
-      router.push('/')
-      router.refresh()
-    }
-
   }
 
   return (

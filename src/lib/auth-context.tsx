@@ -36,24 +36,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const logout = async () => {
-    await runMutation(
-      async () => {
-        const res = await fetch('/api/auth/logout', {
-          method: 'POST',
-          credentials: 'include',
-        });
+    let logoutFailed = false
+    try {
+      await runMutation(
+        async () => {
+          const res = await fetch('/api/auth/logout', {
+            method: 'POST',
+            credentials: 'include',
+          });
 
-        if (!res.ok) {
-          throw new Error('Unable to log out right now.');
+          if (!res.ok) {
+            throw new Error('Unable to log out right now.');
+          }
+        },
+        {
+          showSuccessToast: false,
+          errorMessage: TOAST_MESSAGES.auth.logoutError,
         }
-      },
-      {
-        showSuccessToast: false,
-        errorMessage: TOAST_MESSAGES.auth.logoutError,
+      );
+    } catch {
+      logoutFailed = true
+    } finally {
+      setUser(null);
+      if (logoutFailed && typeof window !== 'undefined') {
+        window.sessionStorage.setItem('logoutError', '1')
       }
-    );
-    setUser(null);
-    window.location.href = '/login';
+      window.location.href = '/login';
+    }
   };
 
   return (

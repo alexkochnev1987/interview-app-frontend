@@ -108,7 +108,15 @@ export default function QuestionsPage() {
       const result = await runMutation(
         () => deleteQuestionsBulk(ids),
         {
-          successMessage: TOAST_MESSAGES.question.bulkDeleteSuccess,
+          getSuccessMessage: ({ deleted, blocked }) => {
+            if (deleted.length === 0 && blocked.length > 0) {
+              return TOAST_MESSAGES.question.bulkDeleteNoopSuccess
+            }
+            if (deleted.length > 0 && blocked.length > 0) {
+              return TOAST_MESSAGES.question.bulkDeletePartialSuccess
+            }
+            return TOAST_MESSAGES.question.bulkDeleteSuccess
+          },
           errorMessage: TOAST_MESSAGES.question.bulkDeleteError,
         }
       )

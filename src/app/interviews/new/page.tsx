@@ -89,10 +89,9 @@ export default function NewInterviewPage() {
     }
 
     setSubmitting(true)
-    let interview: Awaited<ReturnType<typeof createInterview>> | null = null
 
     try {
-      interview = await runMutation(
+      const interview = await runMutation(
         () =>
           createInterview({
             candidateName: candidateName.trim(),
@@ -104,16 +103,12 @@ export default function NewInterviewPage() {
           errorMessage: TOAST_MESSAGES.interview.createError,
         }
       )
+      router.push(`/interviews/${interview.id}`)
     } catch {
-      interview = null
+      return
     } finally {
       setSubmitting(false)
     }
-
-    if (interview) {
-      router.push(`/interviews/${interview.id}`)
-    }
-
   }
 
   const selectedQuestions = questions.filter((question) => selectedQuestionIds.includes(question.id))

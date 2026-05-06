@@ -5,6 +5,8 @@ export const TOAST_MESSAGES = {
     saveSuccess: "Question saved",
     saveError: "Failed to save question",
     bulkDeleteSuccess: "Questions deleted",
+    bulkDeletePartialSuccess: "Questions deleted with skips",
+    bulkDeleteNoopSuccess: "No questions deleted",
     bulkDeleteError: "Failed to delete questions",
     restoreSuccess: "Question restored",
     restoreError: "Failed to restore question",

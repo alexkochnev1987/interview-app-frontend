@@ -183,29 +183,24 @@ export function QuestionEditor({
     }
 
     setSubmitting(true)
-    let persisted: QuestionInput | null = null
 
     try {
-      persisted = normalizeInitialValue(
+      const persisted = normalizeInitialValue(
         await runMutation(() => onSubmit(payload), {
           showSuccessToast: saveToastOptions?.enabled ?? true,
           successMessage: saveToastOptions?.successMessage ?? TOAST_MESSAGES.question.saveSuccess,
           errorMessage: saveToastOptions?.errorMessage ?? TOAST_MESSAGES.question.saveError,
         }),
       )
-    } catch {
-      persisted = null
-    } finally {
-      setSubmitting(false)
-    }
-
-    if (persisted) {
       const normalizedMetadataText = formatMetadata(persisted.metadata)
       setValue(persisted)
       setMetadataText(normalizedMetadataText)
       markSaved(persisted, normalizedMetadataText)
+    } catch {
+      return
+    } finally {
+      setSubmitting(false)
     }
-
   }
 
   return (
