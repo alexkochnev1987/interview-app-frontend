@@ -32,6 +32,10 @@ export function OverallPanel({ result }: OverallPanelProps) {
   const trustFlags = result.trustFlags ?? []
   const categoryEntries = Object.entries(result.categoryScores ?? {})
   const isPlaceholder = isPlaceholderResult(result)
+  const summaryLines = (result.summary ?? '')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0)
 
   return (
     <Stack gap={4}>
@@ -63,7 +67,22 @@ export function OverallPanel({ result }: OverallPanelProps) {
                 >
                   Overall result
                 </EyebrowBadge>
-                <SectionHeading size="lg">{result.summary}</SectionHeading>
+                {summaryLines.length > 1 ? (
+                  <Stack gap={3} as="ul">
+                    {summaryLines.map((line, index) => (
+                      <BodyText
+                        as="li"
+                        key={index}
+                        size="lead"
+                        tone="foreground"
+                      >
+                        {line}
+                      </BodyText>
+                    ))}
+                  </Stack>
+                ) : summaryLines.length === 1 ? (
+                  <SectionHeading size="lg">{summaryLines[0]}</SectionHeading>
+                ) : null}
                 <Inline gap={2} wrap="wrap">
                   {decision ? (
                     <StatusPill tone={decisionTone(decision)} casing="chip">

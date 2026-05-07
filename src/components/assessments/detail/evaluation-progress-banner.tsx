@@ -90,10 +90,7 @@ export function EvaluationProgressBanner({
               variant="outline-pill"
               shape="pill"
               size="sm"
-              onClick={() => {
-                setPollExpired(false)
-                router.refresh()
-              }}
+              onClick={() => router.refresh()}
             >
               <Icon size="md">
                 <RefreshCw />
@@ -107,6 +104,10 @@ export function EvaluationProgressBanner({
   }
 
   if (inFlight) {
+    return null
+  }
+
+  if (interview.status === 'failed') {
     return null
   }
 

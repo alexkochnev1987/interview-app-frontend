@@ -58,11 +58,11 @@ export default async function InterviewDetailPage({
   } catch (err) {
     if (isForbiddenError(err)) {
       return (
-      <ForbiddenAccessPage
-        title={FORBIDDEN_TITLE}
-        description={FORBIDDEN_DESCRIPTION}
-      />
-    )
+        <ForbiddenAccessPage
+          title={FORBIDDEN_TITLE}
+          description={FORBIDDEN_DESCRIPTION}
+        />
+      )
     }
     error = err instanceof Error ? err.message : 'Failed to load interview.'
   }

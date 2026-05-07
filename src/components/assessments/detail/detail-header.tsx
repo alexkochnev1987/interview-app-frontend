@@ -30,9 +30,11 @@ interface DetailHeaderProps {
 function findSubmittedAt(interview: Interview): string | null {
   let latest: string | null = null
   for (const answer of interview.answers) {
-    if (answer.status !== 'submitted' || !answer.submittedAt) continue
-    if (latest === null || new Date(answer.submittedAt).getTime() > new Date(latest).getTime()) {
-      latest = answer.submittedAt
+    if (answer.status !== 'submitted') continue
+    const stamp = answer.submittedAt ?? answer.uploadedAt
+    if (!stamp) continue
+    if (latest === null || new Date(stamp).getTime() > new Date(latest).getTime()) {
+      latest = stamp
     }
   }
   return latest

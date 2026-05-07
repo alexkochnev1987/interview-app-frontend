@@ -31,13 +31,12 @@ export function RerunAllButton({
         const res = await validateInterview(interviewId)
         if (res.requestedCount === 0) {
           return {
-            info: {
-              title: 'Nothing to re-evaluate',
-              message:
-                'No submitted answers to score yet. The candidate has not finished any answers.',
-            },
+            title: 'Nothing to re-evaluate',
+            message:
+              'No submitted answers to score yet. The candidate has not finished any answers.',
           }
         }
+        return undefined
       }}
     />
   )

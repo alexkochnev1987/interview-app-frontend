@@ -29,14 +29,19 @@ export interface ServerRequestContext {
 }
 
 export async function getServerRequestContext(): Promise<ServerRequestContext> {
-  const cookieStore = await cookies()
   const headerStore = await headers()
-  const cookieHeader = cookieStore
+  const rawCookieHeader = headerStore.get('cookie')
+  const cookieHeader = rawCookieHeader ?? (await buildCookieHeaderFallback())
+  const origin = getRequestOrigin(headerStore)
+  return { cookieHeader, origin }
+}
+
+async function buildCookieHeaderFallback(): Promise<string> {
+  const cookieStore = await cookies()
+  return cookieStore
     .getAll()
     .map(({ name, value }) => `${name}=${value}`)
     .join('; ')
-  const origin = getRequestOrigin(headerStore)
-  return { cookieHeader, origin }
 }
 
 const MAX_CLIENT_ERROR_BODY = 500
@@ -68,7 +73,7 @@ export async function requestServer<T>(
 
   if (!res.ok) {
     const body = await res.text()
-    throw new ApiError(res.status, safeErrorMessage(path, res.status, body), path)
+    throw new ApiError(res.status, safeErrorMessage(path, res.status, body), path, body)
   }
 
   const body = await res.text()

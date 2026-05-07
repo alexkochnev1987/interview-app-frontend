@@ -23,7 +23,7 @@ export interface RerunInfo {
   message: string
 }
 
-export type RerunResult = { info?: RerunInfo } | void
+export type RerunResult = RerunInfo | undefined
 
 const ALREADY_IN_PROGRESS_TITLE = 'Re-evaluation already in progress'
 
@@ -69,15 +69,19 @@ export function RerunButton({
     try {
       const result = await onRun()
       if (!mountedRef.current) return
-      if (result?.info) {
+      if (result) {
         setNotice({
           kind: 'info',
-          title: result.info.title,
-          message: result.info.message,
+          title: result.title,
+          message: result.message,
         })
       }
       setPhase('submitted')
-      router.refresh()
+      setTimeout(() => {
+        if (mountedRef.current) {
+          router.refresh()
+        }
+      }, 0)
     } catch (err) {
       if (!mountedRef.current) return
       if (err instanceof ApiError && err.status === 409) {

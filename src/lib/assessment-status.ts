@@ -25,10 +25,12 @@ function assertNever(value: never): never {
   throw new Error(`Unhandled interview status: ${String(value)}`)
 }
 
-function hasInFlightValidation(interview: Interview): boolean {
+export function isValidationInFlight(interview: Interview): boolean {
   return interview.answers.some(
     (a) =>
-      a.validation?.status === 'queued' || a.validation?.status === 'processing',
+      a.status === 'submitted' &&
+      (a.validation?.status === 'queued' ||
+        a.validation?.status === 'processing'),
   )
 }
 
@@ -41,7 +43,7 @@ export function deriveReviewStatus(interview: Interview): ReviewStatus {
     case 'in_progress':
       return 'in_progress'
     case 'processing':
-      if (hasInFlightValidation(interview)) return 'scoring'
+      if (isValidationInFlight(interview)) return 'scoring'
       if (interview.result) return 'ready'
       return 'scoring'
     case 'completed':
@@ -63,6 +65,8 @@ export function reviewStatusLabel(status: ReviewStatus): string {
       return 'Awaiting candidate'
     case 'failed':
       return 'Failed'
+    default:
+      return assertNever(status)
   }
 }
 
@@ -78,6 +82,8 @@ export function reviewStatusTone(status: ReviewStatus): ReviewStatusTone {
       return 'pending'
     case 'failed':
       return 'failed'
+    default:
+      return assertNever(status)
   }
 }
 
@@ -89,6 +95,8 @@ export function decisionLabel(decision: InterviewDecision): string {
       return 'Review'
     case 'reject':
       return 'Reject'
+    default:
+      return assertNever(decision)
   }
 }
 
@@ -100,6 +108,8 @@ export function decisionTone(decision: InterviewDecision): DecisionTone {
       return 'pending'
     case 'reject':
       return 'failed'
+    default:
+      return assertNever(decision)
   }
 }
 

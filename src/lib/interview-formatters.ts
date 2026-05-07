@@ -18,7 +18,7 @@ export function formatInterviewDate(iso: string) {
 }
 
 export function formatInterviewStatusLabel(status: Interview['status']) {
-  return status.replace('_', ' ')
+  return status.replaceAll('_', ' ')
 }
 
 export function getCandidateInitials(name: string) {

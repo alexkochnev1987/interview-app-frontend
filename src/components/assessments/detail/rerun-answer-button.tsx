@@ -26,6 +26,7 @@ export function RerunAnswerButton({
       errorFallback="Failed to start re-evaluation for this answer."
       onRun={async () => {
         await validateInterviewQuestion(interviewId, questionIndex)
+        return undefined
       }}
     />
   )

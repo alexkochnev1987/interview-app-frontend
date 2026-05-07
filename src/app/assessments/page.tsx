@@ -37,16 +37,31 @@ function sortByCompletion(a: Interview, b: Interview): number {
 export default async function AssessmentsPage() {
   noStore()
 
-  let me: MeResponse | null = null
   let ctx: Awaited<ReturnType<typeof getServerRequestContext>> | null = null
   try {
     ctx = await getServerRequestContext()
-    me = (await requestServer<MeResponse>('/auth/me', ctx)) ?? null
   } catch {
-    me = null
+    ctx = null
   }
 
-  if (!ctx || !me || !canReviewAssessments(me.role)) {
+  if (!ctx) {
+    return (
+      <ForbiddenAccessPage
+        title={FORBIDDEN_TITLE}
+        description={FORBIDDEN_DESCRIPTION}
+      />
+    )
+  }
+
+  const [meResult, interviewsResult] = await Promise.allSettled([
+    requestServer<MeResponse>('/auth/me', ctx),
+    requestServer<Interview[]>('/interviews', ctx),
+  ])
+
+  const me: MeResponse | null =
+    meResult.status === 'fulfilled' ? meResult.value ?? null : null
+
+  if (!me || !canReviewAssessments(me.role)) {
     return (
       <ForbiddenAccessPage
         title={FORBIDDEN_TITLE}
@@ -58,9 +73,10 @@ export default async function AssessmentsPage() {
   let interviews: Interview[] = []
   let error: string | null = null
 
-  try {
-    interviews = (await requestServer<Interview[]>('/interviews', ctx)) ?? []
-  } catch (err) {
+  if (interviewsResult.status === 'fulfilled') {
+    interviews = interviewsResult.value ?? []
+  } else {
+    const err = interviewsResult.reason
     if (isForbiddenError(err)) {
       return (
         <ForbiddenAccessPage
