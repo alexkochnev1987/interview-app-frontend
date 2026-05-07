@@ -8,6 +8,7 @@ export function Toaster(props: ToasterProps) {
       expand
       closeButton
       position="top-right"
+      theme="system"
       toastOptions={{
         duration: 5000,
         className:

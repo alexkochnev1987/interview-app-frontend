@@ -217,6 +217,7 @@ export default function InterviewDetailClient({
         setCandidateLinkError("");
         const data = await runMutation(() => generateCandidateLink(id), {
           showSuccessToast: mode === "refresh",
+          showErrorToast: mode === "refresh",
           successMessage: TOAST_MESSAGES.interview.refreshLinkSuccess,
           errorMessage: TOAST_MESSAGES.interview.refreshLinkError,
         });

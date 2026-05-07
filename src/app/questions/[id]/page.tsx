@@ -87,9 +87,7 @@ export default function EditQuestionPage() {
       setRestoreOpen(false);
       router.refresh();
     } catch (err) {
-      setRestoreError(
-        err instanceof Error ? err.message : TOAST_MESSAGES.question.restoreError,
-      );
+      setRestoreError(null);
     } finally {
       setRestoring(false);
     }
@@ -111,9 +109,7 @@ export default function EditQuestionPage() {
       if (err instanceof QuestionInUseError) {
         setDeleteError(err.message);
       } else {
-        setDeleteError(
-          err instanceof Error ? err.message : TOAST_MESSAGES.question.deleteError,
-        );
+        setDeleteError(null);
       }
     } finally {
       setDeleting(false);

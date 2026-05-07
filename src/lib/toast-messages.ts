@@ -23,10 +23,6 @@ export const TOAST_MESSAGES = {
     uploadSuccess: (questionNumber: number) => `Upload completed for question ${questionNumber}`,
     uploadError: (questionNumber: number) => `Upload failed for question ${questionNumber}`,
   },
-  auth: {
-    loginError: "Login failed",
-    logoutError: "Failed to log out",
-  },
   take: {
     submitSuccess: "Answer submitted",
     submitError: "Failed to submit answer",

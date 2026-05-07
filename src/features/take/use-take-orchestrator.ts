@@ -389,7 +389,9 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
       }
     } catch (err) {
       await abortMultipartUploads();
-      setSubmitError(err instanceof Error ? err.message : TAKE_MESSAGES.uploadFailedFallback);
+      if (action !== 'submit') {
+        setSubmitError(err instanceof Error ? err.message : TAKE_MESSAGES.uploadFailedFallback);
+      }
       autoStartedQuestionKeyRef.current = '';
       setStage('interview');
     } finally {

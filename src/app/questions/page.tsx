@@ -125,12 +125,8 @@ export default function QuestionsPage() {
       setSelectedIds(new Set())
       setBulkConfirmOpen(false)
       setBulkResult(result)
-    } catch (err) {
-      setBulkError(
-        err instanceof Error
-          ? err.message
-          : TOAST_MESSAGES.question.bulkDeleteError
-      )
+    } catch {
+      setBulkError(null)
       setBulkConfirmOpen(false)
     } finally {
       setBulkDeleting(false)

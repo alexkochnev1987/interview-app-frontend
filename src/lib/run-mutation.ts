@@ -8,6 +8,7 @@ type RunMutationOptions<TData> = {
   getSuccessDescription?: (data: TData) => string | undefined
   getErrorMessage?: (error: unknown) => string
   showSuccessToast?: boolean
+  showErrorToast?: boolean
 }
 
 const DEFAULT_SUCCESS_MESSAGE = "Action completed"
@@ -41,7 +42,9 @@ export async function runMutation<TData>(
     const errorDescription =
       options?.getErrorMessage?.(error) ?? getErrorDescription(error)
 
-    notifyError(errorMessage, { description: errorDescription })
+    if (options?.showErrorToast !== false) {
+      notifyError(errorMessage, { description: errorDescription })
+    }
 
     throw error
   }
