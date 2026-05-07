@@ -1,4 +1,5 @@
-import { copyFile, mkdir } from 'node:fs/promises';
+import { copyFile, mkdir, access } from 'node:fs/promises';
+import { constants } from 'node:fs';
 import { resolve } from 'node:path';
 
 async function run() {
@@ -9,6 +10,14 @@ async function run() {
   const destination = resolve(destinationDir, 'openapi.json');
 
   await mkdir(destinationDir, { recursive: true });
+
+  try {
+    await access(source, constants.F_OK);
+  } catch {
+    console.warn(`[openapi] Source spec not found at ${source}; keeping existing ${destination}.`);
+    return;
+  }
+
   await copyFile(source, destination);
   console.log(`OpenAPI spec synced from ${source} to ${destination}`);
 }
