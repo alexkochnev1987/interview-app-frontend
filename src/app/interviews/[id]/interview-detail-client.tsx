@@ -388,6 +388,7 @@ export default function InterviewDetailClient({
       const refreshedInterview = await runMutation(
         async () => {
           const { uploadUrl, mediaKey } = await getPresignedUrl(
+            interview.id,
             questionIndex,
             file.type as "video/webm",
           );

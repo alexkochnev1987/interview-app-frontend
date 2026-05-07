@@ -192,7 +192,7 @@ export function QuestionEditor({
           errorMessage: saveToastOptions?.errorMessage ?? TOAST_MESSAGES.question.saveError,
         }),
       )
-      const normalizedMetadataText = formatMetadata(persisted.metadata)
+      const normalizedMetadataText = formatMetadata(persisted.metadata ?? {})
       setValue(persisted)
       setMetadataText(normalizedMetadataText)
       markSaved(persisted, normalizedMetadataText)
