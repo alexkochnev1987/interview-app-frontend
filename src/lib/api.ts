@@ -22,6 +22,7 @@ export type QuestionRedFlag = Schemas['QuestionRedFlagDto'];
 
 export type QuestionDraft = Schemas['QuestionDraftResponseDto'];
 export type QuestionInput = Schemas['CreateQuestionDto'];
+export type UpdateQuestionInput = Schemas['UpdateQuestionDto'];
 export type Question = Schemas['QuestionResponseDto'];
 
 export type InterviewQuestion = Schemas['InterviewResponseDto']['questions'][number];
@@ -124,7 +125,7 @@ export async function fetchQuestions(): Promise<Question[]> {
 
 export async function login(data: LoginPayload): Promise<AuthUserResponseDto> {
   return handle(client.POST('/auth/login', {
-    body: data as any,
+    body: data,
   }));
 }
 
@@ -156,17 +157,17 @@ export async function getQuestion(id: string): Promise<Question> {
 
 export async function createQuestion(data: QuestionInput): Promise<Question> {
   return handle(client.POST('/questions', {
-    body: data as any
+    body: data
   }));
 }
 
 export async function updateQuestion(
   id: string,
-  data: QuestionInput,
+  data: UpdateQuestionInput,
 ): Promise<Question> {
   return handle(client.PATCH('/questions/{id}', {
     params: { path: { id } },
-    body: data as any
+    body: data
   }));
 }
 
@@ -186,8 +187,11 @@ export async function deleteQuestion(
 
   if (response.status === 409) {
     let message = 'Question is used by an active interview.';
-    if (error && typeof error === 'object' && (error as any).message) {
-      message = (error as any).message;
+    if (error && typeof error === 'object' && error !== null && 'message' in error) {
+      const maybeMessage = (error as { message?: unknown }).message;
+      if (typeof maybeMessage === 'string') {
+        message = maybeMessage;
+      }
     }
     throw new QuestionInUseError(message);
   }
@@ -216,10 +220,10 @@ export async function deleteQuestionsBulk(
 }
 
 export async function draftQuestion(
-  question: Partial<QuestionInput>,
+  question: Schemas['DraftQuestionDto']['question'],
 ): Promise<QuestionDraft> {
   return handle(client.POST('/ai/question-draft', {
-    body: { question } as any
+    body: { question }
   }));
 }
 
@@ -235,9 +239,9 @@ export async function findSimilarQuestions(
   limit = 5,
 ): Promise<SimilarQuestionMatch[]> {
   const data = await handle(client.POST('/questions/similar', {
-    body: { draft, excludeQuestionId, limit } as any
+    body: { draft, excludeQuestionId, limit }
   }));
-  return (data as any).matches;
+  return data.matches;
 }
 
 export async function fetchInterviews(): Promise<Interview[]> {
@@ -248,7 +252,7 @@ export async function createInterview(
   data: CreateInterviewPayload,
 ): Promise<Interview & CandidateLinkResponse> {
   return handle(client.POST('/interviews', {
-    body: data as any
+    body: data
   })) as Promise<Interview & CandidateLinkResponse>;
 }
 
@@ -366,7 +370,7 @@ export async function sendTakeAnswerProgress(
 ): Promise<void> {
   await handle(client.POST('/take/{id}/answer/progress', {
     params: { path: { id } },
-    body: payload as any
+    body: payload
   }));
 }
 
@@ -431,6 +435,6 @@ export async function submitTakeAnswer(
 ): Promise<void> {
   await handle(client.POST('/take/{id}/answer', {
     params: { path: { id } },
-    body: payload as any
+    body: payload
   }));
 }

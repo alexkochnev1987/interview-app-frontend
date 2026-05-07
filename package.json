@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "npm run openapi:refresh && next dev -p 3001",
-    "build": "npm run openapi:refresh && next build --webpack",
+    "build": "npm run openapi:generate && next build --webpack",
     "start": "next start",
     "lint": "eslint .",
     "openapi:backend:generate": "node scripts/generate-backend-openapi.mjs",
