@@ -307,27 +307,15 @@ export async function getPresignedUrl(
   mediaType?: CaptureTarget,
 ): Promise<PresignedUrlResponse>;
 export async function getPresignedUrl(
-  interviewId: string,
   questionIndex: number,
   contentType: 'video/webm',
-  mediaType?: CaptureTarget,
-): Promise<PresignedUrlResponse>;
-export async function getPresignedUrl(
-  arg1: number | string,
-  arg2: number | 'video/webm',
-  arg3?: 'video/webm' | CaptureTarget,
-  arg4?: CaptureTarget,
+  mediaType: CaptureTarget = 'camera',
 ): Promise<PresignedUrlResponse> {
-  const [resolvedQuestionIndex, resolvedContentType, resolvedMediaType] =
-    typeof arg1 === 'string'
-      ? [arg2 as number, arg3 as 'video/webm', arg4 ?? 'camera']
-      : [arg1, arg2 as 'video/webm', (arg3 as CaptureTarget | undefined) ?? 'camera'];
-
   return handle(client.POST('/upload/presign', {
     body: {
-      questionIndex: resolvedQuestionIndex,
-      contentType: resolvedContentType,
-      mediaType: resolvedMediaType,
+      questionIndex,
+      contentType,
+      mediaType,
     }
   }));
 }
