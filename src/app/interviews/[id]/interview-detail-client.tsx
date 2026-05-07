@@ -41,6 +41,8 @@ import {
   formatInterviewStatusLabel,
   getCandidateInitials,
 } from '@/lib/interview-formatters'
+import { runMutation } from '@/lib/run-mutation'
+import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 interface InterviewDetailClientProps {
   initialInterview: Interview
@@ -97,7 +99,12 @@ export default function InterviewDetailClient({
       try {
         setCandidateLinkStatus('loading')
         setCandidateLinkError('')
-        const data = await generateCandidateLink(id)
+        const data = await runMutation(() => generateCandidateLink(id), {
+          showSuccessToast: mode === 'refresh',
+          showErrorToast: mode === 'refresh',
+          successMessage: TOAST_MESSAGES.interview.refreshLinkSuccess,
+          errorMessage: TOAST_MESSAGES.interview.refreshLinkError,
+        })
         setCandidateLink(buildCandidateUrl(data.candidateLink))
         setCandidateLinkStatus('ready')
         if (mode === 'refresh') setCopyStatus('idle')
