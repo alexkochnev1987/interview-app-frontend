@@ -13,6 +13,7 @@ import { QuestionDangerZone } from '@/components/questions/detail/question-dange
 import {
   deleteQuestion,
   getQuestion,
+  QuestionInUseError,
   restoreQuestion,
   updateQuestion,
   type Question,
@@ -86,8 +87,9 @@ export default function EditQuestionPage() {
       setRestoreOpen(false);
       router.refresh();
     } catch (err) {
-      setRestoreError(null);
-      setRestoreOpen(false);
+      setRestoreError(
+        err instanceof Error ? err.message : TOAST_MESSAGES.question.restoreError,
+      );
     } finally {
       setRestoring(false);
     }
@@ -106,8 +108,14 @@ export default function EditQuestionPage() {
       router.push('/questions');
       router.refresh();
     } catch (err) {
-      setDeleteError(null);
-      setConfirmOpen(false);
+      if (err instanceof QuestionInUseError) {
+        setDeleteError(err.message);
+      } else {
+        setDeleteError(
+          err instanceof Error ? err.message : TOAST_MESSAGES.question.deleteError,
+        );
+      }
+    } finally {
       setDeleting(false);
     }
   }

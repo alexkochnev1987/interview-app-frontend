@@ -1,8 +1,6 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { runMutation } from '@/lib/run-mutation';
-import { TOAST_MESSAGES } from '@/lib/toast-messages';
 
 interface User {
   id: string;
@@ -36,33 +34,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const logout = async () => {
-    let logoutFailed = false
-    try {
-      await runMutation(
-        async () => {
-          const res = await fetch('/api/auth/logout', {
-            method: 'POST',
-            credentials: 'include',
-          });
-
-          if (!res.ok) {
-            throw new Error('Unable to log out right now.');
-          }
-        },
-        {
-          showSuccessToast: false,
-          errorMessage: TOAST_MESSAGES.auth.logoutError,
-        }
-      );
-    } catch {
-      logoutFailed = true
-    } finally {
-      setUser(null);
-      if (logoutFailed && typeof window !== 'undefined') {
-        window.sessionStorage.setItem('logoutError', '1')
-      }
-      window.location.href = '/login';
-    }
+    await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+    setUser(null);
+    window.location.href = '/login';
   };
 
   return (
