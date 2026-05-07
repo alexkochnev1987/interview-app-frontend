@@ -53,8 +53,8 @@ export function EvaluationProgressBanner({
 
   useEffect(() => {
     if (!inFlight) {
-      setPollExpired(false)
-      return
+      const handle = setTimeout(() => setPollExpired(false), 0)
+      return () => clearTimeout(handle)
     }
     if (pollExpired) return
     const startedAt = Date.now()

@@ -45,18 +45,21 @@ export function LazyMediaPlayback({
 
   useEffect(() => {
     if (state.phase !== 'ready') {
-      setIsStale(false)
-      return
+      const handle = setTimeout(() => setIsStale(false), 0)
+      return () => clearTimeout(handle)
     }
     const remaining =
       state.loadedAt + SIGNED_URL_REFRESH_THRESHOLD_MS - Date.now()
     if (remaining <= 0) {
-      setIsStale(true)
-      return
+      const handle = setTimeout(() => setIsStale(true), 0)
+      return () => clearTimeout(handle)
     }
-    setIsStale(false)
+    const resetHandle = setTimeout(() => setIsStale(false), 0)
     const id = setTimeout(() => setIsStale(true), remaining)
-    return () => clearTimeout(id)
+    return () => {
+      clearTimeout(resetHandle)
+      clearTimeout(id)
+    }
   }, [state])
 
   async function handleLoad() {

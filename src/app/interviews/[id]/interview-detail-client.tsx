@@ -122,7 +122,10 @@ export default function InterviewDetailClient({
   )
 
   useEffect(() => {
-    void loadCandidateLink('initial')
+    const handle = setTimeout(() => {
+      void loadCandidateLink('initial')
+    }, 0)
+    return () => clearTimeout(handle)
   }, [loadCandidateLink])
 
   async function handleCopyCandidateLink() {
