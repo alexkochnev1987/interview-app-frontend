@@ -4,36 +4,23 @@ import { ApiError } from './api-error'
 
 export { ApiError, isForbiddenError } from './api-error'
 
-const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]'])
-
-function isLocalHost(host: string | null | undefined): boolean {
-  if (!host) return false
-  const hostname = host.split(':')[0]
-  return LOCAL_HOSTS.has(hostname)
-}
-
-export function getRequestOrigin(headerStore: Headers): string {
-  const forwardedProto = headerStore.get('x-forwarded-proto')
-  const forwardedHost = headerStore.get('x-forwarded-host')
-  const host = forwardedHost ?? headerStore.get('host')
-  const protocol = forwardedProto ?? (isLocalHost(host) ? 'http' : 'https')
-  if (!host) {
-    throw new Error('Unable to resolve request host for server API fetch.')
+function getBackendOrigin(): string {
+  const origin = process.env.BACKEND_URL
+  if (!origin) {
+    throw new Error('BACKEND_URL is not configured for server-side API calls.')
   }
-  return `${protocol}://${host}`
+  return origin.replace(/\/+$/, '')
 }
 
 export interface ServerRequestContext {
   cookieHeader: string
-  origin: string
 }
 
 export async function getServerRequestContext(): Promise<ServerRequestContext> {
   const headerStore = await headers()
   const rawCookieHeader = headerStore.get('cookie')
   const cookieHeader = rawCookieHeader ?? (await buildCookieHeaderFallback())
-  const origin = getRequestOrigin(headerStore)
-  return { cookieHeader, origin }
+  return { cookieHeader }
 }
 
 async function buildCookieHeaderFallback(): Promise<string> {
@@ -50,10 +37,10 @@ function safeErrorMessage(path: string, status: number, body: string): string {
   if (status >= 400 && status < 500) {
     const trimmed = body.trim().slice(0, MAX_CLIENT_ERROR_BODY)
     return trimmed
-      ? `API error ${status} for /api${path}: ${trimmed}`
-      : `API error ${status} for /api${path}.`
+      ? `API error ${status} for ${path}: ${trimmed}`
+      : `API error ${status} for ${path}.`
   }
-  return `API error ${status} for /api${path}. Please try again.`
+  return `API error ${status} for ${path}. Please try again.`
 }
 
 const SERVER_REQUEST_TIMEOUT_MS = 15_000
@@ -62,7 +49,7 @@ export async function requestServer<T>(
   path: string,
   ctx: ServerRequestContext,
 ): Promise<T | undefined> {
-  const res = await fetch(`${ctx.origin}/api${path}`, {
+  const res = await fetch(`${getBackendOrigin()}${path}`, {
     headers: {
       'Content-Type': 'application/json',
       cookie: ctx.cookieHeader,
@@ -84,7 +71,7 @@ export async function requestServer<T>(
   const contentType = res.headers.get('content-type') ?? ''
   if (!contentType.includes('application/json')) {
     throw new Error(
-      `Expected JSON from /api${path}, got ${contentType || 'unknown content type'}.`,
+      `Expected JSON from ${path}, got ${contentType || 'unknown content type'}.`,
     )
   }
 

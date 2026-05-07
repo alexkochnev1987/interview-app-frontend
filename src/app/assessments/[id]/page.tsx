@@ -111,10 +111,13 @@ export default async function AssessmentDetailPage({
   const canRerun = reviewStatus !== 'pending' && reviewStatus !== 'in_progress'
   const interviewId = interview.id
 
+  const answersByIndex = new Map(
+    interview.answers.map((a) => [a.questionIndex, a]),
+  )
   const questionsWithAnswers = interview.questions.map((question, index) => ({
     question,
     questionIndex: index,
-    answer: interview.answers.find((a) => a.questionIndex === index),
+    answer: answersByIndex.get(index),
   }))
 
   return (
