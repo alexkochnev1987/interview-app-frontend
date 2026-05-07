@@ -450,6 +450,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/interviews/{id}/questions/{questionIndex}/upload-url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Generate presigned URL for recruiter manual answer upload */
+        post: operations["RecruiterMediaController_presignManualUpload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/interviews/{id}/questions/{questionIndex}/complete-upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Confirm recruiter manual answer upload */
+        post: operations["RecruiterMediaController_completeManualUpload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/interviews/{id}/questions/{questionIndex}/media": {
         parameters: {
             query?: never;
@@ -1076,6 +1110,15 @@ export interface components {
             uploadId: string;
             /** @example true */
             aborted: boolean;
+        };
+        RecruiterPresignUploadBodyDto: {
+            /** @enum {string} */
+            contentType: "video/webm";
+            /** @enum {string} */
+            mediaType?: "camera" | "screen";
+        };
+        RecruiterConfirmUploadBodyDto: {
+            mediaKey: string;
         };
         InterviewAnswerMediaResponseDto: {
             questionIndex: number;
@@ -2394,6 +2437,106 @@ export interface operations {
                 };
             };
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    RecruiterMediaController_presignManualUpload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                questionIndex: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RecruiterPresignUploadBodyDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PresignedUrlResponseDto"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    RecruiterMediaController_completeManualUpload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                questionIndex: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RecruiterConfirmUploadBodyDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConfirmUploadResponseDto"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

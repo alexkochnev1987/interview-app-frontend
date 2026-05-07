@@ -40,26 +40,18 @@ export type InterviewWorkflowStatus = NonNullable<Schemas['InterviewResponseDto'
 export type InterviewWorkflowStage = NonNullable<Schemas['InterviewResponseDto']['workflow']>['currentStage'];
 
 export type MediaArtifact = Schemas['MediaArtifactDto'];
-export type AnswerBehaviorSignals = Schemas['BehaviorSignalsDto'] & { copyCount?: number };
-export type AnswerBehaviorEvent = Omit<Schemas['BehaviorEventDto'], 'eventType'> & { 
-  eventType: Schemas['BehaviorEventDto']['eventType'] | 'copy' 
-};
 export type AnswerTranscript = Schemas['AnswerTranscriptDto'];
 export type ClientTranscriptPayload = Schemas['ClientTranscriptDto'];
 export type AnswerEvaluation = Schemas['AnswerEvaluationDto'];
 export type AnswerValidation = Schemas['AnswerValidationDto'];
-export type Answer = Omit<Schemas['AnswerDto'], 'behaviorSignals'> & {
-  behaviorSignals?: AnswerBehaviorSignals;
-};
+export type Answer = Schemas['AnswerDto'];
 export type AnswerVersion = Schemas['AnswerVersionDto'];
 
 export type InterviewQuestionResult = Schemas['InterviewQuestionResultDto'];
 export type InterviewBehaviorSummary = Schemas['InterviewBehaviorSummaryDto'];
 export type InterviewResult = Schemas['InterviewResultResponseDto'];
 export type InterviewWorkflow = Schemas['InterviewWorkflowDto'];
-export type Interview = Omit<Schemas['InterviewResponseDto'], 'answers'> & {
-  answers: Answer[];
-};
+export type Interview = Schemas['InterviewResponseDto'];
 
 export type ValidateAllAnswersResponse = Schemas['StartAllAnswerValidationsResponseDto'];
 export type InterviewAnswerMediaResponse = Schemas['InterviewAnswerMediaResponseDto'];
@@ -74,13 +66,9 @@ export type TakeInterviewData = Schemas['TakeInterviewResponseDto'];
 export type MultipartUploadSessionResponse = Schemas['MultipartUploadSessionResponseDto'];
 export type MultipartUploadPartResponse = Schemas['MultipartUploadPartResponseDto'];
 
-export type TakeProgressPayload = Omit<Schemas['SaveAnswerProgressDto'], 'behaviorEvents'> & {
-  behaviorEvents: AnswerBehaviorEvent[];
-};
+export type TakeProgressPayload = Schemas['SaveAnswerProgressDto'];
 
-export type SubmitTakeAnswerPayload = Omit<Schemas['SubmitAnswerDto'], 'behaviorEvents'> & {
-  behaviorEvents: AnswerBehaviorEvent[];
-};
+export type SubmitTakeAnswerPayload = Schemas['SubmitAnswerDto'];
 
 export type CaptureTarget = 'camera' | 'screen';
 
@@ -246,11 +234,7 @@ export async function draftQuestion(
   }));
 }
 
-export interface SimilarQuestionMatch {
-  question: Question;
-  score: number;
-  reasons: string[];
-}
+export type SimilarQuestionMatch = Schemas['SimilarQuestionMatchDto'];
 
 export async function findSimilarQuestions(
   draft: Partial<QuestionInput>,
@@ -258,7 +242,7 @@ export async function findSimilarQuestions(
   limit = 5,
 ): Promise<SimilarQuestionMatch[]> {
   const data = await handle(client.POST('/questions/similar', {
-    body: { draft, excludeQuestionId, limit }
+    body: { draft: draft as Schemas['FindSimilarDraftDto'], excludeQuestionId, limit }
   }));
   return data.matches;
 }
@@ -301,32 +285,32 @@ export async function generateCandidateLink(
   }));
 }
 
+
 export async function getPresignedUrl(
-  questionIndex: number,
-  contentType: 'video/webm',
-  mediaType?: CaptureTarget,
-): Promise<PresignedUrlResponse>;
-export async function getPresignedUrl(
+  interviewId: string,
   questionIndex: number,
   contentType: 'video/webm',
   mediaType: CaptureTarget = 'camera',
 ): Promise<PresignedUrlResponse> {
-  return handle(client.POST('/upload/presign', {
-    body: {
-      questionIndex,
-      contentType,
-      mediaType,
-    }
-  }));
+  return handle(
+    client.POST('/interviews/{id}/questions/{questionIndex}/upload-url', {
+      params: { path: { id: interviewId, questionIndex } },
+      body: { contentType, mediaType },
+    }),
+  );
 }
 
 export async function completeUpload(
+  interviewId: string,
   questionIndex: number,
   mediaKey: string,
 ): Promise<ConfirmUploadResponse> {
-  return handle(client.POST('/upload/complete', {
-    body: { questionIndex, mediaKey }
-  }));
+  return handle(
+    client.POST('/interviews/{id}/questions/{questionIndex}/complete-upload', {
+      params: { path: { id: interviewId, questionIndex } },
+      body: { mediaKey },
+    }),
+  );
 }
 
 export async function completeUploadAndFetchInterview(
@@ -334,7 +318,7 @@ export async function completeUploadAndFetchInterview(
   questionIndex: number,
   mediaKey: string,
 ): Promise<Interview> {
-  await completeUpload(questionIndex, mediaKey);
+  await completeUpload(interviewId, questionIndex, mediaKey);
   return getInterview(interviewId);
 }
 
