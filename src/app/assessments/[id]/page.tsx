@@ -15,6 +15,7 @@ import { Stack } from '@/components/ui/layout/stack'
 import { SectionHeading } from '@/components/ui/text'
 import { type Interview, type MeResponse } from '@/lib/api'
 import { deriveReviewStatus } from '@/lib/assessment-status'
+import { classifyAuthGate } from '@/lib/auth-gate'
 import { canReviewAssessments } from '@/lib/auth-roles'
 import {
   getServerRequestContext,
@@ -59,15 +60,23 @@ export default async function AssessmentDetailPage({
     requestServer<Interview>(`/interviews/${encodedId}`, ctx),
   ])
 
-  const me: MeResponse | null =
-    meResult.status === 'fulfilled' ? meResult.value ?? null : null
-
-  if (!me || !canReviewAssessments(me.role)) {
+  const gate = classifyAuthGate(meResult, canReviewAssessments)
+  if (gate.kind === 'forbidden') {
     return (
       <ForbiddenAccessPage
         title={FORBIDDEN_TITLE}
         description={FORBIDDEN_DESCRIPTION}
       />
+    )
+  }
+  if (gate.kind === 'error') {
+    return (
+      <PageShell spacing="tight">
+        <Alert variant="danger">
+          <AlertTitle>Assessment unavailable</AlertTitle>
+          <AlertDescription>{gate.message}</AlertDescription>
+        </Alert>
+      </PageShell>
     )
   }
 

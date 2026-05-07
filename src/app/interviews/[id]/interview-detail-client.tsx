@@ -142,6 +142,9 @@ export default function InterviewDetailClient({
   const submittedCount = interview.answers.filter(
     (answer) => answer.status === 'submitted',
   ).length
+  const answersByIndex = new Map(
+    interview.answers.map((a) => [a.questionIndex, a]),
+  )
   const candidateLinkPreview = formatCandidateLinkPreview(candidateLink)
   const showReviewCta = REVIEWABLE_STATUSES.has(interview.status)
 
@@ -348,9 +351,7 @@ export default function InterviewDetailClient({
 
         <Stack gap={4}>
           {interview.questions.map((question, questionIndex) => {
-            const answer = interview.answers.find(
-              (item) => item.questionIndex === questionIndex,
-            )
+            const answer = answersByIndex.get(questionIndex)
 
             return (
               <Card key={question.id} variant="surface">

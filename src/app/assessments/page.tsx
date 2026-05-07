@@ -7,6 +7,7 @@ import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { type Interview, type MeResponse } from '@/lib/api'
 import { getCompletionDate } from '@/lib/assessment-status'
+import { classifyAuthGate } from '@/lib/auth-gate'
 import { canReviewAssessments } from '@/lib/auth-roles'
 import {
   getServerRequestContext,
@@ -58,15 +59,23 @@ export default async function AssessmentsPage() {
     requestServer<Interview[]>('/interviews', ctx),
   ])
 
-  const me: MeResponse | null =
-    meResult.status === 'fulfilled' ? meResult.value ?? null : null
-
-  if (!me || !canReviewAssessments(me.role)) {
+  const gate = classifyAuthGate(meResult, canReviewAssessments)
+  if (gate.kind === 'forbidden') {
     return (
       <ForbiddenAccessPage
         title={FORBIDDEN_TITLE}
         description={FORBIDDEN_DESCRIPTION}
       />
+    )
+  }
+  if (gate.kind === 'error') {
+    return (
+      <PageShell>
+        <Alert variant="danger">
+          <AlertTitle>Could not load assessments</AlertTitle>
+          <AlertDescription>{gate.message}</AlertDescription>
+        </Alert>
+      </PageShell>
     )
   }
 
