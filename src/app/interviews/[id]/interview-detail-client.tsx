@@ -46,7 +46,7 @@ import { BodyText, SectionHeading } from "@/components/ui/text";
 import { UnstyledLink } from "@/components/ui/unstyled-link";
 import { VideoFrame, VideoSurface } from "@/components/ui/video-frame";
 import {
-  completeUpload,
+  completeUploadAndFetchInterview,
   generateCandidateLink,
   getInterview,
   getInterviewAnswerMedia,
@@ -385,12 +385,12 @@ export default function InterviewDetailClient({
     );
 
     try {
-      const updatedInterview = await runMutation(
+      const refreshedInterview = await runMutation(
         async () => {
           const { uploadUrl, mediaKey } = await getPresignedUrl(
             interview.id,
             questionIndex,
-            file.type,
+            file.type as "video/webm",
           );
 
           const uploadResponse = await fetch(uploadUrl, {
@@ -403,14 +403,18 @@ export default function InterviewDetailClient({
             throw new Error("Upload to storage failed");
           }
 
-          return completeUpload(interview.id, questionIndex, mediaKey);
+          return completeUploadAndFetchInterview(
+            interview.id,
+            questionIndex,
+            mediaKey,
+          );
         },
         {
           successMessage: TOAST_MESSAGES.interview.uploadSuccess(questionIndex + 1),
           errorMessage: TOAST_MESSAGES.interview.uploadError(questionIndex + 1),
         },
       );
-      setInterview(updatedInterview);
+      setInterview(refreshedInterview);
       setUploadStates((current) =>
         current.map((state, index) =>
           index === questionIndex ? { status: "uploaded" } : state,

@@ -15,8 +15,12 @@ jobs:
         with:
           node-version: '22'
       - run: npm ci
+      - name: Regenerate OpenAPI types from committed spec
+        run: npm run openapi:generate
+      - name: Ensure generated types match committed spec
+        run: git diff --exit-code -- src/lib/api-types.ts
       - run: npm run lint
-      - run: npm run build
+      - run: npx next build --webpack
 
 # Deploy is handled by AWS Amplify auto-build (connected to GitHub repo).
 # Amplify watches develop → dev, main → prod and builds automatically.

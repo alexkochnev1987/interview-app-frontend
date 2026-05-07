@@ -3,10 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3001",
-    "build": "next build --webpack",
+    "dev": "npm run openapi:refresh && next dev -p 3001",
+    "build": "npm run openapi:generate && next build --webpack",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "openapi:backend:generate": "node scripts/generate-backend-openapi.mjs",
+    "openapi:sync": "node scripts/sync-openapi.mjs",
+    "openapi:generate": "npx --yes openapi-typescript openapi/openapi.json -o src/lib/api-types.ts",
+    "openapi:refresh": "npm run openapi:backend:generate && npm run openapi:sync && npm run openapi:generate"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",
@@ -14,6 +18,7 @@
     "clsx": "^2.1.1",
     "lucide-react": "^1.8.0",
     "next": "^16.2.4",
+    "openapi-fetch": "^0.17.0",
     "radix-ui": "^1.4.3",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
@@ -29,6 +34,7 @@
     "autoprefixer": "^10.5.0",
     "eslint": "^9.39.4",
     "eslint-config-next": "^16.2.4",
+    "openapi-typescript": "^7.13.0",
     "postcss": "^8.5.10",
     "tailwindcss": "^3.4.17",
     "tailwindcss-animate": "^1.0.7",
