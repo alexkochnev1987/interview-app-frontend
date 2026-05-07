@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { createQuestion, type QuestionInput } from '@/lib/api';
+import { TOAST_MESSAGES } from '@/lib/toast-messages';
 import { QuestionEditor } from '../question-editor';
 
 export default function NewQuestionPage() {
@@ -18,6 +19,10 @@ export default function NewQuestionPage() {
       title="New Question"
       submitLabel="Create Question"
       onSubmit={handleSubmit}
+      saveToastOptions={{
+        successMessage: TOAST_MESSAGES.question.createSuccess,
+        errorMessage: TOAST_MESSAGES.question.createError,
+      }}
     />
   );
 }

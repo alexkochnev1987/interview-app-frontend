@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 
 import { AppBody, AppShellRoot } from "@/components/ui/app-shell"
+import { Toaster } from "@/components/ui/toaster"
 import { AuthProvider } from "@/lib/auth-context"
 
 import "./globals.css"
@@ -24,6 +25,7 @@ export default function RootLayout({
             <NavHeader />
             {children}
           </AppShellRoot>
+          <Toaster />
         </AuthProvider>
       </AppBody>
     </html>

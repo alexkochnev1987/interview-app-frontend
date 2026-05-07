@@ -129,13 +129,12 @@ export default function LoginPage() {
           <CardContent>
             <form onSubmit={handleSubmit}>
               <Stack gap={6}>
-                {error ? (
+              {error ? (
                 <Alert variant="danger">
                   <AlertTitle>Authentication failed</AlertTitle>
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               ) : null}
-
               <Stack gap={4}>
                 <FormField htmlFor="email" label="Email">
                   <Input

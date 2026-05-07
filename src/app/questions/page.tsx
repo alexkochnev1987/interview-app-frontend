@@ -24,6 +24,8 @@ import {
   type Question,
 } from '@/lib/api'
 import { useAuth } from '@/lib/auth-context'
+import { runMutation } from '@/lib/run-mutation'
+import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 function matchesQuery(question: Question, normalizedQuery: string): boolean {
   if (!normalizedQuery) return true
@@ -103,14 +105,28 @@ export default function QuestionsPage() {
     setBulkDeleting(true)
     setBulkError(null)
     try {
-      const result = await deleteQuestionsBulk(ids)
+      const result = await runMutation(
+        () => deleteQuestionsBulk(ids),
+        {
+          getSuccessMessage: ({ deleted, blocked }) => {
+            if (deleted.length === 0 && blocked.length > 0) {
+              return TOAST_MESSAGES.question.bulkDeleteNoopSuccess
+            }
+            if (deleted.length > 0 && blocked.length > 0) {
+              return TOAST_MESSAGES.question.bulkDeletePartialSuccess
+            }
+            return TOAST_MESSAGES.question.bulkDeleteSuccess
+          },
+          errorMessage: TOAST_MESSAGES.question.bulkDeleteError,
+        }
+      )
       const fresh = await fetchQuestions()
       setQuestions(fresh)
       setSelectedIds(new Set())
       setBulkConfirmOpen(false)
       setBulkResult(result)
-    } catch (err) {
-      setBulkError(err instanceof Error ? err.message : 'Bulk delete failed.')
+    } catch {
+      setBulkError(null)
       setBulkConfirmOpen(false)
     } finally {
       setBulkDeleting(false)

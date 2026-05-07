@@ -20,6 +20,8 @@ import {
   type QuestionInput,
 } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
+import { runMutation } from '@/lib/run-mutation';
+import { TOAST_MESSAGES } from '@/lib/toast-messages';
 import { QuestionEditor } from '../question-editor';
 
 export default function EditQuestionPage() {
@@ -77,15 +79,15 @@ export default function EditQuestionPage() {
     setRestoring(true);
     setRestoreError(null);
     try {
-      const restored = await restoreQuestion(id);
+      const restored = await runMutation(() => restoreQuestion(id), {
+        successMessage: TOAST_MESSAGES.question.restoreSuccess,
+        errorMessage: TOAST_MESSAGES.question.restoreError,
+      });
       setQuestion(restored);
       setRestoreOpen(false);
       router.refresh();
     } catch (err) {
-      setRestoreError(
-        err instanceof Error ? err.message : 'Failed to restore question.',
-      );
-      setRestoreOpen(false);
+      setRestoreError(null);
     } finally {
       setRestoring(false);
     }
@@ -96,7 +98,10 @@ export default function EditQuestionPage() {
     setDeleting(true);
     setDeleteError(null);
     try {
-      await deleteQuestion(id);
+      await runMutation(() => deleteQuestion(id), {
+        successMessage: TOAST_MESSAGES.question.deleteSuccess,
+        errorMessage: TOAST_MESSAGES.question.deleteError,
+      });
       setConfirmOpen(false);
       router.push('/questions');
       router.refresh();
@@ -104,11 +109,9 @@ export default function EditQuestionPage() {
       if (err instanceof QuestionInUseError) {
         setDeleteError(err.message);
       } else {
-        setDeleteError(
-          err instanceof Error ? err.message : 'Failed to delete question.',
-        );
+        setDeleteError(null);
       }
-      setConfirmOpen(false);
+    } finally {
       setDeleting(false);
     }
   }
