@@ -51,7 +51,7 @@ export function EditorPromptSection({
         <Textarea
           id="followUpQuestions"
           size="sm"
-          value={joinStringList(value.followUpQuestions)}
+          value={joinStringList(value.followUpQuestions || [])}
           onChange={(event) =>
             onUpdate({ followUpQuestions: parseStringList(event.target.value) })
           }

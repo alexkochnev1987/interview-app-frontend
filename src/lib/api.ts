@@ -1,356 +1,222 @@
+import createClient from 'openapi-fetch';
+import { paths, components } from './api-types';
 import { ApiError } from './api-error';
 
 export { ApiError, isForbiddenError } from './api-error';
 
-const API_URL = '/api';
+const client = createClient<paths>({
+  baseUrl: '/api',
+  headers: {
+    'Content-Type': 'application/json',
+  }
+});
 
-export type QuestionDifficulty = 'easy' | 'medium' | 'hard';
-export type QuestionRedFlagSeverity = 'low' | 'medium' | 'high';
+type Schemas = components['schemas'];
 
-export interface QuestionExpectedConcept {
-  id: string;
-  label: string;
-  weight: number;
-  description: string;
-}
+export type QuestionDifficulty = Schemas['QuestionResponseDto']['difficulty'];
+export type AuthUserResponseDto = Schemas['AuthUserResponseDto'];
+export type MeResponse = AuthUserResponseDto;
+export type LoginPayload = Schemas['LoginDto'];
+export type LogoutResponse = Schemas['LogoutResponseDto'];
+export type FeedbackResponse = Schemas['FeedbackResponseDto'];
+export type QuestionRedFlagSeverity = Schemas['QuestionRedFlagDto']['severity'];
 
-export interface QuestionRedFlag {
-  id: string;
-  label: string;
-  severity: QuestionRedFlagSeverity;
-}
+export type QuestionExpectedConcept = Schemas['QuestionExpectedConceptDto'];
+export type QuestionRedFlag = Schemas['QuestionRedFlagDto'];
 
-export interface QuestionDraft {
-  externalId?: string;
-  role?: string;
-  focus?: string;
-  outputLanguage: string;
-  category?: string;
-  subcategory?: string;
-  questionText: string;
-  followUpQuestions: string[];
-  expectedConcepts: QuestionExpectedConcept[];
-  redFlags: QuestionRedFlag[];
-  difficulty: QuestionDifficulty;
-  weight: number;
-  sampleGoodAnswer?: string;
-  minimumPassScore: number;
-  tags: string[];
-  metadata: Record<string, unknown>;
-}
+export type QuestionDraft = Schemas['QuestionDraftResponseDto'];
+export type QuestionInput = Schemas['CreateQuestionDto'];
+export type UpdateQuestionInput = Schemas['UpdateQuestionDto'];
+export type Question = Schemas['QuestionResponseDto'];
 
-export interface QuestionInput {
-  externalId?: string;
-  role?: string;
-  focus?: string;
-  outputLanguage: string;
-  category?: string;
-  subcategory?: string;
-  questionText: string;
-  followUpQuestions: string[];
-  expectedConcepts: QuestionExpectedConcept[];
-  redFlags: QuestionRedFlag[];
-  difficulty: QuestionDifficulty;
-  weight: number;
-  sampleGoodAnswer?: string;
-  minimumPassScore: number;
-  tags: string[];
-  metadata: Record<string, unknown>;
-}
+export type InterviewQuestion = Schemas['InterviewResponseDto']['questions'][number];
 
-export interface Question extends QuestionInput {
-  id: string;
-  createdAt: string;
-  updatedAt: string;
-  deleted: boolean;
-}
+export type CandidateQuestionView = Schemas['CandidateQuestionViewDto'];
 
-export interface InterviewQuestion {
-  id: string;
-  externalId?: string;
-  role?: string;
-  focus?: string;
-  outputLanguage: string;
-  category?: string;
-  subcategory?: string;
-  questionText: string;
-  followUpQuestions: string[];
-  expectedConcepts: QuestionExpectedConcept[];
-  redFlags: QuestionRedFlag[];
-  difficulty: QuestionDifficulty;
-  weight: number;
-  sampleGoodAnswer?: string;
-  minimumPassScore: number;
-  tags: string[];
-  metadata: Record<string, unknown>;
-}
+export type InterviewBehaviorRisk = NonNullable<Schemas['InterviewResultResponseDto']['behaviorSummary']>['riskLevel'];
+export type InterviewDecision = NonNullable<Schemas['InterviewResultResponseDto']['decision']>;
+export type AnswerDecisionHint = NonNullable<Schemas['InterviewQuestionResultDto']['decisionHint']>;
 
-export interface CandidateQuestionView {
-  text: string;
-}
+export type AnswerStatus = NonNullable<Schemas['TakeInterviewResponseDto']['currentAnswerMeta']>['status'];
+export type AnswerValidationStatus = Schemas['StartAllAnswerValidationsResponseDto']['answers'][number]['status'];
 
-export type InterviewBehaviorRisk = 'low' | 'medium' | 'high';
-export type InterviewDecision = 'proceed' | 'review' | 'reject';
-export type AnswerDecisionHint = 'pass' | 'review' | 'fail';
-export type AnswerStatus = 'recording' | 'submitted';
-export type AnswerValidationStatus = 'idle' | 'queued' | 'processing' | 'completed' | 'failed';
-export type InterviewWorkflowStatus =
-  | 'idle'
-  | 'queued'
-  | 'processing'
-  | 'completed'
-  | 'failed';
-export type InterviewWorkflowStage =
-  | 'validate_answers'
-  | 'transcribe_audio'
-  | 'analyze_answers'
-  | 'aggregate_result'
-  | 'store_result';
+export type InterviewWorkflowStatus = NonNullable<Schemas['InterviewResponseDto']['workflow']>['status'];
+export type InterviewWorkflowStage = NonNullable<Schemas['InterviewResponseDto']['workflow']>['currentStage'];
 
-export interface MediaArtifact {
-  mediaKey: string;
-  contentType: string;
-  fileSizeBytes?: number;
-  uploadedAt: string;
-}
+export type MediaArtifact = Schemas['MediaArtifactDto'];
+export type AnswerTranscript = Schemas['AnswerTranscriptDto'];
+export type ClientTranscriptPayload = Schemas['ClientTranscriptDto'];
+export type AnswerEvaluation = Schemas['AnswerEvaluationDto'];
+export type AnswerValidation = Schemas['AnswerValidationDto'];
+export type Answer = Schemas['AnswerDto'];
+export type AnswerVersion = Schemas['AnswerVersionDto'];
 
-export interface AnswerBehaviorSignals {
-  tabHiddenCount: number;
-  windowBlurCount: number;
-  copyCount: number;
-  pasteCount: number;
-  keydownCount: number;
-  resizeCount: number;
-}
+export type InterviewQuestionResult = Schemas['InterviewQuestionResultDto'];
+export type InterviewBehaviorSummary = Schemas['InterviewBehaviorSummaryDto'];
+export type InterviewResult = Schemas['InterviewResultResponseDto'];
+export type InterviewWorkflow = Schemas['InterviewWorkflowDto'];
+export type Interview = Schemas['InterviewResponseDto'];
 
-export interface AnswerBehaviorEvent {
-  eventType: 'tab_hidden' | 'window_blur' | 'copy' | 'paste' | 'keydown' | 'resize';
-  occurredAt: string;
-  versionNumber: number;
-}
+export type ValidateAllAnswersResponse = Schemas['StartAllAnswerValidationsResponseDto'];
+export type StartAnswerValidationResult = Schemas['StartAnswerValidationResultDto'];
+export type InterviewAnswerMediaResponse = Schemas['InterviewAnswerMediaResponseDto'];
+export type CandidateLinkResponse = Schemas['CandidateLinkResponseDto'];
 
-export interface AnswerTranscript {
-  text?: string;
-  language?: string;
-  provider?: 'browser-web-speech' | 'whisper';
-  generatedAt?: string;
-  isFinal?: boolean;
-}
+export type CreateInterviewPayload = Schemas['CreateInterviewDto'];
 
-export interface ClientTranscriptPayload {
-  text: string;
-  language: string;
-  provider: 'browser-web-speech' | 'whisper';
-  generatedAt: string;
-  isFinal: boolean;
-}
+export type PresignedUrlResponse = Schemas['PresignedUrlResponseDto'];
+export type ConfirmUploadResponse = Schemas['ConfirmUploadResponseDto'];
 
-export interface AnswerEvaluation {
-  overallScore?: number;
-  categoryScores?: Record<string, number>;
-  coveredConceptIds?: string[];
-  missedConceptIds?: string[];
-  redFlagIds?: string[];
-  behaviorRisk?: InterviewBehaviorRisk;
-  summary?: string;
-  decisionHint?: AnswerDecisionHint;
-  evaluatedAt?: string;
-}
+export type TakeInterviewData = Schemas['TakeInterviewResponseDto'];
+export type MultipartUploadSessionResponse = Schemas['MultipartUploadSessionResponseDto'];
+export type MultipartUploadPartResponse = Schemas['MultipartUploadPartResponseDto'];
 
-export interface AnswerValidation {
-  status: AnswerValidationStatus;
-  executionArn?: string;
-  sourceVersionNumber?: number;
-  requestedAt?: string;
-  startedAt?: string;
-  completedAt?: string;
-  errorMessage?: string;
-}
+export type TakeProgressPayload = Schemas['SaveAnswerProgressDto'];
 
-export interface Answer {
-  questionIndex: number;
-  questionId: string;
-  status: AnswerStatus;
-  mediaKey: string;
-  screenMediaKey?: string;
-  uploadedAt: string;
-  durationSeconds?: number;
-  retakeCount?: number;
-  startedAt?: string;
-  submittedAt?: string;
-  camera?: MediaArtifact;
-  screen?: MediaArtifact;
-  behaviorSignals?: AnswerBehaviorSignals;
-  selectedVersionNumber?: number;
-  versions?: AnswerVersion[];
-  behaviorEvents?: AnswerBehaviorEvent[];
-  transcript?: AnswerTranscript;
-  evaluation?: AnswerEvaluation;
-  validation?: AnswerValidation;
-}
+export type SubmitTakeAnswerPayload = Schemas['SubmitAnswerDto'];
 
-export interface AnswerVersion {
-  versionNumber: number;
-  mediaKey: string;
-  screenMediaKey?: string;
-  uploadedAt: string;
-  durationSeconds?: number;
-  startedAt?: string;
-  submittedAt?: string;
-  camera?: MediaArtifact;
-  screen?: MediaArtifact;
-  behaviorSignals?: AnswerBehaviorSignals;
-  behaviorEvents?: AnswerBehaviorEvent[];
-}
+export type CaptureTarget = 'camera' | 'screen';
 
-export interface InterviewQuestionResult {
-  questionIndex: number;
-  questionId: string;
-  score?: number;
-  categoryScores?: Record<string, number>;
-  summary?: string;
-  decisionHint?: AnswerDecisionHint;
-}
+type ApiResult<T> = { data?: T; error?: unknown; response: Response };
 
-export interface InterviewBehaviorSummary {
-  riskLevel?: InterviewBehaviorRisk;
-  notes: string[];
-}
-
-export interface InterviewResult {
-  overallScore: number;
-  summary: string;
-  categoryScores?: Record<string, number>;
-  rubricVersion?: string;
-  decision?: InterviewDecision;
-  trustScore?: number;
-  trustFlags?: string[];
-  behaviorSummary?: InterviewBehaviorSummary;
-  questionResults?: InterviewQuestionResult[];
-  completedAt: string;
-}
-
-export interface InterviewWorkflow {
-  status: InterviewWorkflowStatus;
-  currentStage?: InterviewWorkflowStage;
-  executionId?: string;
-  startedAt?: string;
-  completedAt?: string;
-  lastUpdatedAt: string;
-  errorMessage?: string;
-}
-
-export interface Interview {
-  id: string;
-  candidateName: string;
-  position: string;
-  questions: InterviewQuestion[];
-  answers: Answer[];
-  status: 'pending' | 'in_progress' | 'processing' | 'completed' | 'failed';
-  result?: InterviewResult;
-  workflow?: InterviewWorkflow;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface ValidateAllAnswersResponse {
-  ok: true;
-  interviewId: string;
-  requestedCount: number;
-  queuedCount: number;
-  reusedCount: number;
-  skippedCount: number;
-  answers: Array<{
-    status: AnswerValidationStatus;
-    questionIndex: number;
-    sourceVersionNumber: number;
-    reused: boolean;
-  }>;
-}
-
-export interface InterviewAnswerMediaResponse {
-  questionIndex: number;
-  cameraUrl?: string;
-  screenUrl?: string;
-}
-
-export interface CandidateLinkResponse {
-  candidateLink: string;
-}
-
-export interface CreateInterviewPayload {
-  candidateName: string;
-  position: string;
-  questionIds: string[];
-}
-
-export interface PresignedUrlResponse {
-  uploadUrl: string;
-  mediaKey: string;
-}
-
-export interface MeResponse {
-  id: string;
-  email: string;
-  name: string;
-  role: string;
-}
-
-function extractApiMessage(status: number, body: string): string {
-  const trimmed = body.trim();
-  if (!trimmed) return `API error ${status}`;
-  try {
-    const parsed = JSON.parse(trimmed) as { message?: unknown };
-    if (typeof parsed.message === 'string' && parsed.message.length > 0) {
-      return parsed.message;
+function extractMessage(error: unknown, status: number, body?: string): string {
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const maybeMessage = (error as { message?: unknown }).message;
+    if (typeof maybeMessage === 'string' && maybeMessage.length > 0) {
+      return maybeMessage;
     }
-  } catch {}
-  return `API error ${status}: ${trimmed}`;
+  }
+  if (body) {
+    const trimmed = body.trim();
+    if (trimmed.length > 0) {
+      try {
+        const parsed = JSON.parse(trimmed) as { message?: unknown };
+        if (typeof parsed.message === 'string' && parsed.message.length > 0) {
+          return parsed.message;
+        }
+      } catch {}
+      return trimmed;
+    }
+  }
+  return `API error ${status}`;
 }
 
-const REQUEST_TIMEOUT_MS = 30_000;
+async function handle<T>(promise: Promise<ApiResult<T>>): Promise<T> {
+  const { data, error, response } = await promise;
 
-async function request<T>(path: string, options?: RequestInit): Promise<T> {
-  const { signal, headers, ...rest } = options ?? {};
-  const res = await fetch(`${API_URL}${path}`, {
-    ...rest,
-    headers: { 'Content-Type': 'application/json', ...headers },
-    signal: signal ?? AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+  if (error) {
+    const message = extractMessage(error, response.status);
+    const path = new URL(response.url).pathname;
+    throw new ApiError(response.status, message, path);
+  }
+
+  if (data === undefined) {
+    const path = new URL(response.url).pathname;
+    throw new ApiError(response.status, `API error ${response.status}: Empty response body`, path);
+  }
+
+  return data;
+}
+
+function getServerBaseUrl(): string {
+  const baseUrl = process.env.BACKEND_URL;
+  if (!baseUrl) {
+    throw new Error('BACKEND_URL is not configured for server-side API calls.');
+  }
+  return baseUrl.replace(/\/+$/, '');
+}
+
+function createServerClient(cookieHeader: string) {
+  const serverFetch: typeof fetch = (input, init) => {
+    const headers = new Headers(init?.headers);
+    headers.set('Content-Type', 'application/json');
+    headers.set('cookie', cookieHeader);
+
+    return fetch(input, {
+      ...init,
+      cache: 'no-store',
+      headers,
+    });
+  };
+
+  return createClient<paths>({
+    baseUrl: getServerBaseUrl(),
+    fetch: serverFetch,
+  });
+}
+
+async function postWithQuery<T>(
+  path: string,
+  query?: Record<string, string>,
+): Promise<T> {
+  const queryString = query ? '?' + new URLSearchParams(query).toString() : '';
+  const res = await fetch(`/api${path}${queryString}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
   });
 
   if (!res.ok) {
     const body = await res.text();
-    throw new ApiError(res.status, extractApiMessage(res.status, body), path, body);
+    throw new ApiError(res.status, extractMessage(undefined, res.status, body), path, body);
   }
 
-  const body = await res.text();
-  if (!body) return undefined as T;
-  return JSON.parse(body) as T;
+  if (res.status === 204) {
+    return undefined as T;
+  }
+
+  return (await res.json()) as T;
 }
 
 export async function fetchQuestions(): Promise<Question[]> {
-  return request<Question[]>('/questions');
+  return handle(client.GET('/questions'));
+}
+
+export async function login(data: LoginPayload): Promise<AuthUserResponseDto> {
+  return handle(client.POST('/auth/login', {
+    body: data,
+  }));
+}
+
+export async function getCurrentUser(): Promise<AuthUserResponseDto> {
+  return handle(client.GET('/auth/me'));
+}
+
+export async function logout(): Promise<LogoutResponse> {
+  return handle(client.POST('/auth/logout'));
+}
+
+export async function getFeedbackByToken(
+  id: string,
+  token: string,
+): Promise<FeedbackResponse> {
+  return handle(client.GET('/feedback/{id}', {
+    params: {
+      path: { id },
+      query: { token },
+    },
+  }));
 }
 
 export async function getQuestion(id: string): Promise<Question> {
-  return request<Question>(`/questions/${id}`);
+  return handle(client.GET('/questions/{id}', {
+    params: { path: { id } }
+  }));
 }
 
 export async function createQuestion(data: QuestionInput): Promise<Question> {
-  return request<Question>('/questions', {
-    method: 'POST',
-    body: JSON.stringify(data),
-  });
+  return handle(client.POST('/questions', {
+    body: data
+  }));
 }
 
 export async function updateQuestion(
   id: string,
-  data: QuestionInput,
+  data: UpdateQuestionInput,
 ): Promise<Question> {
-  return request<Question>(`/questions/${id}`, {
-    method: 'PATCH',
-    body: JSON.stringify(data),
-  });
+  return handle(client.PATCH('/questions/{id}', {
+    params: { path: { id } },
+    body: data
+  }));
 }
 
 export class QuestionInUseError extends Error {
@@ -363,115 +229,125 @@ export class QuestionInUseError extends Error {
 export async function deleteQuestion(
   id: string,
 ): Promise<{ id: string; deleted: true }> {
-  const res = await fetch(`${API_URL}/questions/${id}`, {
-    method: 'DELETE',
-    headers: { 'Content-Type': 'application/json' },
+  const { data, error, response } = await client.DELETE('/questions/{id}', {
+    params: { path: { id } }
   });
+  const status = response.status;
+  const path = `/questions/${id}`;
 
-  if (res.status === 409) {
-    const body = await res.text();
+  if (status === 409) {
     let message = 'Question is used by an active interview.';
-    try {
-      const parsed = JSON.parse(body) as { message?: string };
-      if (parsed.message) message = parsed.message;
-    } catch {}
+    if (error && typeof error === 'object' && error !== null && 'message' in error) {
+      const maybeMessage = (error as { message?: unknown }).message;
+      if (typeof maybeMessage === 'string') {
+        message = maybeMessage;
+      }
+    }
     throw new QuestionInUseError(message);
   }
 
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`API error ${res.status}: ${body}`);
+  if (error) {
+    throw new ApiError(status, extractMessage(error, status), path);
   }
 
-  return res.json() as Promise<{ id: string; deleted: true }>;
+  if (!data) {
+    throw new ApiError(status, 'API error: Empty response body', path);
+  }
+
+  if (data.deleted !== true) {
+    throw new Error('API error: delete response did not confirm deletion.');
+  }
+
+  return { id: data.id, deleted: true };
+
 }
 
 export async function restoreQuestion(id: string): Promise<Question> {
-  return request<Question>(`/questions/${id}/restore`, {
-    method: 'PATCH',
-  });
+  return handle(client.PATCH('/questions/{id}/restore', {
+    params: { path: { id } }
+  }));
 }
 
-export interface BulkDeleteResult {
-  deleted: string[];
-  blocked: Array<{ id: string; questionText: string; reason: string }>;
-}
+export type BulkDeleteResult = Schemas['BulkDeleteQuestionsResponseDto'];
 
 export async function deleteQuestionsBulk(
   ids: string[],
 ): Promise<BulkDeleteResult> {
-  return request<BulkDeleteResult>('/questions/bulk-delete', {
-    method: 'POST',
-    body: JSON.stringify({ ids }),
-  });
+  return handle(client.POST('/questions/bulk-delete', {
+    body: { ids }
+  }));
 }
 
 export async function draftQuestion(
-  question: Partial<QuestionInput>,
+  question: Schemas['DraftQuestionDto']['question'],
 ): Promise<QuestionDraft> {
-  return request<QuestionDraft>('/ai/question-draft', {
-    method: 'POST',
-    body: JSON.stringify({ question }),
-  });
+  return handle(client.POST('/ai/question-draft', {
+    body: { question }
+  }));
 }
 
-export interface SimilarQuestionMatch {
-  question: Question;
-  score: number;
-  reasons: string[];
-}
+export type SimilarQuestionMatch = Schemas['SimilarQuestionMatchDto'];
 
 export async function findSimilarQuestions(
   draft: Partial<QuestionInput>,
   excludeQuestionId?: string,
   limit = 5,
 ): Promise<SimilarQuestionMatch[]> {
-  const res = await request<{ matches: SimilarQuestionMatch[] }>(
-    '/questions/similar',
-    {
-      method: 'POST',
-      body: JSON.stringify({ draft, excludeQuestionId, limit }),
-    },
-  );
-  return res.matches;
+  const data = await handle(client.POST('/questions/similar', {
+    body: { draft: draft as Schemas['FindSimilarDraftDto'], excludeQuestionId, limit }
+  }));
+  return data.matches;
 }
 
 export async function fetchInterviews(): Promise<Interview[]> {
-  return request<Interview[]>('/interviews');
+  return handle(client.GET('/interviews'));
+
 }
 
 export async function createInterview(
   data: CreateInterviewPayload,
 ): Promise<Interview & CandidateLinkResponse> {
-  return request<Interview & CandidateLinkResponse>('/interviews', {
-    method: 'POST',
-    body: JSON.stringify(data),
-  });
+  return handle(client.POST('/interviews', {
+    body: data
+  }));
 }
 
 export async function getInterview(id: string): Promise<Interview> {
-  return request<Interview>(`/interviews/${id}`);
+  return handle(client.GET('/interviews/{id}', {
+    params: { path: { id } }
+  }));
+}
+
+export async function getInterviewServer(
+  id: string,
+  cookieHeader: string,
+): Promise<Interview> {
+  const serverClient = createServerClient(cookieHeader);
+  return handle(serverClient.GET('/interviews/{id}', {
+    params: { path: { id } },
+  }));
 }
 
 export async function generateCandidateLink(
   id: string,
 ): Promise<CandidateLinkResponse> {
-  return request<CandidateLinkResponse>(`/interviews/${id}/candidate-link`, {
-    method: 'POST',
-  });
+  return handle(client.POST('/interviews/{id}/candidate-link', {
+    params: { path: { id } }
+  }));
 }
+
 
 export async function getPresignedUrl(
   interviewId: string,
   questionIndex: number,
-  contentType: string,
+  contentType: 'video/webm',
+  mediaType: CaptureTarget = 'camera',
 ): Promise<PresignedUrlResponse> {
-  return request<PresignedUrlResponse>(
-    `/interviews/${interviewId}/questions/${questionIndex}/upload-url`,
-    {
-      method: 'POST',
-      body: JSON.stringify({ contentType }),
-    },
+  return handle(
+    client.POST('/interviews/{id}/questions/{questionIndex}/upload-url', {
+      params: { path: { id: interviewId, questionIndex } },
+      body: { contentType, mediaType },
+    }),
   );
 }
 
@@ -479,30 +355,37 @@ export async function completeUpload(
   interviewId: string,
   questionIndex: number,
   mediaKey: string,
-): Promise<Interview> {
-  return request<Interview>(
-    `/interviews/${interviewId}/questions/${questionIndex}/complete-upload`,
-    {
-      method: 'POST',
-      body: JSON.stringify({ mediaKey }),
-    },
+): Promise<ConfirmUploadResponse> {
+  return handle(
+    client.POST('/interviews/{id}/questions/{questionIndex}/complete-upload', {
+      params: { path: { id: interviewId, questionIndex } },
+      body: { mediaKey },
+    }),
   );
 }
 
+export async function completeUploadAndFetchInterview(
+  interviewId: string,
+  questionIndex: number,
+  mediaKey: string,
+): Promise<Interview> {
+  await completeUpload(interviewId, questionIndex, mediaKey);
+  return getInterview(interviewId);
+}
+
 export async function completeInterview(id: string): Promise<Interview> {
-  return request<Interview>(`/interviews/${id}/complete`, {
-    method: 'PATCH',
-  });
+  return handle(client.PATCH('/interviews/{id}/complete', {
+    params: { path: { id } }
+  }));
 }
 
 export async function validateInterview(
   id: string,
   options: { force?: boolean } = {},
 ): Promise<ValidateAllAnswersResponse> {
-  const query = options.force ? '?force=true' : ''
-  return request<ValidateAllAnswersResponse>(
-    `/interviews/${encodeURIComponent(id)}/validate${query}`,
-    { method: 'POST' },
+  return postWithQuery<ValidateAllAnswersResponse>(
+    `/interviews/${encodeURIComponent(id)}/validate`,
+    options.force ? { force: 'true' } : undefined,
   );
 }
 
@@ -510,11 +393,10 @@ export async function validateInterviewQuestion(
   id: string,
   questionIndex: number,
   options: { force?: boolean } = {},
-): Promise<ValidateAllAnswersResponse> {
-  const query = options.force ? '?force=true' : ''
-  return request<ValidateAllAnswersResponse>(
-    `/interviews/${encodeURIComponent(id)}/questions/${questionIndex}/validate${query}`,
-    { method: 'POST' },
+): Promise<StartAnswerValidationResult> {
+  return postWithQuery<StartAnswerValidationResult>(
+    `/interviews/${encodeURIComponent(id)}/questions/${questionIndex}/validate`,
+    options.force ? { force: 'true' } : undefined,
   );
 }
 
@@ -522,93 +404,61 @@ export async function getInterviewAnswerMedia(
   interviewId: string,
   questionIndex: number,
 ): Promise<InterviewAnswerMediaResponse> {
-  return request<InterviewAnswerMediaResponse>(
-    `/interviews/${interviewId}/questions/${questionIndex}/media`,
-  );
+  return handle(client.GET('/interviews/{id}/questions/{questionIndex}/media', {
+    params: { path: { id: interviewId, questionIndex } }
+  }));
 }
 
 export async function getResults(id: string): Promise<InterviewResult> {
-  return request<InterviewResult>(`/interviews/${id}/results`);
+  return handle(client.GET('/interviews/{id}/results', {
+    params: { path: { id } }
+  }));
 }
 
-type CaptureTarget = 'camera' | 'screen';
-
-export interface TakeInterviewData {
-  id: string;
-  position: string;
-  candidateName: string;
-  totalQuestions: number;
-  currentQuestion: { text: string } | null;
-  currentQuestionIndex: number;
-  currentAnswerMeta: {
-    status: 'recording' | 'submitted';
-    versionCount: number;
-    selectedVersionNumber: number;
-  } | null;
-  completed: boolean;
-}
-
-export interface MultipartUploadSessionResponse {
-  mediaKey: string;
-  uploadId: string;
-}
-
-export interface MultipartUploadPartResponse {
-  mediaKey: string;
-  uploadId: string;
-  partNumber: number;
-  uploadUrl: string;
-}
-
-export interface TakeProgressPayload {
-  questionIndex: number;
-  versionNumber: number;
-  mediaKey: string;
-  screenMediaKey?: string;
-  durationSeconds?: number;
-  startedAt?: string;
-  submittedAt?: string;
-  cameraFileSizeBytes?: number;
-  screenFileSizeBytes?: number;
-  behaviorSignals: AnswerBehaviorSignals;
-  behaviorEvents: AnswerBehaviorEvent[];
-  clientTranscript?: ClientTranscriptPayload;
-}
-
-export interface SubmitTakeAnswerPayload extends TakeProgressPayload {
-  submitAnswer: boolean;
+export async function getResultsServer(
+  id: string,
+  cookieHeader: string,
+): Promise<InterviewResult> {
+  const serverClient = createServerClient(cookieHeader);
+  return handle(serverClient.GET('/interviews/{id}/results', {
+    params: { path: { id } },
+  }));
 }
 
 export async function getTakeInterview(
   id: string,
   token?: string,
 ): Promise<TakeInterviewData> {
-  const query = token ? `?token=${encodeURIComponent(token)}` : '';
-  return request<TakeInterviewData>(`/take/${id}${query}`);
+  return handle(client.GET('/take/{id}', {
+    params: {
+      path: { id },
+      query: token ? { token } : undefined
+    }
+  }));
 }
 
 export async function startMultipartUpload(
   questionIndex: number,
   mediaType: CaptureTarget,
+  contentType: 'video/webm' = 'video/webm',
 ): Promise<MultipartUploadSessionResponse> {
-  return request<MultipartUploadSessionResponse>('/upload/multipart/start', {
-    method: 'POST',
-    body: JSON.stringify({
+  return handle(client.POST('/upload/multipart/start', {
+    body: {
       questionIndex,
-      contentType: 'video/webm',
+      contentType,
       mediaType,
-    }),
-  });
+    }
+  }));
 }
 
 export async function sendTakeAnswerProgress(
   id: string,
   payload: TakeProgressPayload,
 ): Promise<void> {
-  await request<void>(`/take/${id}/answer/progress`, {
-    method: 'POST',
-    body: JSON.stringify(payload),
-  });
+  await handle(client.POST('/take/{id}/answer/progress', {
+    params: { path: { id } },
+    body: payload
+  }));
 }
 
 export async function presignMultipartPart(
@@ -617,15 +467,14 @@ export async function presignMultipartPart(
   uploadId: string,
   partNumber: number,
 ): Promise<MultipartUploadPartResponse> {
-  return request<MultipartUploadPartResponse>('/upload/multipart/part', {
-    method: 'POST',
-    body: JSON.stringify({
+  return handle(client.POST('/upload/multipart/part', {
+    body: {
       questionIndex,
       mediaKey,
       uploadId,
       partNumber,
-    }),
-  });
+    }
+  }));
 }
 
 export async function uploadMultipartPart(uploadUrl: string, partBlob: Blob): Promise<void> {
@@ -644,14 +493,13 @@ export async function completeMultipartUpload(
   mediaKey: string,
   uploadId: string,
 ): Promise<void> {
-  await request<void>('/upload/multipart/complete', {
-    method: 'POST',
-    body: JSON.stringify({
+  await handle(client.POST('/upload/multipart/complete', {
+    body: {
       questionIndex,
       mediaKey,
       uploadId,
-    }),
-  });
+    }
+  }));
 }
 
 export async function abortMultipartUpload(
@@ -659,22 +507,21 @@ export async function abortMultipartUpload(
   mediaKey: string,
   uploadId: string,
 ): Promise<void> {
-  await request<void>('/upload/multipart/abort', {
-    method: 'POST',
-    body: JSON.stringify({
+  await handle(client.POST('/upload/multipart/abort', {
+    body: {
       questionIndex,
       mediaKey,
       uploadId,
-    }),
-  });
+    }
+  }));
 }
 
 export async function submitTakeAnswer(
   id: string,
   payload: SubmitTakeAnswerPayload,
 ): Promise<void> {
-  await request<void>(`/take/${id}/answer`, {
-    method: 'POST',
-    body: JSON.stringify(payload),
-  });
+  await handle(client.POST('/take/{id}/answer', {
+    params: { path: { id } },
+    body: payload
+  }));
 }

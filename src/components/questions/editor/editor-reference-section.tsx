@@ -64,7 +64,7 @@ export function EditorReferenceSection({
             <Textarea
               id="tags"
               size="sm"
-              value={joinStringList(value.tags)}
+              value={joinStringList(value.tags || [])}
               onChange={(event) => onUpdate({ tags: parseStringList(event.target.value) })}
               placeholder="Comma or newline separated"
               disabled={submitting}

@@ -162,18 +162,18 @@ export function QuestionEditor({
       externalId: value.externalId?.trim() || undefined,
       role: value.role?.trim() || undefined,
       focus: value.focus?.trim() || undefined,
-      outputLanguage: value.outputLanguage.trim() || 'English',
+      outputLanguage: value.outputLanguage?.trim() || 'English',
       category: value.category?.trim() || undefined,
       subcategory: value.subcategory?.trim() || undefined,
       questionText: value.questionText.trim(),
-      followUpQuestions: value.followUpQuestions.map((item) => item.trim()).filter(Boolean),
+      followUpQuestions: (value.followUpQuestions || []).map((item) => item.trim()).filter(Boolean),
       expectedConcepts: value.expectedConcepts,
       redFlags: value.redFlags,
       difficulty: value.difficulty,
       weight: Math.max(0.1, Number(value.weight) || 1),
       sampleGoodAnswer: value.sampleGoodAnswer?.trim() || undefined,
       minimumPassScore: Math.max(0, Math.min(5, Number(value.minimumPassScore) || 0)),
-      tags: value.tags.map((item) => item.trim()).filter(Boolean),
+      tags: (value.tags || []).map((item) => item.trim()).filter(Boolean),
       metadata,
     }
 
@@ -192,7 +192,7 @@ export function QuestionEditor({
           errorMessage: saveToastOptions?.errorMessage ?? TOAST_MESSAGES.question.saveError,
         }),
       )
-      const normalizedMetadataText = formatMetadata(persisted.metadata)
+      const normalizedMetadataText = formatMetadata(persisted.metadata ?? {})
       setValue(persisted)
       setMetadataText(normalizedMetadataText)
       markSaved(persisted, normalizedMetadataText)
@@ -208,7 +208,7 @@ export function QuestionEditor({
       <QuestionEditorHeader
         title={title}
         difficulty={value.difficulty}
-        weight={value.weight}
+        weight={value.weight || 1}
         pendingDraftCount={pendingDraftFields.length}
       />
 

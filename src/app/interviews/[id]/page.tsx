@@ -5,7 +5,13 @@ import InterviewDetailClient from './interview-detail-client'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
-import { type Interview, type MeResponse } from '@/lib/api'
+import {
+  getInterviewServer,
+  getResultsServer,
+  type Interview,
+  type InterviewResult,
+  type MeResponse,
+} from '@/lib/api'
 import { canConfigureInterview } from '@/lib/auth-roles'
 import {
   getServerRequestContext,
@@ -48,13 +54,21 @@ export default async function InterviewDetailPage({
     )
   }
 
-  const encodedId = encodeURIComponent(id)
   let interview: Interview | null = null
+  let results: InterviewResult | null = null
   let error: string | null = null
 
   try {
-    interview =
-      (await requestServer<Interview>(`/interviews/${encodedId}`, ctx)) ?? null
+    interview = await getInterviewServer(id, ctx.cookieHeader)
+    results = interview.result ?? null
+
+    if (interview.status === 'completed') {
+      try {
+        results = await getResultsServer(id, ctx.cookieHeader)
+      } catch {
+        results = interview.result ?? null
+      }
+    }
   } catch (err) {
     if (isForbiddenError(err)) {
       return (
@@ -80,5 +94,11 @@ export default async function InterviewDetailPage({
     )
   }
 
-  return <InterviewDetailClient initialInterview={interview} />
+  return (
+    <InterviewDetailClient
+      id={id}
+      initialInterview={interview}
+      initialResults={results}
+    />
+  )
 }

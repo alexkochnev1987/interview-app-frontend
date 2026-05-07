@@ -52,6 +52,7 @@ function mockQuestion(
   difficulty: 'easy' | 'medium' | 'hard',
   weight: number
 ) {
+  const now = new Date().toISOString()
   return {
     id,
     role: 'frontend intern',
@@ -78,6 +79,9 @@ function mockQuestion(
     minimumPassScore: difficulty === 'hard' ? 3.5 : difficulty === 'medium' ? 3 : 2.5,
     tags: [],
     metadata: {},
+    createdAt: now,
+    updatedAt: now,
+    deleted: false,
   }
 }
 

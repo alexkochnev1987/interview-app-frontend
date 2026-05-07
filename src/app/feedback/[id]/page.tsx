@@ -17,17 +17,7 @@ import { Inline } from '@/components/ui/layout/inline'
 import { Section } from '@/components/ui/layout/section'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText } from '@/components/ui/text'
-
-interface Feedback {
-  overallResult?: string
-  overallScore?: number
-  categoryScores?: Record<string, number>
-  generalFeedback?: string
-  improvements?: string
-  position: string
-  date: string
-  expiresAt: string
-}
+import { getFeedbackByToken, type FeedbackResponse as Feedback } from '@/lib/api'
 
 function resultTone(result?: string) {
   switch (result?.toLowerCase()) {
@@ -57,13 +47,7 @@ export default function FeedbackPage() {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    fetch(`/api/feedback/${id}?token=${token}`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error('Invalid or expired feedback link')
-        }
-        return res.json()
-      })
+    getFeedbackByToken(id, token)
       .then((data) => setFeedback(data))
       .catch((err) => setError(err instanceof Error ? err.message : 'Failed to load'))
   }, [id, token])
