@@ -495,9 +495,13 @@ export async function completeInterview(id: string): Promise<Interview> {
   });
 }
 
-export async function validateInterview(id: string): Promise<ValidateAllAnswersResponse> {
+export async function validateInterview(
+  id: string,
+  options: { force?: boolean } = {},
+): Promise<ValidateAllAnswersResponse> {
+  const query = options.force ? '?force=true' : ''
   return request<ValidateAllAnswersResponse>(
-    `/interviews/${encodeURIComponent(id)}/validate`,
+    `/interviews/${encodeURIComponent(id)}/validate${query}`,
     { method: 'POST' },
   );
 }
@@ -505,9 +509,11 @@ export async function validateInterview(id: string): Promise<ValidateAllAnswersR
 export async function validateInterviewQuestion(
   id: string,
   questionIndex: number,
+  options: { force?: boolean } = {},
 ): Promise<ValidateAllAnswersResponse> {
+  const query = options.force ? '?force=true' : ''
   return request<ValidateAllAnswersResponse>(
-    `/interviews/${encodeURIComponent(id)}/questions/${questionIndex}/validate`,
+    `/interviews/${encodeURIComponent(id)}/questions/${questionIndex}/validate${query}`,
     { method: 'POST' },
   );
 }

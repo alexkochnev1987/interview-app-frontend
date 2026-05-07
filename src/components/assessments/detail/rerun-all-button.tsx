@@ -28,7 +28,7 @@ export function RerunAllButton({
       errorTitle="Could not start re-evaluation"
       errorFallback="Failed to start re-evaluation."
       onRun={async () => {
-        const res = await validateInterview(interviewId)
+        const res = await validateInterview(interviewId, { force: true })
         if (res.requestedCount === 0) {
           return {
             title: 'Nothing to re-evaluate',
