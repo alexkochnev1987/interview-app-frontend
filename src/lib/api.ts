@@ -12,6 +12,9 @@ type Schemas = components['schemas'];
 
 export type QuestionDifficulty = Schemas['QuestionResponseDto']['difficulty'];
 export type AuthUserResponseDto = Schemas['AuthUserResponseDto'];
+export type LoginPayload = Schemas['LoginDto'];
+export type LogoutResponse = Schemas['LogoutResponseDto'];
+export type FeedbackResponse = Schemas['FeedbackResponseDto'];
 export type QuestionRedFlagSeverity = Schemas['QuestionRedFlagDto']['severity'];
 
 export type QuestionExpectedConcept = Schemas['QuestionExpectedConceptDto'];
@@ -96,8 +99,53 @@ async function handle<T>(promise: Promise<{ data?: T; error?: any; response: Res
   return data as T;
 }
 
+function createServerClient(origin: string, cookieHeader: string) {
+  const serverFetch: typeof fetch = (input, init) => {
+    const headers = new Headers(init?.headers);
+    headers.set('Content-Type', 'application/json');
+    headers.set('cookie', cookieHeader);
+
+    return fetch(input, {
+      ...init,
+      cache: 'no-store',
+      headers,
+    });
+  };
+
+  return createClient<paths>({
+    baseUrl: `${origin}/api`,
+    fetch: serverFetch,
+  });
+}
+
 export async function fetchQuestions(): Promise<Question[]> {
   return handle(client.GET('/questions'));
+}
+
+export async function login(data: LoginPayload): Promise<AuthUserResponseDto> {
+  return handle(client.POST('/auth/login', {
+    body: data as any,
+  }));
+}
+
+export async function getCurrentUser(): Promise<AuthUserResponseDto> {
+  return handle(client.GET('/auth/me'));
+}
+
+export async function logout(): Promise<LogoutResponse> {
+  return handle(client.POST('/auth/logout'));
+}
+
+export async function getFeedbackByToken(
+  id: string,
+  token: string,
+): Promise<FeedbackResponse> {
+  return handle(client.GET('/feedback/{id}', {
+    params: {
+      path: { id },
+      query: { token },
+    },
+  }));
 }
 
 export async function getQuestion(id: string): Promise<Question> {
@@ -210,6 +258,17 @@ export async function getInterview(id: string): Promise<Interview> {
   })) as Promise<Interview>;
 }
 
+export async function getInterviewServer(
+  id: string,
+  origin: string,
+  cookieHeader: string,
+): Promise<Interview> {
+  const serverClient = createServerClient(origin, cookieHeader);
+  return handle(serverClient.GET('/interviews/{id}', {
+    params: { path: { id } },
+  })) as Promise<Interview>;
+}
+
 export async function generateCandidateLink(
   id: string,
 ): Promise<CandidateLinkResponse> {
@@ -261,6 +320,17 @@ export async function getInterviewAnswerMedia(
 export async function getResults(id: string): Promise<InterviewResult> {
   return handle(client.GET('/interviews/{id}/results', {
     params: { path: { id } }
+  }));
+}
+
+export async function getResultsServer(
+  id: string,
+  origin: string,
+  cookieHeader: string,
+): Promise<InterviewResult> {
+  const serverClient = createServerClient(origin, cookieHeader);
+  return handle(serverClient.GET('/interviews/{id}/results', {
+    params: { path: { id } },
   }));
 }
 

@@ -6,6 +6,8 @@ import InterviewDetailClient from "./interview-detail-client";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { PageShell } from "@/components/ui/layout/page-shell";
 import {
+  getInterviewServer,
+  getResultsServer,
   type Interview,
   type InterviewResult,
 } from "@/lib/api";
@@ -29,59 +31,18 @@ function getRequestOrigin(headerStore: Headers) {
   return `${protocol}://${host}`;
 }
 
-async function requestServer<T>(
-  path: string,
-  cookieHeader: string,
-  origin: string,
-) {
-  const res = await fetch(`${origin}/api${path}`, {
-    headers: {
-      "Content-Type": "application/json",
-      cookie: cookieHeader,
-    },
-    cache: "no-store",
-  });
-
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`API error ${res.status}: ${body}`);
-  }
-
-  const body = await res.text();
-  if (!body) {
-    return undefined as T;
-  }
-
-  const contentType = res.headers.get("content-type") ?? "";
-  if (!contentType.includes("application/json")) {
-    throw new Error(
-      `Expected JSON from /api${path}, got ${contentType || "unknown content type"}.`,
-    );
-  }
-
-  return JSON.parse(body) as T;
-}
-
 async function loadInterviewPageData(
   id: string,
   cookieHeader: string,
   origin: string,
 ) {
-  const interview = await requestServer<Interview>(
-    `/interviews/${id}`,
-    cookieHeader,
-    origin,
-  );
+  const interview = await getInterviewServer(id, origin, cookieHeader);
 
   let results: InterviewResult | null = interview.result ?? null;
 
   if (interview.status === "completed") {
     try {
-      results = await requestServer<InterviewResult>(
-        `/interviews/${id}/results`,
-        cookieHeader,
-        origin,
-      );
+      results = await getResultsServer(id, origin, cookieHeader);
     } catch {
       results = interview.result ?? null;
     }

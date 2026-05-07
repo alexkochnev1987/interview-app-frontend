@@ -3,11 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3001",
-    "build": "next build --webpack",
+    "dev": "npm run openapi:refresh && next dev -p 3001",
+    "build": "npm run openapi:refresh && next build --webpack",
     "start": "next start",
     "lint": "eslint .",
-    "openapi:generate": "openapi-typescript openapi/openapi.json -o src/lib/api-types.ts"
+    "openapi:backend:generate": "node scripts/generate-backend-openapi.mjs",
+    "openapi:sync": "node scripts/sync-openapi.mjs",
+    "openapi:generate": "npx --yes openapi-typescript openapi/openapi.json -o src/lib/api-types.ts",
+    "openapi:refresh": "npm run openapi:backend:generate && npm run openapi:sync && npm run openapi:generate"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",

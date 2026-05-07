@@ -17,6 +17,7 @@ import { Grid } from '@/components/ui/layout/grid'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText, SectionHeading } from '@/components/ui/text'
+import { login } from '@/lib/api'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -31,17 +32,7 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ email, password }),
-      })
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
-        throw new Error(data.message || 'Invalid credentials')
-      }
+      await login({ email, password })
 
       router.push('/')
       router.refresh()
