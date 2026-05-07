@@ -65,11 +65,7 @@ export type ValidateAllAnswersResponse = Schemas['StartAllAnswerValidationsRespo
 export type InterviewAnswerMediaResponse = Schemas['InterviewAnswerMediaResponseDto'];
 export type CandidateLinkResponse = Schemas['CandidateLinkResponseDto'];
 
-export interface CreateInterviewPayload {
-  candidateName: string;
-  position: string;
-  questionIds: string[];
-}
+export type CreateInterviewPayload = Schemas['CreateInterviewDto'];
 
 export type PresignedUrlResponse = Schemas['PresignedUrlResponseDto'];
 export type ConfirmUploadResponse = Schemas['ConfirmUploadResponseDto'];
@@ -91,13 +87,27 @@ export type CaptureTarget = 'camera' | 'screen';
 /**
  * Helper to handle openapi-fetch responses and throw errors on failure
  */
-async function handle<T>(promise: Promise<{ data?: T; error?: any; response: Response }>): Promise<T> {
+type ApiResult<T> = { data?: T; error?: unknown; response: Response };
+
+async function handle<T>(promise: Promise<ApiResult<T>>): Promise<T> {
   const { data, error, response } = await promise;
+
   if (error) {
-    const message = typeof error === 'object' && error.message ? error.message : JSON.stringify(error);
+    let message = JSON.stringify(error);
+    if (typeof error === 'object' && error !== null && 'message' in error) {
+      const maybeMessage = (error as { message?: unknown }).message;
+      if (typeof maybeMessage === 'string') {
+        message = maybeMessage;
+      }
+    }
     throw new Error(`API error ${response.status}: ${message}`);
   }
-  return data as T;
+
+  if (data === undefined) {
+    throw new Error(`API error ${response.status}: Empty response body`);
+  }
+
+  return data;
 }
 
 function createServerClient(origin: string, cookieHeader: string) {
@@ -200,7 +210,16 @@ export async function deleteQuestion(
     throw new Error(`API error ${response.status}: ${JSON.stringify(error)}`);
   }
 
-  return data as { id: string; deleted: true };
+  if (!data) {
+    throw new Error('API error: Empty response body');
+  }
+
+  if (data.deleted !== true) {
+    throw new Error('API error: delete response did not confirm deletion.');
+  }
+
+  return { id: data.id, deleted: true };
+
 }
 
 export async function restoreQuestion(id: string): Promise<Question> {
@@ -245,7 +264,8 @@ export async function findSimilarQuestions(
 }
 
 export async function fetchInterviews(): Promise<Interview[]> {
-  return handle(client.GET('/interviews')) as Promise<Interview[]>;
+  return handle(client.GET('/interviews'));
+
 }
 
 export async function createInterview(
@@ -253,13 +273,13 @@ export async function createInterview(
 ): Promise<Interview & CandidateLinkResponse> {
   return handle(client.POST('/interviews', {
     body: data
-  })) as Promise<Interview & CandidateLinkResponse>;
+  }));
 }
 
 export async function getInterview(id: string): Promise<Interview> {
   return handle(client.GET('/interviews/{id}', {
     params: { path: { id } }
-  })) as Promise<Interview>;
+  }));
 }
 
 export async function getInterviewServer(
@@ -270,7 +290,7 @@ export async function getInterviewServer(
   const serverClient = createServerClient(origin, cookieHeader);
   return handle(serverClient.GET('/interviews/{id}', {
     params: { path: { id } },
-  })) as Promise<Interview>;
+  }));
 }
 
 export async function generateCandidateLink(
@@ -284,10 +304,31 @@ export async function generateCandidateLink(
 export async function getPresignedUrl(
   questionIndex: number,
   contentType: 'video/webm',
-  mediaType: CaptureTarget = 'camera'
+  mediaType?: CaptureTarget,
+): Promise<PresignedUrlResponse>;
+export async function getPresignedUrl(
+  interviewId: string,
+  questionIndex: number,
+  contentType: 'video/webm',
+  mediaType?: CaptureTarget,
+): Promise<PresignedUrlResponse>;
+export async function getPresignedUrl(
+  arg1: number | string,
+  arg2: number | 'video/webm',
+  arg3?: 'video/webm' | CaptureTarget,
+  arg4?: CaptureTarget,
 ): Promise<PresignedUrlResponse> {
+  const [resolvedQuestionIndex, resolvedContentType, resolvedMediaType] =
+    typeof arg1 === 'string'
+      ? [arg2 as number, arg3 as 'video/webm', arg4 ?? 'camera']
+      : [arg1, arg2 as 'video/webm', (arg3 as CaptureTarget | undefined) ?? 'camera'];
+
   return handle(client.POST('/upload/presign', {
-    body: { questionIndex, contentType, mediaType }
+    body: {
+      questionIndex: resolvedQuestionIndex,
+      contentType: resolvedContentType,
+      mediaType: resolvedMediaType,
+    }
   }));
 }
 
@@ -300,10 +341,19 @@ export async function completeUpload(
   }));
 }
 
+export async function completeUploadAndFetchInterview(
+  interviewId: string,
+  questionIndex: number,
+  mediaKey: string,
+): Promise<Interview> {
+  await completeUpload(questionIndex, mediaKey);
+  return getInterview(interviewId);
+}
+
 export async function completeInterview(id: string): Promise<Interview> {
   return handle(client.PATCH('/interviews/{id}/complete', {
     params: { path: { id } }
-  })) as Promise<Interview>;
+  }));
 }
 
 export async function validateInterview(id: string): Promise<ValidateAllAnswersResponse> {
