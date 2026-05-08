@@ -444,7 +444,7 @@ export default function InterviewDetailClient({
     setError(null);
 
     try {
-      await runMutation(() => validateInterview(interview.id), {
+      await runMutation(() => validateInterview(interview.id, { force: true }), {
         successMessage: TOAST_MESSAGES.interview.validationStartSuccess,
         errorMessage: TOAST_MESSAGES.interview.validationStartError,
       });
@@ -498,6 +498,9 @@ export default function InterviewDetailClient({
       answer.validation?.status === "processing",
   );
   const totalQuestions = interview.questions.length;
+  const answersByIndex = new Map(
+    interview.answers.map((a) => [a.questionIndex, a]),
+  );
   const progressValue =
     answeredCount === 0
       ? 0
@@ -745,9 +748,7 @@ export default function InterviewDetailClient({
 
         <Stack gap={4}>
           {interview.questions.map((question, questionIndex) => {
-            const answer = interview.answers.find(
-              (item) => item.questionIndex === questionIndex,
-            );
+            const answer = answersByIndex.get(questionIndex);
             const hasAnswer = Boolean(answer);
             const uploadState = uploadStates[questionIndex] ?? {
               status: "idle",

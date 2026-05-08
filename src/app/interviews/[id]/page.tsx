@@ -1,93 +1,102 @@
-import { cookies, headers } from "next/headers";
-import { unstable_noStore as noStore } from "next/cache";
+import { unstable_noStore as noStore } from 'next/cache'
 
-import InterviewDetailClient from "./interview-detail-client";
+import InterviewDetailClient from './interview-detail-client'
 
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { PageShell } from "@/components/ui/layout/page-shell";
-import {
-  getInterviewServer,
-  getResultsServer,
-  type Interview,
-  type InterviewResult,
-} from "@/lib/api";
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
+import { PageShell } from '@/components/ui/layout/page-shell'
+import { type Interview, type InterviewResult } from '@/lib/api'
+import { loadAuthGate } from '@/lib/auth-gate'
+import { canConfigureInterview } from '@/lib/auth-roles'
+import { isForbiddenError, requestServer } from '@/lib/server-fetch'
 
 interface InterviewDetailPageProps {
   params: Promise<{
-    id: string;
-  }>;
+    id: string
+  }>
 }
 
-function getRequestOrigin(headerStore: Headers) {
-  const forwardedProto = headerStore.get("x-forwarded-proto");
-  const forwardedHost = headerStore.get("x-forwarded-host");
-  const host = forwardedHost ?? headerStore.get("host");
-  const protocol = forwardedProto ?? (host?.includes("localhost") ? "http" : "https");
-
-  if (!host) {
-    throw new Error("Unable to resolve request host for server API fetch.");
-  }
-
-  return `${protocol}://${host}`;
-}
-
-async function loadInterviewPageData(
-  id: string,
-  cookieHeader: string,
-  origin: string,
-) {
-  const interview = await getInterviewServer(id, origin, cookieHeader);
-
-  let results: InterviewResult | null = interview.result ?? null;
-
-  if (interview.status === "completed") {
-    try {
-      results = await getResultsServer(id, origin, cookieHeader);
-    } catch {
-      results = interview.result ?? null;
-    }
-  }
-
-  return {
-    interview,
-    results,
-  };
-}
+const FORBIDDEN_TITLE = "You don't have access to this interview"
+const FORBIDDEN_DESCRIPTION =
+  'Configuring interviews is reserved for HR, admin, and super-admin users. If you think this is a mistake, contact your workspace owner.'
 
 export default async function InterviewDetailPage({
   params,
 }: InterviewDetailPageProps) {
-  noStore();
+  noStore()
 
-  const { id } = await params;
-  const cookieStore = await cookies();
-  const headerStore = await headers();
-  const cookieHeader = cookieStore
-    .getAll()
-    .map(({ name, value }) => `${name}=${value}`)
-    .join("; ");
-  const origin = getRequestOrigin(headerStore);
+  const { id } = await params
 
-  let interview: Interview;
-  let results: InterviewResult | null;
+  const auth = await loadAuthGate(canConfigureInterview)
+  if (auth.kind === 'forbidden') {
+    return (
+      <ForbiddenAccessPage
+        title={FORBIDDEN_TITLE}
+        description={FORBIDDEN_DESCRIPTION}
+      />
+    )
+  }
+  if (auth.kind === 'error') {
+    return (
+      <PageShell spacing="tight">
+        <Alert variant="danger">
+          <AlertTitle>Interview unavailable</AlertTitle>
+          <AlertDescription>{auth.message}</AlertDescription>
+        </Alert>
+      </PageShell>
+    )
+  }
+
+  const encodedId = encodeURIComponent(id)
+  let interview: Interview | null = null
+  let results: InterviewResult | null = null
+  let error: string | null = null
 
   try {
-    ({ interview, results } = await loadInterviewPageData(
-      id,
-      cookieHeader,
-      origin,
-    ));
-  } catch (error) {
+    interview =
+      (await requestServer<Interview>(
+        `/interviews/${encodedId}`,
+        auth.ctx,
+      )) ?? null
+
+    if (interview) {
+      results = interview.result ?? null
+
+      if (interview.status === 'completed') {
+        try {
+          results =
+            (await requestServer<InterviewResult>(
+              `/interviews/${encodedId}/results`,
+              auth.ctx,
+            )) ?? interview.result ?? null
+        } catch {
+          results = interview.result ?? null
+        }
+      }
+    }
+  } catch (err) {
+    if (isForbiddenError(err)) {
+      return (
+        <ForbiddenAccessPage
+          title={FORBIDDEN_TITLE}
+          description={FORBIDDEN_DESCRIPTION}
+        />
+      )
+    }
+    error = err instanceof Error ? err.message : 'Failed to load interview.'
+  }
+
+  if (error || !interview) {
     return (
       <PageShell spacing="tight">
         <Alert variant="danger">
           <AlertTitle>Interview unavailable</AlertTitle>
           <AlertDescription>
-            {error instanceof Error ? error.message : "Failed to load interview."}
+            {error ?? 'The requested interview could not be loaded.'}
           </AlertDescription>
         </Alert>
       </PageShell>
-    );
+    )
   }
 
   return (
@@ -96,5 +105,5 @@ export default async function InterviewDetailPage({
       initialInterview={interview}
       initialResults={results}
     />
-  );
+  )
 }

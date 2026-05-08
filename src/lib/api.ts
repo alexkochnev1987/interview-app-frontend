@@ -1,7 +1,10 @@
 import createClient from 'openapi-fetch';
 import { paths, components } from './api-types';
+import { ApiError } from './api-error';
 
-const client = createClient<paths>({ 
+export { ApiError, isForbiddenError } from './api-error';
+
+const client = createClient<paths>({
   baseUrl: '/api',
   headers: {
     'Content-Type': 'application/json',
@@ -12,6 +15,7 @@ type Schemas = components['schemas'];
 
 export type QuestionDifficulty = Schemas['QuestionResponseDto']['difficulty'];
 export type AuthUserResponseDto = Schemas['AuthUserResponseDto'];
+export type MeResponse = AuthUserResponseDto;
 export type LoginPayload = Schemas['LoginDto'];
 export type LogoutResponse = Schemas['LogoutResponseDto'];
 export type FeedbackResponse = Schemas['FeedbackResponseDto'];
@@ -54,6 +58,7 @@ export type InterviewWorkflow = Schemas['InterviewWorkflowDto'];
 export type Interview = Schemas['InterviewResponseDto'];
 
 export type ValidateAllAnswersResponse = Schemas['StartAllAnswerValidationsResponseDto'];
+export type StartAnswerValidationResult = Schemas['StartAnswerValidationResultDto'];
 export type InterviewAnswerMediaResponse = Schemas['InterviewAnswerMediaResponseDto'];
 export type CandidateLinkResponse = Schemas['CandidateLinkResponseDto'];
 
@@ -72,49 +77,67 @@ export type SubmitTakeAnswerPayload = Schemas['SubmitAnswerDto'];
 
 export type CaptureTarget = 'camera' | 'screen';
 
-/**
- * Helper to handle openapi-fetch responses and throw errors on failure
- */
 type ApiResult<T> = { data?: T; error?: unknown; response: Response };
+
+function messageFromError(error: unknown, status: number): string {
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const maybeMessage = (error as { message?: unknown }).message;
+    if (typeof maybeMessage === 'string' && maybeMessage.length > 0) {
+      return maybeMessage;
+    }
+  }
+  return `API error ${status}`;
+}
+
+function messageFromBody(body: string, status: number): string {
+  const trimmed = body.trim();
+  if (trimmed.length === 0) return `API error ${status}`;
+  try {
+    const parsed = JSON.parse(trimmed) as { message?: unknown };
+    if (typeof parsed.message === 'string' && parsed.message.length > 0) {
+      return parsed.message;
+    }
+  } catch {}
+  return trimmed;
+}
 
 async function handle<T>(promise: Promise<ApiResult<T>>): Promise<T> {
   const { data, error, response } = await promise;
 
   if (error) {
-    let message = JSON.stringify(error);
-    if (typeof error === 'object' && error !== null && 'message' in error) {
-      const maybeMessage = (error as { message?: unknown }).message;
-      if (typeof maybeMessage === 'string') {
-        message = maybeMessage;
-      }
-    }
-    throw new Error(`API error ${response.status}: ${message}`);
+    const message = messageFromError(error, response.status);
+    const path = new URL(response.url).pathname;
+    throw new ApiError(response.status, message, path);
   }
 
   if (data === undefined) {
-    throw new Error(`API error ${response.status}: Empty response body`);
+    const path = new URL(response.url).pathname;
+    throw new ApiError(response.status, `API error ${response.status}: Empty response body`, path);
   }
 
   return data;
 }
 
-function createServerClient(origin: string, cookieHeader: string) {
-  const serverFetch: typeof fetch = (input, init) => {
-    const headers = new Headers(init?.headers);
-    headers.set('Content-Type', 'application/json');
-    headers.set('cookie', cookieHeader);
-
-    return fetch(input, {
-      ...init,
-      cache: 'no-store',
-      headers,
-    });
-  };
-
-  return createClient<paths>({
-    baseUrl: `${origin}/api`,
-    fetch: serverFetch,
+async function postWithQuery<T>(
+  path: string,
+  query?: Record<string, string>,
+): Promise<T> {
+  const queryString = query ? '?' + new URLSearchParams(query).toString() : '';
+  const res = await fetch(`/api${path}${queryString}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
   });
+
+  if (!res.ok) {
+    const body = await res.text();
+    throw new ApiError(res.status, messageFromBody(body, res.status), path, body);
+  }
+
+  if (res.status === 204) {
+    return undefined as T;
+  }
+
+  return (await res.json()) as T;
 }
 
 export async function fetchQuestions(): Promise<Question[]> {
@@ -182,8 +205,10 @@ export async function deleteQuestion(
   const { data, error, response } = await client.DELETE('/questions/{id}', {
     params: { path: { id } }
   });
+  const status = response.status;
+  const path = `/questions/${id}`;
 
-  if (response.status === 409) {
+  if (status === 409) {
     let message = 'Question is used by an active interview.';
     if (error && typeof error === 'object' && error !== null && 'message' in error) {
       const maybeMessage = (error as { message?: unknown }).message;
@@ -195,11 +220,11 @@ export async function deleteQuestion(
   }
 
   if (error) {
-    throw new Error(`API error ${response.status}: ${JSON.stringify(error)}`);
+    throw new ApiError(status, messageFromError(error, status), path);
   }
 
   if (!data) {
-    throw new Error('API error: Empty response body');
+    throw new ApiError(status, 'API error: Empty response body', path);
   }
 
   if (data.deleted !== true) {
@@ -266,16 +291,6 @@ export async function getInterview(id: string): Promise<Interview> {
   }));
 }
 
-export async function getInterviewServer(
-  id: string,
-  origin: string,
-  cookieHeader: string,
-): Promise<Interview> {
-  const serverClient = createServerClient(origin, cookieHeader);
-  return handle(serverClient.GET('/interviews/{id}', {
-    params: { path: { id } },
-  }));
-}
 
 export async function generateCandidateLink(
   id: string,
@@ -328,10 +343,25 @@ export async function completeInterview(id: string): Promise<Interview> {
   }));
 }
 
-export async function validateInterview(id: string): Promise<ValidateAllAnswersResponse> {
-  return handle(client.POST('/interviews/{id}/validate', {
-    params: { path: { id } }
-  }));
+export async function validateInterview(
+  id: string,
+  options: { force?: boolean } = {},
+): Promise<ValidateAllAnswersResponse> {
+  return postWithQuery<ValidateAllAnswersResponse>(
+    `/interviews/${encodeURIComponent(id)}/validate`,
+    options.force ? { force: 'true' } : undefined,
+  );
+}
+
+export async function validateInterviewQuestion(
+  id: string,
+  questionIndex: number,
+  options: { force?: boolean } = {},
+): Promise<StartAnswerValidationResult> {
+  return postWithQuery<StartAnswerValidationResult>(
+    `/interviews/${encodeURIComponent(id)}/questions/${questionIndex}/validate`,
+    options.force ? { force: 'true' } : undefined,
+  );
 }
 
 export async function getInterviewAnswerMedia(
@@ -349,23 +379,12 @@ export async function getResults(id: string): Promise<InterviewResult> {
   }));
 }
 
-export async function getResultsServer(
-  id: string,
-  origin: string,
-  cookieHeader: string,
-): Promise<InterviewResult> {
-  const serverClient = createServerClient(origin, cookieHeader);
-  return handle(serverClient.GET('/interviews/{id}/results', {
-    params: { path: { id } },
-  }));
-}
-
 export async function getTakeInterview(
   id: string,
   token?: string,
 ): Promise<TakeInterviewData> {
   return handle(client.GET('/take/{id}', {
-    params: { 
+    params: {
       path: { id },
       query: token ? { token } : undefined
     }

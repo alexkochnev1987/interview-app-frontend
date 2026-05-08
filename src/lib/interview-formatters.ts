@@ -1,5 +1,14 @@
 import type { Interview } from '@/lib/api'
 
+export function formatMetricLabel(value: string) {
+  return value
+    .replaceAll('_', ' ')
+    .split(' ')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ')
+}
+
 export function formatInterviewDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', {
     month: 'short',
@@ -9,7 +18,7 @@ export function formatInterviewDate(iso: string) {
 }
 
 export function formatInterviewStatusLabel(status: Interview['status']) {
-  return status.replace('_', ' ')
+  return status.replaceAll('_', ' ')
 }
 
 export function getCandidateInitials(name: string) {
