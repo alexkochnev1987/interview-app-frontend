@@ -4,23 +4,36 @@ import { ApiError } from './api-error'
 
 export { ApiError, isForbiddenError } from './api-error'
 
-function getBackendOrigin(): string {
-  const origin = process.env.BACKEND_URL
-  if (!origin) {
-    throw new Error('BACKEND_URL is not configured for server-side API calls.')
+function firstForwardedValue(value: string | null): string | null {
+  if (!value) return null
+  const first = value.split(',')[0].trim()
+  return first || null
+}
+
+function resolveOrigin(headerStore: Headers): string {
+  const forwardedProto = firstForwardedValue(
+    headerStore.get('x-forwarded-proto'),
+  )
+  const forwardedHost = firstForwardedValue(headerStore.get('x-forwarded-host'))
+  const host = forwardedHost ?? headerStore.get('host')
+  if (!host) {
+    throw new Error('Unable to resolve request host for server-side API fetch.')
   }
-  return origin.replace(/\/+$/, '')
+  const protocol =
+    forwardedProto ?? (host.includes('localhost') ? 'http' : 'https')
+  return `${protocol}://${host}`
 }
 
 export interface ServerRequestContext {
   cookieHeader: string
+  origin: string
 }
 
 export async function getServerRequestContext(): Promise<ServerRequestContext> {
   const headerStore = await headers()
   const rawCookieHeader = headerStore.get('cookie')
   const cookieHeader = rawCookieHeader ?? (await buildCookieHeaderFallback())
-  return { cookieHeader }
+  return { cookieHeader, origin: resolveOrigin(headerStore) }
 }
 
 async function buildCookieHeaderFallback(): Promise<string> {
@@ -67,7 +80,7 @@ export async function requestServer<T>(
   path: string,
   ctx: ServerRequestContext,
 ): Promise<T | undefined> {
-  const res = await fetch(`${getBackendOrigin()}${path}`, {
+  const res = await fetch(`${ctx.origin}/api${path}`, {
     headers: {
       'Content-Type': 'application/json',
       cookie: ctx.cookieHeader,
