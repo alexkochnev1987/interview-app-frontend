@@ -31,16 +31,30 @@ async function buildCookieHeaderFallback(): Promise<string> {
     .join('; ')
 }
 
-const MAX_CLIENT_ERROR_BODY = 500
+const MAX_API_MESSAGE_LENGTH = 500
 
-function safeErrorMessage(path: string, status: number, body: string): string {
-  if (status >= 400 && status < 500) {
-    const trimmed = body.trim().slice(0, MAX_CLIENT_ERROR_BODY)
-    return trimmed
-      ? `API error ${status} for ${path}: ${trimmed}`
-      : `API error ${status} for ${path}.`
+function extractApiMessage(body: string): string | undefined {
+  const trimmed = body.trim()
+  if (!trimmed) return undefined
+  try {
+    const parsed = JSON.parse(trimmed) as { message?: unknown }
+    if (typeof parsed.message === 'string' && parsed.message.length > 0) {
+      return parsed.message.slice(0, MAX_API_MESSAGE_LENGTH)
+    }
+  } catch {}
+  return undefined
+}
+
+function safeErrorMessage(status: number, body: string): string {
+  if (status >= 500) {
+    return 'Service is currently unavailable. Please try again.'
   }
-  return `API error ${status} for ${path}. Please try again.`
+  const parsed = extractApiMessage(body)
+  if (parsed) return parsed
+  if (status === 401) return 'You need to sign in to continue.'
+  if (status === 403) return "You don't have access to this resource."
+  if (status === 404) return 'Not found.'
+  return 'Request was rejected.'
 }
 
 const SERVER_REQUEST_TIMEOUT_MS = 15_000
@@ -60,7 +74,7 @@ export async function requestServer<T>(
 
   if (!res.ok) {
     const body = await res.text()
-    throw new ApiError(res.status, safeErrorMessage(path, res.status, body), path, body)
+    throw new ApiError(res.status, safeErrorMessage(res.status, body), path, body)
   }
 
   const body = await res.text()
