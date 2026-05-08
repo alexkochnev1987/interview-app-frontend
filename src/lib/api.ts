@@ -79,33 +79,33 @@ export type CaptureTarget = 'camera' | 'screen';
 
 type ApiResult<T> = { data?: T; error?: unknown; response: Response };
 
-function extractMessage(error: unknown, status: number, body?: string): string {
+function messageFromError(error: unknown, status: number): string {
   if (typeof error === 'object' && error !== null && 'message' in error) {
     const maybeMessage = (error as { message?: unknown }).message;
     if (typeof maybeMessage === 'string' && maybeMessage.length > 0) {
       return maybeMessage;
     }
   }
-  if (body) {
-    const trimmed = body.trim();
-    if (trimmed.length > 0) {
-      try {
-        const parsed = JSON.parse(trimmed) as { message?: unknown };
-        if (typeof parsed.message === 'string' && parsed.message.length > 0) {
-          return parsed.message;
-        }
-      } catch {}
-      return trimmed;
-    }
-  }
   return `API error ${status}`;
+}
+
+function messageFromBody(body: string, status: number): string {
+  const trimmed = body.trim();
+  if (trimmed.length === 0) return `API error ${status}`;
+  try {
+    const parsed = JSON.parse(trimmed) as { message?: unknown };
+    if (typeof parsed.message === 'string' && parsed.message.length > 0) {
+      return parsed.message;
+    }
+  } catch {}
+  return trimmed;
 }
 
 async function handle<T>(promise: Promise<ApiResult<T>>): Promise<T> {
   const { data, error, response } = await promise;
 
   if (error) {
-    const message = extractMessage(error, response.status);
+    const message = messageFromError(error, response.status);
     const path = new URL(response.url).pathname;
     throw new ApiError(response.status, message, path);
   }
@@ -116,33 +116,6 @@ async function handle<T>(promise: Promise<ApiResult<T>>): Promise<T> {
   }
 
   return data;
-}
-
-function getServerBaseUrl(): string {
-  const baseUrl = process.env.BACKEND_URL;
-  if (!baseUrl) {
-    throw new Error('BACKEND_URL is not configured for server-side API calls.');
-  }
-  return baseUrl.replace(/\/+$/, '');
-}
-
-function createServerClient(cookieHeader: string) {
-  const serverFetch: typeof fetch = (input, init) => {
-    const headers = new Headers(init?.headers);
-    headers.set('Content-Type', 'application/json');
-    headers.set('cookie', cookieHeader);
-
-    return fetch(input, {
-      ...init,
-      cache: 'no-store',
-      headers,
-    });
-  };
-
-  return createClient<paths>({
-    baseUrl: getServerBaseUrl(),
-    fetch: serverFetch,
-  });
 }
 
 async function postWithQuery<T>(
@@ -157,7 +130,7 @@ async function postWithQuery<T>(
 
   if (!res.ok) {
     const body = await res.text();
-    throw new ApiError(res.status, extractMessage(undefined, res.status, body), path, body);
+    throw new ApiError(res.status, messageFromBody(body, res.status), path, body);
   }
 
   if (res.status === 204) {
@@ -247,7 +220,7 @@ export async function deleteQuestion(
   }
 
   if (error) {
-    throw new ApiError(status, extractMessage(error, status), path);
+    throw new ApiError(status, messageFromError(error, status), path);
   }
 
   if (!data) {
@@ -318,15 +291,6 @@ export async function getInterview(id: string): Promise<Interview> {
   }));
 }
 
-export async function getInterviewServer(
-  id: string,
-  cookieHeader: string,
-): Promise<Interview> {
-  const serverClient = createServerClient(cookieHeader);
-  return handle(serverClient.GET('/interviews/{id}', {
-    params: { path: { id } },
-  }));
-}
 
 export async function generateCandidateLink(
   id: string,
@@ -412,16 +376,6 @@ export async function getInterviewAnswerMedia(
 export async function getResults(id: string): Promise<InterviewResult> {
   return handle(client.GET('/interviews/{id}/results', {
     params: { path: { id } }
-  }));
-}
-
-export async function getResultsServer(
-  id: string,
-  cookieHeader: string,
-): Promise<InterviewResult> {
-  const serverClient = createServerClient(cookieHeader);
-  return handle(serverClient.GET('/interviews/{id}/results', {
-    params: { path: { id } },
   }));
 }
 

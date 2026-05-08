@@ -1,7 +1,7 @@
 'use client'
 
 import { useAuth } from '@/lib/auth-context'
-import { canReviewAssessments } from '@/lib/auth-roles'
+import { canConfigureInterview, canReviewAssessments } from '@/lib/auth-roles'
 import { usePathname } from 'next/navigation'
 import {
   Sparkles,
@@ -39,7 +39,9 @@ export function NavHeader() {
     ...(canReviewAssessments(user?.role)
       ? [{ href: '/assessments', label: 'Assessments', icon: ClipboardList }]
       : []),
-    { href: '/interviews/new', label: 'New Interview', icon: Plus },
+    ...(canConfigureInterview(user?.role)
+      ? [{ href: '/interviews/new', label: 'New Interview', icon: Plus }]
+      : []),
   ]
 
   function isActive(href: string) {

@@ -77,11 +77,7 @@ export function RerunButton({
         })
       }
       setPhase('submitted')
-      setTimeout(() => {
-        if (mountedRef.current) {
-          router.refresh()
-        }
-      }, 0)
+      router.refresh()
     } catch (err) {
       if (!mountedRef.current) return
       if (err instanceof ApiError && err.status === 409) {

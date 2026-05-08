@@ -5,15 +5,11 @@ import { AssessmentsListHeader } from '@/components/assessments/list/assessments
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
-import { type Interview, type MeResponse } from '@/lib/api'
+import { type Interview } from '@/lib/api'
 import { getCompletionDate } from '@/lib/assessment-status'
-import { classifyAuthGate } from '@/lib/auth-gate'
+import { loadAuthGate } from '@/lib/auth-gate'
 import { canReviewAssessments } from '@/lib/auth-roles'
-import {
-  getServerRequestContext,
-  isForbiddenError,
-  requestServer,
-} from '@/lib/server-fetch'
+import { isForbiddenError, requestServer } from '@/lib/server-fetch'
 
 const HR_VISIBLE_STATUSES: ReadonlySet<Interview['status']> = new Set<
   Interview['status']
@@ -38,14 +34,8 @@ function sortByCompletion(a: Interview, b: Interview): number {
 export default async function AssessmentsPage() {
   noStore()
 
-  let ctx: Awaited<ReturnType<typeof getServerRequestContext>> | null = null
-  try {
-    ctx = await getServerRequestContext()
-  } catch {
-    ctx = null
-  }
-
-  if (!ctx) {
+  const auth = await loadAuthGate(canReviewAssessments)
+  if (auth.kind === 'forbidden') {
     return (
       <ForbiddenAccessPage
         title={FORBIDDEN_TITLE}
@@ -53,27 +43,12 @@ export default async function AssessmentsPage() {
       />
     )
   }
-
-  const [meResult, interviewsResult] = await Promise.allSettled([
-    requestServer<MeResponse>('/auth/me', ctx),
-    requestServer<Interview[]>('/interviews', ctx),
-  ])
-
-  const gate = classifyAuthGate(meResult, canReviewAssessments)
-  if (gate.kind === 'forbidden') {
-    return (
-      <ForbiddenAccessPage
-        title={FORBIDDEN_TITLE}
-        description={FORBIDDEN_DESCRIPTION}
-      />
-    )
-  }
-  if (gate.kind === 'error') {
+  if (auth.kind === 'error') {
     return (
       <PageShell>
         <Alert variant="danger">
           <AlertTitle>Could not load assessments</AlertTitle>
-          <AlertDescription>{gate.message}</AlertDescription>
+          <AlertDescription>{auth.message}</AlertDescription>
         </Alert>
       </PageShell>
     )
@@ -82,10 +57,10 @@ export default async function AssessmentsPage() {
   let interviews: Interview[] = []
   let error: string | null = null
 
-  if (interviewsResult.status === 'fulfilled') {
-    interviews = interviewsResult.value ?? []
-  } else {
-    const err = interviewsResult.reason
+  try {
+    interviews =
+      (await requestServer<Interview[]>('/interviews', auth.ctx)) ?? []
+  } catch (err) {
     if (isForbiddenError(err)) {
       return (
         <ForbiddenAccessPage

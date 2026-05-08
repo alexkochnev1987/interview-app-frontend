@@ -33,13 +33,17 @@ async function buildCookieHeaderFallback(): Promise<string> {
 
 const MAX_API_MESSAGE_LENGTH = 500
 
+function truncateWithMarker(value: string, max: number): string {
+  return value.length > max ? `${value.slice(0, max)}…` : value
+}
+
 function extractApiMessage(body: string): string | undefined {
   const trimmed = body.trim()
   if (!trimmed) return undefined
   try {
     const parsed = JSON.parse(trimmed) as { message?: unknown }
     if (typeof parsed.message === 'string' && parsed.message.length > 0) {
-      return parsed.message.slice(0, MAX_API_MESSAGE_LENGTH)
+      return truncateWithMarker(parsed.message, MAX_API_MESSAGE_LENGTH)
     }
   } catch {}
   return undefined
@@ -84,8 +88,11 @@ export async function requestServer<T>(
 
   const contentType = res.headers.get('content-type') ?? ''
   if (!contentType.includes('application/json')) {
-    throw new Error(
+    throw new ApiError(
+      res.status,
       `Expected JSON from ${path}, got ${contentType || 'unknown content type'}.`,
+      path,
+      body,
     )
   }
 

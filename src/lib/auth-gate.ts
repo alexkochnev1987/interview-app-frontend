@@ -1,33 +1,36 @@
 import { ApiError } from './api-error'
 import type { MeResponse } from './api'
+import {
+  getServerRequestContext,
+  requestServer,
+  type ServerRequestContext,
+} from './server-fetch'
 
 export type AuthGate =
-  | { kind: 'authorized'; me: MeResponse }
+  | { kind: 'authorized'; ctx: ServerRequestContext; me: MeResponse }
   | { kind: 'forbidden' }
   | { kind: 'error'; message: string }
 
-export function classifyAuthGate(
-  result: PromiseSettledResult<MeResponse | undefined>,
+export async function loadAuthGate(
   roleCheck: (role: string) => boolean,
-): AuthGate {
-  if (result.status === 'rejected') {
-    const reason = result.reason
+): Promise<AuthGate> {
+  const ctx = await getServerRequestContext()
+
+  try {
+    const me = await requestServer<MeResponse>('/auth/me', ctx)
+    if (!me || !roleCheck(me.role)) {
+      return { kind: 'forbidden' }
+    }
+    return { kind: 'authorized', ctx, me }
+  } catch (err) {
     if (
-      reason instanceof ApiError &&
-      (reason.status === 401 || reason.status === 403)
+      err instanceof ApiError &&
+      (err.status === 401 || err.status === 403)
     ) {
       return { kind: 'forbidden' }
     }
     const message =
-      reason instanceof Error
-        ? reason.message
-        : 'Failed to load your profile.'
+      err instanceof Error ? err.message : 'Failed to load your profile.'
     return { kind: 'error', message }
   }
-
-  const me = result.value
-  if (!me || !roleCheck(me.role)) {
-    return { kind: 'forbidden' }
-  }
-  return { kind: 'authorized', me }
 }

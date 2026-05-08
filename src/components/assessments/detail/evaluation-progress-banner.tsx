@@ -49,14 +49,22 @@ export function EvaluationProgressBanner({
   const router = useRouter()
   const counts = countAnswers(interview)
   const inFlight = counts.queued + counts.processing > 0
+  const inFlightSignature = interview.answers
+    .filter(
+      (a) =>
+        a.validation?.status === 'queued' ||
+        a.validation?.status === 'processing',
+    )
+    .map((a) => `${a.questionIndex}:${a.validation?.requestedAt ?? ''}`)
+    .sort()
+    .join(',')
   const [pollExpired, setPollExpired] = useState(false)
 
   useEffect(() => {
-    if (!inFlight) {
-      const handle = setTimeout(() => setPollExpired(false), 0)
-      return () => clearTimeout(handle)
+    const resetHandle = setTimeout(() => setPollExpired(false), 0)
+    if (!inFlightSignature) {
+      return () => clearTimeout(resetHandle)
     }
-    if (pollExpired) return
     const startedAt = Date.now()
     const id = setInterval(() => {
       if (Date.now() - startedAt >= MAX_POLL_DURATION_MS) {
@@ -66,8 +74,11 @@ export function EvaluationProgressBanner({
       }
       router.refresh()
     }, REFRESH_INTERVAL_MS)
-    return () => clearInterval(id)
-  }, [inFlight, pollExpired, router])
+    return () => {
+      clearTimeout(resetHandle)
+      clearInterval(id)
+    }
+  }, [inFlightSignature, router])
 
   if (counts.total === 0) return null
 

@@ -184,14 +184,12 @@ export function OverallPanel({ result }: OverallPanelProps) {
               valueSize="hero"
               valueTone="primary"
               description={
-                trustFlags.length > 0
-                  ? `Flags: ${trustFlags.join(', ')}`
-                  : 'No trust flags raised.'
+                trustFlags.length === 0 ? 'No trust flags raised.' : undefined
               }
             />
           ) : null}
 
-          {trustFlags.length > 0 && result.trustScore === undefined ? (
+          {trustFlags.length > 0 ? (
             <ConceptList label="Trust flags" tone="flag" items={trustFlags} />
           ) : null}
         </Stack>

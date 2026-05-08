@@ -5,5 +5,10 @@ function hasAdminRole(role: string | null | undefined): boolean {
   return ADMIN_ROLES.has(role)
 }
 
-export const canReviewAssessments = hasAdminRole
-export const canConfigureInterview = hasAdminRole
+export function canReviewAssessments(role: string | null | undefined): boolean {
+  return hasAdminRole(role)
+}
+
+export function canConfigureInterview(role: string | null | undefined): boolean {
+  return hasAdminRole(role)
+}

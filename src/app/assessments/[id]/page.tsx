@@ -13,15 +13,11 @@ import { PageShell } from '@/components/ui/layout/page-shell'
 import { Section } from '@/components/ui/layout/section'
 import { Stack } from '@/components/ui/layout/stack'
 import { SectionHeading } from '@/components/ui/text'
-import { type Interview, type MeResponse } from '@/lib/api'
+import { type Interview } from '@/lib/api'
 import { deriveReviewStatus } from '@/lib/assessment-status'
-import { classifyAuthGate } from '@/lib/auth-gate'
+import { loadAuthGate } from '@/lib/auth-gate'
 import { canReviewAssessments } from '@/lib/auth-roles'
-import {
-  getServerRequestContext,
-  isForbiddenError,
-  requestServer,
-} from '@/lib/server-fetch'
+import { isForbiddenError, requestServer } from '@/lib/server-fetch'
 
 interface AssessmentDetailPageProps {
   params: Promise<{ id: string }>
@@ -38,14 +34,8 @@ export default async function AssessmentDetailPage({
 
   const { id } = await params
 
-  let ctx: Awaited<ReturnType<typeof getServerRequestContext>> | null = null
-  try {
-    ctx = await getServerRequestContext()
-  } catch {
-    ctx = null
-  }
-
-  if (!ctx) {
+  const auth = await loadAuthGate(canReviewAssessments)
+  if (auth.kind === 'forbidden') {
     return (
       <ForbiddenAccessPage
         title={FORBIDDEN_TITLE}
@@ -53,40 +43,26 @@ export default async function AssessmentDetailPage({
       />
     )
   }
-
-  const encodedId = encodeURIComponent(id)
-  const [meResult, interviewResult] = await Promise.allSettled([
-    requestServer<MeResponse>('/auth/me', ctx),
-    requestServer<Interview>(`/interviews/${encodedId}`, ctx),
-  ])
-
-  const gate = classifyAuthGate(meResult, canReviewAssessments)
-  if (gate.kind === 'forbidden') {
-    return (
-      <ForbiddenAccessPage
-        title={FORBIDDEN_TITLE}
-        description={FORBIDDEN_DESCRIPTION}
-      />
-    )
-  }
-  if (gate.kind === 'error') {
+  if (auth.kind === 'error') {
     return (
       <PageShell spacing="tight">
         <Alert variant="danger">
           <AlertTitle>Assessment unavailable</AlertTitle>
-          <AlertDescription>{gate.message}</AlertDescription>
+          <AlertDescription>{auth.message}</AlertDescription>
         </Alert>
       </PageShell>
     )
   }
 
+  const encodedId = encodeURIComponent(id)
   let interview: Interview | null = null
   let error: string | null = null
 
-  if (interviewResult.status === 'fulfilled') {
-    interview = interviewResult.value ?? null
-  } else {
-    const err = interviewResult.reason
+  try {
+    interview =
+      (await requestServer<Interview>(`/interviews/${encodedId}`, auth.ctx)) ??
+      null
+  } catch (err) {
     if (isForbiddenError(err)) {
       return (
         <ForbiddenAccessPage

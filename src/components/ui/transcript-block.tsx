@@ -15,21 +15,17 @@ export function TranscriptBlock({
   emptyLabel = 'Transcript is not available yet.',
   className,
 }: TranscriptBlockProps) {
-  if (!text) {
-    return (
-      <div className={cn(baseClasses, className)}>
+  return (
+    <div className={cn(baseClasses, className)}>
+      {text ? (
+        <BodyText size="sm" tone="foreground">
+          {text}
+        </BodyText>
+      ) : (
         <BodyText size="sm" tone="muted" italic>
           {emptyLabel}
         </BodyText>
-      </div>
-    )
-  }
-
-  return (
-    <div className={cn(baseClasses, className)}>
-      <BodyText size="sm" tone="foreground">
-        {text}
-      </BodyText>
+      )}
     </div>
   )
 }

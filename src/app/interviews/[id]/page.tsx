@@ -5,20 +5,10 @@ import InterviewDetailClient from './interview-detail-client'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
-import {
-  getInterviewServer,
-  getResultsServer,
-  type Interview,
-  type InterviewResult,
-  type MeResponse,
-} from '@/lib/api'
-import { classifyAuthGate } from '@/lib/auth-gate'
+import { type Interview, type InterviewResult } from '@/lib/api'
+import { loadAuthGate } from '@/lib/auth-gate'
 import { canConfigureInterview } from '@/lib/auth-roles'
-import {
-  getServerRequestContext,
-  isForbiddenError,
-  requestServer,
-} from '@/lib/server-fetch'
+import { isForbiddenError, requestServer } from '@/lib/server-fetch'
 
 interface InterviewDetailPageProps {
   params: Promise<{
@@ -37,14 +27,8 @@ export default async function InterviewDetailPage({
 
   const { id } = await params
 
-  let ctx: Awaited<ReturnType<typeof getServerRequestContext>> | null = null
-  try {
-    ctx = await getServerRequestContext()
-  } catch {
-    ctx = null
-  }
-
-  if (!ctx) {
+  const auth = await loadAuthGate(canConfigureInterview)
+  if (auth.kind === 'forbidden') {
     return (
       <ForbiddenAccessPage
         title={FORBIDDEN_TITLE}
@@ -52,49 +36,46 @@ export default async function InterviewDetailPage({
       />
     )
   }
-
-  const [meResult, interviewResult] = await Promise.allSettled([
-    requestServer<MeResponse>('/auth/me', ctx),
-    getInterviewServer(id, ctx.cookieHeader),
-  ])
-
-  const gate = classifyAuthGate(meResult, canConfigureInterview)
-  if (gate.kind === 'forbidden') {
-    return (
-      <ForbiddenAccessPage
-        title={FORBIDDEN_TITLE}
-        description={FORBIDDEN_DESCRIPTION}
-      />
-    )
-  }
-  if (gate.kind === 'error') {
+  if (auth.kind === 'error') {
     return (
       <PageShell spacing="tight">
         <Alert variant="danger">
           <AlertTitle>Interview unavailable</AlertTitle>
-          <AlertDescription>{gate.message}</AlertDescription>
+          <AlertDescription>{auth.message}</AlertDescription>
         </Alert>
       </PageShell>
     )
   }
 
+  const encodedId = encodeURIComponent(id)
   let interview: Interview | null = null
   let results: InterviewResult | null = null
   let error: string | null = null
 
-  if (interviewResult.status === 'fulfilled') {
-    interview = interviewResult.value ?? null
-    results = interview?.result ?? null
+  try {
+    interview =
+      (await requestServer<Interview>(
+        `/interviews/${encodedId}`,
+        auth.ctx,
+      )) ?? null
 
-    if (interview?.status === 'completed') {
-      try {
-        results = await getResultsServer(id, ctx.cookieHeader)
-      } catch {
-        results = interview.result ?? null
+    if (interview) {
+      results = interview.result ?? null
+
+      if (interview.status === 'completed') {
+        try {
+          results =
+            (await requestServer<InterviewResult>(
+              `/interviews/${encodedId}/results`,
+              auth.ctx,
+            )) ?? interview.result ?? null
+        } catch {
+          results = interview.result ?? null
+        }
       }
     }
-  } else {
-    if (isForbiddenError(interviewResult.reason)) {
+  } catch (err) {
+    if (isForbiddenError(err)) {
       return (
         <ForbiddenAccessPage
           title={FORBIDDEN_TITLE}
@@ -102,10 +83,7 @@ export default async function InterviewDetailPage({
         />
       )
     }
-    error =
-      interviewResult.reason instanceof Error
-        ? interviewResult.reason.message
-        : 'Failed to load interview.'
+    error = err instanceof Error ? err.message : 'Failed to load interview.'
   }
 
   if (error || !interview) {
