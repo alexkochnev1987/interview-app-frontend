@@ -4,9 +4,17 @@ import { ApiError } from './api-error'
 
 export { ApiError, isForbiddenError } from './api-error'
 
+function firstForwardedValue(value: string | null): string | null {
+  if (!value) return null
+  const first = value.split(',')[0].trim()
+  return first || null
+}
+
 function resolveOrigin(headerStore: Headers): string {
-  const forwardedProto = headerStore.get('x-forwarded-proto')
-  const forwardedHost = headerStore.get('x-forwarded-host')
+  const forwardedProto = firstForwardedValue(
+    headerStore.get('x-forwarded-proto'),
+  )
+  const forwardedHost = firstForwardedValue(headerStore.get('x-forwarded-host'))
   const host = forwardedHost ?? headerStore.get('host')
   if (!host) {
     throw new Error('Unable to resolve request host for server-side API fetch.')
