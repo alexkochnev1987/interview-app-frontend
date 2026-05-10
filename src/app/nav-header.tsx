@@ -1,7 +1,11 @@
 'use client'
 
 import { useAuth } from '@/lib/auth-context'
-import { canConfigureInterview, canReviewAssessments } from '@/lib/auth-roles'
+import {
+  canConfigureInterview,
+  canManageTeam,
+  canReviewAssessments,
+} from '@/lib/auth-roles'
 import { usePathname } from 'next/navigation'
 import {
   Sparkles,
@@ -10,6 +14,7 @@ import {
   LayoutDashboard,
   LibraryBig,
   Plus,
+  Users,
 } from 'lucide-react'
 
 import { AppHeader, AppHeaderInner } from '@/components/ui/app-header'
@@ -41,6 +46,9 @@ export function NavHeader() {
       : []),
     ...(canConfigureInterview(user?.role)
       ? [{ href: '/interviews/new', label: 'New Interview', icon: Plus }]
+      : []),
+    ...(canManageTeam(user?.role)
+      ? [{ href: '/team', label: 'Team', icon: Users }]
       : []),
   ]
 

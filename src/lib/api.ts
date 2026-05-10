@@ -140,6 +140,18 @@ async function postWithQuery<T>(
   return (await res.json()) as T;
 }
 
+export type TeamMember = Schemas['AuthUserResponseDto'];
+
+export async function updateUserRole(
+  id: string,
+  role: 'super_admin' | 'admin' | 'hr' | 'candidate',
+): Promise<TeamMember> {
+  return handle(client.PATCH('/users/{id}/role', {
+    params: { path: { id } },
+    body: { role },
+  }));
+}
+
 export async function fetchQuestions(): Promise<Question[]> {
   return handle(client.GET('/questions'));
 }
