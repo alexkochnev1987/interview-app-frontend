@@ -31,7 +31,7 @@ import { BodyText } from '@/components/ui/text'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
 
 export function NavHeader() {
-  const { user, loading, logout } = useAuth()
+  const { user, logout } = useAuth()
   const pathname = usePathname()
 
   if (pathname.startsWith('/take') || pathname.startsWith('/feedback')) {
@@ -83,19 +83,17 @@ export function NavHeader() {
           </UnstyledLink>
         }
         nav={
-          loading
-            ? null
-            : user
-              ? links.map(({ href, label, icon: LinkIcon }) => (
-                  <NavLink key={href} href={href} active={isActive(href)}>
-                    <Icon size="md"><LinkIcon /></Icon>
-                    {label}
-                  </NavLink>
-                ))
-              : null
+          user
+            ? links.map(({ href, label, icon: LinkIcon }) => (
+                <NavLink key={href} href={href} active={isActive(href)}>
+                  <Icon size="md"><LinkIcon /></Icon>
+                  {label}
+                </NavLink>
+              ))
+            : null
         }
         actions={
-          loading ? null : user ? (
+          user ? (
             <>
               <SurfaceTile
                 tone="soft"

@@ -1,39 +1,52 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { getCurrentUser, logout as apiLogout, type AuthUserResponseDto as User } from '@/lib/api';
+import { useRouter } from 'next/navigation';
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { logout as apiLogout, type AuthUserResponseDto as User } from '@/lib/api';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  establishSession: (sessionUser: User) => void;
   logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
-  loading: true,
+  loading: false,
+  establishSession: () => {},
   logout: async () => {},
 });
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+export function AuthProvider({
+  children,
+  initialUser,
+}: {
+  children: ReactNode;
+  initialUser: User | null;
+}) {
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(initialUser);
+  const loading = false;
 
   useEffect(() => {
-    getCurrentUser()
-      .then((data) => setUser(data))
-      .catch(() => setUser(null))
-      .finally(() => setLoading(false));
-  }, []);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- align client state with RSC session snapshot after router.refresh() / navigations
+    setUser(initialUser);
+  }, [initialUser]);
+
+  const establishSession = (sessionUser: User) => {
+    setUser(sessionUser);
+  };
 
   const logout = async () => {
     await apiLogout();
     setUser(null);
-    window.location.href = '/login';
+    router.push('/login');
+    router.refresh();
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, logout }}>
+    <AuthContext.Provider value={{ user, loading, establishSession, logout }}>
       {children}
     </AuthContext.Provider>
   );
