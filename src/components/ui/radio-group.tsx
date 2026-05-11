@@ -1,77 +1,63 @@
 'use client'
 
-import { createContext, useContext } from 'react'
-import type { ReactNode } from 'react'
+import * as React from 'react'
+
+import { RadioGroup as RadioGroupPrimitive } from 'radix-ui'
 
 import { cn } from '@/lib/utils'
 
-interface RadioGroupContextValue {
-  value: string
-  onValueChange: (value: string) => void
-}
-
-const RadioGroupContext = createContext<RadioGroupContextValue | null>(null)
-
-function useRadioGroup() {
-  const ctx = useContext(RadioGroupContext)
-  if (!ctx) throw new Error('RadioItem must be used inside RadioGroup')
-  return ctx
-}
-
-interface RadioGroupProps {
-  value: string
-  onValueChange: (value: string) => void
-  children: ReactNode
-  className?: string
-}
-
-function RadioGroup({ value, onValueChange, children, className }: RadioGroupProps) {
+function RadioGroup({
+  className,
+  ...props
+}: React.ComponentProps<typeof RadioGroupPrimitive.Root>) {
   return (
-    <RadioGroupContext.Provider value={{ value, onValueChange }}>
-      <div role="radiogroup" className={cn('flex flex-col gap-2', className)}>
-        {children}
-      </div>
-    </RadioGroupContext.Provider>
+    <RadioGroupPrimitive.Root
+      data-slot="radio-group"
+      orientation="vertical"
+      className={cn('flex flex-col gap-2', className)}
+      {...props}
+    />
   )
 }
 
-interface RadioItemProps {
-  value: string
-  children: ReactNode
-  disabled?: boolean
-  className?: string
+interface RadioItemProps
+  extends Omit<
+    React.ComponentProps<typeof RadioGroupPrimitive.Item>,
+    'children'
+  > {
+  children: React.ReactNode
 }
 
-function RadioItem({ value, children, disabled, className }: RadioItemProps) {
-  const { value: groupValue, onValueChange } = useRadioGroup()
-  const checked = groupValue === value
-
+function RadioItem({ children, className, disabled, ...props }: RadioItemProps) {
   return (
-    <button
-      type="button"
-      role="radio"
-      aria-checked={checked}
+    <RadioGroupPrimitive.Item
+      data-slot="radio-group-item"
+      {...props}
       disabled={disabled}
-      onClick={() => onValueChange(value)}
       className={cn(
-        'flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left text-sm transition-colors',
-        checked
-          ? 'border-primary bg-primary/5 text-foreground'
-          : 'border-border bg-transparent text-muted-foreground hover:border-primary/40 hover:text-foreground',
-        disabled && 'cursor-not-allowed opacity-50',
+        'group flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left text-sm transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+        'border-border bg-transparent text-muted-foreground hover:border-primary/40 hover:text-foreground',
+        'data-[state=checked]:border-primary data-[state=checked]:bg-primary/5 data-[state=checked]:text-foreground',
+        'disabled:cursor-not-allowed disabled:opacity-50',
         className,
       )}
+      {...props}
     >
       <span
         className={cn(
           'flex size-4 shrink-0 items-center justify-center rounded-full border-2 transition-colors',
-          checked ? 'border-primary' : 'border-muted-foreground/40',
+          'border-muted-foreground/40 group-data-[state=checked]:border-primary',
         )}
       >
-        {checked && <span className="size-2 rounded-full bg-primary" />}
+        <RadioGroupPrimitive.Indicator
+          data-slot="radio-group-indicator"
+          className="flex items-center justify-center"
+        >
+          <span className="size-2 rounded-full bg-primary" />
+        </RadioGroupPrimitive.Indicator>
       </span>
       {children}
-    </button>
+    </RadioGroupPrimitive.Item>
   )
 }
 

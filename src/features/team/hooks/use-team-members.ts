@@ -69,6 +69,7 @@ export function useTeamMembers(initialMembers: TeamMember[]) {
   return {
     actorId,
     actorRole,
+    actorSessionRole: user?.role ?? null,
     statCards,
     roleFilter,
     setRoleFilter: setRoleFilterAndResetPage,

@@ -1,4 +1,5 @@
 import type { StatusTone } from '@/components/ui/status-pill'
+import { roleOutranks } from '@/lib/auth-roles'
 
 export type TeamMemberRole = 'super_admin' | 'admin' | 'hr' | 'candidate'
 
@@ -51,6 +52,53 @@ export function assignableRoleRadioOptions(): {
   label: string
 }[] {
   return TEAM_ROLE_ROWS.map((r) => ({ value: r.id, label: r.label }))
+}
+
+export const TEAM_ROLES_ASSIGNABLE_BY_ACTOR: Record<
+  TeamMemberRole,
+  readonly TeamMemberRole[]
+> = {
+  super_admin: ['super_admin', 'admin', 'hr', 'candidate'],
+  admin: ['hr', 'candidate'],
+  hr: [],
+  candidate: [],
+}
+
+export function assignableRoleRadioOptionsForActor(
+  actorRole: string | null | undefined,
+  targetMemberRole: string | null | undefined,
+): { value: TeamMemberRole; label: string }[] {
+  const memberRole = targetMemberRole as TeamMemberRole | undefined
+  if (
+    actorRole &&
+    memberRole &&
+    TEAM_ROLE_ROWS.some((r) => r.id === memberRole) &&
+    !roleOutranks(actorRole, memberRole)
+  ) {
+    const row = TEAM_ROLE_ROWS.find((r) => r.id === memberRole)
+    return row ? [{ value: row.id, label: row.label }] : []
+  }
+
+  const assignList =
+    actorRole && actorRole in TEAM_ROLES_ASSIGNABLE_BY_ACTOR
+      ? TEAM_ROLES_ASSIGNABLE_BY_ACTOR[actorRole as TeamMemberRole]
+      : []
+  const allowed = new Set<TeamMemberRole>(assignList)
+
+  const options = assignableRoleRadioOptions().filter((o) => allowed.has(o.value))
+
+  if (
+    memberRole &&
+    TEAM_ROLE_ROWS.some((r) => r.id === memberRole) &&
+    !options.some((o) => o.value === memberRole)
+  ) {
+    const row = TEAM_ROLE_ROWS.find((r) => r.id === memberRole)
+    if (row) {
+      return [{ value: row.id, label: row.label }, ...options]
+    }
+  }
+
+  return options
 }
 
 export function badgeMetaForRole(role: string): {

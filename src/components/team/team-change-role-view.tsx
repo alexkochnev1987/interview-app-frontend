@@ -41,7 +41,12 @@ export function TeamChangeRoleView({
   onDismiss,
 }: TeamChangeRoleViewProps) {
   return (
-    <ModalShell onDismiss={() => { if (!loading) onDismiss() }}>
+    <ModalShell
+      dismissDisabled={loading}
+      onDismiss={onDismiss}
+      accessibilityTitle="Change role"
+      accessibilityDescription={`${member.name}, ${member.email}`}
+    >
       <CardHeader spacing="sm">
         <Inline justify="between" align="start">
           <Stack gap={1}>

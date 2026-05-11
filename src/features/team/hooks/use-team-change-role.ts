@@ -1,19 +1,18 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { updateUserRole, type TeamMember } from '@/lib/api'
 import { runMutation } from '@/lib/run-mutation'
 
 import {
-  assignableRoleRadioOptions,
+  assignableRoleRadioOptionsForActor,
   type TeamMemberRole,
 } from '../team-roles'
 
-const ROLE_RADIO_OPTIONS = assignableRoleRadioOptions()
-
 export function useTeamChangeRole(
   member: TeamMember,
+  actorSessionRole: string | null,
   onClose: () => void,
   onRoleChanged: (updated: TeamMember) => void,
 ) {
@@ -65,8 +64,14 @@ export function useTeamChangeRole(
 
   const hasChange = selectedRole !== member.role
 
+  const roleOptions = useMemo(
+    () =>
+      assignableRoleRadioOptionsForActor(actorSessionRole, member.role),
+    [actorSessionRole, member.role],
+  )
+
   return {
-    roleOptions: ROLE_RADIO_OPTIONS,
+    roleOptions,
     selectedRole,
     setSelectedRole,
     loading,

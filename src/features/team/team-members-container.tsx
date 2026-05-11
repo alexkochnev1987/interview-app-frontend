@@ -16,6 +16,7 @@ export function TeamMembersContainer({
   const {
     actorId,
     actorRole,
+    actorSessionRole,
     statCards,
     roleFilter,
     setRoleFilter,
@@ -63,6 +64,7 @@ export function TeamMembersContainer({
         <TeamChangeRoleContainer
           key={editingMember.id}
           member={editingMember}
+          actorSessionRole={actorSessionRole}
           onClose={() => setEditingMember(null)}
           onRoleChanged={handleRoleChanged}
         />

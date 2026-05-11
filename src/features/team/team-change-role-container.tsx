@@ -7,12 +7,14 @@ import { useTeamChangeRole } from './hooks/use-team-change-role'
 
 interface TeamChangeRoleContainerProps {
   member: TeamMember
+  actorSessionRole: string | null
   onClose: () => void
   onRoleChanged: (updated: TeamMember) => void
 }
 
 export function TeamChangeRoleContainer({
   member,
+  actorSessionRole,
   onClose,
   onRoleChanged,
 }: TeamChangeRoleContainerProps) {
@@ -24,7 +26,7 @@ export function TeamChangeRoleContainer({
     error,
     hasChange,
     handleApply,
-  } = useTeamChangeRole(member, onClose, onRoleChanged)
+  } = useTeamChangeRole(member, actorSessionRole, onClose, onRoleChanged)
 
   return (
     <TeamChangeRoleView
