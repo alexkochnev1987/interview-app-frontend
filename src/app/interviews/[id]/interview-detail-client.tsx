@@ -58,6 +58,7 @@ import {
 } from "@/lib/api";
 import {
   formatInterviewDate,
+  formatInterviewDateTime,
   formatInterviewStatusLabel,
   getCandidateInitials,
 } from "@/lib/interview-formatters";
@@ -711,9 +712,7 @@ export default function InterviewDetailClient({
                   </BodyText>
                   <BodyText size="sm">
                     Last update{" "}
-                    {new Date(
-                      interview.workflow.lastUpdatedAt,
-                    ).toLocaleString()}
+                    {formatInterviewDateTime(interview.workflow.lastUpdatedAt)}
                   </BodyText>
                   {interview.workflow.errorMessage ? (
                     <BodyText size="sm" tone="danger">
@@ -859,7 +858,7 @@ export default function InterviewDetailClient({
                             </BodyText>
                             <BodyText size="sm">
                               Uploaded{" "}
-                              {new Date(answer.uploadedAt).toLocaleString()}
+                              {formatInterviewDateTime(answer.uploadedAt)}
                             </BodyText>
                             {media?.loading ? (
                               <Inline gap={2} align="center">

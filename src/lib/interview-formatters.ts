@@ -1,5 +1,25 @@
 import type { Interview } from '@/lib/api'
 
+const DISPLAY_TIME_ZONE = 'UTC'
+
+const DISPLAY_LOCALE = 'en-US'
+
+const interviewDateFormatter = new Intl.DateTimeFormat(DISPLAY_LOCALE, {
+  timeZone: DISPLAY_TIME_ZONE,
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric',
+})
+
+const interviewDateTimeFormatter = new Intl.DateTimeFormat(DISPLAY_LOCALE, {
+  timeZone: DISPLAY_TIME_ZONE,
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric',
+  hour: 'numeric',
+  minute: '2-digit',
+})
+
 export function formatMetricLabel(value: string) {
   return value
     .replaceAll('_', ' ')
@@ -10,11 +30,11 @@ export function formatMetricLabel(value: string) {
 }
 
 export function formatInterviewDate(iso: string) {
-  return new Date(iso).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  })
+  return interviewDateFormatter.format(new Date(iso))
+}
+
+export function formatInterviewDateTime(iso: string) {
+  return interviewDateTimeFormatter.format(new Date(iso))
 }
 
 export function formatInterviewStatusLabel(status: Interview['status']) {

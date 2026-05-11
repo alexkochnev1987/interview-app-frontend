@@ -18,6 +18,7 @@ import { Section } from '@/components/ui/layout/section'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText } from '@/components/ui/text'
 import { getFeedbackByToken, type FeedbackResponse as Feedback } from '@/lib/api'
+import { formatInterviewDate } from '@/lib/interview-formatters'
 
 function resultTone(result?: string) {
   switch (result?.toLowerCase()) {
@@ -126,7 +127,7 @@ export default function FeedbackPage() {
                   tone="elevated"
                   icon={<Clock3 className="size-4" />}
                   label="Link expiry"
-                  value={new Date(feedback.expiresAt).toLocaleDateString()}
+                  value={formatInterviewDate(feedback.expiresAt)}
                   valueSize="sm"
                 />
               </Grid>
