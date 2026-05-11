@@ -1,7 +1,7 @@
 import { unstable_noStore as noStore } from 'next/cache'
 
 import { TeamMembersContainer } from '@/features/team/team-members-container'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { FlashErrorToast } from '@/components/ui/flash-error-toast'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { type TeamMember } from '@/lib/api'
@@ -31,12 +31,11 @@ export default async function TeamPage() {
   }
   if (auth.kind === 'error') {
     return (
-      <PageShell>
-        <Alert variant="danger">
-          <AlertTitle>Could not load team management</AlertTitle>
-          <AlertDescription>{auth.message}</AlertDescription>
-        </Alert>
-      </PageShell>
+      <FlashErrorToast
+        toastId="team-auth-gate-error"
+        message="Could not load team management"
+        description={auth.message}
+      />
     )
   }
 
@@ -54,12 +53,11 @@ export default async function TeamPage() {
 
   if (error) {
     return (
-      <PageShell>
-        <Alert variant="danger">
-          <AlertTitle>Could not load team members</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      </PageShell>
+      <FlashErrorToast
+        toastId="team-members-fetch-error"
+        message="Could not load team members"
+        description={error}
+      />
     )
   }
 
