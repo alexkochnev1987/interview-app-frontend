@@ -40,7 +40,16 @@ export function useTeamChangeRole(
     }
   }, [loading])
 
+  const roleOptions = useMemo(
+    () =>
+      assignableRoleRadioOptionsForActor(actorSessionRole, member.role),
+    [actorSessionRole, member.role],
+  )
+
+  const hasChange = selectedRole !== member.role
+
   async function handleApply() {
+    if (roleOptions.length === 0) return
     if (selectedRole === member.role) return
     setLoading(true)
     setError(null)
@@ -61,14 +70,6 @@ export function useTeamChangeRole(
       setLoading(false)
     }
   }
-
-  const hasChange = selectedRole !== member.role
-
-  const roleOptions = useMemo(
-    () =>
-      assignableRoleRadioOptionsForActor(actorSessionRole, member.role),
-    [actorSessionRole, member.role],
-  )
 
   return {
     roleOptions,

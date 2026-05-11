@@ -1,7 +1,7 @@
 import { unstable_noStore as noStore } from 'next/cache'
 
 import { TeamMembersContainer } from '@/features/team/team-members-container'
-import { FlashErrorToast } from '@/components/ui/flash-error-toast'
+import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { type TeamMember } from '@/lib/api'
@@ -31,10 +31,12 @@ export default async function TeamPage() {
   }
   if (auth.kind === 'error') {
     return (
-      <FlashErrorToast
+      <FlashErrorPageFallback
         toastId="team-auth-gate-error"
-        message="Could not load team management"
-        description={auth.message}
+        toastMessage="Could not load team management"
+        toastDescription={auth.message}
+        title="Team management is unavailable right now"
+        description="We could not verify your session or permissions. Check the notification for more detail, or go back home and try again."
       />
     )
   }
@@ -53,10 +55,12 @@ export default async function TeamPage() {
 
   if (error) {
     return (
-      <FlashErrorToast
+      <FlashErrorPageFallback
         toastId="team-members-fetch-error"
-        message="Could not load team members"
-        description={error}
+        toastMessage="Could not load team members"
+        toastDescription={error}
+        title="Could not load team members"
+        description="Something went wrong while loading the teammate list from the workspace. Details are shown in the notification."
       />
     )
   }

@@ -77,16 +77,23 @@ export function TeamChangeRoleView({
 
         <Stack gap={2}>
           <EyebrowLabel size="sm">New Role</EyebrowLabel>
-          <RadioGroup
-            value={selectedRole}
-            onValueChange={(v) => onSelectRole(v as TeamMemberRole)}
-          >
-            {roleOptions.map(({ value, label }) => (
-              <RadioItem key={value} value={value}>
-                {label}
-              </RadioItem>
-            ))}
-          </RadioGroup>
+          {roleOptions.length === 0 ? (
+            <BodyText size="sm" tone="muted">
+              No roles are available for your account to assign. If this looks wrong,
+              try again signed in as a higher-level administrator.
+            </BodyText>
+          ) : (
+            <RadioGroup
+              value={selectedRole}
+              onValueChange={(v) => onSelectRole(v as TeamMemberRole)}
+            >
+              {roleOptions.map(({ value, label }) => (
+                <RadioItem key={value} value={value}>
+                  {label}
+                </RadioItem>
+              ))}
+            </RadioGroup>
+          )}
         </Stack>
 
         {error && (
@@ -100,7 +107,7 @@ export function TeamChangeRoleView({
             type="button"
             variant="gradient"
             shape="pill"
-            disabled={!hasChange || loading}
+            disabled={roleOptions.length === 0 || !hasChange || loading}
             onClick={() => { void onApply() }}
           >
             {loading ? 'Applying role change...' : 'Apply role change'}

@@ -32,7 +32,6 @@ function RadioItem({ children, className, disabled, ...props }: RadioItemProps) 
   return (
     <RadioGroupPrimitive.Item
       data-slot="radio-group-item"
-      {...props}
       disabled={disabled}
       className={cn(
         'group flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left text-sm transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
