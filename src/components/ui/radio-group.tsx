@@ -12,10 +12,10 @@ function RadioGroup({
 }: React.ComponentProps<typeof RadioGroupPrimitive.Root>) {
   return (
     <RadioGroupPrimitive.Root
+      {...props}
       data-slot="radio-group"
       orientation="vertical"
       className={cn('flex flex-col gap-2', className)}
-      {...props}
     />
   )
 }
@@ -31,6 +31,7 @@ interface RadioItemProps
 function RadioItem({ children, className, disabled, ...props }: RadioItemProps) {
   return (
     <RadioGroupPrimitive.Item
+      {...props}
       data-slot="radio-group-item"
       disabled={disabled}
       className={cn(
@@ -40,7 +41,6 @@ function RadioItem({ children, className, disabled, ...props }: RadioItemProps) 
         'disabled:cursor-not-allowed disabled:opacity-50',
         className,
       )}
-      {...props}
     >
       <span
         className={cn(
