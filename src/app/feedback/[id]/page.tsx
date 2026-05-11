@@ -101,7 +101,7 @@ export default function FeedbackPage() {
                   </StatusPill>
                 ) : null}
                 <StatusPill tone="neutral">
-                  Reviewed {new Date(feedback.date).toLocaleDateString()}
+                  Reviewed {formatInterviewDate(feedback.date)}
                 </StatusPill>
               </Inline>
             </CardContent>
