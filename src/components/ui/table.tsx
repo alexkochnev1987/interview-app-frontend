@@ -3,15 +3,26 @@ import * as React from 'react'
 import { cn } from '@/lib/utils'
 
 type TableProps = React.ComponentProps<'table'> & {
-  minRows?: 4
+  minRows?: number
   tabularWidth?: 'default' | 'wide'
 }
 
+const TABLE_HEADER_MIN_HEIGHT_REM = 2.5
+const TABLE_BODY_ROW_MIN_HEIGHT_REM = 4
+
 function Table({ className, minRows, tabularWidth = 'default', ...props }: TableProps) {
+  const minHeightRem =
+    minRows != null && minRows > 0
+      ? TABLE_HEADER_MIN_HEIGHT_REM + minRows * TABLE_BODY_ROW_MIN_HEIGHT_REM
+      : undefined
+
   return (
     <div
       data-slot="table-wrapper"
-      className={cn('w-full min-w-0 overflow-x-auto', minRows === 4 && 'min-h-[18.5rem]')}
+      className={cn('w-full min-w-0 overflow-x-auto')}
+      style={
+        minHeightRem != null ? { minHeight: `${minHeightRem}rem` } : undefined
+      }
     >
       <table
         data-slot="table"

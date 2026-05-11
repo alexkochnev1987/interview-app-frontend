@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { updateUserRole, type TeamMember } from '@/lib/api'
 import { runMutation } from '@/lib/run-mutation'
@@ -20,25 +20,6 @@ export function useTeamChangeRole(
     member.role as TeamMemberRole,
   )
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const onCloseRef = useRef(onClose)
-
-  useEffect(() => {
-    onCloseRef.current = onClose
-  })
-
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !loading) onCloseRef.current()
-    }
-    window.addEventListener('keydown', handleKey)
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => {
-      window.removeEventListener('keydown', handleKey)
-      document.body.style.overflow = previousOverflow
-    }
-  }, [loading])
 
   const roleOptions = useMemo(
     () =>
@@ -52,7 +33,6 @@ export function useTeamChangeRole(
     if (roleOptions.length === 0) return
     if (selectedRole === member.role) return
     setLoading(true)
-    setError(null)
     try {
       const updated = await runMutation(
         () => updateUserRole(member.id, selectedRole),
@@ -64,8 +44,6 @@ export function useTeamChangeRole(
       )
       onRoleChanged(updated)
       onClose()
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update role')
     } finally {
       setLoading(false)
     }
@@ -76,7 +54,6 @@ export function useTeamChangeRole(
     selectedRole,
     setSelectedRole,
     loading,
-    error,
     hasChange,
     handleApply,
   }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useDeferredValue, useMemo, useState } from 'react'
+import { useCallback, useDeferredValue, useMemo, useState } from 'react'
 
 import type { TeamMember } from '@/lib/api'
 import { useAuth } from '@/lib/auth-context'
@@ -39,6 +39,19 @@ export function useTeamMembers(initialMembers: TeamMember[]) {
     1,
     Math.ceil(filteredMembers.length / TEAM_TABLE_PAGE_SIZE),
   )
+
+  const setPageClamped = useCallback(
+    (update: number | ((previousPage: number) => number)) => {
+      setPage((previousPage) => {
+        const current = Math.min(Math.max(1, previousPage), totalPages)
+        const next =
+          typeof update === 'function' ? update(current) : update
+        return Math.min(Math.max(1, next), totalPages)
+      })
+    },
+    [totalPages],
+  )
+
   const safePage = Math.min(page, totalPages)
   const paginatedMembers = filteredMembers.slice(
     (safePage - 1) * TEAM_TABLE_PAGE_SIZE,
@@ -54,12 +67,12 @@ export function useTeamMembers(initialMembers: TeamMember[]) {
 
   function setRoleFilterAndResetPage(value: TeamRoleFilter) {
     setRoleFilter(value)
-    setPage(1)
+    setPageClamped(1)
   }
 
   function onSearchChange(value: string) {
     setQuery(value)
-    setPage(1)
+    setPageClamped(1)
   }
 
   function handleRoleChanged(updated: TeamMember) {
@@ -76,7 +89,7 @@ export function useTeamMembers(initialMembers: TeamMember[]) {
     query,
     onSearchChange,
     page: safePage,
-    setPage,
+    setPage: setPageClamped,
     editingMember,
     setEditingMember,
     filteredMembers,

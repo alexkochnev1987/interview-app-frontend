@@ -19,14 +19,6 @@ export function getMemberInitials(name: string): string {
   return name.trim()[0]?.toUpperCase() ?? ''
 }
 
-export function formatMemberJoinedDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  })
-}
-
 function byTeamTableOrder(a: TeamMember, b: TeamMember): number {
   const roleCmp = compareRolesByAuthorityDesc(a.role, b.role)
   if (roleCmp !== 0) return roleCmp

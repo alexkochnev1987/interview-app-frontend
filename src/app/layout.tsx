@@ -23,10 +23,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <AppBody>
-        <AuthProvider
-          initialUser={session.user}
-          initialSessionVerifyFailed={session.sessionVerifyFailed}
-        >
+        <AuthProvider initialUser={session.user}>
           <AppShellRoot>
             <NavHeader />
             {children}

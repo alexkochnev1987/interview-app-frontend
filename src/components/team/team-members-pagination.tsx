@@ -52,7 +52,7 @@ export function TeamMembersPagination({
                 key={item}
                 variant={item === page ? 'default' : 'ghost'}
                 size="icon-sm"
-                disabled={totalPages === 1}
+                disabled={item === page || totalPages === 1}
                 onClick={() => onPageChange(item)}
               >
                 {item}

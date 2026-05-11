@@ -75,8 +75,7 @@ export function assignableRoleRadioOptionsForActor(
     TEAM_ROLE_ROWS.some((r) => r.id === memberRole) &&
     !roleOutranks(actorRole, memberRole)
   ) {
-    const row = TEAM_ROLE_ROWS.find((r) => r.id === memberRole)
-    return row ? [{ value: row.id, label: row.label }] : []
+    return []
   }
 
   const assignList =
@@ -85,20 +84,7 @@ export function assignableRoleRadioOptionsForActor(
       : []
   const allowed = new Set<TeamMemberRole>(assignList)
 
-  const options = assignableRoleRadioOptions().filter((o) => allowed.has(o.value))
-
-  if (
-    memberRole &&
-    TEAM_ROLE_ROWS.some((r) => r.id === memberRole) &&
-    !options.some((o) => o.value === memberRole)
-  ) {
-    const row = TEAM_ROLE_ROWS.find((r) => r.id === memberRole)
-    if (row) {
-      return [{ value: row.id, label: row.label }, ...options]
-    }
-  }
-
-  return options
+  return assignableRoleRadioOptions().filter((o) => allowed.has(o.value))
 }
 
 export function badgeMetaForRole(role: string): {

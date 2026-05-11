@@ -23,7 +23,6 @@ type TeamChangeRoleViewProps = {
   selectedRole: TeamMemberRole
   onSelectRole: (role: TeamMemberRole) => void
   loading: boolean
-  error: string | null
   hasChange: boolean
   onApply: () => void
   onDismiss: () => void
@@ -35,7 +34,6 @@ export function TeamChangeRoleView({
   selectedRole,
   onSelectRole,
   loading,
-  error,
   hasChange,
   onApply,
   onDismiss,
@@ -95,12 +93,6 @@ export function TeamChangeRoleView({
             </RadioGroup>
           )}
         </Stack>
-
-        {error && (
-          <BodyText size="sm" tone="danger">
-            {error}
-          </BodyText>
-        )}
 
         <Stack gap={2}>
           <Button

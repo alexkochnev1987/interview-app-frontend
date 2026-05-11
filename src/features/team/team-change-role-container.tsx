@@ -23,7 +23,6 @@ export function TeamChangeRoleContainer({
     selectedRole,
     setSelectedRole,
     loading,
-    error,
     hasChange,
     handleApply,
   } = useTeamChangeRole(member, actorSessionRole, onClose, onRoleChanged)
@@ -35,7 +34,6 @@ export function TeamChangeRoleContainer({
       selectedRole={selectedRole}
       onSelectRole={setSelectedRole}
       loading={loading}
-      error={error}
       hasChange={hasChange}
       onApply={handleApply}
       onDismiss={onClose}

@@ -8,11 +8,9 @@ import {
 } from '@/components/ui/table'
 import { BodyText } from '@/components/ui/text'
 import type { TeamMember } from '@/lib/api'
+import { formatInterviewDate } from '@/lib/interview-formatters'
 
-import {
-  formatMemberJoinedDate,
-  getMemberInitials,
-} from '@/features/team/team-member-list'
+import { getMemberInitials } from '@/features/team/team-member-list'
 import type { TeamRowActorRole } from '@/features/team/team-row-policy'
 
 import { TeamMemberRowActions } from './team-member-row-actions'
@@ -51,7 +49,7 @@ export function TeamMemberRow({
       </TableCell>
       <TableCell>
         <BodyText size="sm">
-          {formatMemberJoinedDate(member.createdAt)}
+          {formatInterviewDate(member.createdAt)}
         </BodyText>
       </TableCell>
       <TableCell>
