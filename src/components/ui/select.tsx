@@ -31,6 +31,7 @@ const selectTriggerVariants = cva(
       width: {
         full: "w-full",
         auto: "w-auto min-w-28",
+        "auto-wide": "w-auto min-w-[200px]",
         "full-md-auto": "w-full min-w-0 md:w-auto md:min-w-28",
       },
     },
