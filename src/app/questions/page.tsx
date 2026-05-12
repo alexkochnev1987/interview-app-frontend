@@ -101,8 +101,8 @@ function QuestionsPageContent() {
       setBulkConfirmOpen(false)
       setBulkResult(result)
       query.refetch()
-    } catch {
-      setBulkError(null)
+    } catch (error) {
+      setBulkError(error instanceof Error ? error.message : 'Bulk delete failed.')
       setBulkConfirmOpen(false)
     } finally {
       setBulkDeleting(false)

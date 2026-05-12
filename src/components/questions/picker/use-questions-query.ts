@@ -23,6 +23,7 @@ import {
 
 const DEFAULT_LIMIT = 20
 const SEARCH_DEBOUNCE_MS = 300
+const MAX_Q_LENGTH = 200
 
 export type QuestionsQueryState = {
   q: string
@@ -86,7 +87,7 @@ function readFromSearchParams(
 ): QuestionsQueryState {
   const next: QuestionsQueryState = { ...fallback }
   const q = params.get('q')
-  if (q !== null) next.q = q
+  if (q !== null) next.q = q.slice(0, MAX_Q_LENGTH)
   const difficulty = params.get('difficulty')
   if (difficulty === 'easy' || difficulty === 'medium' || difficulty === 'hard') {
     next.difficulty = difficulty
@@ -95,8 +96,8 @@ function readFromSearchParams(
   if (category) next.category = category
   const subcategory = params.get('subcategory')
   if (subcategory) next.subcategory = subcategory
-  const tags = params.get('tags')
-  if (tags) next.tags = tags.split(',').filter(Boolean)
+  const tags = params.getAll('tags').filter(Boolean)
+  if (tags.length > 0) next.tags = tags
   const role = params.get('role')
   if (role) next.role = role
   const status = params.get('status')
@@ -132,7 +133,7 @@ function writeToSearchParams(state: QuestionsQueryState): URLSearchParams {
   if (state.difficulty) params.set('difficulty', state.difficulty)
   if (state.category) params.set('category', state.category)
   if (state.subcategory) params.set('subcategory', state.subcategory)
-  if (state.tags.length > 0) params.set('tags', state.tags.join(','))
+  state.tags.forEach((tag) => params.append('tags', tag))
   if (state.role) params.set('role', state.role)
   if (state.status !== 'active') params.set('status', state.status)
   if (state.sortBy !== 'updatedAt') params.set('sortBy', state.sortBy)
@@ -205,6 +206,7 @@ export function useQuestionsQuery(
       if (lockStatus) fromUrl.status = lockStatus
       lastWrittenUrlRef.current = currentUrl
       setState(fromUrl)
+      setDebouncedQ(fromUrl.q)
       return
     }
     const url = stateUrl.length > 0 ? `${pathname}?${stateUrl}` : pathname
@@ -229,6 +231,10 @@ export function useQuestionsQuery(
         setData({ items: response.items, total: response.total })
         setError(null)
         setCompletedKey(fetchKey)
+        setState((prev) => {
+          const maxPage = Math.max(1, Math.ceil(response.total / prev.limit))
+          return prev.page > maxPage ? { ...prev, page: maxPage } : prev
+        })
       })
       .catch((err: unknown) => {
         if (controller.signal.aborted) return
@@ -243,6 +249,11 @@ export function useQuestionsQuery(
   }, [fetchKey, fetchParams])
 
   const loading = completedKey !== fetchKey
+
+  const totalPages = useMemo(
+    () => Math.max(1, Math.ceil(data.total / state.limit)),
+    [data.total, state.limit],
+  )
 
   const setQ = useCallback<Dispatch<SetStateAction<string>>>((value) => {
     setState((prev) => {
@@ -304,11 +315,6 @@ export function useQuestionsQuery(
   )
   const refetch = useCallback(() => setRefetchTick((tick) => tick + 1), [])
 
-  const totalPages = useMemo(
-    () => Math.max(1, Math.ceil(data.total / state.limit)),
-    [data.total, state.limit],
-  )
-
   const canReset = useMemo(() => {
     const base = { ...DEFAULT_QUESTIONS_QUERY, ...(initial ?? {}) }
     if (lockStatus) base.status = lockStatus
@@ -321,7 +327,9 @@ export function useQuestionsQuery(
       state.tags.length > 0 ||
       state.status !== base.status ||
       state.sortBy !== base.sortBy ||
-      state.sortOrder !== base.sortOrder
+      state.sortOrder !== base.sortOrder ||
+      state.page !== base.page ||
+      state.limit !== base.limit
     )
   }, [state, initial, lockStatus])
 
