@@ -61,7 +61,10 @@ export function useSimilaritySearch({
   const signalSummary = useMemo<SimilaritySignalSummary>(() => {
     const textTokens = tokenize(value.questionText)
     return {
-      conceptCount: (value.expectedConcepts || []).filter((item) => item.label || item.id).length,
+      conceptCount: (value.expectedConcepts || []).filter((item) => {
+        if (typeof item === 'string') return item.trim().length > 0
+        return Boolean(item.label?.trim() || item.id?.trim())
+      }).length,
       tagCount: (value.tags || []).filter((item) => item.trim()).length,
       taxonomyCount: [value.category, value.subcategory, value.role, value.focus].filter(
         (item) => item?.trim(),
@@ -88,11 +91,19 @@ export function useSimilaritySearch({
     () =>
       JSON.stringify({
         category: normalizeComparable(value.category),
-        concepts: (value.expectedConcepts || []).map((item) => ({
-          description: normalizeComparable(item.description),
-          id: normalizeComparable(item.id),
-          label: normalizeComparable(item.label),
-        })),
+        concepts: (value.expectedConcepts || []).map((item) =>
+          typeof item === 'string'
+            ? {
+                description: '',
+                id: normalizeComparable(item),
+                label: normalizeComparable(item),
+              }
+            : {
+                description: normalizeComparable(item.description),
+                id: normalizeComparable(item.id),
+                label: normalizeComparable(item.label),
+              },
+        ),
         difficulty: value.difficulty,
         focus: normalizeComparable(value.focus),
         questionText: normalizeComparable(value.questionText),

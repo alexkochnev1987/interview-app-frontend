@@ -5,9 +5,13 @@ import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 
 const statusPillVariants = cva(
-  "rounded-full border-0 px-3 py-1 text-[0.68rem] font-semibold shadow-none",
+  "rounded-full border-0 shadow-none",
   {
     variants: {
+      size: {
+        default: "px-3 py-1 text-[0.68rem] font-semibold",
+        compact: "px-2.5 py-1 text-[0.66rem] font-bold",
+      },
       tone: {
         neutral:
           "bg-[hsl(var(--surface-low))] text-[hsl(var(--muted-foreground))] ring-1 ring-[hsl(var(--border)/0.55)]",
@@ -28,6 +32,7 @@ const statusPillVariants = cva(
       },
     },
     defaultVariants: {
+      size: "default",
       tone: "neutral",
       casing: "eyebrow",
     },
@@ -41,6 +46,7 @@ interface StatusPillProps
     VariantProps<typeof statusPillVariants> {}
 
 export function StatusPill({
+  size,
   tone,
   casing,
   className,
@@ -50,7 +56,7 @@ export function StatusPill({
   return (
     <Badge
       variant="secondary"
-      className={cn(statusPillVariants({ tone, casing }), className)}
+      className={cn(statusPillVariants({ size, tone, casing }), className)}
       {...props}
     >
       {children}

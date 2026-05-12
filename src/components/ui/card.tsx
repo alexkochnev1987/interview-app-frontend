@@ -13,6 +13,8 @@ const cardVariants = cva(
           "border border-hairline-strong bg-surface-glass shadow-soft",
         floating:
           "border border-hairline-strong bg-surface-glass shadow-float",
+        metric:
+          "relative isolate border border-hairline-strong bg-[linear-gradient(135deg,hsl(var(--card)/0.98),hsl(var(--surface-low)/0.58))] shadow-float after:pointer-events-none after:absolute after:-right-10 after:-top-10 after:size-24 after:rounded-full after:bg-[hsl(var(--primary)/0.08)] after:blur-2xl",
         tinted:
           "border border-hairline-strong bg-surface-low-glass shadow-soft",
         warning:
@@ -38,6 +40,8 @@ const cardVariants = cva(
         none: "",
         hover:
           "transition-transform duration-200 group-hover:-translate-y-1 group-hover:shadow-float",
+        "hover-glow":
+          "transition-all duration-200 hover:-translate-y-0.5 hover:shadow-float",
       },
       state: {
         default: "",
@@ -48,6 +52,18 @@ const cardVariants = cva(
         auto: "",
         full: "h-full",
       },
+      accent: {
+        none: "",
+        primary: "border-l-[4px] border-l-[hsl(var(--primary))]",
+        neutral: "border-l-[4px] border-l-slate-300",
+        info: "border-l-[4px] border-l-sky-300",
+        warning: "border-l-[4px] border-l-amber-300",
+        success: "border-l-[4px] border-l-emerald-300",
+      },
+      flexChild: {
+        default: "",
+        contain: "min-w-0",
+      },
     },
     defaultVariants: {
       variant: "default",
@@ -56,6 +72,8 @@ const cardVariants = cva(
       interaction: "none",
       state: "default",
       height: "auto",
+      accent: "none",
+      flexChild: "default",
     },
   },
 )
@@ -68,6 +86,8 @@ function Card({
   interaction,
   state,
   height,
+  accent,
+  flexChild,
   ...props
 }: React.ComponentProps<"div"> & VariantProps<typeof cardVariants>) {
   return (
@@ -76,7 +96,16 @@ function Card({
       data-size={size ?? "default"}
       data-variant={variant ?? "default"}
       className={cn(
-        cardVariants({ variant, size, effects, interaction, state, height }),
+        cardVariants({
+          variant,
+          size,
+          effects,
+          interaction,
+          state,
+          height,
+          accent,
+          flexChild,
+        }),
         className
       )}
       {...props}
@@ -172,6 +201,7 @@ const cardTitleVariants = cva(
         md: "text-xl tracking-display leading-snug",
         lg: "text-2xl tracking-display leading-snug",
         xl: "text-3xl font-semibold tracking-display-tight leading-snug",
+        metric: "text-4xl font-semibold tracking-display-tight leading-none",
       },
       width: {
         auto: "",

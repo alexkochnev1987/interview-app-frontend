@@ -28,6 +28,7 @@ const inlineVariants = cva('flex flex-row', {
       end: 'justify-end',
       between: 'justify-between',
       around: 'justify-around',
+      'center-lg-end': 'justify-center lg:justify-end',
     },
     wrap: {
       nowrap: 'flex-nowrap',
