@@ -34,9 +34,13 @@ const gridVariants = cva('grid', {
       'identity-5': 'grid-cols-1 lg:grid-cols-2 xl:grid-cols-5',
       'toolbar-2': 'grid-cols-1 md:grid-cols-[1fr_220px]',
       'toolbar-3': 'grid-cols-1 md:grid-cols-[1fr_220px_auto]',
+      'toolbar-filter-search':
+        'grid-cols-1 gap-3 [&>*]:min-w-0 md:grid-cols-[auto_minmax(16rem,1fr)] md:items-center',
       'metrics-3': 'grid-cols-1 md:grid-cols-3',
       'metrics-2-md': 'grid-cols-1 sm:grid-cols-2',
-      'metrics-5': 'grid-cols-2 md:grid-cols-3 xl:grid-cols-5',
+      'metrics-5': 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5',
+      'pagination-footer':
+        'grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center [&>*:first-child]:min-w-0 [&>*:last-child]:justify-self-center sm:[&>*:last-child]:justify-self-end',
       'consent-shell': 'grid-cols-1 lg:grid-cols-[1.1fr_0.9fr]',
       'consent-info-4': 'grid-cols-1 md:grid-cols-2 xl:grid-cols-4',
     },

@@ -7,15 +7,17 @@ import { Input } from '@/components/ui/input'
 type SearchInputProps = Omit<
   ComponentProps<typeof Input>,
   'shape' | 'iconAffix' | 'type'
->
+> & {
+  width?: ComponentProps<typeof IconAffix>['width']
+}
 
-export function SearchInput({ size = 'lg', ...props }: SearchInputProps) {
+export function SearchInput({ size = 'lg', width, ...props }: SearchInputProps) {
   return (
-    <IconAffix icon={<Search className="size-4" />}>
+    <IconAffix icon={<Search className="size-4" />} width={width}>
       <Input
         type="search"
         size={size}
-        shape="pill"
+        shape="rounded"
         iconAffix="leading"
         {...props}
       />

@@ -1,4 +1,5 @@
 import { cookies, headers } from 'next/headers'
+import { cache } from 'react'
 
 import { ApiError } from './api-error'
 
@@ -29,12 +30,14 @@ export interface ServerRequestContext {
   origin: string
 }
 
-export async function getServerRequestContext(): Promise<ServerRequestContext> {
-  const headerStore = await headers()
-  const rawCookieHeader = headerStore.get('cookie')
-  const cookieHeader = rawCookieHeader ?? (await buildCookieHeaderFallback())
-  return { cookieHeader, origin: resolveOrigin(headerStore) }
-}
+export const getServerRequestContext = cache(
+  async (): Promise<ServerRequestContext> => {
+    const headerStore = await headers()
+    const rawCookieHeader = headerStore.get('cookie')
+    const cookieHeader = rawCookieHeader ?? (await buildCookieHeaderFallback())
+    return { cookieHeader, origin: resolveOrigin(headerStore) }
+  },
+)
 
 async function buildCookieHeaderFallback(): Promise<string> {
   const cookieStore = await cookies()

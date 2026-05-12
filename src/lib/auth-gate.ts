@@ -1,10 +1,7 @@
 import { ApiError } from './api-error'
 import type { MeResponse } from './api'
-import {
-  getServerRequestContext,
-  requestServer,
-  type ServerRequestContext,
-} from './server-fetch'
+import { fetchCachedServerAuthMe } from './auth-server'
+import { getServerRequestContext, type ServerRequestContext } from './server-fetch'
 
 export type AuthGate =
   | { kind: 'authorized'; ctx: ServerRequestContext; me: MeResponse }
@@ -16,8 +13,12 @@ export async function loadAuthGate(
 ): Promise<AuthGate> {
   const ctx = await getServerRequestContext()
 
+  if (!ctx.cookieHeader) {
+    return { kind: 'forbidden' }
+  }
+
   try {
-    const me = await requestServer<MeResponse>('/auth/me', ctx)
+    const me = await fetchCachedServerAuthMe(ctx.cookieHeader, ctx.origin)
     if (!me || !roleCheck(me.role)) {
       return { kind: 'forbidden' }
     }

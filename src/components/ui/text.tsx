@@ -11,7 +11,7 @@ const sectionHeadingVariants = cva('font-semibold text-foreground', {
       sm: 'text-lg tracking-display-loose',
       md: 'text-xl tracking-display',
       lg: 'text-2xl tracking-display',
-      xl: 'text-3xl font-semibold tracking-display-tight',
+      xl: 'text-2xl font-semibold tracking-display-tight sm:text-3xl',
     },
   },
   defaultVariants: {

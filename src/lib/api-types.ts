@@ -770,8 +770,8 @@ export interface components {
             subcategory?: string;
             questionText: string;
             followUpQuestions?: string[];
-            expectedConcepts?: components["schemas"]["QuestionExpectedConceptDto"][];
-            redFlags?: components["schemas"]["QuestionRedFlagDto"][];
+            expectedConcepts?: (string | components["schemas"]["QuestionExpectedConceptDto"])[];
+            redFlags?: (string | components["schemas"]["QuestionRedFlagDto"])[];
             /** @enum {string} */
             difficulty?: "easy" | "medium" | "hard";
             weight?: number;
@@ -812,8 +812,8 @@ export interface components {
             subcategory?: string;
             questionText?: string;
             followUpQuestions?: string[];
-            expectedConcepts?: components["schemas"]["QuestionExpectedConceptDto"][];
-            redFlags?: components["schemas"]["QuestionRedFlagDto"][];
+            expectedConcepts?: (string | components["schemas"]["QuestionExpectedConceptDto"])[];
+            redFlags?: (string | components["schemas"]["QuestionRedFlagDto"])[];
             /** @enum {string} */
             difficulty?: "easy" | "medium" | "hard";
             weight?: number;
@@ -2054,7 +2054,10 @@ export interface operations {
     };
     InterviewController_validateAllAnswers: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Re-evaluate answers whose latest validation already completed. Defaults to false; in-flight validations always return 409. */
+                force?: boolean;
+            };
             header?: never;
             path: {
                 id: string;
@@ -2107,7 +2110,10 @@ export interface operations {
     };
     InterviewController_validateAnswer: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Re-evaluate the answer if its latest validation already completed. Defaults to false; in-flight validations always return 409. */
+                force?: boolean;
+            };
             header?: never;
             path: {
                 id: string;

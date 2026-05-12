@@ -17,10 +17,12 @@ import { Grid } from '@/components/ui/layout/grid'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText, SectionHeading } from '@/components/ui/text'
+import { useAuth } from '@/lib/auth-context'
 import { login } from '@/lib/api'
 
 export default function LoginPage() {
   const router = useRouter()
+  const { establishSession } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -32,8 +34,8 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      await login({ email, password })
-
+      const sessionUser = await login({ email, password })
+      establishSession(sessionUser)
       router.push('/')
       router.refresh()
     } catch (err) {

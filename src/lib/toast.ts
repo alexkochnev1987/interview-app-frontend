@@ -2,6 +2,7 @@ import { toast } from "sonner"
 
 type NotifyOptions = {
   description?: string
+  id?: string
 }
 
 const DEFAULT_SUCCESS_TITLE = "Done"
@@ -25,6 +26,7 @@ export function notifySuccess(message = DEFAULT_SUCCESS_TITLE, options?: NotifyO
 
 export function notifyError(message = DEFAULT_ERROR_TITLE, options?: NotifyOptions) {
   toast.error(toSentence(message), {
+    id: options?.id,
     description: options?.description ? toSentence(options.description) : undefined,
   })
 }

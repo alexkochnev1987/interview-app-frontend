@@ -1,7 +1,11 @@
 'use client'
 
 import { useAuth } from '@/lib/auth-context'
-import { canConfigureInterview, canReviewAssessments } from '@/lib/auth-roles'
+import {
+  canConfigureInterview,
+  canManageTeam,
+  canReviewAssessments,
+} from '@/lib/auth-roles'
 import { usePathname } from 'next/navigation'
 import {
   Sparkles,
@@ -10,6 +14,7 @@ import {
   LayoutDashboard,
   LibraryBig,
   Plus,
+  Users,
 } from 'lucide-react'
 
 import { AppHeader, AppHeaderInner } from '@/components/ui/app-header'
@@ -26,7 +31,7 @@ import { BodyText } from '@/components/ui/text'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
 
 export function NavHeader() {
-  const { user, loading, logout } = useAuth()
+  const { user, logout } = useAuth()
   const pathname = usePathname()
 
   if (pathname.startsWith('/take') || pathname.startsWith('/feedback')) {
@@ -41,6 +46,9 @@ export function NavHeader() {
       : []),
     ...(canConfigureInterview(user?.role)
       ? [{ href: '/interviews/new', label: 'New Interview', icon: Plus }]
+      : []),
+    ...(canManageTeam(user?.role)
+      ? [{ href: '/team', label: 'Team', icon: Users }]
       : []),
   ]
 
@@ -75,19 +83,17 @@ export function NavHeader() {
           </UnstyledLink>
         }
         nav={
-          loading
-            ? null
-            : user
-              ? links.map(({ href, label, icon: LinkIcon }) => (
-                  <NavLink key={href} href={href} active={isActive(href)}>
-                    <Icon size="md"><LinkIcon /></Icon>
-                    {label}
-                  </NavLink>
-                ))
-              : null
+          user
+            ? links.map(({ href, label, icon: LinkIcon }) => (
+                <NavLink key={href} href={href} active={isActive(href)}>
+                  <Icon size="md"><LinkIcon /></Icon>
+                  {label}
+                </NavLink>
+              ))
+            : null
         }
         actions={
-          loading ? null : user ? (
+          user ? (
             <>
               <SurfaceTile
                 tone="soft"

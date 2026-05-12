@@ -37,6 +37,11 @@ const surfaceTileVariants = cva('ring-1 ring-hairline', {
       start: '',
       end: 'text-right',
     },
+    width: {
+      auto: '',
+      full: 'w-full',
+      'full-lg-auto': 'w-full max-w-full lg:w-auto',
+    },
   },
   defaultVariants: {
     tone: 'soft',
@@ -45,6 +50,7 @@ const surfaceTileVariants = cva('ring-1 ring-hairline', {
     minHeight: 'none',
     visibility: 'always',
     textAlign: 'start',
+    width: 'auto',
   },
 })
 
@@ -60,6 +66,7 @@ export function SurfaceTile({
   minHeight,
   visibility,
   textAlign,
+  width,
   ...props
 }: SurfaceTileProps) {
   return (
@@ -72,6 +79,7 @@ export function SurfaceTile({
           minHeight,
           visibility,
           textAlign,
+          width,
         }),
         className,
       )}

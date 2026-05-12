@@ -10,6 +10,26 @@ import {
   type QuestionInput,
   type QuestionRedFlag,
 } from '@/lib/api'
+
+function coerceExpectedConcepts(
+  items: (string | QuestionExpectedConcept)[] | undefined,
+): QuestionExpectedConcept[] {
+  return (items ?? []).map((item) =>
+    typeof item === 'string'
+      ? { id: item, label: item, weight: 0, description: '' }
+      : item,
+  )
+}
+
+function coerceRedFlags(
+  items: (string | QuestionRedFlag)[] | undefined,
+): QuestionRedFlag[] {
+  return (items ?? []).map((item) =>
+    typeof item === 'string'
+      ? { id: item, label: item, severity: 'medium' }
+      : item,
+  )
+}
 import {
   formatExpectedConcepts,
   formatRedFlags,
@@ -47,7 +67,7 @@ export function EditorRubricSection({
         >
           <RawListTextarea
             id="expectedConcepts"
-            parsedValue={value.expectedConcepts || []}
+            parsedValue={coerceExpectedConcepts(value.expectedConcepts)}
             format={formatExpectedConcepts}
             parse={parseExpectedConcepts}
             onParsedChange={(next) => onUpdate({ expectedConcepts: next })}
@@ -64,7 +84,7 @@ export function EditorRubricSection({
         >
           <RawListTextarea
             id="redFlags"
-            parsedValue={value.redFlags || []}
+            parsedValue={coerceRedFlags(value.redFlags)}
             format={formatRedFlags}
             parse={parseRedFlags}
             onParsedChange={(next) => onUpdate({ redFlags: next })}
