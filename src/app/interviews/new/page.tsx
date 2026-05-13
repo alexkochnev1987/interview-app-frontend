@@ -255,7 +255,7 @@ function NewInterviewPageContent() {
               showStatusFilter={false}
               loading={facetsResult.loading}
               error={facetsResult.error}
-              onRetry={facetsResult.retry}
+              onRetry={facetsResult.refetch}
             />
 
             <QuestionSelectedPanel selected={selectedQuestions} onRemove={removeSelected} />

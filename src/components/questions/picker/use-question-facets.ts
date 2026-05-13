@@ -26,7 +26,7 @@ export type UseQuestionFacetsResult = {
   facets: QuestionFacets
   loading: boolean
   error: string | null
-  retry: () => void
+  refetch: () => void
 }
 
 type FilterSnapshot = Pick<
@@ -61,7 +61,18 @@ export function useQuestionFacets(
   const [attempt, setAttempt] = useState(0)
   const [completedKey, setCompletedKey] = useState<string | null>(null)
 
-  const params = useMemo(() => buildParams(snapshot, debouncedQ), [snapshot, debouncedQ])
+  const params = useMemo(
+    () => buildParams(snapshot, debouncedQ),
+    [
+      debouncedQ,
+      snapshot.difficulty,
+      snapshot.category,
+      snapshot.subcategory,
+      snapshot.role,
+      snapshot.status,
+      snapshot.tags,
+    ],
+  )
   const paramsKey = useMemo(
     () => `${JSON.stringify(params)}::${attempt}`,
     [params, attempt],
@@ -98,6 +109,6 @@ export function useQuestionFacets(
     facets,
     loading,
     error,
-    retry: () => setAttempt((value) => value + 1),
+    refetch: () => setAttempt((value) => value + 1),
   }
 }

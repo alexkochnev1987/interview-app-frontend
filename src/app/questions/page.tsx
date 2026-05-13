@@ -42,7 +42,10 @@ function QuestionsPageContent() {
   const { user } = useAuth()
   const isSuperAdmin = user?.role === 'super_admin'
 
-  const query = useQuestionsQuery({ syncUrl: true })
+  const query = useQuestionsQuery({
+    syncUrl: true,
+    lockStatus: isSuperAdmin ? undefined : 'active',
+  })
   const facetsResult = useQuestionFacets(query.state, query.debouncedQ)
   const facets = facetsResult.facets
 
@@ -101,6 +104,7 @@ function QuestionsPageContent() {
       setBulkConfirmOpen(false)
       setBulkResult(result)
       query.refetch()
+      facetsResult.refetch()
     } catch (error) {
       setBulkError(error instanceof Error ? error.message : 'Bulk delete failed.')
       setBulkConfirmOpen(false)
@@ -156,7 +160,7 @@ function QuestionsPageContent() {
           showStatusFilter={isSuperAdmin}
           loading={facetsResult.loading}
           error={facetsResult.error}
-          onRetry={facetsResult.retry}
+          onRetry={facetsResult.refetch}
         />
 
         <Stack gap={4}>
