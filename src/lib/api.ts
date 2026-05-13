@@ -28,6 +28,12 @@ export type QuestionDraft = Schemas['QuestionDraftResponseDto'];
 export type QuestionInput = Schemas['CreateQuestionDto'];
 export type UpdateQuestionInput = Schemas['UpdateQuestionDto'];
 export type Question = Schemas['QuestionResponseDto'];
+export type PaginatedQuestions = Schemas['PaginatedQuestionsResponseDto'];
+export type QuestionFacetsResponse = Schemas['QuestionFacetsResponseDto'];
+export type FetchQuestionsParams = NonNullable<paths['/questions']['get']['parameters']['query']>;
+export type QuestionSortField = NonNullable<FetchQuestionsParams['sortBy']>;
+export type QuestionSortOrder = NonNullable<FetchQuestionsParams['sortOrder']>;
+export type QuestionStatusFilter = NonNullable<FetchQuestionsParams['status']>;
 
 export type InterviewQuestion = Schemas['InterviewResponseDto']['questions'][number];
 
@@ -152,8 +158,34 @@ export async function updateUserRole(
   }));
 }
 
-export async function fetchQuestions(): Promise<Question[]> {
-  return handle(client.GET('/questions'));
+export async function fetchQuestions(
+  params?: FetchQuestionsParams,
+  init?: { signal?: AbortSignal },
+): Promise<PaginatedQuestions> {
+  return handle(
+    client.GET('/questions', {
+      params: { query: params ?? {} },
+      signal: init?.signal,
+    }),
+  );
+}
+
+export type FetchQuestionFacetsParams = NonNullable<
+  paths['/questions/facets']['get']['parameters']['query']
+>;
+
+export type FacetCount = Schemas['FacetCountDto'];
+
+export async function fetchQuestionFacets(
+  params?: FetchQuestionFacetsParams,
+  init?: { signal?: AbortSignal },
+): Promise<QuestionFacetsResponse> {
+  return handle(
+    client.GET('/questions/facets', {
+      params: { query: params ?? {} },
+      signal: init?.signal,
+    }),
+  );
 }
 
 export async function login(data: LoginPayload): Promise<AuthUserResponseDto> {
