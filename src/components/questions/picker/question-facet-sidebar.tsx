@@ -368,7 +368,7 @@ function FacetSection(props: {
     <DividedStackItem>
       <Stack gap={2}>
         <Inline gap={2} align="center" justify="between">
-          <EyebrowLabel>{title}</EyebrowLabel>
+          <EyebrowLabel weight="bold">{title}</EyebrowLabel>
           {activeCount > 0 ? (
             <StatusPill tone="primary" size="compact">
               {activeCount}
