@@ -1,6 +1,8 @@
 import type { PermissionStatus } from '@/components/take/types';
 import type { StatusTone } from '@/components/ui/status-pill';
 
+export const TAKE_RECORDING_LIMIT_SECONDS = 240;
+
 export interface TakeBehaviorSignals {
   tabHiddenCount: number;
   windowBlurCount: number;
@@ -75,4 +77,13 @@ export function formatTime(seconds: number) {
   const minutes = Math.floor(seconds / 60);
   const remainder = seconds % 60;
   return `${minutes}:${remainder.toString().padStart(2, '0')}`;
+}
+
+export function formatRecordingLimitLabel(seconds: number) {
+  const minutes = Math.floor(seconds / 60);
+  const remainder = seconds % 60;
+  if (remainder === 0) {
+    return `${minutes} min`;
+  }
+  return `${minutes} min ${remainder} sec`;
 }

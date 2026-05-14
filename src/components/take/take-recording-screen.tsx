@@ -1,31 +1,27 @@
 import type { RefObject } from 'react';
 
-import { SurfaceCard } from '@/components/ui/surface-card';
 import { PageMain } from '@/components/layout/page-shell';
-import { TakeRecordingActions } from '@/components/take/recording/take-recording-actions';
-import { TakeRecordingGuidance } from '@/components/take/recording/take-recording-guidance';
-import { TakeRecordingHeader } from '@/components/take/recording/take-recording-header';
-import { TakeRecordingPreview } from '@/components/take/recording/take-recording-preview';
-import { TakeRecordingStatus } from '@/components/take/recording/take-recording-status';
-import { LiveTranscriptPanel } from '@/components/take/live-transcript-panel';
+import {
+  TakeRecordingHeroColumn,
+  TakeRecordingSidebarColumn,
+} from '@/components/take/recording/take-recording-columns';
+import { TakeRecordingSessionHeader } from '@/components/take/recording/take-recording-session-header';
 import type { InterviewDataView, TakeStage } from '@/components/take/types';
-import { CardContent } from '@/components/ui/card';
-import { Heading } from '@/components/ui/heading';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Container, Grid, Stack } from '@/components/ui/layout';
-import { TAKE_MESSAGES } from '@/features/take';
+import type { InterviewerPresence } from '@/features/take/use-take-question-tts';
+import type { VersionPersistKind } from '@/features/take/session-machine';
+import { Grid, Stack } from '@/components/ui/layout';
 
 interface TakeRecordingScreenProps {
   interview: InterviewDataView;
+  currentVersionNumber: number;
   stage: TakeStage;
+  recording: boolean;
   progressValue: number;
   screenSurface: string;
   setupError: string;
   submitError: string;
-  currentVersionNumber: number;
-  retakeCount: number;
   timeLeft: number;
-  transitionLabel: string;
+  versionPersistKind: VersionPersistKind | null;
   uploading: boolean;
   isBrowserTranscriptSupported: boolean;
   finalTranscript: string;
@@ -33,7 +29,10 @@ interface TakeRecordingScreenProps {
   browserTranscriptWarning?: string;
   videoRef: RefObject<HTMLVideoElement | null>;
   screenVideoRef: RefObject<HTMLVideoElement | null>;
+  micOn: boolean;
+  interviewerPresence: InterviewerPresence;
   formatTime: (seconds: number) => string;
+  recordingStartBusy: boolean;
   onReconnect: () => void;
   onRerecord: () => void;
   onSubmit: () => void;
@@ -41,15 +40,15 @@ interface TakeRecordingScreenProps {
 
 export function TakeRecordingScreen({
   interview,
+  currentVersionNumber,
   stage,
+  recording,
   progressValue,
   screenSurface,
   setupError,
   submitError,
-  currentVersionNumber,
-  retakeCount,
   timeLeft,
-  transitionLabel,
+  versionPersistKind,
   uploading,
   isBrowserTranscriptSupported,
   finalTranscript,
@@ -57,72 +56,59 @@ export function TakeRecordingScreen({
   browserTranscriptWarning,
   videoRef,
   screenVideoRef,
+  micOn,
+  interviewerPresence,
   formatTime,
+  recordingStartBusy,
   onReconnect,
   onRerecord,
   onSubmit,
 }: TakeRecordingScreenProps) {
   return (
     <PageMain>
-      <Container width="wide" align="center">
-        <Grid as="section" columns="split-12-8" gap={6}>
-          <SurfaceCard tone="glassSoft">
-            <CardContent layout="fill-column" spacing="lg">
-              <TakeRecordingHeader
-                interview={interview}
-                progressValue={progressValue}
-                screenSurface={screenSurface}
-                setupError={setupError}
-                currentVersionNumber={currentVersionNumber}
-                retakeCount={retakeCount}
-              />
-            </CardContent>
-          </SurfaceCard>
+      <Stack gap={6} width="full">
+        <TakeRecordingSessionHeader
+          interview={interview}
+          currentVersionNumber={currentVersionNumber}
+          screenSurface={screenSurface}
+          setupError={setupError}
+          stage={stage}
+          recording={recording}
+          recordingStartBusy={recordingStartBusy}
+          versionPersistKind={versionPersistKind}
+        />
 
-          <SurfaceCard tone="glassFloat">
-            <CardContent layout="fill-column" spacing="lg">
-              <Stack gap={3}>
-                <TakeRecordingStatus stage={stage} timeLeft={timeLeft} formatTime={formatTime} />
+        <Grid as="section" columns="aside-22" gap={6}>
+          <TakeRecordingHeroColumn
+            stage={stage}
+            timeLeft={timeLeft}
+            formatTime={formatTime}
+            videoRef={videoRef}
+            screenVideoRef={screenVideoRef}
+            micOn={micOn}
+            interviewerPresence={interviewerPresence}
+          />
 
-                <Heading variant="questionTitle">{interview.currentQuestion?.text}</Heading>
-              </Stack>
-
-              <TakeRecordingPreview
-                isRecording={stage === 'recording'}
-                timeLeft={timeLeft}
-                formatTime={formatTime}
-                videoRef={videoRef}
-                screenVideoRef={screenVideoRef}
-              />
-
-              <LiveTranscriptPanel
-                isSupported={isBrowserTranscriptSupported}
-                finalTranscript={finalTranscript}
-                interimTranscript={interimTranscript}
-                warning={browserTranscriptWarning}
-                stage={stage}
-              />
-
-              <TakeRecordingGuidance stage={stage} transitionLabel={transitionLabel} />
-              {submitError ? (
-                <Alert variant="destructive">
-                  <AlertTitle>{TAKE_MESSAGES.submitFailedTitle}</AlertTitle>
-                  <AlertDescription>{submitError}</AlertDescription>
-                </Alert>
-              ) : null}
-              <TakeRecordingActions
-                stage={stage}
-                uploading={uploading}
-                transitionLabel={transitionLabel}
-                setupError={setupError}
-                onReconnect={onReconnect}
-                onRerecord={onRerecord}
-                onSubmit={onSubmit}
-              />
-            </CardContent>
-          </SurfaceCard>
+          <TakeRecordingSidebarColumn
+            interview={interview}
+            stage={stage}
+            recording={recording}
+            progressValue={progressValue}
+            submitError={submitError}
+            uploading={uploading}
+            recordingStartBusy={recordingStartBusy}
+            isBrowserTranscriptSupported={isBrowserTranscriptSupported}
+            finalTranscript={finalTranscript}
+            interimTranscript={interimTranscript}
+            browserTranscriptWarning={browserTranscriptWarning}
+            setupError={setupError}
+            onReconnect={onReconnect}
+            onRerecord={onRerecord}
+            onSubmit={onSubmit}
+            interviewerPresence={interviewerPresence}
+          />
         </Grid>
-      </Container>
+      </Stack>
     </PageMain>
   );
 }

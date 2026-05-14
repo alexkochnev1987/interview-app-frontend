@@ -14,7 +14,7 @@ export function TakeConsentCheckboxBlock({
   onConsentChange,
 }: TakeConsentCheckboxBlockProps) {
   return (
-    <TakePanel tone="white">
+    <TakePanel radius="lg" padding="lg">
       <Inline align="start" gap={3}>
         <Checkbox
           id="consent"

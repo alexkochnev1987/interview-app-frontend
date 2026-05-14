@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useBrowserTranscript } from '@/lib/use-browser-transcript';
 import { submitTakeAnswer, type TakeInterviewData } from '@/lib/api';
@@ -17,7 +17,6 @@ import {
   stageAfterInterviewLoad,
   stopMediaStream,
   useTakeAnswerPersistence,
-  useTakeAutoStartRecording,
   useTakeBehaviorTracking,
   useTakeBeginRecording,
   useTakeInterviewLoader,
@@ -28,7 +27,10 @@ import {
   type TakeBehaviorSignals,
   progressValueForStage,
   TAKE_MESSAGES,
+  type VersionPersistKind,
 } from '@/features/take';
+import { useTakeQuestionTts } from '@/features/take/use-take-question-tts';
+import { TAKE_RECORDING_LIMIT_SECONDS } from './utils';
 
 type PendingVersionAction = 'submit' | 'rerecord' | null;
 
@@ -58,7 +60,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
   const [error, setError] = useState('');
   const [consent, setConsent] = useState(false);
   const [recording, setRecording] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(240);
+  const [timeLeft, setTimeLeft] = useState(TAKE_RECORDING_LIMIT_SECONDS);
   const [retakeCount, setRetakeCount] = useState(0);
   const [currentVersionNumber, setCurrentVersionNumber] = useState(1);
   const [uploading, setUploading] = useState(false);
@@ -68,7 +70,17 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
   const [setupBusy, setSetupBusy] = useState(false);
   const [setupError, setSetupError] = useState('');
   const [submitError, setSubmitError] = useState('');
-  const [transitionLabel, setTransitionLabel] = useState('');
+  const [versionPersistKind, setVersionPersistKind] = useState<VersionPersistKind | null>(null);
+  const [recordingStartBusy, setRecordingStartBusy] = useState(false);
+  const [lobbyMicOn, setLobbyMicOn] = useState(false);
+  const [lobbyCameraOn, setLobbyCameraOn] = useState(false);
+
+  const [interviewerPresence, questionSpeechRecordingAllowedRef] = useTakeQuestionTts(
+    interview,
+    stage,
+  );
+
+  const stageRef = useRef<TakeStage>('loading');
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const screenVideoRef = useRef<HTMLVideoElement>(null);
@@ -99,6 +111,10 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
   const requestVersionActionRef = useRef<(action: PendingVersionAction) => void>(() => undefined);
   const autoStartedQuestionKeyRef = useRef('');
 
+  useEffect(() => {
+    stageRef.current = stage;
+  }, [stage]);
+
   function attachCameraPreview(stream: MediaStream) {
     cameraStreamRef.current = stream;
     if (videoRef.current) {
@@ -108,7 +124,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
   }
 
   useEffect(() => {
-    if (stage !== 'interview' && stage !== 'recording') {
+    if (stage !== 'interview' && stage !== 'recording' && stage !== 'lobby') {
       return;
     }
 
@@ -166,16 +182,30 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     setScreenSurface('');
     setSetupBusy(false);
     setSetupError(message);
-    setTransitionLabel('');
+    setVersionPersistKind(null);
     autoStartedQuestionKeyRef.current = '';
     releaseCaptureStreams(cameraStreamRef, screenStreamRef, videoRef);
     if (screenVideoRef.current) {
       screenVideoRef.current.srcObject = null;
     }
+    setLobbyMicOn(false);
+    setLobbyCameraOn(false);
     setStage('consent');
   }
 
   function handleScreenShareEnded(message: string) {
+    if (stageRef.current === 'lobby') {
+      stopMediaStream(screenStreamRef.current);
+      screenStreamRef.current = null;
+      if (screenVideoRef.current) {
+        screenVideoRef.current.srcObject = null;
+      }
+      setScreenStatus('denied');
+      setScreenSurface('');
+      setSetupError(message);
+      return;
+    }
+
     discardRecordingRef.current = true;
     pendingVersionActionRef.current = null;
     stopActiveRecorders();
@@ -185,7 +215,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     setScreenSurface('');
     setSetupBusy(false);
     setSetupError(message);
-    setTransitionLabel('');
+    setVersionPersistKind(null);
     autoStartedQuestionKeyRef.current = '';
     stopMediaStream(screenStreamRef.current);
     screenStreamRef.current = null;
@@ -222,7 +252,12 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     },
   });
 
-  const { handleStartInterview } = useTakePermissions({
+  const {
+    restartFullInterviewCapture,
+    prepareLobbyDevices,
+    attachLobbyScreenShare,
+    enterInterviewFromLobby,
+  } = useTakePermissions({
     setSetupBusy,
     setSetupError,
     setCameraStatus,
@@ -230,14 +265,76 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     setScreenSurface,
     setStage,
     clearRecordingArtifacts,
-    releaseCaptureStreams: () => releaseCaptureStreams(cameraStreamRef, screenStreamRef, videoRef),
+    releaseCaptureStreams: () =>
+      releaseCaptureStreams(cameraStreamRef, screenStreamRef, videoRef),
     attachCameraPreview,
     stopMediaStream,
-    resetInterviewSetup,
     handleScreenShareEnded,
     getPermissionErrorMessage,
     screenStreamRef,
+    cameraStreamRef,
+    screenVideoRef,
   });
+
+  const bootstrapLobbyMedia = useCallback(async (openedVia: 'mic' | 'camera') => {
+    await prepareLobbyDevices();
+    const stream = cameraStreamRef.current;
+    if (!stream) return;
+
+    const micOn = openedVia === 'mic';
+    const camOn = openedVia === 'camera';
+
+    stream.getAudioTracks().forEach((t) => {
+      t.enabled = micOn;
+    });
+    stream.getVideoTracks().forEach((t) => {
+      t.enabled = camOn;
+    });
+
+    setLobbyMicOn(micOn);
+    setLobbyCameraOn(camOn);
+  }, [prepareLobbyDevices]);
+
+  const toggleLobbyMic = useCallback(async () => {
+    if (setupBusy) return;
+    const stream = cameraStreamRef.current;
+    const hasLive = stream?.getTracks().some((t) => t.readyState === 'live');
+    if (!hasLive) {
+      await bootstrapLobbyMedia('mic');
+      return;
+    }
+    const next = !lobbyMicOn;
+    stream!.getAudioTracks().forEach((t) => {
+      t.enabled = next;
+    });
+    setLobbyMicOn(next);
+  }, [bootstrapLobbyMedia, lobbyMicOn, setupBusy]);
+
+  const toggleLobbyCamera = useCallback(async () => {
+    if (setupBusy) return;
+    const stream = cameraStreamRef.current;
+    const hasLive = stream?.getTracks().some((t) => t.readyState === 'live');
+    if (!hasLive) {
+      await bootstrapLobbyMedia('camera');
+      return;
+    }
+    const next = !lobbyCameraOn;
+    stream!.getVideoTracks().forEach((t) => {
+      t.enabled = next;
+    });
+    setLobbyCameraOn(next);
+  }, [bootstrapLobbyMedia, lobbyCameraOn, setupBusy]);
+
+  const lobbyJoinReady = useMemo(
+    () =>
+      cameraStatus === 'granted' &&
+      lobbyMicOn &&
+      lobbyCameraOn &&
+      screenStatus === 'granted' &&
+      screenSurface === 'monitor' &&
+      !setupError,
+    [cameraStatus, lobbyCameraOn, lobbyMicOn, screenStatus, screenSurface, setupError],
+  );
 
   const {
     startMultipartUploadSession,
@@ -395,7 +492,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
       autoStartedQuestionKeyRef.current = '';
       setStage('interview');
     } finally {
-      setTransitionLabel('');
+      setVersionPersistKind(null);
       setUploading(false);
       persistInFlightRef.current = false;
     }
@@ -426,17 +523,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     scheduleProgressFlush: () => scheduleProgressFlush('event'),
   });
 
-  useTakeAutoStartRecording({
-    stage,
-    recording,
-    uploading,
-    interview,
-    cameraStatus,
-    screenStatus,
-    screenSurface,
-    autoStartedQuestionKeyRef,
-    beginRecordingRef,
-  });
+  const clearVersionPersistKind = useCallback(() => setVersionPersistKind(null), []);
 
   const { requestVersionAction } = useTakeRecordingControls({
     uploading,
@@ -445,7 +532,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     answerStoppedAtMsRef,
     answerStartedAtMsRef,
     answerDurationSecondsRef,
-    setTransitionLabel,
+    onEnterVersionPersist: setVersionPersistKind,
     setStage,
     scheduleProgressFlush,
     stopActiveRecorders,
@@ -496,7 +583,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     setTimeLeft,
     setSetupError,
     setStage,
-    setTransitionLabel,
+    clearVersionPersistKind,
     clearRecordingArtifacts,
     resetInterviewSetup,
     startMultipartUploadSession,
@@ -518,6 +605,62 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     };
   }, [beginRecording]);
 
+  const proceedToLobby = useCallback(() => {
+    autoStartedQuestionKeyRef.current = '';
+    setSetupError('');
+    setLobbyMicOn(false);
+    setLobbyCameraOn(false);
+    setStage('lobby');
+  }, []);
+
+  const capturePipelineReady = Boolean(
+    interview &&
+      !setupError &&
+      cameraStatus === 'granted' &&
+      screenStatus === 'granted' &&
+      screenSurface === 'monitor',
+  );
+
+  useEffect(() => {
+    if (stage !== 'interview') return;
+    if (!interview?.currentQuestion) return;
+    if (recording || uploading || recordingStartBusy) return;
+    if (!capturePipelineReady) return;
+    if (setupError) return;
+    if (!questionSpeechRecordingAllowedRef.current) return;
+
+    const questionKey = `${interview.currentQuestionIndex}:${interview.currentAnswerMeta?.versionCount ?? 0}`;
+    if (autoStartedQuestionKeyRef.current === questionKey) return;
+
+    autoStartedQuestionKeyRef.current = questionKey;
+    const nextVersionNumber = (interview.currentAnswerMeta?.versionCount ?? 0) + 1;
+
+    setRecordingStartBusy(true);
+    void (async () => {
+      try {
+        await beginRecordingRef.current(nextVersionNumber, interview.currentQuestionIndex);
+      } finally {
+        setRecordingStartBusy(false);
+      }
+    })();
+  }, [
+    stage,
+    setupError,
+    interview?.currentQuestion,
+    interview?.currentQuestionIndex,
+    interview?.currentAnswerMeta?.versionCount,
+    recording,
+    uploading,
+    recordingStartBusy,
+    capturePipelineReady,
+    interviewerPresence,
+    questionSpeechRecordingAllowedRef,
+  ]);
+
+  const startInterviewFromLobby = useCallback(() => {
+    if (!enterInterviewFromLobby()) return;
+  }, [enterInterviewFromLobby]);
+
   return {
     stage,
     interview,
@@ -534,7 +677,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     setupBusy,
     setupError,
     submitError,
-    transitionLabel,
+    versionPersistKind,
     videoRef,
     screenVideoRef,
     isBrowserTranscriptSupported,
@@ -542,7 +685,19 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     interimTranscript,
     browserTranscriptWarning,
     setConsent,
-    handleStartInterview,
+    proceedToLobby,
+    restartFullInterviewCapture,
+    prepareLobbyDevices,
+    attachLobbyScreenShare,
+    enterInterviewFromLobby,
+    startInterviewFromLobby,
+    toggleLobbyMic,
+    toggleLobbyCamera,
+    lobbyMicOn,
+    lobbyCameraOn,
+    lobbyJoinReady,
+    recordingStartBusy,
+    capturePipelineReady,
     requestVersionAction: (action: PendingVersionAction) => {
       if (action === 'submit') {
         requestSubmitAction();
@@ -554,6 +709,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     permissionLabel,
     permissionTone,
     formatTime,
+    interviewerPresence,
     progressValue:
       interview ? progressValueForStage({ interview, stage }) : 0,
   };

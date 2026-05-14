@@ -1,12 +1,10 @@
-import { Sparkles } from 'lucide-react';
+import { ListVideo } from 'lucide-react';
 
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge';
-import { SurfaceCard, SurfaceCardMax5xl } from '@/components/ui/surface-card';
-import type { StatusTone } from '@/components/ui/status-pill';
-import { PageMain } from '@/components/layout/page-shell';
+import { SurfaceCard } from '@/components/ui/surface-card';
+import { PageMainViewport } from '@/components/layout/page-shell';
 import { TakeCapabilityCards } from '@/components/take/consent/take-capability-cards';
 import { TakeConsentCheckboxBlock } from '@/components/take/consent/take-consent-checkbox-block';
-import { TakePermissionStatusList } from '@/components/take/consent/take-permission-status-list';
 import { TakePanel } from '@/components/take/take-panel';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -15,61 +13,50 @@ import { Heading } from '@/components/ui/heading';
 import { Grid, Stack } from '@/components/ui/layout';
 import { TextList, TextListItem } from '@/components/ui/text-list';
 import { Text } from '@/components/ui/text';
-import type { InterviewDataView, PermissionStatus } from '@/components/take/types';
+import type { InterviewDataView } from '@/components/take/types';
+import { formatTakeQuestionCountLabel, TAKE_MESSAGES } from '@/features/take';
 
 interface TakeConsentScreenProps {
   interview: InterviewDataView;
-  cameraStatus: PermissionStatus;
-  screenStatus: PermissionStatus;
-  screenSurface: string;
   consent: boolean;
-  setupBusy: boolean;
   setupError: string;
   onConsentChange: (checked: boolean) => void;
-  onStartInterview: () => void;
-  permissionLabel: (status: PermissionStatus) => string;
-  permissionTone: (status: PermissionStatus) => StatusTone;
+  onContinueToLobby: () => void;
 }
 
 export function TakeConsentScreen({
   interview,
-  cameraStatus,
-  screenStatus,
-  screenSurface,
   consent,
-  setupBusy,
   setupError,
   onConsentChange,
-  onStartInterview,
-  permissionLabel,
-  permissionTone,
+  onContinueToLobby,
 }: TakeConsentScreenProps) {
   return (
-    <PageMain>
-      <SurfaceCardMax5xl tone="glassFloat">
+    <PageMainViewport>
+      <SurfaceCard tone="glassFloat" grow="fill">
         <CardContent layout="fill-column" spacing="xl">
-          <Grid columns="consent-shell" gap={8}>
-            <Stack gap={5}>
-              <EyebrowBadge icon={<Sparkles size={14} />}>Candidate interview</EyebrowBadge>
+          <Grid columns="consent-shell" gap={8} grow="fill">
+            <Stack gap={5} height="full" >
+              <Stack gap={5}>
+                <EyebrowBadge icon={<ListVideo size={14} strokeWidth={2} />}>Candidate interview</EyebrowBadge>
 
-              <Stack gap={3}>
-                <Heading variant="heroTitle">Interview for {interview.position}</Heading>
-                <Text variant="heroDescription">
-                  Welcome, {interview.candidateName}. You will answer {interview.totalQuestions}{' '}
-                  questions, with up to four minutes for each response.
-                </Text>
+                <Stack gap={3}>
+                  <Heading variant="sectionHeroTitle">Interview for {interview.position}</Heading>
+                  <Text variant="heroDescription">
+                    Welcome, <strong>{interview.candidateName}</strong>. You will answer{' '}
+                    {formatTakeQuestionCountLabel(interview.totalQuestions)}, with up to four minutes for each response.
+                  </Text>
+                </Stack>
               </Stack>
 
               <TakeCapabilityCards />
             </Stack>
 
-            <SurfaceCard tone="glassSoft">
+            <SurfaceCard tone="glassSoftFlat" height="full">
               <CardHeader>
                 <Stack gap={2}>
                   <CardTitle size="lg">Before you start</CardTitle>
-                  <Text variant="bodyMutedSm">
-                    One button will request camera, microphone, and then full-screen sharing.
-                  </Text>
+                  <Text variant="bodyMutedSm">{TAKE_MESSAGES.consentPrepHint}</Text>
                 </Stack>
               </CardHeader>
               <CardContent>
@@ -98,14 +85,6 @@ export function TakeConsentScreen({
                     </Stack>
                   </TakePanel>
 
-                  <TakePermissionStatusList
-                    cameraStatus={cameraStatus}
-                    screenStatus={screenStatus}
-                    screenSurface={screenSurface}
-                    permissionLabel={permissionLabel}
-                    permissionTone={permissionTone}
-                  />
-
                   {setupError ? (
                     <Alert variant="destructive">
                       <AlertTitle>Setup incomplete</AlertTitle>
@@ -118,13 +97,13 @@ export function TakeConsentScreen({
                   <Stack width="full">
                     <Button
                       type="button"
-                      disabled={!consent || setupBusy}
-                      onClick={onStartInterview}
+                      disabled={!consent}
+                      onClick={onContinueToLobby}
                       variant="gradient"
                       size="2xl"
                       shape="rounded"
                     >
-                      {setupBusy ? 'Requesting access...' : 'Allow Camera, Mic & Entire Screen'}
+                      {TAKE_MESSAGES.consentContinue}
                     </Button>
                   </Stack>
                 </Stack>
@@ -132,7 +111,7 @@ export function TakeConsentScreen({
             </SurfaceCard>
           </Grid>
         </CardContent>
-      </SurfaceCardMax5xl>
-    </PageMain>
+      </SurfaceCard>
+    </PageMainViewport>
   );
 }

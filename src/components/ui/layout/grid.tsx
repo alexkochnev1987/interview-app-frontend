@@ -5,6 +5,10 @@ import { cn } from '@/lib/utils'
 
 const gridVariants = cva('grid', {
   variants: {
+    grow: {
+      none: '',
+      fill: 'min-h-0 min-w-0 flex-1',
+    },
     gap: {
       0: 'gap-0',
       2: 'gap-2',
@@ -41,7 +45,13 @@ const gridVariants = cva('grid', {
       'metrics-5': 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5',
       'pagination-footer':
         'grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center [&>*:first-child]:min-w-0 [&>*:last-child]:justify-self-center sm:[&>*:last-child]:justify-self-end',
-      'consent-shell': 'grid-cols-1 lg:grid-cols-[1.1fr_0.9fr]',
+      'consent-shell':
+        'grid-cols-1 content-start lg:grid-cols-[1.1fr_0.9fr]',
+      'lobby-shell': cn(
+        'grid-cols-1 lg:grid-cols-[1.1fr_0.9fr]',
+        'grid-rows-[minmax(0,1fr)_auto] lg:grid-rows-[minmax(0,1fr)]',
+        '[&>*]:min-h-0',
+      ),
       'consent-info-4': 'grid-cols-1 md:grid-cols-2 xl:grid-cols-4',
     },
     align: {
@@ -52,6 +62,7 @@ const gridVariants = cva('grid', {
     },
   },
   defaultVariants: {
+    grow: 'none',
     gap: 4,
     columns: 1,
     align: 'stretch',
@@ -66,6 +77,7 @@ type GridProps = Omit<React.ComponentProps<'div'>, 'color'> &
 export function Grid({
   as,
   className,
+  grow,
   gap,
   columns,
   align,
@@ -75,7 +87,7 @@ export function Grid({
 
   return (
     <Comp
-      className={cn(gridVariants({ gap, columns, align }), className)}
+      className={cn(gridVariants({ grow, gap, columns, align }), className)}
       {...props}
     />
   )

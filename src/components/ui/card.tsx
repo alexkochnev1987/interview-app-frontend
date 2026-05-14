@@ -11,6 +11,8 @@ const cardVariants = cva(
         default: "bg-card ring-1 ring-foreground/10",
         surface:
           "border border-hairline-strong bg-surface-glass shadow-soft",
+        surfaceFlat:
+          "border border-hairline-strong bg-surface-glass shadow-none",
         floating:
           "border border-hairline-strong bg-surface-glass shadow-float",
         metric:
@@ -50,7 +52,7 @@ const cardVariants = cva(
       },
       height: {
         auto: "",
-        full: "h-full",
+        full: "h-full min-h-0",
       },
       accent: {
         none: "",
@@ -64,6 +66,10 @@ const cardVariants = cva(
         default: "",
         contain: "min-w-0",
       },
+      grow: {
+        none: "",
+        fill: "min-h-0 min-w-0 flex-1",
+      },
     },
     defaultVariants: {
       variant: "default",
@@ -74,6 +80,7 @@ const cardVariants = cva(
       height: "auto",
       accent: "none",
       flexChild: "default",
+      grow: "none",
     },
   },
 )
@@ -88,6 +95,7 @@ function Card({
   height,
   accent,
   flexChild,
+  grow,
   ...props
 }: React.ComponentProps<"div"> & VariantProps<typeof cardVariants>) {
   return (
@@ -105,6 +113,7 @@ function Card({
           height,
           accent,
           flexChild,
+          grow,
         }),
         className
       )}
@@ -143,7 +152,8 @@ const cardContentVariants = cva("", {
     },
     layout: {
       default: "",
-      "fill-column": "flex h-full flex-col",
+      "fill-column":
+        "flex min-h-0 min-w-0 flex-1 flex-col self-stretch",
       "row-end": "flex flex-wrap justify-end",
       "split-row": "flex flex-col sm:flex-row sm:items-center sm:justify-between",
       "stack-center": "flex flex-1 flex-col items-center justify-center text-center",

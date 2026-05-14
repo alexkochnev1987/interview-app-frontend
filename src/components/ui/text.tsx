@@ -116,7 +116,7 @@ const takeTextVariants = cva('', {
       bodyMutedSm: 'text-sm leading-6 text-muted-foreground',
       bodySm: 'text-sm leading-6 text-foreground',
       eyebrowLabel:
-        'text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground',
+        'text-[0.72rem] font-semibold uppercase tracking-eyebrow-widest text-muted-foreground',
       metricLabel: 'text-[0.72rem] font-semibold uppercase tracking-[0.2em]',
       metricLabelCompact:
         'text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground',

@@ -1,5 +1,5 @@
 import type { MutableRefObject } from 'react';
-import { canRequestVersionAction, transitionLabelForAction } from './session-machine';
+import { canRequestVersionAction, type VersionPersistKind } from './session-machine';
 
 type PendingVersionAction = 'submit' | 'rerecord' | null;
 
@@ -10,7 +10,7 @@ interface UseTakeRecordingControlsParams {
   answerStoppedAtMsRef: MutableRefObject<number | null>;
   answerStartedAtMsRef: MutableRefObject<number | null>;
   answerDurationSecondsRef: MutableRefObject<number>;
-  setTransitionLabel: (value: string) => void;
+  onEnterVersionPersist: (action: VersionPersistKind) => void;
   setStage: (value: 'transition') => void;
   scheduleProgressFlush: (reason: 'stop') => void;
   stopActiveRecorders: () => void;
@@ -23,7 +23,7 @@ export function useTakeRecordingControls({
   answerStoppedAtMsRef,
   answerStartedAtMsRef,
   answerDurationSecondsRef,
-  setTransitionLabel,
+  onEnterVersionPersist,
   setStage,
   scheduleProgressFlush,
   stopActiveRecorders,
@@ -51,7 +51,7 @@ export function useTakeRecordingControls({
     }
 
     pendingVersionActionRef.current = action;
-    setTransitionLabel(transitionLabelForAction(action));
+    onEnterVersionPersist(action);
     setStage('transition');
     scheduleProgressFlush('stop');
     stopRecording();

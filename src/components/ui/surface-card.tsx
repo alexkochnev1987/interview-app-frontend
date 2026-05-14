@@ -4,13 +4,14 @@ import { Card } from '@/components/ui/card'
 import { Container } from '@/components/ui/layout/container'
 import { HoverLift } from '@/components/ui/hover-lift'
 
-type SurfaceCardTone = 'glassSoft' | 'glassFloat' | 'mutedSoft'
+type SurfaceCardTone = 'glassSoft' | 'glassSoftFlat' | 'glassFloat' | 'mutedSoft'
 
 const toneMap: Record<
   SurfaceCardTone,
   NonNullable<ComponentProps<typeof Card>['variant']>
 > = {
   glassSoft: 'surface',
+  glassSoftFlat: 'surfaceFlat',
   glassFloat: 'floating',
   mutedSoft: 'tinted',
 }

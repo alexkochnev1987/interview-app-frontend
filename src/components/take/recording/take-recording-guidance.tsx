@@ -2,13 +2,22 @@ import type { TakeStage } from '@/components/take/types';
 import { TakePanel } from '@/components/take/take-panel';
 import { Stack } from '@/components/ui/layout';
 import { Text } from '@/components/ui/text';
+import { TAKE_MESSAGES } from '@/features/take';
+import type { InterviewerPresence } from '@/features/take/use-take-question-tts';
 
 interface TakeRecordingGuidanceProps {
   stage: TakeStage;
-  transitionLabel: string;
+  recording: boolean;
+  recordingStartBusy: boolean;
+  interviewerPresence: InterviewerPresence;
 }
 
-export function TakeRecordingGuidance({ stage, transitionLabel }: TakeRecordingGuidanceProps) {
+export function TakeRecordingGuidance({
+  stage,
+  recording,
+  recordingStartBusy,
+  interviewerPresence,
+}: TakeRecordingGuidanceProps) {
   return (
     <TakePanel>
       <Stack gap={3}>
@@ -17,8 +26,14 @@ export function TakeRecordingGuidance({ stage, transitionLabel }: TakeRecordingG
         </Text>
         <Text variant="bodyMutedSm">
           {stage === 'transition'
-            ? transitionLabel || 'Saving the current answer version.'
-            : 'Recording starts automatically for each question. Use Submit when the answer is ready, or Re-record to create a new version for the same question.'}
+            ? TAKE_MESSAGES.guidanceInterview
+            : stage === 'interview' && !recording
+              ? recordingStartBusy
+                ? TAKE_MESSAGES.recordingStartingBusy
+                : interviewerPresence === 'speaking'
+                  ? TAKE_MESSAGES.guidanceInterviewerSpeaking
+                  : TAKE_MESSAGES.guidanceBeforeRecording
+              : TAKE_MESSAGES.guidanceInterview}
         </Text>
       </Stack>
     </TakePanel>

@@ -1,6 +1,7 @@
 import type { MutableRefObject } from 'react';
 
 import type { CaptureTarget, MultipartUploadSession, MultipartUploadState } from './runtime';
+import { TAKE_RECORDING_LIMIT_SECONDS } from './utils';
 
 type PendingVersionAction = 'submit' | 'rerecord' | null;
 
@@ -26,7 +27,7 @@ interface UseTakeBeginRecordingParams {
   setTimeLeft: (value: number | ((prev: number) => number)) => void;
   setSetupError: (value: string) => void;
   setStage: (value: 'recording' | 'interview') => void;
-  setTransitionLabel: (value: string) => void;
+  clearVersionPersistKind: () => void;
   clearRecordingArtifacts: () => void;
   resetInterviewSetup: (message: string) => void;
   startMultipartUploadSession: (
@@ -69,7 +70,7 @@ export function useTakeBeginRecording({
   setTimeLeft,
   setSetupError,
   setStage,
-  setTransitionLabel,
+  clearVersionPersistKind,
   clearRecordingArtifacts,
   resetInterviewSetup,
   startMultipartUploadSession,
@@ -163,10 +164,10 @@ export function useTakeBeginRecording({
     startBrowserTranscript();
 
     setRecording(true);
-    setTimeLeft(240);
+    setTimeLeft(TAKE_RECORDING_LIMIT_SECONDS);
     setSetupError('');
     setStage('recording');
-    setTransitionLabel('');
+    clearVersionPersistKind();
 
     timerRef.current = setInterval(() => {
       setTimeLeft((current) => {

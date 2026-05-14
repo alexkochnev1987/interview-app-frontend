@@ -2,6 +2,7 @@ import type { TakeInterviewData } from '@/lib/api';
 import type { TakeStage } from '@/components/take/types';
 
 export type PendingVersionAction = 'submit' | 'rerecord' | null;
+export type VersionPersistKind = Exclude<PendingVersionAction, null>;
 type LoadMode = 'initial' | 'resume';
 
 export function stageAfterInterviewLoad(
@@ -21,12 +22,6 @@ export function canRequestVersionAction(params: {
 }) {
   const { action, uploading, recording } = params;
   return Boolean(action && !uploading && recording);
-}
-
-export function transitionLabelForAction(action: Exclude<PendingVersionAction, null>) {
-  return action === 'submit'
-    ? 'Submitting answer and moving to the next question...'
-    : 'Saving this version and starting a new recording...';
 }
 
 export function progressValueForStage(params: {

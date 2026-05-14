@@ -52,27 +52,25 @@ export function TakePermissionStatusList({
   permissionTone,
 }: TakePermissionStatusListProps) {
   return (
-    <TakePanel tone="white" radius="lg" padding="lg">
-      <Stack gap={3}>
-        <PermissionRow
-          title="Camera and microphone"
-          description="Required before recording can begin."
-          status={cameraStatus}
-          permissionLabel={permissionLabel}
-          permissionTone={permissionTone}
-        />
-        <PermissionRow
-          title="Entire screen share"
-          description={
-            screenSurface === 'monitor'
-              ? 'Entire screen is confirmed and ready.'
-              : 'In the share picker, choose Entire screen / Screen.'
-          }
-          status={screenStatus}
-          permissionLabel={permissionLabel}
-          permissionTone={permissionTone}
-        />
-      </Stack>
-    </TakePanel>
+    <Stack gap={4} width="full">
+      <PermissionRow
+        title="Camera and microphone"
+        description="Required before recording can begin."
+        status={cameraStatus}
+        permissionLabel={permissionLabel}
+        permissionTone={permissionTone}
+      />
+      <PermissionRow
+        title="Entire screen share"
+        description={
+          screenSurface === 'monitor'
+            ? 'Entire screen is confirmed and ready.'
+            : 'In the share picker, choose Entire screen / Screen.'
+        }
+        status={screenStatus}
+        permissionLabel={permissionLabel}
+        permissionTone={permissionTone}
+      />
+    </Stack>
   );
 }

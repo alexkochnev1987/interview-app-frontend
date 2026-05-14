@@ -1,29 +1,43 @@
 import type { RefObject } from 'react';
-import { RecordingCameraVideo, RecordingScreenVideo } from '@/components/ui/recording-preview';
+
+import { RecordingAiInterviewerSessionLayout } from '@/components/ui/recording-preview';
+import type { TakeStage } from '@/components/take/types';
+import type { InterviewerPresence } from '@/features/take/use-take-question-tts';
 import { TakeVideoContainer } from './take-video-container';
 import { TakeRecordingTimer } from './take-recording-timer';
 
 interface TakeRecordingPreviewProps {
-  isRecording: boolean;
+  stage: TakeStage;
   timeLeft: number;
   formatTime: (seconds: number) => string;
   videoRef: RefObject<HTMLVideoElement | null>;
   screenVideoRef: RefObject<HTMLVideoElement | null>;
+  micOn: boolean;
+  interviewerPresence: InterviewerPresence;
 }
 
 export function TakeRecordingPreview({
-  isRecording,
+  stage,
   timeLeft,
   formatTime,
   videoRef,
   screenVideoRef,
+  micOn,
+  interviewerPresence,
 }: TakeRecordingPreviewProps) {
   return (
-    <TakeVideoContainer>
-      <RecordingScreenVideo videoRef={screenVideoRef} />
-      <RecordingCameraVideo videoRef={videoRef} />
-
-      {isRecording ? <TakeRecordingTimer timeLabel={formatTime(timeLeft)} /> : null}
+    <TakeVideoContainer layout="grow">
+      <RecordingAiInterviewerSessionLayout
+        cameraVideoRef={videoRef}
+        screenVideoRef={screenVideoRef}
+        micOn={micOn}
+        interviewerPresence={interviewerPresence}
+        timerOverlay={
+          stage === 'recording' || stage === 'transition' ? (
+            <TakeRecordingTimer timeLabel={formatTime(timeLeft)} />
+          ) : null
+        }
+      />
     </TakeVideoContainer>
   );
 }

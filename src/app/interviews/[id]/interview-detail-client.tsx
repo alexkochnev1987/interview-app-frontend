@@ -623,6 +623,7 @@ export default function InterviewDetailClient({
                     <Button
                       type="button"
                       variant="gradient"
+                      shape="pill"
                       size="sm"
                       onClick={handleCopyCandidateLink}
                       disabled={
