@@ -28,7 +28,6 @@ const gridVariants = cva('grid', {
       'split-84-116': 'grid-cols-1 xl:grid-cols-[0.84fr_1.16fr]',
       'split-72-128': 'grid-cols-1 xl:grid-cols-[0.72fr_1.28fr]',
       'aside-22': 'grid-cols-1 xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-start',
-      'aside-22-left': 'grid-cols-1 xl:grid-cols-[20rem_minmax(0,1fr)] xl:items-start',
       'login-shell': 'grid-cols-1 lg:grid-cols-[1.1fr_420px] lg:items-center',
       'editor-2': 'grid-cols-1 xl:grid-cols-2',
       'identity-4': 'grid-cols-1 lg:grid-cols-2 xl:grid-cols-4',

@@ -82,7 +82,6 @@ function mockQuestion(
     createdAt: now,
     updatedAt: now,
     deleted: false,
-    usageCount: 0,
   }
 }
 

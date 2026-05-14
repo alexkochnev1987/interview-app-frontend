@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Suspense, useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowRight, BriefcaseBusiness, CirclePlus, Sparkles, UserRound } from 'lucide-react'
 
@@ -10,9 +10,11 @@ import { EyebrowLabel } from '@/components/ui/eyebrow-label'
 import { FormField } from '@/components/ui/form-field'
 import { HeroLead, HeroTitle } from '@/components/ui/hero-text'
 import { IconAffix } from '@/components/ui/icon-affix'
+import { MetricPanel } from '@/components/ui/metric-panel'
 import { SelectableTile } from '@/components/ui/selectable-tile'
 import { StatusPill } from '@/components/ui/status-pill'
 import { EmptyStateCard, LoadingStateCard } from '@/components/ui/state-card'
+import { SurfaceTile } from '@/components/ui/surface-tile'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -23,74 +25,50 @@ import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { Input } from '@/components/ui/input'
 import { BodyText, SectionHeading } from '@/components/ui/text'
-import {
-  buildActiveFilterChips,
-  QuestionFacetSidebar,
-  QuestionPagination,
-  QuestionPickerToolbar,
-  QuestionSelectedPanel,
-  useQuestionFacets,
-  useQuestionsQuery,
-} from '@/components/questions/picker'
-import { createInterview, type Question } from '@/lib/api'
+import { createInterview, fetchQuestions, type Question } from '@/lib/api'
 import { runMutation } from '@/lib/run-mutation'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 export default function NewInterviewPage() {
-  return (
-    <Suspense fallback={<PageShell><LoadingStateCard label="Loading interview setup..." /></PageShell>}>
-      <NewInterviewPageContent />
-    </Suspense>
-  )
-}
-
-function NewInterviewPageContent() {
   const router = useRouter()
   const [candidateName, setCandidateName] = useState('')
   const [position, setPosition] = useState('')
-  const [selectedById, setSelectedById] = useState<Map<string, Question>>(new Map())
+  const [questions, setQuestions] = useState<Question[]>([])
+  const [selectedQuestionIds, setSelectedQuestionIds] = useState<string[]>([])
+  const [loadingQuestions, setLoadingQuestions] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const query = useQuestionsQuery({ syncUrl: false, lockStatus: 'active' })
-  const facetsResult = useQuestionFacets(query.state, query.debouncedQ)
-  const facets = facetsResult.facets
+  useEffect(() => {
+    let cancelled = false
 
-  const activeChips = buildActiveFilterChips(
-    query.state,
-    {
-      setDifficulty: query.setDifficulty,
-      setCategory: query.setCategory,
-      setSubcategory: query.setSubcategory,
-      setRole: query.setRole,
-      setTags: query.setTags,
-      setStatus: query.setStatus,
-    },
-    { showStatusFilter: false },
-  )
-
-  const selectedCount = selectedById.size
-  const selectedQuestions = Array.from(selectedById.values())
-
-  function toggleQuestion(question: Question) {
-    setSelectedById((prev) => {
-      const next = new Map(prev)
-      if (next.has(question.id)) {
-        next.delete(question.id)
-      } else {
-        next.set(question.id, question)
+    async function loadQuestions() {
+      try {
+        const data = await fetchQuestions()
+        if (!cancelled) {
+          setQuestions(data)
+          setLoadingQuestions(false)
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : 'Failed to load questions.')
+          setLoadingQuestions(false)
+        }
       }
-      return next
-    })
-  }
+    }
 
-  function removeSelected(id: string) {
-    setSelectedById((prev) => {
-      if (!prev.has(id)) return prev
-      const next = new Map(prev)
-      next.delete(id)
-      return next
-    })
+    loadQuestions()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  function toggleQuestion(id: string) {
+    setSelectedQuestionIds((current) =>
+      current.includes(id)
+        ? current.filter((questionId) => questionId !== id)
+        : [...current, id]
+    )
   }
 
   async function handleSubmit(event: FormEvent) {
@@ -105,7 +83,7 @@ function NewInterviewPageContent() {
       setError('Position is required.')
       return
     }
-    if (selectedCount === 0) {
+    if (selectedQuestionIds.length === 0) {
       setError('Select at least one question.')
       return
     }
@@ -118,7 +96,7 @@ function NewInterviewPageContent() {
           createInterview({
             candidateName: candidateName.trim(),
             position: position.trim(),
-            questionIds: Array.from(selectedById.keys()),
+            questionIds: selectedQuestionIds,
           }),
         {
           successMessage: TOAST_MESSAGES.interview.createSuccess,
@@ -133,46 +111,59 @@ function NewInterviewPageContent() {
     }
   }
 
-  const showEmptyState = !query.loading && query.items.length === 0
-  const allEmpty =
-    showEmptyState &&
-    query.total === 0 &&
-    query.state.q === '' &&
-    !query.state.difficulty &&
-    !query.state.category &&
-    !query.state.subcategory &&
-    !query.state.role &&
-    query.state.tags.length === 0
+  const selectedQuestions = questions.filter((question) => selectedQuestionIds.includes(question.id))
 
   return (
     <PageShell>
-      <Card variant="floating" size="lg">
-        <CardContent spacing="xl">
-          <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
-            Create Interview Flow
-          </EyebrowBadge>
-          <Stack gap={3}>
-            <HeroTitle>
-              Assemble the candidate packet before you send the interview link.
-            </HeroTitle>
-            <HeroLead width="prose">
-              Capture the role, choose only the questions that matter, and keep the decision
-              criteria explicit before the recording session starts.
-            </HeroLead>
-          </Stack>
-          <Inline gap={3} wrap="wrap">
-            <Button asChild variant="gradient">
-              <Link href="/questions/new">
-                <CirclePlus className="size-4" />
-                Create Question
-              </Link>
-            </Button>
-            <Button asChild variant="outline-pill" shape="pill">
-              <Link href="/questions">Open Question Bank</Link>
-            </Button>
-          </Inline>
-        </CardContent>
-      </Card>
+      <Grid as="section" columns="split-12-8" gap={6}>
+        <Card variant="floating" size="lg">
+          <CardContent spacing="xl">
+            <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
+              Create Interview Flow
+            </EyebrowBadge>
+            <Stack gap={3}>
+              <HeroTitle>
+                Assemble the candidate packet before you send the interview link.
+              </HeroTitle>
+              <HeroLead width="prose">
+                Capture the role, choose only the questions that matter, and keep the decision
+                criteria explicit before the recording session starts.
+              </HeroLead>
+            </Stack>
+            <Inline gap={3} wrap="wrap">
+              <Button asChild variant="gradient">
+                <Link href="/questions/new">
+                  <CirclePlus className="size-4" />
+                  Create Question
+                </Link>
+              </Button>
+              <Button asChild variant="outline-pill" shape="pill">
+                <Link href="/questions">Open Question Bank</Link>
+              </Button>
+            </Inline>
+          </CardContent>
+        </Card>
+
+        <Card variant="tinted">
+          <CardHeader spacing="xs">
+            <CardTitle size="lg">Selection summary</CardTitle>
+            <CardDescription>
+              Keep the prompt set tight. Dense but intentional interviews score better than generic
+              long-form sessions.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Grid columns="metrics-2-md" gap={4}>
+              <MetricPanel tone="elevated" label="Selected" value={selectedQuestionIds.length} />
+              <MetricPanel
+                tone="elevated"
+                label="Available"
+                value={loadingQuestions ? '...' : questions.length}
+              />
+            </Grid>
+          </CardContent>
+        </Card>
+      </Grid>
 
       {error ? (
         <Alert variant="danger">
@@ -182,84 +173,56 @@ function NewInterviewPageContent() {
       ) : null}
 
       <form onSubmit={handleSubmit}>
-        <Grid columns="aside-22-left" gap={6}>
-          <Stack gap={4}>
-            <Card variant="surface">
-              <CardHeader spacing="xs">
-                <CardTitle size="lg">Candidate brief</CardTitle>
-                <CardDescription>
-                  This metadata will anchor the scoring context once answers arrive.
-                </CardDescription>
-              </CardHeader>
-              <CardContent spacing="lg">
-                <FormField htmlFor="candidateName" label="Candidate name">
-                  <IconAffix icon={<UserRound className="size-4" />}>
-                    <Input
-                      id="candidateName"
-                      iconAffix="leading"
-                      value={candidateName}
-                      onChange={(event) => setCandidateName(event.target.value)}
-                      placeholder="e.g. Jane Doe"
-                      disabled={submitting}
-                    />
-                  </IconAffix>
-                </FormField>
+        <Grid columns="split-72-128" gap={6}>
+          <Card variant="surface">
+            <CardHeader spacing="xs">
+              <CardTitle size="lg">Candidate brief</CardTitle>
+              <CardDescription>
+                This metadata will anchor the scoring context once answers arrive.
+              </CardDescription>
+            </CardHeader>
+            <CardContent spacing="lg">
+              <FormField htmlFor="candidateName" label="Candidate name">
+                <IconAffix icon={<UserRound className="size-4" />}>
+                  <Input
+                    id="candidateName"
+                    iconAffix="leading"
+                    value={candidateName}
+                    onChange={(event) => setCandidateName(event.target.value)}
+                    placeholder="e.g. Jane Doe"
+                    disabled={submitting}
+                  />
+                </IconAffix>
+              </FormField>
 
-                <FormField htmlFor="position" label="Position">
-                  <IconAffix icon={<BriefcaseBusiness className="size-4" />}>
-                    <Input
-                      id="position"
-                      iconAffix="leading"
-                      value={position}
-                      onChange={(event) => setPosition(event.target.value)}
-                      placeholder="e.g. Senior Frontend Engineer"
-                      disabled={submitting}
-                    />
-                  </IconAffix>
-                </FormField>
+              <FormField htmlFor="position" label="Position">
+                <IconAffix icon={<BriefcaseBusiness className="size-4" />}>
+                  <Input
+                    id="position"
+                    iconAffix="leading"
+                    value={position}
+                    onChange={(event) => setPosition(event.target.value)}
+                    placeholder="e.g. Senior Frontend Engineer"
+                    disabled={submitting}
+                  />
+                </IconAffix>
+              </FormField>
 
-                <Button
-                  type="submit"
-                  variant="gradient"
-                  width="full"
-                  disabled={submitting || selectedCount === 0}
-                >
-                  {submitting ? 'Creating...' : `Create Interview${selectedCount > 0 ? ` (${selectedCount})` : ''}`}
-                  <ArrowRight className="size-4" />
-                </Button>
-              </CardContent>
-            </Card>
-
-            <QuestionFacetSidebar
-              difficulties={facets.difficulties}
-              categories={facets.categories}
-              subcategories={facets.subcategories}
-              roles={facets.roles}
-              tags={facets.tags}
-              selected={{
-                difficulty: query.state.difficulty,
-                category: query.state.category,
-                subcategory: query.state.subcategory,
-                role: query.state.role,
-                tags: query.state.tags,
-                status: query.state.status,
-              }}
-              onDifficultyChange={query.setDifficulty}
-              onCategoryChange={query.setCategory}
-              onSubcategoryChange={query.setSubcategory}
-              onRoleChange={query.setRole}
-              onTagsChange={query.setTags}
-              onStatusChange={query.setStatus}
-              onReset={query.reset}
-              canReset={query.canReset}
-              showStatusFilter={false}
-              loading={facetsResult.loading}
-              error={facetsResult.error}
-              onRetry={facetsResult.refetch}
-            />
-
-            <QuestionSelectedPanel selected={selectedQuestions} onRemove={removeSelected} />
-          </Stack>
+              <MetricPanel
+                label="Ready to send"
+                description="Once the interview is created, the candidate flow can start uploading answers immediately against this curated question packet."
+              />
+              <Button
+                type="submit"
+                variant="gradient"
+                width="full"
+                disabled={submitting || loadingQuestions || questions.length === 0}
+              >
+                {submitting ? 'Creating...' : 'Create Interview'}
+                <ArrowRight className="size-4" />
+              </Button>
+            </CardContent>
+          </Card>
 
           <Card variant="surface">
             <CardHeader spacing="xs">
@@ -267,76 +230,36 @@ function NewInterviewPageContent() {
                 <Stack gap={1.5}>
                   <CardTitle size="lg">Question selection</CardTitle>
                   <CardDescription>
-                    Pick the prompts that actually differentiate the candidate. Your selection is
-                    kept even when filters hide a question from the list.
+                    Pick the prompts that actually differentiate the candidate.
                   </CardDescription>
                 </Stack>
-                <StatusPill tone="neutral">{selectedCount} selected</StatusPill>
+                <StatusPill tone="neutral">{selectedQuestionIds.length} selected</StatusPill>
               </Inline>
             </CardHeader>
             <CardContent spacing="md">
-              <QuestionPickerToolbar
-                q={query.state.q}
-                onQChange={query.setQ}
-                sortBy={query.state.sortBy}
-                sortOrder={query.state.sortOrder}
-                onSortChange={query.setSort}
-                activeChips={activeChips}
-                resultCount={query.total}
-                loading={query.loading}
-              />
-
-              {query.error ? (
-                <Alert variant="danger">
-                  <AlertTitle>Question feed unavailable</AlertTitle>
-                  <AlertDescription>
-                    {query.error}
-                    <Button
-                      type="button"
-                      variant="outline-pill"
-                      shape="pill"
-                      size="sm"
-                      onClick={query.refetch}
-                    >
-                      Retry
-                    </Button>
-                  </AlertDescription>
-                </Alert>
-              ) : null}
-
-              {query.loading && query.items.length === 0 ? (
+              {loadingQuestions ? (
                 <LoadingStateCard tone="ghost" label="Loading question bank..." />
-              ) : showEmptyState ? (
+              ) : questions.length === 0 ? (
                 <EmptyStateCard
                   tone="ghost"
-                  title={allEmpty ? 'No saved questions yet' : 'No questions match the current filters'}
-                  description={
-                    allEmpty
-                      ? 'Create the first reusable prompt before you assemble an interview packet.'
-                      : 'Try clearing some filters or searching with a different term.'
-                  }
+                  title="No saved questions yet"
+                  description="Create the first reusable prompt before you assemble an interview packet."
                   action={
-                    allEmpty ? (
-                      <Button asChild variant="gradient">
-                        <Link href="/questions/new">Create your first question</Link>
-                      </Button>
-                    ) : (
-                      <Button type="button" variant="outline-pill" shape="pill" onClick={query.reset}>
-                        Reset filters
-                      </Button>
-                    )
+                    <Button asChild variant="gradient">
+                      <Link href="/questions/new">Create your first question</Link>
+                    </Button>
                   }
                 />
               ) : (
                 <Stack gap={3}>
-                  {query.items.map((question) => {
-                    const selected = selectedById.has(question.id)
+                  {questions.map((question) => {
+                    const selected = selectedQuestionIds.includes(question.id)
 
                     return (
                       <SelectableTile key={question.id} selected={selected}>
                         <Checkbox
                           checked={selected}
-                          onCheckedChange={() => toggleQuestion(question)}
+                          onCheckedChange={() => toggleQuestion(question.id)}
                           disabled={submitting}
                           align="top"
                         />
@@ -349,11 +272,6 @@ function NewInterviewPageContent() {
                                 {question.category}
                               </StatusPill>
                             ) : null}
-                            {question.subcategory ? (
-                              <StatusPill tone="neutral" casing="chip">
-                                {question.subcategory}
-                              </StatusPill>
-                            ) : null}
                           </Inline>
 
                           <Stack gap={1.5}>
@@ -362,7 +280,7 @@ function NewInterviewPageContent() {
                             </SectionHeading>
                             <BodyText size="sm">
                               {question.role ? `${question.role} · ` : ''}
-                              used {question.usageCount}× · weight {question.weight}
+                              weight {question.weight}
                             </BodyText>
                           </Stack>
 
@@ -391,13 +309,16 @@ function NewInterviewPageContent() {
                 </Stack>
               )}
 
-              <QuestionPagination
-                page={query.state.page}
-                totalPages={query.totalPages}
-                total={query.total}
-                limit={query.state.limit}
-                onPageChange={query.setPage}
-              />
+              {selectedQuestions.length > 0 ? (
+                <SurfaceTile>
+                  <Stack gap={2}>
+                    <EyebrowLabel>Current packet</EyebrowLabel>
+                    <BodyText size="sm">
+                      {selectedQuestions.map((question) => question.questionText).join(' · ')}
+                    </BodyText>
+                  </Stack>
+                </SurfaceTile>
+              ) : null}
             </CardContent>
           </Card>
         </Grid>

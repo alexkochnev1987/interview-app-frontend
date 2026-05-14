@@ -21,16 +21,10 @@ const iconVariants = cva('shrink-0', {
 interface IconProps extends VariantProps<typeof iconVariants> {
   children: ReactElement<{ className?: string }>
   className?: string
-  spinning?: boolean
 }
 
-export function Icon({ children, size, className, spinning }: IconProps) {
+export function Icon({ children, size, className }: IconProps) {
   if (!isValidElement<{ className?: string }>(children)) return children
-  const merged = cn(
-    iconVariants({ size }),
-    spinning ? 'animate-spin' : undefined,
-    children.props.className,
-    className,
-  )
+  const merged = cn(iconVariants({ size }), children.props.className, className)
   return cloneElement(children, { className: merged })
 }

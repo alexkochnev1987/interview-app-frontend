@@ -1,72 +1,92 @@
 'use client'
 
 import Link from 'next/link'
-import { Suspense, useState } from 'react'
-import { LoaderCircle, Search, Trash2 } from 'lucide-react'
+import { useDeferredValue, useEffect, useState } from 'react'
+import { Search } from 'lucide-react'
 
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { EmptyStateCard, LoadingStateCard } from '@/components/ui/state-card'
 import { CardGrid } from '@/components/ui/layout/card-grid'
-import { Grid } from '@/components/ui/layout/grid'
-import { Inline } from '@/components/ui/layout/inline'
-import { Stack } from '@/components/ui/layout/stack'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { BulkDeleteResultAlerts } from '@/components/questions/library/bulk-delete-result-alerts'
 import { QuestionCard } from '@/components/questions/library/question-card'
 import { QuestionsLibraryHeader } from '@/components/questions/library/questions-library-header'
 import {
-  buildActiveFilterChips,
-  QuestionFacetSidebar,
-  QuestionPagination,
-  QuestionPickerToolbar,
-  useQuestionFacets,
-  useQuestionsQuery,
-} from '@/components/questions/picker'
+  QuestionsLibraryToolbar,
+  type DifficultyFilter,
+} from '@/components/questions/library/questions-library-toolbar'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { Icon } from '@/components/ui/icon'
-import { deleteQuestionsBulk, type BulkDeleteResult } from '@/lib/api'
+import {
+  deleteQuestionsBulk,
+  fetchQuestions,
+  type BulkDeleteResult,
+  type Question,
+} from '@/lib/api'
 import { useAuth } from '@/lib/auth-context'
 import { runMutation } from '@/lib/run-mutation'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
-export default function QuestionsPage() {
-  return (
-    <Suspense fallback={<PageShell><LoadingStateCard label="Loading questions..." /></PageShell>}>
-      <QuestionsPageContent />
-    </Suspense>
-  )
+function matchesQuery(question: Question, normalizedQuery: string): boolean {
+  if (!normalizedQuery) return true
+  const haystack = [
+    question.questionText,
+    question.role ?? '',
+    question.category ?? '',
+    question.subcategory ?? '',
+    question.tags.join(' '),
+    question.expectedConcepts.map((item) => item.label).join(' '),
+    question.redFlags.map((item) => item.label).join(' '),
+  ]
+    .join(' ')
+    .toLowerCase()
+  return haystack.includes(normalizedQuery)
 }
 
-function QuestionsPageContent() {
-  const { user } = useAuth()
-  const isSuperAdmin = user?.role === 'super_admin'
-
-  const query = useQuestionsQuery({
-    syncUrl: true,
-    lockStatus: isSuperAdmin ? undefined : 'active',
-  })
-  const facetsResult = useQuestionFacets(query.state, query.debouncedQ)
-  const facets = facetsResult.facets
-
-  const activeChips = buildActiveFilterChips(
-    query.state,
-    {
-      setDifficulty: query.setDifficulty,
-      setCategory: query.setCategory,
-      setSubcategory: query.setSubcategory,
-      setRole: query.setRole,
-      setTags: query.setTags,
-      setStatus: query.setStatus,
-    },
-    { showStatusFilter: isSuperAdmin },
-  )
-
+export default function QuestionsPage() {
+  const [questions, setQuestions] = useState<Question[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [query, setQuery] = useState('')
+  const [difficulty, setDifficulty] = useState<DifficultyFilter>('all')
+  const deferredQuery = useDeferredValue(query)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [bulkConfirmOpen, setBulkConfirmOpen] = useState(false)
   const [bulkDeleting, setBulkDeleting] = useState(false)
   const [bulkResult, setBulkResult] = useState<BulkDeleteResult | null>(null)
   const [bulkError, setBulkError] = useState<string | null>(null)
+  const { user } = useAuth()
+  const canDelete = user?.role === 'super_admin'
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function load() {
+      try {
+        const data = await fetchQuestions()
+        if (!cancelled) {
+          setQuestions(data)
+          setLoading(false)
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : 'Failed to load questions.')
+          setLoading(false)
+        }
+      }
+    }
+
+    load()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const normalizedQuery = deferredQuery.trim().toLowerCase()
+  const filteredQuestions = questions.filter((question) => {
+    if (difficulty !== 'all' && question.difficulty !== difficulty) return false
+    return matchesQuery(question, normalizedQuery)
+  })
 
   function toggleSelected(id: string) {
     setSelectedIds((prev) => {
@@ -100,13 +120,13 @@ function QuestionsPageContent() {
           errorMessage: TOAST_MESSAGES.question.bulkDeleteError,
         }
       )
+      const fresh = await fetchQuestions()
+      setQuestions(fresh)
       setSelectedIds(new Set())
       setBulkConfirmOpen(false)
       setBulkResult(result)
-      query.refetch()
-      facetsResult.refetch()
-    } catch (error) {
-      setBulkError(error instanceof Error ? error.message : 'Bulk delete failed.')
+    } catch {
+      setBulkError(null)
       setBulkConfirmOpen(false)
     } finally {
       setBulkDeleting(false)
@@ -114,158 +134,75 @@ function QuestionsPageContent() {
   }
 
   const selectedCount = selectedIds.size
-  const showEmptyState = !query.loading && query.items.length === 0
-  const allEmpty =
-    showEmptyState &&
-    query.total === 0 &&
-    query.state.q === '' &&
-    !query.state.difficulty &&
-    !query.state.category &&
-    !query.state.subcategory &&
-    !query.state.role &&
-    query.state.tags.length === 0 &&
-    query.state.status === 'active'
 
   return (
     <PageShell>
       <QuestionsLibraryHeader
-        loading={query.loading}
-        totalCount={query.total}
-        visibleCount={query.items.length}
+        loading={loading}
+        totalCount={questions.length}
+        visibleCount={filteredQuestions.length}
       />
 
-      <Grid columns="aside-22-left" gap={6}>
-        <QuestionFacetSidebar
-          difficulties={facets.difficulties}
-          categories={facets.categories}
-          subcategories={facets.subcategories}
-          roles={facets.roles}
-          tags={facets.tags}
-          selected={{
-            difficulty: query.state.difficulty,
-            category: query.state.category,
-            subcategory: query.state.subcategory,
-            role: query.state.role,
-            tags: query.state.tags,
-            status: query.state.status,
-          }}
-          onDifficultyChange={query.setDifficulty}
-          onCategoryChange={query.setCategory}
-          onSubcategoryChange={query.setSubcategory}
-          onRoleChange={query.setRole}
-          onTagsChange={query.setTags}
-          onStatusChange={query.setStatus}
-          onReset={query.reset}
-          canReset={query.canReset}
-          showStatusFilter={isSuperAdmin}
-          loading={facetsResult.loading}
-          error={facetsResult.error}
-          onRetry={facetsResult.refetch}
+      {error && (
+        <Alert variant="danger">
+          <AlertTitle>Question feed unavailable</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      <QuestionsLibraryToolbar
+        query={query}
+        onQueryChange={setQuery}
+        difficulty={difficulty}
+        onDifficultyChange={setDifficulty}
+        canBulkDelete={canDelete}
+        selectedCount={selectedCount}
+        bulkDeleting={bulkDeleting}
+        onRequestBulkDelete={() => {
+          setBulkError(null)
+          setBulkResult(null)
+          setBulkConfirmOpen(true)
+        }}
+      />
+
+      {canDelete && (
+        <BulkDeleteResultAlerts result={bulkResult} error={bulkError} />
+      )}
+
+      {loading ? (
+        <LoadingStateCard label="Loading questions..." />
+      ) : filteredQuestions.length === 0 ? (
+        <EmptyStateCard
+          icon={<Search className="size-5" />}
+          title={
+            questions.length === 0
+              ? 'No saved questions yet'
+              : 'No questions match the current filters'
+          }
+          description={
+            questions.length === 0
+              ? 'Create your first reusable prompt and start building a structured question bank.'
+              : 'Try widening the search or reset the difficulty filter to bring more prompts back in.'
+          }
+          action={
+            <Button asChild variant="gradient">
+              <Link href="/questions/new">Create Question</Link>
+            </Button>
+          }
         />
-
-        <Stack gap={4}>
-          {query.error ? (
-            <Alert variant="danger">
-              <AlertTitle>Question feed unavailable</AlertTitle>
-              <AlertDescription>
-                <Inline gap={3} align="center" wrap="wrap">
-                  <span>{query.error}</span>
-                  <Button type="button" variant="outline-pill" shape="pill" size="sm" onClick={query.refetch}>
-                    Retry
-                  </Button>
-                </Inline>
-              </AlertDescription>
-            </Alert>
-          ) : null}
-
-          <QuestionPickerToolbar
-            q={query.state.q}
-            onQChange={query.setQ}
-            sortBy={query.state.sortBy}
-            sortOrder={query.state.sortOrder}
-            onSortChange={query.setSort}
-            activeChips={activeChips}
-            resultCount={query.total}
-            loading={query.loading}
-            bulkActions={
-              isSuperAdmin ? (
-                <Button
-                  type="button"
-                  variant="destructive"
-                  shape="pill"
-                  size="xl"
-                  disabled={selectedCount === 0 || bulkDeleting}
-                  onClick={() => {
-                    setBulkError(null)
-                    setBulkResult(null)
-                    setBulkConfirmOpen(true)
-                  }}
-                >
-                  {bulkDeleting ? (
-                    <Icon size="md" spinning><LoaderCircle /></Icon>
-                  ) : (
-                    <Icon size="md"><Trash2 /></Icon>
-                  )}
-                  {bulkDeleting
-                    ? 'Deleting...'
-                    : selectedCount > 0
-                      ? `Delete selected (${selectedCount})`
-                      : 'Delete selected'}
-                </Button>
-              ) : null
-            }
-          />
-
-          {isSuperAdmin && (
-            <BulkDeleteResultAlerts result={bulkResult} error={bulkError} />
-          )}
-
-          {query.loading && query.items.length === 0 ? (
-            <LoadingStateCard label="Loading questions..." />
-          ) : showEmptyState ? (
-            <EmptyStateCard
-              icon={<Search className="size-5" />}
-              title={allEmpty ? 'No saved questions yet' : 'No questions match the current filters'}
-              description={
-                allEmpty
-                  ? 'Create your first reusable prompt and start building a structured question bank.'
-                  : 'Try widening the search, clearing a filter, or resetting back to defaults.'
-              }
-              action={
-                allEmpty ? (
-                  <Button asChild variant="gradient">
-                    <Link href="/questions/new">Create Question</Link>
-                  </Button>
-                ) : (
-                  <Button type="button" variant="outline-pill" shape="pill" onClick={query.reset}>
-                    Reset filters
-                  </Button>
-                )
-              }
+      ) : (
+        <CardGrid>
+          {filteredQuestions.map((question) => (
+            <QuestionCard
+              key={question.id}
+              question={question}
+              selectable={canDelete}
+              selected={selectedIds.has(question.id)}
+              onToggleSelected={toggleSelected}
             />
-          ) : (
-            <CardGrid>
-              {query.items.map((question) => (
-                <QuestionCard
-                  key={question.id}
-                  question={question}
-                  selectable={isSuperAdmin}
-                  selected={selectedIds.has(question.id)}
-                  onToggleSelected={toggleSelected}
-                />
-              ))}
-            </CardGrid>
-          )}
-
-          <QuestionPagination
-            page={query.state.page}
-            totalPages={query.totalPages}
-            total={query.total}
-            limit={query.state.limit}
-            onPageChange={query.setPage}
-          />
-        </Stack>
-      </Grid>
+          ))}
+        </CardGrid>
+      )}
 
       <ConfirmDialog
         open={bulkConfirmOpen}
