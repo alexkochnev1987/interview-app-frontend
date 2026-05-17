@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 
 import { Grid, Stack } from '@/components/ui/layout';
 import { Text } from '@/components/ui/text';
-import { TakePanel } from '@/components/take/take-panel';
+import { Panel } from '@/components/ui/panel';
 
 interface CapabilityCardProps {
   icon: LucideIcon;
@@ -33,7 +33,7 @@ const CAPABILITY_ITEMS: CapabilityCardProps[] = [
 
 function CapabilityCard({ icon: Icon, title, description }: CapabilityCardProps) {
   return (
-    <TakePanel radius="lg" padding="md">
+    <Panel radius="lg" padding="md">
       <Stack gap={2}>
         <Text as="span" variant="iconPrimary">
           <Icon size={20} strokeWidth={2} />
@@ -45,7 +45,7 @@ function CapabilityCard({ icon: Icon, title, description }: CapabilityCardProps)
           <Text variant="bodyMutedSm">{description}</Text>
         </Stack>
       </Stack>
-    </TakePanel>
+    </Panel>
   );
 }
 

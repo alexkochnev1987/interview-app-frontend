@@ -13,7 +13,7 @@ export const TAKE_MESSAGES = {
   uploadFailedFallback: 'Upload failed',
   submitFailedTitle: 'Submit failed',
   reconnectCameraAndScreen: 'Reconnect camera + screen',
-  rerecordAsNewVersion: 'Re-record as new version',
+  rerecordAsNewVersion: 'Retake',
   submitAndNext: 'Submit & Next',
   submitCompleteInterview: 'Submit & Finish',
   lobbyEnableCameraMicFirst: 'Enable your microphone and camera first, then share your entire screen.',
@@ -36,7 +36,7 @@ export const TAKE_MESSAGES = {
     "Next you'll activate your microphone and camera, preview yourself, then share your entire screen to join.",
 
   guidanceInterview:
-    'When you are recording, tap Submit once your answer feels complete or Re-record to save another version.',
+    'While recording, tap Submit when you are finished, or Retake to record another attempt.',
 
   guidanceBeforeRecording:
     'Your camera and full screen share stay on. Recording starts automatically when this question is ready.',
@@ -46,12 +46,26 @@ export const TAKE_MESSAGES = {
 
   sessionReadyLabel: 'Ready to record',
 
+  recordingSessionTitleInterview: 'Interview',
+
   recordingPrepLabel: 'Preparing session…',
   recordingStartingBusy: 'Starting recording…',
+
+  beforeUnloadLeaveInterview:
+    'If you reload or leave now, you will exit this interview and may lose your progress. Are you sure?',
 } as const;
+
+export function isLastInterviewQuestion(
+  currentQuestionIndex: number,
+  totalQuestions: number,
+): boolean {
+  if (totalQuestions <= 0) return false;
+  return currentQuestionIndex + 1 >= totalQuestions;
+}
 
 export function submitAnswerActionLabel(currentQuestionIndex: number, totalQuestions: number): string {
   if (totalQuestions <= 0) return TAKE_MESSAGES.submitAndNext;
-  const isLastQuestion = currentQuestionIndex + 1 >= totalQuestions;
-  return isLastQuestion ? TAKE_MESSAGES.submitCompleteInterview : TAKE_MESSAGES.submitAndNext;
+  return isLastInterviewQuestion(currentQuestionIndex, totalQuestions)
+    ? TAKE_MESSAGES.submitCompleteInterview
+    : TAKE_MESSAGES.submitAndNext;
 }

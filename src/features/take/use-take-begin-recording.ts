@@ -39,7 +39,7 @@ interface UseTakeBeginRecordingParams {
   abortMultipartUploads: () => Promise<void>;
   handleRecordedChunk: (target: CaptureTarget, blob: Blob) => void;
   onRecordersStopped: () => void;
-  startBrowserTranscript: () => void;
+  primeBrowserTranscriptForRecordingSession: () => void;
 }
 
 interface BeginRecordingInput {
@@ -79,7 +79,7 @@ export function useTakeBeginRecording({
   abortMultipartUploads,
   handleRecordedChunk,
   onRecordersStopped,
-  startBrowserTranscript,
+  primeBrowserTranscriptForRecordingSession,
 }: UseTakeBeginRecordingParams) {
   function handleRecorderStopped() {
     stoppedRecordersRef.current += 1;
@@ -161,7 +161,7 @@ export function useTakeBeginRecording({
     screenRecorderRef.current = screenRecorder;
     cameraRecorder.start(1000);
     screenRecorder.start(1000);
-    startBrowserTranscript();
+    primeBrowserTranscriptForRecordingSession();
 
     setRecording(true);
     setTimeLeft(TAKE_RECORDING_LIMIT_SECONDS);

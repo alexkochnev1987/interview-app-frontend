@@ -1,5 +1,5 @@
 import type { TakeStage } from '@/components/take/types';
-import { TakePanel } from '@/components/take/take-panel';
+import { Panel } from '@/components/ui/panel';
 import { Stack } from '@/components/ui/layout';
 import { Text } from '@/components/ui/text';
 import { TAKE_MESSAGES } from '@/features/take';
@@ -19,7 +19,7 @@ export function TakeRecordingGuidance({
   interviewerPresence,
 }: TakeRecordingGuidanceProps) {
   return (
-    <TakePanel>
+    <Panel>
       <Stack gap={3}>
         <Text as="span" variant="eyebrowLabel">
           Guidance
@@ -36,6 +36,6 @@ export function TakeRecordingGuidance({
               : TAKE_MESSAGES.guidanceInterview}
         </Text>
       </Stack>
-    </TakePanel>
+    </Panel>
   );
 }

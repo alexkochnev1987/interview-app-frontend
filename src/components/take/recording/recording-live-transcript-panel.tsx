@@ -1,5 +1,5 @@
 import { Stack } from '@/components/ui/layout';
-import { TakePanel } from '@/components/take/take-panel';
+import { Panel } from '@/components/ui/panel';
 import { Text } from '@/components/ui/text';
 import { TranscriptScrollArea } from '@/components/ui/transcript-scroll-area';
 import type { TakeStage } from '@/components/take/types';
@@ -20,7 +20,7 @@ export function LiveTranscriptPanel({
   stage,
 }: LiveTranscriptPanelProps) {
   return (
-    <TakePanel minHeight="transcript">
+    <Panel minHeight="transcript">
       <Stack gap={2} grow="fill" height="full">
         <Text as="span" variant="eyebrowLabel">
           Live transcript
@@ -53,6 +53,6 @@ export function LiveTranscriptPanel({
           </Stack>
         </TranscriptScrollArea>
       </Stack>
-    </TakePanel>
+    </Panel>
   );
 }

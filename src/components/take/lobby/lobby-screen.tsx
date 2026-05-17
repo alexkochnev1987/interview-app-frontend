@@ -1,3 +1,5 @@
+'use client';
+
 import type { ReactNode, RefObject } from 'react';
 
 import { Video } from 'lucide-react';
@@ -5,13 +7,18 @@ import { Video } from 'lucide-react';
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge';
 import type { StatusTone } from '@/components/ui/status-pill';
 import { SurfaceCard } from '@/components/ui/surface-card';
-import { RecordingPrepRoomFloatingControls, RecordingPreviewFrame, RecordingPreviewPlaceholder, RecordingScreenVideo } from '@/components/ui/recording-preview';
 import { PageMainViewport } from '@/components/layout/page-shell';
-import { TakeLobbyMediaToolbar } from '@/components/take/lobby/take-lobby-media-toolbar';
-import { TakePermissionStatusList } from '@/components/take/consent/take-permission-status-list';
+import {
+  LobbyPrepFloatingControls,
+  LobbyPreviewFrame,
+  LobbyPreviewPlaceholder,
+  LobbyScreenVideo,
+} from '@/components/ui/take';
+import { TakePermissionStatusList } from '../consent/consent-permission-status-list';
+import { TakeLobbyMediaToolbar } from './lobby-media-toolbar';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { CardContent, CardTitle } from '@/components/ui/card';
 import { Grid, Stack } from '@/components/ui/layout';
 import { Text } from '@/components/ui/text';
 import type { PermissionStatus } from '@/components/take/types';
@@ -59,14 +66,14 @@ export function TakeLobbyScreen({
   let previewOverlay: ReactNode = null;
   if (!permissionGranted) {
     previewOverlay = (
-      <RecordingPreviewPlaceholder
+      <LobbyPreviewPlaceholder
         title={TAKE_MESSAGES.lobbyPreviewMutedTitle}
         description={TAKE_MESSAGES.lobbyPreviewMutedLead}
       />
     );
   } else if (!lobbyCameraOn) {
     previewOverlay = (
-      <RecordingPreviewPlaceholder
+      <LobbyPreviewPlaceholder
         title={TAKE_MESSAGES.lobbyPreviewCameraOffTitle}
         description={TAKE_MESSAGES.lobbyPreviewCameraOffLead}
       />
@@ -75,19 +82,17 @@ export function TakeLobbyScreen({
 
   return (
     <PageMainViewport>
-      <SurfaceCard tone="glassFloat" grow="fill">
+      <SurfaceCard tone="glassFloat" grow="fill" size="lg">
         <CardContent layout="fill-column" spacing="xl">
-          <Grid columns="lobby-shell" gap={8} grow="fill">
+          <EyebrowBadge icon={<Video size={14} />}>{TAKE_MESSAGES.lobbyEyebrow}</EyebrowBadge>
+          <Grid columns="lobby-shell" gap={10} grow="fill">
             <Stack gap={5} width="full" height="full">
-              <EyebrowBadge icon={<Video size={14} />}>{TAKE_MESSAGES.lobbyEyebrow}</EyebrowBadge>
-
               <Text variant="heroDescription">{TAKE_MESSAGES.lobbyLead}</Text>
-
               <Stack grow="fill" width="full">
-                <RecordingPreviewFrame layout="growLobby">
-                  <RecordingScreenVideo videoRef={videoRef} />
+                <LobbyPreviewFrame>
+                  <LobbyScreenVideo videoRef={videoRef} />
                   {previewOverlay}
-                  <RecordingPrepRoomFloatingControls>
+                  <LobbyPrepFloatingControls>
                     <TakeLobbyMediaToolbar
                       setupBusy={setupBusy}
                       micOn={permissionGranted && lobbyMicOn}
@@ -97,53 +102,46 @@ export function TakeLobbyScreen({
                       onToggleCamera={onToggleCamera}
                       onScreenShare={onScreenShare}
                     />
-                  </RecordingPrepRoomFloatingControls>
-                </RecordingPreviewFrame>
+                  </LobbyPrepFloatingControls>
+                </LobbyPreviewFrame>
               </Stack>
             </Stack>
 
             <Stack width="full" placeSelf="start">
-              <SurfaceCard tone="glassSoftFlat" flexChild="contain">
-                <CardHeader>
-                  <Stack gap={2}>
-                    <CardTitle size="lg">Devices & screens</CardTitle>
-                    <Text variant="bodyMutedSm">{TAKE_MESSAGES.lobbyDevicesHelp}</Text>
-                  </Stack>
-                </CardHeader>
+              <Stack gap={2}>
+                <CardTitle size="lg">Devices & screens</CardTitle>
+                <Text variant="bodyMutedSm">{TAKE_MESSAGES.lobbyDevicesHelp}</Text>
+              </Stack>
+              <Stack gap={5}>
+                <TakePermissionStatusList
+                  cameraStatus={cameraStatus}
+                  screenStatus={screenStatus}
+                  screenSurface={screenSurface}
+                  permissionLabel={permissionLabel}
+                  permissionTone={permissionTone}
+                />
 
-                <CardContent spacing="lg">
-                  <Stack gap={5}>
-                    <TakePermissionStatusList
-                      cameraStatus={cameraStatus}
-                      screenStatus={screenStatus}
-                      screenSurface={screenSurface}
-                      permissionLabel={permissionLabel}
-                      permissionTone={permissionTone}
-                    />
+                {setupError ? (
+                  <Alert variant="destructive">
+                    <AlertTitle>Could not finish setup</AlertTitle>
+                    <AlertDescription>{setupError}</AlertDescription>
+                  </Alert>
+                ) : null}
 
-                    {setupError ? (
-                      <Alert variant="destructive">
-                        <AlertTitle>Could not finish setup</AlertTitle>
-                        <AlertDescription>{setupError}</AlertDescription>
-                      </Alert>
-                    ) : null}
-
-                    <Stack width="full">
-                      <Button
-                        type="button"
-                        disabled={!lobbyJoinReady || setupBusy}
-                        variant="gradient"
-                        size="2xl"
-                        shape="rounded"
-                        width="full"
-                        onClick={onJoin}
-                      >
-                        {joinLabel}
-                      </Button>
-                    </Stack>
-                  </Stack>
-                </CardContent>
-              </SurfaceCard>
+                <Stack width="full">
+                  <Button
+                    type="button"
+                    disabled={!lobbyJoinReady || setupBusy}
+                    variant="gradient"
+                    size="2xl"
+                    shape="rounded"
+                    width="full"
+                    onClick={onJoin}
+                  >
+                    {joinLabel}
+                  </Button>
+                </Stack>
+              </Stack>
             </Stack>
           </Grid>
         </CardContent>

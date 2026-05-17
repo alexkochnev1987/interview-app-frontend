@@ -24,11 +24,11 @@ export function TakeLobbyMediaToolbar({
   onScreenShare,
 }: TakeLobbyMediaToolbarProps) {
   return (
-    <Inline justify="center" gap={4}>
+    <Inline justify="center" gap={3}>
       <Button
         type="button"
         variant={micOn ? 'secondary' : 'outline'}
-        size="icon-xl"
+        size="icon-prep-room"
         shape="pill"
         disabled={setupBusy}
         aria-pressed={micOn}
@@ -40,7 +40,7 @@ export function TakeLobbyMediaToolbar({
       <Button
         type="button"
         variant={cameraOn ? 'secondary' : 'outline'}
-        size="icon-xl"
+        size="icon-prep-room"
         shape="pill"
         disabled={setupBusy}
         aria-pressed={cameraOn}
@@ -52,7 +52,7 @@ export function TakeLobbyMediaToolbar({
       <Button
         type="button"
         variant={screenShareReady ? 'secondary' : 'outline'}
-        size="icon-xl"
+        size="icon-prep-room"
         shape="pill"
         disabled={setupBusy}
         aria-pressed={screenShareReady}

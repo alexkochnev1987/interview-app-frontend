@@ -9,6 +9,7 @@ const PROVIDER = 'browser-web-speech' as const;
 const DEFAULT_LANGUAGE = 'en-US';
 const MAX_AUTO_RESTARTS = 3;
 const DEFAULT_STOP_TIMEOUT_MS = 700;
+const RESTART_RECOGNITION_AFTER_SYNTH_MS = 275;
 
 type StopOptions = {
   finalize?: boolean;
@@ -55,6 +56,9 @@ export function useBrowserTranscript() {
   const finalTranscriptRef = useRef('');
   const isSessionActiveRef = useRef(false);
   const restartAttemptsRef = useRef(0);
+  const outboundSynthHoldRef = useRef(false);
+  const pendingResumeAfterSynthRef = useRef(false);
+  const afterSynthResumeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     languageRef.current = getDefaultLanguage();
@@ -68,6 +72,45 @@ export function useBrowserTranscript() {
     clearTimeout(stopTimeoutRef.current);
     stopTimeoutRef.current = null;
   }, []);
+
+  const clearAfterSynthResumeTimeout = useCallback(() => {
+    if (!afterSynthResumeTimeoutRef.current) {
+      return;
+    }
+
+    clearTimeout(afterSynthResumeTimeoutRef.current);
+    afterSynthResumeTimeoutRef.current = null;
+  }, []);
+
+  const tryStartRecognitionListening = useCallback(() => {
+    const recognition = recognitionRef.current;
+    if (!recognition || !isSessionActiveRef.current) {
+      return;
+    }
+
+    try {
+      recognition.start();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unable to start speech recognition';
+      setWarning(message);
+    }
+  }, []);
+
+  const armRecognitionResumeAfterSynthGap = useCallback(() => {
+    clearAfterSynthResumeTimeout();
+    afterSynthResumeTimeoutRef.current = setTimeout(() => {
+      afterSynthResumeTimeoutRef.current = null;
+      outboundSynthHoldRef.current = false;
+
+      if (!isSessionActiveRef.current) {
+        pendingResumeAfterSynthRef.current = true;
+        return;
+      }
+
+      pendingResumeAfterSynthRef.current = false;
+      tryStartRecognitionListening();
+    }, RESTART_RECOGNITION_AFTER_SYNTH_MS);
+  }, [clearAfterSynthResumeTimeout, tryStartRecognitionListening]);
 
   const appendFinalText = useCallback((base: string, chunk: string) => {
     const trimmedChunk = chunk.trim();
@@ -136,6 +179,11 @@ export function useBrowserTranscript() {
         pendingStopResolve(buildSnapshot());
       }
 
+      if (outboundSynthHoldRef.current) {
+        restartAttemptsRef.current = 0;
+        return;
+      }
+
       if (!isSessionActiveRef.current) {
         return;
       }
@@ -194,7 +242,7 @@ export function useBrowserTranscript() {
     setInterimTranscriptValue,
   ]);
 
-  const start = useCallback(() => {
+  const primeRecordingSession = useCallback(() => {
     setWarning(undefined);
     restartAttemptsRef.current = 0;
     isSessionActiveRef.current = true;
@@ -205,6 +253,7 @@ export function useBrowserTranscript() {
     if (!recognition) {
       setIsListening(false);
       isSessionActiveRef.current = false;
+      pendingResumeAfterSynthRef.current = false;
       setWarning('Web Speech API is not supported in this browser');
       return;
     }
@@ -212,19 +261,53 @@ export function useBrowserTranscript() {
     languageRef.current = getDefaultLanguage();
     recognition.lang = languageRef.current;
 
+    if (pendingResumeAfterSynthRef.current && !outboundSynthHoldRef.current) {
+      pendingResumeAfterSynthRef.current = false;
+      queueMicrotask(() => {
+        tryStartRecognitionListening();
+      });
+      return;
+    }
+
+    armRecognitionResumeAfterSynthGap();
+  }, [
+    armRecognitionResumeAfterSynthGap,
+    ensureRecognition,
+    setFinalTranscriptValue,
+    setInterimTranscriptValue,
+    tryStartRecognitionListening,
+  ]);
+
+  const pauseRecognitionForOutboundSynth = useCallback(() => {
+    clearAfterSynthResumeTimeout();
+    outboundSynthHoldRef.current = true;
+    const recognition = recognitionRef.current;
+    if (!recognition) {
+      return;
+    }
+
     try {
-      recognition.start();
+      recognition.stop();
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Unable to start speech recognition';
+      const message = error instanceof Error ? error.message : 'Unable to pause speech recognition';
       setWarning(message);
     }
-  }, [ensureRecognition, setFinalTranscriptValue, setInterimTranscriptValue]);
+  }, [clearAfterSynthResumeTimeout]);
+
+  const discardOutboundSynthGuards = useCallback(() => {
+    clearAfterSynthResumeTimeout();
+    outboundSynthHoldRef.current = false;
+    pendingResumeAfterSynthRef.current = false;
+  }, [clearAfterSynthResumeTimeout]);
 
   const stop = useCallback(
     async (options?: StopOptions): Promise<BrowserTranscriptSnapshot> => {
       const recognition = recognitionRef.current;
       isSessionActiveRef.current = false;
       restartAttemptsRef.current = 0;
+      outboundSynthHoldRef.current = false;
+      pendingResumeAfterSynthRef.current = false;
+      clearAfterSynthResumeTimeout();
 
       const finalize = Boolean(options?.finalize);
       const timeoutMs = Math.max(0, options?.timeoutMs ?? DEFAULT_STOP_TIMEOUT_MS);
@@ -289,6 +372,7 @@ export function useBrowserTranscript() {
       appendFinalText,
       buildSnapshot,
       clearStopTimeout,
+      clearAfterSynthResumeTimeout,
       setFinalTranscriptValue,
       setInterimTranscriptValue,
     ],
@@ -296,8 +380,11 @@ export function useBrowserTranscript() {
 
   const reset = useCallback(() => {
     clearStopTimeout();
+    clearAfterSynthResumeTimeout();
     isSessionActiveRef.current = false;
     restartAttemptsRef.current = 0;
+    outboundSynthHoldRef.current = false;
+    pendingResumeAfterSynthRef.current = false;
     const recognition = recognitionRef.current;
 
     if (recognition) {
@@ -314,7 +401,7 @@ export function useBrowserTranscript() {
     setInterimTranscriptValue('');
     setFinalTranscriptValue('');
     setWarning(undefined);
-  }, [clearStopTimeout, setFinalTranscriptValue, setInterimTranscriptValue]);
+  }, [clearStopTimeout, clearAfterSynthResumeTimeout, setFinalTranscriptValue, setInterimTranscriptValue]);
 
   const getSnapshot = useCallback((): BrowserTranscriptSnapshot => {
     return buildSnapshot();
@@ -323,8 +410,11 @@ export function useBrowserTranscript() {
   useEffect(() => {
     return () => {
       clearStopTimeout();
+      clearAfterSynthResumeTimeout();
       isSessionActiveRef.current = false;
       restartAttemptsRef.current = 0;
+      outboundSynthHoldRef.current = false;
+      pendingResumeAfterSynthRef.current = false;
       const recognition = recognitionRef.current;
       if (!recognition) {
         return;
@@ -338,7 +428,7 @@ export function useBrowserTranscript() {
         setWarning(message);
       }
     };
-  }, [clearStopTimeout]);
+  }, [clearStopTimeout, clearAfterSynthResumeTimeout]);
 
   return useMemo(
     () => ({
@@ -347,7 +437,10 @@ export function useBrowserTranscript() {
       interimTranscript,
       finalTranscript,
       warning,
-      start,
+      primeRecordingSession,
+      pauseRecognitionForOutboundSynth,
+      scheduleRecognitionResumeAfterSynthUtterance: armRecognitionResumeAfterSynthGap,
+      discardOutboundSynthGuards,
       stop,
       reset,
       getSnapshot,
@@ -358,7 +451,10 @@ export function useBrowserTranscript() {
       interimTranscript,
       finalTranscript,
       warning,
-      start,
+      primeRecordingSession,
+      pauseRecognitionForOutboundSynth,
+      armRecognitionResumeAfterSynthGap,
+      discardOutboundSynthGuards,
       stop,
       reset,
       getSnapshot,

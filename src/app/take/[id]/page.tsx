@@ -2,15 +2,20 @@
 
 import { useParams, useSearchParams } from 'next/navigation'
 
-import { useTakeOrchestrator } from '@/features/take'
+import {
+  useTakeInterviewBeforeUnload,
+  useTakeOrchestrator,
+} from '@/features/take'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { LoadingStateCard } from '@/components/ui/state-card'
 import { PageContent, PageMainLayout } from '@/components/layout/page-shell'
-import { TakeCompleteScreen } from '@/components/take/take-complete-screen'
-import { TakeConsentScreen } from '@/components/take/take-consent-screen'
-import { TakeLobbyScreen } from '@/components/take/take-lobby-screen'
-import { TakeRecordingScreen } from '@/components/take/take-recording-screen'
+import {
+  TakeCompleteScreen,
+  TakeConsentScreen,
+  TakeLobbyScreen,
+  TakeRecordingScreen,
+} from '@/components/take'
 
 export default function TakeInterviewPage() {
   const params = useParams()
@@ -58,6 +63,8 @@ export default function TakeInterviewPage() {
     interviewerPresence,
   } = useTakeOrchestrator({ id, candidateToken })
 
+  useTakeInterviewBeforeUnload(stage)
+
   if (error && !interview) {
     return (
       <PageMainLayout>
@@ -74,9 +81,7 @@ export default function TakeInterviewPage() {
   if (stage === 'loading' || !interview) {
     return (
       <PageMainLayout>
-        <PageContent>
           <LoadingStateCard label="Loading interview..." />
-        </PageContent>
       </PageMainLayout>
     )
   }
@@ -140,7 +145,6 @@ export default function TakeInterviewPage() {
       browserTranscriptWarning={browserTranscriptWarning}
       videoRef={videoRef}
       screenVideoRef={screenVideoRef}
-      micOn={lobbyMicOn}
       interviewerPresence={interviewerPresence}
       formatTime={formatTime}
       recordingStartBusy={recordingStartBusy}

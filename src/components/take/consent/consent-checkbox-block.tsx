@@ -1,7 +1,7 @@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Inline, Stack } from '@/components/ui/layout';
 import { Label } from '@/components/ui/label';
-import { TakePanel } from '@/components/take/take-panel';
+import { Panel } from '@/components/ui/panel';
 import { Text } from '@/components/ui/text';
 
 interface TakeConsentCheckboxBlockProps {
@@ -14,7 +14,7 @@ export function TakeConsentCheckboxBlock({
   onConsentChange,
 }: TakeConsentCheckboxBlockProps) {
   return (
-    <TakePanel radius="lg" padding="lg">
+    <Panel radius="lg" padding="lg">
       <Inline align="start" gap={3}>
         <Checkbox
           id="consent"
@@ -31,6 +31,6 @@ export function TakeConsentCheckboxBlock({
           <Text variant="bodyMutedSm">Data is used only for interview evaluation and is stored for 90 days.</Text>
         </Stack>
       </Inline>
-    </TakePanel>
+    </Panel>
   );
 }

@@ -1,10 +1,12 @@
+import { CheckCircle2 } from 'lucide-react';
+
 import { SurfaceCard } from '@/components/ui/surface-card';
 import { PageMain } from '@/components/layout/page-shell';
 import { CardContent } from '@/components/ui/card';
 import { Heading } from '@/components/ui/heading';
+import { IconBox } from '@/components/ui/icon-box';
 import { Stack } from '@/components/ui/layout';
 import { Text } from '@/components/ui/text';
-import { TakeSubmissionIconBox } from './take-submission-icon-box';
 
 interface TakeCompleteScreenProps {
   candidateName: string;
@@ -17,15 +19,15 @@ export function TakeCompleteScreen({ candidateName, position }: TakeCompleteScre
       <SurfaceCard tone="glassFloat" size="lg">
         <CardContent layout="stack-center" spacing="xl">
           <Stack gap={6} align="center" width="full">
-            <TakeSubmissionIconBox />
+            <IconBox centered>
+              <CheckCircle2 size={32} />
+            </IconBox>
             <Stack gap={3} align="center">
               <Heading variant="heroTitle">Thank you, {candidateName}</Heading>
               <Text variant="heroDescription">
-                Your interview for <strong>{position}</strong> has been submitted.
-              </Text>
-              <Text variant="bodyMutedSm">
-                Camera and full-screen recordings for each answer have been stored for reviewer
-                evaluation.
+                Your interview for <strong>{position}</strong> is submitted and saved securely for
+                review. If you&apos;re selected to continue, our team will reach out within a few
+                business days with next steps.
               </Text>
             </Stack>
           </Stack>

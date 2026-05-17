@@ -40,6 +40,10 @@ const buttonVariants = cva(
         "icon-lg": "size-9",
         "icon-xl":
           "size-11 [&_svg:not([class*='size-'])]:size-5",
+        "icon-2xl":
+          "size-12 [&_svg:not([class*='size-'])]:size-[1.375rem]",
+        "icon-prep-room":
+          "size-10 [&_svg:not([class*='size-'])]:size-[1.125rem] sm:size-12 sm:[&_svg:not([class*='size-'])]:size-[1.375rem]",
       },
       shape: {
         rounded: "rounded-lg",
@@ -82,6 +86,18 @@ const buttonVariants = cva(
       },
       {
         size: "icon-xl",
+        shape: "rounded",
+        className:
+          "rounded-[min(var(--radius),14px)] in-data-[slot=button-group]:rounded-lg",
+      },
+      {
+        size: "icon-2xl",
+        shape: "rounded",
+        className:
+          "rounded-[min(var(--radius),14px)] in-data-[slot=button-group]:rounded-lg",
+      },
+      {
+        size: "icon-prep-room",
         shape: "rounded",
         className:
           "rounded-[min(var(--radius),14px)] in-data-[slot=button-group]:rounded-lg",

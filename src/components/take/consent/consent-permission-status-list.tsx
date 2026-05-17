@@ -1,6 +1,6 @@
 import type { PermissionStatus } from '@/components/take/types';
 import { StatusPill, type StatusTone } from '@/components/ui/status-pill';
-import { TakePanel } from '@/components/take/take-panel';
+import { Panel } from '@/components/ui/panel';
 import { Inline, Stack } from '@/components/ui/layout';
 import { Text } from '@/components/ui/text';
 
@@ -28,7 +28,7 @@ function PermissionRow({
   permissionTone,
 }: PermissionRowProps) {
   return (
-    <TakePanel tone="surface" radius="lg">
+    <Panel tone="surface" radius="lg">
       <Inline align="center" justify="between" gap={3}>
         <Stack gap={1}>
           <Text as="span" variant="labelSmStrong">
@@ -40,7 +40,7 @@ function PermissionRow({
           {permissionLabel(status)}
         </StatusPill>
       </Inline>
-    </TakePanel>
+    </Panel>
   );
 }
 

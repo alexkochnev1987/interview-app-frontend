@@ -109,8 +109,8 @@ const config: Config = {
       },
       keyframes: {
         aiOrbRingSpeaking: {
-          "0%, 100%": { opacity: "0.2", transform: "scale(1)" },
-          "50%": { opacity: "0.48", transform: "scale(1.06)" },
+          "0%, 100%": { opacity: "0.42", transform: "scale(1)" },
+          "50%": { opacity: "0.78", transform: "scale(1.06)" },
         },
       },
       animation: {

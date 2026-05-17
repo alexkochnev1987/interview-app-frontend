@@ -6,17 +6,31 @@ import type { TakeInterviewData } from '@/lib/api';
 
 export type InterviewerPresence = 'speaking' | 'listening';
 
-function speakQuestion(text: string, onEnd: () => void) {
+export type QuestionSpeechSynthCapture = Readonly<{
+  pauseRecognitionBeforeSpeak: () => void;
+  scheduleRecognitionResumeAfterSynthUtterance: () => void;
+  discardOutboundSynthGuards: () => void;
+}>;
+
+function speakQuestion(
+  text: string,
+  onEnd: () => void,
+  speechCapture?: QuestionSpeechSynthCapture | null,
+) {
   if (typeof window === 'undefined') {
+    speechCapture?.discardOutboundSynthGuards();
     queueMicrotask(onEnd);
     return;
   }
 
   const synth = window.speechSynthesis;
   if (!synth) {
+    speechCapture?.discardOutboundSynthGuards();
     queueMicrotask(onEnd);
     return;
   }
+
+  speechCapture?.pauseRecognitionBeforeSpeak();
 
   synth.cancel();
   try {
@@ -31,6 +45,7 @@ function speakQuestion(text: string, onEnd: () => void) {
 
   const finish = () => {
     queueMicrotask(onEnd);
+    speechCapture?.scheduleRecognitionResumeAfterSynthUtterance();
   };
 
   utterance.onend = finish;
@@ -42,6 +57,7 @@ function speakQuestion(text: string, onEnd: () => void) {
 export function useTakeQuestionTts(
   interview: TakeInterviewData | null,
   stage: TakeStage,
+  speechCapture?: QuestionSpeechSynthCapture | null,
 ): readonly [InterviewerPresence, MutableRefObject<boolean>] {
   const [speakingActive, setSpeakingActive] = useState(false);
   const recordingAllowedRef = useRef(true);
@@ -53,6 +69,7 @@ export function useTakeQuestionTts(
       if (typeof window !== 'undefined' && window.speechSynthesis) {
         window.speechSynthesis.cancel();
       }
+      speechCapture?.discardOutboundSynthGuards();
       recordingAllowedRef.current = true;
       queueMicrotask(() => setSpeakingActive(false));
       return;
@@ -60,6 +77,7 @@ export function useTakeQuestionTts(
 
     const text = interview?.currentQuestion?.text?.trim();
     if (!text) {
+      speechCapture?.discardOutboundSynthGuards();
       recordingAllowedRef.current = true;
       queueMicrotask(() => setSpeakingActive(false));
       return;
@@ -76,12 +94,13 @@ export function useTakeQuestionTts(
       queueMicrotask(() => setSpeakingActive(false));
     };
 
-    speakQuestion(text, release);
+    speakQuestion(text, release, speechCapture ?? null);
 
     return () => {
       if (typeof window !== 'undefined' && window.speechSynthesis) {
         window.speechSynthesis.cancel();
       }
+      speechCapture?.discardOutboundSynthGuards();
       release();
     };
   }, [
@@ -90,6 +109,7 @@ export function useTakeQuestionTts(
     interview?.currentQuestion?.text,
     interview?.currentQuestionIndex,
     interview?.currentAnswerMeta?.versionCount,
+    speechCapture,
   ]);
 
   const presence: InterviewerPresence =

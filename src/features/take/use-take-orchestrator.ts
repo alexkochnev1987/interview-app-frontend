@@ -28,8 +28,12 @@ import {
   progressValueForStage,
   TAKE_MESSAGES,
   type VersionPersistKind,
+  isLastInterviewQuestion,
 } from '@/features/take';
-import { useTakeQuestionTts } from '@/features/take/use-take-question-tts';
+import {
+  useTakeQuestionTts,
+  type QuestionSpeechSynthCapture,
+} from '@/features/take/use-take-question-tts';
 import { TAKE_RECORDING_LIMIT_SECONDS } from './utils';
 
 type PendingVersionAction = 'submit' | 'rerecord' | null;
@@ -49,11 +53,27 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     interimTranscript,
     finalTranscript,
     warning: browserTranscriptWarning,
-    start: startBrowserTranscript,
+    primeRecordingSession,
+    pauseRecognitionForOutboundSynth,
+    scheduleRecognitionResumeAfterSynthUtterance,
+    discardOutboundSynthGuards,
     stop: stopBrowserTranscript,
     reset: resetBrowserTranscript,
     getSnapshot: getBrowserTranscriptSnapshot,
   } = useBrowserTranscript();
+
+  const questionSpeechSynthCapture = useMemo<QuestionSpeechSynthCapture>(
+    () => ({
+      pauseRecognitionBeforeSpeak: pauseRecognitionForOutboundSynth,
+      scheduleRecognitionResumeAfterSynthUtterance,
+      discardOutboundSynthGuards,
+    }),
+    [
+      pauseRecognitionForOutboundSynth,
+      scheduleRecognitionResumeAfterSynthUtterance,
+      discardOutboundSynthGuards,
+    ],
+  );
 
   const [stage, setStage] = useState<TakeStage>('loading');
   const [interview, setInterview] = useState<TakeInterviewData | null>(null);
@@ -78,6 +98,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
   const [interviewerPresence, questionSpeechRecordingAllowedRef] = useTakeQuestionTts(
     interview,
     stage,
+    questionSpeechSynthCapture,
   );
 
   const stageRef = useRef<TakeStage>('loading');
@@ -473,13 +494,18 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
       };
 
       if (action === 'submit') {
+        const showSubmitSuccessToast = isLastInterviewQuestion(
+          interview.currentQuestionIndex,
+          interview.totalQuestions,
+        );
         await runMutation(
           () => handleSubmit(),
           {
             successMessage: TOAST_MESSAGES.take.submitSuccess,
+            showSuccessToast: showSubmitSuccessToast,
             errorMessage: TOAST_MESSAGES.take.submitError,
             getErrorMessage: () => 'Please review recording data and try again.',
-          }
+          },
         );
       } else {
         await handleRerecord();
@@ -592,7 +618,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     abortMultipartUploads,
     handleRecordedChunk,
     onRecordersStopped,
-    startBrowserTranscript,
+    primeBrowserTranscriptForRecordingSession: primeRecordingSession,
   });
 
   useEffect(() => {

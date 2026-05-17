@@ -8,7 +8,7 @@ const headingVariants = cva('', {
       sectionHeroTitle: 'text-3xl font-semibold tracking-[-0.04em] text-foreground md:text-4xl',
       questionTitle: 'text-2xl font-semibold leading-9 tracking-[-0.03em] text-foreground',
       toolbarSessionTitle:
-        'truncate text-sm font-semibold leading-tight tracking-tight text-foreground sm:text-[0.9375rem]',
+        'm-0 min-w-0 text-sm font-semibold leading-tight tracking-tight text-foreground sm:text-[0.9375rem]',
     },
   },
   defaultVariants: {
