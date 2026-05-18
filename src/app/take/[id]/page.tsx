@@ -1,13 +1,17 @@
 'use client'
 
 import { useParams, useSearchParams } from 'next/navigation'
-import { LoadingStateCard } from '@/components/ui/state-card'
+import { AlertCircle } from 'lucide-react'
+
 import { PageContent, PageMainLayout } from '@/components/layout/page-shell'
 import { TakeCompleteScreen } from '@/components/take/take-complete-screen'
 import { TakeConsentScreen } from '@/components/take/take-consent-screen'
 import { TakeRecordingScreen } from '@/components/take/take-recording-screen'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { FlashErrorToast } from '@/components/ui/flash-error-toast'
+import { Icon } from '@/components/ui/icon'
+import { EmptyStateCard, LoadingStateCard } from '@/components/ui/state-card'
 import { useTakeOrchestrator } from '@/features/take'
+import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 export default function TakeInterviewPage() {
   const params = useParams()
@@ -50,10 +54,20 @@ export default function TakeInterviewPage() {
     return (
       <PageMainLayout>
         <PageContent>
-          <Alert variant="destructive">
-            <AlertTitle>Interview unavailable</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
+          <FlashErrorToast
+            toastId="take-interview-unavailable"
+            message={TOAST_MESSAGES.pageGate.interview.unavailableTitle}
+            description={error}
+          />
+          <EmptyStateCard
+            icon={
+              <Icon size="lg">
+                <AlertCircle />
+              </Icon>
+            }
+            title={TOAST_MESSAGES.pageGate.interview.unavailableTitle}
+            description="This interview link may be invalid, expired, or no longer available. Details are shown in the notification."
+          />
         </PageContent>
       </PageMainLayout>
     )

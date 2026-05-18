@@ -4,11 +4,11 @@ import { useEffect, useRef, useState, type ComponentProps } from 'react'
 import { useRouter } from 'next/navigation'
 import { RefreshCw } from 'lucide-react'
 
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
-import { Stack } from '@/components/ui/layout/stack'
 import { ApiError } from '@/lib/api'
+import { notifyError, notifySuccess } from '@/lib/toast'
+import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 const SUCCESS_AUTORESET_MS = 2500
 
@@ -16,16 +16,12 @@ type ButtonVariant = ComponentProps<typeof Button>['variant']
 type ButtonSize = ComponentProps<typeof Button>['size']
 type IconSize = ComponentProps<typeof Icon>['size']
 
-type Notice = { kind: 'error' | 'info'; title: string; message: string }
-
 export interface RerunInfo {
   title: string
   message: string
 }
 
 export type RerunResult = RerunInfo | undefined
-
-const ALREADY_IN_PROGRESS_TITLE = 'Re-evaluation already in progress'
 
 interface RerunButtonProps {
   onRun: () => Promise<RerunResult>
@@ -54,7 +50,6 @@ export function RerunButton({
   const [phase, setPhase] = useState<'idle' | 'submitting' | 'submitted'>(
     'idle',
   )
-  const [notice, setNotice] = useState<Notice | null>(null)
   const mountedRef = useRef(true)
 
   useEffect(() => {
@@ -65,35 +60,26 @@ export function RerunButton({
 
   async function handleClick() {
     setPhase('submitting')
-    setNotice(null)
     try {
       const result = await onRun()
       if (!mountedRef.current) return
       if (result) {
-        setNotice({
-          kind: 'info',
-          title: result.title,
-          message: result.message,
-        })
+        notifySuccess(result.title, { description: result.message })
       }
       setPhase('submitted')
       router.refresh()
     } catch (err) {
       if (!mountedRef.current) return
       if (err instanceof ApiError && err.status === 409) {
-        setNotice({
-          kind: 'info',
-          title: ALREADY_IN_PROGRESS_TITLE,
-          message: err.message,
+        notifySuccess(TOAST_MESSAGES.rerun.alreadyInProgressTitle, {
+          description: err.message,
         })
         setPhase('submitted')
         router.refresh()
         return
       }
-      setNotice({
-        kind: 'error',
-        title: errorTitle,
-        message: err instanceof Error ? err.message : errorFallback,
+      notifyError(errorTitle, {
+        description: err instanceof Error ? err.message : errorFallback,
       })
       setPhase('idle')
     }
@@ -108,30 +94,22 @@ export function RerunButton({
   }, [phase])
 
   return (
-    <Stack gap={2}>
-      <Button
-        type="button"
-        variant={variant}
-        size={size}
-        shape="pill"
-        onClick={handleClick}
-        disabled={disabled || phase !== 'idle'}
-      >
-        <Icon size={iconSize}>
-          <RefreshCw />
-        </Icon>
-        {phase === 'submitting'
-          ? 'Starting…'
-          : phase === 'submitted'
-            ? submittedLabel
-            : idleLabel}
-      </Button>
-      {notice ? (
-        <Alert variant={notice.kind === 'info' ? 'warning' : 'danger'}>
-          <AlertTitle>{notice.title}</AlertTitle>
-          <AlertDescription>{notice.message}</AlertDescription>
-        </Alert>
-      ) : null}
-    </Stack>
+    <Button
+      type="button"
+      variant={variant}
+      size={size}
+      shape="pill"
+      onClick={handleClick}
+      disabled={disabled || phase !== 'idle'}
+    >
+      <Icon size={iconSize}>
+        <RefreshCw />
+      </Icon>
+      {phase === 'submitting'
+        ? 'Starting…'
+        : phase === 'submitted'
+          ? submittedLabel
+          : idleLabel}
+    </Button>
   )
 }

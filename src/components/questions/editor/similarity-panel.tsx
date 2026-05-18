@@ -1,13 +1,13 @@
 'use client'
 
 import Link from 'next/link'
+import { useEffect, useRef } from 'react'
 import { Search } from 'lucide-react'
 
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
 import { MetricPanel } from '@/components/ui/metric-panel'
 import { StatusPill } from '@/components/ui/status-pill'
 import { SurfaceTile } from '@/components/ui/surface-tile'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -25,6 +25,8 @@ import {
   type SimilarStatus,
   type SimilaritySignalSummary,
 } from '@/lib/question-editor/parsers'
+import { notifyError } from '@/lib/toast'
+import { TOAST_MESSAGES } from '@/lib/toast-messages'
 import { truncateText } from '@/lib/text'
 
 interface SimilarityPanelProps {
@@ -50,6 +52,23 @@ export function SimilarityPanel({
   disabled,
   onRunSearch,
 }: SimilarityPanelProps) {
+  const lastSimilarityErrorRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    if (status !== 'error' || !error) {
+      lastSimilarityErrorRef.current = null
+      return
+    }
+    if (error === lastSimilarityErrorRef.current) {
+      return
+    }
+    lastSimilarityErrorRef.current = error
+    notifyError(TOAST_MESSAGES.similarity.searchFailedTitle, {
+      id: 'similarity-search-error',
+      description: error,
+    })
+  }, [error, status])
+
   return (
     <Card variant="surface">
       <CardHeader spacing="lg">
@@ -97,13 +116,6 @@ export function SimilarityPanel({
           <PanelMessage>
             Comparing the current draft with the stored question library.
           </PanelMessage>
-        ) : null}
-
-        {status === 'error' && error ? (
-          <Alert variant="danger">
-            <AlertTitle>Similarity search failed</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
         ) : null}
 
         {status === 'success' && matches.length === 0 ? (

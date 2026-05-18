@@ -27,6 +27,7 @@ import { LoadingStateCard } from "@/components/ui/state-card";
 import { SurfaceTile } from "@/components/ui/surface-tile";
 import { PageShell } from "@/components/ui/layout/page-shell";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { FlashErrorPageFallback } from "@/components/ui/flash-error-page-fallback";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -63,6 +64,7 @@ import {
   getCandidateInitials,
 } from "@/lib/interview-formatters";
 import { runMutation } from "@/lib/run-mutation";
+import { notifyError } from "@/lib/toast";
 import { TOAST_MESSAGES } from "@/lib/toast-messages";
 
 type UploadStatus = "idle" | "uploading" | "uploaded" | "error";
@@ -202,6 +204,7 @@ export default function InterviewDetailClient({
   );
   const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const validationPollRef = useRef<number | null>(null);
+  const lastActionErrorRef = useRef<string | null>(null);
 
   const buildCandidateUrl = useCallback((relativeLink: string) => {
     if (typeof window === "undefined") {
@@ -243,6 +246,21 @@ export default function InterviewDetailClient({
   useEffect(() => {
     void loadCandidateLink("initial");
   }, [loadCandidateLink]);
+
+  useEffect(() => {
+    if (!error || !interview) {
+      lastActionErrorRef.current = null;
+      return;
+    }
+    if (error === lastActionErrorRef.current) {
+      return;
+    }
+    lastActionErrorRef.current = error;
+    notifyError(TOAST_MESSAGES.interviewAction.failedTitle, {
+      id: "interview-action-error",
+      description: error,
+    });
+  }, [error, interview]);
 
   function setFileInputRef(index: number, element: HTMLInputElement | null) {
     fileInputRefs.current[index] = element;
@@ -468,18 +486,15 @@ export default function InterviewDetailClient({
 
   if (error && !interview) {
     return (
-      <PageShell spacing="tight">
-        <Alert variant="danger">
-          <AlertTitle>Interview unavailable</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-        <Button asChild variant="outline-pill" shape="pill">
-          <UnstyledLink href="/">
-            <ArrowLeft className="size-4" />
-            Back to dashboard
-          </UnstyledLink>
-        </Button>
-      </PageShell>
+      <FlashErrorPageFallback
+        toastId="interview-detail-client-load-error"
+        toastMessage={TOAST_MESSAGES.pageGate.interview.unavailableTitle}
+        toastDescription={error}
+        title={TOAST_MESSAGES.pageGate.interview.unavailableTitle}
+        description="Something went wrong while loading this interview. Details are shown in the notification."
+        backHref="/"
+        backLabel="Back to dashboard"
+      />
     );
   }
 
@@ -725,13 +740,6 @@ export default function InterviewDetailClient({
           </CardContent>
         </Card>
       </Grid>
-
-      {error ? (
-        <Alert variant="danger">
-          <AlertTitle>Interview action failed</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      ) : null}
 
       <Section gap={4}>
         <Inline gap={4} align="end" justify="between" wrap="wrap">

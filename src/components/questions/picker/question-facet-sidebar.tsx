@@ -1,9 +1,8 @@
 'use client'
 
-import { AlertCircle, RotateCcw, Search } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { RotateCcw, Search } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { EyebrowLabel } from '@/components/ui/eyebrow-label'
@@ -21,6 +20,8 @@ import type {
   QuestionDifficulty,
   QuestionStatusFilter,
 } from '@/lib/api'
+import { notifyError } from '@/lib/toast'
+import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 const COLLAPSED_LIMIT = 6
 const TAG_COLLAPSED_LIMIT = 12
@@ -83,6 +84,23 @@ export function QuestionFacetSidebar(props: QuestionFacetSidebarProps) {
     selected.tags.length +
     (showStatusFilter && selected.status !== 'active' ? 1 : 0)
 
+  const lastFacetsErrorRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    if (!error) {
+      lastFacetsErrorRef.current = null
+      return
+    }
+    if (error === lastFacetsErrorRef.current) {
+      return
+    }
+    lastFacetsErrorRef.current = error
+    notifyError(TOAST_MESSAGES.questionFacets.unavailableTitle, {
+      id: 'question-facets-error',
+      description: error,
+    })
+  }, [error])
+
   return (
     <Card variant="surface" size="sm">
       <CardContent spacing="md">
@@ -118,24 +136,17 @@ export function QuestionFacetSidebar(props: QuestionFacetSidebarProps) {
           </Button>
 
           {error ? (
-            <Alert variant="warning">
-              <AlertCircle className="size-4" />
-              <AlertTitle>Filter options unavailable</AlertTitle>
-              <AlertDescription>
-                <Inline gap={3} align="center" wrap="wrap">
-                  <span>{error}</span>
-                  <Button
-                    type="button"
-                    variant="outline-pill"
-                    shape="pill"
-                    size="sm"
-                    onClick={onRetry}
-                  >
-                    Retry
-                  </Button>
-                </Inline>
-              </AlertDescription>
-            </Alert>
+            <Inline gap={3} align="center" wrap="wrap">
+              <Button
+                type="button"
+                variant="outline-pill"
+                shape="pill"
+                size="sm"
+                onClick={onRetry}
+              >
+                Retry
+              </Button>
+            </Inline>
           ) : null}
         </Stack>
 

@@ -8,9 +8,9 @@ import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
 import { HeroLead, HeroTitle } from '@/components/ui/hero-text'
 import { MetricPanel } from '@/components/ui/metric-panel'
 import { StatusPill } from '@/components/ui/status-pill'
+import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { LoadingStateCard } from '@/components/ui/state-card'
 import { PageShell } from '@/components/ui/layout/page-shell'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Grid } from '@/components/ui/layout/grid'
 import { Inline } from '@/components/ui/layout/inline'
@@ -19,6 +19,7 @@ import { Stack } from '@/components/ui/layout/stack'
 import { BodyText } from '@/components/ui/text'
 import { getFeedbackByToken, type FeedbackResponse as Feedback } from '@/lib/api'
 import { formatInterviewDate } from '@/lib/interview-formatters'
+import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 function resultTone(result?: string) {
   switch (result?.toLowerCase()) {
@@ -55,14 +56,13 @@ export default function FeedbackPage() {
 
   if (error) {
     return (
-      <PageShell>
-        <Stack width="xl" align="center">
-          <Alert variant="danger">
-            <AlertTitle>Feedback unavailable</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        </Stack>
-      </PageShell>
+      <FlashErrorPageFallback
+        toastId="feedback-unavailable"
+        toastMessage={TOAST_MESSAGES.pageGate.feedback.unavailableTitle}
+        toastDescription={error}
+        title={TOAST_MESSAGES.pageGate.feedback.unavailableTitle}
+        description="This feedback link may be invalid, expired, or no longer available. Details are shown in the notification."
+      />
     )
   }
 

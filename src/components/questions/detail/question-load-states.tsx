@@ -5,7 +5,6 @@ import { AlertTriangle, ArrowLeft, LoaderCircle, PenSquare } from 'lucide-react'
 
 import { HeroTitle } from '@/components/ui/hero-text'
 import { IconBadge } from '@/components/ui/icon-badge'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -14,10 +13,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { FlashErrorToast } from '@/components/ui/flash-error-toast'
 import { Inline } from '@/components/ui/layout/inline'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText } from '@/components/ui/text'
+
+const LOAD_FAILED_TITLE = 'Load failed'
 
 export function QuestionLoadingCard() {
   return (
@@ -46,6 +48,11 @@ interface QuestionUnavailableCardProps {
 export function QuestionUnavailableCard({ message }: QuestionUnavailableCardProps) {
   return (
     <PageShell>
+      <FlashErrorToast
+        toastId="question-load-failed"
+        message={LOAD_FAILED_TITLE}
+        description={message}
+      />
       <Card variant="floating">
         <CardHeader spacing="md">
           <IconBadge tone="danger" size="lg">
@@ -55,15 +62,15 @@ export function QuestionUnavailableCard({ message }: QuestionUnavailableCardProp
             <CardTitle size="xl">Question unavailable</CardTitle>
             <CardDescription width="lg">
               The editor could not load this question, so the route stops here
-              instead of rendering a partially broken form.
+              instead of rendering a partially broken form. Details are shown in
+              the notification.
             </CardDescription>
           </Stack>
         </CardHeader>
         <CardContent spacing="lg">
-          <Alert variant="danger">
-            <AlertTitle>Load failed</AlertTitle>
-            <AlertDescription>{message}</AlertDescription>
-          </Alert>
+          <BodyText size="sm" tone="muted">
+            {message}
+          </BodyText>
 
           <Inline gap={3} wrap="wrap">
             <Button asChild variant="gradient">

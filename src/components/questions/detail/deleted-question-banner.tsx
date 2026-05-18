@@ -1,13 +1,15 @@
 'use client'
 
+import { useEffect, useRef } from 'react'
 import { LoaderCircle, RotateCcw } from 'lucide-react'
 
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText } from '@/components/ui/text'
+import { notifyError } from '@/lib/toast'
+import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 interface DeletedQuestionBannerProps {
   restoring: boolean
@@ -20,6 +22,23 @@ export function DeletedQuestionBanner({
   restoreError,
   onRestore,
 }: DeletedQuestionBannerProps) {
+  const lastRestoreErrorRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    if (!restoreError) {
+      lastRestoreErrorRef.current = null
+      return
+    }
+    if (restoreError === lastRestoreErrorRef.current) {
+      return
+    }
+    lastRestoreErrorRef.current = restoreError
+    notifyError(TOAST_MESSAGES.restore.cannotRestoreTitle, {
+      id: 'restore-question-error',
+      description: restoreError,
+    })
+  }, [restoreError])
+
   return (
     <PageShell as="section" spacing="compact" padding="top">
       <Card variant="danger-soft" size="sm" role="alert">
@@ -50,12 +69,6 @@ export function DeletedQuestionBanner({
           </Button>
         </CardContent>
       </Card>
-      {restoreError && (
-        <Alert variant="danger">
-          <AlertTitle>Cannot restore</AlertTitle>
-          <AlertDescription>{restoreError}</AlertDescription>
-        </Alert>
-      )}
     </PageShell>
   )
 }

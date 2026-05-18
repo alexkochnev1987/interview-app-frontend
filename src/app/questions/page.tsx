@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Suspense, useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import { LoaderCircle, Search, Trash2 } from 'lucide-react'
 
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
@@ -22,12 +22,12 @@ import {
   useQuestionFacets,
   useQuestionsQuery,
 } from '@/components/questions/picker'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { deleteQuestionsBulk, type BulkDeleteResult } from '@/lib/api'
 import { useAuth } from '@/lib/auth-context'
 import { runMutation } from '@/lib/run-mutation'
+import { notifyError } from '@/lib/toast'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 export default function QuestionsPage() {
@@ -67,6 +67,22 @@ function QuestionsPageContent() {
   const [bulkDeleting, setBulkDeleting] = useState(false)
   const [bulkResult, setBulkResult] = useState<BulkDeleteResult | null>(null)
   const [bulkError, setBulkError] = useState<string | null>(null)
+  const lastFeedErrorRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    if (!query.error) {
+      lastFeedErrorRef.current = null
+      return
+    }
+    if (query.error === lastFeedErrorRef.current) {
+      return
+    }
+    lastFeedErrorRef.current = query.error
+    notifyError(TOAST_MESSAGES.questionFeed.unavailableTitle, {
+      id: 'question-feed-error',
+      description: query.error,
+    })
+  }, [query.error])
 
   function toggleSelected(id: string) {
     setSelectedIds((prev) => {
@@ -165,17 +181,17 @@ function QuestionsPageContent() {
 
         <Stack gap={4}>
           {query.error ? (
-            <Alert variant="danger">
-              <AlertTitle>Question feed unavailable</AlertTitle>
-              <AlertDescription>
-                <Inline gap={3} align="center" wrap="wrap">
-                  <span>{query.error}</span>
-                  <Button type="button" variant="outline-pill" shape="pill" size="sm" onClick={query.refetch}>
-                    Retry
-                  </Button>
-                </Inline>
-              </AlertDescription>
-            </Alert>
+            <Inline gap={3} align="center" wrap="wrap">
+              <Button
+                type="button"
+                variant="outline-pill"
+                shape="pill"
+                size="sm"
+                onClick={query.refetch}
+              >
+                Retry
+              </Button>
+            </Inline>
           ) : null}
 
           <QuestionPickerToolbar

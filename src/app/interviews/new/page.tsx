@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Suspense, useState, type FormEvent } from 'react'
+import { Suspense, useEffect, useRef, useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowRight, BriefcaseBusiness, CirclePlus, Sparkles, UserRound } from 'lucide-react'
 
@@ -34,6 +34,7 @@ import {
 } from '@/components/questions/picker'
 import { createInterview, type Question } from '@/lib/api'
 import { runMutation } from '@/lib/run-mutation'
+import { notifyError } from '@/lib/toast'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 export default function NewInterviewPage() {
@@ -68,6 +69,23 @@ function NewInterviewPageContent() {
     },
     { showStatusFilter: false },
   )
+
+  const lastFeedErrorRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    if (!query.error) {
+      lastFeedErrorRef.current = null
+      return
+    }
+    if (query.error === lastFeedErrorRef.current) {
+      return
+    }
+    lastFeedErrorRef.current = query.error
+    notifyError(TOAST_MESSAGES.questionFeed.unavailableTitle, {
+      id: 'interview-new-question-feed-error',
+      description: query.error,
+    })
+  }, [query.error])
 
   const selectedCount = selectedById.size
   const selectedQuestions = Array.from(selectedById.values())
@@ -287,21 +305,17 @@ function NewInterviewPageContent() {
               />
 
               {query.error ? (
-                <Alert variant="danger">
-                  <AlertTitle>Question feed unavailable</AlertTitle>
-                  <AlertDescription>
-                    {query.error}
-                    <Button
-                      type="button"
-                      variant="outline-pill"
-                      shape="pill"
-                      size="sm"
-                      onClick={query.refetch}
-                    >
-                      Retry
-                    </Button>
-                  </AlertDescription>
-                </Alert>
+                <Inline gap={3} align="center" wrap="wrap">
+                  <Button
+                    type="button"
+                    variant="outline-pill"
+                    shape="pill"
+                    size="sm"
+                    onClick={query.refetch}
+                  >
+                    Retry
+                  </Button>
+                </Inline>
               ) : null}
 
               {query.loading && query.items.length === 0 ? (

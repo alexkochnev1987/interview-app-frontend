@@ -1,8 +1,8 @@
 'use client'
 
+import { useEffect, useRef } from 'react'
 import { LoaderCircle, Trash2 } from 'lucide-react'
 
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -12,6 +12,8 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { PageShell } from '@/components/ui/layout/page-shell'
+import { notifyError } from '@/lib/toast'
+import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 interface QuestionDangerZoneProps {
   deleting: boolean
@@ -24,6 +26,23 @@ export function QuestionDangerZone({
   deleteError,
   onRequestDelete,
 }: QuestionDangerZoneProps) {
+  const lastDeleteErrorRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    if (!deleteError) {
+      lastDeleteErrorRef.current = null
+      return
+    }
+    if (deleteError === lastDeleteErrorRef.current) {
+      return
+    }
+    lastDeleteErrorRef.current = deleteError
+    notifyError(TOAST_MESSAGES.deleteQuestion.cannotDeleteTitle, {
+      id: 'delete-question-error',
+      description: deleteError,
+    })
+  }, [deleteError])
+
   return (
     <PageShell as="section" spacing="compact" padding="bottom">
       <Card variant="danger-soft">
@@ -36,12 +55,6 @@ export function QuestionDangerZone({
           </CardDescription>
         </CardHeader>
         <CardContent spacing="md">
-          {deleteError && (
-            <Alert variant="danger">
-              <AlertTitle>Cannot delete</AlertTitle>
-              <AlertDescription>{deleteError}</AlertDescription>
-            </Alert>
-          )}
           <Button
             type="button"
             variant="destructive"
