@@ -147,11 +147,31 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List questions */
+        /** List questions (paginated, filterable, sortable) */
         get: operations["QuestionController_findAll"];
         put?: never;
         /** Create question */
         post: operations["QuestionController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/questions/facets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Faceted counts for the picker sidebar
+         * @description Returns each filter facet (difficulty / category / subcategory / role / tags) with a per-value count. Counts respect every other filter on the request so the user sees what is still available before clicking.
+         */
+        get: operations["QuestionController_getFacets"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -760,6 +780,32 @@ export interface components {
             /** Format: date-time */
             updatedAt: string;
             deleted: boolean;
+            /** @description Number of times this question has been used in an interview. */
+            usageCount: number;
+        };
+        PaginatedQuestionsResponseDto: {
+            items: components["schemas"]["QuestionResponseDto"][];
+            /** @description Total rows matching the filter, ignoring page/limit. */
+            total: number;
+            page: number;
+            limit: number;
+        };
+        FacetCountDto: {
+            value: string;
+            /** @description Number of active questions with this value, given the rest of the current filters. */
+            count: number;
+        };
+        QuestionFacetsResponseDto: {
+            /** @description Difficulty value + count, given all OTHER current filters (difficulty itself is not applied). */
+            difficulties: components["schemas"]["FacetCountDto"][];
+            /** @description Category value + count, given all OTHER current filters (category itself is not applied). */
+            categories: components["schemas"]["FacetCountDto"][];
+            /** @description Subcategory value + count, given all OTHER current filters (subcategory itself is not applied). Exposed as the "Type" facet in the picker. */
+            subcategories: components["schemas"]["FacetCountDto"][];
+            /** @description Role value + count, given all OTHER current filters (role itself is not applied). */
+            roles: components["schemas"]["FacetCountDto"][];
+            /** @description Tag value + count, given all OTHER current filters (tag overlap is not applied). */
+            tags: components["schemas"]["FacetCountDto"][];
         };
         CreateQuestionDto: {
             externalId?: string;
@@ -1517,7 +1563,24 @@ export interface operations {
     };
     QuestionController_findAll: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Free-text search over question text, role, category, subcategory, tags. */
+                q?: string;
+                difficulty?: "easy" | "medium" | "hard";
+                category?: string;
+                /** @description Subcategory — exposed as the "Type" filter in the picker UI. */
+                subcategory?: string;
+                /** @description ANY-match: rows whose tags array overlaps the given list. Send as ?tags=react,hooks or repeated. */
+                tags?: string[];
+                role?: string;
+                outputLanguage?: string;
+                /** @description Non-super_admin callers are forced to "active" regardless of what they pass. */
+                status?: "active" | "inactive" | "all";
+                sortBy?: "createdAt" | "updatedAt" | "difficulty" | "questionText" | "popularity";
+                sortOrder?: "asc" | "desc";
+                page?: number;
+                limit?: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -1529,7 +1592,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["QuestionResponseDto"][];
+                    "application/json": components["schemas"]["PaginatedQuestionsResponseDto"];
                 };
             };
             401: {
@@ -1580,6 +1643,50 @@ export interface operations {
                 };
             };
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    QuestionController_getFacets: {
+        parameters: {
+            query?: {
+                /** @description Free-text search over question text, role, category, subcategory, tags. */
+                q?: string;
+                difficulty?: "easy" | "medium" | "hard";
+                category?: string;
+                /** @description Subcategory — exposed as the "Type" filter in the picker UI. */
+                subcategory?: string;
+                /** @description ANY-match: rows whose tags array overlaps the given list. Send as ?tags=react,hooks or repeated. */
+                tags?: string[];
+                role?: string;
+                outputLanguage?: string;
+                /** @description Non-super_admin callers are forced to "active" regardless of what they pass. */
+                status?: "active" | "inactive" | "all";
+                sortBy?: "createdAt" | "updatedAt" | "difficulty" | "questionText" | "popularity";
+                sortOrder?: "asc" | "desc";
+                page?: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionFacetsResponseDto"];
+                };
+            };
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
