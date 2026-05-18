@@ -17,6 +17,11 @@ export type QuestionSpeechSynthCapture = Readonly<{
   discardOutboundSynthGuards: () => void;
 }>;
 
+function cancelBrowserSpeechSynth() {
+  if (typeof window === 'undefined') return;
+  window.speechSynthesis?.cancel();
+}
+
 function speakQuestion(
   text: string,
   onEnd: () => void,
@@ -37,7 +42,7 @@ function speakQuestion(
 
   speechCapture?.pauseRecognitionBeforeSpeak();
 
-  synth.cancel();
+  cancelBrowserSpeechSynth();
   try {
     synth.resume();
   } catch {
@@ -71,9 +76,7 @@ export function useTakeQuestionTts(
 
   useEffect(() => {
     if (!takeAudioStage) {
-      if (typeof window !== 'undefined' && window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-      }
+      cancelBrowserSpeechSynth();
       speechCapture?.discardOutboundSynthGuards();
       recordingAllowedRef.current = true;
       queueMicrotask(() => setSpeakingActive(false));
@@ -114,6 +117,7 @@ export function useTakeQuestionTts(
     );
 
     watchdogTimer = setTimeout(() => {
+      cancelBrowserSpeechSynth();
       speechCapture?.scheduleRecognitionResumeAfterSynthUtterance();
       release();
     }, watchdogMs);
@@ -121,9 +125,7 @@ export function useTakeQuestionTts(
     speakQuestion(text, release, speechCapture ?? null);
 
     return () => {
-      if (typeof window !== 'undefined' && window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-      }
+      cancelBrowserSpeechSynth();
       speechCapture?.discardOutboundSynthGuards();
       release();
     };

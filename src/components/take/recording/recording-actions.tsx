@@ -42,7 +42,7 @@ export function TakeRecordingActions({
 
   return (
     <Stack align="stretch" gap={3} width="full">
-      {stage === 'interview' && (!capturePipelineReady || setupError) ? (
+      {!capturePipelineReady || setupError ? (
         <Button
           type="button"
           variant="outline"

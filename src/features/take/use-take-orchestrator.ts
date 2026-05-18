@@ -3,36 +3,36 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useBrowserTranscript } from '@/lib/use-browser-transcript';
 import { type TakeInterviewData } from '@/lib/api';
 import type { PermissionStatus, TakeStage } from '@/components/take/types';
+import { TAKE_MESSAGES } from './messages';
+import { progressValueForStage, stageAfterInterviewLoad, type VersionPersistKind } from './session-machine';
 import {
   clearProgressTimers,
+  releaseCaptureStreams,
+  releaseCameraCapture,
+  stopMediaStream,
+  type AnswerBehaviorEvent,
+  type MultipartUploadState,
+} from './runtime';
+import {
   createEmptyBehaviorSignals,
   formatTime,
   getPermissionErrorMessage,
-  permissionTone,
   permissionLabel,
-  releaseCaptureStreams,
-  releaseCameraCapture,
-  stageAfterInterviewLoad,
-  stopMediaStream,
-  useTakeAnswerPersistence,
-  useTakeBehaviorTracking,
-  useTakeBeginRecording,
-  useTakeInterviewLoader,
-  useTakePermissions,
-  useTakeRecordingControls,
-  type AnswerBehaviorEvent,
-  type MultipartUploadState,
+  permissionTone,
+  TAKE_RECORDING_LIMIT_SECONDS,
   type TakeBehaviorSignals,
-  progressValueForStage,
-  TAKE_MESSAGES,
-  type VersionPersistKind,
-} from '@/features/take';
+} from './utils';
+import { useTakeAnswerPersistence } from './use-take-answer-persistence';
+import { useTakeBehaviorTracking } from './use-take-behavior-tracking';
+import { useTakeBeginRecording } from './use-take-begin-recording';
+import { useTakeInterviewLoader } from './use-take-interview-loader';
+import { useTakePermissions } from './use-take-permissions';
+import { useTakeRecordingControls } from './use-take-recording-controls';
 import { useTakeVersionPersistence } from './use-take-version-persistence';
 import {
   useTakeQuestionTts,
   type QuestionSpeechSynthCapture,
-} from '@/features/take/use-take-question-tts';
-import { TAKE_RECORDING_LIMIT_SECONDS } from './utils';
+} from './use-take-question-tts';
 
 type PendingVersionAction = 'submit' | 'rerecord' | null;
 
@@ -116,6 +116,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
   const answerStoppedAtMsRef = useRef<number | null>(null);
   const answerDurationSecondsRef = useRef<number>(0);
   const stoppedRecordersRef = useRef(0);
+  const expectedRecorderStopsRef = useRef(0);
   const currentVersionNumberRef = useRef(1);
   const behaviorSignalsRef = useRef<TakeBehaviorSignals>(createEmptyBehaviorSignals());
   const behaviorEventsRef = useRef<AnswerBehaviorEvent[]>([]);
@@ -174,25 +175,13 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     answerStoppedAtMsRef.current = null;
     answerDurationSecondsRef.current = 0;
     stoppedRecordersRef.current = 0;
+    expectedRecorderStopsRef.current = 0;
     behaviorSignalsRef.current = createEmptyBehaviorSignals();
     behaviorEventsRef.current = [];
     flushedBehaviorEventCountRef.current = 0;
     progressRequestChainRef.current = Promise.resolve();
     multipartUploadsRef.current = { camera: null, screen: null };
     resetBrowserTranscript();
-  }
-
-  function stopActiveRecorders() {
-    clearProgressTimers(timerRef, progressHeartbeatRef, progressFlushTimeoutRef);
-    const cameraRecorder = cameraRecorderRef.current;
-    const screenRecorder = screenRecorderRef.current;
-    if (cameraRecorder && cameraRecorder.state !== 'inactive') {
-      cameraRecorder.stop();
-    }
-    if (screenRecorder && screenRecorder.state !== 'inactive') {
-      screenRecorder.stop();
-    }
-    setRecording(false);
   }
 
   function resetInterviewSetup(message: string) {
@@ -448,6 +437,19 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     void persistCurrentVersion(pendingAction);
   }
 
+  function stopActiveRecorders() {
+    clearProgressTimers(timerRef, progressHeartbeatRef, progressFlushTimeoutRef);
+    stoppedRecordersRef.current = 0;
+    expectedRecorderStopsRef.current = stopActiveTakeMediaRecorders(
+      cameraRecorderRef,
+      screenRecorderRef,
+    );
+    if (expectedRecorderStopsRef.current === 0) {
+      onRecordersStopped();
+    }
+    setRecording(false);
+  }
+
   useTakeBehaviorTracking({
     recording,
     currentVersionNumberRef,
@@ -513,6 +515,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     screenStreamRef,
     cameraRecorderRef,
     screenRecorderRef,
+    expectedRecorderStopsRef,
     timerRef,
     stoppedRecordersRef,
     discardRecordingRef,
@@ -652,4 +655,22 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     progressValue:
       interview ? progressValueForStage({ interview, stage }) : 0,
   };
+}
+
+function stopActiveTakeMediaRecorders(
+  cameraRecorderRef: { current: MediaRecorder | null },
+  screenRecorderRef: { current: MediaRecorder | null },
+): number {
+  let expectedStopEvents = 0;
+  for (const recorderRef of [cameraRecorderRef, screenRecorderRef] as const) {
+    const recorder = recorderRef.current;
+    if (
+      recorder !== null &&
+      (recorder.state === 'recording' || recorder.state === 'paused')
+    ) {
+      recorder.stop();
+      expectedStopEvents += 1;
+    }
+  }
+  return expectedStopEvents;
 }

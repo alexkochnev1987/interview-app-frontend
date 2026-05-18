@@ -1,4 +1,4 @@
-import { useRef, type MutableRefObject } from 'react';
+import { type MutableRefObject } from 'react';
 
 import type { CaptureTarget, MultipartUploadSession, MultipartUploadState } from './runtime';
 import { buildMediaRecorderOptions, pickSupportedMediaRecorderMimeType, TAKE_RECORDING_LIMIT_SECONDS } from './utils';
@@ -10,6 +10,7 @@ interface UseTakeBeginRecordingParams {
   screenStreamRef: MutableRefObject<MediaStream | null>;
   cameraRecorderRef: MutableRefObject<MediaRecorder | null>;
   screenRecorderRef: MutableRefObject<MediaRecorder | null>;
+  expectedRecorderStopsRef: MutableRefObject<number>;
   timerRef: MutableRefObject<ReturnType<typeof setInterval> | null>;
   stoppedRecordersRef: MutableRefObject<number>;
   discardRecordingRef: MutableRefObject<boolean>;
@@ -53,6 +54,7 @@ export function useTakeBeginRecording({
   screenStreamRef,
   cameraRecorderRef,
   screenRecorderRef,
+  expectedRecorderStopsRef,
   timerRef,
   stoppedRecordersRef,
   discardRecordingRef,
@@ -81,8 +83,6 @@ export function useTakeBeginRecording({
   onRecordersStopped,
   primeBrowserTranscriptForRecordingSession,
 }: UseTakeBeginRecordingParams) {
-  const expectedRecorderStopsRef = useRef(0);
-
   function handleRecorderStopped() {
     stoppedRecordersRef.current += 1;
     if (stoppedRecordersRef.current < expectedRecorderStopsRef.current) {
@@ -171,12 +171,9 @@ export function useTakeBeginRecording({
     cameraRecorderRef.current = cameraRecorder;
     screenRecorderRef.current = screenRecorder;
 
-    let startedRecorders = 0;
     cameraRecorder.start(1000);
-    startedRecorders += 1;
     screenRecorder.start(1000);
-    startedRecorders += 1;
-    expectedRecorderStopsRef.current = startedRecorders;
+    expectedRecorderStopsRef.current = 2;
 
     primeBrowserTranscriptForRecordingSession();
 
@@ -189,8 +186,11 @@ export function useTakeBeginRecording({
     const countdownInterval = setInterval(() => {
       setTimeLeft((current) => {
         if (current <= 1) {
-          clearInterval(countdownInterval);
-          timerRef.current = null;
+          const intervalId = timerRef.current;
+          if (intervalId !== null) {
+            clearInterval(intervalId);
+            timerRef.current = null;
+          }
           requestVersionActionRef.current('submit');
           return 0;
         }
