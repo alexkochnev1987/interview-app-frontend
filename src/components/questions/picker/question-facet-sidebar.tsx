@@ -126,7 +126,13 @@ export function QuestionFacetSidebar(props: QuestionFacetSidebarProps) {
           </Button>
 
           {error ? (
-            <Inline gap={3} align="center" wrap="wrap">
+            <Stack gap={2}>
+              <BodyText size="sm" weight="semibold">
+                {TOAST_MESSAGES.questionFacets.unavailableTitle}
+              </BodyText>
+              <BodyText size="sm" tone="muted">
+                {error}
+              </BodyText>
               <Button
                 type="button"
                 variant="outline-pill"
@@ -136,7 +142,7 @@ export function QuestionFacetSidebar(props: QuestionFacetSidebarProps) {
               >
                 Retry
               </Button>
-            </Inline>
+            </Stack>
           ) : null}
         </Stack>
 

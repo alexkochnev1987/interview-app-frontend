@@ -259,13 +259,15 @@ function QuestionsPageContent() {
             </CardGrid>
           )}
 
-          <QuestionPagination
-            page={query.state.page}
-            totalPages={query.totalPages}
-            total={query.total}
-            limit={query.state.limit}
-            onPageChange={query.setPage}
-          />
+          {!query.error ? (
+            <QuestionPagination
+              page={query.state.page}
+              totalPages={query.totalPages}
+              total={query.total}
+              limit={query.state.limit}
+              onPageChange={query.setPage}
+            />
+          ) : null}
         </Stack>
       </Grid>
 

@@ -9,7 +9,7 @@ import { SurfaceTile } from '@/components/ui/surface-tile'
 import { BodyText } from '@/components/ui/text'
 import { useNotifyErrorOnce, useNotifyOnceWhen } from '@/hooks/use-notify-once'
 import { type BulkDeleteResult } from '@/lib/api'
-import { notifySuccess } from '@/lib/toast'
+import { notifyInfo, notifySuccess } from '@/lib/toast'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
 import { truncateText } from '@/lib/text'
 
@@ -60,7 +60,7 @@ export function BulkDeleteResultAlerts({
     toastId: 'bulk-delete-partial',
     notify: () => {
       if (!result) return
-      notifySuccess(
+      notifyInfo(
         TOAST_MESSAGES.bulkDelete.partialTitle(
           result.deleted.length,
           result.blocked.length,
