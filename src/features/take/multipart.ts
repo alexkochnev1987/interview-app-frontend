@@ -38,7 +38,11 @@ export function queueBufferedUpload({
       (activeSession.bufferedBytes >= MULTIPART_PART_SIZE_BYTES ||
         (forceFinal && activeSession.bufferedBytes > 0))
     ) {
-      const partBlob = new Blob(activeSession.bufferedChunks, { type: 'video/webm' });
+      const inferredType =
+        activeSession.partBlobType?.trim() ||
+        activeSession.bufferedChunks[0]?.type?.trim() ||
+        'video/webm';
+      const partBlob = new Blob(activeSession.bufferedChunks, { type: inferredType });
       activeSession.bufferedChunks = [];
       activeSession.bufferedBytes = 0;
 

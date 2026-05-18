@@ -5,12 +5,39 @@ import type { TakeStage } from '@/components/take/types';
 import { TAKE_MESSAGES } from './messages';
 
 type ScreenTrackSettings = MediaTrackSettings & { displaySurface?: string };
+
 type InterviewDisplayMediaOptions = DisplayMediaStreamOptions & {
   monitorTypeSurfaces?: 'include' | 'exclude';
   selfBrowserSurface?: 'include' | 'exclude';
   surfaceSwitching?: 'include' | 'exclude';
   systemAudio?: 'include' | 'exclude';
 };
+
+const INTERVIEW_DISPLAY_MEDIA_OPTIONS: InterviewDisplayMediaOptions = {
+  video: true,
+  audio: true,
+  monitorTypeSurfaces: 'include',
+  selfBrowserSurface: 'exclude',
+  surfaceSwitching: 'include',
+  systemAudio: 'include',
+};
+
+function readDisplaySurface(screenTrack: MediaStreamTrack): string {
+  return (screenTrack.getSettings() as ScreenTrackSettings).displaySurface ?? 'unknown';
+}
+
+function isAcceptedInterviewDisplaySurface(displaySurface: string): boolean {
+  return displaySurface === 'monitor';
+}
+
+function logInterviewDisplaySurfaceRejected(context: string, displaySurface: string) {
+  if (process.env.NODE_ENV === 'development') {
+    console.debug('[take:screen] Rejected capture: expected displaySurface "monitor".', {
+      context,
+      displaySurface,
+    });
+  }
+}
 
 interface UseTakePermissionsParams {
   setSetupBusy: (value: boolean) => void;
@@ -21,6 +48,7 @@ interface UseTakePermissionsParams {
   setStage: Dispatch<SetStateAction<TakeStage>>;
   clearRecordingArtifacts: () => void;
   releaseCaptureStreams: () => void;
+  releaseLobbyCameraOnly: () => void;
   attachCameraPreview: (stream: MediaStream) => void;
   stopMediaStream: (stream: MediaStream | null) => void;
   handleScreenShareEnded: (message: string) => void;
@@ -39,6 +67,7 @@ export function useTakePermissions({
   setStage,
   clearRecordingArtifacts,
   releaseCaptureStreams,
+  releaseLobbyCameraOnly,
   attachCameraPreview,
   stopMediaStream,
   handleScreenShareEnded,
@@ -47,7 +76,6 @@ export function useTakePermissions({
   cameraStreamRef,
   screenVideoRef,
 }: UseTakePermissionsParams) {
-  /** Full teardown + capture (used when reconnecting from the recording flow). */
   async function restartFullInterviewCapture() {
     if (!navigator.mediaDevices?.getUserMedia || !navigator.mediaDevices?.getDisplayMedia) {
       setSetupError(TAKE_MESSAGES.browserUnsupported);
@@ -74,16 +102,7 @@ export function useTakePermissions({
       setCameraStatus('granted');
       setScreenStatus('pending');
 
-      const displayMediaOptions: InterviewDisplayMediaOptions = {
-        video: true,
-        audio: true,
-        monitorTypeSurfaces: 'include',
-        selfBrowserSurface: 'exclude',
-        surfaceSwitching: 'include',
-        systemAudio: 'include',
-      };
-
-      const screenStream = await navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
+      const screenStream = await navigator.mediaDevices.getDisplayMedia(INTERVIEW_DISPLAY_MEDIA_OPTIONS);
 
       const screenTrack = screenStream.getVideoTracks()[0];
       if (!screenTrack) {
@@ -91,8 +110,9 @@ export function useTakePermissions({
         throw new Error('Screen sharing did not provide a video track.');
       }
 
-      const displaySurface = (screenTrack.getSettings() as ScreenTrackSettings).displaySurface ?? 'unknown';
-      if (displaySurface !== 'monitor') {
+      const displaySurface = readDisplaySurface(screenTrack);
+      if (!isAcceptedInterviewDisplaySurface(displaySurface)) {
+        logInterviewDisplaySurfaceRejected('restartFullInterviewCapture', displaySurface);
         setScreenStatus('denied');
         setScreenSurface(displaySurface);
         stopMediaStream(screenStream);
@@ -131,16 +151,8 @@ export function useTakePermissions({
       setSetupError('');
       setCameraStatus('pending');
 
-      stopMediaStream(screenStreamRef.current);
-      screenStreamRef.current = null;
-      if (screenVideoRef.current) {
-        screenVideoRef.current.srcObject = null;
-      }
-      releaseCaptureStreams();
+      releaseLobbyCameraOnly();
       clearRecordingArtifacts();
-
-      setScreenStatus('idle');
-      setScreenSurface('');
 
       const cameraStream = await navigator.mediaDevices.getUserMedia({
         video: { width: 854, height: 480 },
@@ -182,16 +194,7 @@ export function useTakePermissions({
       setSetupError('');
       setScreenStatus('pending');
 
-      const displayMediaOptions: InterviewDisplayMediaOptions = {
-        video: true,
-        audio: true,
-        monitorTypeSurfaces: 'include',
-        selfBrowserSurface: 'exclude',
-        surfaceSwitching: 'include',
-        systemAudio: 'include',
-      };
-
-      const screenStream = await navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
+      const screenStream = await navigator.mediaDevices.getDisplayMedia(INTERVIEW_DISPLAY_MEDIA_OPTIONS);
 
       const screenTrack = screenStream.getVideoTracks()[0];
       if (!screenTrack) {
@@ -199,8 +202,9 @@ export function useTakePermissions({
         throw new Error('Screen sharing did not provide a video track.');
       }
 
-      const displaySurface = (screenTrack.getSettings() as ScreenTrackSettings).displaySurface ?? 'unknown';
-      if (displaySurface !== 'monitor') {
+      const displaySurface = readDisplaySurface(screenTrack);
+      if (!isAcceptedInterviewDisplaySurface(displaySurface)) {
+        logInterviewDisplaySurfaceRejected('attachLobbyScreenShare', displaySurface);
         setScreenStatus('denied');
         setScreenSurface(displaySurface);
         stopMediaStream(screenStream);
@@ -227,17 +231,22 @@ export function useTakePermissions({
   function enterInterviewFromLobby(): boolean {
     const cam = cameraStreamRef.current;
     if (!cam?.getTracks().some((t) => t.readyState === 'live')) {
+      setSetupError(TAKE_MESSAGES.lobbyInterviewStartBlocked);
       return false;
     }
     const screen = screenStreamRef.current;
     const screenTrack = screen?.getVideoTracks()[0];
     if (!screen?.active || !screenTrack || screenTrack.readyState !== 'live') {
+      setSetupError(TAKE_MESSAGES.lobbyInterviewStartBlocked);
       return false;
     }
-    const displaySurface = (screenTrack.getSettings() as ScreenTrackSettings).displaySurface ?? 'unknown';
-    if (displaySurface !== 'monitor') {
+    const displaySurface = readDisplaySurface(screenTrack);
+    if (!isAcceptedInterviewDisplaySurface(displaySurface)) {
+      logInterviewDisplaySurfaceRejected('enterInterviewFromLobby', displaySurface);
+      setSetupError(getPermissionErrorMessage(new Error('wrong-surface'), true));
       return false;
     }
+    setSetupError('');
     setStage('interview');
     return true;
   }

@@ -1,7 +1,7 @@
 import type { MutableRefObject } from 'react';
 
 import type { CaptureTarget, MultipartUploadSession, MultipartUploadState } from './runtime';
-import { TAKE_RECORDING_LIMIT_SECONDS } from './utils';
+import { buildMediaRecorderOptions, pickSupportedMediaRecorderMimeType, TAKE_RECORDING_LIMIT_SECONDS } from './utils';
 
 type PendingVersionAction = 'submit' | 'rerecord' | null;
 
@@ -136,10 +136,7 @@ export function useTakeBeginRecording({
       return;
     }
 
-    const recorderOptions: MediaRecorderOptions = {
-      mimeType: 'video/webm',
-      videoBitsPerSecond: 1_500_000,
-    };
+    const recorderOptions = buildMediaRecorderOptions();
 
     const cameraRecorder = new MediaRecorder(cameraStreamRef.current, recorderOptions);
     cameraRecorder.ondataavailable = (event) => {
@@ -156,6 +153,18 @@ export function useTakeBeginRecording({
     screenRecorder.onstop = () => {
       handleRecorderStopped();
     };
+
+    const cameraSession = multipartUploadsRef.current.camera;
+    const screenSession = multipartUploadsRef.current.screen;
+    const mimeForParts =
+      cameraRecorder.mimeType.trim() ||
+      screenRecorder.mimeType.trim() ||
+      pickSupportedMediaRecorderMimeType() ||
+      '';
+    if (cameraSession && screenSession && mimeForParts) {
+      cameraSession.partBlobType = mimeForParts;
+      screenSession.partBlobType = mimeForParts;
+    }
 
     cameraRecorderRef.current = cameraRecorder;
     screenRecorderRef.current = screenRecorder;

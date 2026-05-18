@@ -13,6 +13,7 @@ export interface MultipartUploadSession {
   questionIndex: number;
   mediaKey: string;
   uploadId: string;
+  partBlobType?: string;
   nextPartNumber: number;
   uploadedPartCount: number;
   bufferedChunks: Blob[];
@@ -54,6 +55,18 @@ export function releaseCaptureStreams(
   stopMediaStream(screenStreamRef.current);
   cameraStreamRef.current = null;
   screenStreamRef.current = null;
+
+  if (videoRef.current) {
+    videoRef.current.srcObject = null;
+  }
+}
+
+export function releaseCameraCapture(
+  cameraStreamRef: { current: MediaStream | null },
+  videoRef: { current: HTMLVideoElement | null },
+) {
+  stopMediaStream(cameraStreamRef.current);
+  cameraStreamRef.current = null;
 
   if (videoRef.current) {
     videoRef.current.srcObject = null;

@@ -17,6 +17,8 @@ export const TAKE_MESSAGES = {
   submitAndNext: 'Submit & Next',
   submitCompleteInterview: 'Submit & Finish',
   lobbyEnableCameraMicFirst: 'Enable your microphone and camera first, then share your entire screen.',
+  lobbyInterviewStartBlocked:
+    'Could not start the interview. Keep microphone, camera, and entire-screen sharing active, then try again.',
   lobbyEyebrow: 'Prep room',
   lobbyLead:
     'Enable mic and camera, share your full screen, then select Start Interview when all checks are ready.',
