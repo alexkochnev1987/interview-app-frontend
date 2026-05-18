@@ -29,6 +29,8 @@ export const TOAST_MESSAGES = {
       `Deleted ${deletedCount}, blocked ${blockedCount}`,
     successTitle: (count: number) => `Deleted ${count} question(s)`,
     successDescription: "The library is up to date.",
+    noopTitle: "No questions deleted",
+    noopDescription: "None of the selected questions were removed.",
     blockedIntro:
       "These questions are used in active interviews and were not deleted:",
   },

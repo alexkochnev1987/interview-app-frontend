@@ -24,7 +24,6 @@ import {
   type SimilarStatus,
   type SimilaritySignalSummary,
 } from '@/lib/question-editor/parsers'
-import { useNotifyErrorOnce } from '@/hooks/use-notify-once'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
 import { truncateText } from '@/lib/text'
 
@@ -51,13 +50,6 @@ export function SimilarityPanel({
   disabled,
   onRunSearch,
 }: SimilarityPanelProps) {
-  useNotifyErrorOnce({
-    value: status === 'error' ? error : null,
-    toastId: 'similarity-search-error',
-    message: TOAST_MESSAGES.similarity.searchFailedTitle,
-    description: error ?? undefined,
-  })
-
   return (
     <Card variant="surface">
       <CardHeader spacing="lg">
@@ -105,6 +97,30 @@ export function SimilarityPanel({
           <PanelMessage>
             Comparing the current draft with the stored question library.
           </PanelMessage>
+        ) : null}
+
+        {status === 'error' ? (
+          <Stack gap={2}>
+            <BodyText size="sm" weight="semibold">
+              {TOAST_MESSAGES.similarity.searchFailedTitle}
+            </BodyText>
+            {error ? (
+              <BodyText size="sm" tone="muted">
+                {error}
+              </BodyText>
+            ) : null}
+            <Button
+              type="button"
+              variant="outline-pill"
+              shape="pill"
+              size="sm"
+              onClick={onRunSearch}
+              disabled={disabled || !hasInput}
+            >
+              <Search className="size-3.5" />
+              Retry search
+            </Button>
+          </Stack>
         ) : null}
 
         {status === 'success' && matches.length === 0 ? (

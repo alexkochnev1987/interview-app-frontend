@@ -38,6 +38,13 @@ export function BulkDeleteResultAlerts({
     return `${operationGeneration}:${result.deleted.join(',')}|${result.blocked.map((item) => item.id).join(',')}`
   }, [result, operationGeneration])
 
+  const noopKey = useMemo(() => {
+    if (!result || result.deleted.length > 0 || result.blocked.length > 0) {
+      return null
+    }
+    return `${operationGeneration}:noop`
+  }, [result, operationGeneration])
+
   useNotifyErrorOnce({
     value: error ? `${operationGeneration}:${error}` : null,
     toastId: 'bulk-delete-error',
@@ -53,6 +60,17 @@ export function BulkDeleteResultAlerts({
       notifySuccess(TOAST_MESSAGES.bulkDelete.successTitle(result.deleted.length), {
         id: 'bulk-delete-success',
         description: TOAST_MESSAGES.bulkDelete.successDescription,
+      })
+    },
+  })
+
+  useNotifyOnceWhen({
+    value: noopKey,
+    toastId: 'bulk-delete-noop',
+    notify: () => {
+      notifyInfo(TOAST_MESSAGES.bulkDelete.noopTitle, {
+        id: 'bulk-delete-noop',
+        description: TOAST_MESSAGES.bulkDelete.noopDescription,
       })
     },
   })

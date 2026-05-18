@@ -7,7 +7,7 @@ import { RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { ApiError } from '@/lib/api'
-import { notifyError, notifyInfo, notifySuccess } from '@/lib/toast'
+import { notifyError, notifyInfo } from '@/lib/toast'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 const SUCCESS_AUTORESET_MS = 2500
@@ -64,7 +64,10 @@ export function RerunButton({
       const result = await onRun()
       if (!mountedRef.current) return
       if (result) {
-        notifySuccess(result.title, { description: result.message })
+        notifyInfo(result.title, {
+          id: 'rerun-informational',
+          description: result.message,
+        })
       }
       setPhase('submitted')
       router.refresh()
