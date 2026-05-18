@@ -20,6 +20,7 @@ interface TakeRecordingScreenProps {
   progressValue: number;
   screenSurface: string;
   setupError: string;
+  capturePipelineReady: boolean;
   submitError: string;
   timeLeft: number;
   versionPersistKind: VersionPersistKind | null;
@@ -46,6 +47,7 @@ export function TakeRecordingScreen({
   progressValue,
   screenSurface,
   setupError,
+  capturePipelineReady,
   submitError,
   timeLeft,
   versionPersistKind,
@@ -106,6 +108,7 @@ export function TakeRecordingScreen({
             interviewerPresence={interviewerPresence}
             uploading={uploading}
             setupError={setupError}
+            capturePipelineReady={capturePipelineReady}
             submitAnswerLabel={submitAnswerLabel}
             onReconnect={onReconnect}
             onRerecord={onRerecord}

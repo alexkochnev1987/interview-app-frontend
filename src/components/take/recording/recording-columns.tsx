@@ -70,6 +70,7 @@ interface TakeRecordingSidebarColumnProps {
   interviewerPresence: InterviewerPresence;
   uploading: boolean;
   setupError: string;
+  capturePipelineReady: boolean;
   submitAnswerLabel: string;
   onReconnect: () => void;
   onRerecord: () => void;
@@ -90,6 +91,7 @@ export function TakeRecordingSidebarColumn({
   interviewerPresence,
   uploading,
   setupError,
+  capturePipelineReady,
   submitAnswerLabel,
   onReconnect,
   onRerecord,
@@ -133,6 +135,7 @@ export function TakeRecordingSidebarColumn({
               stage={stage}
               uploading={uploading}
               setupError={setupError}
+              capturePipelineReady={capturePipelineReady}
               recording={recording}
               recordingStartBusy={recordingStartBusy}
               interviewerPresence={interviewerPresence}

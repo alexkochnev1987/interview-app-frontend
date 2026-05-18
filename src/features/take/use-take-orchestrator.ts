@@ -184,8 +184,14 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
 
   function stopActiveRecorders() {
     clearProgressTimers(timerRef, progressHeartbeatRef, progressFlushTimeoutRef);
-    if (cameraRecorderRef.current?.state === 'recording') cameraRecorderRef.current.stop();
-    if (screenRecorderRef.current?.state === 'recording') screenRecorderRef.current.stop();
+    const cameraRecorder = cameraRecorderRef.current;
+    const screenRecorder = screenRecorderRef.current;
+    if (cameraRecorder && cameraRecorder.state !== 'inactive') {
+      cameraRecorder.stop();
+    }
+    if (screenRecorder && screenRecorder.state !== 'inactive') {
+      screenRecorder.stop();
+    }
     setRecording(false);
   }
 

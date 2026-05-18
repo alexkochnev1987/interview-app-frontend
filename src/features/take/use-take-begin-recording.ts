@@ -1,4 +1,4 @@
-import type { MutableRefObject } from 'react';
+import { useRef, type MutableRefObject } from 'react';
 
 import type { CaptureTarget, MultipartUploadSession, MultipartUploadState } from './runtime';
 import { buildMediaRecorderOptions, pickSupportedMediaRecorderMimeType, TAKE_RECORDING_LIMIT_SECONDS } from './utils';
@@ -81,9 +81,11 @@ export function useTakeBeginRecording({
   onRecordersStopped,
   primeBrowserTranscriptForRecordingSession,
 }: UseTakeBeginRecordingParams) {
+  const expectedRecorderStopsRef = useRef(0);
+
   function handleRecorderStopped() {
     stoppedRecordersRef.current += 1;
-    if (stoppedRecordersRef.current !== 2) {
+    if (stoppedRecordersRef.current < expectedRecorderStopsRef.current) {
       return;
     }
     onRecordersStopped();
@@ -168,8 +170,14 @@ export function useTakeBeginRecording({
 
     cameraRecorderRef.current = cameraRecorder;
     screenRecorderRef.current = screenRecorder;
+
+    let startedRecorders = 0;
     cameraRecorder.start(1000);
+    startedRecorders += 1;
     screenRecorder.start(1000);
+    startedRecorders += 1;
+    expectedRecorderStopsRef.current = startedRecorders;
+
     primeBrowserTranscriptForRecordingSession();
 
     setRecording(true);
@@ -178,15 +186,18 @@ export function useTakeBeginRecording({
     setStage('recording');
     clearVersionPersistKind();
 
-    timerRef.current = setInterval(() => {
+    const countdownInterval = setInterval(() => {
       setTimeLeft((current) => {
         if (current <= 1) {
+          clearInterval(countdownInterval);
+          timerRef.current = null;
           requestVersionActionRef.current('submit');
           return 0;
         }
         return current - 1;
       });
     }, 1000);
+    timerRef.current = countdownInterval;
   }
 
   return { beginRecording };

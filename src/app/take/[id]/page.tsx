@@ -55,6 +55,7 @@ export default function TakeInterviewPage() {
     recording,
     startInterviewFromLobby,
     recordingStartBusy,
+    capturePipelineReady,
     currentVersionNumber,
     requestVersionAction,
     permissionLabel,
@@ -135,6 +136,7 @@ export default function TakeInterviewPage() {
       progressValue={progressValue}
       screenSurface={screenSurface}
       setupError={setupError}
+      capturePipelineReady={capturePipelineReady}
       submitError={submitError}
       timeLeft={timeLeft}
       versionPersistKind={versionPersistKind}

@@ -4,6 +4,11 @@ import { useEffect, useRef, useState } from 'react';
 import type { TakeStage } from '@/components/take/types';
 import type { TakeInterviewData } from '@/lib/api';
 
+const QUESTION_SPEAK_MS_PER_CHAR = 100;
+const QUESTION_SPEAK_WATCHDOG_SLACK_MS = 15_000;
+const QUESTION_SPEAK_WATCHDOG_MIN_MS = 10_000;
+const QUESTION_SPEAK_WATCHDOG_MAX_MS = 25 * 60 * 1000;
+
 export type InterviewerPresence = 'speaking' | 'listening';
 
 export type QuestionSpeechSynthCapture = Readonly<{
@@ -87,12 +92,31 @@ export function useTakeQuestionTts(
     queueMicrotask(() => setSpeakingActive(true));
 
     let done = false;
+    let watchdogTimer: ReturnType<typeof setTimeout> | undefined;
+
     const release = () => {
       if (done) return;
       done = true;
+      if (watchdogTimer !== undefined) {
+        clearTimeout(watchdogTimer);
+        watchdogTimer = undefined;
+      }
       recordingAllowedRef.current = true;
       queueMicrotask(() => setSpeakingActive(false));
     };
+
+    const watchdogMs = Math.min(
+      QUESTION_SPEAK_WATCHDOG_MAX_MS,
+      Math.max(
+        QUESTION_SPEAK_WATCHDOG_MIN_MS,
+        text.length * QUESTION_SPEAK_MS_PER_CHAR + QUESTION_SPEAK_WATCHDOG_SLACK_MS,
+      ),
+    );
+
+    watchdogTimer = setTimeout(() => {
+      speechCapture?.scheduleRecognitionResumeAfterSynthUtterance();
+      release();
+    }, watchdogMs);
 
     speakQuestion(text, release, speechCapture ?? null);
 

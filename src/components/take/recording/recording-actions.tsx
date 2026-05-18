@@ -10,6 +10,7 @@ interface TakeRecordingActionsProps {
   stage: TakeStage;
   uploading: boolean;
   setupError: string;
+  capturePipelineReady: boolean;
   recording: boolean;
   recordingStartBusy: boolean;
   interviewerPresence: InterviewerPresence;
@@ -23,6 +24,7 @@ export function TakeRecordingActions({
   stage,
   uploading,
   setupError,
+  capturePipelineReady,
   recording,
   recordingStartBusy,
   interviewerPresence,
@@ -40,7 +42,7 @@ export function TakeRecordingActions({
 
   return (
     <Stack align="stretch" gap={3} width="full">
-      {stage === 'interview' && setupError ? (
+      {stage === 'interview' && (!capturePipelineReady || setupError) ? (
         <Button
           type="button"
           variant="outline"
