@@ -7,7 +7,7 @@ import { RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { ApiError } from '@/lib/api'
-import { notifyError, notifySuccess } from '@/lib/toast'
+import { notifyError, notifyInfo, notifySuccess } from '@/lib/toast'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 const SUCCESS_AUTORESET_MS = 2500
@@ -71,7 +71,8 @@ export function RerunButton({
     } catch (err) {
       if (!mountedRef.current) return
       if (err instanceof ApiError && err.status === 409) {
-        notifySuccess(TOAST_MESSAGES.rerun.alreadyInProgressTitle, {
+        notifyInfo(TOAST_MESSAGES.rerun.alreadyInProgressTitle, {
+          id: 'rerun-already-in-progress',
           description: err.message,
         })
         setPhase('submitted')

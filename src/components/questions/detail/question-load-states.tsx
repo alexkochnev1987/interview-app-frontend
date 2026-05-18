@@ -18,8 +18,7 @@ import { Inline } from '@/components/ui/layout/inline'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText } from '@/components/ui/text'
-
-const LOAD_FAILED_TITLE = 'Load failed'
+import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 export function QuestionLoadingCard() {
   return (
@@ -50,8 +49,7 @@ export function QuestionUnavailableCard({ message }: QuestionUnavailableCardProp
     <PageShell>
       <FlashErrorToast
         toastId="question-load-failed"
-        message={LOAD_FAILED_TITLE}
-        description={message}
+        message={TOAST_MESSAGES.pageGate.questions.loadFailedTitle}
       />
       <Card variant="floating">
         <CardHeader spacing="md">
@@ -59,11 +57,11 @@ export function QuestionUnavailableCard({ message }: QuestionUnavailableCardProp
             <AlertTriangle className="size-5" />
           </IconBadge>
           <Stack gap={2}>
-            <CardTitle size="xl">Question unavailable</CardTitle>
+            <CardTitle size="xl">
+              {TOAST_MESSAGES.pageGate.questions.unavailableTitle}
+            </CardTitle>
             <CardDescription width="lg">
-              The editor could not load this question, so the route stops here
-              instead of rendering a partially broken form. Details are shown in
-              the notification.
+              {TOAST_MESSAGES.pageGate.questions.loadFailedCardDescription}
             </CardDescription>
           </Stack>
         </CardHeader>

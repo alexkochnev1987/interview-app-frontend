@@ -1,7 +1,7 @@
 'use client'
 
 import { RotateCcw, Search } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -20,7 +20,7 @@ import type {
   QuestionDifficulty,
   QuestionStatusFilter,
 } from '@/lib/api'
-import { notifyError } from '@/lib/toast'
+import { useNotifyErrorOnce } from '@/hooks/use-notify-once'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 const COLLAPSED_LIMIT = 6
@@ -84,22 +84,12 @@ export function QuestionFacetSidebar(props: QuestionFacetSidebarProps) {
     selected.tags.length +
     (showStatusFilter && selected.status !== 'active' ? 1 : 0)
 
-  const lastFacetsErrorRef = useRef<string | null>(null)
-
-  useEffect(() => {
-    if (!error) {
-      lastFacetsErrorRef.current = null
-      return
-    }
-    if (error === lastFacetsErrorRef.current) {
-      return
-    }
-    lastFacetsErrorRef.current = error
-    notifyError(TOAST_MESSAGES.questionFacets.unavailableTitle, {
-      id: 'question-facets-error',
-      description: error,
-    })
-  }, [error])
+  useNotifyErrorOnce({
+    value: error,
+    toastId: 'question-facets-error',
+    message: TOAST_MESSAGES.questionFacets.unavailableTitle,
+    description: error,
+  })
 
   return (
     <Card variant="surface" size="sm">

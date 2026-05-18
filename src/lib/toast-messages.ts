@@ -4,10 +4,6 @@ export const TOAST_MESSAGES = {
     createError: "Failed to create question",
     saveSuccess: "Question saved",
     saveError: "Failed to save question",
-    bulkDeleteSuccess: "Questions deleted",
-    bulkDeletePartialSuccess: "Questions deleted with skips",
-    bulkDeleteNoopSuccess: "No questions deleted",
-    bulkDeleteError: "Failed to delete questions",
     restoreSuccess: "Question restored",
     restoreError: "Failed to restore question",
     deleteSuccess: "Question deleted",
@@ -53,9 +49,6 @@ export const TOAST_MESSAGES = {
       unavailableTitle: "Assessment unavailable",
       loadDetailFallback: "Failed to load assessment.",
       notFoundFallback: "The requested assessment could not be loaded.",
-      interviewFailedTitle: "This interview failed to complete",
-      interviewFailedDescription:
-        "The take ended in a failed state. Some answers, transcripts, or evaluations may be missing. You can re-run AI evaluation for any answer that does have a transcript below.",
     },
     interview: {
       unavailableTitle: "Interview unavailable",
@@ -69,6 +62,10 @@ export const TOAST_MESSAGES = {
     },
     questions: {
       editorIssueTitle: "Question editor issue",
+      loadFailedTitle: "Load failed",
+      unavailableTitle: "Question unavailable",
+      loadFailedCardDescription:
+        "The editor could not load this question, so the route stops here instead of rendering a partially broken form.",
     },
   },
   rerun: {
@@ -86,8 +83,5 @@ export const TOAST_MESSAGES = {
   },
   deleteQuestion: {
     cannotDeleteTitle: "Cannot delete",
-  },
-  interviewAction: {
-    failedTitle: "Interview action failed",
   },
 } as const

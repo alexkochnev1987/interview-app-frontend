@@ -1,14 +1,15 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useMemo } from 'react'
 
 import { BulletList } from '@/components/ui/bullet-list'
 import { Card, CardContent } from '@/components/ui/card'
 import { Stack } from '@/components/ui/layout/stack'
 import { SurfaceTile } from '@/components/ui/surface-tile'
 import { BodyText } from '@/components/ui/text'
+import { useNotifyErrorOnce, useNotifyOnceWhen } from '@/hooks/use-notify-once'
 import { type BulkDeleteResult } from '@/lib/api'
-import { notifyError, notifySuccess } from '@/lib/toast'
+import { notifySuccess } from '@/lib/toast'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
 import { truncateText } from '@/lib/text'
 
@@ -21,59 +22,53 @@ export function BulkDeleteResultAlerts({
   result,
   error,
 }: BulkDeleteResultAlertsProps) {
-  const lastErrorRef = useRef<string | null>(null)
-  const lastSuccessKeyRef = useRef<string | null>(null)
-  const lastPartialKeyRef = useRef<string | null>(null)
-
-  useEffect(() => {
-    if (!error) {
-      lastErrorRef.current = null
-      return
-    }
-    if (error === lastErrorRef.current) {
-      return
-    }
-    lastErrorRef.current = error
-    notifyError(TOAST_MESSAGES.bulkDelete.failedTitle, {
-      id: 'bulk-delete-error',
-      description: error,
-    })
-  }, [error])
-
-  useEffect(() => {
+  const successKey = useMemo(() => {
     if (!result || result.blocked.length > 0 || result.deleted.length === 0) {
-      lastSuccessKeyRef.current = null
-      return
+      return null
     }
-    const key = result.deleted.join(',')
-    if (key === lastSuccessKeyRef.current) {
-      return
-    }
-    lastSuccessKeyRef.current = key
-    notifySuccess(TOAST_MESSAGES.bulkDelete.successTitle(result.deleted.length), {
-      id: 'bulk-delete-success',
-      description: TOAST_MESSAGES.bulkDelete.successDescription,
-    })
+    return result.deleted.join(',')
   }, [result])
 
-  useEffect(() => {
+  const partialKey = useMemo(() => {
     if (!result || result.blocked.length === 0) {
-      lastPartialKeyRef.current = null
-      return
+      return null
     }
-    const key = `${result.deleted.join(',')}|${result.blocked.map((item) => item.id).join(',')}`
-    if (key === lastPartialKeyRef.current) {
-      return
-    }
-    lastPartialKeyRef.current = key
-    notifySuccess(
-      TOAST_MESSAGES.bulkDelete.partialTitle(
-        result.deleted.length,
-        result.blocked.length,
-      ),
-      { id: 'bulk-delete-partial' },
-    )
+    return `${result.deleted.join(',')}|${result.blocked.map((item) => item.id).join(',')}`
   }, [result])
+
+  useNotifyErrorOnce({
+    value: error,
+    toastId: 'bulk-delete-error',
+    message: TOAST_MESSAGES.bulkDelete.failedTitle,
+    description: error,
+  })
+
+  useNotifyOnceWhen({
+    value: successKey,
+    toastId: 'bulk-delete-success',
+    notify: () => {
+      if (!result) return
+      notifySuccess(TOAST_MESSAGES.bulkDelete.successTitle(result.deleted.length), {
+        id: 'bulk-delete-success',
+        description: TOAST_MESSAGES.bulkDelete.successDescription,
+      })
+    },
+  })
+
+  useNotifyOnceWhen({
+    value: partialKey,
+    toastId: 'bulk-delete-partial',
+    notify: () => {
+      if (!result) return
+      notifySuccess(
+        TOAST_MESSAGES.bulkDelete.partialTitle(
+          result.deleted.length,
+          result.blocked.length,
+        ),
+        { id: 'bulk-delete-partial' },
+      )
+    },
+  })
 
   if (error) {
     return null

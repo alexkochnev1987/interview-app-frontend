@@ -2,6 +2,7 @@
 
 import { RerunButton } from '@/components/assessments/detail/rerun-button'
 import { validateInterview } from '@/lib/api'
+import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 interface RerunAllButtonProps {
   interviewId: string
@@ -24,16 +25,15 @@ export function RerunAllButton({
       size={size}
       variant={variant}
       idleLabel={label}
-      submittedLabel="Re-evaluation queued"
-      errorTitle="Could not start re-evaluation"
-      errorFallback="Failed to start re-evaluation."
+      submittedLabel={TOAST_MESSAGES.rerun.queuedLabel}
+      errorTitle={TOAST_MESSAGES.rerun.startFailedTitle}
+      errorFallback={TOAST_MESSAGES.rerun.allFailedFallback}
       onRun={async () => {
         const res = await validateInterview(interviewId, { force: true })
         if (res.requestedCount === 0) {
           return {
-            title: 'Nothing to re-evaluate',
-            message:
-              'No submitted answers to score yet. The candidate has not finished any answers.',
+            title: TOAST_MESSAGES.rerun.nothingToReevaluateTitle,
+            message: TOAST_MESSAGES.rerun.nothingToReevaluateMessage,
           }
         }
         return undefined

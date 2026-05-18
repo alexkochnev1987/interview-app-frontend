@@ -22,6 +22,9 @@ const FORBIDDEN_DESCRIPTION =
 
 const LOAD_FAILED_TITLE = TOAST_MESSAGES.pageGate.assessments.loadFailedTitle
 
+const ERROR_BACK_HREF = '/'
+const ERROR_BACK_LABEL = 'Back to dashboard'
+
 function sortByCompletion(a: Interview, b: Interview): number {
   const ca = getCompletionDate(a)
   const cb = getCompletionDate(b)
@@ -53,7 +56,9 @@ export default async function AssessmentsPage() {
         toastMessage={LOAD_FAILED_TITLE}
         toastDescription={auth.message}
         title="Assessments are unavailable right now"
-        description="We could not verify your session or permissions. Check the notification for more detail, or go back home and try again."
+        description="We could not verify your session or permissions. Check the notification for more detail, or return to the dashboard and try again."
+        backHref={ERROR_BACK_HREF}
+        backLabel={ERROR_BACK_LABEL}
       />
     )
   }
@@ -87,6 +92,8 @@ export default async function AssessmentsPage() {
         toastDescription={error}
         title={LOAD_FAILED_TITLE}
         description="Something went wrong while loading the assessment list from the workspace. Details are shown in the notification."
+        backHref={ERROR_BACK_HREF}
+        backLabel={ERROR_BACK_LABEL}
       />
     )
   }

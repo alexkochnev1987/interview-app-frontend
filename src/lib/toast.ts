@@ -7,6 +7,7 @@ type NotifyOptions = {
 
 const DEFAULT_SUCCESS_TITLE = "Done"
 const DEFAULT_ERROR_TITLE = "Something went wrong"
+const DEFAULT_INFO_TITLE = "Notice"
 
 function toSentence(value: string) {
   const trimmed = value.trim()
@@ -20,6 +21,14 @@ function toSentence(value: string) {
 
 export function notifySuccess(message = DEFAULT_SUCCESS_TITLE, options?: NotifyOptions) {
   toast.success(toSentence(message), {
+    id: options?.id,
+    description: options?.description ? toSentence(options.description) : undefined,
+  })
+}
+
+export function notifyInfo(message = DEFAULT_INFO_TITLE, options?: NotifyOptions) {
+  toast.info(toSentence(message), {
+    id: options?.id,
     description: options?.description ? toSentence(options.description) : undefined,
   })
 }

@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
 import { LoaderCircle, Trash2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -12,7 +11,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { PageShell } from '@/components/ui/layout/page-shell'
-import { notifyError } from '@/lib/toast'
+import { useNotifyErrorOnce } from '@/hooks/use-notify-once'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 interface QuestionDangerZoneProps {
@@ -26,22 +25,12 @@ export function QuestionDangerZone({
   deleteError,
   onRequestDelete,
 }: QuestionDangerZoneProps) {
-  const lastDeleteErrorRef = useRef<string | null>(null)
-
-  useEffect(() => {
-    if (!deleteError) {
-      lastDeleteErrorRef.current = null
-      return
-    }
-    if (deleteError === lastDeleteErrorRef.current) {
-      return
-    }
-    lastDeleteErrorRef.current = deleteError
-    notifyError(TOAST_MESSAGES.deleteQuestion.cannotDeleteTitle, {
-      id: 'delete-question-error',
-      description: deleteError,
-    })
-  }, [deleteError])
+  useNotifyErrorOnce({
+    value: deleteError,
+    toastId: 'delete-question-error',
+    message: TOAST_MESSAGES.deleteQuestion.cannotDeleteTitle,
+    description: deleteError,
+  })
 
   return (
     <PageShell as="section" spacing="compact" padding="bottom">

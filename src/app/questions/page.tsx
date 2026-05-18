@@ -1,8 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { Suspense, useEffect, useRef, useState } from 'react'
-import { LoaderCircle, Search, Trash2 } from 'lucide-react'
+import { Suspense, useState } from 'react'
+import { AlertCircle, LoaderCircle, Search, Trash2 } from 'lucide-react'
 
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { EmptyStateCard, LoadingStateCard } from '@/components/ui/state-card'
@@ -26,8 +26,8 @@ import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { deleteQuestionsBulk, type BulkDeleteResult } from '@/lib/api'
 import { useAuth } from '@/lib/auth-context'
+import { useNotifyErrorOnce } from '@/hooks/use-notify-once'
 import { runMutation } from '@/lib/run-mutation'
-import { notifyError } from '@/lib/toast'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 export default function QuestionsPage() {
@@ -67,22 +67,13 @@ function QuestionsPageContent() {
   const [bulkDeleting, setBulkDeleting] = useState(false)
   const [bulkResult, setBulkResult] = useState<BulkDeleteResult | null>(null)
   const [bulkError, setBulkError] = useState<string | null>(null)
-  const lastFeedErrorRef = useRef<string | null>(null)
 
-  useEffect(() => {
-    if (!query.error) {
-      lastFeedErrorRef.current = null
-      return
-    }
-    if (query.error === lastFeedErrorRef.current) {
-      return
-    }
-    lastFeedErrorRef.current = query.error
-    notifyError(TOAST_MESSAGES.questionFeed.unavailableTitle, {
-      id: 'question-feed-error',
-      description: query.error,
-    })
-  }, [query.error])
+  useNotifyErrorOnce({
+    value: query.error,
+    toastId: 'question-feed-error',
+    message: TOAST_MESSAGES.questionFeed.unavailableTitle,
+    description: query.error,
+  })
 
   function toggleSelected(id: string) {
     setSelectedIds((prev) => {
@@ -101,21 +92,10 @@ function QuestionsPageContent() {
     setBulkDeleting(true)
     setBulkError(null)
     try {
-      const result = await runMutation(
-        () => deleteQuestionsBulk(ids),
-        {
-          getSuccessMessage: ({ deleted, blocked }) => {
-            if (deleted.length === 0 && blocked.length > 0) {
-              return TOAST_MESSAGES.question.bulkDeleteNoopSuccess
-            }
-            if (deleted.length > 0 && blocked.length > 0) {
-              return TOAST_MESSAGES.question.bulkDeletePartialSuccess
-            }
-            return TOAST_MESSAGES.question.bulkDeleteSuccess
-          },
-          errorMessage: TOAST_MESSAGES.question.bulkDeleteError,
-        }
-      )
+      const result = await runMutation(() => deleteQuestionsBulk(ids), {
+        showSuccessToast: false,
+        showErrorToast: false,
+      })
       setSelectedIds(new Set())
       setBulkConfirmOpen(false)
       setBulkResult(result)
@@ -180,20 +160,6 @@ function QuestionsPageContent() {
         />
 
         <Stack gap={4}>
-          {query.error ? (
-            <Inline gap={3} align="center" wrap="wrap">
-              <Button
-                type="button"
-                variant="outline-pill"
-                shape="pill"
-                size="sm"
-                onClick={query.refetch}
-              >
-                Retry
-              </Button>
-            </Inline>
-          ) : null}
-
           <QuestionPickerToolbar
             q={query.state.q}
             onQChange={query.setQ}
@@ -236,7 +202,27 @@ function QuestionsPageContent() {
             <BulkDeleteResultAlerts result={bulkResult} error={bulkError} />
           )}
 
-          {query.loading && query.items.length === 0 ? (
+          {query.error ? (
+            <EmptyStateCard
+              icon={
+                <Icon size="lg">
+                  <AlertCircle />
+                </Icon>
+              }
+              title={TOAST_MESSAGES.questionFeed.unavailableTitle}
+              description={query.error}
+              action={
+                <Button
+                  type="button"
+                  variant="outline-pill"
+                  shape="pill"
+                  onClick={query.refetch}
+                >
+                  Retry
+                </Button>
+              }
+            />
+          ) : query.loading && query.items.length === 0 ? (
             <LoadingStateCard label="Loading questions..." />
           ) : showEmptyState ? (
             <EmptyStateCard

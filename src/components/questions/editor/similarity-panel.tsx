@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useRef } from 'react'
 import { Search } from 'lucide-react'
 
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
@@ -25,7 +24,7 @@ import {
   type SimilarStatus,
   type SimilaritySignalSummary,
 } from '@/lib/question-editor/parsers'
-import { notifyError } from '@/lib/toast'
+import { useNotifyErrorOnce } from '@/hooks/use-notify-once'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
 import { truncateText } from '@/lib/text'
 
@@ -52,22 +51,12 @@ export function SimilarityPanel({
   disabled,
   onRunSearch,
 }: SimilarityPanelProps) {
-  const lastSimilarityErrorRef = useRef<string | null>(null)
-
-  useEffect(() => {
-    if (status !== 'error' || !error) {
-      lastSimilarityErrorRef.current = null
-      return
-    }
-    if (error === lastSimilarityErrorRef.current) {
-      return
-    }
-    lastSimilarityErrorRef.current = error
-    notifyError(TOAST_MESSAGES.similarity.searchFailedTitle, {
-      id: 'similarity-search-error',
-      description: error,
-    })
-  }, [error, status])
+  useNotifyErrorOnce({
+    value: status === 'error' ? error : null,
+    toastId: 'similarity-search-error',
+    message: TOAST_MESSAGES.similarity.searchFailedTitle,
+    description: error ?? undefined,
+  })
 
   return (
     <Card variant="surface">
@@ -120,7 +109,7 @@ export function SimilarityPanel({
 
         {status === 'success' && matches.length === 0 ? (
           <PanelMessage>
-            No close matches crossed the current similarity threshold.
+            {TOAST_MESSAGES.similarity.noMatches}
           </PanelMessage>
         ) : null}
 

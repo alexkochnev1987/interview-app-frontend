@@ -1,8 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
-
-import { notifyError } from '@/lib/toast'
+import { useNotifyErrorOnce } from '@/hooks/use-notify-once'
 
 type FlashErrorToastProps = {
   message: string
@@ -10,19 +8,22 @@ type FlashErrorToastProps = {
   toastId: string
 }
 
-export function FlashErrorToast({ message, description, toastId }: FlashErrorToastProps) {
-  const shownRef = useRef(false)
+function flashDedupeValue(message: string, description?: string) {
+  const title = message.trim()
+  const detail = description?.trim()
+  if (!detail) {
+    return title
+  }
+  return `${title}\0${detail}`
+}
 
-  useEffect(() => {
-    if (shownRef.current) {
-      return
-    }
-    shownRef.current = true
-    notifyError(message, {
-      id: toastId,
-      ...(description ? { description } : {}),
-    })
-  }, [message, description, toastId])
+export function FlashErrorToast({ message, description, toastId }: FlashErrorToastProps) {
+  useNotifyErrorOnce({
+    value: flashDedupeValue(message, description),
+    toastId,
+    message,
+    description,
+  })
 
   return null
 }
