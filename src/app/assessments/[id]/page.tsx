@@ -124,6 +124,7 @@ export default async function AssessmentDetailPage({
 
       <EvaluationProgressBanner interview={interview} />
 
+      {/* Persistent contextual banner — see DOCUMENTATION.md (Alert vs toast). */}
       {isFailed ? (
         <Alert variant="danger">
           <AlertTitle>This interview failed to complete</AlertTitle>

@@ -52,6 +52,10 @@ Treat `shadcn/ui` components as a base layer, not as a place to dump app-specifi
 If the app needs a new visual treatment, add a variant or wrap the primitive in a semantic component.
 If the app needs a new composition pattern, add or extend a layout primitive in `src/components/ui/layout/**`.
 
+## User feedback (Alert vs toast)
+
+See `DOCUMENTATION.md` → **Alert vs toast**. Persistent or actionable page state → `Alert`; transient action outcomes and one-shot errors → Sonner (`notifySuccess` / `notifyError` / `notifyInfo`). Recoverable sidebar/feed errors may use inline copy + Retry without a duplicate toast.
+
 ## Non-Goals
 - Do not rewrite untouched files.
 - Do not restyle screens unless the current task already requires editing that screen.

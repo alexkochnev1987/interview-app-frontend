@@ -16,28 +16,30 @@ import { truncateText } from '@/lib/text'
 interface BulkDeleteResultAlertsProps {
   result: BulkDeleteResult | null
   error: string | null
+  operationGeneration: number
 }
 
 export function BulkDeleteResultAlerts({
   result,
   error,
+  operationGeneration,
 }: BulkDeleteResultAlertsProps) {
   const successKey = useMemo(() => {
     if (!result || result.blocked.length > 0 || result.deleted.length === 0) {
       return null
     }
-    return result.deleted.join(',')
-  }, [result])
+    return `${operationGeneration}:${result.deleted.join(',')}`
+  }, [result, operationGeneration])
 
   const partialKey = useMemo(() => {
     if (!result || result.blocked.length === 0) {
       return null
     }
-    return `${result.deleted.join(',')}|${result.blocked.map((item) => item.id).join(',')}`
-  }, [result])
+    return `${operationGeneration}:${result.deleted.join(',')}|${result.blocked.map((item) => item.id).join(',')}`
+  }, [result, operationGeneration])
 
   useNotifyErrorOnce({
-    value: error,
+    value: error ? `${operationGeneration}:${error}` : null,
     toastId: 'bulk-delete-error',
     message: TOAST_MESSAGES.bulkDelete.failedTitle,
     description: error,

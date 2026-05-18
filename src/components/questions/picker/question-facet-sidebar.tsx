@@ -20,7 +20,6 @@ import type {
   QuestionDifficulty,
   QuestionStatusFilter,
 } from '@/lib/api'
-import { useNotifyErrorOnce } from '@/hooks/use-notify-once'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 const COLLAPSED_LIMIT = 6
@@ -83,13 +82,6 @@ export function QuestionFacetSidebar(props: QuestionFacetSidebarProps) {
     (selected.role ? 1 : 0) +
     selected.tags.length +
     (showStatusFilter && selected.status !== 'active' ? 1 : 0)
-
-  useNotifyErrorOnce({
-    value: error,
-    toastId: 'question-facets-error',
-    message: TOAST_MESSAGES.questionFacets.unavailableTitle,
-    description: error,
-  })
 
   return (
     <Card variant="surface" size="sm">

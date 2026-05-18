@@ -67,6 +67,7 @@ function QuestionsPageContent() {
   const [bulkDeleting, setBulkDeleting] = useState(false)
   const [bulkResult, setBulkResult] = useState<BulkDeleteResult | null>(null)
   const [bulkError, setBulkError] = useState<string | null>(null)
+  const [bulkOperationGeneration, setBulkOperationGeneration] = useState(0)
 
   useNotifyErrorOnce({
     value: query.error,
@@ -91,6 +92,7 @@ function QuestionsPageContent() {
 
     setBulkDeleting(true)
     setBulkError(null)
+    setBulkOperationGeneration((generation) => generation + 1)
     try {
       const result = await runMutation(() => deleteQuestionsBulk(ids), {
         showSuccessToast: false,
@@ -199,7 +201,11 @@ function QuestionsPageContent() {
           />
 
           {isSuperAdmin && (
-            <BulkDeleteResultAlerts result={bulkResult} error={bulkError} />
+            <BulkDeleteResultAlerts
+              result={bulkResult}
+              error={bulkError}
+              operationGeneration={bulkOperationGeneration}
+            />
           )}
 
           {query.error ? (

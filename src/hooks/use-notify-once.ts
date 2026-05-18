@@ -44,6 +44,10 @@ export function useNotifyOnceWhen({
     if (activeValue === lastValueRef.current) {
       return
     }
+
+    if (lastValueRef.current) {
+      notifiedSessionKeys.delete(sessionKey(toastId, lastValueRef.current))
+    }
     lastValueRef.current = activeValue
 
     const key = sessionKey(toastId, activeValue)

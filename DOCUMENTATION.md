@@ -134,6 +134,18 @@ npm run dev
 # Frontend: http://localhost:3001
 ```
 
+### Alert vs toast (frontend feedback)
+
+After the alert → toast migration, use this split:
+
+| Pattern | When to use | Examples |
+|--------|-------------|----------|
+| **`Alert` (inline)** | Persistent, contextual, or actionable state on the page | Login errors, interview setup blocked, question editor validation, take consent/recording, upload failure on interview detail, evaluation progress, failed-interview banner on assessment detail |
+| **Sonner toast** | Transient outcome of a user action or a one-shot load failure | Save/delete success, bulk delete summary, rerun conflicts, page-gate flash errors |
+| **EmptyState / inline copy + Retry** | Recoverable load failures where the user needs context next to the control | Question feed error, facet sidebar error (toast omitted — inline copy has Retry) |
+
+Do not remove remaining `Alert` usages to “finish” the migration unless the UX above is preserved another way. Copy lives in `src/lib/toast-messages.ts` for toasts; whitelisted Alerts may stay hardcoded or use `TOAST_MESSAGES` where shared.
+
 ### Что запускается в Docker
 ```
 PostgreSQL   localhost:5433   (БД, данные сохраняются в volume)

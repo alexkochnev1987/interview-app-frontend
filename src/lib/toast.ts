@@ -9,6 +9,8 @@ const DEFAULT_SUCCESS_TITLE = "Done"
 const DEFAULT_ERROR_TITLE = "Something went wrong"
 const DEFAULT_INFO_TITLE = "Notice"
 
+const TERMINAL_PUNCTUATION = /[.!?:]$/
+
 function toSentence(value: string) {
   const trimmed = value.trim()
 
@@ -16,7 +18,7 @@ function toSentence(value: string) {
     return trimmed
   }
 
-  return trimmed.endsWith(".") ? trimmed : `${trimmed}.`
+  return TERMINAL_PUNCTUATION.test(trimmed) ? trimmed : `${trimmed}.`
 }
 
 export function notifySuccess(message = DEFAULT_SUCCESS_TITLE, options?: NotifyOptions) {
