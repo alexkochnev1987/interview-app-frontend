@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 
 import { notifyError, notifySuccess } from '@/lib/toast'
 
@@ -28,7 +28,7 @@ export function useNotifyOnceWhen({
 
   useEffect(() => {
     notifyRef.current = notify
-  })
+  }, [notify])
 
   useEffect(() => {
     const activeValue = value?.trim() ? value.trim() : null
@@ -90,15 +90,20 @@ export function useNotifyErrorOnce({
   message,
   description,
 }: UseNotifyErrorOnceOptions) {
-  useNotifyOnceWhen({
-    value,
-    enabled,
-    toastId,
-    notify: () =>
+  const notify = useCallback(
+    () =>
       notifyError(message, {
         id: toastId,
         ...(description?.trim() ? { description } : {}),
       }),
+    [message, description, toastId],
+  )
+
+  useNotifyOnceWhen({
+    value,
+    enabled,
+    toastId,
+    notify,
   })
 }
 
@@ -117,14 +122,19 @@ export function useNotifySuccessOnce({
   message,
   description,
 }: UseNotifySuccessOnceOptions) {
-  useNotifyOnceWhen({
-    value,
-    enabled,
-    toastId,
-    notify: () =>
+  const notify = useCallback(
+    () =>
       notifySuccess(message, {
         id: toastId,
         ...(description?.trim() ? { description } : {}),
       }),
+    [message, description, toastId],
+  )
+
+  useNotifyOnceWhen({
+    value,
+    enabled,
+    toastId,
+    notify,
   })
 }
