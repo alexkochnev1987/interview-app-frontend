@@ -32,12 +32,22 @@ export function useNotifyOnceWhen({
 
   useEffect(() => {
     const activeValue = value?.trim() ? value.trim() : null
+    let registeredKey: string | null = null
+
+    const releaseKey = (key: string | null, trackedValue: string | null) => {
+      if (!key) return
+      notifiedSessionKeys.delete(key)
+      if (lastValueRef.current === trackedValue) {
+        lastValueRef.current = null
+      }
+    }
 
     if (!enabled || !activeValue) {
       if (lastValueRef.current) {
-        notifiedSessionKeys.delete(sessionKey(toastId, lastValueRef.current))
+        releaseKey(sessionKey(toastId, lastValueRef.current), lastValueRef.current)
+      } else {
+        lastValueRef.current = null
       }
-      lastValueRef.current = null
       return
     }
 
@@ -54,9 +64,14 @@ export function useNotifyOnceWhen({
     if (notifiedSessionKeys.has(key)) {
       return
     }
-    notifiedSessionKeys.add(key)
 
+    notifiedSessionKeys.add(key)
+    registeredKey = key
     notifyRef.current()
+
+    return () => {
+      releaseKey(registeredKey, activeValue)
+    }
   }, [value, enabled, toastId])
 }
 

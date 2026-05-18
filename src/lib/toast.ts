@@ -21,23 +21,33 @@ function toSentence(value: string) {
   return TERMINAL_PUNCTUATION.test(trimmed) ? trimmed : `${trimmed}.`
 }
 
+function trimDescription(value: string) {
+  return value.trim()
+}
+
 export function notifySuccess(message = DEFAULT_SUCCESS_TITLE, options?: NotifyOptions) {
   toast.success(toSentence(message), {
     id: options?.id,
-    description: options?.description ? toSentence(options.description) : undefined,
+    description: options?.description
+      ? trimDescription(options.description)
+      : undefined,
   })
 }
 
 export function notifyInfo(message = DEFAULT_INFO_TITLE, options?: NotifyOptions) {
   toast.info(toSentence(message), {
     id: options?.id,
-    description: options?.description ? toSentence(options.description) : undefined,
+    description: options?.description
+      ? trimDescription(options.description)
+      : undefined,
   })
 }
 
 export function notifyError(message = DEFAULT_ERROR_TITLE, options?: NotifyOptions) {
   toast.error(toSentence(message), {
     id: options?.id,
-    description: options?.description ? toSentence(options.description) : undefined,
+    description: options?.description
+      ? trimDescription(options.description)
+      : undefined,
   })
 }
