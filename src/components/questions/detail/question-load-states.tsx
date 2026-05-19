@@ -5,7 +5,6 @@ import { AlertTriangle, ArrowLeft, LoaderCircle, PenSquare } from 'lucide-react'
 
 import { HeroTitle } from '@/components/ui/hero-text'
 import { IconBadge } from '@/components/ui/icon-badge'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -18,6 +17,7 @@ import { Inline } from '@/components/ui/layout/inline'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText } from '@/components/ui/text'
+import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 export function QuestionLoadingCard() {
   return (
@@ -52,18 +52,18 @@ export function QuestionUnavailableCard({ message }: QuestionUnavailableCardProp
             <AlertTriangle className="size-5" />
           </IconBadge>
           <Stack gap={2}>
-            <CardTitle size="xl">Question unavailable</CardTitle>
+            <CardTitle size="xl">
+              {TOAST_MESSAGES.pageGate.questions.unavailableTitle}
+            </CardTitle>
             <CardDescription width="lg">
-              The editor could not load this question, so the route stops here
-              instead of rendering a partially broken form.
+              {TOAST_MESSAGES.pageGate.questions.loadFailedCardDescription}
             </CardDescription>
           </Stack>
         </CardHeader>
         <CardContent spacing="lg">
-          <Alert variant="danger">
-            <AlertTitle>Load failed</AlertTitle>
-            <AlertDescription>{message}</AlertDescription>
-          </Alert>
+          <BodyText size="sm" tone="muted">
+            {message}
+          </BodyText>
 
           <Inline gap={3} wrap="wrap">
             <Button asChild variant="gradient">

@@ -6,6 +6,7 @@ import { OverallPanel } from '@/components/assessments/detail/overall-panel'
 import { QuestionSection } from '@/components/assessments/detail/question-section'
 import { RerunAllButton } from '@/components/assessments/detail/rerun-all-button'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { EyebrowLabel } from '@/components/ui/eyebrow-label'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { Inline } from '@/components/ui/layout/inline'
@@ -18,6 +19,7 @@ import { deriveReviewStatus } from '@/lib/assessment-status'
 import { loadAuthGate } from '@/lib/auth-gate'
 import { canReviewAssessments } from '@/lib/auth-roles'
 import { isForbiddenError, requestServer } from '@/lib/server-fetch'
+import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 interface AssessmentDetailPageProps {
   params: Promise<{ id: string }>
@@ -26,6 +28,8 @@ interface AssessmentDetailPageProps {
 const FORBIDDEN_TITLE = "You don't have access to this assessment"
 const FORBIDDEN_DESCRIPTION =
   'This area is reserved for HR and admin reviewers. If you think this is a mistake, contact your workspace owner.'
+
+const UNAVAILABLE_TITLE = TOAST_MESSAGES.pageGate.assessments.unavailableTitle
 
 export default async function AssessmentDetailPage({
   params,
@@ -45,12 +49,12 @@ export default async function AssessmentDetailPage({
   }
   if (auth.kind === 'error') {
     return (
-      <PageShell spacing="tight">
-        <Alert variant="danger">
-          <AlertTitle>Assessment unavailable</AlertTitle>
-          <AlertDescription>{auth.message}</AlertDescription>
-        </Alert>
-      </PageShell>
+      <FlashErrorPageFallback
+        title="This assessment is unavailable right now"
+        description={`We could not verify your session or permissions. ${auth.message}`}
+        backHref="/assessments"
+        backLabel="Back to assessments"
+      />
     )
   }
 
@@ -71,19 +75,22 @@ export default async function AssessmentDetailPage({
         />
       )
     }
-    error = err instanceof Error ? err.message : 'Failed to load assessment.'
+    error =
+      err instanceof Error
+        ? err.message
+        : TOAST_MESSAGES.pageGate.assessments.loadDetailFallback
   }
 
   if (error || !interview) {
     return (
-      <PageShell spacing="tight">
-        <Alert variant="danger">
-          <AlertTitle>Assessment unavailable</AlertTitle>
-          <AlertDescription>
-            {error ?? 'The requested assessment could not be loaded.'}
-          </AlertDescription>
-        </Alert>
-      </PageShell>
+      <FlashErrorPageFallback
+        title={UNAVAILABLE_TITLE}
+        description={
+          error ?? TOAST_MESSAGES.pageGate.assessments.notFoundFallback
+        }
+        backHref="/assessments"
+        backLabel="Back to assessments"
+      />
     )
   }
 

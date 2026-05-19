@@ -2,13 +2,13 @@ import { unstable_noStore as noStore } from 'next/cache'
 
 import InterviewDetailClient from './interview-detail-client'
 
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
-import { PageShell } from '@/components/ui/layout/page-shell'
 import { type Interview, type InterviewResult } from '@/lib/api'
 import { loadAuthGate } from '@/lib/auth-gate'
 import { canConfigureInterview } from '@/lib/auth-roles'
 import { isForbiddenError, requestServer } from '@/lib/server-fetch'
+import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 interface InterviewDetailPageProps {
   params: Promise<{
@@ -19,6 +19,8 @@ interface InterviewDetailPageProps {
 const FORBIDDEN_TITLE = "You don't have access to this interview"
 const FORBIDDEN_DESCRIPTION =
   'Configuring interviews is reserved for HR, admin, and super-admin users. If you think this is a mistake, contact your workspace owner.'
+
+const UNAVAILABLE_TITLE = TOAST_MESSAGES.pageGate.interview.unavailableTitle
 
 export default async function InterviewDetailPage({
   params,
@@ -38,12 +40,10 @@ export default async function InterviewDetailPage({
   }
   if (auth.kind === 'error') {
     return (
-      <PageShell spacing="tight">
-        <Alert variant="danger">
-          <AlertTitle>Interview unavailable</AlertTitle>
-          <AlertDescription>{auth.message}</AlertDescription>
-        </Alert>
-      </PageShell>
+      <FlashErrorPageFallback
+        title="This interview is unavailable right now"
+        description={`We could not verify your session or permissions. ${auth.message}`}
+      />
     )
   }
 
@@ -83,19 +83,20 @@ export default async function InterviewDetailPage({
         />
       )
     }
-    error = err instanceof Error ? err.message : 'Failed to load interview.'
+    error =
+      err instanceof Error
+        ? err.message
+        : TOAST_MESSAGES.pageGate.interview.loadFailedFallback
   }
 
   if (error || !interview) {
     return (
-      <PageShell spacing="tight">
-        <Alert variant="danger">
-          <AlertTitle>Interview unavailable</AlertTitle>
-          <AlertDescription>
-            {error ?? 'The requested interview could not be loaded.'}
-          </AlertDescription>
-        </Alert>
-      </PageShell>
+      <FlashErrorPageFallback
+        title={UNAVAILABLE_TITLE}
+        description={
+          error ?? TOAST_MESSAGES.pageGate.interview.notFoundFallback
+        }
+      />
     )
   }
 

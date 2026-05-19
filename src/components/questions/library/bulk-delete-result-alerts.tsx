@@ -1,43 +1,29 @@
 'use client'
 
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { BulletList } from '@/components/ui/bullet-list'
+import { Card, CardContent } from '@/components/ui/card'
 import { Stack } from '@/components/ui/layout/stack'
+import { SurfaceTile } from '@/components/ui/surface-tile'
 import { BodyText } from '@/components/ui/text'
 import { type BulkDeleteResult } from '@/lib/api'
+import { TOAST_MESSAGES } from '@/lib/toast-messages'
 import { truncateText } from '@/lib/text'
 
 interface BulkDeleteResultAlertsProps {
   result: BulkDeleteResult | null
-  error: string | null
 }
 
-export function BulkDeleteResultAlerts({
-  result,
-  error,
-}: BulkDeleteResultAlertsProps) {
-  if (error) {
-    return (
-      <Alert variant="danger">
-        <AlertTitle>Bulk delete failed</AlertTitle>
-        <AlertDescription>{error}</AlertDescription>
-      </Alert>
-    )
+export function BulkDeleteResultAlerts({ result }: BulkDeleteResultAlertsProps) {
+  if (!result || result.blocked.length === 0) {
+    return null
   }
 
-  if (!result) return null
-
-  if (result.blocked.length > 0) {
-    return (
-      <Alert variant="warning">
-        <AlertTitle>
-          Deleted {result.deleted.length}, blocked {result.blocked.length}
-        </AlertTitle>
-        <AlertDescription>
-          <Stack gap={2}>
-            <BodyText size="sm">
-              These questions are used in active interviews and were not deleted:
-            </BodyText>
+  return (
+    <Card variant="warning" size="sm">
+      <CardContent spacing="md">
+        <Stack gap={2}>
+          <BodyText size="sm">{TOAST_MESSAGES.bulkDelete.blockedIntro}</BodyText>
+          <SurfaceTile tone="soft" padding="md" rounded="lg" width="full">
             <BulletList>
               {result.blocked.map((item) => (
                 <li key={item.id}>
@@ -51,20 +37,9 @@ export function BulkDeleteResultAlerts({
                 </li>
               ))}
             </BulletList>
-          </Stack>
-        </AlertDescription>
-      </Alert>
-    )
-  }
-
-  if (result.deleted.length > 0) {
-    return (
-      <Alert variant="success">
-        <AlertTitle>Deleted {result.deleted.length} question(s)</AlertTitle>
-        <AlertDescription>The library is up to date.</AlertDescription>
-      </Alert>
-    )
-  }
-
-  return null
+          </SurfaceTile>
+        </Stack>
+      </CardContent>
+    </Card>
+  )
 }

@@ -177,7 +177,6 @@ export default function InterviewDetailClient({
   const [interview, setInterview] = useState<Interview | null>(initialInterview);
   const [results, setResults] = useState<InterviewResult | null>(initialResults);
   const [loading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [validating, setValidating] = useState(false);
   const [uploadStates, setUploadStates] = useState<QuestionUploadState[]>(
     initialInterview.questions.map((_, qi) => {
@@ -442,7 +441,6 @@ export default function InterviewDetailClient({
     }
 
     setValidating(true);
-    setError(null);
 
     try {
       await runMutation(() => validateInterview(interview.id, { force: true }), {
@@ -462,23 +460,6 @@ export default function InterviewDetailClient({
     return (
       <PageShell>
         <LoadingStateCard label="Loading interview..." />
-      </PageShell>
-    );
-  }
-
-  if (error && !interview) {
-    return (
-      <PageShell spacing="tight">
-        <Alert variant="danger">
-          <AlertTitle>Interview unavailable</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-        <Button asChild variant="outline-pill" shape="pill">
-          <UnstyledLink href="/">
-            <ArrowLeft className="size-4" />
-            Back to dashboard
-          </UnstyledLink>
-        </Button>
       </PageShell>
     );
   }
@@ -726,13 +707,6 @@ export default function InterviewDetailClient({
           </CardContent>
         </Card>
       </Grid>
-
-      {error ? (
-        <Alert variant="danger">
-          <AlertTitle>Interview action failed</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      ) : null}
 
       <Section gap={4}>
         <Inline gap={4} align="end" justify="between" wrap="wrap">
