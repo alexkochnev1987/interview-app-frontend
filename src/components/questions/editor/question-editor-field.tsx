@@ -8,6 +8,7 @@ interface QuestionEditorFieldProps {
   hint?: string
   htmlFor: string
   label: string
+  error?: string
 }
 
 export function QuestionEditorField({
@@ -15,9 +16,10 @@ export function QuestionEditorField({
   hint,
   htmlFor,
   label,
+  error,
 }: QuestionEditorFieldProps) {
   return (
-    <FormField htmlFor={htmlFor} label={label} hint={hint}>
+    <FormField htmlFor={htmlFor} label={label} hint={hint} error={error}>
       {children}
     </FormField>
   )

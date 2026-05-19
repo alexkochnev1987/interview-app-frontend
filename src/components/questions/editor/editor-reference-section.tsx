@@ -22,6 +22,7 @@ interface EditorReferenceSectionProps {
   onUpdate: (patch: Partial<QuestionInput>) => void
   onMetadataTextChange: (next: string) => void
   renderAiSuggestion: (field: DraftFieldKey) => ReactNode
+  metadataError?: string
 }
 
 export function EditorReferenceSection({
@@ -31,6 +32,7 @@ export function EditorReferenceSection({
   onUpdate,
   onMetadataTextChange,
   renderAiSuggestion,
+  metadataError,
 }: EditorReferenceSectionProps) {
   return (
     <EditorSectionCard
@@ -76,6 +78,7 @@ export function EditorReferenceSection({
             htmlFor="metadata"
             label="Additional metadata"
             hint="Valid JSON object that can carry rubric or source information."
+            error={metadataError}
           >
             <Textarea
               id="metadata"
@@ -85,6 +88,7 @@ export function EditorReferenceSection({
               onChange={(event) => onMetadataTextChange(event.target.value)}
               placeholder='{"rubricVersion":"v1"}'
               disabled={submitting}
+              aria-invalid={metadataError ? true : undefined}
             />
           </QuestionEditorField>
         </Stack>

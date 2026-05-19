@@ -7,7 +7,6 @@ import { ArrowRight, LockKeyhole, ShieldCheck, Sparkles } from 'lucide-react'
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
 import { HeroLead, HeroTitle } from '@/components/ui/hero-text'
 import { IconBadge } from '@/components/ui/icon-badge'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { DividerLabel } from '@/components/ui/divider-label'
@@ -19,18 +18,37 @@ import { Stack } from '@/components/ui/layout/stack'
 import { BodyText, SectionHeading } from '@/components/ui/text'
 import { useAuth } from '@/lib/auth-context'
 import { login } from '@/lib/api'
+import { type FieldErrors, validateLogin } from '@/lib/form-validation'
+
+type LoginField = 'email' | 'password'
 
 export default function LoginPage() {
   const router = useRouter()
   const { establishSession } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors<LoginField>>({})
   const [loading, setLoading] = useState(false)
+
+  function clearFieldError(field: LoginField) {
+    setFieldErrors((current) => {
+      if (!current[field]) return current
+      const next = { ...current }
+      delete next[field]
+      return next
+    })
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    setError('')
+
+    const errors = validateLogin({ email, password })
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors)
+      return
+    }
+
+    setFieldErrors({})
     setLoading(true)
 
     try {
@@ -39,7 +57,9 @@ export default function LoginPage() {
       router.push('/')
       router.refresh()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed')
+      setFieldErrors({
+        password: err instanceof Error ? err.message : 'Login failed',
+      })
     } finally {
       setLoading(false)
     }
@@ -122,32 +142,32 @@ export default function LoginPage() {
           <CardContent>
             <form onSubmit={handleSubmit}>
               <Stack gap={6}>
-              {error ? (
-                <Alert variant="danger">
-                  <AlertTitle>Authentication failed</AlertTitle>
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              ) : null}
               <Stack gap={4}>
-                <FormField htmlFor="email" label="Email">
+                <FormField htmlFor="email" label="Email" error={fieldErrors.email}>
                   <Input
                     id="email"
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value)
+                      clearFieldError('email')
+                    }}
                     placeholder="admin@interview-app.com"
-                    required
+                    aria-invalid={fieldErrors.email ? true : undefined}
                   />
                 </FormField>
 
-                <FormField htmlFor="password" label="Password">
+                <FormField htmlFor="password" label="Password" error={fieldErrors.password}>
                   <Input
                     id="password"
                     type="password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                      setPassword(e.target.value)
+                      clearFieldError('password')
+                    }}
                     placeholder="Password"
-                    required
+                    aria-invalid={fieldErrors.password ? true : undefined}
                   />
                 </FormField>
               </Stack>

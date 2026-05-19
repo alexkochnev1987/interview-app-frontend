@@ -18,6 +18,7 @@ interface EditorPromptSectionProps {
   submitting: boolean
   onUpdate: (patch: Partial<QuestionInput>) => void
   renderAiSuggestion: (field: DraftFieldKey) => ReactNode
+  questionTextError?: string
 }
 
 export function EditorPromptSection({
@@ -25,6 +26,7 @@ export function EditorPromptSection({
   submitting,
   onUpdate,
   renderAiSuggestion,
+  questionTextError,
 }: EditorPromptSectionProps) {
   return (
     <EditorSectionCard
@@ -32,13 +34,18 @@ export function EditorPromptSection({
       description="Write the core question clearly, then capture the follow-up probes that interviewers should keep ready."
       icon={<Sparkles className="size-4" />}
     >
-      <QuestionEditorField htmlFor="questionText" label="Question text">
+      <QuestionEditorField
+        htmlFor="questionText"
+        label="Question text"
+        error={questionTextError}
+      >
         <Textarea
           id="questionText"
           value={value.questionText}
           onChange={(event) => onUpdate({ questionText: event.target.value })}
           placeholder="e.g. What is a closure in JavaScript?"
           disabled={submitting}
+          aria-invalid={questionTextError ? true : undefined}
         />
         {renderAiSuggestion('questionText')}
       </QuestionEditorField>
