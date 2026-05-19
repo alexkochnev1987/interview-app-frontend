@@ -17,6 +17,7 @@ export function RerunAnswerButton({
 }: RerunAnswerButtonProps) {
   return (
     <RerunButton
+      toastId={`rerun-answer-${interviewId}-${questionIndex}`}
       disabled={disabled}
       size="sm"
       variant="outline-pill"

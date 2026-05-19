@@ -33,6 +33,7 @@ interface RerunButtonProps {
   size?: ButtonSize
   iconSize?: IconSize
   disabled?: boolean
+  toastId?: string
 }
 
 export function RerunButton({
@@ -45,6 +46,7 @@ export function RerunButton({
   size = 'sm',
   iconSize = 'md',
   disabled,
+  toastId,
 }: RerunButtonProps) {
   const router = useRouter()
   const [phase, setPhase] = useState<'idle' | 'submitting' | 'submitted'>(
@@ -65,7 +67,7 @@ export function RerunButton({
       if (!mountedRef.current) return
       if (result) {
         notifyInfo(result.title, {
-          id: 'rerun-informational',
+          id: toastId ? `${toastId}-informational` : undefined,
           description: result.message,
         })
       }
@@ -75,7 +77,7 @@ export function RerunButton({
       if (!mountedRef.current) return
       if (err instanceof ApiError && err.status === 409) {
         notifyInfo(TOAST_MESSAGES.rerun.alreadyInProgressTitle, {
-          id: 'rerun-already-in-progress',
+          id: toastId ? `${toastId}-already-in-progress` : undefined,
           description: err.message,
         })
         setPhase('submitted')
@@ -83,6 +85,7 @@ export function RerunButton({
         return
       }
       notifyError(errorTitle, {
+        id: toastId ? `${toastId}-error` : undefined,
         description: err instanceof Error ? err.message : errorFallback,
       })
       setPhase('idle')

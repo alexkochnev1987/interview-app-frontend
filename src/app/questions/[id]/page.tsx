@@ -95,7 +95,7 @@ export default function EditQuestionPage() {
       await runMutation(() => deleteQuestion(id), {
         successMessage: TOAST_MESSAGES.question.deleteSuccess,
         errorMessage: TOAST_MESSAGES.question.deleteError,
-        getErrorMessage: (err) =>
+        getErrorTitle: (err) =>
           err instanceof QuestionInUseError
             ? TOAST_MESSAGES.deleteQuestion.cannotDeleteTitle
             : TOAST_MESSAGES.question.deleteError,

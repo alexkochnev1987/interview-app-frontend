@@ -21,6 +21,7 @@ export function RerunAllButton({
 }: RerunAllButtonProps) {
   return (
     <RerunButton
+      toastId={`rerun-all-${interviewId}`}
       disabled={disabled}
       size={size}
       variant={variant}
