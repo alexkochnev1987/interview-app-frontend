@@ -5,7 +5,7 @@ import { Children, type ReactNode } from 'react';
 import { Clock, Layers, Loader2 } from 'lucide-react';
 
 import { Inline, Stack } from '@/components/ui/layout';
-import { BodyText } from '@/components/ui/text';
+import { BodyText, Text } from '@/components/ui/text';
 import { cn } from '@/lib/utils';
 
 export function RecordingHeaderTitleCluster({ children }: { children: ReactNode }) {
@@ -103,14 +103,9 @@ export function RecordingHeaderInlineMetrics({
     >
       <Inline gap={1} wrap="nowrap" align="center" className="min-w-0 shrink-0 whitespace-nowrap">
         <Clock className="size-3 shrink-0 opacity-80" aria-hidden />
-        <BodyText
-          as="span"
-          tone="muted"
-          weight="semibold"
-          className="text-[0.58rem] uppercase tracking-[0.14em]"
-        >
+        <Text as="span" variant="headerMetricEyebrow">
           Limit
-        </BodyText>
+        </Text>
         <BodyText as="span" size="xs" weight="semibold" tone="foreground">
           {recordingLimitLabel}
         </BodyText>
@@ -127,15 +122,15 @@ export function RecordingHeaderInlineMetrics({
         >
           v{answerVersionNumber}
         </BodyText>
-        <BodyText as="span" tone="muted" className="text-[0.62rem]">
+        <Text as="span" variant="headerMetricMeta">
           · {previousVersionsKept} kept
-        </BodyText>
+        </Text>
         {versionActivity === 'saving' ? (
           <Inline gap={1} wrap="nowrap" align="center">
             <Loader2 className="size-3 shrink-0 animate-spin opacity-80" aria-hidden />
-            <BodyText as="span" weight="medium" tone="muted" className="text-[0.62rem]">
+            <Text as="span" variant="headerMetricMetaMedium">
               Saving…
-            </BodyText>
+            </Text>
           </Inline>
         ) : null}
       </Inline>

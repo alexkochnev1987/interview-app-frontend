@@ -5,7 +5,7 @@ import { Sparkles, UserRound } from 'lucide-react';
 
 import { Panel } from '@/components/ui/panel';
 import { CameraPreviewVideo, type CameraPreviewVideoRefProps } from './camera-preview';
-import { BodyText } from '@/components/ui/text';
+import { BodyText, Text } from '@/components/ui/text';
 import { Inline, Stack } from '@/components/ui/layout';
 import { cn } from '@/lib/utils';
 
@@ -43,14 +43,9 @@ function AiInterviewerLabelBadge() {
         strokeWidth={2}
         aria-hidden
       />
-      <BodyText
-        as="span"
-        tone="inherit"
-        weight="semibold"
-        className="text-[0.625rem] leading-none uppercase tracking-[0.12em]"
-      >
+      <Text as="span" variant="toolbarEyebrow">
         AI interviewer
-      </BodyText>
+      </Text>
     </Inline>
   );
 }

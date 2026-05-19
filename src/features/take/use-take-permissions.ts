@@ -51,7 +51,6 @@ interface UseTakePermissionsParams {
   releaseLobbyCameraOnly: () => void;
   attachCameraPreview: (stream: MediaStream) => void;
   stopMediaStream: (stream: MediaStream | null) => void;
-  handleScreenShareEnded: (message: string) => void;
   getPermissionErrorMessage: (error: unknown, requiresEntireScreen?: boolean) => string;
   screenStreamRef: MutableRefObject<MediaStream | null>;
   cameraStreamRef: MutableRefObject<MediaStream | null>;
@@ -70,7 +69,6 @@ export function useTakePermissions({
   releaseLobbyCameraOnly,
   attachCameraPreview,
   stopMediaStream,
-  handleScreenShareEnded,
   getPermissionErrorMessage,
   screenStreamRef,
   cameraStreamRef,
@@ -120,10 +118,6 @@ export function useTakePermissions({
         setSetupError(getPermissionErrorMessage(new Error('wrong-surface'), true));
         return;
       }
-
-      screenTrack.onended = () => {
-        handleScreenShareEnded(TAKE_MESSAGES.screenShareStopped);
-      };
 
       screenStreamRef.current = screenStream;
       setScreenSurface(displaySurface);
@@ -211,10 +205,6 @@ export function useTakePermissions({
         setSetupError(getPermissionErrorMessage(new Error('wrong-surface'), true));
         return;
       }
-
-      screenTrack.onended = () => {
-        handleScreenShareEnded(TAKE_MESSAGES.screenShareStopped);
-      };
 
       screenStreamRef.current = screenStream;
       setScreenSurface(displaySurface);

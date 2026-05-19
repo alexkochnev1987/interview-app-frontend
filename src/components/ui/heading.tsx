@@ -4,9 +4,10 @@ import type { ElementType, ReactNode } from 'react';
 const headingVariants = cva('', {
   variants: {
     variant: {
-      heroTitle: 'text-4xl font-semibold tracking-[-0.04em] text-foreground md:text-5xl',
-      sectionHeroTitle: 'text-3xl font-semibold tracking-[-0.04em] text-foreground md:text-4xl',
-      questionTitle: 'text-2xl font-semibold leading-9 tracking-[-0.03em] text-foreground',
+      heroTitle: 'text-4xl font-semibold tracking-display-tight text-foreground md:text-5xl',
+      sectionHeroTitle:
+        'text-3xl font-semibold tracking-display-tight text-foreground md:text-4xl',
+      questionTitle: 'text-2xl font-semibold leading-9 tracking-display text-foreground',
       toolbarSessionTitle:
         'm-0 min-w-0 text-sm font-semibold leading-tight tracking-tight text-foreground sm:text-[0.9375rem]',
     },

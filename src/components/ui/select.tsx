@@ -19,7 +19,7 @@ const selectTriggerVariants = cva(
       },
       size: {
         default: "h-8",
-        sm: "h-7 rounded-[min(calc(var(--radius)-4px),10px)]",
+        sm: "h-7 rounded-[min(theme(borderRadius.md),10px)]",
         md: "h-11",
         lg: "h-12",
       },

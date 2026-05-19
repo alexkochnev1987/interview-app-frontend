@@ -116,12 +116,18 @@ const takeTextVariants = cva('', {
       bodyMutedSm: 'text-sm leading-6 text-muted-foreground',
       bodySm: 'text-sm leading-6 text-foreground',
       eyebrowLabel:
-        'text-[0.72rem] font-semibold uppercase tracking-eyebrow-widest text-muted-foreground',
-      metricLabel: 'text-[0.72rem] font-semibold uppercase tracking-[0.2em]',
+        'text-xs font-semibold uppercase tracking-eyebrow text-muted-foreground',
+      metricLabel: 'text-xs font-semibold uppercase tracking-eyebrow-wider',
       metricLabelCompact:
-        'text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground',
-      metricValueLg: 'text-3xl font-semibold tracking-[-0.04em] text-foreground',
-      metricValueXl: 'text-4xl font-semibold tracking-[-0.04em] text-foreground',
+        'text-xs font-semibold uppercase tracking-eyebrow-wide text-muted-foreground',
+      metricValueLg: 'text-3xl font-semibold tracking-display-tight text-foreground',
+      metricValueXl: 'text-4xl font-semibold tracking-display-tight text-foreground',
+      headerMetricEyebrow:
+        'text-xs font-semibold uppercase tracking-eyebrow text-muted-foreground',
+      headerMetricMeta: 'text-xs text-muted-foreground',
+      headerMetricMetaMedium: 'text-xs font-medium text-muted-foreground',
+      toolbarEyebrow:
+        'text-xs font-semibold leading-none uppercase tracking-eyebrow',
       labelSmStrong: 'text-sm font-semibold text-foreground',
       labelSm: 'text-sm font-medium text-foreground',
       captionMutedXs: 'text-xs leading-5 text-muted-foreground',
@@ -143,7 +149,6 @@ interface TextProps extends VariantProps<typeof takeTextVariants> {
   className?: string
 }
 
-/** Semantic text variants used by take interview screens */
 export function Text({ as = 'p', children, variant, className }: TextProps) {
   if (as === 'span') {
     return (

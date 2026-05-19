@@ -47,6 +47,10 @@ const stackVariants = cva('flex flex-col', {
       auto: '',
       full: 'h-full min-h-0',
     },
+    overflow: {
+      none: '',
+      y: 'overflow-y-auto overscroll-contain [scrollbar-gutter:stable]',
+    },
     placeSelf: {
       auto: '',
       start: 'self-start',
@@ -61,6 +65,7 @@ const stackVariants = cva('flex flex-col', {
     width: 'auto',
     grow: 'none',
     height: 'auto',
+    overflow: 'none',
     placeSelf: 'auto',
   },
 })
@@ -79,6 +84,7 @@ export function Stack({
   width,
   grow,
   height,
+  overflow,
   placeSelf,
   ...props
 }: StackProps) {
@@ -87,7 +93,16 @@ export function Stack({
   return (
     <Comp
       className={cn(
-        stackVariants({ gap, align, justify, width, grow, height, placeSelf }),
+        stackVariants({
+          gap,
+          align,
+          justify,
+          width,
+          grow,
+          height,
+          overflow,
+          placeSelf,
+        }),
         className,
       )}
       {...props}
