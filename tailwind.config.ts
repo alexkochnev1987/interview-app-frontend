@@ -112,9 +112,14 @@ const config: Config = {
           "0%, 100%": { opacity: "0.42", transform: "scale(1)" },
           "50%": { opacity: "0.78", transform: "scale(1.06)" },
         },
+        indeterminateProgress: {
+          "0%": { transform: "translateX(-100%) scaleX(0.5)" },
+          "100%": { transform: "translateX(200%) scaleX(0.5)" },
+        },
       },
       animation: {
         "ai-orb-ring-speaking": "aiOrbRingSpeaking 1.5s ease-in-out infinite",
+        "indeterminate-progress": "indeterminateProgress 1.4s linear infinite",
       },
     },
   },
