@@ -8,8 +8,11 @@ export function validateLogin(values: {
 }): FieldErrors<'email' | 'password'> {
   const errors: FieldErrors<'email' | 'password'> = {}
 
-  if (!values.email.trim()) {
+  const email = values.email.trim()
+  if (!email) {
     errors.email = 'Email is required.'
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errors.email = 'Enter a valid email address.'
   }
   if (!values.password.trim()) {
     errors.password = 'Password is required.'

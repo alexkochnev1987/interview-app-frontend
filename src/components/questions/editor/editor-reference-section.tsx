@@ -41,38 +41,42 @@ export function EditorReferenceSection({
       icon={<Save className="size-4" />}
     >
       <Grid columns="editor-2" gap={6}>
-        <QuestionEditorField
-          htmlFor="sampleGoodAnswer"
-          label="Sample good answer"
-          hint="Target depth reference for evaluation."
-        >
-          <Textarea
-            id="sampleGoodAnswer"
-            size="xl"
-            value={value.sampleGoodAnswer ?? ''}
-            onChange={(event) => onUpdate({ sampleGoodAnswer: event.target.value })}
-            placeholder="Target depth reference for evaluation"
-            disabled={submitting}
-          />
-          {renderAiSuggestion('sampleGoodAnswer')}
-        </QuestionEditorField>
-
-        <Stack gap={6}>
+        <Stack gap={2}>
           <QuestionEditorField
-            htmlFor="tags"
-            label="Tags"
-            hint="Comma or newline separated tags used for filtering and imports."
+            htmlFor="sampleGoodAnswer"
+            label="Sample good answer"
+            hint="Target depth reference for evaluation."
           >
             <Textarea
-              id="tags"
-              size="sm"
-              value={joinStringList(value.tags || [])}
-              onChange={(event) => onUpdate({ tags: parseStringList(event.target.value) })}
-              placeholder="Comma or newline separated"
+              id="sampleGoodAnswer"
+              size="xl"
+              value={value.sampleGoodAnswer ?? ''}
+              onChange={(event) => onUpdate({ sampleGoodAnswer: event.target.value })}
+              placeholder="Target depth reference for evaluation"
               disabled={submitting}
             />
-            {renderAiSuggestion('tags')}
           </QuestionEditorField>
+          {renderAiSuggestion('sampleGoodAnswer')}
+        </Stack>
+
+        <Stack gap={6}>
+          <Stack gap={2}>
+            <QuestionEditorField
+              htmlFor="tags"
+              label="Tags"
+              hint="Comma or newline separated tags used for filtering and imports."
+            >
+              <Textarea
+                id="tags"
+                size="sm"
+                value={joinStringList(value.tags || [])}
+                onChange={(event) => onUpdate({ tags: parseStringList(event.target.value) })}
+                placeholder="Comma or newline separated"
+                disabled={submitting}
+              />
+            </QuestionEditorField>
+            {renderAiSuggestion('tags')}
+          </Stack>
 
           <QuestionEditorField
             htmlFor="metadata"
@@ -88,7 +92,6 @@ export function EditorReferenceSection({
               onChange={(event) => onMetadataTextChange(event.target.value)}
               placeholder='{"rubricVersion":"v1"}'
               disabled={submitting}
-              aria-invalid={metadataError ? true : undefined}
             />
           </QuestionEditorField>
         </Stack>

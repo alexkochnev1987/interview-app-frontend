@@ -19,6 +19,7 @@ import {
   type QuestionDraft,
   type QuestionInput,
 } from '@/lib/api'
+import { clearFieldError } from '@/lib/clear-field-error'
 import { type FieldErrors, validateQuestionForm } from '@/lib/form-validation'
 import {
   DRAFT_FIELDS,
@@ -76,36 +77,28 @@ export function QuestionEditor({
 
   const similarity = useSimilaritySearch({ value, questionId })
 
-  function clearFieldError(field: QuestionFormField) {
-    setFieldErrors((current) => {
-      if (!current[field]) return current
-      const next = { ...current }
-      delete next[field]
-      return next
-    })
-  }
-
   function update(patch: Partial<QuestionInput>) {
     if ('questionText' in patch) {
-      clearFieldError('questionText')
+      clearFieldError('questionText', setFieldErrors)
     }
     setValue((current) => ({ ...current, ...patch }))
   }
 
   function handleMetadataTextChange(next: string) {
-    clearFieldError('metadata')
+    clearFieldError('metadata', setFieldErrors)
     setMetadataText(next)
   }
 
   async function handleGenerate() {
     if (!value.questionText.trim()) {
-      setFieldErrors({
+      setFieldErrors((prev) => ({
+        ...prev,
         questionText: 'Question text is required before AI generation.',
-      })
+      }))
       return
     }
 
-    clearFieldError('questionText')
+    clearFieldError('questionText', setFieldErrors)
     setAiStatus('loading')
 
     try {
@@ -117,12 +110,13 @@ export function QuestionEditor({
       setAiDraft(null)
       setDismissedDraftFields([])
       setAiStatus('error')
-      setFieldErrors({
+      setFieldErrors((prev) => ({
+        ...prev,
         questionText:
           err instanceof Error
             ? err.message
             : FEEDBACK_POLICY.draftQuestion.inlineErrorFallback,
-      })
+      }))
     }
   }
 

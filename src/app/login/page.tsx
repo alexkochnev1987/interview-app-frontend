@@ -18,6 +18,7 @@ import { Stack } from '@/components/ui/layout/stack'
 import { BodyText, SectionHeading } from '@/components/ui/text'
 import { useAuth } from '@/lib/auth-context'
 import { login } from '@/lib/api'
+import { clearFieldError } from '@/lib/clear-field-error'
 import { type FieldErrors, validateLogin } from '@/lib/form-validation'
 
 type LoginField = 'email' | 'password'
@@ -29,15 +30,6 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [fieldErrors, setFieldErrors] = useState<FieldErrors<LoginField>>({})
   const [loading, setLoading] = useState(false)
-
-  function clearFieldError(field: LoginField) {
-    setFieldErrors((current) => {
-      if (!current[field]) return current
-      const next = { ...current }
-      delete next[field]
-      return next
-    })
-  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -57,9 +49,10 @@ export default function LoginPage() {
       router.push('/')
       router.refresh()
     } catch (err) {
-      setFieldErrors({
+      setFieldErrors((prev) => ({
+        ...prev,
         password: err instanceof Error ? err.message : 'Login failed',
-      })
+      }))
     } finally {
       setLoading(false)
     }
@@ -140,7 +133,7 @@ export default function LoginPage() {
             <CardTitle size="xl">Sign in</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} noValidate>
               <Stack gap={6}>
               <Stack gap={4}>
                 <FormField htmlFor="email" label="Email" error={fieldErrors.email}>
@@ -150,10 +143,9 @@ export default function LoginPage() {
                     value={email}
                     onChange={(e) => {
                       setEmail(e.target.value)
-                      clearFieldError('email')
+                      clearFieldError('email', setFieldErrors)
                     }}
                     placeholder="admin@interview-app.com"
-                    aria-invalid={fieldErrors.email ? true : undefined}
                   />
                 </FormField>
 
@@ -164,10 +156,9 @@ export default function LoginPage() {
                     value={password}
                     onChange={(e) => {
                       setPassword(e.target.value)
-                      clearFieldError('password')
+                      clearFieldError('password', setFieldErrors)
                     }}
                     placeholder="Password"
-                    aria-invalid={fieldErrors.password ? true : undefined}
                   />
                 </FormField>
               </Stack>

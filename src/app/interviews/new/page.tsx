@@ -40,6 +40,7 @@ import {
   useQuestionsQuery,
 } from '@/components/questions/picker'
 import { createInterview, type Question } from '@/lib/api'
+import { clearFieldError } from '@/lib/clear-field-error'
 import { type FieldErrors, validateNewInterview } from '@/lib/form-validation'
 import { runMutation } from '@/lib/run-mutation'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
@@ -82,17 +83,8 @@ function NewInterviewPageContent() {
   const selectedCount = selectedById.size
   const selectedQuestions = Array.from(selectedById.values())
 
-  function clearFieldError(field: NewInterviewField) {
-    setFieldErrors((current) => {
-      if (!current[field]) return current
-      const next = { ...current }
-      delete next[field]
-      return next
-    })
-  }
-
   function toggleQuestion(question: Question) {
-    clearFieldError('questions')
+    clearFieldError('questions', setFieldErrors)
     setSelectedById((prev) => {
       const next = new Map(prev)
       if (next.has(question.id)) {
@@ -105,7 +97,7 @@ function NewInterviewPageContent() {
   }
 
   function removeSelected(id: string) {
-    clearFieldError('questions')
+    clearFieldError('questions', setFieldErrors)
     setSelectedById((prev) => {
       if (!prev.has(id)) return prev
       const next = new Map(prev)
@@ -192,7 +184,7 @@ function NewInterviewPageContent() {
         </CardContent>
       </Card>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} noValidate>
         <Grid columns="aside-22-left" gap={6}>
           <Stack gap={4}>
             <Card variant="surface">
@@ -215,11 +207,10 @@ function NewInterviewPageContent() {
                       value={candidateName}
                       onChange={(event) => {
                         setCandidateName(event.target.value)
-                        clearFieldError('candidateName')
+                        clearFieldError('candidateName', setFieldErrors)
                       }}
                       placeholder="e.g. Jane Doe"
                       disabled={submitting}
-                      aria-invalid={fieldErrors.candidateName ? true : undefined}
                     />
                   </IconAffix>
                 </FormField>
@@ -232,11 +223,10 @@ function NewInterviewPageContent() {
                       value={position}
                       onChange={(event) => {
                         setPosition(event.target.value)
-                        clearFieldError('position')
+                        clearFieldError('position', setFieldErrors)
                       }}
                       placeholder="e.g. Senior Frontend Engineer"
                       disabled={submitting}
-                      aria-invalid={fieldErrors.position ? true : undefined}
                     />
                   </IconAffix>
                 </FormField>
