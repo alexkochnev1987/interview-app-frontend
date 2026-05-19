@@ -1,6 +1,44 @@
 import type { PermissionStatus } from '@/components/take/types';
 import type { StatusTone } from '@/components/ui/status-pill';
 
+export const TAKE_RECORDING_LIMIT_SECONDS = 240;
+
+const MEDIA_RECORDER_CANDIDATE_TYPES = [
+  'video/webm;codecs=vp9,opus',
+  'video/webm;codecs=vp8,opus',
+  'video/webm;codecs=vp9',
+  'video/webm;codecs=vp8',
+  'video/webm',
+  'video/mp4',
+  'video/mp4;codecs=avc1.42E01E,mp4a.40.2',
+] as const;
+
+export function pickSupportedMediaRecorderMimeType(): string | undefined {
+  if (typeof MediaRecorder === 'undefined' || !MediaRecorder.isTypeSupported) {
+    return undefined;
+  }
+
+  for (const type of MEDIA_RECORDER_CANDIDATE_TYPES) {
+    if (MediaRecorder.isTypeSupported(type)) {
+      return type;
+    }
+  }
+
+  return undefined;
+}
+
+export function buildMediaRecorderOptions(
+  videoBitsPerSecond = 1_500_000,
+): MediaRecorderOptions {
+  const mimeType = pickSupportedMediaRecorderMimeType();
+
+  if (mimeType) {
+    return { mimeType, videoBitsPerSecond };
+  }
+
+  return { videoBitsPerSecond };
+}
+
 export interface TakeBehaviorSignals {
   tabHiddenCount: number;
   windowBlurCount: number;
@@ -75,4 +113,13 @@ export function formatTime(seconds: number) {
   const minutes = Math.floor(seconds / 60);
   const remainder = seconds % 60;
   return `${minutes}:${remainder.toString().padStart(2, '0')}`;
+}
+
+export function formatRecordingLimitLabel(seconds: number) {
+  const minutes = Math.floor(seconds / 60);
+  const remainder = seconds % 60;
+  if (remainder === 0) {
+    return `${minutes} min`;
+  }
+  return `${minutes} min ${remainder} sec`;
 }

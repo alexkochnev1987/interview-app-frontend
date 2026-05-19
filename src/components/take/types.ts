@@ -1,6 +1,13 @@
 import type { TakeInterviewData } from '@/lib/api';
 
-export type TakeStage = 'loading' | 'consent' | 'interview' | 'recording' | 'transition' | 'complete';
+export type TakeStage =
+  | 'loading'
+  | 'consent'
+  | 'lobby'
+  | 'interview'
+  | 'recording'
+  | 'transition'
+  | 'complete';
 
 export type InterviewDataView = Pick<
   TakeInterviewData,

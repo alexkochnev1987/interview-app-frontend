@@ -11,8 +11,12 @@ const cardVariants = cva(
         default: "bg-card ring-1 ring-foreground/10",
         surface:
           "border border-hairline-strong bg-surface-glass shadow-soft",
+        surfaceFlat:
+          "border border-hairline-strong bg-surface-glass shadow-none",
         floating:
           "border border-hairline-strong bg-surface-glass shadow-float",
+        recordingHero:
+          "border border-hairline-strong bg-white shadow-float",
         metric:
           "relative isolate border border-hairline-strong bg-[linear-gradient(135deg,hsl(var(--card)/0.98),hsl(var(--surface-low)/0.58))] shadow-float after:pointer-events-none after:absolute after:-right-10 after:-top-10 after:size-24 after:rounded-full after:bg-[hsl(var(--primary)/0.08)] after:blur-2xl",
         tinted:
@@ -29,6 +33,7 @@ const cardVariants = cva(
         default: "gap-4 py-4",
         md: "gap-5 py-5",
         lg: "gap-6 py-8",
+        flush: "gap-0 p-0",
         state: "gap-4 py-16 min-h-[300px]",
       },
       effects: {
@@ -50,7 +55,7 @@ const cardVariants = cva(
       },
       height: {
         auto: "",
-        full: "h-full",
+        full: "h-full min-h-0",
       },
       accent: {
         none: "",
@@ -64,6 +69,10 @@ const cardVariants = cva(
         default: "",
         contain: "min-w-0",
       },
+      grow: {
+        none: "",
+        fill: "min-h-0 min-w-0 flex-1",
+      },
     },
     defaultVariants: {
       variant: "default",
@@ -74,6 +83,7 @@ const cardVariants = cva(
       height: "auto",
       accent: "none",
       flexChild: "default",
+      grow: "none",
     },
   },
 )
@@ -88,6 +98,7 @@ function Card({
   height,
   accent,
   flexChild,
+  grow,
   ...props
 }: React.ComponentProps<"div"> & VariantProps<typeof cardVariants>) {
   return (
@@ -105,6 +116,7 @@ function Card({
           height,
           accent,
           flexChild,
+          grow,
         }),
         className
       )}
@@ -130,6 +142,19 @@ const cardHeaderSpacingVariants = cva("", {
   },
 })
 
+const cardHeaderInsetVariants = cva("", {
+  variants: {
+    inset: {
+      card:
+        "px-4 group-data-[size=xs]/card:px-6 group-data-[size=sm]/card:px-3 group-data-[size=md]/card:px-5 group-data-[size=lg]/card:px-8 group-data-[size=state]/card:px-8",
+      none: "px-0",
+    },
+  },
+  defaultVariants: {
+    inset: "card",
+  },
+})
+
 const cardContentVariants = cva("", {
   variants: {
     spacing: {
@@ -143,7 +168,8 @@ const cardContentVariants = cva("", {
     },
     layout: {
       default: "",
-      "fill-column": "flex h-full flex-col",
+      "fill-column":
+        "flex min-h-0 min-w-0 flex-1 flex-col self-stretch",
       "row-end": "flex flex-wrap justify-end",
       "split-row": "flex flex-col sm:flex-row sm:items-center sm:justify-between",
       "stack-center": "flex flex-1 flex-col items-center justify-center text-center",
@@ -174,14 +200,17 @@ const cardContentVariants = cva("", {
 function CardHeader({
   className,
   spacing,
+  inset,
   ...props
 }: React.ComponentProps<"div"> &
-  VariantProps<typeof cardHeaderSpacingVariants>) {
+  VariantProps<typeof cardHeaderSpacingVariants> &
+  VariantProps<typeof cardHeaderInsetVariants>) {
   return (
     <div
       data-slot="card-header"
       className={cn(
-        "group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-xl px-4 group-data-[size=xs]/card:px-6 group-data-[size=sm]/card:px-3 group-data-[size=md]/card:px-5 group-data-[size=lg]/card:px-8 group-data-[size=state]/card:px-8 has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3",
+        "group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-xl has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3",
+        cardHeaderInsetVariants({ inset }),
         cardHeaderSpacingVariants({ spacing }),
         className
       )}
@@ -274,19 +303,34 @@ function CardAction({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+const cardContentInsetVariants = cva("", {
+  variants: {
+    inset: {
+      card: "px-4 group-data-[size=xs]/card:px-6 group-data-[size=sm]/card:px-3 group-data-[size=md]/card:px-5 group-data-[size=lg]/card:px-8 group-data-[size=state]/card:px-8",
+      none: "!px-0",
+    },
+  },
+  defaultVariants: {
+    inset: "card",
+  },
+})
+
 function CardContent({
   className,
   spacing,
   layout,
+  inset,
   ...props
-}: React.ComponentProps<"div"> & VariantProps<typeof cardContentVariants>) {
+}: React.ComponentProps<"div"> &
+  VariantProps<typeof cardContentVariants> &
+  VariantProps<typeof cardContentInsetVariants>) {
   return (
     <div
       data-slot="card-content"
       className={cn(
-        "px-4 group-data-[size=xs]/card:px-6 group-data-[size=sm]/card:px-3 group-data-[size=md]/card:px-5 group-data-[size=lg]/card:px-8 group-data-[size=state]/card:px-8",
+        cardContentInsetVariants({ inset }),
         cardContentVariants({ spacing, layout }),
-        className
+        className,
       )}
       {...props}
     />

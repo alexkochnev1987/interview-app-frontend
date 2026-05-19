@@ -1,6 +1,7 @@
-import type { MutableRefObject } from 'react';
+import { type MutableRefObject } from 'react';
 
 import type { CaptureTarget, MultipartUploadSession, MultipartUploadState } from './runtime';
+import { buildMediaRecorderOptions, pickSupportedMediaRecorderMimeType, TAKE_RECORDING_LIMIT_SECONDS } from './utils';
 
 type PendingVersionAction = 'submit' | 'rerecord' | null;
 
@@ -9,6 +10,7 @@ interface UseTakeBeginRecordingParams {
   screenStreamRef: MutableRefObject<MediaStream | null>;
   cameraRecorderRef: MutableRefObject<MediaRecorder | null>;
   screenRecorderRef: MutableRefObject<MediaRecorder | null>;
+  expectedRecorderStopsRef: MutableRefObject<number>;
   timerRef: MutableRefObject<ReturnType<typeof setInterval> | null>;
   stoppedRecordersRef: MutableRefObject<number>;
   discardRecordingRef: MutableRefObject<boolean>;
@@ -26,7 +28,7 @@ interface UseTakeBeginRecordingParams {
   setTimeLeft: (value: number | ((prev: number) => number)) => void;
   setSetupError: (value: string) => void;
   setStage: (value: 'recording' | 'interview') => void;
-  setTransitionLabel: (value: string) => void;
+  clearVersionPersistKind: () => void;
   clearRecordingArtifacts: () => void;
   resetInterviewSetup: (message: string) => void;
   startMultipartUploadSession: (
@@ -38,7 +40,7 @@ interface UseTakeBeginRecordingParams {
   abortMultipartUploads: () => Promise<void>;
   handleRecordedChunk: (target: CaptureTarget, blob: Blob) => void;
   onRecordersStopped: () => void;
-  startBrowserTranscript: () => void;
+  primeBrowserTranscriptForRecordingSession: () => void;
 }
 
 interface BeginRecordingInput {
@@ -52,6 +54,7 @@ export function useTakeBeginRecording({
   screenStreamRef,
   cameraRecorderRef,
   screenRecorderRef,
+  expectedRecorderStopsRef,
   timerRef,
   stoppedRecordersRef,
   discardRecordingRef,
@@ -69,7 +72,7 @@ export function useTakeBeginRecording({
   setTimeLeft,
   setSetupError,
   setStage,
-  setTransitionLabel,
+  clearVersionPersistKind,
   clearRecordingArtifacts,
   resetInterviewSetup,
   startMultipartUploadSession,
@@ -78,11 +81,11 @@ export function useTakeBeginRecording({
   abortMultipartUploads,
   handleRecordedChunk,
   onRecordersStopped,
-  startBrowserTranscript,
+  primeBrowserTranscriptForRecordingSession,
 }: UseTakeBeginRecordingParams) {
   function handleRecorderStopped() {
     stoppedRecordersRef.current += 1;
-    if (stoppedRecordersRef.current !== 2) {
+    if (stoppedRecordersRef.current < expectedRecorderStopsRef.current) {
       return;
     }
     onRecordersStopped();
@@ -135,10 +138,7 @@ export function useTakeBeginRecording({
       return;
     }
 
-    const recorderOptions: MediaRecorderOptions = {
-      mimeType: 'video/webm',
-      videoBitsPerSecond: 1_500_000,
-    };
+    const recorderOptions = buildMediaRecorderOptions();
 
     const cameraRecorder = new MediaRecorder(cameraStreamRef.current, recorderOptions);
     cameraRecorder.ondataavailable = (event) => {
@@ -156,27 +156,48 @@ export function useTakeBeginRecording({
       handleRecorderStopped();
     };
 
+    const cameraSession = multipartUploadsRef.current.camera;
+    const screenSession = multipartUploadsRef.current.screen;
+    const mimeForParts =
+      cameraRecorder.mimeType.trim() ||
+      screenRecorder.mimeType.trim() ||
+      pickSupportedMediaRecorderMimeType() ||
+      '';
+    if (cameraSession && screenSession && mimeForParts) {
+      cameraSession.partBlobType = mimeForParts;
+      screenSession.partBlobType = mimeForParts;
+    }
+
     cameraRecorderRef.current = cameraRecorder;
     screenRecorderRef.current = screenRecorder;
+
     cameraRecorder.start(1000);
     screenRecorder.start(1000);
-    startBrowserTranscript();
+    expectedRecorderStopsRef.current = 2;
+
+    primeBrowserTranscriptForRecordingSession();
 
     setRecording(true);
-    setTimeLeft(240);
+    setTimeLeft(TAKE_RECORDING_LIMIT_SECONDS);
     setSetupError('');
     setStage('recording');
-    setTransitionLabel('');
+    clearVersionPersistKind();
 
-    timerRef.current = setInterval(() => {
+    const countdownInterval = setInterval(() => {
       setTimeLeft((current) => {
         if (current <= 1) {
+          const intervalId = timerRef.current;
+          if (intervalId !== null) {
+            clearInterval(intervalId);
+            timerRef.current = null;
+          }
           requestVersionActionRef.current('submit');
           return 0;
         }
         return current - 1;
       });
     }, 1000);
+    timerRef.current = countdownInterval;
   }
 
   return { beginRecording };

@@ -6,11 +6,15 @@ const pageFrameVariants = cva("", {
     spacing: {
       page: "py-10 md:py-12",
       compact: "py-12",
-      login: "py-10 lg:py-14",
+    },
+    stretch: {
+      none: "",
+      viewport: "min-h-[100dvh] flex flex-col box-border",
     },
   },
   defaultVariants: {
     spacing: "page",
+    stretch: "none",
   },
 })
 
@@ -19,9 +23,9 @@ type PageFrameProps = Omit<ComponentProps<"div">, "className"> &
     as?: "div" | "main" | "section"
   }
 
-function PageFrame({ as, spacing, ...props }: PageFrameProps) {
+function PageFrame({ as, spacing, stretch, ...props }: PageFrameProps) {
   const Comp = as ?? "div"
-  return <Comp {...props} className={pageFrameVariants({ spacing })} />
+  return <Comp {...props} className={pageFrameVariants({ spacing, stretch })} />
 }
 
 export { PageFrame }
