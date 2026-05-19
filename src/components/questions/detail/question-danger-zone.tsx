@@ -11,27 +11,16 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { PageShell } from '@/components/ui/layout/page-shell'
-import { useNotifyErrorOnce } from '@/hooks/use-notify-once'
-import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 interface QuestionDangerZoneProps {
   deleting: boolean
-  deleteError: string | null
   onRequestDelete: () => void
 }
 
 export function QuestionDangerZone({
   deleting,
-  deleteError,
   onRequestDelete,
 }: QuestionDangerZoneProps) {
-  useNotifyErrorOnce({
-    value: deleteError,
-    toastId: 'delete-question-error',
-    message: TOAST_MESSAGES.deleteQuestion.cannotDeleteTitle,
-    description: deleteError,
-  })
-
   return (
     <PageShell as="section" spacing="compact" padding="bottom">
       <Card variant="danger-soft">

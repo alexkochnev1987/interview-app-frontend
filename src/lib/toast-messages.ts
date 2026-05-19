@@ -80,9 +80,6 @@ export const TOAST_MESSAGES = {
       "No submitted answers to score yet. The candidate has not finished any answers.",
     queuedLabel: "Re-evaluation queued",
   },
-  restore: {
-    cannotRestoreTitle: "Cannot restore",
-  },
   deleteQuestion: {
     cannotDeleteTitle: "Cannot delete",
   },

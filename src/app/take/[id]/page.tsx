@@ -10,7 +10,6 @@ import {
   TakeLobbyScreen,
   TakeRecordingScreen,
 } from '@/components/take'
-import { FlashErrorToast } from '@/components/ui/flash-error-toast'
 import { Icon } from '@/components/ui/icon'
 import { EmptyStateCard, LoadingStateCard } from '@/components/ui/state-card'
 import {
@@ -72,11 +71,6 @@ export default function TakeInterviewPage() {
     return (
       <PageMainLayout>
         <PageContent>
-          <FlashErrorToast
-            toastId="take-interview-unavailable"
-            message={TOAST_MESSAGES.pageGate.interview.unavailableTitle}
-            description={error}
-          />
           <EmptyStateCard
             icon={
               <Icon size="lg">
@@ -84,7 +78,7 @@ export default function TakeInterviewPage() {
               </Icon>
             }
             title={TOAST_MESSAGES.pageGate.interview.unavailableTitle}
-            description="This interview link may be invalid, expired, or no longer available. Details are shown in the notification."
+            description={error}
           />
         </PageContent>
       </PageMainLayout>

@@ -33,10 +33,8 @@ export default function EditQuestionPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [restoring, setRestoring] = useState(false);
-  const [restoreError, setRestoreError] = useState<string | null>(null);
   const [restoreOpen, setRestoreOpen] = useState(false);
   const { user } = useAuth();
   const canDelete = user?.role === 'super_admin';
@@ -77,7 +75,6 @@ export default function EditQuestionPage() {
   async function performRestore() {
     if (restoring) return;
     setRestoring(true);
-    setRestoreError(null);
     try {
       const restored = await runMutation(() => restoreQuestion(id), {
         successMessage: TOAST_MESSAGES.question.restoreSuccess,
@@ -86,8 +83,6 @@ export default function EditQuestionPage() {
       setQuestion(restored);
       setRestoreOpen(false);
       router.refresh();
-    } catch (err) {
-      setRestoreError(null);
     } finally {
       setRestoring(false);
     }
@@ -96,21 +91,18 @@ export default function EditQuestionPage() {
   async function performDelete() {
     if (deleting) return;
     setDeleting(true);
-    setDeleteError(null);
     try {
       await runMutation(() => deleteQuestion(id), {
         successMessage: TOAST_MESSAGES.question.deleteSuccess,
         errorMessage: TOAST_MESSAGES.question.deleteError,
+        getErrorMessage: (err) =>
+          err instanceof QuestionInUseError
+            ? TOAST_MESSAGES.deleteQuestion.cannotDeleteTitle
+            : TOAST_MESSAGES.question.deleteError,
       });
       setConfirmOpen(false);
       router.push('/questions');
       router.refresh();
-    } catch (err) {
-      if (err instanceof QuestionInUseError) {
-        setDeleteError(err.message);
-      } else {
-        setDeleteError(null);
-      }
     } finally {
       setDeleting(false);
     }
@@ -129,11 +121,7 @@ export default function EditQuestionPage() {
       {question.deleted && (
         <DeletedQuestionBanner
           restoring={restoring}
-          restoreError={restoreError}
-          onRestore={() => {
-            setRestoreError(null);
-            setRestoreOpen(true);
-          }}
+          onRestore={() => setRestoreOpen(true)}
         />
       )}
       <QuestionEditor
@@ -163,11 +151,7 @@ export default function EditQuestionPage() {
       {!question.deleted && canDelete && (
         <QuestionDangerZone
           deleting={deleting}
-          deleteError={deleteError}
-          onRequestDelete={() => {
-            setDeleteError(null);
-            setConfirmOpen(true);
-          }}
+          onRequestDelete={() => setConfirmOpen(true)}
         />
       )}
       <ConfirmDialog

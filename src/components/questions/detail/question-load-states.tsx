@@ -13,7 +13,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { FlashErrorToast } from '@/components/ui/flash-error-toast'
 import { Inline } from '@/components/ui/layout/inline'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { Stack } from '@/components/ui/layout/stack'
@@ -47,10 +46,6 @@ interface QuestionUnavailableCardProps {
 export function QuestionUnavailableCard({ message }: QuestionUnavailableCardProps) {
   return (
     <PageShell>
-      <FlashErrorToast
-        toastId="question-load-failed"
-        message={TOAST_MESSAGES.pageGate.questions.loadFailedTitle}
-      />
       <Card variant="floating">
         <CardHeader spacing="md">
           <IconBadge tone="danger" size="lg">

@@ -26,7 +26,8 @@ import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { deleteQuestionsBulk, type BulkDeleteResult } from '@/lib/api'
 import { useAuth } from '@/lib/auth-context'
-import { useNotifyErrorOnce } from '@/hooks/use-notify-once'
+import { notifyBulkDeleteOutcome } from '@/lib/notify-bulk-delete'
+import { notifyError } from '@/lib/toast'
 import { runMutation } from '@/lib/run-mutation'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
@@ -66,15 +67,6 @@ function QuestionsPageContent() {
   const [bulkConfirmOpen, setBulkConfirmOpen] = useState(false)
   const [bulkDeleting, setBulkDeleting] = useState(false)
   const [bulkResult, setBulkResult] = useState<BulkDeleteResult | null>(null)
-  const [bulkError, setBulkError] = useState<string | null>(null)
-  const [bulkOperationGeneration, setBulkOperationGeneration] = useState(0)
-
-  useNotifyErrorOnce({
-    value: query.error,
-    toastId: 'question-feed-error',
-    message: TOAST_MESSAGES.questionFeed.unavailableTitle,
-    description: query.error,
-  })
 
   function toggleSelected(id: string) {
     setSelectedIds((prev) => {
@@ -91,20 +83,24 @@ function QuestionsPageContent() {
     if (ids.length === 0) return
 
     setBulkDeleting(true)
-    setBulkError(null)
-    setBulkOperationGeneration((generation) => generation + 1)
     try {
       const result = await runMutation(() => deleteQuestionsBulk(ids), {
         showSuccessToast: false,
         showErrorToast: false,
       })
+      notifyBulkDeleteOutcome(result)
       setSelectedIds(new Set())
       setBulkConfirmOpen(false)
       setBulkResult(result)
       query.refetch()
       facetsResult.refetch()
     } catch (error) {
-      setBulkError(error instanceof Error ? error.message : 'Bulk delete failed.')
+      setBulkResult(null)
+      notifyError(TOAST_MESSAGES.bulkDelete.failedTitle, {
+        id: 'bulk-delete-error',
+        description:
+          error instanceof Error ? error.message : 'Bulk delete failed.',
+      })
       setBulkConfirmOpen(false)
     } finally {
       setBulkDeleting(false)
@@ -180,7 +176,6 @@ function QuestionsPageContent() {
                   size="xl"
                   disabled={selectedCount === 0 || bulkDeleting}
                   onClick={() => {
-                    setBulkError(null)
                     setBulkResult(null)
                     setBulkConfirmOpen(true)
                   }}
@@ -201,11 +196,7 @@ function QuestionsPageContent() {
           />
 
           {isSuperAdmin && (
-            <BulkDeleteResultAlerts
-              result={bulkResult}
-              error={bulkError}
-              operationGeneration={bulkOperationGeneration}
-            />
+            <BulkDeleteResultAlerts result={bulkResult} />
           )}
 
           {query.error ? (

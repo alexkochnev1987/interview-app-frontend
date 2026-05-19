@@ -41,7 +41,6 @@ import {
   useQuestionsQuery,
 } from '@/components/questions/picker'
 import { createInterview, type Question } from '@/lib/api'
-import { useNotifyErrorOnce } from '@/hooks/use-notify-once'
 import { runMutation } from '@/lib/run-mutation'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
@@ -77,13 +76,6 @@ function NewInterviewPageContent() {
     },
     { showStatusFilter: false },
   )
-
-  useNotifyErrorOnce({
-    value: query.error,
-    toastId: 'interview-new-question-feed-error',
-    message: TOAST_MESSAGES.questionFeed.unavailableTitle,
-    description: query.error,
-  })
 
   const selectedCount = selectedById.size
   const selectedQuestions = Array.from(selectedById.values())

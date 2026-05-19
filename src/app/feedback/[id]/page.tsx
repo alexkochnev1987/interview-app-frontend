@@ -57,11 +57,8 @@ export default function FeedbackPage() {
   if (error) {
     return (
       <FlashErrorPageFallback
-        toastId="feedback-unavailable"
-        toastMessage={TOAST_MESSAGES.pageGate.feedback.unavailableTitle}
-        toastDescription={error}
         title={TOAST_MESSAGES.pageGate.feedback.unavailableTitle}
-        description="This feedback link may be invalid, expired, or no longer available. Details are shown in the notification."
+        description={error}
       />
     )
   }

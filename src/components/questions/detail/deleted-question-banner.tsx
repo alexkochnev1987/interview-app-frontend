@@ -7,27 +7,16 @@ import { Card, CardContent } from '@/components/ui/card'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText } from '@/components/ui/text'
-import { useNotifyErrorOnce } from '@/hooks/use-notify-once'
-import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 interface DeletedQuestionBannerProps {
   restoring: boolean
-  restoreError: string | null
   onRestore: () => void
 }
 
 export function DeletedQuestionBanner({
   restoring,
-  restoreError,
   onRestore,
 }: DeletedQuestionBannerProps) {
-  useNotifyErrorOnce({
-    value: restoreError,
-    toastId: 'restore-question-error',
-    message: TOAST_MESSAGES.restore.cannotRestoreTitle,
-    description: restoreError,
-  })
-
   return (
     <PageShell as="section" spacing="compact" padding="top">
       <Card variant="danger-soft" size="sm" role="alert">

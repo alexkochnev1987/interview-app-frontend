@@ -52,11 +52,8 @@ export default async function AssessmentsPage() {
   if (auth.kind === 'error') {
     return (
       <FlashErrorPageFallback
-        toastId="assessments-auth-gate-error"
-        toastMessage={LOAD_FAILED_TITLE}
-        toastDescription={auth.message}
         title="Assessments are unavailable right now"
-        description="We could not verify your session or permissions. Check the notification for more detail, or return to the dashboard and try again."
+        description={`We could not verify your session or permissions. ${auth.message}`}
         backHref={ERROR_BACK_HREF}
         backLabel={ERROR_BACK_LABEL}
       />
@@ -87,11 +84,8 @@ export default async function AssessmentsPage() {
   if (error) {
     return (
       <FlashErrorPageFallback
-        toastId="assessments-fetch-error"
-        toastMessage={LOAD_FAILED_TITLE}
-        toastDescription={error}
         title={LOAD_FAILED_TITLE}
-        description="Something went wrong while loading the assessment list from the workspace. Details are shown in the notification."
+        description={error}
         backHref={ERROR_BACK_HREF}
         backLabel={ERROR_BACK_LABEL}
       />

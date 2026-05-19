@@ -50,11 +50,8 @@ export default async function AssessmentDetailPage({
   if (auth.kind === 'error') {
     return (
       <FlashErrorPageFallback
-        toastId="assessment-detail-auth-gate-error"
-        toastMessage={UNAVAILABLE_TITLE}
-        toastDescription={auth.message}
         title="This assessment is unavailable right now"
-        description="We could not verify your session or permissions. Check the notification for more detail, or go back to the assessment list and try again."
+        description={`We could not verify your session or permissions. ${auth.message}`}
         backHref="/assessments"
         backLabel="Back to assessments"
       />
@@ -87,13 +84,10 @@ export default async function AssessmentDetailPage({
   if (error || !interview) {
     return (
       <FlashErrorPageFallback
-        toastId="assessment-detail-fetch-error"
-        toastMessage={UNAVAILABLE_TITLE}
-        toastDescription={
+        title={UNAVAILABLE_TITLE}
+        description={
           error ?? TOAST_MESSAGES.pageGate.assessments.notFoundFallback
         }
-        title={UNAVAILABLE_TITLE}
-        description="Something went wrong while loading this assessment. Details are shown in the notification."
         backHref="/assessments"
         backLabel="Back to assessments"
       />

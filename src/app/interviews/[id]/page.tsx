@@ -41,11 +41,8 @@ export default async function InterviewDetailPage({
   if (auth.kind === 'error') {
     return (
       <FlashErrorPageFallback
-        toastId="interview-detail-auth-gate-error"
-        toastMessage={UNAVAILABLE_TITLE}
-        toastDescription={auth.message}
         title="This interview is unavailable right now"
-        description="We could not verify your session or permissions. Check the notification for more detail, or go back home and try again."
+        description={`We could not verify your session or permissions. ${auth.message}`}
       />
     )
   }
@@ -95,13 +92,10 @@ export default async function InterviewDetailPage({
   if (error || !interview) {
     return (
       <FlashErrorPageFallback
-        toastId="interview-detail-fetch-error"
-        toastMessage={UNAVAILABLE_TITLE}
-        toastDescription={
+        title={UNAVAILABLE_TITLE}
+        description={
           error ?? TOAST_MESSAGES.pageGate.interview.notFoundFallback
         }
-        title={UNAVAILABLE_TITLE}
-        description="Something went wrong while loading this interview. Details are shown in the notification."
       />
     )
   }

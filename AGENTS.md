@@ -54,7 +54,7 @@ If the app needs a new composition pattern, add or extend a layout primitive in 
 
 ## User feedback (Alert vs toast)
 
-See `DOCUMENTATION.md` → **Alert vs toast**. Persistent or actionable page state → `Alert`; transient action outcomes and one-shot errors → Sonner (`notifySuccess` / `notifyError` / `notifyInfo`). Recoverable sidebar/feed errors may use inline copy + Retry without a duplicate toast.
+See `DOCUMENTATION.md` → **Alert vs toast**. Persistent or actionable page state → `Alert`. User actions → toast in the handler after `await` / `runMutation`, not `useEffect` on state. Passive load errors → inline / EmptyState (+ Retry); no duplicate toast.
 
 ## Non-Goals
 - Do not rewrite untouched files.

@@ -32,11 +32,8 @@ export default async function TeamPage() {
   if (auth.kind === 'error') {
     return (
       <FlashErrorPageFallback
-        toastId="team-auth-gate-error"
-        toastMessage="Could not load team management"
-        toastDescription={auth.message}
         title="Team management is unavailable right now"
-        description="We could not verify your session or permissions. Check the notification for more detail, or go back home and try again."
+        description={`We could not verify your session or permissions. ${auth.message}`}
       />
     )
   }
@@ -56,11 +53,8 @@ export default async function TeamPage() {
   if (error) {
     return (
       <FlashErrorPageFallback
-        toastId="team-members-fetch-error"
-        toastMessage="Could not load team members"
-        toastDescription={error}
         title="Could not load team members"
-        description="Something went wrong while loading the teammate list from the workspace. Details are shown in the notification."
+        description={error}
       />
     )
   }
