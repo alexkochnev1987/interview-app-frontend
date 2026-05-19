@@ -3,7 +3,14 @@
 import Link from 'next/link'
 import { Suspense, useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowRight, BriefcaseBusiness, CirclePlus, Sparkles, UserRound } from 'lucide-react'
+import {
+  AlertCircle,
+  ArrowRight,
+  BriefcaseBusiness,
+  CirclePlus,
+  Sparkles,
+  UserRound,
+} from 'lucide-react'
 
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
 import { EyebrowLabel } from '@/components/ui/eyebrow-label'
@@ -16,6 +23,7 @@ import { EmptyStateCard, LoadingStateCard } from '@/components/ui/state-card'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
+import { Icon } from '@/components/ui/icon'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Grid } from '@/components/ui/layout/grid'
@@ -176,7 +184,7 @@ function NewInterviewPageContent() {
 
       {error ? (
         <Alert variant="danger">
-          <AlertTitle>Interview setup blocked</AlertTitle>
+          <AlertTitle>{TOAST_MESSAGES.pageGate.interview.setupBlockedTitle}</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       ) : null}
@@ -287,24 +295,27 @@ function NewInterviewPageContent() {
               />
 
               {query.error ? (
-                <Alert variant="danger">
-                  <AlertTitle>Question feed unavailable</AlertTitle>
-                  <AlertDescription>
-                    {query.error}
+                <EmptyStateCard
+                  tone="ghost"
+                  icon={
+                    <Icon size="lg">
+                      <AlertCircle />
+                    </Icon>
+                  }
+                  title={TOAST_MESSAGES.questionFeed.unavailableTitle}
+                  description={query.error}
+                  action={
                     <Button
                       type="button"
                       variant="outline-pill"
                       shape="pill"
-                      size="sm"
                       onClick={query.refetch}
                     >
                       Retry
                     </Button>
-                  </AlertDescription>
-                </Alert>
-              ) : null}
-
-              {query.loading && query.items.length === 0 ? (
+                  }
+                />
+              ) : query.loading && query.items.length === 0 ? (
                 <LoadingStateCard tone="ghost" label="Loading question bank..." />
               ) : showEmptyState ? (
                 <EmptyStateCard

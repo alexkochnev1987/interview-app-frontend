@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { Suspense, useState } from 'react'
-import { LoaderCircle, Search, Trash2 } from 'lucide-react'
+import { AlertCircle, LoaderCircle, Search, Trash2 } from 'lucide-react'
 
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { EmptyStateCard, LoadingStateCard } from '@/components/ui/state-card'
@@ -22,11 +22,12 @@ import {
   useQuestionFacets,
   useQuestionsQuery,
 } from '@/components/questions/picker'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { deleteQuestionsBulk, type BulkDeleteResult } from '@/lib/api'
 import { useAuth } from '@/lib/auth-context'
+import { notifyBulkDeleteOutcome } from '@/lib/notify-bulk-delete'
+import { notifyError } from '@/lib/toast'
 import { runMutation } from '@/lib/run-mutation'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
@@ -66,7 +67,6 @@ function QuestionsPageContent() {
   const [bulkConfirmOpen, setBulkConfirmOpen] = useState(false)
   const [bulkDeleting, setBulkDeleting] = useState(false)
   const [bulkResult, setBulkResult] = useState<BulkDeleteResult | null>(null)
-  const [bulkError, setBulkError] = useState<string | null>(null)
 
   function toggleSelected(id: string) {
     setSelectedIds((prev) => {
@@ -83,30 +83,24 @@ function QuestionsPageContent() {
     if (ids.length === 0) return
 
     setBulkDeleting(true)
-    setBulkError(null)
     try {
-      const result = await runMutation(
-        () => deleteQuestionsBulk(ids),
-        {
-          getSuccessMessage: ({ deleted, blocked }) => {
-            if (deleted.length === 0 && blocked.length > 0) {
-              return TOAST_MESSAGES.question.bulkDeleteNoopSuccess
-            }
-            if (deleted.length > 0 && blocked.length > 0) {
-              return TOAST_MESSAGES.question.bulkDeletePartialSuccess
-            }
-            return TOAST_MESSAGES.question.bulkDeleteSuccess
-          },
-          errorMessage: TOAST_MESSAGES.question.bulkDeleteError,
-        }
-      )
+      const result = await runMutation(() => deleteQuestionsBulk(ids), {
+        showSuccessToast: false,
+        showErrorToast: false,
+      })
+      notifyBulkDeleteOutcome(result)
       setSelectedIds(new Set())
       setBulkConfirmOpen(false)
       setBulkResult(result)
       query.refetch()
       facetsResult.refetch()
     } catch (error) {
-      setBulkError(error instanceof Error ? error.message : 'Bulk delete failed.')
+      setBulkResult(null)
+      notifyError(TOAST_MESSAGES.bulkDelete.failedTitle, {
+        id: 'bulk-delete-error',
+        description:
+          error instanceof Error ? error.message : 'Bulk delete failed.',
+      })
       setBulkConfirmOpen(false)
     } finally {
       setBulkDeleting(false)
@@ -164,20 +158,6 @@ function QuestionsPageContent() {
         />
 
         <Stack gap={4}>
-          {query.error ? (
-            <Alert variant="danger">
-              <AlertTitle>Question feed unavailable</AlertTitle>
-              <AlertDescription>
-                <Inline gap={3} align="center" wrap="wrap">
-                  <span>{query.error}</span>
-                  <Button type="button" variant="outline-pill" shape="pill" size="sm" onClick={query.refetch}>
-                    Retry
-                  </Button>
-                </Inline>
-              </AlertDescription>
-            </Alert>
-          ) : null}
-
           <QuestionPickerToolbar
             q={query.state.q}
             onQChange={query.setQ}
@@ -196,7 +176,6 @@ function QuestionsPageContent() {
                   size="xl"
                   disabled={selectedCount === 0 || bulkDeleting}
                   onClick={() => {
-                    setBulkError(null)
                     setBulkResult(null)
                     setBulkConfirmOpen(true)
                   }}
@@ -217,10 +196,30 @@ function QuestionsPageContent() {
           />
 
           {isSuperAdmin && (
-            <BulkDeleteResultAlerts result={bulkResult} error={bulkError} />
+            <BulkDeleteResultAlerts result={bulkResult} />
           )}
 
-          {query.loading && query.items.length === 0 ? (
+          {query.error ? (
+            <EmptyStateCard
+              icon={
+                <Icon size="lg">
+                  <AlertCircle />
+                </Icon>
+              }
+              title={TOAST_MESSAGES.questionFeed.unavailableTitle}
+              description={query.error}
+              action={
+                <Button
+                  type="button"
+                  variant="outline-pill"
+                  shape="pill"
+                  onClick={query.refetch}
+                >
+                  Retry
+                </Button>
+              }
+            />
+          ) : query.loading && query.items.length === 0 ? (
             <LoadingStateCard label="Loading questions..." />
           ) : showEmptyState ? (
             <EmptyStateCard
@@ -257,13 +256,15 @@ function QuestionsPageContent() {
             </CardGrid>
           )}
 
-          <QuestionPagination
-            page={query.state.page}
-            totalPages={query.totalPages}
-            total={query.total}
-            limit={query.state.limit}
-            onPageChange={query.setPage}
-          />
+          {!query.error ? (
+            <QuestionPagination
+              page={query.state.page}
+              totalPages={query.totalPages}
+              total={query.total}
+              limit={query.state.limit}
+              onPageChange={query.setPage}
+            />
+          ) : null}
         </Stack>
       </Grid>
 

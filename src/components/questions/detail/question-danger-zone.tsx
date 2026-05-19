@@ -2,7 +2,6 @@
 
 import { LoaderCircle, Trash2 } from 'lucide-react'
 
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -15,13 +14,11 @@ import { PageShell } from '@/components/ui/layout/page-shell'
 
 interface QuestionDangerZoneProps {
   deleting: boolean
-  deleteError: string | null
   onRequestDelete: () => void
 }
 
 export function QuestionDangerZone({
   deleting,
-  deleteError,
   onRequestDelete,
 }: QuestionDangerZoneProps) {
   return (
@@ -36,12 +33,6 @@ export function QuestionDangerZone({
           </CardDescription>
         </CardHeader>
         <CardContent spacing="md">
-          {deleteError && (
-            <Alert variant="danger">
-              <AlertTitle>Cannot delete</AlertTitle>
-              <AlertDescription>{deleteError}</AlertDescription>
-            </Alert>
-          )}
           <Button
             type="button"
             variant="destructive"

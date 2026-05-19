@@ -1,14 +1,8 @@
 'use client'
 
 import { useParams, useSearchParams } from 'next/navigation'
+import { AlertCircle } from 'lucide-react'
 
-import {
-  useTakeInterviewBeforeUnload,
-  useTakeOrchestrator,
-} from '@/features/take'
-
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { LoadingStateCard } from '@/components/ui/state-card'
 import { PageContent, PageMainLayout } from '@/components/layout/page-shell'
 import {
   TakeCompleteScreen,
@@ -16,6 +10,13 @@ import {
   TakeLobbyScreen,
   TakeRecordingScreen,
 } from '@/components/take'
+import { Icon } from '@/components/ui/icon'
+import { EmptyStateCard, LoadingStateCard } from '@/components/ui/state-card'
+import {
+  useTakeInterviewBeforeUnload,
+  useTakeOrchestrator,
+} from '@/features/take'
+import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 export default function TakeInterviewPage() {
   const params = useParams()
@@ -70,10 +71,15 @@ export default function TakeInterviewPage() {
     return (
       <PageMainLayout>
         <PageContent>
-          <Alert variant="destructive">
-            <AlertTitle>Interview unavailable</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
+          <EmptyStateCard
+            icon={
+              <Icon size="lg">
+                <AlertCircle />
+              </Icon>
+            }
+            title={TOAST_MESSAGES.pageGate.interview.unavailableTitle}
+            description={error}
+          />
         </PageContent>
       </PageMainLayout>
     )
@@ -82,7 +88,7 @@ export default function TakeInterviewPage() {
   if (stage === 'loading' || !interview) {
     return (
       <PageMainLayout>
-          <LoadingStateCard label="Loading interview..." />
+        <LoadingStateCard label="Loading interview..." />
       </PageMainLayout>
     )
   }

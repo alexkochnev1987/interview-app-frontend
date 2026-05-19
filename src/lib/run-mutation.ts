@@ -6,6 +6,7 @@ type RunMutationOptions<TData> = {
   errorMessage?: string
   getSuccessMessage?: (data: TData) => string
   getSuccessDescription?: (data: TData) => string | undefined
+  getErrorTitle?: (error: unknown) => string
   getErrorMessage?: (error: unknown) => string
   showSuccessToast?: boolean
   showErrorToast?: boolean
@@ -38,7 +39,10 @@ export async function runMutation<TData>(
 
     return data
   } catch (error) {
-    const errorMessage = options?.errorMessage ?? DEFAULT_ERROR_MESSAGE
+    const errorMessage =
+      options?.getErrorTitle?.(error) ??
+      options?.errorMessage ??
+      DEFAULT_ERROR_MESSAGE
     const errorDescription =
       options?.getErrorMessage?.(error) ?? getErrorDescription(error)
 

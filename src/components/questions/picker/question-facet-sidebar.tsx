@@ -1,9 +1,8 @@
 'use client'
 
-import { AlertCircle, RotateCcw, Search } from 'lucide-react'
+import { RotateCcw, Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { EyebrowLabel } from '@/components/ui/eyebrow-label'
@@ -21,6 +20,7 @@ import type {
   QuestionDifficulty,
   QuestionStatusFilter,
 } from '@/lib/api'
+import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 const COLLAPSED_LIMIT = 6
 const TAG_COLLAPSED_LIMIT = 12
@@ -118,24 +118,23 @@ export function QuestionFacetSidebar(props: QuestionFacetSidebarProps) {
           </Button>
 
           {error ? (
-            <Alert variant="warning">
-              <AlertCircle className="size-4" />
-              <AlertTitle>Filter options unavailable</AlertTitle>
-              <AlertDescription>
-                <Inline gap={3} align="center" wrap="wrap">
-                  <span>{error}</span>
-                  <Button
-                    type="button"
-                    variant="outline-pill"
-                    shape="pill"
-                    size="sm"
-                    onClick={onRetry}
-                  >
-                    Retry
-                  </Button>
-                </Inline>
-              </AlertDescription>
-            </Alert>
+            <Stack gap={2}>
+              <BodyText size="sm" weight="semibold">
+                {TOAST_MESSAGES.questionFacets.unavailableTitle}
+              </BodyText>
+              <BodyText size="sm" tone="muted">
+                {error}
+              </BodyText>
+              <Button
+                type="button"
+                variant="outline-pill"
+                shape="pill"
+                size="sm"
+                onClick={onRetry}
+              >
+                Retry
+              </Button>
+            </Stack>
           ) : null}
         </Stack>
 

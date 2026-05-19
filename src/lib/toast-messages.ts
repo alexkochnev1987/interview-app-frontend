@@ -4,10 +4,6 @@ export const TOAST_MESSAGES = {
     createError: "Failed to create question",
     saveSuccess: "Question saved",
     saveError: "Failed to save question",
-    bulkDeleteSuccess: "Questions deleted",
-    bulkDeletePartialSuccess: "Questions deleted with skips",
-    bulkDeleteNoopSuccess: "No questions deleted",
-    bulkDeleteError: "Failed to delete questions",
     restoreSuccess: "Question restored",
     restoreError: "Failed to restore question",
     deleteSuccess: "Question deleted",
@@ -26,5 +22,65 @@ export const TOAST_MESSAGES = {
   take: {
     submitSuccess: "Answer submitted",
     submitError: "Failed to submit answer",
+  },
+  bulkDelete: {
+    failedTitle: "Bulk delete failed",
+    partialTitle: (deletedCount: number, blockedCount: number) =>
+      `Deleted ${deletedCount}, blocked ${blockedCount}`,
+    successTitle: (count: number) => `Deleted ${count} question(s)`,
+    successDescription: "The library is up to date.",
+    noopTitle: "No questions deleted",
+    noopDescription: "None of the selected questions were removed.",
+    blockedIntro:
+      "These questions are used in active interviews and were not deleted:",
+  },
+  questionFeed: {
+    unavailableTitle: "Question feed unavailable",
+  },
+  questionFacets: {
+    unavailableTitle: "Filter options unavailable",
+  },
+  similarity: {
+    searchFailedTitle: "Similarity search failed",
+    noMatches: "No close matches crossed the current similarity threshold.",
+  },
+  pageGate: {
+    assessments: {
+      loadFailedTitle: "Could not load assessments",
+      loadFailedFallback: "Failed to load assessments.",
+      unavailableTitle: "Assessment unavailable",
+      loadDetailFallback: "Failed to load assessment.",
+      notFoundFallback: "The requested assessment could not be loaded.",
+    },
+    interview: {
+      unavailableTitle: "Interview unavailable",
+      loadFailedFallback: "Failed to load interview.",
+      notFoundFallback: "The requested interview could not be loaded.",
+      setupBlockedTitle: "Interview setup blocked",
+    },
+    feedback: {
+      unavailableTitle: "Feedback unavailable",
+      loadFailedFallback: "Failed to load",
+    },
+    questions: {
+      editorIssueTitle: "Question editor issue",
+      loadFailedTitle: "Load failed",
+      unavailableTitle: "Question unavailable",
+      loadFailedCardDescription:
+        "The editor could not load this question, so the route stops here instead of rendering a partially broken form.",
+    },
+  },
+  rerun: {
+    alreadyInProgressTitle: "Re-evaluation already in progress",
+    startFailedTitle: "Could not start re-evaluation",
+    allFailedFallback: "Failed to start re-evaluation.",
+    answerFailedFallback: "Failed to start re-evaluation for this answer.",
+    nothingToReevaluateTitle: "Nothing to re-evaluate",
+    nothingToReevaluateMessage:
+      "No submitted answers to score yet. The candidate has not finished any answers.",
+    queuedLabel: "Re-evaluation queued",
+  },
+  deleteQuestion: {
+    cannotDeleteTitle: "Cannot delete",
   },
 } as const

@@ -2,7 +2,6 @@
 
 import { LoaderCircle, RotateCcw } from 'lucide-react'
 
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { PageShell } from '@/components/ui/layout/page-shell'
@@ -11,13 +10,11 @@ import { BodyText } from '@/components/ui/text'
 
 interface DeletedQuestionBannerProps {
   restoring: boolean
-  restoreError: string | null
   onRestore: () => void
 }
 
 export function DeletedQuestionBanner({
   restoring,
-  restoreError,
   onRestore,
 }: DeletedQuestionBannerProps) {
   return (
@@ -50,12 +47,6 @@ export function DeletedQuestionBanner({
           </Button>
         </CardContent>
       </Card>
-      {restoreError && (
-        <Alert variant="danger">
-          <AlertTitle>Cannot restore</AlertTitle>
-          <AlertDescription>{restoreError}</AlertDescription>
-        </Alert>
-      )}
     </PageShell>
   )
 }

@@ -2,15 +2,11 @@ import Link from 'next/link'
 import { AlertCircle } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { FlashErrorToast } from '@/components/ui/flash-error-toast'
 import { Icon } from '@/components/ui/icon'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { EmptyStateCard } from '@/components/ui/state-card'
 
 type FlashErrorPageFallbackProps = {
-  toastId: string
-  toastMessage: string
-  toastDescription?: string
   title: string
   description: string
   backHref?: string
@@ -18,9 +14,6 @@ type FlashErrorPageFallbackProps = {
 }
 
 export function FlashErrorPageFallback({
-  toastId,
-  toastMessage,
-  toastDescription,
   title,
   description,
   backHref = '/',
@@ -28,11 +21,6 @@ export function FlashErrorPageFallback({
 }: FlashErrorPageFallbackProps) {
   return (
     <PageShell>
-      <FlashErrorToast
-        toastId={toastId}
-        message={toastMessage}
-        description={toastDescription}
-      />
       <EmptyStateCard
         icon={
           <Icon size="lg">

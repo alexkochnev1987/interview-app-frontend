@@ -7,7 +7,6 @@ import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
 import { MetricPanel } from '@/components/ui/metric-panel'
 import { StatusPill } from '@/components/ui/status-pill'
 import { SurfaceTile } from '@/components/ui/surface-tile'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -25,6 +24,7 @@ import {
   type SimilarStatus,
   type SimilaritySignalSummary,
 } from '@/lib/question-editor/parsers'
+import { TOAST_MESSAGES } from '@/lib/toast-messages'
 import { truncateText } from '@/lib/text'
 
 interface SimilarityPanelProps {
@@ -99,16 +99,33 @@ export function SimilarityPanel({
           </PanelMessage>
         ) : null}
 
-        {status === 'error' && error ? (
-          <Alert variant="danger">
-            <AlertTitle>Similarity search failed</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
+        {status === 'error' ? (
+          <Stack gap={2}>
+            <BodyText size="sm" weight="semibold">
+              {TOAST_MESSAGES.similarity.searchFailedTitle}
+            </BodyText>
+            {error ? (
+              <BodyText size="sm" tone="muted">
+                {error}
+              </BodyText>
+            ) : null}
+            <Button
+              type="button"
+              variant="outline-pill"
+              shape="pill"
+              size="sm"
+              onClick={onRunSearch}
+              disabled={disabled || !hasInput}
+            >
+              <Search className="size-3.5" />
+              Retry search
+            </Button>
+          </Stack>
         ) : null}
 
         {status === 'success' && matches.length === 0 ? (
           <PanelMessage>
-            No close matches crossed the current similarity threshold.
+            {TOAST_MESSAGES.similarity.noMatches}
           </PanelMessage>
         ) : null}
 

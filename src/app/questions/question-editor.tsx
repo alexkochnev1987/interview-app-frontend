@@ -214,7 +214,7 @@ export function QuestionEditor({
 
       {error ? (
         <Alert variant="danger">
-          <AlertTitle>Question editor issue</AlertTitle>
+          <AlertTitle>{TOAST_MESSAGES.pageGate.questions.editorIssueTitle}</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       ) : null}
