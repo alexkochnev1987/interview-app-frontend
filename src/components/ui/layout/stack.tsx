@@ -41,7 +41,21 @@ const stackVariants = cva('flex flex-col', {
     },
     grow: {
       none: '',
-      fill: 'min-w-0 flex-1',
+      fill: 'min-h-0 min-w-0 flex-1',
+    },
+    height: {
+      auto: '',
+      full: 'h-full min-h-0',
+    },
+    overflow: {
+      none: '',
+      y: 'overflow-y-auto overscroll-contain [scrollbar-gutter:stable]',
+    },
+    placeSelf: {
+      auto: '',
+      start: 'self-start',
+      center: 'self-center',
+      stretch: 'self-stretch',
     },
   },
   defaultVariants: {
@@ -50,6 +64,9 @@ const stackVariants = cva('flex flex-col', {
     justify: 'start',
     width: 'auto',
     grow: 'none',
+    height: 'auto',
+    overflow: 'none',
+    placeSelf: 'auto',
   },
 })
 
@@ -66,6 +83,9 @@ export function Stack({
   justify,
   width,
   grow,
+  height,
+  overflow,
+  placeSelf,
   ...props
 }: StackProps) {
   const Comp = (as ?? 'div') as React.ElementType
@@ -73,7 +93,16 @@ export function Stack({
   return (
     <Comp
       className={cn(
-        stackVariants({ gap, align, justify, width, grow }),
+        stackVariants({
+          gap,
+          align,
+          justify,
+          width,
+          grow,
+          height,
+          overflow,
+          placeSelf,
+        }),
         className,
       )}
       {...props}

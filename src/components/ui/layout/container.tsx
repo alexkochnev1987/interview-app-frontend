@@ -15,10 +15,15 @@ const containerVariants = cva('container', {
       start: '',
       center: 'mx-auto',
     },
+    layout: {
+      default: '',
+      viewportColumn: 'flex min-h-0 min-w-0 flex-1 flex-col',
+    },
   },
   defaultVariants: {
     width: 'default',
     align: 'start',
+    layout: 'default',
   },
 })
 
@@ -32,13 +37,14 @@ export function Container({
   className,
   width,
   align,
+  layout,
   ...props
 }: ContainerProps) {
   const Comp = (as ?? 'div') as React.ElementType
 
   return (
     <Comp
-      className={cn(containerVariants({ width, align }), className)}
+      className={cn(containerVariants({ width, align, layout }), className)}
       {...props}
     />
   )

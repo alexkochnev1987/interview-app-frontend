@@ -1,13 +1,21 @@
 'use client'
 
 import { useParams, useSearchParams } from 'next/navigation'
+
+import {
+  useTakeInterviewBeforeUnload,
+  useTakeOrchestrator,
+} from '@/features/take'
+
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { LoadingStateCard } from '@/components/ui/state-card'
 import { PageContent, PageMainLayout } from '@/components/layout/page-shell'
-import { TakeCompleteScreen } from '@/components/take/take-complete-screen'
-import { TakeConsentScreen } from '@/components/take/take-consent-screen'
-import { TakeRecordingScreen } from '@/components/take/take-recording-screen'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { useTakeOrchestrator } from '@/features/take'
+import {
+  TakeCompleteScreen,
+  TakeConsentScreen,
+  TakeLobbyScreen,
+  TakeRecordingScreen,
+} from '@/components/take'
 
 export default function TakeInterviewPage() {
   const params = useParams()
@@ -25,10 +33,8 @@ export default function TakeInterviewPage() {
     setupBusy,
     setupError,
     submitError,
-    currentVersionNumber,
-    retakeCount,
     timeLeft,
-    transitionLabel,
+    versionPersistKind,
     uploading,
     isBrowserTranscriptSupported,
     finalTranscript,
@@ -38,13 +44,27 @@ export default function TakeInterviewPage() {
     screenVideoRef,
     progressValue,
     setConsent,
-    handleStartInterview,
+    proceedToLobby,
+    restartFullInterviewCapture,
+    attachLobbyScreenShare,
+    toggleLobbyMic,
+    toggleLobbyCamera,
+    lobbyMicOn,
+    lobbyCameraOn,
+    lobbyJoinReady,
+    recording,
+    startInterviewFromLobby,
+    recordingStartBusy,
+    capturePipelineReady,
+    currentVersionNumber,
     requestVersionAction,
     permissionLabel,
     permissionTone,
     formatTime,
+    interviewerPresence,
   } = useTakeOrchestrator({ id, candidateToken })
 
+  useTakeInterviewBeforeUnload(stage)
 
   if (error && !interview) {
     return (
@@ -62,31 +82,47 @@ export default function TakeInterviewPage() {
   if (stage === 'loading' || !interview) {
     return (
       <PageMainLayout>
-        <PageContent>
           <LoadingStateCard label="Loading interview..." />
-        </PageContent>
       </PageMainLayout>
     )
   }
 
   if (stage === 'complete') {
-    return <TakeCompleteScreen candidateName={interview.candidateName} position={interview.position} />
+    return (
+      <TakeCompleteScreen candidateName={interview.candidateName} position={interview.position} />
+    )
   }
 
   if (stage === 'consent') {
     return (
       <TakeConsentScreen
         interview={interview}
+        consent={consent}
+        setupError={setupError}
+        onConsentChange={setConsent}
+        onContinueToLobby={proceedToLobby}
+      />
+    )
+  }
+
+  if (stage === 'lobby') {
+    return (
+      <TakeLobbyScreen
         cameraStatus={cameraStatus}
         screenStatus={screenStatus}
         screenSurface={screenSurface}
-        consent={consent}
         setupBusy={setupBusy}
         setupError={setupError}
-        onConsentChange={setConsent}
-        onStartInterview={handleStartInterview}
+        videoRef={videoRef}
         permissionLabel={permissionLabel}
         permissionTone={permissionTone}
+        lobbyMicOn={lobbyMicOn}
+        lobbyCameraOn={lobbyCameraOn}
+        lobbyJoinReady={lobbyJoinReady}
+        onToggleMic={() => void toggleLobbyMic()}
+        onToggleCamera={() => void toggleLobbyCamera()}
+        onScreenShare={() => void attachLobbyScreenShare()}
+        onJoin={startInterviewFromLobby}
       />
     )
   }
@@ -94,15 +130,16 @@ export default function TakeInterviewPage() {
   return (
     <TakeRecordingScreen
       interview={interview}
+      currentVersionNumber={currentVersionNumber}
       stage={stage}
+      recording={recording}
       progressValue={progressValue}
       screenSurface={screenSurface}
       setupError={setupError}
+      capturePipelineReady={capturePipelineReady}
       submitError={submitError}
-      currentVersionNumber={currentVersionNumber}
-      retakeCount={retakeCount}
       timeLeft={timeLeft}
-      transitionLabel={transitionLabel}
+      versionPersistKind={versionPersistKind}
       uploading={uploading}
       isBrowserTranscriptSupported={isBrowserTranscriptSupported}
       finalTranscript={finalTranscript}
@@ -110,8 +147,10 @@ export default function TakeInterviewPage() {
       browserTranscriptWarning={browserTranscriptWarning}
       videoRef={videoRef}
       screenVideoRef={screenVideoRef}
+      interviewerPresence={interviewerPresence}
       formatTime={formatTime}
-      onReconnect={handleStartInterview}
+      recordingStartBusy={recordingStartBusy}
+      onReconnect={restartFullInterviewCapture}
       onRerecord={() => requestVersionAction('rerecord')}
       onSubmit={() => requestVersionAction('submit')}
     />

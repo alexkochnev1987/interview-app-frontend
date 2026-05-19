@@ -21,7 +21,7 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
         gradient:
-          "bg-primary-gradient text-primary-foreground shadow-soft hover:brightness-105",
+          "bg-primary-gradient text-primary-foreground hover:brightness-105",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
@@ -40,6 +40,12 @@ const buttonVariants = cva(
           "size-6 [&_svg:not([class*='size-'])]:size-3",
         "icon-sm": "size-7",
         "icon-lg": "size-9",
+        "icon-xl":
+          "size-11 [&_svg:not([class*='size-'])]:size-5",
+        "icon-2xl":
+          "size-12 [&_svg:not([class*='size-'])]:size-[1.375rem]",
+        "icon-prep-room":
+          "size-10 [&_svg:not([class*='size-'])]:size-[1.125rem] sm:size-12 sm:[&_svg:not([class*='size-'])]:size-[1.375rem]",
       },
       shape: {
         rounded: "rounded-lg",
@@ -59,31 +65,49 @@ const buttonVariants = cva(
       {
         size: "xs",
         shape: "rounded",
-        className: "rounded-[min(var(--radius-md),10px)] in-data-[slot=button-group]:rounded-lg",
+        className:
+          "rounded-[min(calc(var(--radius)-4px),10px)] in-data-[slot=button-group]:rounded-lg",
       },
       {
         size: "sm",
         shape: "rounded",
-        className: "rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg",
+        className:
+          "rounded-[min(calc(var(--radius)-2px),12px)] in-data-[slot=button-group]:rounded-lg",
       },
       {
         size: "icon-xs",
         shape: "rounded",
-        className: "rounded-[min(var(--radius-md),10px)] in-data-[slot=button-group]:rounded-lg",
+        className:
+          "rounded-[min(calc(var(--radius)-4px),10px)] in-data-[slot=button-group]:rounded-lg",
       },
       {
         size: "icon-sm",
         shape: "rounded",
-        className: "rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg",
+        className:
+          "rounded-[min(calc(var(--radius)-2px),12px)] in-data-[slot=button-group]:rounded-lg",
+      },
+      {
+        size: "icon-xl",
+        shape: "rounded",
+        className:
+          "rounded-[min(var(--radius),14px)] in-data-[slot=button-group]:rounded-lg",
+      },
+      {
+        size: "icon-2xl",
+        shape: "rounded",
+        className:
+          "rounded-[min(var(--radius),14px)] in-data-[slot=button-group]:rounded-lg",
+      },
+      {
+        size: "icon-prep-room",
+        shape: "rounded",
+        className:
+          "rounded-[min(var(--radius),14px)] in-data-[slot=button-group]:rounded-lg",
       },
       {
         variant: "gradient",
         size: "default",
         className: "px-5",
-      },
-      {
-        variant: "gradient",
-        className: "rounded-full",
       },
       {
         variant: "link",

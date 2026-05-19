@@ -107,6 +107,15 @@ const config: Config = {
         sans: ["var(--font-sans)"],
         heading: ["var(--font-sans)"],
       },
+      keyframes: {
+        aiOrbRingSpeaking: {
+          "0%, 100%": { opacity: "0.42", transform: "scale(1)" },
+          "50%": { opacity: "0.78", transform: "scale(1.06)" },
+        },
+      },
+      animation: {
+        "ai-orb-ring-speaking": "aiOrbRingSpeaking 1.5s ease-in-out infinite",
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],

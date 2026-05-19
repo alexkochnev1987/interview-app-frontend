@@ -1,6 +1,6 @@
 import type { PermissionStatus } from '@/components/take/types';
 import { StatusPill, type StatusTone } from '@/components/ui/status-pill';
-import { TakePanel } from '@/components/take/take-panel';
+import { Panel } from '@/components/ui/panel';
 import { Inline, Stack } from '@/components/ui/layout';
 import { Text } from '@/components/ui/text';
 
@@ -28,7 +28,7 @@ function PermissionRow({
   permissionTone,
 }: PermissionRowProps) {
   return (
-    <TakePanel tone="surface" radius="lg">
+    <Panel tone="surface" radius="lg">
       <Inline align="center" justify="between" gap={3}>
         <Stack gap={1}>
           <Text as="span" variant="labelSmStrong">
@@ -40,7 +40,7 @@ function PermissionRow({
           {permissionLabel(status)}
         </StatusPill>
       </Inline>
-    </TakePanel>
+    </Panel>
   );
 }
 
@@ -52,27 +52,25 @@ export function TakePermissionStatusList({
   permissionTone,
 }: TakePermissionStatusListProps) {
   return (
-    <TakePanel tone="white" radius="lg" padding="lg">
-      <Stack gap={3}>
-        <PermissionRow
-          title="Camera and microphone"
-          description="Required before recording can begin."
-          status={cameraStatus}
-          permissionLabel={permissionLabel}
-          permissionTone={permissionTone}
-        />
-        <PermissionRow
-          title="Entire screen share"
-          description={
-            screenSurface === 'monitor'
-              ? 'Entire screen is confirmed and ready.'
-              : 'In the share picker, choose Entire screen / Screen.'
-          }
-          status={screenStatus}
-          permissionLabel={permissionLabel}
-          permissionTone={permissionTone}
-        />
-      </Stack>
-    </TakePanel>
+    <Stack gap={4} width="full">
+      <PermissionRow
+        title="Camera and microphone"
+        description="Required before recording can begin."
+        status={cameraStatus}
+        permissionLabel={permissionLabel}
+        permissionTone={permissionTone}
+      />
+      <PermissionRow
+        title="Entire screen share"
+        description={
+          screenSurface === 'monitor'
+            ? 'Entire screen is confirmed and ready.'
+            : 'In the share picker, choose Entire screen / Screen.'
+        }
+        status={screenStatus}
+        permissionLabel={permissionLabel}
+        permissionTone={permissionTone}
+      />
+    </Stack>
   );
 }

@@ -13,6 +13,7 @@ export interface MultipartUploadSession {
   questionIndex: number;
   mediaKey: string;
   uploadId: string;
+  partBlobType?: string;
   nextPartNumber: number;
   uploadedPartCount: number;
   bufferedChunks: Blob[];
@@ -58,6 +59,63 @@ export function releaseCaptureStreams(
   if (videoRef.current) {
     videoRef.current.srcObject = null;
   }
+}
+
+export function releaseCameraCapture(
+  cameraStreamRef: { current: MediaStream | null },
+  videoRef: { current: HTMLVideoElement | null },
+) {
+  stopMediaStream(cameraStreamRef.current);
+  cameraStreamRef.current = null;
+
+  if (videoRef.current) {
+    videoRef.current.srcObject = null;
+  }
+}
+
+export function clearVideoPreview(videoRef: { current: HTMLVideoElement | null }) {
+  if (videoRef.current) {
+    videoRef.current.srcObject = null;
+  }
+}
+
+export function releaseScreenCapture(
+  screenStreamRef: { current: MediaStream | null },
+  screenVideoRef: { current: HTMLVideoElement | null },
+) {
+  stopMediaStream(screenStreamRef.current);
+  screenStreamRef.current = null;
+  clearVideoPreview(screenVideoRef);
+}
+
+export function releaseAllInterviewCaptures(
+  cameraStreamRef: { current: MediaStream | null },
+  screenStreamRef: { current: MediaStream | null },
+  videoRef: { current: HTMLVideoElement | null },
+  screenVideoRef: { current: HTMLVideoElement | null },
+) {
+  releaseCaptureStreams(cameraStreamRef, screenStreamRef, videoRef);
+  clearVideoPreview(screenVideoRef);
+}
+
+export function stopActiveTakeMediaRecorders(
+  cameraRecorderRef: { current: MediaRecorder | null },
+  screenRecorderRef: { current: MediaRecorder | null },
+): number {
+  let expectedStopEvents = 0;
+
+  for (const recorderRef of [cameraRecorderRef, screenRecorderRef] as const) {
+    const recorder = recorderRef.current;
+    if (
+      recorder !== null &&
+      (recorder.state === 'recording' || recorder.state === 'paused')
+    ) {
+      recorder.stop();
+      expectedStopEvents += 1;
+    }
+  }
+
+  return expectedStopEvents;
 }
 
 export function clearProgressTimers(
