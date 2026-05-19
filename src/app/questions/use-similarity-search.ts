@@ -1,7 +1,13 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  keepPreviousData,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query'
 
+import { similarQuestionsQueryKey } from '@/components/questions/picker/query-keys'
 import {
   findSimilarQuestions,
   type QuestionInput,
@@ -40,23 +46,12 @@ export function useSimilaritySearch({
   debounceMs = DEFAULT_DEBOUNCE_MS,
   minQuestionTextLength = DEFAULT_MIN_TEXT_LENGTH,
 }: UseSimilaritySearchOptions): UseSimilaritySearchResult {
-  const [status, setStatus] = useState<SimilarStatus>('idle')
-  const [matches, setMatches] = useState<SimilarQuestionMatch[]>([])
-  const [error, setError] = useState<string | null>(null)
-  const [lastFetchedSignature, setLastFetchedSignature] = useState<string | null>(null)
-
   const valueRef = useRef(value)
   useEffect(() => {
     valueRef.current = value
   })
 
-  const searchSeqRef = useRef(0)
-  const mountedRef = useRef(true)
-  useEffect(() => {
-    return () => {
-      mountedRef.current = false
-    }
-  }, [])
+  const [manualError, setManualError] = useState<string | null>(null)
 
   const signalSummary = useMemo<SimilaritySignalSummary>(() => {
     const textTokens = tokenize(value.questionText)
@@ -123,64 +118,72 @@ export function useSimilaritySearch({
     ],
   )
 
-  const resultsStale = lastFetchedSignature !== null && lastFetchedSignature !== signature
-
+  const [debouncedSignature, setDebouncedSignature] = useState(signature)
   useEffect(() => {
-    if (!hasInput) return
-    if (lastFetchedSignature === signature) return
-    if (valueRef.current.questionText.trim().length < minQuestionTextLength) return
-
-    let cancelled = false
-    const timer = setTimeout(async () => {
-      const mySeq = ++searchSeqRef.current
-      setError(null)
-      setStatus('loading')
-
-      try {
-        const result = await findSimilarQuestions(valueRef.current, questionId)
-        if (cancelled || !mountedRef.current || mySeq !== searchSeqRef.current) return
-        setMatches(result)
-        setStatus('success')
-        setLastFetchedSignature(signature)
-      } catch (err) {
-        if (cancelled || !mountedRef.current || mySeq !== searchSeqRef.current) return
-        setMatches([])
-        setStatus('error')
-        setError(err instanceof Error ? err.message : 'Failed to load similar questions.')
-        setLastFetchedSignature(signature)
-      }
+    if (signature === debouncedSignature) return
+    const handle = window.setTimeout(() => {
+      setDebouncedSignature(signature)
     }, debounceMs)
+    return () => window.clearTimeout(handle)
+  }, [signature, debouncedSignature, debounceMs])
 
-    return () => {
-      cancelled = true
-      clearTimeout(timer)
-    }
-  }, [signature, hasInput, lastFetchedSignature, questionId, debounceMs, minQuestionTextLength])
+  const textLongEnough =
+    value.questionText.trim().length >= minQuestionTextLength
 
-  async function runManualSearch() {
+  const query = useQuery({
+    queryKey: similarQuestionsQueryKey(debouncedSignature, questionId),
+    queryFn: ({ signal }) =>
+      findSimilarQuestions(valueRef.current, questionId, 5, { signal }),
+    enabled: hasInput && textLongEnough,
+    staleTime: Infinity,
+    placeholderData: keepPreviousData,
+  })
+
+  const queryClient = useQueryClient()
+  const runManualSearch = useCallback(async () => {
     if (!hasInput) {
-      setStatus('error')
-      setError('Add prompt text, taxonomy, tags, or rubric concepts before searching.')
+      setManualError(
+        'Add prompt text, taxonomy, tags, or rubric concepts before searching.',
+      )
       return
     }
+    setManualError(null)
+    setDebouncedSignature(signature)
+    await queryClient.fetchQuery({
+      queryKey: similarQuestionsQueryKey(signature, questionId),
+      queryFn: ({ signal }) =>
+        findSimilarQuestions(valueRef.current, questionId, 5, { signal }),
+      staleTime: Infinity,
+    })
+  }, [hasInput, queryClient, questionId, signature])
 
-    const mySeq = ++searchSeqRef.current
-    setError(null)
-    setStatus('loading')
-    setLastFetchedSignature(signature)
-
-    try {
-      const result = await findSimilarQuestions(valueRef.current, questionId)
-      if (!mountedRef.current || mySeq !== searchSeqRef.current) return
-      setMatches(result)
-      setStatus('success')
-    } catch (err) {
-      if (!mountedRef.current || mySeq !== searchSeqRef.current) return
-      setMatches([])
-      setStatus('error')
-      setError(err instanceof Error ? err.message : 'Failed to load similar questions.')
+  useEffect(() => {
+    if (manualError && hasInput) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- clear stale manual error once input becomes searchable again
+      setManualError(null)
     }
-  }
+  }, [manualError, hasInput])
+
+  const matches: SimilarQuestionMatch[] = query.data ?? []
+  const queryErrorMessage =
+    query.error instanceof Error ? query.error.message : null
+  const error = manualError ?? queryErrorMessage
+
+  const status: SimilarStatus = manualError
+    ? 'error'
+    : !hasInput || !textLongEnough
+      ? matches.length > 0
+        ? 'success'
+        : 'idle'
+      : query.isFetching
+        ? 'loading'
+        : queryErrorMessage
+          ? 'error'
+          : query.data
+            ? 'success'
+            : 'idle'
+
+  const resultsStale = query.isPlaceholderData
 
   return {
     status,

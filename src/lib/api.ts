@@ -309,9 +309,11 @@ export async function findSimilarQuestions(
   draft: Partial<QuestionInput>,
   excludeQuestionId?: string,
   limit = 5,
+  init?: { signal?: AbortSignal },
 ): Promise<SimilarQuestionMatch[]> {
   const data = await handle(client.POST('/questions/similar', {
-    body: { draft: draft as Schemas['FindSimilarDraftDto'], excludeQuestionId, limit }
+    body: { draft: draft as Schemas['FindSimilarDraftDto'], excludeQuestionId, limit },
+    signal: init?.signal,
   }));
   return data.matches;
 }
