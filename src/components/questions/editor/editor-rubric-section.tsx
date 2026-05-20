@@ -4,6 +4,7 @@ import { WandSparkles } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 
 import { Grid } from '@/components/ui/layout/grid'
+import { Stack } from '@/components/ui/layout/stack'
 import { Textarea } from '@/components/ui/textarea'
 import {
   type QuestionExpectedConcept,
@@ -60,39 +61,43 @@ export function EditorRubricSection({
       icon={<WandSparkles className="size-4" />}
     >
       <Grid columns="editor-2" gap={6}>
-        <QuestionEditorField
-          htmlFor="expectedConcepts"
-          label="Expected concepts"
-          hint="Format: id | label | weight | description"
-        >
-          <RawListTextarea
-            id="expectedConcepts"
-            parsedValue={coerceExpectedConcepts(value.expectedConcepts)}
-            format={formatExpectedConcepts}
-            parse={parseExpectedConcepts}
-            onParsedChange={(next) => onUpdate({ expectedConcepts: next })}
-            placeholder="id | label | weight | description"
-            disabled={submitting}
-          />
+        <Stack gap={2}>
+          <QuestionEditorField
+            htmlFor="expectedConcepts"
+            label="Expected concepts"
+            hint="Format: id | label | weight | description"
+          >
+            <RawListTextarea
+              id="expectedConcepts"
+              parsedValue={coerceExpectedConcepts(value.expectedConcepts)}
+              format={formatExpectedConcepts}
+              parse={parseExpectedConcepts}
+              onParsedChange={(next) => onUpdate({ expectedConcepts: next })}
+              placeholder="id | label | weight | description"
+              disabled={submitting}
+            />
+          </QuestionEditorField>
           {renderAiSuggestion('expectedConcepts')}
-        </QuestionEditorField>
+        </Stack>
 
-        <QuestionEditorField
-          htmlFor="redFlags"
-          label="Red flags"
-          hint="Format: id | label | severity"
-        >
-          <RawListTextarea
-            id="redFlags"
-            parsedValue={coerceRedFlags(value.redFlags)}
-            format={formatRedFlags}
-            parse={parseRedFlags}
-            onParsedChange={(next) => onUpdate({ redFlags: next })}
-            placeholder="id | label | severity"
-            disabled={submitting}
-          />
+        <Stack gap={2}>
+          <QuestionEditorField
+            htmlFor="redFlags"
+            label="Red flags"
+            hint="Format: id | label | severity"
+          >
+            <RawListTextarea
+              id="redFlags"
+              parsedValue={coerceRedFlags(value.redFlags)}
+              format={formatRedFlags}
+              parse={parseRedFlags}
+              onParsedChange={(next) => onUpdate({ redFlags: next })}
+              placeholder="id | label | severity"
+              disabled={submitting}
+            />
+          </QuestionEditorField>
           {renderAiSuggestion('redFlags')}
-        </QuestionEditorField>
+        </Stack>
       </Grid>
     </EditorSectionCard>
   )
