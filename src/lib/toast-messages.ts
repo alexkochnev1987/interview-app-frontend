@@ -69,10 +69,18 @@ export const TOAST_MESSAGES = {
       notFoundFallback: "The requested assessment could not be loaded.",
     },
     interview: {
+      forbiddenTitle: "You don't have access to this interview",
+      forbiddenDescription:
+        "Configuring interviews is reserved for HR, admin, and super-admin users. If you think this is a mistake, contact your workspace owner.",
+      createUnavailableTitle: "Interview setup is unavailable right now",
       unavailableTitle: "Interview unavailable",
       loadFailedFallback: "Failed to load interview.",
       notFoundFallback: "The requested interview could not be loaded.",
       setupBlockedTitle: "Interview setup blocked",
+      candidateNameRequired: "Candidate name is required.",
+      positionRequired: "Position is required.",
+      questionsRequired: "Select at least one question.",
+      creatingLabel: "Creating...",
     },
     feedback: {
       unavailableTitle: "Feedback unavailable",
