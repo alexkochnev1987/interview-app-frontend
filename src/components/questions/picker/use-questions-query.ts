@@ -35,13 +35,6 @@ import { questionsListQueryKey } from './query-keys'
 const SEARCH_DEBOUNCE_MS = 300
 const VIEW_STORAGE_KEY = 'questions:view'
 
-export {
-  DEFAULT_QUESTIONS_QUERY,
-  QUESTION_VIEWS,
-  type QuestionView,
-  type QuestionsQueryState,
-} from '@/lib/questions-query-state'
-
 function withLockedDefaults(
   initial?: Partial<QuestionsQueryState>,
   lockStatus?: QuestionStatusFilter,
