@@ -83,6 +83,7 @@ type UseQuestionsQueryOptions = {
   initial?: Partial<QuestionsQueryState>
   syncUrl?: boolean
   lockStatus?: QuestionStatusFilter
+  disableFetchInCardsView?: boolean
 }
 
 export type UseQuestionsQueryResult = {
@@ -197,7 +198,7 @@ export function buildFetchParams(
 export function useQuestionsQuery(
   options: UseQuestionsQueryOptions = {},
 ): UseQuestionsQueryResult {
-  const { initial, syncUrl, lockStatus } = options
+  const { initial, syncUrl, lockStatus, disableFetchInCardsView } = options
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -263,6 +264,7 @@ export function useQuestionsQuery(
     queryKey: questionsListQueryKey(fetchParams),
     queryFn: ({ signal }) => fetchQuestions(fetchParams, { signal }),
     placeholderData: keepPreviousData,
+    enabled: !disableFetchInCardsView || state.view !== 'cards',
   })
 
   const total = query.data?.total ?? 0

@@ -57,6 +57,7 @@ function QuestionsPageContent() {
   const query = useQuestionsQuery({
     syncUrl: true,
     lockStatus: isSuperAdmin ? undefined : 'active',
+    disableFetchInCardsView: true,
   })
   const isCardsView = query.state.view === 'cards'
   const cardsInfiniteParams = useMemo(() => {
@@ -118,6 +119,15 @@ function QuestionsPageContent() {
   )
 
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const prevCardsSelectionSignatureRef = useRef<string | null>(null)
+  useEffect(() => {
+    if (!isCardsView) return
+    if (prevCardsSelectionSignatureRef.current === cardsFilterSignature) return
+    if (prevCardsSelectionSignatureRef.current !== null) {
+      setSelectedIds(new Set())
+    }
+    prevCardsSelectionSignatureRef.current = cardsFilterSignature
+  }, [cardsFilterSignature, isCardsView])
   const [bulkConfirmOpen, setBulkConfirmOpen] = useState(false)
   const [bulkDeleting, setBulkDeleting] = useState(false)
   const [bulkResult, setBulkResult] = useState<BulkDeleteResult | null>(null)
@@ -211,7 +221,7 @@ function QuestionsPageContent() {
     viewItems.length === 0 &&
     !viewLoading &&
     viewTotal === 0 &&
-    query.state.q === '' &&
+    query.debouncedQ === '' &&
     !query.state.difficulty &&
     !query.state.category &&
     !query.state.subcategory &&
@@ -258,8 +268,8 @@ function QuestionsPageContent() {
         sortOrder={query.state.sortOrder}
         onSortChange={query.setSort}
         activeChips={activeChips}
-        resultCount={query.total}
-        loading={query.loading}
+        resultCount={isCardsView ? infinite.total : query.total}
+        loading={isCardsView ? (infinite.isInitialLoading || infinite.isFetching) : query.loading}
         viewToggle={
           <Inline gap={2} align="center">
             <Button

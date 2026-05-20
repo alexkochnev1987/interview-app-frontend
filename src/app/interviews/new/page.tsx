@@ -441,13 +441,15 @@ function NewInterviewPageContent() {
                 </Stack>
               )}
 
-              <Pagination
-                page={query.state.page}
-                totalPages={query.totalPages}
-                total={query.total}
-                limit={query.state.limit}
-                onPageChange={query.setPage}
-              />
+              {!query.error ? (
+                <Pagination
+                  page={query.state.page}
+                  totalPages={query.totalPages}
+                  total={query.total}
+                  limit={query.state.limit}
+                  onPageChange={query.setPage}
+                />
+              ) : null}
             </CardContent>
           </Card>
         </Grid>

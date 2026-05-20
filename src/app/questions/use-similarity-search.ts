@@ -49,7 +49,7 @@ export function useSimilaritySearch({
   const valueRef = useRef(value)
   useEffect(() => {
     valueRef.current = value
-  })
+  }, [value])
 
   const [manualError, setManualError] = useState<string | null>(null)
 
@@ -183,7 +183,7 @@ export function useSimilaritySearch({
             ? 'success'
             : 'idle'
 
-  const resultsStale = query.isPlaceholderData
+  const resultsStale = query.isPlaceholderData || signature !== debouncedSignature
 
   return {
     status,

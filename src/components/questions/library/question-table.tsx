@@ -33,13 +33,14 @@ const TAGS_VISIBLE = 3
 
 type SortableField = Extract<
   QuestionSortField,
-  'questionText' | 'difficulty' | 'updatedAt' | 'popularity'
+  'questionText' | 'difficulty' | 'updatedAt' | 'createdAt' | 'popularity'
 >
 
 const SORT_LABEL: Record<SortableField, string> = {
   questionText: 'Question',
   difficulty: 'Difficulty',
   updatedAt: 'Updated',
+  createdAt: 'Created',
   popularity: 'Popularity',
 }
 
@@ -95,8 +96,8 @@ function TagsCell({ tags }: { tags: string[] }) {
 
   return (
     <PillRow>
-      {visible.map((tag) => (
-        <StatusPill key={tag} tone="neutral" casing="chip" size="compact">
+      {visible.map((tag, index) => (
+        <StatusPill key={`${tag}-${index}`} tone="neutral" casing="chip" size="compact">
           {tag}
         </StatusPill>
       ))}
@@ -223,6 +224,13 @@ export function QuestionTable({
               direction={directionFor(sortBy, sortOrder, 'updatedAt')}
               onSortClick={() => handleSortClick('updatedAt')}
             />
+            <SortableTableHead
+              visibility="lg-up"
+              nowrap
+              label={SORT_LABEL.createdAt}
+              direction={directionFor(sortBy, sortOrder, 'createdAt')}
+              onSortClick={() => handleSortClick('createdAt')}
+            />
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -304,6 +312,16 @@ export function QuestionTable({
                     title={updatedAtFormatted}
                   >
                     {updatedAtFormatted}
+                  </BodyText>
+                </TableCell>
+                <TableCell visibility="lg-up" nowrap>
+                  <BodyText
+                    as="span"
+                    size="sm"
+                    tone="muted"
+                    title={formatInterviewDate(question.createdAt)}
+                  >
+                    {formatInterviewDate(question.createdAt)}
                   </BodyText>
                 </TableCell>
               </TableRow>
