@@ -232,17 +232,6 @@ function NewInterviewPageContent() {
                   </IconAffix>
                 </FormField>
 
-                {fieldErrors.questions ? (
-                  <BodyText
-                    id={questionsErrorId}
-                    role="alert"
-                    size="sm"
-                    tone="danger"
-                  >
-                    {fieldErrors.questions}
-                  </BodyText>
-                ) : null}
-
                 <Button
                   type="submit"
                   variant="gradient"
@@ -299,6 +288,16 @@ function NewInterviewPageContent() {
                 </Stack>
                 <StatusPill tone="neutral">{selectedCount} selected</StatusPill>
               </Inline>
+              {fieldErrors.questions ? (
+                <BodyText
+                  id={questionsErrorId}
+                  role="alert"
+                  size="sm"
+                  tone="danger"
+                >
+                  {fieldErrors.questions}
+                </BodyText>
+              ) : null}
             </CardHeader>
             <CardContent spacing="md">
               <QuestionPickerToolbar

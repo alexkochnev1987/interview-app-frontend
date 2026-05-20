@@ -68,6 +68,7 @@ export function QuestionEditor({
   const [aiDraft, setAiDraft] = useState<QuestionDraft | null>(null)
   const [dismissedDraftFields, setDismissedDraftFields] = useState<DraftFieldKey[]>([])
   const [fieldErrors, setFieldErrors] = useState<FieldErrors<QuestionFormField>>({})
+  const [aiError, setAiError] = useState<string | null>(null)
 
   const { dirtyFields, isDirty, markSaved } = useDirtyTracking({
     value,
@@ -91,6 +92,7 @@ export function QuestionEditor({
 
   async function handleGenerate() {
     if (!value.questionText.trim()) {
+      setAiError(null)
       setFieldErrors((prev) => ({
         ...prev,
         questionText: 'Question text is required before AI generation.',
@@ -99,6 +101,7 @@ export function QuestionEditor({
     }
 
     clearFieldError('questionText', setFieldErrors)
+    setAiError(null)
     setAiStatus('loading')
 
     try {
@@ -110,13 +113,11 @@ export function QuestionEditor({
       setAiDraft(null)
       setDismissedDraftFields([])
       setAiStatus('error')
-      setFieldErrors((prev) => ({
-        ...prev,
-        questionText:
-          err instanceof Error
-            ? err.message
-            : FEEDBACK_POLICY.draftQuestion.inlineErrorFallback,
-      }))
+      setAiError(
+        err instanceof Error
+          ? err.message
+          : FEEDBACK_POLICY.draftQuestion.inlineErrorFallback,
+      )
     }
   }
 
@@ -275,6 +276,7 @@ export function QuestionEditor({
               pendingCount={pendingDraftFields.length}
               loading={aiStatus === 'loading'}
               disabled={submitting}
+              error={aiError ?? undefined}
               onGenerate={handleGenerate}
               onApplyAll={applyAllAiFields}
             />

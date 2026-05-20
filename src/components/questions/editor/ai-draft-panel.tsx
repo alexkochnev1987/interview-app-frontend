@@ -12,12 +12,14 @@ import {
 } from '@/components/ui/card'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
+import { BodyText } from '@/components/ui/text'
 
 interface AiDraftPanelProps {
   hasPendingDraft: boolean
   pendingCount: number
   loading: boolean
   disabled: boolean
+  error?: string
   onGenerate: () => void
   onApplyAll: () => void
 }
@@ -27,6 +29,7 @@ export function AiDraftPanel({
   pendingCount,
   loading,
   disabled,
+  error,
   onGenerate,
   onApplyAll,
 }: AiDraftPanelProps) {
@@ -47,27 +50,34 @@ export function AiDraftPanel({
           </CardDescription>
         </Stack>
 
-        <Inline gap={2} align="center" justify="end" wrap="wrap">
-          {hasPendingDraft ? (
+        <Stack gap={2}>
+          {error ? (
+            <BodyText role="alert" size="sm" tone="danger">
+              {error}
+            </BodyText>
+          ) : null}
+          <Inline gap={2} align="center" justify="end" wrap="wrap">
+            {hasPendingDraft ? (
+              <Button
+                type="button"
+                variant="outline-pill"
+                shape="pill"
+                onClick={onApplyAll}
+              >
+                Apply all
+              </Button>
+            ) : null}
             <Button
               type="button"
-              variant="outline-pill"
-              shape="pill"
-              onClick={onApplyAll}
+              variant="gradient"
+              onClick={onGenerate}
+              disabled={disabled || loading}
             >
-              Apply all
+              <WandSparkles className="size-4" />
+              {loading ? 'Generating...' : 'Generate AI Draft'}
             </Button>
-          ) : null}
-          <Button
-            type="button"
-            variant="gradient"
-            onClick={onGenerate}
-            disabled={disabled || loading}
-          >
-            <WandSparkles className="size-4" />
-            {loading ? 'Generating...' : 'Generate AI Draft'}
-          </Button>
-        </Inline>
+          </Inline>
+        </Stack>
       </CardHeader>
     </Card>
   )

@@ -36,26 +36,18 @@ function withControlAria(child: ReactNode, aria: ControlAriaProps): ReactNode {
     return cloneElement(child, aria as Record<string, unknown>)
   }
 
-  const nestedChildren = Children.toArray(
-    (child.props as { children?: ReactNode }).children,
-  )
-  const controlIndex = nestedChildren.findIndex(
-    (item): item is ReactElement<Record<string, unknown>> =>
-      isValidElement<Record<string, unknown>>(item) && isFormControl(item),
-  )
-  if (controlIndex === -1) return child
+  const wrapperChildren = (child.props as { children?: ReactNode }).children
+  let patched = false
 
-  const control = nestedChildren[controlIndex] as ReactElement<Record<string, unknown>>
+  const nextChildren = Children.map(wrapperChildren, (item) => {
+    if (!patched && isValidElement<Record<string, unknown>>(item) && isFormControl(item)) {
+      patched = true
+      return cloneElement(item, aria as Record<string, unknown>)
+    }
+    return item
+  })
 
-  return cloneElement(
-    child,
-    {},
-    nestedChildren.map((item, index) =>
-      index === controlIndex
-        ? cloneElement(control, aria as Record<string, unknown>)
-        : item,
-    ),
-  )
+  return patched ? cloneElement(child, {}, nextChildren) : child
 }
 
 export function FormField({ htmlFor, label, hint, error, children }: FormFieldProps) {
