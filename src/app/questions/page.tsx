@@ -74,7 +74,18 @@ function QuestionsPageContent() {
       sortOrder: full.sortOrder,
       limit: full.limit,
     }
-  }, [query.state, query.debouncedQ])
+  }, [
+    query.state.difficulty,
+    query.state.category,
+    query.state.subcategory,
+    query.state.role,
+    query.state.tags,
+    query.state.status,
+    query.state.sortBy,
+    query.state.sortOrder,
+    query.state.limit,
+    query.debouncedQ,
+  ])
   const infinite = useQuestionsInfinite({
     params: cardsInfiniteParams,
     enabled: isCardsView,
@@ -122,6 +133,9 @@ function QuestionsPageContent() {
   const prevCardsSelectionSignatureRef = useRef<string | null>(null)
   useEffect(() => {
     if (!isCardsView) return
+    // Intentionally not resetting the ref when leaving cards view: selections survive
+    // a view switch so the user can select in table view and bulk-delete from cards view.
+    // Only a filter change (new signature) clears the selection.
     if (prevCardsSelectionSignatureRef.current === cardsFilterSignature) return
     if (prevCardsSelectionSignatureRef.current !== null) {
       setSelectedIds(new Set())

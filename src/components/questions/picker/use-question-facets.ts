@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 
 import { fetchQuestionFacets, type FacetCount, type FetchQuestionFacetsParams } from '@/lib/api'
@@ -76,12 +76,15 @@ export function useQuestionFacets(
       }
     : EMPTY_FACETS
 
+  const queryRefetch = query.refetch
+  const refetch = useCallback(() => {
+    void queryRefetch()
+  }, [queryRefetch])
+
   return {
     facets,
     loading: query.isPending || query.isFetching,
     error: query.error instanceof Error ? query.error.message : null,
-    refetch: () => {
-      void query.refetch()
-    },
+    refetch,
   }
 }

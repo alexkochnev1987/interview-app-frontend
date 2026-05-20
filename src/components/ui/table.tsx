@@ -37,6 +37,10 @@ function Table({
   )
 
   if (scrollbar === 'top') {
+    // rotateX(180deg) on the outer div flips the element so the native scrollbar
+    // renders at the top; the inner div counter-rotates to restore reading direction.
+    // CSS transforms create a new stacking context — do not render portals or
+    // position:absolute children inside this wrapper.
     return (
       <div
         data-slot="table-wrapper"

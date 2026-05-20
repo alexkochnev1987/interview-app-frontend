@@ -83,7 +83,7 @@ function directionFor(
   return order
 }
 
-function stopRowNav(event: MouseEvent<HTMLElement>) {
+function stopRowClick(event: MouseEvent<HTMLElement>) {
   event.stopPropagation()
 }
 
@@ -250,7 +250,7 @@ export function QuestionTable({
                 onClick={() => onRowClick(question)}
               >
                 {selectable ? (
-                  <TableCell width="tight" onClick={stopRowNav}>
+                  <TableCell width="tight" onClick={stopRowClick}>
                     <Checkbox
                       size="sm"
                       checked={selected}

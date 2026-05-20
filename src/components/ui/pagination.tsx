@@ -30,6 +30,8 @@ export function Pagination({
 
   const firstShown = (page - 1) * limit + 1
   const lastShown = Math.min(total, page * limit)
+
+  if (firstShown > total) return null
   const atStart = page <= 1
   const atEnd = page >= totalPages
 

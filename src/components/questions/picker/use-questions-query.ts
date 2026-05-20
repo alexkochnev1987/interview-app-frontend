@@ -199,12 +199,13 @@ export function useQuestionsQuery(
   options: UseQuestionsQueryOptions = {},
 ): UseQuestionsQueryResult {
   const { initial, syncUrl, lockStatus, disableFetchInCardsView } = options
+  const initialRef = useRef(initial)
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
   const [state, setState] = useState<QuestionsQueryState>(() => {
-    const base = { ...DEFAULT_QUESTIONS_QUERY, ...(initial ?? {}) }
+    const base = { ...DEFAULT_QUESTIONS_QUERY, ...(initialRef.current ?? {}) }
     const start =
       syncUrl && searchParams ? readFromSearchParams(searchParams, base) : base
     if (lockStatus) start.status = lockStatus
@@ -242,7 +243,7 @@ export function useQuestionsQuery(
       return
     }
     if (currentUrl !== lastWrittenUrlRef.current) {
-      const base = { ...DEFAULT_QUESTIONS_QUERY, ...(initial ?? {}) }
+      const base = { ...DEFAULT_QUESTIONS_QUERY, ...(initialRef.current ?? {}) }
       const fromUrl = searchParams ? readFromSearchParams(searchParams, base) : base
       if (lockStatus) fromUrl.status = lockStatus
       lastWrittenUrlRef.current = currentUrl
@@ -253,7 +254,7 @@ export function useQuestionsQuery(
     const url = stateUrl.length > 0 ? `${pathname}?${stateUrl}` : pathname
     lastWrittenUrlRef.current = stateUrl
     router.replace(url, { scroll: false })
-  }, [state, pathname, router, syncUrl, initial, lockStatus, searchParams])
+  }, [state, pathname, router, syncUrl, lockStatus, searchParams])
 
   const fetchParams = useMemo(
     () => buildFetchParams(state, debouncedQ),
@@ -346,11 +347,11 @@ export function useQuestionsQuery(
   }, [])
   const reset = useCallback(
     () => {
-      const base = { ...DEFAULT_QUESTIONS_QUERY, ...(initial ?? {}) }
+      const base = { ...DEFAULT_QUESTIONS_QUERY, ...(initialRef.current ?? {}) }
       if (lockStatus) base.status = lockStatus
       setState((prev) => ({ ...base, view: prev.view }))
     },
-    [initial, lockStatus],
+    [lockStatus],
   )
   const queryRefetch = query.refetch
   const refetch = useCallback(() => {
@@ -358,7 +359,7 @@ export function useQuestionsQuery(
   }, [queryRefetch])
 
   const canReset = useMemo(() => {
-    const base = { ...DEFAULT_QUESTIONS_QUERY, ...(initial ?? {}) }
+    const base = { ...DEFAULT_QUESTIONS_QUERY, ...(initialRef.current ?? {}) }
     if (lockStatus) base.status = lockStatus
     return (
       state.q !== base.q ||
@@ -369,11 +370,9 @@ export function useQuestionsQuery(
       state.tags.length > 0 ||
       state.status !== base.status ||
       state.sortBy !== base.sortBy ||
-      state.sortOrder !== base.sortOrder ||
-      state.page !== base.page ||
-      state.limit !== base.limit
+      state.sortOrder !== base.sortOrder
     )
-  }, [state, initial, lockStatus])
+  }, [state, lockStatus])
 
   return {
     state,
