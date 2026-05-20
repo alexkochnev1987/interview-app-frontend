@@ -199,13 +199,15 @@ export function useQuestionsQuery(
   options: UseQuestionsQueryOptions = {},
 ): UseQuestionsQueryResult {
   const { initial, syncUrl, lockStatus, disableFetchInCardsView } = options
-  const initialRef = useRef(initial)
+  // Capture initial at mount so inline object literals from the call site don't
+  // destabilise dependency arrays on every render.
+  const [capturedInitial] = useState<Partial<QuestionsQueryState> | undefined>(initial)
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
   const [state, setState] = useState<QuestionsQueryState>(() => {
-    const base = { ...DEFAULT_QUESTIONS_QUERY, ...(initialRef.current ?? {}) }
+    const base = { ...DEFAULT_QUESTIONS_QUERY, ...(capturedInitial ?? {}) }
     const start =
       syncUrl && searchParams ? readFromSearchParams(searchParams, base) : base
     if (lockStatus) start.status = lockStatus
@@ -243,7 +245,7 @@ export function useQuestionsQuery(
       return
     }
     if (currentUrl !== lastWrittenUrlRef.current) {
-      const base = { ...DEFAULT_QUESTIONS_QUERY, ...(initialRef.current ?? {}) }
+      const base = { ...DEFAULT_QUESTIONS_QUERY, ...(capturedInitial ?? {}) }
       const fromUrl = searchParams ? readFromSearchParams(searchParams, base) : base
       if (lockStatus) fromUrl.status = lockStatus
       lastWrittenUrlRef.current = currentUrl
@@ -254,7 +256,7 @@ export function useQuestionsQuery(
     const url = stateUrl.length > 0 ? `${pathname}?${stateUrl}` : pathname
     lastWrittenUrlRef.current = stateUrl
     router.replace(url, { scroll: false })
-  }, [state, pathname, router, syncUrl, lockStatus, searchParams])
+  }, [state, pathname, router, syncUrl, capturedInitial, lockStatus, searchParams])
 
   const fetchParams = useMemo(
     () => buildFetchParams(state, debouncedQ),
@@ -347,11 +349,11 @@ export function useQuestionsQuery(
   }, [])
   const reset = useCallback(
     () => {
-      const base = { ...DEFAULT_QUESTIONS_QUERY, ...(initialRef.current ?? {}) }
+      const base = { ...DEFAULT_QUESTIONS_QUERY, ...(capturedInitial ?? {}) }
       if (lockStatus) base.status = lockStatus
       setState((prev) => ({ ...base, view: prev.view }))
     },
-    [lockStatus],
+    [capturedInitial, lockStatus],
   )
   const queryRefetch = query.refetch
   const refetch = useCallback(() => {
@@ -359,7 +361,7 @@ export function useQuestionsQuery(
   }, [queryRefetch])
 
   const canReset = useMemo(() => {
-    const base = { ...DEFAULT_QUESTIONS_QUERY, ...(initialRef.current ?? {}) }
+    const base = { ...DEFAULT_QUESTIONS_QUERY, ...(capturedInitial ?? {}) }
     if (lockStatus) base.status = lockStatus
     return (
       state.q !== base.q ||
@@ -372,7 +374,7 @@ export function useQuestionsQuery(
       state.sortBy !== base.sortBy ||
       state.sortOrder !== base.sortOrder
     )
-  }, [state, lockStatus])
+  }, [state, capturedInitial, lockStatus])
 
   return {
     state,

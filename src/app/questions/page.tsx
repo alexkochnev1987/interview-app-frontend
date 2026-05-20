@@ -22,7 +22,6 @@ import { QuestionTable } from '@/components/questions/library/question-table'
 import { QuestionsLibraryHeader } from '@/components/questions/library/questions-library-header'
 import {
   buildActiveFilterChips,
-  buildFetchParams,
   QuestionFacetSidebar,
   QuestionPickerToolbar,
   QuestionViewToggle,
@@ -60,31 +59,25 @@ function QuestionsPageContent() {
     disableFetchInCardsView: true,
   })
   const isCardsView = query.state.view === 'cards'
-  const cardsInfiniteParams = useMemo(() => {
-    const full = buildFetchParams(query.state, query.debouncedQ)
-    return {
-      q: full.q,
-      difficulty: full.difficulty,
-      category: full.category,
-      subcategory: full.subcategory,
-      tags: full.tags,
-      role: full.role,
-      status: full.status,
-      sortBy: full.sortBy,
-      sortOrder: full.sortOrder,
-      limit: full.limit,
-    }
-  }, [
-    query.state.difficulty,
-    query.state.category,
-    query.state.subcategory,
-    query.state.role,
-    query.state.tags,
-    query.state.status,
-    query.state.sortBy,
-    query.state.sortOrder,
-    query.state.limit,
-    query.debouncedQ,
+  const {
+    difficulty, category, subcategory, role, tags, status,
+    sortBy, sortOrder, limit,
+  } = query.state
+  const { debouncedQ } = query
+  const cardsInfiniteParams = useMemo(() => ({
+    q: debouncedQ || undefined,
+    difficulty,
+    category,
+    subcategory,
+    tags: tags.length > 0 ? tags : undefined,
+    role,
+    status,
+    sortBy,
+    sortOrder,
+    limit,
+  }), [
+    difficulty, category, subcategory, role, tags, status,
+    sortBy, sortOrder, limit, debouncedQ,
   ])
   const infinite = useQuestionsInfinite({
     params: cardsInfiniteParams,
