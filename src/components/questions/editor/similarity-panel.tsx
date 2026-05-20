@@ -26,13 +26,14 @@ import {
 } from '@/lib/question-editor/parsers'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
 import { truncateText } from '@/lib/text'
+import { SIMILARITY_MIN_QUESTION_TEXT_LENGTH } from './use-similarity-search'
 
 interface SimilarityPanelProps {
   status: SimilarStatus
   matches: SimilarQuestionMatch[]
   error: string | null
   signalSummary: SimilaritySignalSummary
-  hasInput: boolean
+  canSearch: boolean
   resultsStale: boolean
   isEditMode: boolean
   disabled: boolean
@@ -44,7 +45,7 @@ export function SimilarityPanel({
   matches,
   error,
   signalSummary,
-  hasInput,
+  canSearch,
   resultsStale,
   isEditMode,
   disabled,
@@ -78,7 +79,7 @@ export function SimilarityPanel({
             shape="pill"
             size="sm"
             onClick={onRunSearch}
-            disabled={disabled || status === 'loading' || !hasInput}
+            disabled={disabled || status === 'loading' || !canSearch}
           >
             <Search className="size-3.5" />
             {status === 'loading' ? 'Searching...' : 'Run search'}
@@ -88,8 +89,8 @@ export function SimilarityPanel({
       <CardContent spacing="md">
         {status === 'idle' ? (
           <PanelMessage>
-            Search uses prompt text, taxonomy, tags, and rubric concepts. The library
-            is queried via embeddings on the backend.
+            Add at least {SIMILARITY_MIN_QUESTION_TEXT_LENGTH} characters of question text, then search for duplicates
+            against the stored library via embeddings on the backend.
           </PanelMessage>
         ) : null}
 
@@ -115,7 +116,7 @@ export function SimilarityPanel({
               shape="pill"
               size="sm"
               onClick={onRunSearch}
-              disabled={disabled || !hasInput}
+              disabled={disabled || !canSearch}
             >
               <Search className="size-3.5" />
               Retry search

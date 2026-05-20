@@ -2,28 +2,18 @@
 
 import { useCallback, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-
-import { fetchQuestionFacets, type FacetCount, type FetchQuestionFacetsParams } from '@/lib/api'
-
+import {
+  fetchQuestionFacets,
+  type QuestionFacetsResponse,
+} from '@/lib/api'
+import {
+  buildQuestionFacetsParams,
+  EMPTY_QUESTION_FACETS,
+  type QuestionsQueryState,
+} from '@/lib/questions-query-state'
 import { questionFacetsQueryKey } from './query-keys'
-import type { QuestionsQueryState } from './use-questions-query'
 
-export type QuestionFacets = {
-  difficulties: FacetCount[]
-  categories: FacetCount[]
-  subcategories: FacetCount[]
-  roles: FacetCount[]
-  tags: FacetCount[]
-}
-
-const EMPTY_FACETS: QuestionFacets = {
-  difficulties: [],
-  categories: [],
-  subcategories: [],
-  roles: [],
-  tags: [],
-}
-
+export type QuestionFacets = QuestionFacetsResponse
 export type UseQuestionFacetsResult = {
   facets: QuestionFacets
   loading: boolean
@@ -45,36 +35,18 @@ type FilterSnapshot = Pick<
 export function useQuestionFacets(
   snapshot: FilterSnapshot,
   debouncedQ: string,
+  initialFacets?: QuestionFacetsResponse,
 ): UseQuestionFacetsResult {
-  const { difficulty, category, subcategory, role, status, tags } = snapshot
-
-  const params = useMemo<FetchQuestionFacetsParams>(
-    () => ({
-      q: debouncedQ || undefined,
-      difficulty,
-      category,
-      subcategory,
-      tags: tags.length > 0 ? tags : undefined,
-      role,
-      status,
-    }),
-    [debouncedQ, difficulty, category, subcategory, role, status, tags],
+  const params = useMemo(
+    () => buildQuestionFacetsParams(snapshot, debouncedQ),
+    [snapshot, debouncedQ],
   )
 
   const query = useQuery({
     queryKey: questionFacetsQueryKey(params),
     queryFn: ({ signal }) => fetchQuestionFacets(params, { signal }),
+    initialData: initialFacets,
   })
-
-  const facets: QuestionFacets = query.data
-    ? {
-        difficulties: query.data.difficulties,
-        categories: query.data.categories,
-        subcategories: query.data.subcategories,
-        roles: query.data.roles,
-        tags: query.data.tags,
-      }
-    : EMPTY_FACETS
 
   const queryRefetch = query.refetch
   const refetch = useCallback(() => {
@@ -82,8 +54,8 @@ export function useQuestionFacets(
   }, [queryRefetch])
 
   return {
-    facets,
-    loading: query.isPending || query.isFetching,
+    facets: query.data ?? EMPTY_QUESTION_FACETS,
+    loading: !initialFacets && query.isPending,
     error: query.error instanceof Error ? query.error.message : null,
     refetch,
   }

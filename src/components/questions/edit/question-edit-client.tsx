@@ -1,0 +1,134 @@
+'use client'
+
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import { DeletedQuestionBanner } from '@/components/questions/detail/deleted-question-banner'
+import { QuestionDangerZone } from '@/components/questions/detail/question-danger-zone'
+import { QuestionEditor } from '@/components/questions/editor/question-editor'
+import {
+  deleteQuestion,
+  QuestionInUseError,
+  restoreQuestion,
+  updateQuestion,
+  type Question,
+  type QuestionInput,
+} from '@/lib/api'
+import { questionToEditorInput } from '@/lib/question-editor/parsers'
+import { runMutation } from '@/lib/run-mutation'
+import { TOAST_MESSAGES } from '@/lib/toast-messages'
+
+type QuestionEditClientProps = {
+  id: string
+  initialQuestion: Question
+  canUpdate: boolean
+  canDelete: boolean
+}
+
+export function QuestionEditClient({
+  id,
+  initialQuestion,
+  canUpdate,
+  canDelete,
+}: QuestionEditClientProps) {
+  const router = useRouter()
+  const [question, setQuestion] = useState(initialQuestion)
+  const [deleting, setDeleting] = useState(false)
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [restoring, setRestoring] = useState(false)
+  const [restoreOpen, setRestoreOpen] = useState(false)
+
+  async function handleSubmit(value: QuestionInput) {
+    const updated = await updateQuestion(id, value)
+    setQuestion(updated)
+    router.refresh()
+    return updated
+  }
+
+  async function performRestore() {
+    if (restoring) return
+    setRestoring(true)
+    try {
+      const restored = await runMutation(() => restoreQuestion(id), {
+        successMessage: TOAST_MESSAGES.question.restoreSuccess,
+        errorMessage: TOAST_MESSAGES.question.restoreError,
+      })
+      setQuestion(restored)
+      setRestoreOpen(false)
+      router.refresh()
+    } finally {
+      setRestoring(false)
+    }
+  }
+
+  async function performDelete() {
+    if (deleting) return
+    setDeleting(true)
+    try {
+      await runMutation(() => deleteQuestion(id), {
+        successMessage: TOAST_MESSAGES.question.deleteSuccess,
+        errorMessage: TOAST_MESSAGES.question.deleteError,
+        getErrorTitle: (err) =>
+          err instanceof QuestionInUseError
+            ? TOAST_MESSAGES.deleteQuestion.cannotDeleteTitle
+            : TOAST_MESSAGES.question.deleteError,
+      })
+      setConfirmOpen(false)
+      router.push('/questions')
+      router.refresh()
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  return (
+    <>
+      {question.deleted && canUpdate ? (
+        <DeletedQuestionBanner
+          restoring={restoring}
+          onRestore={() => setRestoreOpen(true)}
+        />
+      ) : null}
+      <QuestionEditor
+        questionId={id}
+        title={canUpdate ? 'Edit Question' : 'View Question'}
+        readOnly={!canUpdate}
+        initialValue={questionToEditorInput(question)}
+        submitLabel="Save Changes"
+        onSubmit={handleSubmit}
+      />
+      {!question.deleted && canDelete ? (
+        <QuestionDangerZone
+          deleting={deleting}
+          onRequestDelete={() => setConfirmOpen(true)}
+        />
+      ) : null}
+      <ConfirmDialog
+        open={confirmOpen}
+        destructive
+        title="Delete this question?"
+        description="It will be hidden from the library and from new interviews. Past interviews keep their snapshot. Active interviews block deletion."
+        confirmLabel={deleting ? 'Deleting...' : 'Delete'}
+        cancelLabel="Cancel"
+        loading={deleting}
+        onConfirm={performDelete}
+        onCancel={() => {
+          if (!deleting) setConfirmOpen(false)
+        }}
+      />
+      <ConfirmDialog
+        open={restoreOpen}
+        title="Restore this question?"
+        description="It will become visible in the library again and available for new interviews."
+        confirmLabel={restoring ? 'Restoring...' : 'Restore'}
+        cancelLabel="Cancel"
+        loading={restoring}
+        onConfirm={performRestore}
+        onCancel={() => {
+          if (!restoring) setRestoreOpen(false)
+        }}
+      />
+    </>
+  )
+}

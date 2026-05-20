@@ -11,12 +11,14 @@ export type { QuestionSelectedPanelProps } from './question-selected-panel'
 export { QuestionViewToggle } from './question-view-toggle'
 export type { QuestionViewToggleProps } from './question-view-toggle'
 export {
-  buildFetchParams,
+  buildQuestionsFetchParams as buildFetchParams,
   DEFAULT_QUESTIONS_QUERY,
   QUESTION_VIEWS,
-  useQuestionsQuery,
-  type QuestionsQueryState,
   type QuestionView,
+  type QuestionsQueryState,
+} from '@/lib/questions-query-state'
+export {
+  useQuestionsQuery,
   type UseQuestionsQueryResult,
 } from './use-questions-query'
 export {

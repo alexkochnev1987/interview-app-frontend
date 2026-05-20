@@ -106,9 +106,9 @@ async function parseServerResponse<T>(res: Response, path: string): Promise<T | 
 export async function requestServer<T>(
   path: string,
   ctx: ServerRequestContext,
-  options?: { method?: 'GET' | 'POST' },
+  options?: { method?: 'GET' | 'POST'; query?: Record<string, unknown> },
 ): Promise<T | undefined> {
-  const res = await fetch(`${ctx.origin}/api${path}`, {
+  const res = await fetch(buildServerApiUrl(path, ctx.origin, options?.query), {
     method: options?.method ?? 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -119,4 +119,28 @@ export async function requestServer<T>(
   })
 
   return parseServerResponse<T>(res, path)
+}
+
+function buildServerApiUrl(
+  path: string,
+  origin: string,
+  query?: Record<string, unknown>,
+): string {
+  const base = `${origin}/api${path}`
+  if (!query) return base
+
+  const params = new URLSearchParams()
+  for (const [key, value] of Object.entries(query)) {
+    if (value === undefined || value === null) continue
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        params.append(key, String(item))
+      }
+    } else {
+      params.set(key, String(value))
+    }
+  }
+
+  const qs = params.toString()
+  return qs ? `${base}?${qs}` : base
 }

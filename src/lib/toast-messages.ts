@@ -92,6 +92,17 @@ export const TOAST_MESSAGES = {
       unavailableTitle: "Question unavailable",
       loadFailedCardDescription:
         "The editor could not load this question, so the route stops here instead of rendering a partially broken form.",
+      libraryForbiddenTitle: "You don't have access to the question library",
+      libraryForbiddenDescription:
+        "The question library is reserved for HR, admin, and super-admin users. If you think this is a mistake, contact your workspace owner.",
+      libraryUnavailableTitle: "Question library is unavailable right now",
+      createForbiddenTitle: "You don't have access to create questions",
+      createForbiddenDescription:
+        "Creating questions is reserved for admin and super-admin users. If you think this is a mistake, contact your workspace owner.",
+      createUnavailableTitle: "Question creation is unavailable right now",
+      editForbiddenTitle: "You don't have access to edit questions",
+      editForbiddenDescription:
+        "Editing questions is reserved for admin and super-admin users. HR users can browse the library but cannot change prompts.",
     },
   },
   rerun: {

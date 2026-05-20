@@ -51,6 +51,26 @@ export function canConfigureInterview(role: string | null | undefined): boolean 
   return hasAdminRole(role)
 }
 
+export function canReadQuestions(role: string | null | undefined): boolean {
+  return hasAdminRole(role)
+}
+
+export function canCreateQuestions(role: string | null | undefined): boolean {
+  return role === 'super_admin' || role === 'admin'
+}
+
+export function canUpdateQuestions(role: string | null | undefined): boolean {
+  return canCreateQuestions(role)
+}
+
+export function canDeleteQuestions(role: string | null | undefined): boolean {
+  return role === 'super_admin'
+}
+
+export function isSuperAdmin(role: string | null | undefined): boolean {
+  return role === 'super_admin'
+}
+
 export function canManageTeam(role: string | null | undefined): boolean {
   return role === 'super_admin' || role === 'admin'
 }

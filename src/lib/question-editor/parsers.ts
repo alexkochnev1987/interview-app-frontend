@@ -1,4 +1,5 @@
 import {
+  type Question,
   type QuestionExpectedConcept,
   type QuestionInput,
   type QuestionRedFlag,
@@ -170,6 +171,27 @@ export function normalizeInitialValue(initialValue?: QuestionInput): QuestionInp
     subcategory: initialValue?.subcategory ?? '',
     sampleGoodAnswer: initialValue?.sampleGoodAnswer ?? '',
     metadata: initialValue?.metadata ?? {},
+  }
+}
+
+export function questionToEditorInput(question: Question): QuestionInput {
+  return {
+    externalId: question.externalId,
+    role: question.role,
+    focus: question.focus,
+    outputLanguage: question.outputLanguage,
+    category: question.category,
+    subcategory: question.subcategory,
+    questionText: question.questionText,
+    followUpQuestions: question.followUpQuestions,
+    expectedConcepts: question.expectedConcepts,
+    redFlags: question.redFlags,
+    difficulty: question.difficulty,
+    weight: question.weight,
+    sampleGoodAnswer: question.sampleGoodAnswer,
+    minimumPassScore: question.minimumPassScore,
+    tags: question.tags,
+    metadata: question.metadata,
   }
 }
 

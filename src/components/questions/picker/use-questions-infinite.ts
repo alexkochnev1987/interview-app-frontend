@@ -2,10 +2,10 @@
 
 import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query'
 import { useCallback, useMemo } from 'react'
-
 import {
   fetchQuestions,
   type FetchQuestionsParams,
+  type PaginatedQuestions,
   type Question,
 } from '@/lib/api'
 
@@ -14,6 +14,7 @@ import { questionsInfiniteQueryKey } from './query-keys'
 export type UseQuestionsInfiniteOptions = {
   params: Omit<FetchQuestionsParams, 'page'>
   enabled: boolean
+  initialFirstPage?: PaginatedQuestions
 }
 
 export type UseQuestionsInfiniteResult = {
@@ -31,6 +32,7 @@ export type UseQuestionsInfiniteResult = {
 export function useQuestionsInfinite({
   params,
   enabled,
+  initialFirstPage,
 }: UseQuestionsInfiniteOptions): UseQuestionsInfiniteResult {
   const query = useInfiniteQuery({
     queryKey: questionsInfiniteQueryKey(params),
@@ -44,6 +46,9 @@ export function useQuestionsInfinite({
     },
     enabled,
     placeholderData: keepPreviousData,
+    initialData: initialFirstPage
+      ? { pages: [initialFirstPage], pageParams: [1] }
+      : undefined,
   })
 
   const items = useMemo(
@@ -66,7 +71,7 @@ export function useQuestionsInfinite({
     total,
     hasNextPage: query.hasNextPage ?? false,
     isFetchingNextPage: query.isFetchingNextPage,
-    isInitialLoading: query.isPending && enabled,
+    isInitialLoading: !initialFirstPage && query.isPending && enabled,
     isFetching: query.isFetching,
     error: query.error instanceof Error ? query.error.message : null,
     fetchNextPage,
