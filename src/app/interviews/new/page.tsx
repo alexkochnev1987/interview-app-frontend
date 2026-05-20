@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Suspense, useState, type FormEvent } from 'react'
+import { Suspense, useId, useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   AlertCircle,
@@ -57,6 +57,7 @@ export default function NewInterviewPage() {
 
 function NewInterviewPageContent() {
   const router = useRouter()
+  const questionsErrorId = `${useId()}-questions`
   const [candidateName, setCandidateName] = useState('')
   const [position, setPosition] = useState('')
   const [selectedById, setSelectedById] = useState<Map<string, Question>>(new Map())
@@ -231,11 +232,23 @@ function NewInterviewPageContent() {
                   </IconAffix>
                 </FormField>
 
+                {fieldErrors.questions ? (
+                  <BodyText
+                    id={questionsErrorId}
+                    role="alert"
+                    size="sm"
+                    tone="danger"
+                  >
+                    {fieldErrors.questions}
+                  </BodyText>
+                ) : null}
+
                 <Button
                   type="submit"
                   variant="gradient"
                   width="full"
-                  disabled={submitting}
+                  disabled={submitting || selectedCount === 0}
+                  aria-describedby={fieldErrors.questions ? questionsErrorId : undefined}
                 >
                   {submitting ? 'Creating...' : `Create Interview${selectedCount > 0 ? ` (${selectedCount})` : ''}`}
                   <ArrowRight className="size-4" />
@@ -286,11 +299,6 @@ function NewInterviewPageContent() {
                 </Stack>
                 <StatusPill tone="neutral">{selectedCount} selected</StatusPill>
               </Inline>
-              {fieldErrors.questions ? (
-                <BodyText size="sm" tone="danger">
-                  {fieldErrors.questions}
-                </BodyText>
-              ) : null}
             </CardHeader>
             <CardContent spacing="md">
               <QuestionPickerToolbar

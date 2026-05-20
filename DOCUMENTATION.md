@@ -140,14 +140,14 @@ After the alert → toast migration, use this split:
 
 | Pattern | When to use | Examples |
 |--------|-------------|----------|
-| **`FormField` `error` prop** | Client-side submit validation on forms | Login (`validateLogin`), create interview (`validateNewInterview`), question editor (`validateQuestionForm`) — show on submit under the field; clear on change for that field |
-| **`Alert` (inline)** | Persistent, contextual, or actionable state on the page (not submit validation on the three forms above) | Take consent/recording, upload failure on interview detail, evaluation progress, failed-interview banner on assessment detail |
+| **`FormField` `error` prop** | Client-side submit validation on forms | Login (`validateLogin`), create interview (`validateNewInterview`), question editor (`validateQuestionForm` in `src/lib/question-editor/validate-question-form.ts`) — show on submit under the field; clear on change for that field |
+| **`Alert` (inline)** | Persistent, contextual, or actionable state on the page (not client field validation on login / create interview / question editor) | Take consent/recording, upload failure on interview detail, evaluation progress, failed-interview banner on assessment detail, **login API failures** (after `validateLogin` passes) |
 | **Sonner toast** | Transient outcome of a **user action** right after the API responds | Save/delete/restore, bulk delete summary, rerun conflicts — call `notify*` or `runMutation` in the click handler / `try/catch`, not in `useEffect` on state |
 | **EmptyState / inline copy + Retry** | Passive load failures (no user click yet) | Question feed, facets, similarity search, page gates (`FlashErrorPageFallback`), take invalid link — show copy on the page; do not pair with a duplicate toast |
 
 Do not use `useEffect` + module-level dedupe to fire toasts when `error` or `result` state changes.
 
-Do not remove remaining `Alert` usages to “finish” the migration unless the UX above is preserved another way. Validators live in `src/lib/form-validation.ts`. Copy lives in `src/lib/toast-messages.ts` for toasts; whitelisted Alerts may stay hardcoded or use `TOAST_MESSAGES` where shared.
+Do not remove remaining `Alert` usages to “finish” the migration unless the UX above is preserved another way. Validators live in `src/lib/form-validation.ts` (login, new interview) and `src/lib/question-editor/validate-question-form.ts` (question editor). Copy lives in `src/lib/toast-messages.ts` for toasts; whitelisted Alerts may stay hardcoded or use `TOAST_MESSAGES` where shared.
 
 ### Что запускается в Docker
 ```

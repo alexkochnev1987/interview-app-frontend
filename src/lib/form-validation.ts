@@ -1,5 +1,3 @@
-import { parseMetadata } from '@/lib/question-editor/parsers'
-
 export type FieldErrors<K extends string> = Partial<Record<K, string>>
 
 export function validateLogin(values: {
@@ -36,26 +34,6 @@ export function validateNewInterview(values: {
   }
   if (values.selectedCount === 0) {
     errors.questions = 'Select at least one question.'
-  }
-
-  return errors
-}
-
-export function validateQuestionForm(values: {
-  questionText: string
-  metadataText: string
-}): FieldErrors<'questionText' | 'metadata'> {
-  const errors: FieldErrors<'questionText' | 'metadata'> = {}
-
-  if (!values.questionText.trim()) {
-    errors.questionText = 'Question text is required.'
-  }
-
-  try {
-    parseMetadata(values.metadataText)
-  } catch (err) {
-    errors.metadata =
-      err instanceof Error ? err.message : 'Invalid metadata JSON.'
   }
 
   return errors

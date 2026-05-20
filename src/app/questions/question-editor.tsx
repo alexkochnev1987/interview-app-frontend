@@ -20,13 +20,13 @@ import {
   type QuestionInput,
 } from '@/lib/api'
 import { clearFieldError } from '@/lib/clear-field-error'
-import { type FieldErrors, validateQuestionForm } from '@/lib/form-validation'
+import { type FieldErrors } from '@/lib/form-validation'
+import { validateQuestionForm } from '@/lib/question-editor/validate-question-form'
 import {
   DRAFT_FIELDS,
   areEqual,
   formatMetadata,
   normalizeInitialValue,
-  parseMetadata,
   type DraftFieldKey,
 } from '@/lib/question-editor/parsers'
 import { FEEDBACK_POLICY } from '@/lib/feedback-policy'
@@ -164,7 +164,7 @@ export function QuestionEditor({
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
 
-    const errors = validateQuestionForm({
+    const { errors, metadata } = validateQuestionForm({
       questionText: value.questionText,
       metadataText,
     })
@@ -173,7 +173,9 @@ export function QuestionEditor({
       return
     }
 
-    const metadata = parseMetadata(metadataText)
+    if (!metadata) {
+      return
+    }
 
     const payload: QuestionInput = {
       externalId: value.externalId?.trim() || undefined,

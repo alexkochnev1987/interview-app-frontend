@@ -7,6 +7,7 @@ import { ArrowRight, LockKeyhole, ShieldCheck, Sparkles } from 'lucide-react'
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
 import { HeroLead, HeroTitle } from '@/components/ui/hero-text'
 import { IconBadge } from '@/components/ui/icon-badge'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { DividerLabel } from '@/components/ui/divider-label'
@@ -29,6 +30,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [fieldErrors, setFieldErrors] = useState<FieldErrors<LoginField>>({})
+  const [authError, setAuthError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
   async function handleSubmit(e: FormEvent) {
@@ -37,22 +39,22 @@ export default function LoginPage() {
     const errors = validateLogin({ email, password })
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors)
+      setAuthError(null)
       return
     }
 
+    const trimmedEmail = email.trim()
     setFieldErrors({})
+    setAuthError(null)
     setLoading(true)
 
     try {
-      const sessionUser = await login({ email, password })
+      const sessionUser = await login({ email: trimmedEmail, password })
       establishSession(sessionUser)
       router.push('/')
       router.refresh()
     } catch (err) {
-      setFieldErrors((prev) => ({
-        ...prev,
-        password: err instanceof Error ? err.message : 'Login failed',
-      }))
+      setAuthError(err instanceof Error ? err.message : 'Login failed')
     } finally {
       setLoading(false)
     }
@@ -144,6 +146,7 @@ export default function LoginPage() {
                     onChange={(e) => {
                       setEmail(e.target.value)
                       clearFieldError('email', setFieldErrors)
+                      setAuthError(null)
                     }}
                     placeholder="admin@interview-app.com"
                   />
@@ -157,11 +160,19 @@ export default function LoginPage() {
                     onChange={(e) => {
                       setPassword(e.target.value)
                       clearFieldError('password', setFieldErrors)
+                      setAuthError(null)
                     }}
                     placeholder="Password"
                   />
                 </FormField>
               </Stack>
+
+              {authError ? (
+                <Alert variant="danger">
+                  <AlertTitle>Sign in failed</AlertTitle>
+                  <AlertDescription>{authError}</AlertDescription>
+                </Alert>
+              ) : null}
 
               <Button
                 type="submit"
