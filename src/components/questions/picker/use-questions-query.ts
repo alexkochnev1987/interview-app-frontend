@@ -10,6 +10,7 @@ import {
   type Dispatch,
   type SetStateAction,
 } from 'react'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 
 import {
   fetchQuestions,
@@ -21,9 +22,15 @@ import {
   type QuestionStatusFilter,
 } from '@/lib/api'
 
+import { questionsListQueryKey } from './query-keys'
+
 const DEFAULT_LIMIT = 20
 const SEARCH_DEBOUNCE_MS = 300
 const MAX_Q_LENGTH = 200
+const VIEW_STORAGE_KEY = 'questions:view'
+
+export const QUESTION_VIEWS = ['cards', 'table'] as const
+export type QuestionView = (typeof QUESTION_VIEWS)[number]
 
 export type QuestionsQueryState = {
   q: string
@@ -37,6 +44,7 @@ export type QuestionsQueryState = {
   sortOrder: QuestionSortOrder
   page: number
   limit: number
+  view: QuestionView
 }
 
 export const DEFAULT_QUESTIONS_QUERY: QuestionsQueryState = {
@@ -51,12 +59,31 @@ export const DEFAULT_QUESTIONS_QUERY: QuestionsQueryState = {
   sortOrder: 'desc',
   page: 1,
   limit: DEFAULT_LIMIT,
+  view: 'cards',
+}
+
+function readStoredView(): QuestionView | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const stored = window.localStorage.getItem(VIEW_STORAGE_KEY)
+    return stored === 'cards' || stored === 'table' ? stored : null
+  } catch {
+    return null
+  }
+}
+
+function writeStoredView(view: QuestionView) {
+  if (typeof window === 'undefined') return
+  try {
+    window.localStorage.setItem(VIEW_STORAGE_KEY, view)
+  } catch {}
 }
 
 type UseQuestionsQueryOptions = {
   initial?: Partial<QuestionsQueryState>
   syncUrl?: boolean
   lockStatus?: QuestionStatusFilter
+  disableFetchInCardsView?: boolean
 }
 
 export type UseQuestionsQueryResult = {
@@ -77,6 +104,7 @@ export type UseQuestionsQueryResult = {
   setStatus: (value: QuestionStatusFilter) => void
   setSort: (sortBy: QuestionSortField, sortOrder: QuestionSortOrder) => void
   setPage: (value: number) => void
+  setView: (value: QuestionView) => void
   reset: () => void
   refetch: () => void
 }
@@ -124,6 +152,8 @@ function readFromSearchParams(
   if (Number.isFinite(limit) && limit >= 1 && limit <= 100) {
     next.limit = Math.floor(limit)
   }
+  const view = params.get('view')
+  if (view === 'cards' || view === 'table') next.view = view
   return next
 }
 
@@ -138,12 +168,18 @@ function writeToSearchParams(state: QuestionsQueryState): URLSearchParams {
   if (state.status !== 'active') params.set('status', state.status)
   if (state.sortBy !== 'updatedAt') params.set('sortBy', state.sortBy)
   if (state.sortOrder !== 'desc') params.set('sortOrder', state.sortOrder)
-  if (state.page !== 1) params.set('page', String(state.page))
+  if (state.view === 'table' && state.page !== 1) {
+    params.set('page', String(state.page))
+  }
   if (state.limit !== DEFAULT_LIMIT) params.set('limit', String(state.limit))
+  if (state.view !== 'cards') params.set('view', state.view)
   return params
 }
 
-function buildFetchParams(state: QuestionsQueryState, debouncedQ: string): FetchQuestionsParams {
+export function buildFetchParams(
+  state: QuestionsQueryState,
+  debouncedQ: string,
+): FetchQuestionsParams {
   return {
     q: debouncedQ || undefined,
     difficulty: state.difficulty,
@@ -162,26 +198,34 @@ function buildFetchParams(state: QuestionsQueryState, debouncedQ: string): Fetch
 export function useQuestionsQuery(
   options: UseQuestionsQueryOptions = {},
 ): UseQuestionsQueryResult {
-  const { initial, syncUrl, lockStatus } = options
+  const { initial, syncUrl, lockStatus, disableFetchInCardsView } = options
+  // Capture initial at mount so inline object literals from the call site don't
+  // destabilise dependency arrays on every render.
+  const [capturedInitial] = useState<Partial<QuestionsQueryState> | undefined>(initial)
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
   const [state, setState] = useState<QuestionsQueryState>(() => {
-    const base = { ...DEFAULT_QUESTIONS_QUERY, ...(initial ?? {}) }
+    const base = { ...DEFAULT_QUESTIONS_QUERY, ...(capturedInitial ?? {}) }
     const start =
       syncUrl && searchParams ? readFromSearchParams(searchParams, base) : base
     if (lockStatus) start.status = lockStatus
+    if (start.view === 'cards' && start.page !== 1) start.page = 1
     return start
   })
+  const hydratedStoredViewRef = useRef(false)
+  useEffect(() => {
+    if (hydratedStoredViewRef.current) return
+    hydratedStoredViewRef.current = true
+    if (syncUrl && searchParams?.get('view') !== null) return
+    const stored = readStoredView()
+    if (stored) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- post-mount SSR-safe localStorage hydration of view preference
+      setState((prev) => (prev.view === stored ? prev : { ...prev, view: stored }))
+    }
+  }, [syncUrl, searchParams])
   const [debouncedQ, setDebouncedQ] = useState(() => state.q)
-  const [data, setData] = useState<{ items: Question[]; total: number }>({
-    items: [],
-    total: 0,
-  })
-  const [error, setError] = useState<string | null>(null)
-  const [refetchTick, setRefetchTick] = useState(0)
-  const [completedKey, setCompletedKey] = useState<string | null>(null)
   const lastWrittenUrlRef = useRef<string | null>(
     syncUrl && searchParams ? searchParams.toString() : null,
   )
@@ -201,7 +245,7 @@ export function useQuestionsQuery(
       return
     }
     if (currentUrl !== lastWrittenUrlRef.current) {
-      const base = { ...DEFAULT_QUESTIONS_QUERY, ...(initial ?? {}) }
+      const base = { ...DEFAULT_QUESTIONS_QUERY, ...(capturedInitial ?? {}) }
       const fromUrl = searchParams ? readFromSearchParams(searchParams, base) : base
       if (lockStatus) fromUrl.status = lockStatus
       lastWrittenUrlRef.current = currentUrl
@@ -212,47 +256,36 @@ export function useQuestionsQuery(
     const url = stateUrl.length > 0 ? `${pathname}?${stateUrl}` : pathname
     lastWrittenUrlRef.current = stateUrl
     router.replace(url, { scroll: false })
-  }, [state, pathname, router, syncUrl, initial, lockStatus, searchParams])
+  }, [state, pathname, router, syncUrl, capturedInitial, lockStatus, searchParams])
 
   const fetchParams = useMemo(
     () => buildFetchParams(state, debouncedQ),
     [state, debouncedQ],
   )
-  const fetchKey = useMemo(
-    () => `${JSON.stringify(fetchParams)}::${refetchTick}`,
-    [fetchParams, refetchTick],
-  )
 
+  const query = useQuery({
+    queryKey: questionsListQueryKey(fetchParams),
+    queryFn: ({ signal }) => fetchQuestions(fetchParams, { signal }),
+    placeholderData: keepPreviousData,
+    enabled: !disableFetchInCardsView || state.view !== 'cards',
+  })
+
+  const total = query.data?.total ?? 0
   useEffect(() => {
-    const controller = new AbortController()
-    fetchQuestions(fetchParams, { signal: controller.signal })
-      .then((response) => {
-        if (controller.signal.aborted) return
-        setData({ items: response.items, total: response.total })
-        setError(null)
-        setCompletedKey(fetchKey)
-        setState((prev) => {
-          const maxPage = Math.max(1, Math.ceil(response.total / prev.limit))
-          return prev.page > maxPage ? { ...prev, page: maxPage } : prev
-        })
-      })
-      .catch((err: unknown) => {
-        if (controller.signal.aborted) return
-        if (err instanceof DOMException && err.name === 'AbortError') return
-        setError(err instanceof Error ? err.message : 'Failed to load questions.')
-        setCompletedKey(fetchKey)
-      })
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- clamp page after fetch when filters reduce total below current page
+    setState((prev) => {
+      const maxPage = Math.max(1, Math.ceil(total / prev.limit))
+      return prev.page > maxPage ? { ...prev, page: maxPage } : prev
+    })
+  }, [total])
 
-    return () => {
-      controller.abort()
-    }
-  }, [fetchKey, fetchParams])
-
-  const loading = completedKey !== fetchKey
+  const loading = query.isPending || query.isFetching
+  const error =
+    query.error instanceof Error ? query.error.message : null
 
   const totalPages = useMemo(
-    () => Math.max(1, Math.ceil(data.total / state.limit)),
-    [data.total, state.limit],
+    () => Math.max(1, Math.ceil(total / state.limit)),
+    [total, state.limit],
   )
 
   const setQ = useCallback<Dispatch<SetStateAction<string>>>((value) => {
@@ -305,18 +338,32 @@ export function useQuestionsQuery(
     (value: number) => setState((prev) => ({ ...prev, page: Math.max(1, Math.floor(value)) })),
     [],
   )
+  const setView = useCallback((value: QuestionView) => {
+    setState((prev) => {
+      if (prev.view === value) return prev
+      const next = { ...prev, view: value }
+      if (value === 'cards') next.page = 1
+      return next
+    })
+    writeStoredView(value)
+  }, [])
   const reset = useCallback(
     () => {
-      const base = { ...DEFAULT_QUESTIONS_QUERY, ...(initial ?? {}) }
+      const base = { ...DEFAULT_QUESTIONS_QUERY, ...(capturedInitial ?? {}) }
       if (lockStatus) base.status = lockStatus
-      setState(base)
+      setState((prev) => ({ ...base, view: prev.view }))
     },
-    [initial, lockStatus],
+    [capturedInitial, lockStatus],
   )
-  const refetch = useCallback(() => setRefetchTick((tick) => tick + 1), [])
+  const queryRefetch = query.refetch
+  const refetch = useCallback(() => {
+    void queryRefetch()
+  }, [queryRefetch])
 
+  // page and limit are intentionally excluded: navigating pages or changing limit
+  // is not a filter action, so the reset affordance should not appear for those alone.
   const canReset = useMemo(() => {
-    const base = { ...DEFAULT_QUESTIONS_QUERY, ...(initial ?? {}) }
+    const base = { ...DEFAULT_QUESTIONS_QUERY, ...(capturedInitial ?? {}) }
     if (lockStatus) base.status = lockStatus
     return (
       state.q !== base.q ||
@@ -327,17 +374,15 @@ export function useQuestionsQuery(
       state.tags.length > 0 ||
       state.status !== base.status ||
       state.sortBy !== base.sortBy ||
-      state.sortOrder !== base.sortOrder ||
-      state.page !== base.page ||
-      state.limit !== base.limit
+      state.sortOrder !== base.sortOrder
     )
-  }, [state, initial, lockStatus])
+  }, [state, capturedInitial, lockStatus])
 
   return {
     state,
     debouncedQ,
-    items: data.items,
-    total: data.total,
+    items: query.data?.items ?? [],
+    total,
     totalPages,
     loading,
     error,
@@ -351,6 +396,7 @@ export function useQuestionsQuery(
     setStatus,
     setSort,
     setPage,
+    setView,
     reset,
     refetch,
   }

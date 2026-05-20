@@ -70,6 +70,12 @@ const bodyTextVariants = cva('', {
       true: 'italic',
       false: '',
     },
+    clamp: {
+      none: '',
+      1: 'line-clamp-1 min-w-0',
+      2: 'line-clamp-2 min-w-0',
+      3: 'line-clamp-3 min-w-0',
+    },
   },
   defaultVariants: {
     size: 'sm',
@@ -77,6 +83,7 @@ const bodyTextVariants = cva('', {
     weight: 'normal',
     width: 'auto',
     italic: false,
+    clamp: 'none',
   },
 })
 
@@ -93,6 +100,7 @@ export function BodyText({
   weight,
   width,
   italic,
+  clamp,
   as: Tag = 'p',
   ...props
 }: BodyTextProps) {
@@ -100,7 +108,7 @@ export function BodyText({
   return (
     <Comp
       className={cn(
-        bodyTextVariants({ size, tone, weight, width, italic }),
+        bodyTextVariants({ size, tone, weight, width, italic, clamp }),
         className,
       )}
       {...props}

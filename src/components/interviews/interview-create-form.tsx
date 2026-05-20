@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, type FormEvent } from 'react'
+import { useMemo, useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   AlertCircle,
@@ -10,6 +10,16 @@ import {
   UserRound,
 } from 'lucide-react'
 
+import { QuestionTable } from '@/components/questions/library/question-table'
+import {
+  buildActiveFilterChips,
+  QuestionFacetSidebar,
+  QuestionPickerToolbar,
+  QuestionSelectedPanel,
+  QuestionViewToggle,
+  useQuestionFacets,
+  useQuestionsQuery,
+} from '@/components/questions/picker'
 import { EyebrowLabel } from '@/components/ui/eyebrow-label'
 import { FormField } from '@/components/ui/form-field'
 import { IconAffix } from '@/components/ui/icon-affix'
@@ -25,16 +35,8 @@ import { Grid } from '@/components/ui/layout/grid'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { Input } from '@/components/ui/input'
+import { Pagination } from '@/components/ui/pagination'
 import { BodyText, SectionHeading } from '@/components/ui/text'
-import {
-  buildActiveFilterChips,
-  QuestionFacetSidebar,
-  QuestionPagination,
-  QuestionPickerToolbar,
-  QuestionSelectedPanel,
-  useQuestionFacets,
-  useQuestionsQuery,
-} from '@/components/questions/picker'
 import { createInterview, type Question } from '@/lib/api'
 import { runMutation } from '@/lib/run-mutation'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
@@ -68,6 +70,10 @@ export function InterviewCreateForm() {
 
   const selectedCount = selectedById.size
   const selectedQuestions = Array.from(selectedById.values())
+  const selectedIds = useMemo(
+    () => new Set(selectedById.keys()),
+    [selectedById],
+  )
 
   function toggleQuestion(question: Question) {
     setSelectedById((prev) => {
@@ -76,6 +82,18 @@ export function InterviewCreateForm() {
         next.delete(question.id)
       } else {
         next.set(question.id, question)
+      }
+      return next
+    })
+  }
+
+  function toggleQuestionsBulk(questions: Question[], select: boolean) {
+    setSelectedById((prev) => {
+      const next = new Map(prev)
+      if (select) {
+        questions.forEach((q) => next.set(q.id, q))
+      } else {
+        questions.forEach((q) => next.delete(q.id))
       }
       return next
     })
@@ -134,7 +152,7 @@ export function InterviewCreateForm() {
   const allEmpty =
     showEmptyState &&
     query.total === 0 &&
-    query.state.q === '' &&
+    query.debouncedQ === '' &&
     !query.state.difficulty &&
     !query.state.category &&
     !query.state.subcategory &&
@@ -256,6 +274,12 @@ export function InterviewCreateForm() {
                 activeChips={activeChips}
                 resultCount={query.total}
                 loading={query.loading}
+                viewToggle={
+                  <QuestionViewToggle
+                    view={query.state.view}
+                    onViewChange={query.setView}
+                  />
+                }
               />
 
               {query.error ? (
@@ -281,7 +305,7 @@ export function InterviewCreateForm() {
                 />
               ) : query.loading && query.items.length === 0 ? (
                 <LoadingStateCard tone="ghost" label="Loading question bank..." />
-              ) : showEmptyState ? (
+              ) : showEmptyState && !query.error ? (
                 <EmptyStateCard
                   tone="ghost"
                   title={
@@ -310,6 +334,20 @@ export function InterviewCreateForm() {
                       </Button>
                     )
                   }
+                />
+              ) : query.state.view === 'table' ? (
+                <QuestionTable
+                  items={query.items}
+                  selectable
+                  selectedIds={selectedIds}
+                  onToggleSelected={toggleQuestion}
+                  onToggleSelectAll={toggleQuestionsBulk}
+                  onRowClick={toggleQuestion}
+                  sortBy={query.state.sortBy}
+                  sortOrder={query.state.sortOrder}
+                  onSortChange={query.setSort}
+                  page={query.state.page}
+                  loading={query.loading}
                 />
               ) : (
                 <Stack gap={3}>
@@ -378,13 +416,15 @@ export function InterviewCreateForm() {
                 </Stack>
               )}
 
-              <QuestionPagination
-                page={query.state.page}
-                totalPages={query.totalPages}
-                total={query.total}
-                limit={query.state.limit}
-                onPageChange={query.setPage}
-              />
+              {!query.error ? (
+                <Pagination
+                  page={query.state.page}
+                  totalPages={query.totalPages}
+                  total={query.total}
+                  limit={query.state.limit}
+                  onPageChange={query.setPage}
+                />
+              ) : null}
             </CardContent>
           </Card>
         </Grid>

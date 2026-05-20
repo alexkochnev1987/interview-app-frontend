@@ -40,7 +40,7 @@ export default async function NewInterviewPage() {
   return (
     <PageShell>
       <InterviewCreateIntro />
-      <InterviewCreateForm />
+        <InterviewCreateForm />
     </PageShell>
   )
 }
