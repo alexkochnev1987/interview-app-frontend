@@ -45,6 +45,12 @@ export const TOAST_MESSAGES = {
     noMatches: "No close matches crossed the current similarity threshold.",
   },
   pageGate: {
+    login: {
+      failedTitle: "Authentication failed",
+      failedFallback: "Login failed",
+      signingInLabel: "Signing in...",
+      signInLabel: "Sign In",
+    },
     dashboard: {
       forbiddenTitle: "Sign in to view the dashboard",
       forbiddenDescription:
