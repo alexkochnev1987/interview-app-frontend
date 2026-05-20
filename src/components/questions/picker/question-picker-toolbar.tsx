@@ -49,6 +49,7 @@ export type QuestionPickerToolbarProps = {
   resultCount: number
   loading: boolean
   bulkActions?: ReactNode
+  viewToggle?: ReactNode
 }
 
 export function QuestionPickerToolbar(props: QuestionPickerToolbarProps) {
@@ -62,6 +63,7 @@ export function QuestionPickerToolbar(props: QuestionPickerToolbarProps) {
     resultCount,
     loading,
     bulkActions,
+    viewToggle,
   } = props
 
   const sortValue = `${sortBy}:${sortOrder}` as `${QuestionSortField}:${QuestionSortOrder}`
@@ -98,7 +100,8 @@ export function QuestionPickerToolbar(props: QuestionPickerToolbarProps) {
           ))}
         </Inline>
 
-        <Inline gap={2} align="center">
+        <Inline gap={2} align="center" wrap="wrap">
+          {viewToggle}
           <Select
             value={sortValue}
             onValueChange={(value) => {

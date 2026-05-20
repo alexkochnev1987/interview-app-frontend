@@ -4,6 +4,7 @@ import { AppBody, AppShellRoot } from "@/components/ui/app-shell"
 import { Toaster } from "@/components/ui/toaster"
 import { AuthProvider } from "@/lib/auth-context"
 import { getServerSessionSnapshot } from "@/lib/auth-server"
+import { AppQueryClientProvider } from "@/lib/query-client-provider"
 
 import "./globals.css"
 import { NavHeader } from "./nav-header"
@@ -23,13 +24,15 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <AppBody>
-        <AuthProvider initialUser={session.user}>
-          <AppShellRoot>
-            <NavHeader />
-            {children}
-          </AppShellRoot>
-          <Toaster />
-        </AuthProvider>
+        <AppQueryClientProvider>
+          <AuthProvider initialUser={session.user}>
+            <AppShellRoot>
+              <NavHeader />
+              {children}
+            </AppShellRoot>
+            <Toaster />
+          </AuthProvider>
+        </AppQueryClientProvider>
       </AppBody>
     </html>
   )

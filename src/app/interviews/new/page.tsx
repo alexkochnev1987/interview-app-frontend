@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Suspense, useId, useState, type FormEvent } from 'react'
+import { Suspense, useId, useMemo, useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   AlertCircle,
@@ -30,15 +30,17 @@ import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { Input } from '@/components/ui/input'
 import { BodyText, SectionHeading } from '@/components/ui/text'
+import { QuestionTable } from '@/components/questions/library/question-table'
 import {
   buildActiveFilterChips,
   QuestionFacetSidebar,
-  QuestionPagination,
   QuestionPickerToolbar,
   QuestionSelectedPanel,
+  QuestionViewToggle,
   useQuestionFacets,
   useQuestionsQuery,
 } from '@/components/questions/picker'
+import { Pagination } from '@/components/ui/pagination'
 import { createInterview, type Question } from '@/lib/api'
 import { clearFieldError } from '@/lib/clear-field-error'
 import { type FieldErrors, validateNewInterview } from '@/lib/form-validation'
@@ -97,6 +99,21 @@ function NewInterviewPageContent() {
     })
   }
 
+  function toggleQuestionsBulk(questions: Question[], select: boolean) {
+    if (select) {
+      clearFieldError('questions', setFieldErrors)
+    }
+    setSelectedById((prev) => {
+      const next = new Map(prev)
+      if (select) {
+        questions.forEach((q) => next.set(q.id, q))
+      } else {
+        questions.forEach((q) => next.delete(q.id))
+      }
+      return next
+    })
+  }
+
   function removeSelected(id: string) {
     clearFieldError('questions', setFieldErrors)
     setSelectedById((prev) => {
@@ -106,6 +123,11 @@ function NewInterviewPageContent() {
       return next
     })
   }
+
+  const selectedIds = useMemo(
+    () => new Set(selectedById.keys()),
+    [selectedById],
+  )
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
@@ -148,7 +170,7 @@ function NewInterviewPageContent() {
   const allEmpty =
     showEmptyState &&
     query.total === 0 &&
-    query.state.q === '' &&
+    query.debouncedQ === '' &&
     !query.state.difficulty &&
     !query.state.category &&
     !query.state.subcategory &&
@@ -309,6 +331,12 @@ function NewInterviewPageContent() {
                 activeChips={activeChips}
                 resultCount={query.total}
                 loading={query.loading}
+                viewToggle={
+                  <QuestionViewToggle
+                    view={query.state.view}
+                    onViewChange={query.setView}
+                  />
+                }
               />
 
               {query.error ? (
@@ -334,7 +362,7 @@ function NewInterviewPageContent() {
                 />
               ) : query.loading && query.items.length === 0 ? (
                 <LoadingStateCard tone="ghost" label="Loading question bank..." />
-              ) : showEmptyState ? (
+              ) : showEmptyState && !query.error ? (
                 <EmptyStateCard
                   tone="ghost"
                   title={allEmpty ? 'No saved questions yet' : 'No questions match the current filters'}
@@ -354,6 +382,20 @@ function NewInterviewPageContent() {
                       </Button>
                     )
                   }
+                />
+              ) : query.state.view === 'table' ? (
+                <QuestionTable
+                  items={query.items}
+                  selectable
+                  selectedIds={selectedIds}
+                  onToggleSelected={toggleQuestion}
+                  onToggleSelectAll={toggleQuestionsBulk}
+                  onRowClick={toggleQuestion}
+                  sortBy={query.state.sortBy}
+                  sortOrder={query.state.sortOrder}
+                  onSortChange={query.setSort}
+                  page={query.state.page}
+                  loading={query.loading}
                 />
               ) : (
                 <Stack gap={3}>
@@ -419,13 +461,15 @@ function NewInterviewPageContent() {
                 </Stack>
               )}
 
-              <QuestionPagination
-                page={query.state.page}
-                totalPages={query.totalPages}
-                total={query.total}
-                limit={query.state.limit}
-                onPageChange={query.setPage}
-              />
+              {!query.error ? (
+                <Pagination
+                  page={query.state.page}
+                  totalPages={query.totalPages}
+                  total={query.total}
+                  limit={query.state.limit}
+                  onPageChange={query.setPage}
+                />
+              ) : null}
             </CardContent>
           </Card>
         </Grid>
