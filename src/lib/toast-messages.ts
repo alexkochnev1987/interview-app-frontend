@@ -45,6 +45,16 @@ export const TOAST_MESSAGES = {
     noMatches: "No close matches crossed the current similarity threshold.",
   },
   pageGate: {
+    dashboard: {
+      forbiddenTitle: "Sign in to view the dashboard",
+      forbiddenDescription:
+        "This workspace requires an authenticated account. Sign in to continue.",
+      unavailableTitle: "Dashboard is unavailable right now",
+      loadFailedTitle: "Could not load dashboard",
+      loadFailedFallback: "Failed to load interviews.",
+      signInActionLabel: "Sign in",
+      questionBankActionLabel: "Go to question bank",
+    },
     assessments: {
       loadFailedTitle: "Could not load assessments",
       loadFailedFallback: "Failed to load assessments.",

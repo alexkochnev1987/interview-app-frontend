@@ -12,7 +12,8 @@ export function proxy(request: NextRequest) {
   const isPublicPage =
     path === '/login' ||
     path.startsWith('/take') ||
-    path.startsWith('/feedback');
+    path.startsWith('/feedback') ||
+    path.startsWith('/demo');
 
   if (!session && !isPublicPage) {
     return NextResponse.redirect(new URL('/login', request.url));
