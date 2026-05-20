@@ -123,18 +123,18 @@ function QuestionsPageContent() {
   )
 
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
-  const prevCardsSelectionSignatureRef = useRef<string | null>(null)
+  const prevSelectionFilterSigRef = useRef<string | null>(null)
   useEffect(() => {
-    if (!isCardsView) return
-    // Intentionally not resetting the ref when leaving cards view: selections survive
-    // a view switch so the user can select in table view and bulk-delete from cards view.
-    // Only a filter change (new signature) clears the selection.
-    if (prevCardsSelectionSignatureRef.current === cardsFilterSignature) return
-    if (prevCardsSelectionSignatureRef.current !== null) {
+    // Selections survive view switches (select in table, bulk-delete from cards and vice versa).
+    // Any filter/sort/search change in either view clears them to prevent operating on IDs
+    // no longer in the visible result set. Page navigation is excluded from the signature
+    // intentionally so paging alone does not reset selection.
+    if (prevSelectionFilterSigRef.current === cardsFilterSignature) return
+    if (prevSelectionFilterSigRef.current !== null) {
       setSelectedIds(new Set())
     }
-    prevCardsSelectionSignatureRef.current = cardsFilterSignature
-  }, [cardsFilterSignature, isCardsView])
+    prevSelectionFilterSigRef.current = cardsFilterSignature
+  }, [cardsFilterSignature])
   const [bulkConfirmOpen, setBulkConfirmOpen] = useState(false)
   const [bulkDeleting, setBulkDeleting] = useState(false)
   const [bulkResult, setBulkResult] = useState<BulkDeleteResult | null>(null)
@@ -352,7 +352,7 @@ function QuestionsPageContent() {
         <LoadingStateCard label="Loading questions..." />
       ) : viewItems.length === 0 ? (
         <EmptyStateCard
-          icon={<Search className="size-5" />}
+          icon={<Icon size="lg"><Search /></Icon>}
           title={allEmpty ? 'No saved questions yet' : 'No questions match the current filters'}
           description={
             allEmpty
@@ -388,7 +388,7 @@ function QuestionsPageContent() {
       ) : (
         <div ref={cardsScrollRootRef}>
           <CardGrid>
-            {infinite.items.map((question) => (
+            {viewItems.map((question) => (
               <QuestionCard
                 key={question.id}
                 question={question}

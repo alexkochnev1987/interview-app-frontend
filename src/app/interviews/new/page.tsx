@@ -164,7 +164,7 @@ function NewInterviewPageContent() {
   const allEmpty =
     showEmptyState &&
     query.total === 0 &&
-    query.state.q === '' &&
+    query.debouncedQ === '' &&
     !query.state.difficulty &&
     !query.state.category &&
     !query.state.subcategory &&

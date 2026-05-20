@@ -360,6 +360,8 @@ export function useQuestionsQuery(
     void queryRefetch()
   }, [queryRefetch])
 
+  // page and limit are intentionally excluded: navigating pages or changing limit
+  // is not a filter action, so the reset affordance should not appear for those alone.
   const canReset = useMemo(() => {
     const base = { ...DEFAULT_QUESTIONS_QUERY, ...(capturedInitial ?? {}) }
     if (lockStatus) base.status = lockStatus
