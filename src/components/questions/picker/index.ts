@@ -1,7 +1,5 @@
 export { QuestionFacetSidebar } from './question-facet-sidebar'
 export type { QuestionFacetSidebarProps } from './question-facet-sidebar'
-export { QuestionPagination } from './question-pagination'
-export type { QuestionPaginationProps } from './question-pagination'
 export { QuestionPickerToolbar } from './question-picker-toolbar'
 export type {
   ActiveFilterChip,
@@ -10,12 +8,22 @@ export type {
 export { buildActiveFilterChips } from './build-active-chips'
 export { QuestionSelectedPanel } from './question-selected-panel'
 export type { QuestionSelectedPanelProps } from './question-selected-panel'
+export { QuestionViewToggle } from './question-view-toggle'
+export type { QuestionViewToggleProps } from './question-view-toggle'
 export {
+  buildFetchParams,
   DEFAULT_QUESTIONS_QUERY,
+  QUESTION_VIEWS,
   useQuestionsQuery,
   type QuestionsQueryState,
+  type QuestionView,
   type UseQuestionsQueryResult,
 } from './use-questions-query'
+export {
+  useQuestionsInfinite,
+  type UseQuestionsInfiniteOptions,
+  type UseQuestionsInfiniteResult,
+} from './use-questions-infinite'
 export {
   useQuestionFacets,
   type QuestionFacets,
