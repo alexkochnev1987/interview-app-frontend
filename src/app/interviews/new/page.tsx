@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Suspense, useMemo, useState, type FormEvent } from 'react'
+import { Suspense, useId, useMemo, useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   AlertCircle,
@@ -21,7 +21,6 @@ import { SelectableTile } from '@/components/ui/selectable-tile'
 import { StatusPill } from '@/components/ui/status-pill'
 import { EmptyStateCard, LoadingStateCard } from '@/components/ui/state-card'
 import { PageShell } from '@/components/ui/layout/page-shell'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -43,8 +42,12 @@ import {
 } from '@/components/questions/picker'
 import { Pagination } from '@/components/ui/pagination'
 import { createInterview, type Question } from '@/lib/api'
+import { clearFieldError } from '@/lib/clear-field-error'
+import { type FieldErrors, validateNewInterview } from '@/lib/form-validation'
 import { runMutation } from '@/lib/run-mutation'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
+
+type NewInterviewField = 'candidateName' | 'position' | 'questions'
 
 export default function NewInterviewPage() {
   return (
@@ -56,11 +59,12 @@ export default function NewInterviewPage() {
 
 function NewInterviewPageContent() {
   const router = useRouter()
+  const questionsErrorId = `${useId()}-questions`
   const [candidateName, setCandidateName] = useState('')
   const [position, setPosition] = useState('')
   const [selectedById, setSelectedById] = useState<Map<string, Question>>(new Map())
   const [submitting, setSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors<NewInterviewField>>({})
 
   const query = useQuestionsQuery({ syncUrl: false, lockStatus: 'active' })
   const facetsResult = useQuestionFacets(query.state, query.debouncedQ)
@@ -83,6 +87,7 @@ function NewInterviewPageContent() {
   const selectedQuestions = Array.from(selectedById.values())
 
   function toggleQuestion(question: Question) {
+    clearFieldError('questions', setFieldErrors)
     setSelectedById((prev) => {
       const next = new Map(prev)
       if (next.has(question.id)) {
@@ -95,6 +100,9 @@ function NewInterviewPageContent() {
   }
 
   function toggleQuestionsBulk(questions: Question[], select: boolean) {
+    if (select) {
+      clearFieldError('questions', setFieldErrors)
+    }
     setSelectedById((prev) => {
       const next = new Map(prev)
       if (select) {
@@ -107,6 +115,7 @@ function NewInterviewPageContent() {
   }
 
   function removeSelected(id: string) {
+    clearFieldError('questions', setFieldErrors)
     setSelectedById((prev) => {
       if (!prev.has(id)) return prev
       const next = new Map(prev)
@@ -122,21 +131,18 @@ function NewInterviewPageContent() {
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
-    setError(null)
 
-    if (!candidateName.trim()) {
-      setError('Candidate name is required.')
-      return
-    }
-    if (!position.trim()) {
-      setError('Position is required.')
-      return
-    }
-    if (selectedCount === 0) {
-      setError('Select at least one question.')
+    const errors = validateNewInterview({
+      candidateName,
+      position,
+      selectedCount,
+    })
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors)
       return
     }
 
+    setFieldErrors({})
     setSubmitting(true)
 
     try {
@@ -201,14 +207,7 @@ function NewInterviewPageContent() {
         </CardContent>
       </Card>
 
-      {error ? (
-        <Alert variant="danger">
-          <AlertTitle>{TOAST_MESSAGES.pageGate.interview.setupBlockedTitle}</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      ) : null}
-
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} noValidate>
         <Grid columns="aside-22-left" gap={6}>
           <Stack gap={4}>
             <Card variant="surface">
@@ -219,26 +218,36 @@ function NewInterviewPageContent() {
                 </CardDescription>
               </CardHeader>
               <CardContent spacing="lg">
-                <FormField htmlFor="candidateName" label="Candidate name">
+                <FormField
+                  htmlFor="candidateName"
+                  label="Candidate name"
+                  error={fieldErrors.candidateName}
+                >
                   <IconAffix icon={<UserRound className="size-4" />}>
                     <Input
                       id="candidateName"
                       iconAffix="leading"
                       value={candidateName}
-                      onChange={(event) => setCandidateName(event.target.value)}
+                      onChange={(event) => {
+                        setCandidateName(event.target.value)
+                        clearFieldError('candidateName', setFieldErrors)
+                      }}
                       placeholder="e.g. Jane Doe"
                       disabled={submitting}
                     />
                   </IconAffix>
                 </FormField>
 
-                <FormField htmlFor="position" label="Position">
+                <FormField htmlFor="position" label="Position" error={fieldErrors.position}>
                   <IconAffix icon={<BriefcaseBusiness className="size-4" />}>
                     <Input
                       id="position"
                       iconAffix="leading"
                       value={position}
-                      onChange={(event) => setPosition(event.target.value)}
+                      onChange={(event) => {
+                        setPosition(event.target.value)
+                        clearFieldError('position', setFieldErrors)
+                      }}
                       placeholder="e.g. Senior Frontend Engineer"
                       disabled={submitting}
                     />
@@ -250,6 +259,7 @@ function NewInterviewPageContent() {
                   variant="gradient"
                   width="full"
                   disabled={submitting || selectedCount === 0}
+                  aria-describedby={fieldErrors.questions ? questionsErrorId : undefined}
                 >
                   {submitting ? 'Creating...' : `Create Interview${selectedCount > 0 ? ` (${selectedCount})` : ''}`}
                   <ArrowRight className="size-4" />
@@ -300,6 +310,16 @@ function NewInterviewPageContent() {
                 </Stack>
                 <StatusPill tone="neutral">{selectedCount} selected</StatusPill>
               </Inline>
+              {fieldErrors.questions ? (
+                <BodyText
+                  id={questionsErrorId}
+                  role="alert"
+                  size="sm"
+                  tone="danger"
+                >
+                  {fieldErrors.questions}
+                </BodyText>
+              ) : null}
             </CardHeader>
             <CardContent spacing="md">
               <QuestionPickerToolbar

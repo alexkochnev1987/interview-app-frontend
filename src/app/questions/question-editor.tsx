@@ -14,18 +14,19 @@ import { EditorRubricSection } from '@/components/questions/editor/editor-rubric
 import { QuestionEditorHeader } from '@/components/questions/editor/question-editor-header'
 import { QuestionEditorSaveBar } from '@/components/questions/editor/question-editor-save-bar'
 import { SimilarityPanel } from '@/components/questions/editor/similarity-panel'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import {
   draftQuestion,
   type QuestionDraft,
   type QuestionInput,
 } from '@/lib/api'
+import { clearFieldError } from '@/lib/clear-field-error'
+import { type FieldErrors } from '@/lib/form-validation'
+import { validateQuestionForm } from '@/lib/question-editor/validate-question-form'
 import {
   DRAFT_FIELDS,
   areEqual,
   formatMetadata,
   normalizeInitialValue,
-  parseMetadata,
   type DraftFieldKey,
 } from '@/lib/question-editor/parsers'
 import { FEEDBACK_POLICY } from '@/lib/feedback-policy'
@@ -35,6 +36,7 @@ import { useDirtyTracking } from './use-dirty-tracking'
 import { useSimilaritySearch } from './use-similarity-search'
 
 type AiStatus = 'idle' | 'loading' | 'error'
+type QuestionFormField = 'questionText' | 'metadata'
 
 interface QuestionEditorProps {
   questionId?: string
@@ -65,7 +67,8 @@ export function QuestionEditor({
   const [aiStatus, setAiStatus] = useState<AiStatus>('idle')
   const [aiDraft, setAiDraft] = useState<QuestionDraft | null>(null)
   const [dismissedDraftFields, setDismissedDraftFields] = useState<DraftFieldKey[]>([])
-  const [error, setError] = useState<string | null>(null)
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors<QuestionFormField>>({})
+  const [aiError, setAiError] = useState<string | null>(null)
 
   const { dirtyFields, isDirty, markSaved } = useDirtyTracking({
     value,
@@ -76,16 +79,29 @@ export function QuestionEditor({
   const similarity = useSimilaritySearch({ value, questionId })
 
   function update(patch: Partial<QuestionInput>) {
+    if ('questionText' in patch) {
+      clearFieldError('questionText', setFieldErrors)
+    }
     setValue((current) => ({ ...current, ...patch }))
+  }
+
+  function handleMetadataTextChange(next: string) {
+    clearFieldError('metadata', setFieldErrors)
+    setMetadataText(next)
   }
 
   async function handleGenerate() {
     if (!value.questionText.trim()) {
-      setError('Question text is required before AI generation.')
+      setAiError(null)
+      setFieldErrors((prev) => ({
+        ...prev,
+        questionText: 'Question text is required before AI generation.',
+      }))
       return
     }
 
-    setError(null)
+    clearFieldError('questionText', setFieldErrors)
+    setAiError(null)
     setAiStatus('loading')
 
     try {
@@ -97,7 +113,7 @@ export function QuestionEditor({
       setAiDraft(null)
       setDismissedDraftFields([])
       setAiStatus('error')
-      setError(
+      setAiError(
         err instanceof Error
           ? err.message
           : FEEDBACK_POLICY.draftQuestion.inlineErrorFallback,
@@ -148,13 +164,17 @@ export function QuestionEditor({
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
-    setError(null)
 
-    let metadata: Record<string, unknown>
-    try {
-      metadata = parseMetadata(metadataText)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Invalid metadata JSON.')
+    const { errors, metadata } = validateQuestionForm({
+      questionText: value.questionText,
+      metadataText,
+    })
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors)
+      return
+    }
+
+    if (!metadata) {
       return
     }
 
@@ -177,11 +197,7 @@ export function QuestionEditor({
       metadata,
     }
 
-    if (!payload.questionText) {
-      setError('Question text is required.')
-      return
-    }
-
+    setFieldErrors({})
     setSubmitting(true)
 
     try {
@@ -212,13 +228,6 @@ export function QuestionEditor({
         pendingDraftCount={pendingDraftFields.length}
       />
 
-      {error ? (
-        <Alert variant="danger">
-          <AlertTitle>{TOAST_MESSAGES.pageGate.questions.editorIssueTitle}</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      ) : null}
-
       <TwoColumnLayout
         main={(
           <form onSubmit={handleSubmit}>
@@ -228,6 +237,7 @@ export function QuestionEditor({
               submitting={submitting}
               onUpdate={update}
               renderAiSuggestion={renderAiSuggestion}
+              questionTextError={fieldErrors.questionText}
             />
             <EditorIdentitySection
               value={value}
@@ -246,8 +256,9 @@ export function QuestionEditor({
               metadataText={metadataText}
               submitting={submitting}
               onUpdate={update}
-              onMetadataTextChange={setMetadataText}
+              onMetadataTextChange={handleMetadataTextChange}
               renderAiSuggestion={renderAiSuggestion}
+              metadataError={fieldErrors.metadata}
             />
             <QuestionEditorSaveBar
               isDirty={isDirty}
@@ -265,6 +276,7 @@ export function QuestionEditor({
               pendingCount={pendingDraftFields.length}
               loading={aiStatus === 'loading'}
               disabled={submitting}
+              error={aiError ?? undefined}
               onGenerate={handleGenerate}
               onApplyAll={applyAllAiFields}
             />

@@ -19,27 +19,42 @@ import { Stack } from '@/components/ui/layout/stack'
 import { BodyText, SectionHeading } from '@/components/ui/text'
 import { useAuth } from '@/lib/auth-context'
 import { login } from '@/lib/api'
+import { clearFieldError } from '@/lib/clear-field-error'
+import { type FieldErrors, validateLogin } from '@/lib/form-validation'
+
+type LoginField = 'email' | 'password'
 
 export default function LoginPage() {
   const router = useRouter()
   const { establishSession } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors<LoginField>>({})
+  const [authError, setAuthError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    setError('')
+
+    const errors = validateLogin({ email, password })
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors)
+      setAuthError(null)
+      return
+    }
+
+    const trimmedEmail = email.trim()
+    setFieldErrors({})
+    setAuthError(null)
     setLoading(true)
 
     try {
-      const sessionUser = await login({ email, password })
+      const sessionUser = await login({ email: trimmedEmail, password })
       establishSession(sessionUser)
       router.push('/')
       router.refresh()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed')
+      setAuthError(err instanceof Error ? err.message : 'Login failed')
     } finally {
       setLoading(false)
     }
@@ -120,37 +135,44 @@ export default function LoginPage() {
             <CardTitle size="xl">Sign in</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} noValidate>
               <Stack gap={6}>
-              {error ? (
-                <Alert variant="danger">
-                  <AlertTitle>Authentication failed</AlertTitle>
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              ) : null}
               <Stack gap={4}>
-                <FormField htmlFor="email" label="Email">
+                <FormField htmlFor="email" label="Email" error={fieldErrors.email}>
                   <Input
                     id="email"
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value)
+                      clearFieldError('email', setFieldErrors)
+                      setAuthError(null)
+                    }}
                     placeholder="admin@interview-app.com"
-                    required
                   />
                 </FormField>
 
-                <FormField htmlFor="password" label="Password">
+                <FormField htmlFor="password" label="Password" error={fieldErrors.password}>
                   <Input
                     id="password"
                     type="password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                      setPassword(e.target.value)
+                      clearFieldError('password', setFieldErrors)
+                      setAuthError(null)
+                    }}
                     placeholder="Password"
-                    required
                   />
                 </FormField>
               </Stack>
+
+              {authError ? (
+                <Alert variant="danger">
+                  <AlertTitle>Sign in failed</AlertTitle>
+                  <AlertDescription>{authError}</AlertDescription>
+                </Alert>
+              ) : null}
 
               <Button
                 type="submit"

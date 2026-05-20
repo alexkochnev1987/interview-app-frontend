@@ -5,6 +5,7 @@ import { type ReactNode } from 'react'
 
 import { Input } from '@/components/ui/input'
 import { Grid } from '@/components/ui/layout/grid'
+import { Stack } from '@/components/ui/layout/stack'
 import {
   Select,
   SelectContent,
@@ -86,84 +87,94 @@ export function EditorIdentitySection({
       </Grid>
 
       <Grid columns="identity-5" gap={5}>
-        <QuestionEditorField htmlFor="category" label="Category">
-          <Input
-            id="category"
-            value={value.category ?? ''}
-            onChange={(event) => onUpdate({ category: event.target.value })}
-            placeholder="javascript"
-            disabled={submitting}
-          />
+        <Stack gap={2}>
+          <QuestionEditorField htmlFor="category" label="Category">
+            <Input
+              id="category"
+              value={value.category ?? ''}
+              onChange={(event) => onUpdate({ category: event.target.value })}
+              placeholder="javascript"
+              disabled={submitting}
+            />
+          </QuestionEditorField>
           {renderAiSuggestion('category')}
-        </QuestionEditorField>
+        </Stack>
 
-        <QuestionEditorField htmlFor="subcategory" label="Subcategory">
-          <Input
-            id="subcategory"
-            value={value.subcategory ?? ''}
-            onChange={(event) => onUpdate({ subcategory: event.target.value })}
-            placeholder="closures"
-            disabled={submitting}
-          />
+        <Stack gap={2}>
+          <QuestionEditorField htmlFor="subcategory" label="Subcategory">
+            <Input
+              id="subcategory"
+              value={value.subcategory ?? ''}
+              onChange={(event) => onUpdate({ subcategory: event.target.value })}
+              placeholder="closures"
+              disabled={submitting}
+            />
+          </QuestionEditorField>
           {renderAiSuggestion('subcategory')}
-        </QuestionEditorField>
+        </Stack>
 
-        <QuestionEditorField htmlFor="difficulty" label="Difficulty">
-          <Select
-            value={value.difficulty}
-            onValueChange={(next) =>
-              onUpdate({ difficulty: next as QuestionDifficulty })
-            }
-            disabled={submitting}
-          >
-            <SelectTrigger variant="surface" size="md" shape="rounded">
-              <SelectValue placeholder="Select difficulty" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="easy">easy</SelectItem>
-              <SelectItem value="medium">medium</SelectItem>
-              <SelectItem value="hard">hard</SelectItem>
-            </SelectContent>
-          </Select>
+        <Stack gap={2}>
+          <QuestionEditorField htmlFor="difficulty" label="Difficulty">
+            <Select
+              value={value.difficulty}
+              onValueChange={(next) =>
+                onUpdate({ difficulty: next as QuestionDifficulty })
+              }
+              disabled={submitting}
+            >
+              <SelectTrigger variant="surface" size="md" shape="rounded">
+                <SelectValue placeholder="Select difficulty" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="easy">easy</SelectItem>
+                <SelectItem value="medium">medium</SelectItem>
+                <SelectItem value="hard">hard</SelectItem>
+              </SelectContent>
+            </Select>
+          </QuestionEditorField>
           {renderAiSuggestion('difficulty')}
-        </QuestionEditorField>
+        </Stack>
 
-        <QuestionEditorField htmlFor="weight" label="Weight">
-          <Input
-            id="weight"
-            type="number"
-            min={0.1}
-            max={10}
-            step={0.1}
-            value={value.weight}
-            onChange={(event) =>
-              onUpdate({ weight: Math.max(0.1, Number(event.target.value) || 1) })
-            }
-            disabled={submitting}
-          />
+        <Stack gap={2}>
+          <QuestionEditorField htmlFor="weight" label="Weight">
+            <Input
+              id="weight"
+              type="number"
+              min={0.1}
+              max={10}
+              step={0.1}
+              value={value.weight}
+              onChange={(event) =>
+                onUpdate({ weight: Math.max(0.1, Number(event.target.value) || 1) })
+              }
+              disabled={submitting}
+            />
+          </QuestionEditorField>
           {renderAiSuggestion('weight')}
-        </QuestionEditorField>
+        </Stack>
 
-        <QuestionEditorField htmlFor="minimumPassScore" label="Minimum pass score">
-          <Input
-            id="minimumPassScore"
-            type="number"
-            min={0}
-            max={5}
-            step={0.1}
-            value={value.minimumPassScore}
-            onChange={(event) =>
-              onUpdate({
-                minimumPassScore: Math.max(
-                  0,
-                  Math.min(5, Number(event.target.value) || 0),
-                ),
-              })
-            }
-            disabled={submitting}
-          />
+        <Stack gap={2}>
+          <QuestionEditorField htmlFor="minimumPassScore" label="Minimum pass score">
+            <Input
+              id="minimumPassScore"
+              type="number"
+              min={0}
+              max={5}
+              step={0.1}
+              value={value.minimumPassScore}
+              onChange={(event) =>
+                onUpdate({
+                  minimumPassScore: Math.max(
+                    0,
+                    Math.min(5, Number(event.target.value) || 0),
+                  ),
+                })
+              }
+              disabled={submitting}
+            />
+          </QuestionEditorField>
           {renderAiSuggestion('minimumPassScore')}
-        </QuestionEditorField>
+        </Stack>
       </Grid>
     </EditorSectionCard>
   )
