@@ -7,6 +7,7 @@ import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { type Interview, type InterviewResult } from '@/lib/api'
 import { loadAuthGate } from '@/lib/auth-gate'
 import { canConfigureInterview } from '@/lib/auth-roles'
+import { prefetchInterviewDetailExtras } from '@/lib/interview-detail-prefetch'
 import { isForbiddenError, requestServer } from '@/lib/server-fetch'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
@@ -100,11 +101,14 @@ export default async function InterviewDetailPage({
     )
   }
 
+  const extras = await prefetchInterviewDetailExtras(id, interview, auth.ctx)
+
   return (
     <InterviewDetailClient
       id={id}
       initialInterview={interview}
       initialResults={results}
+      initialExtras={extras}
     />
   )
 }

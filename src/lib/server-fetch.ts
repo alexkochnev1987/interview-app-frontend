@@ -79,19 +79,7 @@ function safeErrorMessage(status: number, body: string): string {
 
 const SERVER_REQUEST_TIMEOUT_MS = 15_000
 
-export async function requestServer<T>(
-  path: string,
-  ctx: ServerRequestContext,
-): Promise<T | undefined> {
-  const res = await fetch(`${ctx.origin}/api${path}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      cookie: ctx.cookieHeader,
-    },
-    cache: 'no-store',
-    signal: AbortSignal.timeout(SERVER_REQUEST_TIMEOUT_MS),
-  })
-
+async function parseServerResponse<T>(res: Response, path: string): Promise<T | undefined> {
   if (!res.ok) {
     const body = await res.text()
     throw new ApiError(res.status, safeErrorMessage(res.status, body), path, body)
@@ -113,4 +101,22 @@ export async function requestServer<T>(
   }
 
   return JSON.parse(body) as T
+}
+
+export async function requestServer<T>(
+  path: string,
+  ctx: ServerRequestContext,
+  options?: { method?: 'GET' | 'POST' },
+): Promise<T | undefined> {
+  const res = await fetch(`${ctx.origin}/api${path}`, {
+    method: options?.method ?? 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      cookie: ctx.cookieHeader,
+    },
+    cache: 'no-store',
+    signal: AbortSignal.timeout(SERVER_REQUEST_TIMEOUT_MS),
+  })
+
+  return parseServerResponse<T>(res, path)
 }
