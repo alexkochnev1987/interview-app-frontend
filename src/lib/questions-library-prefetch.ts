@@ -63,3 +63,11 @@ export async function prefetchQuestionsLibrary(
     ? { queryState, listData: questions, facets }
     : { queryState, infiniteFirstPage: questions, facets }
 }
+
+export async function prefetchInterviewCreatePicker(
+  ctx: ServerRequestContext,
+): Promise<QuestionsLibraryPrefetch> {
+  return prefetchQuestionsLibrary(ctx, new URLSearchParams(), {
+    lockStatus: 'active',
+  })
+}

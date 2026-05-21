@@ -38,12 +38,17 @@ import { Input } from '@/components/ui/input'
 import { Pagination } from '@/components/ui/pagination'
 import { BodyText, SectionHeading } from '@/components/ui/text'
 import { createInterview, type Question } from '@/lib/api'
+import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
 import { runMutation } from '@/lib/run-mutation'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 const INTERVIEW_GATE = TOAST_MESSAGES.pageGate.interview
 
-export function InterviewCreateForm() {
+type InterviewCreateFormProps = {
+  initialPrefetch: QuestionsLibraryPrefetch
+}
+
+export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProps) {
   const router = useRouter()
   const [candidateName, setCandidateName] = useState('')
   const [position, setPosition] = useState('')
@@ -51,8 +56,20 @@ export function InterviewCreateForm() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const query = useQuestionsQuery({ syncUrl: false, lockStatus: 'active' })
-  const facetsResult = useQuestionFacets(query.state, query.debouncedQ)
+  const initialListData =
+    initialPrefetch.listData ?? initialPrefetch.infiniteFirstPage
+
+  const query = useQuestionsQuery({
+    initial: initialPrefetch.queryState,
+    initialListData,
+    syncUrl: false,
+    lockStatus: 'active',
+  })
+  const facetsResult = useQuestionFacets(
+    query.state,
+    query.debouncedQ,
+    initialPrefetch.facets,
+  )
   const facets = facetsResult.facets
 
   const activeChips = buildActiveFilterChips(

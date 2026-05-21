@@ -121,6 +121,7 @@ export function useQuestionsQuery(
     lockStatus,
     disableFetchInCardsView,
   } = options
+  const hasServerListData = Boolean(initialListData)
   const [capturedInitial] = useState<Partial<QuestionsQueryState> | undefined>(initial)
   const router = useRouter()
   const pathname = usePathname()
@@ -139,13 +140,14 @@ export function useQuestionsQuery(
   useEffect(() => {
     if (hydratedStoredViewRef.current) return
     hydratedStoredViewRef.current = true
+    if (hasServerListData) return
     if (syncUrl && searchParams?.get('view') !== null) return
     const stored = readStoredView()
     if (stored) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- post-mount SSR-safe localStorage hydration of view preference
       setState((prev) => (prev.view === stored ? prev : { ...prev, view: stored }))
     }
-  }, [syncUrl, searchParams])
+  }, [hasServerListData, syncUrl, searchParams])
   const [debouncedQ, setDebouncedQ] = useState(() => state.q)
   const lastWrittenUrlRef = useRef<string | null>(
     syncUrl && searchParams ? searchParams.toString() : null,

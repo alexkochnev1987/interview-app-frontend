@@ -7,6 +7,7 @@ import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { loadAuthGate } from '@/lib/auth-gate'
 import { canConfigureInterview } from '@/lib/auth-roles'
+import { prefetchInterviewCreatePicker } from '@/lib/questions-library-prefetch'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 const INTERVIEW_GATE = TOAST_MESSAGES.pageGate.interview
@@ -37,10 +38,26 @@ export default async function NewInterviewPage() {
     )
   }
 
+  let initialPrefetch
+  try {
+    initialPrefetch = await prefetchInterviewCreatePicker(auth.ctx)
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : 'Failed to load questions.'
+    return (
+      <FlashErrorPageFallback
+        title={INTERVIEW_GATE.createUnavailableTitle}
+        description={message}
+        backHref={ERROR_BACK_HREF}
+        backLabel={ERROR_BACK_LABEL}
+      />
+    )
+  }
+
   return (
     <PageShell>
       <InterviewCreateIntro />
-      <InterviewCreateForm />
+      <InterviewCreateForm initialPrefetch={initialPrefetch} />
     </PageShell>
   )
 }
