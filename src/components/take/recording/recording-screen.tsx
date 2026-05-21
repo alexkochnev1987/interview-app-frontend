@@ -18,7 +18,6 @@ interface TakeRecordingScreenProps {
   stage: TakeStage;
   recording: boolean;
   progressValue: number;
-  screenSurface: string;
   setupError: string;
   capturePipelineReady: boolean;
   submitError: string;
@@ -45,12 +44,10 @@ export function TakeRecordingScreen({
   stage,
   recording,
   progressValue,
-  screenSurface,
   setupError,
   capturePipelineReady,
   submitError,
   timeLeft,
-  versionPersistKind,
   uploading,
   isBrowserTranscriptSupported,
   finalTranscript,
@@ -76,12 +73,8 @@ export function TakeRecordingScreen({
         <TakeRecordingHeader
           interview={interview}
           currentVersionNumber={currentVersionNumber}
-          screenSurface={screenSurface}
           setupError={setupError}
           stage={stage}
-          recording={recording}
-          recordingStartBusy={recordingStartBusy}
-          versionPersistKind={versionPersistKind}
         />
 
         <Grid as="section" columns="aside-24" gap={4} grow="fill" align="stretch">

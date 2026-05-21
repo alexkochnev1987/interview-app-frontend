@@ -1,73 +1,52 @@
-'use client'
-
-import { useParams, useSearchParams } from 'next/navigation'
+import { unstable_noStore as noStore } from 'next/cache'
 import { AlertCircle } from 'lucide-react'
 
 import { PageContent, PageMainLayout } from '@/components/layout/page-shell'
-import {
-  TakeCompleteScreen,
-  TakeConsentScreen,
-  TakeLobbyScreen,
-  TakeRecordingScreen,
-} from '@/components/take'
+import { TakeInterviewClient } from '@/app/take/[id]/take-interview-client'
 import { Icon } from '@/components/ui/icon'
-import { EmptyStateCard, LoadingStateCard } from '@/components/ui/state-card'
-import {
-  useTakeInterviewBeforeUnload,
-  useTakeOrchestrator,
-} from '@/features/take'
+import { EmptyStateCard } from '@/components/ui/state-card'
+import { type TakeInterviewData } from '@/lib/api'
+import { getServerRequestContext, requestServer } from '@/lib/server-fetch'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
-export default function TakeInterviewPage() {
-  const params = useParams()
-  const searchParams = useSearchParams()
-  const id = params.id as string
-  const candidateToken = searchParams.get('token')?.trim() ?? ''
-  const {
-    stage,
-    interview,
-    error,
-    consent,
-    cameraStatus,
-    screenStatus,
-    screenSurface,
-    setupBusy,
-    setupError,
-    submitError,
-    timeLeft,
-    versionPersistKind,
-    uploading,
-    isBrowserTranscriptSupported,
-    finalTranscript,
-    interimTranscript,
-    browserTranscriptWarning,
-    videoRef,
-    screenVideoRef,
-    progressValue,
-    setConsent,
-    proceedToLobby,
-    restartFullInterviewCapture,
-    attachLobbyScreenShare,
-    toggleLobbyMic,
-    toggleLobbyCamera,
-    lobbyMicOn,
-    lobbyCameraOn,
-    lobbyJoinReady,
-    recording,
-    startInterviewFromLobby,
-    recordingStartBusy,
-    capturePipelineReady,
-    currentVersionNumber,
-    requestVersionAction,
-    permissionLabel,
-    permissionTone,
-    formatTime,
-    interviewerPresence,
-  } = useTakeOrchestrator({ id, candidateToken })
+interface TakeInterviewPageProps {
+  params: Promise<{ id: string }>
+  searchParams: Promise<{ token?: string | string[] }>
+}
 
-  useTakeInterviewBeforeUnload(stage)
+function readToken(value: string | string[] | undefined): string {
+  if (typeof value === 'string') return value.trim()
+  if (Array.isArray(value)) return (value[0] ?? '').trim()
+  return ''
+}
 
-  if (error && !interview) {
+export default async function TakeInterviewPage({
+  params,
+  searchParams,
+}: TakeInterviewPageProps) {
+  noStore()
+
+  const { id } = await params
+  const token = readToken((await searchParams).token)
+  const ctx = await getServerRequestContext()
+  const encodedId = encodeURIComponent(id)
+
+  let interview: TakeInterviewData | null = null
+  let error: string | null = null
+
+  try {
+    interview =
+      (await requestServer<TakeInterviewData>(`/take/${encodedId}`, ctx, {
+        query: token ? { token } : undefined,
+      })) ?? null
+  } catch (err) {
+    error =
+      err instanceof Error
+        ? err.message
+        : 'Failed to load interview.'
+  }
+
+  if (error || !interview) {
     return (
       <PageMainLayout>
         <PageContent>
@@ -78,87 +57,18 @@ export default function TakeInterviewPage() {
               </Icon>
             }
             title={TOAST_MESSAGES.pageGate.interview.unavailableTitle}
-            description={error}
+            description={error ?? 'Failed to load interview.'}
           />
         </PageContent>
       </PageMainLayout>
     )
   }
 
-  if (stage === 'loading' || !interview) {
-    return (
-      <PageMainLayout>
-        <LoadingStateCard label="Loading interview..." />
-      </PageMainLayout>
-    )
-  }
-
-  if (stage === 'complete') {
-    return (
-      <TakeCompleteScreen candidateName={interview.candidateName} position={interview.position} />
-    )
-  }
-
-  if (stage === 'consent') {
-    return (
-      <TakeConsentScreen
-        interview={interview}
-        consent={consent}
-        setupError={setupError}
-        onConsentChange={setConsent}
-        onContinueToLobby={proceedToLobby}
-      />
-    )
-  }
-
-  if (stage === 'lobby') {
-    return (
-      <TakeLobbyScreen
-        cameraStatus={cameraStatus}
-        screenStatus={screenStatus}
-        screenSurface={screenSurface}
-        setupBusy={setupBusy}
-        setupError={setupError}
-        videoRef={videoRef}
-        permissionLabel={permissionLabel}
-        permissionTone={permissionTone}
-        lobbyMicOn={lobbyMicOn}
-        lobbyCameraOn={lobbyCameraOn}
-        lobbyJoinReady={lobbyJoinReady}
-        onToggleMic={() => void toggleLobbyMic()}
-        onToggleCamera={() => void toggleLobbyCamera()}
-        onScreenShare={() => void attachLobbyScreenShare()}
-        onJoin={startInterviewFromLobby}
-      />
-    )
-  }
-
   return (
-    <TakeRecordingScreen
-      interview={interview}
-      currentVersionNumber={currentVersionNumber}
-      stage={stage}
-      recording={recording}
-      progressValue={progressValue}
-      screenSurface={screenSurface}
-      setupError={setupError}
-      capturePipelineReady={capturePipelineReady}
-      submitError={submitError}
-      timeLeft={timeLeft}
-      versionPersistKind={versionPersistKind}
-      uploading={uploading}
-      isBrowserTranscriptSupported={isBrowserTranscriptSupported}
-      finalTranscript={finalTranscript}
-      interimTranscript={interimTranscript}
-      browserTranscriptWarning={browserTranscriptWarning}
-      videoRef={videoRef}
-      screenVideoRef={screenVideoRef}
-      interviewerPresence={interviewerPresence}
-      formatTime={formatTime}
-      recordingStartBusy={recordingStartBusy}
-      onReconnect={restartFullInterviewCapture}
-      onRerecord={() => requestVersionAction('rerecord')}
-      onSubmit={() => requestVersionAction('submit')}
+    <TakeInterviewClient
+      id={id}
+      candidateToken={token}
+      initialInterview={interview}
     />
   )
 }

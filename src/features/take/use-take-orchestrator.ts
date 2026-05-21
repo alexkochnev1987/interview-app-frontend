@@ -47,6 +47,7 @@ const PREVIEW_STAGES = new Set<TakeStage>(['interview', 'recording', 'lobby']);
 interface UseTakeOrchestratorParams {
   id: string;
   candidateToken: string;
+  initialInterview?: TakeInterviewData;
 }
 
 function syncVideoPreview(node: HTMLVideoElement | null, stream: MediaStream | null) {
@@ -68,7 +69,7 @@ function setStreamTracksEnabled(stream: MediaStream, kind: 'audio' | 'video', en
   });
 }
 
-export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorParams) {
+export function useTakeOrchestrator({ id, candidateToken, initialInterview }: UseTakeOrchestratorParams) {
   const {
     isSupported: isBrowserTranscriptSupported,
     interimTranscript,
@@ -96,8 +97,14 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     ],
   );
 
-  const [stage, setStage] = useState<TakeStage>('loading');
-  const [interview, setInterview] = useState<TakeInterviewData | null>(null);
+  const [stage, setStage] = useState<TakeStage>(() =>
+    initialInterview
+      ? stageAfterInterviewLoad(initialInterview, 'initial')
+      : 'loading',
+  );
+  const [interview, setInterview] = useState<TakeInterviewData | null>(
+    initialInterview ?? null,
+  );
   const [error, setError] = useState('');
   const [consent, setConsent] = useState(false);
   const [recording, setRecording] = useState(false);
@@ -220,9 +227,17 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     getBrowserTranscriptSnapshot,
   });
 
+  useEffect(() => {
+    if (!initialInterview || !candidateToken || typeof window === 'undefined') {
+      return
+    }
+    window.history.replaceState(null, '', `/take/${id}`)
+  }, [initialInterview, candidateToken, id])
+
   const { loadInterview } = useTakeInterviewLoader({
     id,
     candidateToken,
+    skipInitialLoad: Boolean(initialInterview),
     onData: (data, mode, tokenOverride) => {
       setInterview(data);
       if (mode === 'initial' && tokenOverride && typeof window !== 'undefined') {

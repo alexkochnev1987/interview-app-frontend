@@ -36,23 +36,14 @@ export const TAKE_MESSAGES = {
   consentContinue: 'Continue to device check',
   consentPrepHint:
     "Next you'll activate your microphone and camera, preview yourself, then share your entire screen to join.",
-
   guidanceInterview:
     'While recording, tap Submit when you are finished, or Retake to record another attempt.',
-
   guidanceBeforeRecording:
     'Your camera and full screen share stay on. Recording starts automatically when this question is ready.',
-
   guidanceInterviewerSpeaking:
     'The interviewer is reading the question aloud. Recording will start automatically when they finish.',
-
-  sessionReadyLabel: 'Ready to record',
-
   recordingSessionTitleInterview: 'Interview',
-
-  recordingPrepLabel: 'Preparing session…',
   recordingStartingBusy: 'Starting recording…',
-
   beforeUnloadLeaveInterview:
     'If you reload or leave now, you will exit this interview and may lose your progress. Are you sure?',
 } as const;
