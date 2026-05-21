@@ -25,7 +25,7 @@ function assertNever(value: never): never {
   throw new Error(`Unhandled interview status: ${String(value)}`)
 }
 
-export function isValidationInFlight(interview: Interview): boolean {
+function isValidationInFlight(interview: Interview): boolean {
   return interview.answers.some(
     (a) =>
       a.status === 'submitted' &&
@@ -136,7 +136,7 @@ export function getCompletionDate(interview: Interview): string | null {
   return null
 }
 
-export const PLACEHOLDER_RESULT_SUMMARY = 'Simulated evaluation result'
+const PLACEHOLDER_RESULT_SUMMARY = 'Simulated evaluation result'
 
 export function isPlaceholderResult(result: InterviewResult): boolean {
   return result.summary === PLACEHOLDER_RESULT_SUMMARY

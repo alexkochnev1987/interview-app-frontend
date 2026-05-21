@@ -215,9 +215,7 @@ export function QuestionsLibraryClient({
   const viewItems = isCardsView ? infinite.items : query.items
   const viewTotal = isCardsView ? infinite.total : query.total
   const viewLoading = isCardsView ? infinite.isInitialLoading : query.loading
-  const viewError = isCardsView
-    ? infinite.items.length === 0 ? infinite.error : null
-    : query.error
+  const viewError = isCardsView ? infinite.blockingError : query.error
   const viewRetry = isCardsView ? infinite.refetch : query.refetch
   const allEmpty =
     viewItems.length === 0 &&
@@ -402,7 +400,7 @@ export function QuestionsLibraryClient({
           isFetchingNextPage={infinite.isFetchingNextPage}
           totalLoaded={infinite.items.length}
           total={infinite.total}
-          error={infinite.error}
+          error={infinite.paginationError}
           onLoadMore={infinite.fetchNextPage}
         />
       ) : null}

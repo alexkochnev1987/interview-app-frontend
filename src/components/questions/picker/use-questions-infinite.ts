@@ -23,7 +23,8 @@ export type UseQuestionsInfiniteResult = {
   isFetchingNextPage: boolean
   isInitialLoading: boolean
   isFetching: boolean
-  error: string | null
+  blockingError: string | null
+  paginationError: string | null
   fetchNextPage: () => void
   refetch: () => void
 }
@@ -62,6 +63,15 @@ export function useQuestionsInfinite({
     void queryRefetch()
   }, [queryRefetch])
 
+  const errorMessage =
+    query.error instanceof Error ? query.error.message : null
+  const paginationError =
+    errorMessage != null && items.length > 0 && !query.isPlaceholderData
+      ? errorMessage
+      : null
+  const blockingError =
+    errorMessage != null && paginationError == null ? errorMessage : null
+
   return {
     items,
     total,
@@ -71,7 +81,8 @@ export function useQuestionsInfinite({
       (!serverHydrated && query.isPending && enabled) ||
       (query.isFetching && query.isPlaceholderData && enabled),
     isFetching: query.isFetching,
-    error: query.error instanceof Error ? query.error.message : null,
+    blockingError,
+    paginationError,
     fetchNextPage,
     refetch,
   }

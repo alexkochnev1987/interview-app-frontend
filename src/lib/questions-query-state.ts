@@ -105,7 +105,7 @@ export function readQuestionsFromSearchParams(
   return next
 }
 
-export function buildQuestionFilterParams(
+function buildQuestionFilterParams(
   state: Pick<
     QuestionsQueryState,
     'difficulty' | 'category' | 'subcategory' | 'tags' | 'role' | 'status'

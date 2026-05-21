@@ -2,12 +2,7 @@ import createClient from 'openapi-fetch';
 import { paths, components } from './api-types';
 import { ApiError } from './api-error';
 
-export {
-  ApiError,
-  isAuthError,
-  isForbiddenError,
-  isUnauthorizedError,
-} from './api-error';
+export { ApiError } from './api-error';
 
 const client = createClient<paths>({
   baseUrl: '/api',
@@ -199,30 +194,8 @@ export async function login(data: LoginPayload): Promise<AuthUserResponseDto> {
   }));
 }
 
-export async function getCurrentUser(): Promise<AuthUserResponseDto> {
-  return handle(client.GET('/auth/me'));
-}
-
 export async function logout(): Promise<LogoutResponse> {
   return handle(client.POST('/auth/logout'));
-}
-
-export async function getFeedbackByToken(
-  id: string,
-  token: string,
-): Promise<FeedbackResponse> {
-  return handle(client.GET('/feedback/{id}', {
-    params: {
-      path: { id },
-      query: { token },
-    },
-  }));
-}
-
-export async function getQuestion(id: string): Promise<Question> {
-  return handle(client.GET('/questions/{id}', {
-    params: { path: { id } }
-  }));
 }
 
 export async function createQuestion(data: QuestionInput): Promise<Question> {
@@ -323,11 +296,6 @@ export async function findSimilarQuestions(
   return data.matches;
 }
 
-export async function fetchInterviews(): Promise<Interview[]> {
-  return handle(client.GET('/interviews'));
-
-}
-
 export async function createInterview(
   data: CreateInterviewPayload,
 ): Promise<Interview & CandidateLinkResponse> {
@@ -366,7 +334,7 @@ export async function getPresignedUrl(
   );
 }
 
-export async function completeUpload(
+async function completeUpload(
   interviewId: string,
   questionIndex: number,
   mediaKey: string,
@@ -386,12 +354,6 @@ export async function completeUploadAndFetchInterview(
 ): Promise<Interview> {
   await completeUpload(interviewId, questionIndex, mediaKey);
   return getInterview(interviewId);
-}
-
-export async function completeInterview(id: string): Promise<Interview> {
-  return handle(client.PATCH('/interviews/{id}/complete', {
-    params: { path: { id } }
-  }));
 }
 
 export async function validateInterview(

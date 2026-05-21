@@ -4,6 +4,7 @@ import { FeedbackView } from '@/components/feedback/feedback-view'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { type FeedbackResponse } from '@/lib/api'
 import { getServerRequestContext, requestServer } from '@/lib/server-fetch'
+import { readSearchParamToken } from '@/lib/text'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 const FEEDBACK_GATE = TOAST_MESSAGES.pageGate.feedback
@@ -13,12 +14,6 @@ interface FeedbackPageProps {
   searchParams: Promise<{ token?: string | string[] }>
 }
 
-function readToken(value: string | string[] | undefined): string {
-  if (typeof value === 'string') return value
-  if (Array.isArray(value)) return value[0] ?? ''
-  return ''
-}
-
 export default async function FeedbackPage({
   params,
   searchParams,
@@ -26,21 +21,19 @@ export default async function FeedbackPage({
   noStore()
 
   const { id } = await params
-  const token = readToken((await searchParams).token)
+  const token = readSearchParamToken((await searchParams).token)
 
   const ctx = await getServerRequestContext()
   const encodedId = encodeURIComponent(id)
-  const encodedToken = encodeURIComponent(token)
 
   let feedback: FeedbackResponse | null = null
   let error: string | null = null
 
   try {
     feedback =
-      (await requestServer<FeedbackResponse>(
-        `/feedback/${encodedId}?token=${encodedToken}`,
-        ctx,
-      )) ?? null
+      (await requestServer<FeedbackResponse>(`/feedback/${encodedId}`, ctx, {
+        query: token ? { token } : undefined,
+      })) ?? null
   } catch (err) {
     error =
       err instanceof Error

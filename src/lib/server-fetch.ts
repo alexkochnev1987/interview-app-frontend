@@ -3,31 +3,14 @@ import { cache } from 'react'
 
 import { ApiError } from './api-error'
 
-export {
-  ApiError,
-  isAuthError,
-  isForbiddenError,
-  isUnauthorizedError,
-} from './api-error'
+export { isForbiddenError } from './api-error'
 
-function firstForwardedValue(value: string | null): string | null {
-  if (!value) return null
-  const first = value.split(',')[0].trim()
-  return first || null
-}
+const DEFAULT_BACKEND_URL = 'http://localhost:3000'
 
-function resolveOrigin(headerStore: Headers): string {
-  const forwardedProto = firstForwardedValue(
-    headerStore.get('x-forwarded-proto'),
-  )
-  const forwardedHost = firstForwardedValue(headerStore.get('x-forwarded-host'))
-  const host = forwardedHost ?? headerStore.get('host')
-  if (!host) {
-    throw new Error('Unable to resolve request host for server-side API fetch.')
-  }
-  const protocol =
-    forwardedProto ?? (host.includes('localhost') ? 'http' : 'https')
-  return `${protocol}://${host}`
+function resolveTrustedApiBase(): string {
+  const configured = process.env.BACKEND_URL?.trim()
+  const base = configured || DEFAULT_BACKEND_URL
+  return base.replace(/\/$/, '')
 }
 
 export interface ServerRequestContext {
@@ -40,7 +23,7 @@ export const getServerRequestContext = cache(
     const headerStore = await headers()
     const rawCookieHeader = headerStore.get('cookie')
     const cookieHeader = rawCookieHeader ?? (await buildCookieHeaderFallback())
-    return { cookieHeader, origin: resolveOrigin(headerStore) }
+    return { cookieHeader, origin: resolveTrustedApiBase() }
   },
 )
 
@@ -128,10 +111,10 @@ export async function requestServer<T>(
 
 function buildServerApiUrl(
   path: string,
-  origin: string,
+  apiBase: string,
   query?: Record<string, unknown>,
 ): string {
-  const base = `${origin}/api${path}`
+  const base = `${apiBase}${path}`
   if (!query) return base
 
   const params = new URLSearchParams()

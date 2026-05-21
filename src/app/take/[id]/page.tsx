@@ -7,17 +7,12 @@ import { Icon } from '@/components/ui/icon'
 import { EmptyStateCard } from '@/components/ui/state-card'
 import { type TakeInterviewData } from '@/lib/api'
 import { getServerRequestContext, requestServer } from '@/lib/server-fetch'
+import { readSearchParamToken } from '@/lib/text'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 interface TakeInterviewPageProps {
   params: Promise<{ id: string }>
   searchParams: Promise<{ token?: string | string[] }>
-}
-
-function readToken(value: string | string[] | undefined): string {
-  if (typeof value === 'string') return value.trim()
-  if (Array.isArray(value)) return (value[0] ?? '').trim()
-  return ''
 }
 
 export default async function TakeInterviewPage({
@@ -27,7 +22,7 @@ export default async function TakeInterviewPage({
   noStore()
 
   const { id } = await params
-  const token = readToken((await searchParams).token)
+  const token = readSearchParamToken((await searchParams).token)
   const ctx = await getServerRequestContext()
   const encodedId = encodeURIComponent(id)
 

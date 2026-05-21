@@ -46,7 +46,7 @@ export function stopMediaStream(stream: MediaStream | null) {
   });
 }
 
-export function releaseCaptureStreams(
+function releaseCaptureStreams(
   cameraStreamRef: { current: MediaStream | null },
   screenStreamRef: { current: MediaStream | null },
   videoRef: { current: HTMLVideoElement | null },
@@ -73,7 +73,7 @@ export function releaseCameraCapture(
   }
 }
 
-export function clearVideoPreview(videoRef: { current: HTMLVideoElement | null }) {
+function clearVideoPreview(videoRef: { current: HTMLVideoElement | null }) {
   if (videoRef.current) {
     videoRef.current.srcObject = null;
   }
