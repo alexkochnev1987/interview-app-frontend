@@ -146,6 +146,7 @@ export function TakeInterviewClient({
       stage={stage}
       recording={recording}
       progressValue={progressValue}
+      screenSurface={screenSurface}
       setupError={setupError}
       capturePipelineReady={capturePipelineReady}
       submitError={submitError}

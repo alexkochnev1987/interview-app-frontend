@@ -43,6 +43,8 @@ export const TAKE_MESSAGES = {
   guidanceInterviewerSpeaking:
     'The interviewer is reading the question aloud. Recording will start automatically when they finish.',
   recordingSessionTitleInterview: 'Interview',
+  sessionReadyLabel: 'Ready to record',
+  recordingPrepLabel: 'Preparing session…',
   recordingStartingBusy: 'Starting recording…',
   beforeUnloadLeaveInterview:
     'If you reload or leave now, you will exit this interview and may lose your progress. Are you sure?',

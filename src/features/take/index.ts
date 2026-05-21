@@ -2,6 +2,7 @@ export * from './multipart';
 export * from './messages';
 export * from './progress';
 export * from './runtime';
+export * from './recording-header-status';
 export * from './session-machine';
 export * from './uploads';
 export * from './use-take-answer-persistence';
