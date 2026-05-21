@@ -1,6 +1,7 @@
 import { unstable_noStore as noStore } from 'next/cache'
 
 import { QuestionsLibraryClient } from '@/components/questions/library/questions-library-client'
+import { QueryHydrationBoundary } from '@/components/questions/query-hydration-boundary'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
@@ -68,10 +69,12 @@ export default async function QuestionsPage({ searchParams }: QuestionsPageProps
 
   return (
     <PageShell>
-      <QuestionsLibraryClient
-        isSuperAdmin={superAdmin}
-        initialPrefetch={initialPrefetch}
-      />
+      <QueryHydrationBoundary state={initialPrefetch.dehydratedState}>
+        <QuestionsLibraryClient
+          isSuperAdmin={superAdmin}
+          initialPrefetch={initialPrefetch}
+        />
+      </QueryHydrationBoundary>
     </PageShell>
   )
 }

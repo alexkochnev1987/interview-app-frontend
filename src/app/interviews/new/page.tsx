@@ -1,6 +1,7 @@
 import { unstable_noStore as noStore } from 'next/cache'
 
 import { InterviewCreateForm } from '@/components/interviews/interview-create-form'
+import { QueryHydrationBoundary } from '@/components/questions/query-hydration-boundary'
 import { InterviewCreateIntro } from '@/components/interviews/interview-create-intro'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
@@ -57,7 +58,9 @@ export default async function NewInterviewPage() {
   return (
     <PageShell>
       <InterviewCreateIntro />
-      <InterviewCreateForm initialPrefetch={initialPrefetch} />
+      <QueryHydrationBoundary state={initialPrefetch.dehydratedState}>
+        <InterviewCreateForm initialPrefetch={initialPrefetch} />
+      </QueryHydrationBoundary>
     </PageShell>
   )
 }

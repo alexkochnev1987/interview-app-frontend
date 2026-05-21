@@ -5,7 +5,6 @@ import { useCallback, useMemo } from 'react'
 import {
   fetchQuestions,
   type FetchQuestionsParams,
-  type PaginatedQuestions,
   type Question,
 } from '@/lib/api'
 
@@ -14,7 +13,7 @@ import { questionsInfiniteQueryKey } from './query-keys'
 export type UseQuestionsInfiniteOptions = {
   params: Omit<FetchQuestionsParams, 'page'>
   enabled: boolean
-  initialFirstPage?: PaginatedQuestions
+  serverHydrated?: boolean
 }
 
 export type UseQuestionsInfiniteResult = {
@@ -32,7 +31,7 @@ export type UseQuestionsInfiniteResult = {
 export function useQuestionsInfinite({
   params,
   enabled,
-  initialFirstPage,
+  serverHydrated,
 }: UseQuestionsInfiniteOptions): UseQuestionsInfiniteResult {
   const query = useInfiniteQuery({
     queryKey: questionsInfiniteQueryKey(params),
@@ -46,9 +45,6 @@ export function useQuestionsInfinite({
     },
     enabled,
     placeholderData: keepPreviousData,
-    initialData: initialFirstPage
-      ? { pages: [initialFirstPage], pageParams: [1] }
-      : undefined,
   })
 
   const items = useMemo(
@@ -72,7 +68,7 @@ export function useQuestionsInfinite({
     hasNextPage: query.hasNextPage ?? false,
     isFetchingNextPage: query.isFetchingNextPage,
     isInitialLoading:
-      (!initialFirstPage && query.isPending && enabled) ||
+      (!serverHydrated && query.isPending && enabled) ||
       (query.isFetching && query.isPlaceholderData && enabled),
     isFetching: query.isFetching,
     error: query.error instanceof Error ? query.error.message : null,

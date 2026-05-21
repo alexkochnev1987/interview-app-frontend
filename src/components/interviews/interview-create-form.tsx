@@ -56,20 +56,13 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const initialListData =
-    initialPrefetch.listData ?? initialPrefetch.infiniteFirstPage
-
   const query = useQuestionsQuery({
     initial: initialPrefetch.queryState,
-    initialListData,
+    serverHydrated: true,
     syncUrl: false,
     lockStatus: 'active',
   })
-  const facetsResult = useQuestionFacets(
-    query.state,
-    query.debouncedQ,
-    initialPrefetch.facets,
-  )
+  const facetsResult = useQuestionFacets(query.state, query.debouncedQ)
   const facets = facetsResult.facets
 
   const activeChips = buildActiveFilterChips(

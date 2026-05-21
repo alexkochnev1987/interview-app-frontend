@@ -51,7 +51,7 @@ export function QuestionsLibraryClient({
 
   const query = useQuestionsQuery({
     initial: initialPrefetch?.queryState,
-    initialListData: initialPrefetch?.listData,
+    serverHydrated: Boolean(initialPrefetch),
     syncUrl: true,
     lockStatus: isSuperAdmin ? undefined : 'active',
     disableFetchInCardsView: true,
@@ -80,7 +80,7 @@ export function QuestionsLibraryClient({
   const infinite = useQuestionsInfinite({
     params: cardsInfiniteParams,
     enabled: isCardsView,
-    initialFirstPage: initialPrefetch?.infiniteFirstPage,
+    serverHydrated: Boolean(initialPrefetch),
   })
 
   const cardsScrollRootRef = useRef<HTMLDivElement>(null)
@@ -105,11 +105,7 @@ export function QuestionsLibraryClient({
       block: 'start',
     })
   }, [cardsFilterSignature, isCardsView])
-  const facetsResult = useQuestionFacets(
-    query.state,
-    query.debouncedQ,
-    initialPrefetch?.facets,
-  )
+  const facetsResult = useQuestionFacets(query.state, query.debouncedQ)
   const facets = facetsResult.facets
 
   const activeChips = buildActiveFilterChips(

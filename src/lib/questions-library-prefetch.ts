@@ -1,8 +1,16 @@
+import { dehydrate, type DehydratedState } from '@tanstack/react-query'
+
+import {
+  questionFacetsQueryKey,
+  questionsInfiniteQueryKey,
+  questionsListQueryKey,
+} from '@/components/questions/picker/query-keys'
 import type {
   PaginatedQuestions,
   QuestionFacetsResponse,
   QuestionStatusFilter,
 } from '@/lib/api'
+import { getQueryClient } from '@/lib/get-query-client'
 import {
   buildQuestionFacetsParams,
   buildQuestionsFetchParams,
@@ -15,9 +23,7 @@ import { type ServerRequestContext, requestServer } from '@/lib/server-fetch'
 
 export type QuestionsLibraryPrefetch = {
   queryState: QuestionsQueryState
-  listData?: PaginatedQuestions
-  infiniteFirstPage?: PaginatedQuestions
-  facets: QuestionFacetsResponse
+  dehydratedState: DehydratedState
 }
 
 async function fetchQuestionsPage(
@@ -43,31 +49,78 @@ async function fetchFacetsPage(
   )
 }
 
+async function hydrateQuestionsPicker(
+  ctx: ServerRequestContext,
+  queryState: QuestionsQueryState,
+  options: { prefetchList: boolean; prefetchInfinite: boolean },
+): Promise<QuestionsLibraryPrefetch> {
+  const queryClient = getQueryClient()
+  const debouncedQ = queryState.q
+  const fetchParams = buildQuestionsFetchParams(queryState, debouncedQ)
+  const facetsParams = buildQuestionFacetsParams(queryState, debouncedQ)
+  const {
+    page: _page,
+    ...infiniteParams
+  } = fetchParams
+
+  const prefetches: Promise<unknown>[] = [
+    queryClient.prefetchQuery({
+      queryKey: questionFacetsQueryKey(facetsParams),
+      queryFn: () => fetchFacetsPage(facetsParams, ctx),
+    }),
+  ]
+
+  if (options.prefetchList) {
+    prefetches.push(
+      queryClient.prefetchQuery({
+        queryKey: questionsListQueryKey(fetchParams),
+        queryFn: () => fetchQuestionsPage(fetchParams, ctx),
+      }),
+    )
+  }
+
+  if (options.prefetchInfinite) {
+    prefetches.push(
+      queryClient.prefetchInfiniteQuery({
+        queryKey: questionsInfiniteQueryKey(infiniteParams),
+        queryFn: ({ pageParam }) =>
+          fetchQuestionsPage({ ...infiniteParams, page: pageParam }, ctx),
+        initialPageParam: 1,
+      }),
+    )
+  }
+
+  await Promise.all(prefetches)
+
+  return {
+    queryState,
+    dehydratedState: dehydrate(queryClient),
+  }
+}
+
 export async function prefetchQuestionsLibrary(
   ctx: ServerRequestContext,
   searchParams: URLSearchParams,
   options?: { lockStatus?: QuestionStatusFilter },
 ): Promise<QuestionsLibraryPrefetch> {
   const queryState = resolveQuestionsQueryState(searchParams, options)
-  const debouncedQ = queryState.q
-  const fetchParams = buildQuestionsFetchParams(queryState, debouncedQ)
-  const facetsParams = buildQuestionFacetsParams(queryState, debouncedQ)
-  const questionsParams =
-    queryState.view === 'table' ? fetchParams : { ...fetchParams, page: 1 }
-  const [questions, facets] = await Promise.all([
-    fetchQuestionsPage(questionsParams, ctx),
-    fetchFacetsPage(facetsParams, ctx),
-  ])
+  const isTableView = queryState.view === 'table'
 
-  return queryState.view === 'table'
-    ? { queryState, listData: questions, facets }
-    : { queryState, infiniteFirstPage: questions, facets }
+  return hydrateQuestionsPicker(ctx, queryState, {
+    prefetchList: isTableView,
+    prefetchInfinite: !isTableView,
+  })
 }
 
 export async function prefetchInterviewCreatePicker(
   ctx: ServerRequestContext,
 ): Promise<QuestionsLibraryPrefetch> {
-  return prefetchQuestionsLibrary(ctx, new URLSearchParams(), {
+  const queryState = resolveQuestionsQueryState(new URLSearchParams(), {
     lockStatus: 'active',
+  })
+
+  return hydrateQuestionsPicker(ctx, queryState, {
+    prefetchList: true,
+    prefetchInfinite: false,
   })
 }

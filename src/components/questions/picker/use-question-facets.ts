@@ -35,7 +35,6 @@ type FilterSnapshot = Pick<
 export function useQuestionFacets(
   snapshot: FilterSnapshot,
   debouncedQ: string,
-  initialFacets?: QuestionFacetsResponse,
 ): UseQuestionFacetsResult {
   const params = useMemo(
     () => buildQuestionFacetsParams(snapshot, debouncedQ),
@@ -46,7 +45,6 @@ export function useQuestionFacets(
     queryKey: questionFacetsQueryKey(params),
     queryFn: ({ signal }) => fetchQuestionFacets(params, { signal }),
     placeholderData: keepPreviousData,
-    initialData: initialFacets,
   })
 
   const queryRefetch = query.refetch

@@ -14,7 +14,6 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query'
 
 import {
   fetchQuestions,
-  type PaginatedQuestions,
   type Question,
   type QuestionDifficulty,
   type QuestionSortField,
@@ -63,7 +62,7 @@ function writeStoredView(view: QuestionView) {
 
 type UseQuestionsQueryOptions = {
   initial?: Partial<QuestionsQueryState>
-  initialListData?: PaginatedQuestions
+  serverHydrated?: boolean
   syncUrl?: boolean
   lockStatus?: QuestionStatusFilter
   disableFetchInCardsView?: boolean
@@ -116,12 +115,11 @@ export function useQuestionsQuery(
 ): UseQuestionsQueryResult {
   const {
     initial,
-    initialListData,
+    serverHydrated,
     syncUrl,
     lockStatus,
     disableFetchInCardsView,
   } = options
-  const hasServerListData = Boolean(initialListData)
   const [capturedInitial] = useState<Partial<QuestionsQueryState> | undefined>(initial)
   const router = useRouter()
   const pathname = usePathname()
@@ -140,14 +138,14 @@ export function useQuestionsQuery(
   useEffect(() => {
     if (hydratedStoredViewRef.current) return
     hydratedStoredViewRef.current = true
-    if (hasServerListData) return
+    if (serverHydrated) return
     if (syncUrl && searchParams?.get('view') !== null) return
     const stored = readStoredView()
     if (stored) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- post-mount SSR-safe localStorage hydration of view preference
       setState((prev) => (prev.view === stored ? prev : { ...prev, view: stored }))
     }
-  }, [hasServerListData, syncUrl, searchParams])
+  }, [serverHydrated, syncUrl, searchParams])
   const [debouncedQ, setDebouncedQ] = useState(() => state.q)
   const lastWrittenUrlRef = useRef<string | null>(
     syncUrl && searchParams ? searchParams.toString() : null,
@@ -192,7 +190,6 @@ export function useQuestionsQuery(
     queryFn: ({ signal }) => fetchQuestions(fetchParams, { signal }),
     placeholderData: keepPreviousData,
     enabled: !disableFetchInCardsView || state.view !== 'cards',
-    initialData: initialListData,
   })
 
   const total = query.data?.total ?? 0
