@@ -64,7 +64,6 @@ import {
 } from "@/lib/interview-formatters";
 import { runMutation } from "@/lib/run-mutation";
 import { TOAST_MESSAGES } from "@/lib/toast-messages";
-import type { InterviewDetailExtras } from "@/lib/interview-detail-prefetch";
 
 type UploadStatus = "idle" | "uploading" | "uploaded" | "error";
 
@@ -84,7 +83,6 @@ interface InterviewDetailClientProps {
   id: string;
   initialInterview: Interview;
   initialResults: InterviewResult | null;
-  initialExtras?: InterviewDetailExtras;
 }
 
 function formatAnswerDuration(seconds?: number) {
@@ -175,7 +173,6 @@ export default function InterviewDetailClient({
   id,
   initialInterview,
   initialResults,
-  initialExtras,
 }: InterviewDetailClientProps) {
   const [interview, setInterview] = useState<Interview | null>(initialInterview);
   const [results, setResults] = useState<InterviewResult | null>(initialResults);
@@ -193,33 +190,12 @@ export default function InterviewDetailClient({
   );
   const [mediaByQuestion, setMediaByQuestion] = useState<
     Record<number, AnswerMediaState>
-  >(() =>
-    initialExtras
-      ? Object.fromEntries(
-          Object.entries(initialExtras.mediaByQuestion).map(
-            ([questionIndex, media]) => [
-              Number(questionIndex),
-              { loading: false, ...media },
-            ],
-          ),
-        )
-      : {},
-  );
-  const [candidateLink, setCandidateLink] = useState(
-    initialExtras?.candidateLink ?? "",
-  );
+  >({});
+  const [candidateLink, setCandidateLink] = useState("");
   const [candidateLinkStatus, setCandidateLinkStatus] = useState<
     "idle" | "loading" | "ready" | "error"
-  >(() =>
-    initialExtras?.candidateLink
-      ? "ready"
-      : initialExtras?.candidateLinkError
-        ? "error"
-        : "idle",
-  );
-  const [candidateLinkError, setCandidateLinkError] = useState(
-    initialExtras?.candidateLinkError ?? "",
-  );
+  >("idle");
+  const [candidateLinkError, setCandidateLinkError] = useState("");
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "error">(
     "idle",
   );
@@ -264,11 +240,8 @@ export default function InterviewDetailClient({
   );
 
   useEffect(() => {
-    if (initialExtras) {
-      return;
-    }
     void loadCandidateLink("initial");
-  }, [initialExtras, loadCandidateLink]);
+  }, [loadCandidateLink]);
 
   function setFileInputRef(index: number, element: HTMLInputElement | null) {
     fileInputRefs.current[index] = element;

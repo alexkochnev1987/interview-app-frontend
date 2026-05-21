@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useMemo } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import {
   fetchQuestionFacets,
   type QuestionFacetsResponse,
@@ -45,6 +45,7 @@ export function useQuestionFacets(
   const query = useQuery({
     queryKey: questionFacetsQueryKey(params),
     queryFn: ({ signal }) => fetchQuestionFacets(params, { signal }),
+    placeholderData: keepPreviousData,
     initialData: initialFacets,
   })
 
@@ -55,7 +56,8 @@ export function useQuestionFacets(
 
   return {
     facets: query.data ?? EMPTY_QUESTION_FACETS,
-    loading: !initialFacets && query.isPending,
+    loading:
+      query.isPending || (query.isFetching && query.isPlaceholderData),
     error: query.error instanceof Error ? query.error.message : null,
     refetch,
   }

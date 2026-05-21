@@ -204,7 +204,8 @@ export function useQuestionsQuery(
     })
   }, [total])
 
-  const loading = !initialListData && query.isPending
+  const loading =
+    query.isPending || (query.isFetching && query.isPlaceholderData)
   const error =
     query.error instanceof Error ? query.error.message : null
 

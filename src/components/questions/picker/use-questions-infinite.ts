@@ -71,7 +71,9 @@ export function useQuestionsInfinite({
     total,
     hasNextPage: query.hasNextPage ?? false,
     isFetchingNextPage: query.isFetchingNextPage,
-    isInitialLoading: !initialFirstPage && query.isPending && enabled,
+    isInitialLoading:
+      (!initialFirstPage && query.isPending && enabled) ||
+      (query.isFetching && query.isPlaceholderData && enabled),
     isFetching: query.isFetching,
     error: query.error instanceof Error ? query.error.message : null,
     fetchNextPage,
