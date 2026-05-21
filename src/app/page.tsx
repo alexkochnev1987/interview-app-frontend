@@ -4,7 +4,12 @@ import { DashboardView } from '@/components/dashboard/dashboard-view'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { type Interview } from '@/lib/api'
-import { loadAuthGate } from '@/lib/auth-gate'
+import { canAccessDashboard } from '@/lib/auth-roles'
+import {
+  loadAuthGate,
+  redirectIfUnauthenticated,
+  redirectIfUnauthorizedError,
+} from '@/lib/auth-gate'
 import { isForbiddenError, requestServer } from '@/lib/server-fetch'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
@@ -13,14 +18,11 @@ const DASHBOARD_GATE = TOAST_MESSAGES.pageGate.dashboard
 const ERROR_SIGN_IN_HREF = '/login'
 const ERROR_ESCAPE_HREF = '/questions'
 
-function canAccessDashboard(role: string): boolean {
-  return Boolean(role)
-}
-
 export default async function DashboardPage() {
   noStore()
 
   const auth = await loadAuthGate(canAccessDashboard)
+  redirectIfUnauthenticated(auth, '/')
   if (auth.kind === 'forbidden') {
     return (
       <ForbiddenAccessPage
@@ -47,6 +49,7 @@ export default async function DashboardPage() {
     interviews =
       (await requestServer<Interview[]>('/interviews', auth.ctx)) ?? []
   } catch (err) {
+    redirectIfUnauthorizedError(err, '/')
     if (isForbiddenError(err)) {
       return (
         <ForbiddenAccessPage

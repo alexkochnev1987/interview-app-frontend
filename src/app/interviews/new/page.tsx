@@ -6,7 +6,7 @@ import { InterviewCreateIntro } from '@/components/interviews/interview-create-i
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
-import { loadAuthGate } from '@/lib/auth-gate'
+import { loadAuthGate, redirectIfUnauthenticated } from '@/lib/auth-gate'
 import { canConfigureInterview } from '@/lib/auth-roles'
 import { prefetchInterviewCreatePicker } from '@/lib/questions-library-prefetch'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
@@ -20,6 +20,7 @@ export default async function NewInterviewPage() {
   noStore()
 
   const auth = await loadAuthGate(canConfigureInterview)
+  redirectIfUnauthenticated(auth, '/interviews/new')
   if (auth.kind === 'forbidden') {
     return (
       <ForbiddenAccessPage

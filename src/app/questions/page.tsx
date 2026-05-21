@@ -5,7 +5,7 @@ import { QueryHydrationBoundary } from '@/components/questions/query-hydration-b
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
-import { loadAuthGate } from '@/lib/auth-gate'
+import { loadAuthGate, redirectIfUnauthenticated } from '@/lib/auth-gate'
 import { canReadQuestions, isSuperAdmin } from '@/lib/auth-roles'
 import { prefetchQuestionsLibrary } from '@/lib/questions-library-prefetch'
 import { toQuestionsSearchParams } from '@/lib/questions-query-state'
@@ -24,6 +24,7 @@ export default async function QuestionsPage({ searchParams }: QuestionsPageProps
   noStore()
 
   const auth = await loadAuthGate(canReadQuestions)
+  redirectIfUnauthenticated(auth, '/questions')
 
   if (auth.kind === 'forbidden') {
     return (

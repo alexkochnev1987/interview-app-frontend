@@ -5,7 +5,11 @@ import InterviewDetailClient from './interview-detail-client'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { type Interview, type InterviewResult } from '@/lib/api'
-import { loadAuthGate } from '@/lib/auth-gate'
+import {
+  loadAuthGate,
+  redirectIfUnauthenticated,
+  redirectIfUnauthorizedError,
+} from '@/lib/auth-gate'
 import { canConfigureInterview } from '@/lib/auth-roles'
 import { isForbiddenError, requestServer } from '@/lib/server-fetch'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
@@ -29,7 +33,9 @@ export default async function InterviewDetailPage({
 
   const { id } = await params
 
+  const returnPath = `/interviews/${encodeURIComponent(id)}`
   const auth = await loadAuthGate(canConfigureInterview)
+  redirectIfUnauthenticated(auth, returnPath)
   if (auth.kind === 'forbidden') {
     return (
       <ForbiddenAccessPage
@@ -75,6 +81,7 @@ export default async function InterviewDetailPage({
       }
     }
   } catch (err) {
+    redirectIfUnauthorizedError(err, returnPath)
     if (isForbiddenError(err)) {
       return (
         <ForbiddenAccessPage

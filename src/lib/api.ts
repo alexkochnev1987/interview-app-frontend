@@ -2,7 +2,12 @@ import createClient from 'openapi-fetch';
 import { paths, components } from './api-types';
 import { ApiError } from './api-error';
 
-export { ApiError, isForbiddenError } from './api-error';
+export {
+  ApiError,
+  isAuthError,
+  isForbiddenError,
+  isUnauthorizedError,
+} from './api-error';
 
 const client = createClient<paths>({
   baseUrl: '/api',

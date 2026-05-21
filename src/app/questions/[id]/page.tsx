@@ -4,7 +4,11 @@ import { QuestionEditClient } from '@/components/questions/edit/question-edit-cl
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { type Question } from '@/lib/api'
-import { loadAuthGate } from '@/lib/auth-gate'
+import {
+  loadAuthGate,
+  redirectIfUnauthenticated,
+  redirectIfUnauthorizedError,
+} from '@/lib/auth-gate'
 import {
   canDeleteQuestions,
   canReadQuestions,
@@ -27,7 +31,9 @@ export default async function EditQuestionPage({ params }: EditQuestionPageProps
 
   const { id } = await params
 
+  const returnPath = `/questions/${encodeURIComponent(id)}`
   const auth = await loadAuthGate(canReadQuestions)
+  redirectIfUnauthenticated(auth, returnPath)
   if (auth.kind === 'forbidden') {
     return (
       <ForbiddenAccessPage
@@ -57,6 +63,7 @@ export default async function EditQuestionPage({ params }: EditQuestionPageProps
         auth.ctx,
       )) ?? null
   } catch (err) {
+    redirectIfUnauthorizedError(err, returnPath)
     if (isForbiddenError(err)) {
       return (
         <ForbiddenAccessPage

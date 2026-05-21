@@ -2,8 +2,10 @@
 
 import { useAuth } from '@/lib/auth-context'
 import {
+  canAccessDashboard,
   canConfigureInterview,
   canManageTeam,
+  canReadQuestions,
   canReviewAssessments,
 } from '@/lib/auth-roles'
 import { usePathname } from 'next/navigation'
@@ -39,8 +41,12 @@ export function NavHeader() {
   }
 
   const links = [
-    { href: '/', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/questions', label: 'Questions', icon: LibraryBig },
+    ...(canAccessDashboard(user?.role)
+      ? [{ href: '/', label: 'Dashboard', icon: LayoutDashboard }]
+      : []),
+    ...(canReadQuestions(user?.role)
+      ? [{ href: '/questions', label: 'Questions', icon: LibraryBig }]
+      : []),
     ...(canReviewAssessments(user?.role)
       ? [{ href: '/assessments', label: 'Assessments', icon: ClipboardList }]
       : []),

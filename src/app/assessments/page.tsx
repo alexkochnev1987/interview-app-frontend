@@ -7,7 +7,11 @@ import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { type Interview } from '@/lib/api'
 import { getCompletionDate } from '@/lib/assessment-status'
-import { loadAuthGate } from '@/lib/auth-gate'
+import {
+  loadAuthGate,
+  redirectIfUnauthenticated,
+  redirectIfUnauthorizedError,
+} from '@/lib/auth-gate'
 import { canReviewAssessments } from '@/lib/auth-roles'
 import { isForbiddenError, requestServer } from '@/lib/server-fetch'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
@@ -41,6 +45,7 @@ export default async function AssessmentsPage() {
   noStore()
 
   const auth = await loadAuthGate(canReviewAssessments)
+  redirectIfUnauthenticated(auth, '/assessments')
   if (auth.kind === 'forbidden') {
     return (
       <ForbiddenAccessPage
@@ -67,6 +72,7 @@ export default async function AssessmentsPage() {
     interviews =
       (await requestServer<Interview[]>('/interviews', auth.ctx)) ?? []
   } catch (err) {
+    redirectIfUnauthorizedError(err, '/assessments')
     if (isForbiddenError(err)) {
       return (
         <ForbiddenAccessPage

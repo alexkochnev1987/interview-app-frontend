@@ -52,9 +52,9 @@ export const TOAST_MESSAGES = {
       signInLabel: "Sign In",
     },
     dashboard: {
-      forbiddenTitle: "Sign in to view the dashboard",
+      forbiddenTitle: "You don't have access to the dashboard",
       forbiddenDescription:
-        "This workspace requires an authenticated account. Sign in to continue.",
+        "The dashboard is reserved for HR, admin, and super-admin users. If you think this is a mistake, contact your workspace owner.",
       unavailableTitle: "Dashboard is unavailable right now",
       loadFailedTitle: "Could not load dashboard",
       loadFailedFallback: "Failed to load interviews.",

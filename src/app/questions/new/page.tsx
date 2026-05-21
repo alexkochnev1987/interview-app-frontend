@@ -3,7 +3,7 @@ import { unstable_noStore as noStore } from 'next/cache'
 import { QuestionNewClient } from '@/components/questions/new/question-new-client'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
-import { loadAuthGate } from '@/lib/auth-gate'
+import { loadAuthGate, redirectIfUnauthenticated } from '@/lib/auth-gate'
 import { canCreateQuestions } from '@/lib/auth-roles'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
@@ -16,6 +16,7 @@ export default async function NewQuestionPage() {
   noStore()
 
   const auth = await loadAuthGate(canCreateQuestions)
+  redirectIfUnauthenticated(auth, '/questions/new')
   if (auth.kind === 'forbidden') {
     return (
       <ForbiddenAccessPage

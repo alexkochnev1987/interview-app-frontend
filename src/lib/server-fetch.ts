@@ -3,7 +3,12 @@ import { cache } from 'react'
 
 import { ApiError } from './api-error'
 
-export { ApiError, isForbiddenError } from './api-error'
+export {
+  ApiError,
+  isAuthError,
+  isForbiddenError,
+  isUnauthorizedError,
+} from './api-error'
 
 function firstForwardedValue(value: string | null): string | null {
   if (!value) return null

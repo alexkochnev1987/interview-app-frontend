@@ -16,7 +16,11 @@ import { Stack } from '@/components/ui/layout/stack'
 import { SectionHeading } from '@/components/ui/text'
 import { type Interview } from '@/lib/api'
 import { deriveReviewStatus } from '@/lib/assessment-status'
-import { loadAuthGate } from '@/lib/auth-gate'
+import {
+  loadAuthGate,
+  redirectIfUnauthenticated,
+  redirectIfUnauthorizedError,
+} from '@/lib/auth-gate'
 import { canReviewAssessments } from '@/lib/auth-roles'
 import { isForbiddenError, requestServer } from '@/lib/server-fetch'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
@@ -38,7 +42,9 @@ export default async function AssessmentDetailPage({
 
   const { id } = await params
 
+  const returnPath = `/assessments/${encodeURIComponent(id)}`
   const auth = await loadAuthGate(canReviewAssessments)
+  redirectIfUnauthenticated(auth, returnPath)
   if (auth.kind === 'forbidden') {
     return (
       <ForbiddenAccessPage
@@ -67,6 +73,7 @@ export default async function AssessmentDetailPage({
       (await requestServer<Interview>(`/interviews/${encodedId}`, auth.ctx)) ??
       null
   } catch (err) {
+    redirectIfUnauthorizedError(err, returnPath)
     if (isForbiddenError(err)) {
       return (
         <ForbiddenAccessPage

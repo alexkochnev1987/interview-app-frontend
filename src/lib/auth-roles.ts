@@ -43,6 +43,10 @@ function hasAdminRole(role: string | null | undefined): boolean {
   return ADMIN_ROLES.has(role)
 }
 
+export function canAccessDashboard(role: string | null | undefined): boolean {
+  return hasAdminRole(role)
+}
+
 export function canReviewAssessments(role: string | null | undefined): boolean {
   return hasAdminRole(role)
 }

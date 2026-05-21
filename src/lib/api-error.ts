@@ -10,6 +10,14 @@ export class ApiError extends Error {
   }
 }
 
+export function isUnauthorizedError(err: unknown): boolean {
+  return err instanceof ApiError && err.status === 401
+}
+
 export function isForbiddenError(err: unknown): boolean {
+  return err instanceof ApiError && err.status === 403
+}
+
+export function isAuthError(err: unknown): boolean {
   return err instanceof ApiError && (err.status === 401 || err.status === 403)
 }
