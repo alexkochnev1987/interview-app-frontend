@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { useBrowserTranscript } from '@/lib/use-browser-transcript';
-import { type TakeInterviewData } from '@/lib/api';
+import { type TakeInterviewData, getTakeInterview } from '@/lib/api';
 import type { PermissionStatus, TakeStage } from '@/components/take/types';
 import { TAKE_MESSAGES } from './messages';
 import { progressValueForStage, stageAfterInterviewLoad, type VersionPersistKind } from './session-machine';
@@ -122,6 +122,10 @@ export function useTakeOrchestrator({ id, candidateToken, initialInterview }: Us
   const [recordingStartBusy, setRecordingStartBusy] = useState(false);
   const [lobbyMicOn, setLobbyMicOn] = useState(false);
   const [lobbyCameraOn, setLobbyCameraOn] = useState(false);
+  const needsCandidateSessionSync = Boolean(candidateToken);
+  const [candidateSessionReady, setCandidateSessionReady] = useState(
+    () => !needsCandidateSessionSync,
+  );
 
   const [interviewerPresence, questionSpeechRecordingAllowedRef] = useTakeQuestionTts(
     interview,
@@ -228,11 +232,24 @@ export function useTakeOrchestrator({ id, candidateToken, initialInterview }: Us
   });
 
   useEffect(() => {
-    if (!initialInterview || !candidateToken || typeof window === 'undefined') {
-      return
-    }
-    window.history.replaceState(null, '', `/take/${id}`)
-  }, [initialInterview, candidateToken, id])
+    if (!candidateToken) return;
+
+    let cancelled = false;
+    void getTakeInterview(id, candidateToken)
+      .then(() => {
+        if (cancelled) return;
+        setCandidateSessionReady(true);
+        window.history.replaceState(null, '', `/take/${id}`);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setError(err instanceof Error ? err.message : 'Failed to load interview');
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id, candidateToken]);
 
   const { loadInterview } = useTakeInterviewLoader({
     id,
@@ -329,6 +346,7 @@ export function useTakeOrchestrator({ id, candidateToken, initialInterview }: Us
   }
 
   const lobbyJoinReady =
+    candidateSessionReady &&
     cameraStatus === 'granted' &&
     lobbyMicOn &&
     lobbyCameraOn &&
@@ -563,6 +581,7 @@ export function useTakeOrchestrator({ id, candidateToken, initialInterview }: Us
 
   const capturePipelineReady = Boolean(
     interview &&
+      candidateSessionReady &&
       !setupError &&
       cameraStatus === 'granted' &&
       screenStatus === 'granted' &&
@@ -580,6 +599,9 @@ export function useTakeOrchestrator({ id, candidateToken, initialInterview }: Us
       return;
     }
     if (!capturePipelineReady || setupError) {
+      return;
+    }
+    if (!candidateSessionReady) {
       return;
     }
     if (!questionSpeechRecordingAllowedRef.current) {
@@ -612,6 +634,7 @@ export function useTakeOrchestrator({ id, candidateToken, initialInterview }: Us
     uploading,
     recordingStartBusy,
     capturePipelineReady,
+    candidateSessionReady,
     interviewerPresence,
     questionSpeechRecordingAllowedRef,
   ]);
