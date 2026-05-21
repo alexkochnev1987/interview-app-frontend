@@ -19,7 +19,6 @@ export type MeResponse = AuthUserResponseDto;
 export type LoginPayload = Schemas['LoginDto'];
 export type LogoutResponse = Schemas['LogoutResponseDto'];
 export type FeedbackResponse = Schemas['FeedbackResponseDto'];
-export type QuestionRedFlagSeverity = Schemas['QuestionRedFlagDto']['severity'];
 
 export type QuestionExpectedConcept = Schemas['QuestionExpectedConceptDto'];
 export type QuestionRedFlag = Schemas['QuestionRedFlagDto'];
@@ -37,33 +36,17 @@ export type QuestionStatusFilter = NonNullable<FetchQuestionsParams['status']>;
 
 export type InterviewQuestion = Schemas['InterviewResponseDto']['questions'][number];
 
-export type CandidateQuestionView = Schemas['CandidateQuestionViewDto'];
-
 export type InterviewBehaviorRisk = NonNullable<Schemas['InterviewResultResponseDto']['behaviorSummary']>['riskLevel'];
 export type InterviewDecision = NonNullable<Schemas['InterviewResultResponseDto']['decision']>;
 export type AnswerDecisionHint = NonNullable<Schemas['InterviewQuestionResultDto']['decisionHint']>;
 
-export type AnswerStatus = NonNullable<Schemas['TakeInterviewResponseDto']['currentAnswerMeta']>['status'];
-export type AnswerValidationStatus = Schemas['StartAllAnswerValidationsResponseDto']['answers'][number]['status'];
-
-export type InterviewWorkflowStatus = NonNullable<Schemas['InterviewResponseDto']['workflow']>['status'];
-export type InterviewWorkflowStage = NonNullable<Schemas['InterviewResponseDto']['workflow']>['currentStage'];
-
-export type MediaArtifact = Schemas['MediaArtifactDto'];
-export type AnswerTranscript = Schemas['AnswerTranscriptDto'];
 export type ClientTranscriptPayload = Schemas['ClientTranscriptDto'];
-export type AnswerEvaluation = Schemas['AnswerEvaluationDto'];
-export type AnswerValidation = Schemas['AnswerValidationDto'];
 export type Answer = Schemas['AnswerDto'];
-export type AnswerVersion = Schemas['AnswerVersionDto'];
 
-export type InterviewQuestionResult = Schemas['InterviewQuestionResultDto'];
-export type InterviewBehaviorSummary = Schemas['InterviewBehaviorSummaryDto'];
 export type InterviewResult = Schemas['InterviewResultResponseDto'];
-export type InterviewWorkflow = Schemas['InterviewWorkflowDto'];
 export type Interview = Schemas['InterviewResponseDto'];
 
-export type ValidateAllAnswersResponse = Schemas['StartAllAnswerValidationsResponseDto'];
+type ValidateAllAnswersResponse = Schemas['StartAllAnswerValidationsResponseDto'];
 export type StartAnswerValidationResult = Schemas['StartAnswerValidationResultDto'];
 export type InterviewAnswerMediaResponse = Schemas['InterviewAnswerMediaResponseDto'];
 export type CandidateLinkResponse = Schemas['CandidateLinkResponseDto'];
@@ -71,7 +54,6 @@ export type CandidateLinkResponse = Schemas['CandidateLinkResponseDto'];
 export type CreateInterviewPayload = Schemas['CreateInterviewDto'];
 
 export type PresignedUrlResponse = Schemas['PresignedUrlResponseDto'];
-export type ConfirmUploadResponse = Schemas['ConfirmUploadResponseDto'];
 
 export type TakeInterviewData = Schemas['TakeInterviewResponseDto'];
 export type MultipartUploadSessionResponse = Schemas['MultipartUploadSessionResponseDto'];
@@ -338,7 +320,7 @@ async function completeUpload(
   interviewId: string,
   questionIndex: number,
   mediaKey: string,
-): Promise<ConfirmUploadResponse> {
+): Promise<Schemas['ConfirmUploadResponseDto']> {
   return handle(
     client.POST('/interviews/{id}/questions/{questionIndex}/complete-upload', {
       params: { path: { id: interviewId, questionIndex } },

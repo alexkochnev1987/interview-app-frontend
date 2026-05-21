@@ -10,7 +10,7 @@ import type {
 } from '@/lib/api'
 
 export const DEFAULT_QUESTIONS_LIMIT = 20
-export const MAX_QUESTIONS_Q_LENGTH = 200
+const MAX_QUESTIONS_Q_LENGTH = 200
 
 export const EMPTY_QUESTION_FACETS: QuestionFacetsResponse = {
   difficulties: [],
@@ -24,7 +24,7 @@ export function emptyPaginatedQuestions(limit = DEFAULT_QUESTIONS_LIMIT): Pagina
   return { items: [], total: 0, page: 1, limit }
 }
 
-export const QUESTION_VIEWS = ['cards', 'table'] as const
+const QUESTION_VIEWS = ['cards', 'table'] as const
 export type QuestionView = (typeof QUESTION_VIEWS)[number]
 
 export type QuestionsQueryState = {

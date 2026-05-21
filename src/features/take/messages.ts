@@ -33,6 +33,7 @@ export const TAKE_MESSAGES = {
   lobbyPreviewCameraOffLead: 'Tap the camera icon in the controls to turn your preview back on.',
   lobbyPreviewMutedTitle: 'Camera preview paused',
   lobbyPreviewMutedLead: 'Tap the microphone or camera icon in the controls to allow access and show your preview.',
+  sessionSyncFailedTitle: 'Session could not start',
   sessionSyncFailed:
     'Could not establish your interview session. Refresh the invite link or open it again in this browser.',
   consentContinue: 'Continue to device check',

@@ -1,10 +1,4 @@
 export {
-  cameraPreviewSurfaceClass,
-  CameraPreviewVideo,
-  type CameraPreviewVideoRefProps,
-} from './camera-preview';
-
-export {
   LobbyPrepFloatingControls,
   LobbyPreviewFrame,
   LobbyPreviewPlaceholder,
@@ -19,8 +13,4 @@ export {
   RecordingHeaderTitleCluster,
 } from './recording-header-layout';
 
-export {
-  RecordingStageHero,
-  type RecordingAiPresence,
-  type RecordingStageHeroProps,
-} from './recording-stage-hero';
+export { RecordingStageHero } from './recording-stage-hero';

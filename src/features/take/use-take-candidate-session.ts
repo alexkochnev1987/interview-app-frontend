@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { getTakeInterview } from '@/lib/api';
-import { notifyError } from '@/lib/toast';
 
 import { TAKE_MESSAGES } from './messages';
 
@@ -17,9 +16,17 @@ export function useTakeCandidateSession({
   const [candidateSessionReady, setCandidateSessionReady] = useState(
     () => !candidateToken,
   );
+  const [sessionSyncError, setSessionSyncError] = useState<string | null>(null);
+  const [syncAttempt, setSyncAttempt] = useState(0);
 
   const confirmSessionReady = useCallback(() => {
+    setSessionSyncError(null);
     setCandidateSessionReady(true);
+  }, []);
+
+  const retrySessionSync = useCallback(() => {
+    setSessionSyncError(null);
+    setSyncAttempt((attempt) => attempt + 1);
   }, []);
 
   useEffect(() => {
@@ -37,6 +44,7 @@ export function useTakeCandidateSession({
         if (cancelled) {
           return;
         }
+        setSessionSyncError(null);
         setCandidateSessionReady(true);
         window.history.replaceState(null, '', `/take/${interviewId}`);
       } catch (err) {
@@ -45,17 +53,20 @@ export function useTakeCandidateSession({
         }
         const description =
           err instanceof Error ? err.message : TAKE_MESSAGES.sessionSyncFailed;
-        notifyError('Session could not start', {
-          id: `take-session-sync-${interviewId}`,
-          description,
-        });
+        setSessionSyncError(description);
+        setCandidateSessionReady(false);
       }
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [interviewId, candidateToken]);
+  }, [interviewId, candidateToken, syncAttempt]);
 
-  return { candidateSessionReady, confirmSessionReady };
+  return {
+    candidateSessionReady,
+    confirmSessionReady,
+    sessionSyncError,
+    retrySessionSync,
+  };
 }

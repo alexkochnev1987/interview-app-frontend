@@ -13,9 +13,8 @@ import {
 } from '@/lib/questions-query-state'
 import { questionFacetsQueryKey } from './query-keys'
 
-export type QuestionFacets = QuestionFacetsResponse
 export type UseQuestionFacetsResult = {
-  facets: QuestionFacets
+  facets: QuestionFacetsResponse
   loading: boolean
   error: string | null
   refetch: () => void

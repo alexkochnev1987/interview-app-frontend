@@ -16,7 +16,7 @@ export interface SimilaritySignalSummary {
   textTokenCount: number
 }
 
-export const DEFAULT_VALUE: QuestionInput = {
+const DEFAULT_VALUE: QuestionInput = {
   externalId: '',
   role: 'frontend intern',
   focus: 'fundamentals',

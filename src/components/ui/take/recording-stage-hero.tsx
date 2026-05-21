@@ -9,7 +9,7 @@ import { BodyText, Text } from '@/components/ui/text';
 import { Inline, Stack } from '@/components/ui/layout';
 import { cn } from '@/lib/utils';
 
-export type RecordingAiPresence = 'speaking' | 'listening';
+type RecordingAiPresence = 'speaking' | 'listening';
 
 function RecordingHiddenCaptureVideo({ videoRef }: CameraPreviewVideoRefProps) {
   return (
@@ -224,7 +224,7 @@ function RecordingTimerBadge({ timeLabel }: RecordingTimerBadgeProps) {
   );
 }
 
-export interface RecordingStageHeroProps {
+interface RecordingStageHeroProps {
   showTimer: boolean;
   timeLeft: number;
   formatTime: (seconds: number) => string;

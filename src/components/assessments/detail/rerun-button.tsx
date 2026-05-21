@@ -16,12 +16,12 @@ type ButtonVariant = ComponentProps<typeof Button>['variant']
 type ButtonSize = ComponentProps<typeof Button>['size']
 type IconSize = ComponentProps<typeof Icon>['size']
 
-export interface RerunInfo {
+interface RerunInfo {
   title: string
   message: string
 }
 
-export type RerunResult = RerunInfo | undefined
+type RerunResult = RerunInfo | undefined
 
 interface RerunButtonProps {
   onRun: () => Promise<RerunResult>

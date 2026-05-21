@@ -34,6 +34,8 @@ export function TakeInterviewClient({
     interview,
     error,
     candidateSessionReady,
+    sessionSyncError,
+    retrySessionSync,
     consent,
     cameraStatus,
     screenStatus,
@@ -112,9 +114,11 @@ export function TakeInterviewClient({
         interview={interview}
         consent={consent}
         setupError={setupError}
+        sessionSyncError={sessionSyncError}
         continueDisabled={!candidateSessionReady}
         onConsentChange={setConsent}
         onContinueToLobby={proceedToLobby}
+        onRetrySessionSync={retrySessionSync}
       />
     )
   }

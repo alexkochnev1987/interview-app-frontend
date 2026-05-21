@@ -3,7 +3,7 @@ import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText } from '@/components/ui/text'
 
-export interface TimestampRowItem {
+interface TimestampRowItem {
   label: string
   value: string | null | undefined
 }

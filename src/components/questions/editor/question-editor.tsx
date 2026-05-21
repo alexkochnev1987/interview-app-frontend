@@ -21,8 +21,7 @@ import {
   type QuestionDraft,
   type QuestionInput,
 } from '@/lib/api'
-import { clearFieldError } from '@/lib/clear-field-error'
-import { type FieldErrors } from '@/lib/form-validation'
+import { clearFieldError, type FieldErrors } from '@/lib/clear-field-error'
 import { validateQuestionForm } from '@/lib/question-editor/validate-question-form'
 import {
   DRAFT_FIELDS,
