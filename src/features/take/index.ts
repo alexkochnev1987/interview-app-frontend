@@ -9,6 +9,7 @@ export * from './use-take-answer-persistence';
 export * from './use-take-behavior-tracking';
 export * from './use-take-begin-recording';
 export * from './use-take-interview-before-unload';
+export * from './use-take-candidate-session';
 export * from './use-take-interview-loader';
 export * from './use-take-orchestrator';
 export * from './use-take-permissions';

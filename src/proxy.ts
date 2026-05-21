@@ -1,13 +1,16 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-import { safeRedirectPath } from '@/lib/safe-redirect-path';
+import {
+  loginReturnPath,
+  safeRedirectPath,
+} from '@/lib/safe-redirect-path';
 
 export function proxy(request: NextRequest) {
   const session = request.cookies.get('session');
   const path = request.nextUrl.pathname;
 
-  if (path.startsWith('/api')) {
+  if (path.startsWith('/api') || path.startsWith('/_next')) {
     return NextResponse.next();
   }
 
@@ -20,7 +23,10 @@ export function proxy(request: NextRequest) {
   if (!session && !isPublicPage) {
     const loginUrl = new URL('/login', request.url);
     const returnPath = `${path}${request.nextUrl.search}`;
-    loginUrl.searchParams.set('from', returnPath);
+    const safeFrom = loginReturnPath(returnPath);
+    if (safeFrom) {
+      loginUrl.searchParams.set('from', safeFrom);
+    }
     return NextResponse.redirect(loginUrl);
   }
 

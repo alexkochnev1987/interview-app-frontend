@@ -1,13 +1,39 @@
-const BLOCKED_PATH_PREFIXES = ['/login', '/take', '/feedback', '/demo'] as const
+const BLOCKED_PATH_PREFIXES = [
+  '/login',
+  '/take',
+  '/feedback',
+  '/demo',
+  '/api',
+  '/_next',
+] as const
+
+function pathnameOf(path: string): string {
+  const queryIndex = path.indexOf('?')
+  return queryIndex === -1 ? path : path.slice(0, queryIndex)
+}
+
+function isBlockedRedirectPath(path: string): boolean {
+  return BLOCKED_PATH_PREFIXES.some(
+    (prefix) => path === prefix || path.startsWith(`${prefix}/`),
+  )
+}
+
+export function loginReturnPath(path: string): string | null {
+  if (!path.startsWith('/') || path.startsWith('//')) {
+    return null
+  }
+
+  if (isBlockedRedirectPath(pathnameOf(path))) {
+    return null
+  }
+
+  return path
+}
 
 export function safeRedirectPath(from: string | null | undefined): string {
-  if (!from || !from.startsWith('/') || from.startsWith('//')) {
+  if (!from) {
     return '/'
   }
 
-  const isBlocked = BLOCKED_PATH_PREFIXES.some(
-    (prefix) => from === prefix || from.startsWith(`${prefix}/`),
-  )
-
-  return isBlocked ? '/' : from
+  return loginReturnPath(from) ?? '/'
 }

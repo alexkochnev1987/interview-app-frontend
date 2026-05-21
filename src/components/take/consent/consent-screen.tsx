@@ -20,6 +20,7 @@ interface TakeConsentScreenProps {
   interview: InterviewDataView;
   consent: boolean;
   setupError: string;
+  continueDisabled?: boolean;
   onConsentChange: (checked: boolean) => void;
   onContinueToLobby: () => void;
 }
@@ -28,6 +29,7 @@ export function TakeConsentScreen({
   interview,
   consent,
   setupError,
+  continueDisabled = false,
   onConsentChange,
   onContinueToLobby,
 }: TakeConsentScreenProps) {
@@ -90,7 +92,7 @@ export function TakeConsentScreen({
                 <Stack width="full">
                   <Button
                     type="button"
-                    disabled={!consent}
+                    disabled={!consent || continueDisabled}
                     onClick={onContinueToLobby}
                     variant="gradient"
                     size="2xl"

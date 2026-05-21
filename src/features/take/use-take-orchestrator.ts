@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { useBrowserTranscript } from '@/lib/use-browser-transcript';
-import { type TakeInterviewData, getTakeInterview } from '@/lib/api';
+import { type TakeInterviewData } from '@/lib/api';
 import type { PermissionStatus, TakeStage } from '@/components/take/types';
 import { TAKE_MESSAGES } from './messages';
 import { progressValueForStage, stageAfterInterviewLoad, type VersionPersistKind } from './session-machine';
@@ -27,6 +27,7 @@ import {
 import { useTakeAnswerPersistence } from './use-take-answer-persistence';
 import { useTakeBehaviorTracking } from './use-take-behavior-tracking';
 import { useTakeBeginRecording } from './use-take-begin-recording';
+import { useTakeCandidateSession } from './use-take-candidate-session';
 import { useTakeInterviewLoader } from './use-take-interview-loader';
 import { useTakePermissions } from './use-take-permissions';
 import { useTakeRecordingControls } from './use-take-recording-controls';
@@ -122,10 +123,10 @@ export function useTakeOrchestrator({ id, candidateToken, initialInterview }: Us
   const [recordingStartBusy, setRecordingStartBusy] = useState(false);
   const [lobbyMicOn, setLobbyMicOn] = useState(false);
   const [lobbyCameraOn, setLobbyCameraOn] = useState(false);
-  const needsCandidateSessionSync = Boolean(candidateToken);
-  const [candidateSessionReady, setCandidateSessionReady] = useState(
-    () => !needsCandidateSessionSync,
-  );
+  const { candidateSessionReady, confirmSessionReady } = useTakeCandidateSession({
+    interviewId: id,
+    candidateToken,
+  });
 
   const [interviewerPresence, questionSpeechRecordingAllowedRef] = useTakeQuestionTts(
     interview,
@@ -231,32 +232,16 @@ export function useTakeOrchestrator({ id, candidateToken, initialInterview }: Us
     getBrowserTranscriptSnapshot,
   });
 
-  useEffect(() => {
-    if (!candidateToken) return;
-
-    let cancelled = false;
-    void getTakeInterview(id, candidateToken)
-      .then(() => {
-        if (cancelled) return;
-        setCandidateSessionReady(true);
-        window.history.replaceState(null, '', `/take/${id}`);
-      })
-      .catch((err) => {
-        if (cancelled) return;
-        setError(err instanceof Error ? err.message : 'Failed to load interview');
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [id, candidateToken]);
-
   const { loadInterview } = useTakeInterviewLoader({
     id,
     candidateToken,
     skipInitialLoad: Boolean(initialInterview),
     onData: (data, mode, tokenOverride) => {
+      setError('');
       setInterview(data);
+      if (mode === 'initial' && tokenOverride) {
+        confirmSessionReady();
+      }
       if (mode === 'initial' && tokenOverride && typeof window !== 'undefined') {
         window.history.replaceState(null, '', `/take/${id}`);
       }
@@ -643,6 +628,7 @@ export function useTakeOrchestrator({ id, candidateToken, initialInterview }: Us
     stage,
     interview,
     error,
+    candidateSessionReady,
     consent,
     recording,
     timeLeft,

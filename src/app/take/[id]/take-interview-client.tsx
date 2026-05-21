@@ -21,7 +21,7 @@ import { TOAST_MESSAGES } from '@/lib/toast-messages'
 type TakeInterviewClientProps = {
   id: string
   candidateToken: string
-  initialInterview: TakeInterviewData
+  initialInterview?: TakeInterviewData
 }
 
 export function TakeInterviewClient({
@@ -33,6 +33,7 @@ export function TakeInterviewClient({
     stage,
     interview,
     error,
+    candidateSessionReady,
     consent,
     cameraStatus,
     screenStatus,
@@ -111,6 +112,7 @@ export function TakeInterviewClient({
         interview={interview}
         consent={consent}
         setupError={setupError}
+        continueDisabled={!candidateSessionReady}
         onConsentChange={setConsent}
         onContinueToLobby={proceedToLobby}
       />
