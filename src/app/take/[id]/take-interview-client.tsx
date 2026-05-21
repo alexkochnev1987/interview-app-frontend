@@ -20,13 +20,13 @@ import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 type TakeInterviewClientProps = {
   id: string
-  candidateToken: string
+  candidateToken?: string
   initialInterview?: TakeInterviewData
 }
 
 export function TakeInterviewClient({
   id,
-  candidateToken,
+  candidateToken = '',
   initialInterview,
 }: TakeInterviewClientProps) {
   const {

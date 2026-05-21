@@ -1,28 +1,25 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { getTakeInterview } from '@/lib/api';
+import { syncCandidateSession } from '@/lib/api';
 
 import { TAKE_MESSAGES } from './messages';
 
 interface UseTakeCandidateSessionParams {
   interviewId: string;
   candidateToken: string;
+  sessionReady?: boolean;
 }
 
 export function useTakeCandidateSession({
   interviewId,
   candidateToken,
+  sessionReady: sessionReadyInitial = !candidateToken,
 }: UseTakeCandidateSessionParams) {
   const [candidateSessionReady, setCandidateSessionReady] = useState(
-    () => !candidateToken,
+    sessionReadyInitial,
   );
   const [sessionSyncError, setSessionSyncError] = useState<string | null>(null);
   const [syncAttempt, setSyncAttempt] = useState(0);
-
-  const confirmSessionReady = useCallback(() => {
-    setSessionSyncError(null);
-    setCandidateSessionReady(true);
-  }, []);
 
   const retrySessionSync = useCallback(() => {
     setSessionSyncError(null);
@@ -30,17 +27,35 @@ export function useTakeCandidateSession({
   }, []);
 
   useEffect(() => {
-    if (!candidateToken) {
+    if (!sessionReadyInitial || typeof window === 'undefined') {
+      return;
+    }
+
+    const path = `/take/${interviewId}`;
+    if (window.location.pathname !== path) {
+      return;
+    }
+
+    const url = new URL(window.location.href);
+    if (!url.searchParams.has('token')) {
+      return;
+    }
+
+    url.searchParams.delete('token');
+    const next = url.search ? `${path}${url.search}` : path;
+    window.history.replaceState(null, '', next);
+  }, [interviewId, sessionReadyInitial]);
+
+  useEffect(() => {
+    if (!candidateToken || sessionReadyInitial) {
       return;
     }
 
     let cancelled = false;
 
     void (async () => {
-      setCandidateSessionReady(false);
-
       try {
-        await getTakeInterview(interviewId, candidateToken);
+        await syncCandidateSession(interviewId, candidateToken);
         if (cancelled) {
           return;
         }
@@ -61,11 +76,10 @@ export function useTakeCandidateSession({
     return () => {
       cancelled = true;
     };
-  }, [interviewId, candidateToken, syncAttempt]);
+  }, [interviewId, candidateToken, sessionReadyInitial, syncAttempt]);
 
   return {
     candidateSessionReady,
-    confirmSessionReady,
     sessionSyncError,
     retrySessionSync,
   };

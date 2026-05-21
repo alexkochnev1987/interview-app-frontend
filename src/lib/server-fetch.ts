@@ -1,6 +1,7 @@
 import { cookies, headers } from 'next/headers'
 import { cache } from 'react'
 
+import type { TakeInterviewData } from './api'
 import { ApiError } from './api-error'
 
 export { isForbiddenError } from './api-error'

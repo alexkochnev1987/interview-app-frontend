@@ -20,6 +20,11 @@ export default async function TakeInterviewPage({
 }: TakeInterviewPageProps) {
   const { id } = await params
   const token = readSearchParamToken((await searchParams).token)
+
+  if (token) {
+    return <TakeInterviewClient id={id} candidateToken={token} />
+  }
+
   const ctx = await getServerRequestContext()
   const encodedId = encodeURIComponent(id)
 
@@ -28,9 +33,7 @@ export default async function TakeInterviewPage({
 
   try {
     interview =
-      (await requestServer<TakeInterviewData>(`/take/${encodedId}`, ctx, {
-        query: token ? { token } : undefined,
-      })) ?? null
+      (await requestServer<TakeInterviewData>(`/take/${encodedId}`, ctx)) ?? null
   } catch (err) {
     error =
       err instanceof Error
@@ -57,10 +60,6 @@ export default async function TakeInterviewPage({
   }
 
   return (
-    <TakeInterviewClient
-      id={id}
-      candidateToken={token}
-      initialInterview={interview}
-    />
+    <TakeInterviewClient id={id} initialInterview={interview} />
   )
 }

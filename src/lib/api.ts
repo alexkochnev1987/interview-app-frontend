@@ -386,6 +386,19 @@ export async function getTakeInterview(
   }));
 }
 
+export async function syncCandidateSession(id: string, token: string): Promise<void> {
+  const path = `/take/${encodeURIComponent(id)}`;
+  const query = new URLSearchParams({ token });
+  const res = await fetch(`/api${path}?${query}`, { credentials: 'include' });
+
+  if (!res.ok) {
+    const body = await res.text();
+    throw new ApiError(res.status, messageFromBody(body, res.status), path, body);
+  }
+
+  await res.text();
+}
+
 export async function startMultipartUpload(
   questionIndex: number,
   mediaType: CaptureTarget,

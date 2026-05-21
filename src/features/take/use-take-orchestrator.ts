@@ -125,12 +125,12 @@ export function useTakeOrchestrator({ id, candidateToken, initialInterview }: Us
   const [lobbyCameraOn, setLobbyCameraOn] = useState(false);
   const {
     candidateSessionReady,
-    confirmSessionReady,
     sessionSyncError,
     retrySessionSync,
   } = useTakeCandidateSession({
     interviewId: id,
     candidateToken,
+    sessionReady: !candidateToken || Boolean(initialInterview),
   });
 
   const [interviewerPresence, questionSpeechRecordingAllowedRef] = useTakeQuestionTts(
@@ -244,9 +244,6 @@ export function useTakeOrchestrator({ id, candidateToken, initialInterview }: Us
     onData: (data, mode, tokenOverride) => {
       setError('');
       setInterview(data);
-      if (mode === 'initial' && tokenOverride) {
-        confirmSessionReady();
-      }
       if (mode === 'initial' && tokenOverride && typeof window !== 'undefined') {
         window.history.replaceState(null, '', `/take/${id}`);
       }
