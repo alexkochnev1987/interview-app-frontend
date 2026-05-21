@@ -15,7 +15,7 @@ function resolveTrustedApiBase(): string {
 
 export interface ServerRequestContext {
   cookieHeader: string
-  origin: string
+  apiBase: string
 }
 
 export const getServerRequestContext = cache(
@@ -23,7 +23,7 @@ export const getServerRequestContext = cache(
     const headerStore = await headers()
     const rawCookieHeader = headerStore.get('cookie')
     const cookieHeader = rawCookieHeader ?? (await buildCookieHeaderFallback())
-    return { cookieHeader, origin: resolveTrustedApiBase() }
+    return { cookieHeader, apiBase: resolveTrustedApiBase() }
   },
 )
 
@@ -96,7 +96,7 @@ export async function requestServer<T>(
   ctx: ServerRequestContext,
   options?: { method?: 'GET' | 'POST'; query?: Record<string, unknown> },
 ): Promise<T | undefined> {
-  const res = await fetch(buildServerApiUrl(path, ctx.origin, options?.query), {
+  const res = await fetch(buildServerApiUrl(path, ctx.apiBase, options?.query), {
     method: options?.method ?? 'GET',
     headers: {
       'Content-Type': 'application/json',

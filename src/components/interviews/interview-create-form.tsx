@@ -1,23 +1,22 @@
 'use client'
 
-import Link from 'next/link'
 import { useMemo, useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import {
-  AlertCircle,
-  ArrowRight,
-  BriefcaseBusiness,
-  UserRound,
-} from 'lucide-react'
+import { ArrowRight, BriefcaseBusiness, UserRound } from 'lucide-react'
 
+import { InfiniteCardsLoader } from '@/components/questions/library/infinite-cards-loader'
 import { QuestionTable } from '@/components/questions/library/question-table'
 import {
   buildActiveFilterChips,
+  pickQuestionsViewSource,
   QuestionFacetSidebar,
+  QuestionPickerFeed,
+  QuestionPickerRefetchAlert,
   QuestionPickerToolbar,
   QuestionSelectedPanel,
   QuestionViewToggle,
   useQuestionFacets,
+  useQuestionsInfinite,
   useQuestionsQuery,
 } from '@/components/questions/picker'
 import { EyebrowLabel } from '@/components/ui/eyebrow-label'
@@ -25,7 +24,6 @@ import { FormField } from '@/components/ui/form-field'
 import { IconAffix } from '@/components/ui/icon-affix'
 import { SelectableTile } from '@/components/ui/selectable-tile'
 import { StatusPill } from '@/components/ui/status-pill'
-import { EmptyStateCard, LoadingStateCard } from '@/components/ui/state-card'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
@@ -61,7 +59,30 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
     serverHydrated: true,
     syncUrl: false,
     lockStatus: 'active',
+    disableFetchInCardsView: true,
   })
+  const isCardsView = query.state.view === 'cards'
+  const cardsInfiniteParams = useMemo(
+    () => ({
+      q: query.debouncedQ || undefined,
+      difficulty: query.state.difficulty,
+      category: query.state.category,
+      subcategory: query.state.subcategory,
+      tags: query.state.tags.length > 0 ? query.state.tags : undefined,
+      role: query.state.role,
+      status: query.state.status,
+      sortBy: query.state.sortBy,
+      sortOrder: query.state.sortOrder,
+      limit: query.state.limit,
+    }),
+    [query.debouncedQ, query.state],
+  )
+  const infinite = useQuestionsInfinite({
+    params: cardsInfiniteParams,
+    enabled: isCardsView,
+    serverHydrated: true,
+  })
+  const view = pickQuestionsViewSource(isCardsView, query, infinite)
   const facetsResult = useQuestionFacets(query.state, query.debouncedQ)
   const facets = facetsResult.facets
 
@@ -157,17 +178,6 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
       setSubmitting(false)
     }
   }
-
-  const showEmptyState = !query.loading && query.items.length === 0
-  const allEmpty =
-    showEmptyState &&
-    query.total === 0 &&
-    query.debouncedQ === '' &&
-    !query.state.difficulty &&
-    !query.state.category &&
-    !query.state.subcategory &&
-    !query.state.role &&
-    query.state.tags.length === 0
 
   return (
     <>
@@ -282,8 +292,8 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
                 sortOrder={query.state.sortOrder}
                 onSortChange={query.setSort}
                 activeChips={activeChips}
-                resultCount={query.total}
-                loading={query.loading}
+                resultCount={view.total}
+                loading={view.toolbarLoading}
                 viewToggle={
                   <QuestionViewToggle
                     view={query.state.view}
@@ -292,76 +302,36 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
                 }
               />
 
-              {query.error ? (
-                <EmptyStateCard
-                  tone="ghost"
-                  icon={
-                    <Icon size="lg">
-                      <AlertCircle />
-                    </Icon>
-                  }
-                  title={TOAST_MESSAGES.questionFeed.unavailableTitle}
-                  description={query.error}
-                  action={
-                    <Button
-                      type="button"
-                      variant="outline-pill"
-                      shape="pill"
-                      onClick={query.refetch}
-                    >
-                      Retry
-                    </Button>
-                  }
-                />
-              ) : query.loading && query.items.length === 0 ? (
-                <LoadingStateCard tone="ghost" label="Loading question bank..." />
-              ) : showEmptyState && !query.error ? (
-                <EmptyStateCard
-                  tone="ghost"
-                  title={
-                    allEmpty
-                      ? 'No saved questions yet'
-                      : 'No questions match the current filters'
-                  }
-                  description={
-                    allEmpty
-                      ? 'Create the first reusable prompt before you assemble an interview packet.'
-                      : 'Try clearing some filters or searching with a different term.'
-                  }
-                  action={
-                    allEmpty ? (
-                      <Button asChild variant="gradient">
-                        <Link href="/questions/new">Create your first question</Link>
-                      </Button>
-                    ) : (
-                      <Button
-                        type="button"
-                        variant="outline-pill"
-                        shape="pill"
-                        onClick={query.reset}
-                      >
-                        Reset filters
-                      </Button>
-                    )
-                  }
-                />
-              ) : query.state.view === 'table' ? (
-                <QuestionTable
-                  items={query.items}
-                  selectable
-                  selectedIds={selectedIds}
-                  onToggleSelected={toggleQuestion}
-                  onToggleSelectAll={toggleQuestionsBulk}
-                  onRowClick={toggleQuestion}
-                  sortBy={query.state.sortBy}
-                  sortOrder={query.state.sortOrder}
-                  onSortChange={query.setSort}
-                  page={query.state.page}
-                  loading={query.loading}
-                />
-              ) : (
-                <Stack gap={3}>
-                  {query.items.map((question) => {
+              <QuestionPickerFeed
+                items={view.items}
+                total={view.total}
+                loading={view.loading}
+                error={view.error}
+                onRetry={view.retry}
+                view={query.state.view}
+                debouncedQ={query.debouncedQ}
+                filterState={query.state}
+                onReset={query.reset}
+                tone="ghost"
+                copyVariant="interview"
+                renderTable={() => (
+                  <QuestionTable
+                    items={query.items}
+                    selectable
+                    selectedIds={selectedIds}
+                    onToggleSelected={toggleQuestion}
+                    onToggleSelectAll={toggleQuestionsBulk}
+                    onRowClick={toggleQuestion}
+                    sortBy={query.state.sortBy}
+                    sortOrder={query.state.sortOrder}
+                    onSortChange={query.setSort}
+                    page={query.state.page}
+                    loading={query.loading}
+                  />
+                )}
+                renderCards={() => (
+                  <Stack gap={3}>
+                    {view.items.map((question) => {
                     const selected = selectedById.has(question.id)
                     return (
                       <SelectableTile key={question.id} selected={selected}>
@@ -422,11 +392,30 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
                         </Stack>
                       </SelectableTile>
                     )
-                  })}
-                </Stack>
-              )}
+                    })}
+                  </Stack>
+                )}
+              />
 
-              {!query.error ? (
+              {!isCardsView ? (
+                <QuestionPickerRefetchAlert
+                  error={query.paginationError}
+                  onRetry={query.refetch}
+                />
+              ) : null}
+
+              {isCardsView && view.items.length > 0 ? (
+                <InfiniteCardsLoader
+                  hasNextPage={infinite.hasNextPage}
+                  isFetchingNextPage={infinite.isFetchingNextPage}
+                  totalLoaded={infinite.items.length}
+                  total={infinite.total}
+                  error={infinite.paginationError}
+                  onLoadMore={infinite.fetchNextPage}
+                />
+              ) : null}
+
+              {!isCardsView && !view.error ? (
                 <Pagination
                   page={query.state.page}
                   totalPages={query.totalPages}

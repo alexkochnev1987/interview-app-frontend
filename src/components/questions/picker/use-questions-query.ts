@@ -30,6 +30,7 @@ import {
 } from '@/lib/questions-query-state'
 
 import { questionsListQueryKey } from './query-keys'
+import { splitListQueryErrors } from './split-questions-query-errors'
 
 const SEARCH_DEBOUNCE_MS = 300
 const VIEW_STORAGE_KEY = 'questions:view'
@@ -75,7 +76,8 @@ export type UseQuestionsQueryResult = {
   total: number
   totalPages: number
   loading: boolean
-  error: string | null
+  blockingError: string | null
+  paginationError: string | null
   canReset: boolean
   setQ: Dispatch<SetStateAction<string>>
   setDifficulty: (value: QuestionDifficulty | undefined) => void
@@ -201,10 +203,16 @@ export function useQuestionsQuery(
     })
   }, [total])
 
+  const items = query.data?.items ?? []
   const loading =
     query.isPending || (query.isFetching && query.isPlaceholderData)
-  const error =
+  const errorMessage =
     query.error instanceof Error ? query.error.message : null
+  const { blockingError, paginationError } = splitListQueryErrors(
+    errorMessage,
+    items.length,
+    query.isPlaceholderData,
+  )
 
   const totalPages = useMemo(
     () => Math.max(1, Math.ceil(total / state.limit)),
@@ -300,11 +308,12 @@ export function useQuestionsQuery(
   return {
     state,
     debouncedQ,
-    items: query.data?.items ?? [],
+    items,
     total,
     totalPages,
     loading,
-    error,
+    blockingError,
+    paginationError,
     canReset,
     setQ,
     setDifficulty,

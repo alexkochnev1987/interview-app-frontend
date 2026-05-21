@@ -121,6 +121,6 @@ export async function prefetchInterviewCreatePicker(
 
   return hydrateQuestionsPicker(ctx, queryState, {
     prefetchList: true,
-    prefetchInfinite: false,
+    prefetchInfinite: true,
   })
 }

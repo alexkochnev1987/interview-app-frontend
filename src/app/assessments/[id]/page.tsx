@@ -1,5 +1,3 @@
-import { unstable_noStore as noStore } from 'next/cache'
-
 import { DetailHeader } from '@/components/assessments/detail/detail-header'
 import { EvaluationProgressBanner } from '@/components/assessments/detail/evaluation-progress-banner'
 import { OverallPanel } from '@/components/assessments/detail/overall-panel'
@@ -38,8 +36,6 @@ const UNAVAILABLE_TITLE = TOAST_MESSAGES.pageGate.assessments.unavailableTitle
 export default async function AssessmentDetailPage({
   params,
 }: AssessmentDetailPageProps) {
-  noStore()
-
   const { id } = await params
 
   const returnPath = `/assessments/${encodeURIComponent(id)}`

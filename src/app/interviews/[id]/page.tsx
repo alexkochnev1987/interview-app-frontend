@@ -1,5 +1,3 @@
-import { unstable_noStore as noStore } from 'next/cache'
-
 import InterviewDetailClient from './interview-detail-client'
 
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
@@ -29,8 +27,6 @@ const UNAVAILABLE_TITLE = TOAST_MESSAGES.pageGate.interview.unavailableTitle
 export default async function InterviewDetailPage({
   params,
 }: InterviewDetailPageProps) {
-  noStore()
-
   const { id } = await params
 
   const returnPath = `/interviews/${encodeURIComponent(id)}`

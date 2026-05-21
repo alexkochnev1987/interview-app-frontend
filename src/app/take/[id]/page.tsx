@@ -1,4 +1,3 @@
-import { unstable_noStore as noStore } from 'next/cache'
 import { AlertCircle } from 'lucide-react'
 
 import { PageContent, PageMainLayout } from '@/components/layout/page-shell'
@@ -19,8 +18,6 @@ export default async function TakeInterviewPage({
   params,
   searchParams,
 }: TakeInterviewPageProps) {
-  noStore()
-
   const { id } = await params
   const token = readSearchParamToken((await searchParams).token)
   const ctx = await getServerRequestContext()

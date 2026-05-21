@@ -1,5 +1,3 @@
-import { unstable_noStore as noStore } from 'next/cache'
-
 import { QuestionEditClient } from '@/components/questions/edit/question-edit-client'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
@@ -27,8 +25,6 @@ const ERROR_BACK_HREF = '/questions'
 const ERROR_BACK_LABEL = 'Back to question library'
 
 export default async function EditQuestionPage({ params }: EditQuestionPageProps) {
-  noStore()
-
   const { id } = await params
 
   const returnPath = `/questions/${encodeURIComponent(id)}`

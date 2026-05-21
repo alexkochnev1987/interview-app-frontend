@@ -46,7 +46,7 @@ export async function loadAuthGate(
   }
 
   try {
-    const me = await fetchCachedServerAuthMe(ctx.cookieHeader, ctx.origin)
+    const me = await fetchCachedServerAuthMe(ctx.cookieHeader, ctx.apiBase)
     if (!me) {
       return { kind: 'unauthenticated' }
     }

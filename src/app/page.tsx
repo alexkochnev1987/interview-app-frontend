@@ -1,5 +1,3 @@
-import { unstable_noStore as noStore } from 'next/cache'
-
 import { DashboardView } from '@/components/dashboard/dashboard-view'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
@@ -19,8 +17,6 @@ const ERROR_SIGN_IN_HREF = '/login'
 const ERROR_ESCAPE_HREF = '/questions'
 
 export default async function DashboardPage() {
-  noStore()
-
   const auth = await loadAuthGate(canAccessDashboard)
   redirectIfUnauthenticated(auth, '/')
   if (auth.kind === 'forbidden') {

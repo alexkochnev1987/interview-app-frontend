@@ -1,5 +1,3 @@
-import { unstable_noStore as noStore } from 'next/cache'
-
 import { FeedbackView } from '@/components/feedback/feedback-view'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { type FeedbackResponse } from '@/lib/api'
@@ -18,8 +16,6 @@ export default async function FeedbackPage({
   params,
   searchParams,
 }: FeedbackPageProps) {
-  noStore()
-
   const { id } = await params
   const token = readSearchParamToken((await searchParams).token)
 

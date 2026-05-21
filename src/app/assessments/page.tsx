@@ -1,5 +1,3 @@
-import { unstable_noStore as noStore } from 'next/cache'
-
 import { AssessmentsListClient } from '@/components/assessments/list/assessments-list-client'
 import { AssessmentsListHeader } from '@/components/assessments/list/assessments-list-header'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
@@ -42,8 +40,6 @@ function sortByCompletion(a: Interview, b: Interview): number {
 }
 
 export default async function AssessmentsPage() {
-  noStore()
-
   const auth = await loadAuthGate(canReviewAssessments)
   redirectIfUnauthenticated(auth, '/assessments')
   if (auth.kind === 'forbidden') {

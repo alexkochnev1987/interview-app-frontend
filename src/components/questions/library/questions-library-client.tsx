@@ -1,14 +1,12 @@
 'use client'
 
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { AlertCircle, LoaderCircle, PanelLeftClose, PanelLeftOpen, Search, Trash2 } from 'lucide-react'
+import { LoaderCircle, PanelLeftClose, PanelLeftOpen, Trash2 } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 
 import { questionsRootQueryKey } from '@/components/questions/picker/query-keys'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
-import { EmptyStateCard, LoadingStateCard } from '@/components/ui/state-card'
 import { CardGrid } from '@/components/ui/layout/card-grid'
 import { Grid } from '@/components/ui/layout/grid'
 import { Inline } from '@/components/ui/layout/inline'
@@ -20,7 +18,10 @@ import { QuestionTable } from '@/components/questions/library/question-table'
 import { QuestionsLibraryHeader } from '@/components/questions/library/questions-library-header'
 import {
   buildActiveFilterChips,
+  pickQuestionsViewSource,
   QuestionFacetSidebar,
+  QuestionPickerFeed,
+  QuestionPickerRefetchAlert,
   QuestionPickerToolbar,
   QuestionViewToggle,
   useQuestionFacets,
@@ -212,22 +213,7 @@ export function QuestionsLibraryClient({
   }
 
   const selectedCount = selectedIds.size
-  const viewItems = isCardsView ? infinite.items : query.items
-  const viewTotal = isCardsView ? infinite.total : query.total
-  const viewLoading = isCardsView ? infinite.isInitialLoading : query.loading
-  const viewError = isCardsView ? infinite.blockingError : query.error
-  const viewRetry = isCardsView ? infinite.refetch : query.refetch
-  const allEmpty =
-    viewItems.length === 0 &&
-    !viewLoading &&
-    viewTotal === 0 &&
-    query.debouncedQ === '' &&
-    !query.state.difficulty &&
-    !query.state.category &&
-    !query.state.subcategory &&
-    !query.state.role &&
-    query.state.tags.length === 0 &&
-    query.state.status === 'active'
+  const view = pickQuestionsViewSource(isCardsView, query, infinite)
 
   const sidebar = (
     <QuestionFacetSidebar
@@ -268,8 +254,8 @@ export function QuestionsLibraryClient({
         sortOrder={query.state.sortOrder}
         onSortChange={query.setSort}
         activeChips={activeChips}
-        resultCount={isCardsView ? infinite.total : query.total}
-        loading={isCardsView ? (infinite.isInitialLoading || infinite.isFetching) : query.loading}
+        resultCount={view.total}
+        loading={view.toolbarLoading}
         viewToggle={
           <Inline gap={2} align="center">
             <Button
@@ -321,80 +307,58 @@ export function QuestionsLibraryClient({
         <BulkDeleteResultAlerts result={bulkResult} />
       )}
 
-      {viewError ? (
-        <EmptyStateCard
-          icon={
-            <Icon size="lg">
-              <AlertCircle />
-            </Icon>
-          }
-          title={TOAST_MESSAGES.questionFeed.unavailableTitle}
-          description={viewError}
-          action={
-            <Button
-              type="button"
-              variant="outline-pill"
-              shape="pill"
-              onClick={viewRetry}
-            >
-              Retry
-            </Button>
-          }
-        />
-      ) : viewItems.length === 0 && viewLoading ? (
-        <LoadingStateCard label="Loading questions..." />
-      ) : viewItems.length === 0 ? (
-        <EmptyStateCard
-          icon={<Icon size="lg"><Search /></Icon>}
-          title={allEmpty ? 'No saved questions yet' : 'No questions match the current filters'}
-          description={
-            allEmpty
-              ? 'Create your first reusable prompt and start building a structured question bank.'
-              : 'Try widening the search, clearing a filter, or resetting back to defaults.'
-          }
-          action={
-            allEmpty ? (
-              <Button asChild variant="gradient">
-                <Link href="/questions/new">Create Question</Link>
-              </Button>
-            ) : (
-              <Button type="button" variant="outline-pill" shape="pill" onClick={query.reset}>
-                Reset filters
-              </Button>
-            )
-          }
-        />
-      ) : query.state.view === 'table' ? (
-        <QuestionTable
-          items={query.items}
-          selectable={isSuperAdmin}
-          selectedIds={selectedIds}
-          onToggleSelected={toggleSelected}
-          onToggleSelectAll={toggleSelectAll}
-          onRowClick={(q) => router.push(`/questions/${q.id}`)}
-          sortBy={query.state.sortBy}
-          sortOrder={query.state.sortOrder}
-          onSortChange={query.setSort}
-          page={query.state.page}
-          loading={query.loading}
-        />
-      ) : (
-        <div ref={cardsScrollRootRef}>
-          <CardGrid>
-            {viewItems.map((question) => (
-              <QuestionCard
-                key={question.id}
-                question={question}
-                selectable={isSuperAdmin}
-                selected={selectedIds.has(question.id)}
-                onToggleSelected={() => toggleSelected(question)}
-              />
-            ))}
-          </CardGrid>
-        </div>
-      )}
+      <QuestionPickerFeed
+        items={view.items}
+        total={view.total}
+        loading={view.loading}
+        error={view.error}
+        onRetry={view.retry}
+        view={query.state.view}
+        debouncedQ={query.debouncedQ}
+        filterState={query.state}
+        onReset={query.reset}
+        copyVariant="library"
+        requireActiveStatusForEmptyBank={isSuperAdmin}
+        renderTable={() => (
+          <QuestionTable
+            items={query.items}
+            selectable={isSuperAdmin}
+            selectedIds={selectedIds}
+            onToggleSelected={toggleSelected}
+            onToggleSelectAll={toggleSelectAll}
+            onRowClick={(q) => router.push(`/questions/${q.id}`)}
+            sortBy={query.state.sortBy}
+            sortOrder={query.state.sortOrder}
+            onSortChange={query.setSort}
+            page={query.state.page}
+            loading={query.loading}
+          />
+        )}
+        renderCards={() => (
+          <div ref={cardsScrollRootRef}>
+            <CardGrid>
+              {view.items.map((question) => (
+                <QuestionCard
+                  key={question.id}
+                  question={question}
+                  selectable={isSuperAdmin}
+                  selected={selectedIds.has(question.id)}
+                  onToggleSelected={() => toggleSelected(question)}
+                />
+              ))}
+            </CardGrid>
+          </div>
+        )}
+      />
 
-      {isCardsView && viewItems.length > 0 ? (
+      {!isCardsView ? (
+        <QuestionPickerRefetchAlert
+          error={query.paginationError}
+          onRetry={query.refetch}
+        />
+      ) : null}
+
+      {isCardsView && view.items.length > 0 ? (
         <InfiniteCardsLoader
           hasNextPage={infinite.hasNextPage}
           isFetchingNextPage={infinite.isFetchingNextPage}
@@ -405,7 +369,7 @@ export function QuestionsLibraryClient({
         />
       ) : null}
 
-      {!isCardsView && !viewError ? (
+      {!isCardsView && !view.error ? (
         <Pagination
           page={query.state.page}
           totalPages={query.totalPages}
@@ -420,9 +384,9 @@ export function QuestionsLibraryClient({
   return (
     <>
       <QuestionsLibraryHeader
-        loading={viewLoading}
-        totalCount={viewTotal}
-        visibleCount={viewItems.length}
+        loading={view.loading}
+        totalCount={view.total}
+        visibleCount={view.items.length}
       />
 
       {sidebarHidden ? (

@@ -1,5 +1,3 @@
-import { unstable_noStore as noStore } from 'next/cache'
-
 import { QuestionsLibraryClient } from '@/components/questions/library/questions-library-client'
 import { QueryHydrationBoundary } from '@/components/questions/query-hydration-boundary'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
@@ -21,8 +19,6 @@ interface QuestionsPageProps {
 }
 
 export default async function QuestionsPage({ searchParams }: QuestionsPageProps) {
-  noStore()
-
   const auth = await loadAuthGate(canReadQuestions)
   redirectIfUnauthenticated(auth, '/questions')
 

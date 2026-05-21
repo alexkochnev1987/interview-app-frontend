@@ -9,6 +9,7 @@ import {
 } from '@/lib/api'
 
 import { questionsInfiniteQueryKey } from './query-keys'
+import { splitInfiniteQueryErrors } from './split-questions-query-errors'
 
 export type UseQuestionsInfiniteOptions = {
   params: Omit<FetchQuestionsParams, 'page'>
@@ -65,12 +66,11 @@ export function useQuestionsInfinite({
 
   const errorMessage =
     query.error instanceof Error ? query.error.message : null
-  const paginationError =
-    errorMessage != null && items.length > 0 && !query.isPlaceholderData
-      ? errorMessage
-      : null
-  const blockingError =
-    errorMessage != null && paginationError == null ? errorMessage : null
+  const { blockingError, paginationError } = splitInfiniteQueryErrors(
+    errorMessage,
+    items.length,
+    query.isPlaceholderData,
+  )
 
   return {
     items,

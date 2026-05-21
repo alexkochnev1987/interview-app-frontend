@@ -1,5 +1,3 @@
-import { unstable_noStore as noStore } from 'next/cache'
-
 import { QuestionNewClient } from '@/components/questions/new/question-new-client'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
@@ -13,8 +11,6 @@ const ERROR_BACK_HREF = '/questions'
 const ERROR_BACK_LABEL = 'Back to question library'
 
 export default async function NewQuestionPage() {
-  noStore()
-
   const auth = await loadAuthGate(canCreateQuestions)
   redirectIfUnauthenticated(auth, '/questions/new')
   if (auth.kind === 'forbidden') {

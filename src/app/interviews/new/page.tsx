@@ -1,5 +1,3 @@
-import { unstable_noStore as noStore } from 'next/cache'
-
 import { InterviewCreateForm } from '@/components/interviews/interview-create-form'
 import { QueryHydrationBoundary } from '@/components/questions/query-hydration-boundary'
 import { InterviewCreateIntro } from '@/components/interviews/interview-create-intro'
@@ -17,8 +15,6 @@ const ERROR_BACK_HREF = '/'
 const ERROR_BACK_LABEL = 'Back to dashboard'
 
 export default async function NewInterviewPage() {
-  noStore()
-
   const auth = await loadAuthGate(canConfigureInterview)
   redirectIfUnauthenticated(auth, '/interviews/new')
   if (auth.kind === 'forbidden') {
