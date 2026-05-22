@@ -6,6 +6,7 @@ interface QuestionEditorFieldProps {
   children: ReactNode
   className?: string
   hint?: string
+  labelTooltip?: ReactNode
   htmlFor: string
   label: string
   error?: string
@@ -14,12 +15,19 @@ interface QuestionEditorFieldProps {
 export function QuestionEditorField({
   children,
   hint,
+  labelTooltip,
   htmlFor,
   label,
   error,
 }: QuestionEditorFieldProps) {
   return (
-    <FormField htmlFor={htmlFor} label={label} hint={hint} error={error}>
+    <FormField
+      htmlFor={htmlFor}
+      label={label}
+      hint={hint}
+      labelTooltip={labelTooltip}
+      error={error}
+    >
       {children}
     </FormField>
   )

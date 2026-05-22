@@ -8,6 +8,7 @@ const textareaVariants = cva(
   {
     variants: {
       size: {
+        xs: "min-h-[72px] text-base",
         sm: "min-h-[120px] text-base",
         md: "min-h-[150px] text-base",
         lg: "min-h-[180px] text-base",

@@ -47,7 +47,7 @@ export function QuestionsLibraryHeader({
               </HeroLead>
             </Stack>
             <Inline>
-              <Button asChild variant="gradient" size="hero">
+              <Button asChild variant="gradient" size="hero" shape="pill">
                 <Link href="/questions/new">
                   <Plus className="size-5" />
                   New Question

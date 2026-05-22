@@ -6,15 +6,23 @@ import {
   type ReactElement,
   type ReactNode,
 } from 'react'
+import { HelpCircle } from 'lucide-react'
 
 import { Label } from '@/components/ui/label'
 import { Stack } from '@/components/ui/layout/stack'
+import { Inline } from '@/components/ui/layout/inline'
 import { BodyText } from '@/components/ui/text'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 
 interface FormFieldProps {
   htmlFor?: string
   label: ReactNode
   hint?: ReactNode
+  labelTooltip?: ReactNode
   error?: string
   children: ReactNode
 }
@@ -50,7 +58,14 @@ function withControlAria(child: ReactNode, aria: ControlAriaProps): ReactNode {
   return patched ? cloneElement(child, {}, nextChildren) : child
 }
 
-export function FormField({ htmlFor, label, hint, error, children }: FormFieldProps) {
+export function FormField({
+  htmlFor,
+  label,
+  hint,
+  labelTooltip,
+  error,
+  children,
+}: FormFieldProps) {
   const baseId = useId()
   const errorId = `${baseId}-error`
   const controlAria = error
@@ -63,8 +78,24 @@ export function FormField({ htmlFor, label, hint, error, children }: FormFieldPr
   return (
     <Stack gap={2}>
       <Stack gap={1}>
-        <Label htmlFor={htmlFor}>{label}</Label>
-        {hint ? <BodyText size="sm">{hint}</BodyText> : null}
+        {labelTooltip ? (
+          <Inline gap={2} align="center">
+            <Label htmlFor={htmlFor}>{label}</Label>
+            <Tooltip>
+              <TooltipTrigger
+                type="button"
+                aria-label="More information"
+                className="inline-flex size-4 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+              >
+                <HelpCircle className="size-4" />
+              </TooltipTrigger>
+              <TooltipContent>{labelTooltip}</TooltipContent>
+            </Tooltip>
+          </Inline>
+        ) : (
+          <Label htmlFor={htmlFor}>{label}</Label>
+        )}
+        {hint && !labelTooltip ? <BodyText size="sm">{hint}</BodyText> : null}
       </Stack>
       {controlAria && singleChild
         ? withControlAria(singleChild, controlAria)
