@@ -143,7 +143,7 @@ function RawListTextarea<T extends ListItem>({
   return (
     <Textarea
       id={id}
-      size="xl"
+      size="xs"
       tone="code"
       value={text}
       onChange={(event) => handleChange(event.target.value)}
