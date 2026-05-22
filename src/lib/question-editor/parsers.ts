@@ -35,6 +35,10 @@ export const DEFAULT_VALUE: QuestionInput = {
 }
 
 export const DRAFT_FIELDS: Array<{ key: DraftFieldKey; label: string }> = [
+  { key: 'externalId', label: 'External ID' },
+  { key: 'role', label: 'Role' },
+  { key: 'focus', label: 'Focus' },
+  { key: 'outputLanguage', label: 'Output Language' },
   { key: 'questionText', label: 'Question Text' },
   { key: 'category', label: 'Category' },
   { key: 'subcategory', label: 'Subcategory' },

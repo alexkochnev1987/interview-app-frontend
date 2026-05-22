@@ -40,53 +40,65 @@ export function EditorIdentitySection({
       description="Anchor the prompt in the role and taxonomy you expect recruiters to search later."
       icon={<BrainCircuit className="size-4" />}
     >
-      <Grid columns="identity-4" gap={5}>
-        <QuestionEditorField
-          htmlFor="externalId"
-          label="External ID"
-          hint="Optional stable identifier for imports."
-        >
-          <Input
-            id="externalId"
-            value={value.externalId ?? ''}
-            onChange={(event) => onUpdate({ externalId: event.target.value })}
-            placeholder="frontend_closure_v1"
-            disabled={submitting}
-          />
-        </QuestionEditorField>
-
-        <QuestionEditorField htmlFor="role" label="Role">
-          <Input
-            id="role"
-            value={value.role ?? ''}
-            onChange={(event) => onUpdate({ role: event.target.value })}
-            placeholder="frontend intern"
-            disabled={submitting}
-          />
-        </QuestionEditorField>
-
-        <QuestionEditorField htmlFor="focus" label="Focus">
-          <Input
-            id="focus"
-            value={value.focus ?? ''}
-            onChange={(event) => onUpdate({ focus: event.target.value })}
-            placeholder="fundamentals"
-            disabled={submitting}
-          />
-        </QuestionEditorField>
-
-        <QuestionEditorField htmlFor="outputLanguage" label="Output language">
-          <Input
-            id="outputLanguage"
-            value={value.outputLanguage}
-            onChange={(event) => onUpdate({ outputLanguage: event.target.value })}
-            placeholder="English"
-            disabled={submitting}
-          />
-        </QuestionEditorField>
-      </Grid>
-
       <Grid columns="identity-5" gap={5}>
+        <Stack gap={2}>
+          <QuestionEditorField
+            htmlFor="externalId"
+            label="External ID"
+            labelTooltip="Optional stable identifier for imports."
+          >
+            <Input
+              id="externalId"
+              value={value.externalId ?? ''}
+              onChange={(event) => onUpdate({ externalId: event.target.value })}
+              placeholder="frontend_closure_v1"
+              disabled={submitting}
+            />
+          </QuestionEditorField>
+          {renderAiSuggestion('externalId')}
+        </Stack>
+
+        <Stack gap={2}>
+          <QuestionEditorField htmlFor="role" label="Role">
+            <Input
+              id="role"
+              value={value.role ?? ''}
+              onChange={(event) => onUpdate({ role: event.target.value })}
+              placeholder="frontend intern"
+              disabled={submitting}
+            />
+          </QuestionEditorField>
+          {renderAiSuggestion('role')}
+        </Stack>
+
+        <Stack gap={2}>
+          <QuestionEditorField htmlFor="focus" label="Focus">
+            <Input
+              id="focus"
+              value={value.focus ?? ''}
+              onChange={(event) => onUpdate({ focus: event.target.value })}
+              placeholder="fundamentals"
+              disabled={submitting}
+            />
+          </QuestionEditorField>
+          {renderAiSuggestion('focus')}
+        </Stack>
+
+        <Stack gap={2}>
+          <QuestionEditorField htmlFor="outputLanguage" label="Output language">
+            <Input
+              id="outputLanguage"
+              value={value.outputLanguage}
+              onChange={(event) => onUpdate({ outputLanguage: event.target.value })}
+              placeholder="English"
+              disabled={submitting}
+            />
+          </QuestionEditorField>
+          {renderAiSuggestion('outputLanguage')}
+        </Stack>
+
+        <div aria-hidden className="hidden xl:block" />
+
         <Stack gap={2}>
           <QuestionEditorField htmlFor="category" label="Category">
             <Input

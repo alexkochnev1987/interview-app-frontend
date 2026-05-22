@@ -1,6 +1,7 @@
 'use client'
 
-import { EyebrowLabel } from '@/components/ui/eyebrow-label'
+import { X } from 'lucide-react'
+
 import { SurfaceTile } from '@/components/ui/surface-tile'
 import { Button } from '@/components/ui/button'
 import { CodeBlock } from '@/components/ui/code-block'
@@ -15,32 +16,35 @@ interface AiSuggestionRowProps {
   onKeep: () => void
 }
 
-export function AiSuggestionRow({
-  value,
-  onApply,
-  onKeep,
-}: AiSuggestionRowProps) {
+export function AiSuggestionRow({ value, onApply, onKeep }: AiSuggestionRowProps) {
   return (
-    <SurfaceTile tone="primary-soft" rounded="xl" padding="md">
-      <Stack gap={3}>
-        <Inline gap={3} align="center" justify="between" wrap="wrap">
-          <EyebrowLabel tone="primary">AI suggestion</EyebrowLabel>
-          <Inline gap={2} wrap="wrap">
-            <Button type="button" size="sm" variant="gradient" onClick={onApply}>
-              Use AI value
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant="outline-pill"
-              shape="pill"
-              onClick={onKeep}
-            >
-              Keep current
-            </Button>
-          </Inline>
+    <SurfaceTile tone="primary-soft" rounded="xl" padding="sm" className="relative">
+      <Button
+        type="button"
+        size="icon-xs"
+        variant="ghost"
+        shape="pill"
+        aria-label="Dismiss AI suggestion"
+        onClick={onKeep}
+        className="absolute right-1.5 top-1.5"
+      >
+        <X />
+      </Button>
+      <Stack gap={2}>
+        <CodeBlock className="pr-6 text-xs leading-5 break-all">
+          {previewValue(value)}
+        </CodeBlock>
+        <Inline gap={1} align="center" justify="end">
+          <Button
+            type="button"
+            size="xs"
+            variant="gradient"
+            shape="pill"
+            onClick={onApply}
+          >
+            Use AI
+          </Button>
         </Inline>
-        <CodeBlock>{previewValue(value)}</CodeBlock>
       </Stack>
     </SurfaceTile>
   )
