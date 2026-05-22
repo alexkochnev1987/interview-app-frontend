@@ -136,9 +136,6 @@ export function QuestionEditor({
   function applyDraftField(field: DraftFieldKey) {
     if (!aiDraft) return
     update({ [field]: aiDraft[field] } as Partial<QuestionInput>)
-    setDismissedDraftFields((current) =>
-      current.includes(field) ? current : [...current, field],
-    )
   }
 
   function keepCurrentField(field: DraftFieldKey) {
@@ -167,7 +164,6 @@ export function QuestionEditor({
 
   function renderAiSuggestion(field: DraftFieldKey) {
     if (!aiDraft) return null
-    if (dismissedDraftFields.includes(field)) return null
     if (pendingDraftFields.some((p) => p.key === field)) {
       return (
         <AiSuggestionRow
