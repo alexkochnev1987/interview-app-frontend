@@ -147,7 +147,7 @@ After the alert → toast migration, use this split:
 
 Do not use `useEffect` + module-level dedupe to fire toasts when `error` or `result` state changes.
 
-Do not remove remaining `Alert` usages to “finish” the migration unless the UX above is preserved another way. Validators live in `src/lib/form-validation.ts` (login, new interview) and `src/lib/question-editor/validate-question-form.ts` (question editor). Copy lives in `src/lib/toast-messages.ts` for toasts; whitelisted Alerts may stay hardcoded or use `TOAST_MESSAGES` where shared.
+Do not remove remaining `Alert` usages to “finish” the migration unless the UX above is preserved another way. Field error state uses `FieldErrors` from `src/lib/clear-field-error.ts`; question editor validation lives in `src/lib/question-editor/validate-question-form.ts`. Copy lives in `src/lib/toast-messages.ts` for toasts; whitelisted Alerts may stay hardcoded or use `TOAST_MESSAGES` where shared.
 
 ### Что запускается в Docker
 ```

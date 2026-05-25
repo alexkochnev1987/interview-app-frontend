@@ -5,6 +5,7 @@ import { getTakeInterview, type TakeInterviewData } from '@/lib/api';
 interface UseTakeInterviewLoaderParams {
   id: string;
   candidateToken: string;
+  skipInitialLoad?: boolean;
   onData: (data: TakeInterviewData, mode: 'initial' | 'resume', tokenOverride?: string) => void;
   onError: (message: string) => void;
   onCleanup: () => void;
@@ -13,6 +14,7 @@ interface UseTakeInterviewLoaderParams {
 export function useTakeInterviewLoader({
   id,
   candidateToken,
+  skipInitialLoad,
   onData,
   onError,
   onCleanup,
@@ -45,12 +47,14 @@ export function useTakeInterviewLoader({
   );
 
   useEffect(() => {
-    void loadInterview('initial', candidateTokenRef.current);
+    if (!skipInitialLoad) {
+      void loadInterview('initial', candidateTokenRef.current)
+    }
 
     return () => {
-      onCleanupRef.current();
-    };
-  }, [loadInterview]);
+      onCleanupRef.current()
+    }
+  }, [loadInterview, skipInitialLoad])
 
   return { loadInterview };
 }

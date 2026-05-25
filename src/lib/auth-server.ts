@@ -7,11 +7,11 @@ import { getServerRequestContext, requestServer } from './server-fetch';
 export const fetchCachedServerAuthMe = cache(
   async (
     cookieHeader: string,
-    origin: string,
+    apiBase: string,
   ): Promise<AuthUserResponseDto | undefined> => {
     return requestServer<AuthUserResponseDto>('/auth/me', {
       cookieHeader,
-      origin,
+      apiBase,
     });
   },
 );
@@ -28,7 +28,7 @@ export async function getServerSessionSnapshot(): Promise<ServerSessionSnapshot>
   }
 
   try {
-    const me = await fetchCachedServerAuthMe(ctx.cookieHeader, ctx.origin);
+    const me = await fetchCachedServerAuthMe(ctx.cookieHeader, ctx.apiBase);
     return { user: me ?? null };
   } catch {
     return { user: null };

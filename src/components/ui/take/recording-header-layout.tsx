@@ -53,10 +53,9 @@ export function RecordingHeaderRow({ children }: { children: ReactNode }) {
         </Inline>
         <Inline
           align="center"
-          wrap="wrap"
+          wrap="nowrap"
           gap={2}
-          width="full"
-          className="min-w-0 lg:min-h-0 lg:min-w-0 lg:flex-1 lg:justify-end"
+          className="min-w-0 shrink-0 overflow-x-auto lg:ml-auto"
         >
           {right}
         </Inline>
@@ -72,7 +71,7 @@ export function RecordingHeaderShell({ children }: { children: ReactNode }) {
       justify="center"
       width="full"
       className={cn(
-        'relative min-h-12 shrink-0 overflow-hidden rounded-xl bg-white px-4 py-2',
+        'relative min-h-10 shrink-0 overflow-hidden rounded-xl bg-white px-3 py-1',
         'dark:bg-background',
       )}
     >

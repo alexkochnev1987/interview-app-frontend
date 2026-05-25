@@ -33,26 +33,22 @@ export const TAKE_MESSAGES = {
   lobbyPreviewCameraOffLead: 'Tap the camera icon in the controls to turn your preview back on.',
   lobbyPreviewMutedTitle: 'Camera preview paused',
   lobbyPreviewMutedLead: 'Tap the microphone or camera icon in the controls to allow access and show your preview.',
+  sessionSyncFailedTitle: 'Session could not start',
+  sessionSyncFailed:
+    'Could not establish your interview session. Refresh the invite link or open it again in this browser.',
   consentContinue: 'Continue to device check',
   consentPrepHint:
     "Next you'll activate your microphone and camera, preview yourself, then share your entire screen to join.",
-
   guidanceInterview:
     'While recording, tap Submit when you are finished, or Retake to record another attempt.',
-
   guidanceBeforeRecording:
     'Your camera and full screen share stay on. Recording starts automatically when this question is ready.',
-
   guidanceInterviewerSpeaking:
     'The interviewer is reading the question aloud. Recording will start automatically when they finish.',
-
-  sessionReadyLabel: 'Ready to record',
-
   recordingSessionTitleInterview: 'Interview',
-
+  sessionReadyLabel: 'Ready to record',
   recordingPrepLabel: 'Preparing session…',
   recordingStartingBusy: 'Starting recording…',
-
   beforeUnloadLeaveInterview:
     'If you reload or leave now, you will exit this interview and may lose your progress. Are you sure?',
 } as const;

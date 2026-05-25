@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { useBrowserTranscript } from '@/lib/use-browser-transcript';
 import { type TakeInterviewData } from '@/lib/api';
@@ -27,6 +27,7 @@ import {
 import { useTakeAnswerPersistence } from './use-take-answer-persistence';
 import { useTakeBehaviorTracking } from './use-take-behavior-tracking';
 import { useTakeBeginRecording } from './use-take-begin-recording';
+import { useTakeCandidateSession } from './use-take-candidate-session';
 import { useTakeInterviewLoader } from './use-take-interview-loader';
 import { useTakePermissions } from './use-take-permissions';
 import { useTakeRecordingControls } from './use-take-recording-controls';
@@ -47,6 +48,7 @@ const PREVIEW_STAGES = new Set<TakeStage>(['interview', 'recording', 'lobby']);
 interface UseTakeOrchestratorParams {
   id: string;
   candidateToken: string;
+  initialInterview?: TakeInterviewData;
 }
 
 function syncVideoPreview(node: HTMLVideoElement | null, stream: MediaStream | null) {
@@ -68,7 +70,7 @@ function setStreamTracksEnabled(stream: MediaStream, kind: 'audio' | 'video', en
   });
 }
 
-export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorParams) {
+export function useTakeOrchestrator({ id, candidateToken, initialInterview }: UseTakeOrchestratorParams) {
   const {
     isSupported: isBrowserTranscriptSupported,
     interimTranscript,
@@ -96,8 +98,14 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     ],
   );
 
-  const [stage, setStage] = useState<TakeStage>('loading');
-  const [interview, setInterview] = useState<TakeInterviewData | null>(null);
+  const [stage, setStage] = useState<TakeStage>(() =>
+    initialInterview
+      ? stageAfterInterviewLoad(initialInterview, 'initial')
+      : 'loading',
+  );
+  const [interview, setInterview] = useState<TakeInterviewData | null>(
+    initialInterview ?? null,
+  );
   const [error, setError] = useState('');
   const [consent, setConsent] = useState(false);
   const [recording, setRecording] = useState(false);
@@ -115,6 +123,15 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
   const [recordingStartBusy, setRecordingStartBusy] = useState(false);
   const [lobbyMicOn, setLobbyMicOn] = useState(false);
   const [lobbyCameraOn, setLobbyCameraOn] = useState(false);
+  const {
+    candidateSessionReady,
+    sessionSyncError,
+    retrySessionSync,
+  } = useTakeCandidateSession({
+    interviewId: id,
+    candidateToken,
+    sessionReady: !candidateToken || Boolean(initialInterview),
+  });
 
   const [interviewerPresence, questionSpeechRecordingAllowedRef] = useTakeQuestionTts(
     interview,
@@ -165,7 +182,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     setLobbyCameraOn(false);
   }
 
-  function clearRecordingArtifacts() {
+  const clearRecordingArtifacts = useCallback(() => {
     clearProgressTimers(timerRef, progressHeartbeatRef, progressFlushTimeoutRef);
     answerStartedAtRef.current = null;
     answerStartedAtMsRef.current = null;
@@ -179,7 +196,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     progressRequestChainRef.current = Promise.resolve();
     multipartUploadsRef.current = { camera: null, screen: null };
     resetBrowserTranscript();
-  }
+  }, [resetBrowserTranscript]);
 
   useEffect(() => {
     if (!PREVIEW_STAGES.has(stage)) {
@@ -223,7 +240,9 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
   const { loadInterview } = useTakeInterviewLoader({
     id,
     candidateToken,
+    skipInitialLoad: Boolean(initialInterview),
     onData: (data, mode, tokenOverride) => {
+      setError('');
       setInterview(data);
       if (mode === 'initial' && tokenOverride && typeof window !== 'undefined') {
         window.history.replaceState(null, '', `/take/${id}`);
@@ -314,6 +333,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
   }
 
   const lobbyJoinReady =
+    candidateSessionReady &&
     cameraStatus === 'granted' &&
     lobbyMicOn &&
     lobbyCameraOn &&
@@ -351,7 +371,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
       beginRecordingRef.current(nextVersionNumber, currentQuestionIndex),
   });
 
-  function onRecordersStopped() {
+  const onRecordersStopped = useCallback(() => {
     const shouldDiscard = discardRecordingRef.current;
     discardRecordingRef.current = false;
     if (shouldDiscard) {
@@ -368,9 +388,9 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     }
 
     void persistCurrentVersion(pendingAction);
-  }
+  }, [clearRecordingArtifacts, persistCurrentVersion]);
 
-  function stopActiveRecorders() {
+  const stopActiveRecorders = useCallback(() => {
     clearProgressTimers(timerRef, progressHeartbeatRef, progressFlushTimeoutRef);
     stoppedRecordersRef.current = 0;
     expectedRecorderStopsRef.current = stopActiveTakeMediaRecorders(
@@ -381,7 +401,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
       onRecordersStopped();
     }
     setRecording(false);
-  }
+  }, [onRecordersStopped]);
 
   function resetInterviewSetup(message: string) {
     discardRecordingRef.current = true;
@@ -439,7 +459,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
         screenTrack.onended = null;
       }
     };
-  }, [stage]);
+  }, [stage, abortMultipartUploads, clearRecordingArtifacts, stopActiveRecorders]);
 
   useTakeBehaviorTracking({
     recording,
@@ -548,6 +568,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
 
   const capturePipelineReady = Boolean(
     interview &&
+      candidateSessionReady &&
       !setupError &&
       cameraStatus === 'granted' &&
       screenStatus === 'granted' &&
@@ -565,6 +586,9 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
       return;
     }
     if (!capturePipelineReady || setupError) {
+      return;
+    }
+    if (!candidateSessionReady) {
       return;
     }
     if (!questionSpeechRecordingAllowedRef.current) {
@@ -597,6 +621,7 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     uploading,
     recordingStartBusy,
     capturePipelineReady,
+    candidateSessionReady,
     interviewerPresence,
     questionSpeechRecordingAllowedRef,
   ]);
@@ -605,6 +630,9 @@ export function useTakeOrchestrator({ id, candidateToken }: UseTakeOrchestratorP
     stage,
     interview,
     error,
+    candidateSessionReady,
+    sessionSyncError,
+    retrySessionSync,
     consent,
     recording,
     timeLeft,

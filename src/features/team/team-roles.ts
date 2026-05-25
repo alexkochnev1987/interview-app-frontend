@@ -47,14 +47,14 @@ export function teamRoleFilterSelectOptions(): {
   ]
 }
 
-export function assignableRoleRadioOptions(): {
+function assignableRoleRadioOptions(): {
   value: TeamMemberRole
   label: string
 }[] {
   return TEAM_ROLE_ROWS.map((r) => ({ value: r.id, label: r.label }))
 }
 
-export const TEAM_ROLES_ASSIGNABLE_BY_ACTOR: Record<
+const TEAM_ROLES_ASSIGNABLE_BY_ACTOR: Record<
   TeamMemberRole,
   readonly TeamMemberRole[]
 > = {

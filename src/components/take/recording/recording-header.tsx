@@ -8,7 +8,7 @@ import {
   RecordingHeaderShell,
   RecordingHeaderTitleCluster,
 } from '@/components/ui/take';
-import { TakeRecordingStatus } from './recording-status';
+import { TakeRecordingHeaderStatus } from '@/components/take/recording/recording-header-status';
 import type { InterviewDataView, TakeStage } from '@/components/take/types';
 import type { VersionPersistKind } from '@/features/take/session-machine';
 import { TAKE_RECORDING_LIMIT_SECONDS, formatRecordingLimitLabel, TAKE_MESSAGES } from '@/features/take';
@@ -58,15 +58,12 @@ export function TakeRecordingHeader({
           </RecordingHeaderCluster>
 
           <RecordingHeaderCluster>
-            <Inline wrap="wrap" align="center" gap={3}>
-              <StatusPill tone="completed" size="compact">
+            <Inline wrap="nowrap" align="center" gap={2}>
+              <StatusPill tone="completed" size="header">
                 Camera + mic
               </StatusPill>
-              <StatusPill tone="completed" size="compact">
-                {screenSurface === 'monitor' ? 'Full screen' : 'Screen pending'}
-              </StatusPill>
-              <TakeRecordingStatus
-                density="compact"
+              <TakeRecordingHeaderStatus
+                screenSurface={screenSurface}
                 stage={stage}
                 recording={recording}
                 recordingStartBusy={recordingStartBusy}

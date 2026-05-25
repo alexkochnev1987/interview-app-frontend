@@ -1,5 +1,3 @@
-import { unstable_noStore as noStore } from 'next/cache'
-
 import { DetailHeader } from '@/components/assessments/detail/detail-header'
 import { EvaluationProgressBanner } from '@/components/assessments/detail/evaluation-progress-banner'
 import { OverallPanel } from '@/components/assessments/detail/overall-panel'
@@ -16,7 +14,11 @@ import { Stack } from '@/components/ui/layout/stack'
 import { SectionHeading } from '@/components/ui/text'
 import { type Interview } from '@/lib/api'
 import { deriveReviewStatus } from '@/lib/assessment-status'
-import { loadAuthGate } from '@/lib/auth-gate'
+import {
+  loadAuthGate,
+  redirectIfUnauthenticated,
+  redirectIfUnauthorizedError,
+} from '@/lib/auth-gate'
 import { canReviewAssessments } from '@/lib/auth-roles'
 import { isForbiddenError, requestServer } from '@/lib/server-fetch'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
@@ -34,11 +36,11 @@ const UNAVAILABLE_TITLE = TOAST_MESSAGES.pageGate.assessments.unavailableTitle
 export default async function AssessmentDetailPage({
   params,
 }: AssessmentDetailPageProps) {
-  noStore()
-
   const { id } = await params
 
+  const returnPath = `/assessments/${encodeURIComponent(id)}`
   const auth = await loadAuthGate(canReviewAssessments)
+  redirectIfUnauthenticated(auth, returnPath)
   if (auth.kind === 'forbidden') {
     return (
       <ForbiddenAccessPage
@@ -67,6 +69,7 @@ export default async function AssessmentDetailPage({
       (await requestServer<Interview>(`/interviews/${encodedId}`, auth.ctx)) ??
       null
   } catch (err) {
+    redirectIfUnauthorizedError(err, returnPath)
     if (isForbiddenError(err)) {
       return (
         <ForbiddenAccessPage

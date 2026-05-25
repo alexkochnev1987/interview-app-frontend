@@ -1,25 +1,39 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+import {
+  loginReturnPath,
+  safeRedirectPath,
+} from '@/lib/safe-redirect-path';
+
 export function proxy(request: NextRequest) {
   const session = request.cookies.get('session');
   const path = request.nextUrl.pathname;
 
-  if (path.startsWith('/api')) {
+  if (path.startsWith('/api') || path.startsWith('/_next')) {
     return NextResponse.next();
   }
 
   const isPublicPage =
     path === '/login' ||
     path.startsWith('/take') ||
-    path.startsWith('/feedback');
+    path.startsWith('/feedback') ||
+    path.startsWith('/demo');
 
   if (!session && !isPublicPage) {
-    return NextResponse.redirect(new URL('/login', request.url));
+    const loginUrl = new URL('/login', request.url);
+    const returnPath = `${path}${request.nextUrl.search}`;
+    const safeFrom = loginReturnPath(returnPath);
+    if (safeFrom) {
+      loginUrl.searchParams.set('from', safeFrom);
+    }
+    return NextResponse.redirect(loginUrl);
   }
 
   if (session && path === '/login') {
-    return NextResponse.redirect(new URL('/', request.url));
+    const from = request.nextUrl.searchParams.get('from');
+    const destination = safeRedirectPath(from);
+    return NextResponse.redirect(new URL(destination, request.url));
   }
 
   return NextResponse.next();

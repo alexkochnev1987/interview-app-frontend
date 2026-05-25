@@ -45,6 +45,22 @@ export const TOAST_MESSAGES = {
     noMatches: "No close matches crossed the current similarity threshold.",
   },
   pageGate: {
+    login: {
+      failedTitle: "Authentication failed",
+      failedFallback: "Login failed",
+      signingInLabel: "Signing in...",
+      signInLabel: "Sign In",
+    },
+    dashboard: {
+      forbiddenTitle: "You don't have access to the dashboard",
+      forbiddenDescription:
+        "The dashboard is reserved for HR, admin, and super-admin users. If you think this is a mistake, contact your workspace owner.",
+      unavailableTitle: "Dashboard is unavailable right now",
+      loadFailedTitle: "Could not load dashboard",
+      loadFailedFallback: "Failed to load interviews.",
+      signInActionLabel: "Sign in",
+      questionBankActionLabel: "Go to question bank",
+    },
     assessments: {
       loadFailedTitle: "Could not load assessments",
       loadFailedFallback: "Failed to load assessments.",
@@ -53,10 +69,18 @@ export const TOAST_MESSAGES = {
       notFoundFallback: "The requested assessment could not be loaded.",
     },
     interview: {
+      forbiddenTitle: "You don't have access to this interview",
+      forbiddenDescription:
+        "Configuring interviews is reserved for HR, admin, and super-admin users. If you think this is a mistake, contact your workspace owner.",
+      createUnavailableTitle: "Interview setup is unavailable right now",
       unavailableTitle: "Interview unavailable",
       loadFailedFallback: "Failed to load interview.",
       notFoundFallback: "The requested interview could not be loaded.",
       setupBlockedTitle: "Interview setup blocked",
+      candidateNameRequired: "Candidate name is required.",
+      positionRequired: "Position is required.",
+      questionsRequired: "Select at least one question.",
+      creatingLabel: "Creating...",
     },
     feedback: {
       unavailableTitle: "Feedback unavailable",
@@ -64,10 +88,17 @@ export const TOAST_MESSAGES = {
     },
     questions: {
       editorIssueTitle: "Question editor issue",
-      loadFailedTitle: "Load failed",
       unavailableTitle: "Question unavailable",
       loadFailedCardDescription:
         "The editor could not load this question, so the route stops here instead of rendering a partially broken form.",
+      libraryForbiddenTitle: "You don't have access to the question library",
+      libraryForbiddenDescription:
+        "The question library is reserved for HR, admin, and super-admin users. If you think this is a mistake, contact your workspace owner.",
+      libraryUnavailableTitle: "Question library is unavailable right now",
+      createForbiddenTitle: "You don't have access to create questions",
+      createForbiddenDescription:
+        "Creating questions is reserved for admin and super-admin users. If you think this is a mistake, contact your workspace owner.",
+      createUnavailableTitle: "Question creation is unavailable right now",
     },
   },
   rerun: {

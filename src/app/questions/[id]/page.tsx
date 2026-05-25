@@ -1,184 +1,96 @@
-'use client';
-
-import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-
-import { ConfirmDialog } from '@/components/ui/confirm-dialog';
-import { DeletedQuestionBanner } from '@/components/questions/detail/deleted-question-banner';
+import { QuestionEditClient } from '@/components/questions/edit/question-edit-client'
+import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
+import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
+import { type Question } from '@/lib/api'
 import {
-  QuestionLoadingCard,
-  QuestionUnavailableCard,
-} from '@/components/questions/detail/question-load-states';
-import { QuestionDangerZone } from '@/components/questions/detail/question-danger-zone';
+  loadAuthGate,
+  redirectIfUnauthenticated,
+  redirectIfUnauthorizedError,
+} from '@/lib/auth-gate'
 import {
-  deleteQuestion,
-  getQuestion,
-  QuestionInUseError,
-  restoreQuestion,
-  updateQuestion,
-  type Question,
-  type QuestionInput,
-} from '@/lib/api';
-import { useAuth } from '@/lib/auth-context';
-import { runMutation } from '@/lib/run-mutation';
-import { TOAST_MESSAGES } from '@/lib/toast-messages';
-import { QuestionEditor } from '../question-editor';
+  canDeleteQuestions,
+  canReadQuestions,
+  canUpdateQuestions,
+} from '@/lib/auth-roles'
+import { isForbiddenError, requestServer } from '@/lib/server-fetch'
+import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
-export default function EditQuestionPage() {
-  const params = useParams<{ id: string }>();
-  const router = useRouter();
-  const id = params.id;
+interface EditQuestionPageProps {
+  params: Promise<{ id: string }>
+}
 
-  const [question, setQuestion] = useState<Question | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [deleting, setDeleting] = useState(false);
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [restoring, setRestoring] = useState(false);
-  const [restoreOpen, setRestoreOpen] = useState(false);
-  const { user } = useAuth();
-  const canDelete = user?.role === 'super_admin';
+const QUESTIONS_GATE = TOAST_MESSAGES.pageGate.questions
 
-  useEffect(() => {
-    let cancelled = false;
+const ERROR_BACK_HREF = '/questions'
+const ERROR_BACK_LABEL = 'Back to question library'
 
-    async function load() {
-      try {
-        const data = await getQuestion(id);
-        if (!cancelled) {
-          setQuestion(data);
-          setLoading(false);
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setError(
-            err instanceof Error ? err.message : 'Failed to load question.',
-          );
-          setLoading(false);
-        }
-      }
-    }
+export default async function EditQuestionPage({ params }: EditQuestionPageProps) {
+  const { id } = await params
 
-    load();
-    return () => {
-      cancelled = true;
-    };
-  }, [id]);
-
-  async function handleSubmit(value: QuestionInput) {
-    const updated = await updateQuestion(id, value);
-    setQuestion(updated);
-    router.refresh();
-    return updated;
+  const returnPath = `/questions/${encodeURIComponent(id)}`
+  const auth = await loadAuthGate(canReadQuestions)
+  redirectIfUnauthenticated(auth, returnPath)
+  if (auth.kind === 'forbidden') {
+    return (
+      <ForbiddenAccessPage
+        title={QUESTIONS_GATE.libraryForbiddenTitle}
+        description={QUESTIONS_GATE.libraryForbiddenDescription}
+      />
+    )
+  }
+  if (auth.kind === 'error') {
+    return (
+      <FlashErrorPageFallback
+        title={QUESTIONS_GATE.unavailableTitle}
+        description={`We could not verify your session or permissions. ${auth.message}`}
+        backHref={ERROR_BACK_HREF}
+        backLabel={ERROR_BACK_LABEL}
+      />
+    )
   }
 
-  async function performRestore() {
-    if (restoring) return;
-    setRestoring(true);
-    try {
-      const restored = await runMutation(() => restoreQuestion(id), {
-        successMessage: TOAST_MESSAGES.question.restoreSuccess,
-        errorMessage: TOAST_MESSAGES.question.restoreError,
-      });
-      setQuestion(restored);
-      setRestoreOpen(false);
-      router.refresh();
-    } finally {
-      setRestoring(false);
-    }
-  }
+  let question: Question | null = null
+  let error: string | null = null
 
-  async function performDelete() {
-    if (deleting) return;
-    setDeleting(true);
-    try {
-      await runMutation(() => deleteQuestion(id), {
-        successMessage: TOAST_MESSAGES.question.deleteSuccess,
-        errorMessage: TOAST_MESSAGES.question.deleteError,
-        getErrorTitle: (err) =>
-          err instanceof QuestionInUseError
-            ? TOAST_MESSAGES.deleteQuestion.cannotDeleteTitle
-            : TOAST_MESSAGES.question.deleteError,
-      });
-      setConfirmOpen(false);
-      router.push('/questions');
-      router.refresh();
-    } finally {
-      setDeleting(false);
+  try {
+    question =
+      (await requestServer<Question>(
+        `/questions/${encodeURIComponent(id)}`,
+        auth.ctx,
+      )) ?? null
+  } catch (err) {
+    redirectIfUnauthorizedError(err, returnPath)
+    if (isForbiddenError(err)) {
+      return (
+        <ForbiddenAccessPage
+          title={QUESTIONS_GATE.libraryForbiddenTitle}
+          description={QUESTIONS_GATE.libraryForbiddenDescription}
+        />
+      )
     }
-  }
-
-  if (loading) {
-    return <QuestionLoadingCard />;
+    error =
+      err instanceof Error
+        ? err.message
+        : QUESTIONS_GATE.loadFailedCardDescription
   }
 
   if (error || !question) {
-    return <QuestionUnavailableCard message={error ?? 'Question not found.'} />;
+    return (
+      <FlashErrorPageFallback
+        title={QUESTIONS_GATE.unavailableTitle}
+        description={error ?? 'Question not found.'}
+        backHref={ERROR_BACK_HREF}
+        backLabel={ERROR_BACK_LABEL}
+      />
+    )
   }
 
   return (
-    <>
-      {question.deleted && (
-        <DeletedQuestionBanner
-          restoring={restoring}
-          onRestore={() => setRestoreOpen(true)}
-        />
-      )}
-      <QuestionEditor
-        questionId={id}
-        title="Edit Question"
-        initialValue={{
-          externalId: question.externalId,
-          role: question.role,
-          focus: question.focus,
-          outputLanguage: question.outputLanguage,
-          category: question.category,
-          subcategory: question.subcategory,
-          questionText: question.questionText,
-          followUpQuestions: question.followUpQuestions,
-          expectedConcepts: question.expectedConcepts,
-          redFlags: question.redFlags,
-          difficulty: question.difficulty,
-          weight: question.weight,
-          sampleGoodAnswer: question.sampleGoodAnswer,
-          minimumPassScore: question.minimumPassScore,
-          tags: question.tags,
-          metadata: question.metadata,
-        }}
-        submitLabel="Save Changes"
-        onSubmit={handleSubmit}
-      />
-      {!question.deleted && canDelete && (
-        <QuestionDangerZone
-          deleting={deleting}
-          onRequestDelete={() => setConfirmOpen(true)}
-        />
-      )}
-      <ConfirmDialog
-        open={confirmOpen}
-        destructive
-        title="Delete this question?"
-        description="It will be hidden from the library and from new interviews. Past interviews keep their snapshot. Active interviews block deletion."
-        confirmLabel={deleting ? 'Deleting...' : 'Delete'}
-        cancelLabel="Cancel"
-        loading={deleting}
-        onConfirm={performDelete}
-        onCancel={() => {
-          if (!deleting) setConfirmOpen(false);
-        }}
-      />
-      <ConfirmDialog
-        open={restoreOpen}
-        title="Restore this question?"
-        description="It will become visible in the library again and available for new interviews."
-        confirmLabel={restoring ? 'Restoring...' : 'Restore'}
-        cancelLabel="Cancel"
-        loading={restoring}
-        onConfirm={performRestore}
-        onCancel={() => {
-          if (!restoring) setRestoreOpen(false);
-        }}
-      />
-    </>
-  );
+    <QuestionEditClient
+      id={id}
+      initialQuestion={question}
+      canUpdate={canUpdateQuestions(auth.me.role)}
+      canDelete={canDeleteQuestions(auth.me.role)}
+    />
+  )
 }

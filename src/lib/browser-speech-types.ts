@@ -1,24 +1,24 @@
-export type BrowserSpeechRecognitionResultAlternative = {
+type BrowserSpeechRecognitionResultAlternative = {
   transcript: string;
 };
 
-export type BrowserSpeechRecognitionResult = {
+type BrowserSpeechRecognitionResult = {
   isFinal: boolean;
   length: number;
   [index: number]: BrowserSpeechRecognitionResultAlternative;
 };
 
-export type BrowserSpeechRecognitionResultList = {
+type BrowserSpeechRecognitionResultList = {
   length: number;
   [index: number]: BrowserSpeechRecognitionResult;
 };
 
-export type BrowserSpeechRecognitionEvent = Event & {
+type BrowserSpeechRecognitionEvent = Event & {
   results: BrowserSpeechRecognitionResultList;
   resultIndex: number;
 };
 
-export type BrowserSpeechRecognitionErrorEvent = Event & {
+type BrowserSpeechRecognitionErrorEvent = Event & {
   error?: string;
   message?: string;
 };
