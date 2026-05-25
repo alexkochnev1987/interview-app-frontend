@@ -1,6 +1,8 @@
 import type { HTMLAttributes } from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
+import { X } from 'lucide-react'
 
+import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 const surfaceTileVariants = cva('ring-1 ring-hairline', {
@@ -56,7 +58,10 @@ const surfaceTileVariants = cva('ring-1 ring-hairline', {
 
 interface SurfaceTileProps
   extends HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof surfaceTileVariants> {}
+    VariantProps<typeof surfaceTileVariants> {
+  onDismiss?: () => void
+  dismissLabel?: string
+}
 
 export function SurfaceTile({
   className,
@@ -67,8 +72,12 @@ export function SurfaceTile({
   visibility,
   textAlign,
   width,
+  onDismiss,
+  dismissLabel = 'Dismiss',
+  children,
   ...props
 }: SurfaceTileProps) {
+  const dismissible = Boolean(onDismiss)
   return (
     <div
       className={cn(
@@ -81,9 +90,25 @@ export function SurfaceTile({
           textAlign,
           width,
         }),
+        dismissible && 'relative',
         className,
       )}
       {...props}
-    />
+    >
+      {dismissible ? (
+        <Button
+          type="button"
+          size="icon-xs"
+          variant="ghost"
+          shape="pill"
+          aria-label={dismissLabel}
+          onClick={onDismiss}
+          className="absolute right-1.5 top-1.5"
+        >
+          <X />
+        </Button>
+      ) : null}
+      {children}
+    </div>
   )
 }

@@ -163,7 +163,9 @@ export function QuestionEditor({
     ? []
     : DRAFT_FIELDS.filter(
         ({ key }) =>
-          !dismissedDraftFields.includes(key) && !areEqual(value[key], aiDraft[key]),
+          !dismissedDraftFields.includes(key) &&
+          aiDraft[key] !== undefined &&
+          !areEqual(value[key], aiDraft[key]),
       )
 
   function renderAiSuggestion(field: DraftFieldKey) {

@@ -95,7 +95,7 @@ export function FormField({
         ) : (
           <Label htmlFor={htmlFor}>{label}</Label>
         )}
-        {hint && !labelTooltip ? <BodyText size="sm">{hint}</BodyText> : null}
+        {hint ? <BodyText size="sm">{hint}</BodyText> : null}
       </Stack>
       {controlAria && singleChild
         ? withControlAria(singleChild, controlAria)

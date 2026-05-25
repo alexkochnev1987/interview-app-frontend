@@ -153,7 +153,7 @@ function Button({
         data-size={size}
         aria-busy={loading || undefined}
         aria-disabled={isDisabled || undefined}
-        className={classes}
+        className={cn(classes, isDisabled && 'pointer-events-none opacity-50')}
         {...props}
       >
         {children}

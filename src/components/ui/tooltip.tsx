@@ -34,7 +34,7 @@ function TooltipContent({
         data-slot="tooltip-content"
         sideOffset={sideOffset}
         className={cn(
-          'z-[100] max-w-xs rounded-md border border-hairline-strong bg-white px-2.5 py-1.5 text-xs leading-snug text-foreground shadow-sm',
+          'z-[100] max-w-xs rounded-md border border-hairline-strong bg-popover px-2.5 py-1.5 text-xs leading-snug text-popover-foreground shadow-sm',
           className,
         )}
         {...props}

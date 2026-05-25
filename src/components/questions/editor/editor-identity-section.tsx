@@ -5,6 +5,7 @@ import { type ReactNode } from 'react'
 
 import { Input } from '@/components/ui/input'
 import { Grid } from '@/components/ui/layout/grid'
+import { Spacer } from '@/components/ui/layout/spacer'
 import { Stack } from '@/components/ui/layout/stack'
 import {
   Select,
@@ -97,7 +98,7 @@ export function EditorIdentitySection({
           {renderAiSuggestion('outputLanguage')}
         </Stack>
 
-        <div aria-hidden className="hidden xl:block" />
+        <Spacer visibility="xl-only" />
 
         <Stack gap={2}>
           <QuestionEditorField htmlFor="category" label="Category">

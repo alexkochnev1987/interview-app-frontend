@@ -4,7 +4,6 @@ import { FormField } from '@/components/ui/form-field'
 
 interface QuestionEditorFieldProps {
   children: ReactNode
-  className?: string
   hint?: string
   labelTooltip?: ReactNode
   htmlFor: string
