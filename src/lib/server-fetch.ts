@@ -1,33 +1,22 @@
 import { cookies, headers } from 'next/headers'
 import { cache } from 'react'
 
+import type { TakeInterviewData } from './api'
 import { ApiError } from './api-error'
 
-export { ApiError, isForbiddenError } from './api-error'
+export { isForbiddenError } from './api-error'
 
-function firstForwardedValue(value: string | null): string | null {
-  if (!value) return null
-  const first = value.split(',')[0].trim()
-  return first || null
-}
+const DEFAULT_BACKEND_URL = 'http://localhost:3000'
 
-function resolveOrigin(headerStore: Headers): string {
-  const forwardedProto = firstForwardedValue(
-    headerStore.get('x-forwarded-proto'),
-  )
-  const forwardedHost = firstForwardedValue(headerStore.get('x-forwarded-host'))
-  const host = forwardedHost ?? headerStore.get('host')
-  if (!host) {
-    throw new Error('Unable to resolve request host for server-side API fetch.')
-  }
-  const protocol =
-    forwardedProto ?? (host.includes('localhost') ? 'http' : 'https')
-  return `${protocol}://${host}`
+function resolveTrustedApiBase(): string {
+  const configured = process.env.BACKEND_URL?.trim()
+  const base = configured || DEFAULT_BACKEND_URL
+  return base.replace(/\/$/, '')
 }
 
 export interface ServerRequestContext {
   cookieHeader: string
-  origin: string
+  apiBase: string
 }
 
 export const getServerRequestContext = cache(
@@ -35,7 +24,7 @@ export const getServerRequestContext = cache(
     const headerStore = await headers()
     const rawCookieHeader = headerStore.get('cookie')
     const cookieHeader = rawCookieHeader ?? (await buildCookieHeaderFallback())
-    return { cookieHeader, origin: resolveOrigin(headerStore) }
+    return { cookieHeader, apiBase: resolveTrustedApiBase() }
   },
 )
 
@@ -79,19 +68,7 @@ function safeErrorMessage(status: number, body: string): string {
 
 const SERVER_REQUEST_TIMEOUT_MS = 15_000
 
-export async function requestServer<T>(
-  path: string,
-  ctx: ServerRequestContext,
-): Promise<T | undefined> {
-  const res = await fetch(`${ctx.origin}/api${path}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      cookie: ctx.cookieHeader,
-    },
-    cache: 'no-store',
-    signal: AbortSignal.timeout(SERVER_REQUEST_TIMEOUT_MS),
-  })
-
+async function parseServerResponse<T>(res: Response, path: string): Promise<T | undefined> {
   if (!res.ok) {
     const body = await res.text()
     throw new ApiError(res.status, safeErrorMessage(res.status, body), path, body)
@@ -113,4 +90,46 @@ export async function requestServer<T>(
   }
 
   return JSON.parse(body) as T
+}
+
+export async function requestServer<T>(
+  path: string,
+  ctx: ServerRequestContext,
+  options?: { method?: 'GET' | 'POST'; query?: Record<string, unknown> },
+): Promise<T | undefined> {
+  const res = await fetch(buildServerApiUrl(path, ctx.apiBase, options?.query), {
+    method: options?.method ?? 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      cookie: ctx.cookieHeader,
+    },
+    cache: 'no-store',
+    signal: AbortSignal.timeout(SERVER_REQUEST_TIMEOUT_MS),
+  })
+
+  return parseServerResponse<T>(res, path)
+}
+
+function buildServerApiUrl(
+  path: string,
+  apiBase: string,
+  query?: Record<string, unknown>,
+): string {
+  const base = `${apiBase}${path}`
+  if (!query) return base
+
+  const params = new URLSearchParams()
+  for (const [key, value] of Object.entries(query)) {
+    if (value === undefined || value === null) continue
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        params.append(key, String(item))
+      }
+    } else {
+      params.set(key, String(value))
+    }
+  }
+
+  const qs = params.toString()
+  return qs ? `${base}?${qs}` : base
 }

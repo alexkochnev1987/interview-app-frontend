@@ -6,7 +6,7 @@ import { LayoutGrid, Rows3 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { SegmentedGroup } from '@/components/ui/segmented-group'
 
-import type { QuestionView } from './use-questions-query'
+import type { QuestionView } from '@/lib/questions-query-state'
 
 export type QuestionViewToggleProps = {
   view: QuestionView

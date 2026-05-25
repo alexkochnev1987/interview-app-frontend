@@ -11,6 +11,7 @@ const statusPillVariants = cva(
       size: {
         default: "px-3 py-1 text-[0.68rem] font-semibold",
         compact: "px-2.5 py-1 text-[0.66rem] font-bold",
+        header: "px-2 py-0.5 text-[0.66rem] font-bold",
       },
       tone: {
         neutral:

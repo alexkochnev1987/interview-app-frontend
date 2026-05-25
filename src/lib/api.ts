@@ -2,7 +2,7 @@ import createClient from 'openapi-fetch';
 import { paths, components } from './api-types';
 import { ApiError } from './api-error';
 
-export { ApiError, isForbiddenError } from './api-error';
+export { ApiError } from './api-error';
 
 const client = createClient<paths>({
   baseUrl: '/api',
@@ -19,7 +19,6 @@ export type MeResponse = AuthUserResponseDto;
 export type LoginPayload = Schemas['LoginDto'];
 export type LogoutResponse = Schemas['LogoutResponseDto'];
 export type FeedbackResponse = Schemas['FeedbackResponseDto'];
-export type QuestionRedFlagSeverity = Schemas['QuestionRedFlagDto']['severity'];
 
 export type QuestionExpectedConcept = Schemas['QuestionExpectedConceptDto'];
 export type QuestionRedFlag = Schemas['QuestionRedFlagDto'];
@@ -37,33 +36,17 @@ export type QuestionStatusFilter = NonNullable<FetchQuestionsParams['status']>;
 
 export type InterviewQuestion = Schemas['InterviewResponseDto']['questions'][number];
 
-export type CandidateQuestionView = Schemas['CandidateQuestionViewDto'];
-
 export type InterviewBehaviorRisk = NonNullable<Schemas['InterviewResultResponseDto']['behaviorSummary']>['riskLevel'];
 export type InterviewDecision = NonNullable<Schemas['InterviewResultResponseDto']['decision']>;
 export type AnswerDecisionHint = NonNullable<Schemas['InterviewQuestionResultDto']['decisionHint']>;
 
-export type AnswerStatus = NonNullable<Schemas['TakeInterviewResponseDto']['currentAnswerMeta']>['status'];
-export type AnswerValidationStatus = Schemas['StartAllAnswerValidationsResponseDto']['answers'][number]['status'];
-
-export type InterviewWorkflowStatus = NonNullable<Schemas['InterviewResponseDto']['workflow']>['status'];
-export type InterviewWorkflowStage = NonNullable<Schemas['InterviewResponseDto']['workflow']>['currentStage'];
-
-export type MediaArtifact = Schemas['MediaArtifactDto'];
-export type AnswerTranscript = Schemas['AnswerTranscriptDto'];
 export type ClientTranscriptPayload = Schemas['ClientTranscriptDto'];
-export type AnswerEvaluation = Schemas['AnswerEvaluationDto'];
-export type AnswerValidation = Schemas['AnswerValidationDto'];
 export type Answer = Schemas['AnswerDto'];
-export type AnswerVersion = Schemas['AnswerVersionDto'];
 
-export type InterviewQuestionResult = Schemas['InterviewQuestionResultDto'];
-export type InterviewBehaviorSummary = Schemas['InterviewBehaviorSummaryDto'];
 export type InterviewResult = Schemas['InterviewResultResponseDto'];
-export type InterviewWorkflow = Schemas['InterviewWorkflowDto'];
 export type Interview = Schemas['InterviewResponseDto'];
 
-export type ValidateAllAnswersResponse = Schemas['StartAllAnswerValidationsResponseDto'];
+type ValidateAllAnswersResponse = Schemas['StartAllAnswerValidationsResponseDto'];
 export type StartAnswerValidationResult = Schemas['StartAnswerValidationResultDto'];
 export type InterviewAnswerMediaResponse = Schemas['InterviewAnswerMediaResponseDto'];
 export type CandidateLinkResponse = Schemas['CandidateLinkResponseDto'];
@@ -71,7 +54,6 @@ export type CandidateLinkResponse = Schemas['CandidateLinkResponseDto'];
 export type CreateInterviewPayload = Schemas['CreateInterviewDto'];
 
 export type PresignedUrlResponse = Schemas['PresignedUrlResponseDto'];
-export type ConfirmUploadResponse = Schemas['ConfirmUploadResponseDto'];
 
 export type TakeInterviewData = Schemas['TakeInterviewResponseDto'];
 export type MultipartUploadSessionResponse = Schemas['MultipartUploadSessionResponseDto'];
@@ -194,30 +176,8 @@ export async function login(data: LoginPayload): Promise<AuthUserResponseDto> {
   }));
 }
 
-export async function getCurrentUser(): Promise<AuthUserResponseDto> {
-  return handle(client.GET('/auth/me'));
-}
-
 export async function logout(): Promise<LogoutResponse> {
   return handle(client.POST('/auth/logout'));
-}
-
-export async function getFeedbackByToken(
-  id: string,
-  token: string,
-): Promise<FeedbackResponse> {
-  return handle(client.GET('/feedback/{id}', {
-    params: {
-      path: { id },
-      query: { token },
-    },
-  }));
-}
-
-export async function getQuestion(id: string): Promise<Question> {
-  return handle(client.GET('/questions/{id}', {
-    params: { path: { id } }
-  }));
 }
 
 export async function createQuestion(data: QuestionInput): Promise<Question> {
@@ -318,11 +278,6 @@ export async function findSimilarQuestions(
   return data.matches;
 }
 
-export async function fetchInterviews(): Promise<Interview[]> {
-  return handle(client.GET('/interviews'));
-
-}
-
 export async function createInterview(
   data: CreateInterviewPayload,
 ): Promise<Interview & CandidateLinkResponse> {
@@ -361,11 +316,11 @@ export async function getPresignedUrl(
   );
 }
 
-export async function completeUpload(
+async function completeUpload(
   interviewId: string,
   questionIndex: number,
   mediaKey: string,
-): Promise<ConfirmUploadResponse> {
+): Promise<Schemas['ConfirmUploadResponseDto']> {
   return handle(
     client.POST('/interviews/{id}/questions/{questionIndex}/complete-upload', {
       params: { path: { id: interviewId, questionIndex } },
@@ -381,12 +336,6 @@ export async function completeUploadAndFetchInterview(
 ): Promise<Interview> {
   await completeUpload(interviewId, questionIndex, mediaKey);
   return getInterview(interviewId);
-}
-
-export async function completeInterview(id: string): Promise<Interview> {
-  return handle(client.PATCH('/interviews/{id}/complete', {
-    params: { path: { id } }
-  }));
 }
 
 export async function validateInterview(
@@ -435,6 +384,19 @@ export async function getTakeInterview(
       query: token ? { token } : undefined
     }
   }));
+}
+
+export async function syncCandidateSession(id: string, token: string): Promise<void> {
+  const path = `/take/${encodeURIComponent(id)}`;
+  const query = new URLSearchParams({ token });
+  const res = await fetch(`/api${path}?${query}`, { credentials: 'include' });
+
+  if (!res.ok) {
+    const body = await res.text();
+    throw new ApiError(res.status, messageFromBody(body, res.status), path, body);
+  }
+
+  await res.text();
 }
 
 export async function startMultipartUpload(

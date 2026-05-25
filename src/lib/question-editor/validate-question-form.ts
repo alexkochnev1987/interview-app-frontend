@@ -1,6 +1,6 @@
 import { parseMetadata } from '@/lib/question-editor/parsers'
 
-import type { FieldErrors } from '@/lib/form-validation'
+import type { FieldErrors } from '@/lib/clear-field-error'
 
 export type QuestionFormFieldErrors = FieldErrors<'questionText' | 'metadata'>
 

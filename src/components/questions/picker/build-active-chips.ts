@@ -1,4 +1,4 @@
-import type { QuestionsQueryState } from './use-questions-query'
+import type { QuestionsQueryState } from '@/lib/questions-query-state'
 import type { ActiveFilterChip } from './question-picker-toolbar'
 import type { UseQuestionsQueryResult } from './use-questions-query'
 

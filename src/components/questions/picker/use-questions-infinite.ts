@@ -2,7 +2,6 @@
 
 import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query'
 import { useCallback, useMemo } from 'react'
-
 import {
   fetchQuestions,
   type FetchQuestionsParams,
@@ -10,10 +9,12 @@ import {
 } from '@/lib/api'
 
 import { questionsInfiniteQueryKey } from './query-keys'
+import { splitInfiniteQueryErrors } from './split-questions-query-errors'
 
 export type UseQuestionsInfiniteOptions = {
   params: Omit<FetchQuestionsParams, 'page'>
   enabled: boolean
+  serverHydrated?: boolean
 }
 
 export type UseQuestionsInfiniteResult = {
@@ -23,7 +24,8 @@ export type UseQuestionsInfiniteResult = {
   isFetchingNextPage: boolean
   isInitialLoading: boolean
   isFetching: boolean
-  error: string | null
+  blockingError: string | null
+  paginationError: string | null
   fetchNextPage: () => void
   refetch: () => void
 }
@@ -31,6 +33,7 @@ export type UseQuestionsInfiniteResult = {
 export function useQuestionsInfinite({
   params,
   enabled,
+  serverHydrated,
 }: UseQuestionsInfiniteOptions): UseQuestionsInfiniteResult {
   const query = useInfiniteQuery({
     queryKey: questionsInfiniteQueryKey(params),
@@ -61,14 +64,25 @@ export function useQuestionsInfinite({
     void queryRefetch()
   }, [queryRefetch])
 
+  const errorMessage =
+    query.error instanceof Error ? query.error.message : null
+  const { blockingError, paginationError } = splitInfiniteQueryErrors(
+    errorMessage,
+    items.length,
+    query.isPlaceholderData,
+  )
+
   return {
     items,
     total,
     hasNextPage: query.hasNextPage ?? false,
     isFetchingNextPage: query.isFetchingNextPage,
-    isInitialLoading: query.isPending && enabled,
+    isInitialLoading:
+      (!serverHydrated && query.isPending && enabled) ||
+      (query.isFetching && query.isPlaceholderData && enabled),
     isFetching: query.isFetching,
-    error: query.error instanceof Error ? query.error.message : null,
+    blockingError,
+    paginationError,
     fetchNextPage,
     refetch,
   }

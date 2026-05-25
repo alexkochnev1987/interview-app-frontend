@@ -14,13 +14,14 @@ import { EditorRubricSection } from '@/components/questions/editor/editor-rubric
 import { QuestionEditorHeader } from '@/components/questions/editor/question-editor-header'
 import { QuestionEditorSaveBar } from '@/components/questions/editor/question-editor-save-bar'
 import { SimilarityPanel } from '@/components/questions/editor/similarity-panel'
+import { useDirtyTracking } from '@/components/questions/editor/use-dirty-tracking'
+import { useSimilaritySearch } from '@/components/questions/editor/use-similarity-search'
 import {
   draftQuestion,
   type QuestionDraft,
   type QuestionInput,
 } from '@/lib/api'
-import { clearFieldError } from '@/lib/clear-field-error'
-import { type FieldErrors } from '@/lib/form-validation'
+import { clearFieldError, type FieldErrors } from '@/lib/clear-field-error'
 import { validateQuestionForm } from '@/lib/question-editor/validate-question-form'
 import {
   DRAFT_FIELDS,
@@ -32,8 +33,6 @@ import {
 import { FEEDBACK_POLICY } from '@/lib/feedback-policy'
 import { runMutation } from '@/lib/run-mutation'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
-import { useDirtyTracking } from './use-dirty-tracking'
-import { useSimilaritySearch } from './use-similarity-search'
 
 type AiStatus = 'idle' | 'loading' | 'error'
 type QuestionFormField = 'questionText' | 'metadata'
@@ -44,6 +43,7 @@ interface QuestionEditorProps {
   initialValue?: QuestionInput
   submitLabel: string
   onSubmit: (value: QuestionInput) => Promise<QuestionInput>
+  readOnly?: boolean
   saveToastOptions?: {
     enabled?: boolean
     successMessage?: string
@@ -57,6 +57,7 @@ export function QuestionEditor({
   initialValue,
   submitLabel,
   onSubmit,
+  readOnly = false,
   saveToastOptions,
 }: QuestionEditorProps) {
   const [value, setValue] = useState<QuestionInput>(normalizeInitialValue(initialValue))
@@ -69,6 +70,7 @@ export function QuestionEditor({
   const [dismissedDraftFields, setDismissedDraftFields] = useState<DraftFieldKey[]>([])
   const [fieldErrors, setFieldErrors] = useState<FieldErrors<QuestionFormField>>({})
   const [aiError, setAiError] = useState<string | null>(null)
+  const fieldsDisabled = submitting || readOnly
 
   const { dirtyFields, isDirty, markSaved } = useDirtyTracking({
     value,
@@ -79,6 +81,7 @@ export function QuestionEditor({
   const similarity = useSimilaritySearch({ value, questionId })
 
   function update(patch: Partial<QuestionInput>) {
+    if (readOnly) return
     if ('questionText' in patch) {
       clearFieldError('questionText', setFieldErrors)
     }
@@ -91,6 +94,7 @@ export function QuestionEditor({
   }
 
   async function handleGenerate() {
+    if (readOnly) return
     if (!value.questionText.trim()) {
       setAiError(null)
       setFieldErrors((prev) => ({
@@ -122,7 +126,7 @@ export function QuestionEditor({
   }
 
   function applyDraftField(field: DraftFieldKey) {
-    if (!aiDraft) return
+    if (!aiDraft || readOnly) return
     update({ [field]: aiDraft[field] } as Partial<QuestionInput>)
     setDismissedDraftFields((current) => current.filter((item) => item !== field))
   }
@@ -134,7 +138,7 @@ export function QuestionEditor({
   }
 
   function applyAllAiFields() {
-    if (!aiDraft || pendingDraftFields.length === 0) return
+    if (!aiDraft || pendingDraftFields.length === 0 || readOnly) return
     setValue((current) => {
       let next = current
       for (const { key } of pendingDraftFields) {
@@ -152,7 +156,9 @@ export function QuestionEditor({
       )
 
   function renderAiSuggestion(field: DraftFieldKey) {
-    if (!aiDraft || !pendingDraftFields.some((p) => p.key === field)) return null
+    if (readOnly || !aiDraft || !pendingDraftFields.some((p) => p.key === field)) {
+      return null
+    }
     return (
       <AiSuggestionRow
         value={aiDraft[field]}
@@ -164,6 +170,7 @@ export function QuestionEditor({
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
+    if (readOnly) return
 
     const { errors, metadata } = validateQuestionForm({
       questionText: value.questionText,
@@ -225,70 +232,76 @@ export function QuestionEditor({
         title={title}
         difficulty={value.difficulty}
         weight={value.weight || 1}
-        pendingDraftCount={pendingDraftFields.length}
+        pendingDraftCount={readOnly ? 0 : pendingDraftFields.length}
       />
 
       <TwoColumnLayout
         main={(
           <form onSubmit={handleSubmit}>
             <Stack gap={6}>
-            <EditorPromptSection
-              value={value}
-              submitting={submitting}
-              onUpdate={update}
-              renderAiSuggestion={renderAiSuggestion}
-              questionTextError={fieldErrors.questionText}
-            />
-            <EditorIdentitySection
-              value={value}
-              submitting={submitting}
-              onUpdate={update}
-              renderAiSuggestion={renderAiSuggestion}
-            />
-            <EditorRubricSection
-              value={value}
-              submitting={submitting}
-              onUpdate={update}
-              renderAiSuggestion={renderAiSuggestion}
-            />
-            <EditorReferenceSection
-              value={value}
-              metadataText={metadataText}
-              submitting={submitting}
-              onUpdate={update}
-              onMetadataTextChange={handleMetadataTextChange}
-              renderAiSuggestion={renderAiSuggestion}
-              metadataError={fieldErrors.metadata}
-            />
-            <QuestionEditorSaveBar
-              isDirty={isDirty}
-              dirtyFieldLabels={dirtyFields.map((f) => f.label)}
-              submitting={submitting}
-              submitLabel={submitLabel}
-            />
+              <EditorPromptSection
+                value={value}
+                submitting={fieldsDisabled}
+                onUpdate={update}
+                renderAiSuggestion={renderAiSuggestion}
+                questionTextError={fieldErrors.questionText}
+              />
+              <EditorIdentitySection
+                value={value}
+                submitting={fieldsDisabled}
+                onUpdate={update}
+                renderAiSuggestion={renderAiSuggestion}
+              />
+              <EditorRubricSection
+                value={value}
+                submitting={fieldsDisabled}
+                onUpdate={update}
+                renderAiSuggestion={renderAiSuggestion}
+              />
+              <EditorReferenceSection
+                value={value}
+                metadataText={metadataText}
+                submitting={fieldsDisabled}
+                onUpdate={update}
+                onMetadataTextChange={
+                  readOnly ? () => {} : handleMetadataTextChange
+                }
+                renderAiSuggestion={renderAiSuggestion}
+                metadataError={fieldErrors.metadata}
+              />
+              {!readOnly ? (
+                <QuestionEditorSaveBar
+                  isDirty={isDirty}
+                  dirtyFieldLabels={dirtyFields.map((f) => f.label)}
+                  submitting={submitting}
+                  submitLabel={submitLabel}
+                />
+              ) : null}
             </Stack>
           </form>
         )}
         aside={(
           <>
-            <AiDraftPanel
-              hasPendingDraft={Boolean(aiDraft) && pendingDraftFields.length > 0}
-              pendingCount={pendingDraftFields.length}
-              loading={aiStatus === 'loading'}
-              disabled={submitting}
-              error={aiError ?? undefined}
-              onGenerate={handleGenerate}
-              onApplyAll={applyAllAiFields}
-            />
+            {!readOnly ? (
+              <AiDraftPanel
+                hasPendingDraft={Boolean(aiDraft) && pendingDraftFields.length > 0}
+                pendingCount={pendingDraftFields.length}
+                loading={aiStatus === 'loading'}
+                disabled={fieldsDisabled}
+                error={aiError ?? undefined}
+                onGenerate={handleGenerate}
+                onApplyAll={applyAllAiFields}
+              />
+            ) : null}
             <SimilarityPanel
               status={similarity.status}
               matches={similarity.matches}
               error={similarity.error}
               signalSummary={similarity.signalSummary}
-              hasInput={similarity.hasInput}
+              canSearch={similarity.canSearch}
               resultsStale={similarity.resultsStale}
               isEditMode={Boolean(questionId)}
-              disabled={submitting}
+              disabled={fieldsDisabled}
               onRunSearch={similarity.runManualSearch}
             />
           </>

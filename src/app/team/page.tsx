@@ -1,11 +1,13 @@
-import { unstable_noStore as noStore } from 'next/cache'
-
 import { TeamMembersContainer } from '@/features/team/team-members-container'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { type TeamMember } from '@/lib/api'
-import { loadAuthGate } from '@/lib/auth-gate'
+import {
+  loadAuthGate,
+  redirectIfUnauthenticated,
+  redirectIfUnauthorizedError,
+} from '@/lib/auth-gate'
 import { canManageTeam } from '@/lib/auth-roles'
 import { isForbiddenError, requestServer } from '@/lib/server-fetch'
 
@@ -23,9 +25,8 @@ function teamForbiddenPage() {
 }
 
 export default async function TeamPage() {
-  noStore()
-
   const auth = await loadAuthGate(canManageTeam)
+  redirectIfUnauthenticated(auth, '/team')
   if (auth.kind === 'forbidden') {
     return teamForbiddenPage()
   }
@@ -44,6 +45,7 @@ export default async function TeamPage() {
   try {
     members = (await requestServer<TeamMember[]>('/users', auth.ctx)) ?? []
   } catch (err) {
+    redirectIfUnauthorizedError(err, '/team')
     if (isForbiddenError(err)) {
       return teamForbiddenPage()
     }

@@ -201,6 +201,8 @@ export default function InterviewDetailClient({
   );
   const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const validationPollRef = useRef<number | null>(null);
+  const requestedMediaRef = useRef<Map<number, string>>(new Map());
+  const mediaFetchInterviewIdRef = useRef(id);
 
   const buildCandidateUrl = useCallback((relativeLink: string) => {
     if (typeof window === "undefined") {
@@ -309,6 +311,11 @@ export default function InterviewDetailClient({
       return;
     }
 
+    if (mediaFetchInterviewIdRef.current !== id) {
+      requestedMediaRef.current.clear();
+      mediaFetchInterviewIdRef.current = id;
+    }
+
     const answersWithMedia = interview.answers.filter(
       (answer) => answer.mediaKey || answer.screenMediaKey,
     );
@@ -317,10 +324,12 @@ export default function InterviewDetailClient({
     }
 
     answersWithMedia.forEach((answer) => {
-      const existing = mediaByQuestion[answer.questionIndex];
-      if (existing?.loading || existing?.cameraUrl || existing?.screenUrl) {
+      const mediaFingerprint = `${answer.mediaKey ?? ""}|${answer.screenMediaKey ?? ""}`;
+      if (requestedMediaRef.current.get(answer.questionIndex) === mediaFingerprint) {
         return;
       }
+
+      requestedMediaRef.current.set(answer.questionIndex, mediaFingerprint);
 
       setMediaByQuestion((current) => ({
         ...current,
@@ -355,7 +364,7 @@ export default function InterviewDetailClient({
           }));
         });
     });
-  }, [id, interview, mediaByQuestion]);
+  }, [id, interview]);
 
   async function handleCopyCandidateLink() {
     if (!candidateLink) {

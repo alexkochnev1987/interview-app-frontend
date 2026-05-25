@@ -48,4 +48,4 @@ function Input({
   )
 }
 
-export { Input, inputVariants }
+export { Input }

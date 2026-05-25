@@ -33,12 +33,22 @@ interface UseSimilaritySearchResult {
   error: string | null
   signalSummary: SimilaritySignalSummary
   hasInput: boolean
+  canSearch: boolean
   resultsStale: boolean
   runManualSearch: () => Promise<void>
 }
 
+export const SIMILARITY_MIN_QUESTION_TEXT_LENGTH = 20
+
 const DEFAULT_DEBOUNCE_MS = 1000
-const DEFAULT_MIN_TEXT_LENGTH = 20
+const DEFAULT_MIN_TEXT_LENGTH = SIMILARITY_MIN_QUESTION_TEXT_LENGTH
+
+function questionTextTooShort(
+  questionText: string,
+  minQuestionTextLength: number,
+): boolean {
+  return questionText.trim().length < minQuestionTextLength
+}
 
 export function useSimilaritySearch({
   value,
@@ -127,42 +137,54 @@ export function useSimilaritySearch({
     return () => window.clearTimeout(handle)
   }, [signature, debouncedSignature, debounceMs])
 
-  const textLongEnough =
-    value.questionText.trim().length >= minQuestionTextLength
+  const trimmedQuestionText = value.questionText.trim()
+  const textLongEnough = trimmedQuestionText.length >= minQuestionTextLength
+  const canSearch = textLongEnough
 
   const query = useQuery({
     queryKey: similarQuestionsQueryKey(debouncedSignature, questionId),
     queryFn: ({ signal }) =>
       findSimilarQuestions(valueRef.current, questionId, 5, { signal }),
-    enabled: hasInput && textLongEnough,
+    enabled: canSearch,
     staleTime: Infinity,
     placeholderData: keepPreviousData,
   })
 
   const queryClient = useQueryClient()
   const runManualSearch = useCallback(async () => {
-    if (!hasInput) {
+    const currentText = valueRef.current.questionText.trim()
+    if (!currentText) {
+      setManualError('Add question text before searching for similar questions.')
+      return
+    }
+    if (questionTextTooShort(currentText, minQuestionTextLength)) {
       setManualError(
-        'Add prompt text, taxonomy, tags, or rubric concepts before searching.',
+        `Add at least ${minQuestionTextLength} characters of question text before searching.`,
       )
       return
     }
     setManualError(null)
     setDebouncedSignature(signature)
-    await queryClient.fetchQuery({
-      queryKey: similarQuestionsQueryKey(signature, questionId),
-      queryFn: ({ signal }) =>
-        findSimilarQuestions(valueRef.current, questionId, 5, { signal }),
-      staleTime: Infinity,
-    })
-  }, [hasInput, queryClient, questionId, signature])
+    try {
+      await queryClient.fetchQuery({
+        queryKey: similarQuestionsQueryKey(signature, questionId),
+        queryFn: ({ signal }) =>
+          findSimilarQuestions(valueRef.current, questionId, 5, { signal }),
+        staleTime: Infinity,
+      })
+    } catch (err) {
+      setManualError(
+        err instanceof Error ? err.message : 'Similarity search failed.',
+      )
+    }
+  }, [minQuestionTextLength, queryClient, questionId, signature])
 
   useEffect(() => {
-    if (manualError && hasInput) {
+    if (manualError && canSearch) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- clear stale manual error once input becomes searchable again
       setManualError(null)
     }
-  }, [manualError, hasInput])
+  }, [manualError, canSearch])
 
   const matches: SimilarQuestionMatch[] = query.data ?? []
   const queryErrorMessage =
@@ -171,7 +193,7 @@ export function useSimilaritySearch({
 
   const status: SimilarStatus = manualError
     ? 'error'
-    : !hasInput || !textLongEnough
+    : !canSearch
       ? matches.length > 0
         ? 'success'
         : 'idle'
@@ -191,6 +213,7 @@ export function useSimilaritySearch({
     error,
     signalSummary,
     hasInput,
+    canSearch,
     resultsStale,
     runManualSearch,
   }
