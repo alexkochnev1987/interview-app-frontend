@@ -146,6 +146,21 @@ function Button({
 
   if (asChild) {
     const isDisabled = disabled || loading
+    const disabledOverrides = isDisabled
+      ? {
+          tabIndex: -1,
+          onClick: (event: React.MouseEvent<HTMLElement>) => {
+            event.preventDefault()
+            event.stopPropagation()
+          },
+          onKeyDown: (event: React.KeyboardEvent<HTMLElement>) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault()
+              event.stopPropagation()
+            }
+          },
+        }
+      : {}
     return (
       <Slot.Root
         data-slot="button"
@@ -155,6 +170,7 @@ function Button({
         aria-disabled={isDisabled || undefined}
         className={cn(classes, isDisabled && 'pointer-events-none opacity-50')}
         {...props}
+        {...disabledOverrides}
       >
         {children}
       </Slot.Root>
