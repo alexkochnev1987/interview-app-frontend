@@ -1,6 +1,7 @@
 'use client'
 
 import { type FormEvent, useState } from 'react'
+import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
@@ -100,7 +101,9 @@ export function LoginForm() {
             <DividerLabel>Or</DividerLabel>
 
             <Button asChild variant="outline-pill" size="xl" width="full">
-              <a href="/api/auth/google">Sign in with Google</a>
+              <Link href="/api/auth/google" prefetch={false}>
+                Sign in with Google
+              </Link>
             </Button>
           </Stack>
         </form>

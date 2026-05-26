@@ -1,13 +1,13 @@
 import { AlertCircle } from 'lucide-react'
 
 import { PageContent, PageMainLayout } from '@/components/layout/page-shell'
-import { TakeInterviewClient } from '@/app/take/[id]/take-interview-client'
 import { Icon } from '@/components/ui/icon'
 import { EmptyStateCard } from '@/components/ui/state-card'
 import { type TakeInterviewData } from '@/lib/api'
 import { getServerRequestContext, requestServer } from '@/lib/server-fetch'
 import { readSearchParamToken } from '@/lib/text'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
+import { TakeInterviewClient } from './take-interview-client'
 
 interface TakeInterviewPageProps {
   params: Promise<{ id: string }>

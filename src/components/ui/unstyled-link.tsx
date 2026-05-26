@@ -1,11 +1,9 @@
-import Link, { type LinkProps } from 'next/link'
-import type { AnchorHTMLAttributes, ReactNode } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 
+import { Link } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
 
-interface UnstyledLinkProps
-  extends LinkProps,
-    Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof LinkProps> {
+interface UnstyledLinkProps extends ComponentProps<typeof Link> {
   children?: ReactNode
 }
 
