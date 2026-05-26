@@ -3,6 +3,7 @@ import { QueryHydrationBoundary } from '@/components/questions/query-hydration-b
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
+import type { Locale } from '@/i18n/locales'
 import { loadAuthGate, redirectIfUnauthenticated } from '@/lib/auth-gate'
 import { canReadQuestions, isSuperAdmin } from '@/lib/auth-roles'
 import { prefetchQuestionsLibrary } from '@/lib/questions-library-prefetch'
@@ -15,12 +16,17 @@ const ERROR_BACK_HREF = '/'
 const ERROR_BACK_LABEL = 'Back to dashboard'
 
 interface QuestionsPageProps {
+  params: Promise<{ locale: Locale }>
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
-export default async function QuestionsPage({ searchParams }: QuestionsPageProps) {
+export default async function QuestionsPage({
+  params,
+  searchParams,
+}: QuestionsPageProps) {
+  const { locale } = await params
   const auth = await loadAuthGate(canReadQuestions)
-  redirectIfUnauthenticated(auth, '/questions')
+  redirectIfUnauthenticated(auth, '/questions', locale)
 
   if (auth.kind === 'forbidden') {
     return (

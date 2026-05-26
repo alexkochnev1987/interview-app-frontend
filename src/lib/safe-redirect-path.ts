@@ -1,4 +1,4 @@
-import { LOCALES, type Locale } from '@/i18n/locales'
+import { stripLocalePrefix } from '@/i18n/pathname'
 
 const BLOCKED_PATH_PREFIXES = [
   '/login',
@@ -14,17 +14,8 @@ function pathnameOf(path: string): string {
   return queryIndex === -1 ? path : path.slice(0, queryIndex)
 }
 
-function withoutLocalePrefix(path: string): string {
-  const [, segment] = path.split('/')
-  if (!LOCALES.includes(segment as Locale)) {
-    return path
-  }
-
-  return path.slice(segment.length + 1) || '/'
-}
-
 function isBlockedRedirectPath(path: string): boolean {
-  const unlocalizedPath = withoutLocalePrefix(path)
+  const unlocalizedPath = stripLocalePrefix(path)
   return BLOCKED_PATH_PREFIXES.some(
     (prefix) =>
       unlocalizedPath === prefix || unlocalizedPath.startsWith(`${prefix}/`),

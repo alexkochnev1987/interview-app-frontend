@@ -1,6 +1,5 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { LoaderCircle, PanelLeftClose, PanelLeftOpen, Trash2 } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
@@ -31,6 +30,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { Pagination } from '@/components/ui/pagination'
+import { useRouter } from '@/i18n/navigation'
 import { deleteQuestionsBulk, type BulkDeleteResult, type Question } from '@/lib/api'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
 import { notifyBulkDeleteOutcome } from '@/lib/notify-bulk-delete'

@@ -1,6 +1,7 @@
 import { DashboardView } from '@/components/dashboard/dashboard-view'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
+import type { Locale } from '@/i18n/locales'
 import { type Interview } from '@/lib/api'
 import { canAccessDashboard } from '@/lib/auth-roles'
 import {
@@ -16,9 +17,14 @@ const DASHBOARD_GATE = TOAST_MESSAGES.pageGate.dashboard
 const ERROR_SIGN_IN_HREF = '/login'
 const ERROR_ESCAPE_HREF = '/questions'
 
-export default async function DashboardPage() {
+interface DashboardPageProps {
+  params: Promise<{ locale: Locale }>
+}
+
+export default async function DashboardPage({ params }: DashboardPageProps) {
+  const { locale } = await params
   const auth = await loadAuthGate(canAccessDashboard)
-  redirectIfUnauthenticated(auth, '/')
+  redirectIfUnauthenticated(auth, '/', locale)
   if (auth.kind === 'forbidden') {
     return (
       <ForbiddenAccessPage
@@ -45,7 +51,7 @@ export default async function DashboardPage() {
     interviews =
       (await requestServer<Interview[]>('/interviews', auth.ctx)) ?? []
   } catch (err) {
-    redirectIfUnauthorizedError(err, '/')
+    redirectIfUnauthorizedError(err, '/', locale)
     if (isForbiddenError(err)) {
       return (
         <ForbiddenAccessPage

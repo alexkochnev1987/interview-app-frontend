@@ -3,6 +3,7 @@ import { AssessmentsListHeader } from '@/components/assessments/list/assessments
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
+import type { Locale } from '@/i18n/locales'
 import { type Interview } from '@/lib/api'
 import { getCompletionDate } from '@/lib/assessment-status'
 import {
@@ -39,9 +40,16 @@ function sortByCompletion(a: Interview, b: Interview): number {
   return new Date(db).getTime() - new Date(da).getTime()
 }
 
-export default async function AssessmentsPage() {
+interface AssessmentsPageProps {
+  params: Promise<{ locale: Locale }>
+}
+
+export default async function AssessmentsPage({
+  params,
+}: AssessmentsPageProps) {
+  const { locale } = await params
   const auth = await loadAuthGate(canReviewAssessments)
-  redirectIfUnauthenticated(auth, '/assessments')
+  redirectIfUnauthenticated(auth, '/assessments', locale)
   if (auth.kind === 'forbidden') {
     return (
       <ForbiddenAccessPage
@@ -68,7 +76,7 @@ export default async function AssessmentsPage() {
     interviews =
       (await requestServer<Interview[]>('/interviews', auth.ctx)) ?? []
   } catch (err) {
-    redirectIfUnauthorizedError(err, '/assessments')
+    redirectIfUnauthorizedError(err, '/assessments', locale)
     if (isForbiddenError(err)) {
       return (
         <ForbiddenAccessPage

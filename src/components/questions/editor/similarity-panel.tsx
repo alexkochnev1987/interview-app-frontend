@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { Search } from 'lucide-react'
 
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
@@ -20,6 +19,7 @@ import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText } from '@/components/ui/text'
 import { type SimilarQuestionMatch } from '@/lib/api'
+import { Link } from '@/i18n/navigation'
 import {
   type SimilarStatus,
   type SimilaritySignalSummary,

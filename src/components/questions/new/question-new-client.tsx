@@ -1,7 +1,7 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
 import { QuestionEditor } from '@/components/questions/editor/question-editor'
+import { useRouter } from '@/i18n/navigation'
 import { createQuestion, type QuestionInput } from '@/lib/api'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
 

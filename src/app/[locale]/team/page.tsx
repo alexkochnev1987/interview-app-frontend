@@ -2,6 +2,7 @@ import { TeamMembersContainer } from '@/features/team/team-members-container'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
+import type { Locale } from '@/i18n/locales'
 import { type TeamMember } from '@/lib/api'
 import {
   loadAuthGate,
@@ -24,9 +25,14 @@ function teamForbiddenPage() {
   )
 }
 
-export default async function TeamPage() {
+interface TeamPageProps {
+  params: Promise<{ locale: Locale }>
+}
+
+export default async function TeamPage({ params }: TeamPageProps) {
+  const { locale } = await params
   const auth = await loadAuthGate(canManageTeam)
-  redirectIfUnauthenticated(auth, '/team')
+  redirectIfUnauthenticated(auth, '/team', locale)
   if (auth.kind === 'forbidden') {
     return teamForbiddenPage()
   }
@@ -45,7 +51,7 @@ export default async function TeamPage() {
   try {
     members = (await requestServer<TeamMember[]>('/users', auth.ctx)) ?? []
   } catch (err) {
-    redirectIfUnauthorizedError(err, '/team')
+    redirectIfUnauthorizedError(err, '/team', locale)
     if (isForbiddenError(err)) {
       return teamForbiddenPage()
     }

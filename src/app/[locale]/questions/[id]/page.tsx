@@ -1,6 +1,7 @@
 import { QuestionEditClient } from '@/components/questions/edit/question-edit-client'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
+import type { Locale } from '@/i18n/locales'
 import { type Question } from '@/lib/api'
 import {
   loadAuthGate,
@@ -16,7 +17,7 @@ import { isForbiddenError, requestServer } from '@/lib/server-fetch'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 interface EditQuestionPageProps {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string; locale: Locale }>
 }
 
 const QUESTIONS_GATE = TOAST_MESSAGES.pageGate.questions
@@ -25,11 +26,11 @@ const ERROR_BACK_HREF = '/questions'
 const ERROR_BACK_LABEL = 'Back to question library'
 
 export default async function EditQuestionPage({ params }: EditQuestionPageProps) {
-  const { id } = await params
+  const { id, locale } = await params
 
   const returnPath = `/questions/${encodeURIComponent(id)}`
   const auth = await loadAuthGate(canReadQuestions)
-  redirectIfUnauthenticated(auth, returnPath)
+  redirectIfUnauthenticated(auth, returnPath, locale)
   if (auth.kind === 'forbidden') {
     return (
       <ForbiddenAccessPage
@@ -59,7 +60,7 @@ export default async function EditQuestionPage({ params }: EditQuestionPageProps
         auth.ctx,
       )) ?? null
   } catch (err) {
-    redirectIfUnauthorizedError(err, returnPath)
+    redirectIfUnauthorizedError(err, returnPath, locale)
     if (isForbiddenError(err)) {
       return (
         <ForbiddenAccessPage

@@ -4,6 +4,7 @@ import { InterviewCreateIntro } from '@/components/interviews/interview-create-i
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
+import type { Locale } from '@/i18n/locales'
 import { loadAuthGate, redirectIfUnauthenticated } from '@/lib/auth-gate'
 import { canConfigureInterview } from '@/lib/auth-roles'
 import { prefetchInterviewCreatePicker } from '@/lib/questions-library-prefetch'
@@ -14,9 +15,16 @@ const INTERVIEW_GATE = TOAST_MESSAGES.pageGate.interview
 const ERROR_BACK_HREF = '/'
 const ERROR_BACK_LABEL = 'Back to dashboard'
 
-export default async function NewInterviewPage() {
+interface NewInterviewPageProps {
+  params: Promise<{ locale: Locale }>
+}
+
+export default async function NewInterviewPage({
+  params,
+}: NewInterviewPageProps) {
+  const { locale } = await params
   const auth = await loadAuthGate(canConfigureInterview)
-  redirectIfUnauthenticated(auth, '/interviews/new')
+  redirectIfUnauthenticated(auth, '/interviews/new', locale)
   if (auth.kind === 'forbidden') {
     return (
       <ForbiddenAccessPage

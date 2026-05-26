@@ -1,5 +1,11 @@
 'use client'
 
+import { useLocale } from 'next-intl'
+import { useSearchParams } from 'next/navigation'
+
+import { LanguageSwitcher } from '@/components/ui/language-switcher'
+import { LOCALE_LABELS, LOCALES, type Locale } from '@/i18n/locales'
+import { usePathname } from '@/i18n/navigation'
 import { useAuth } from '@/lib/auth-context'
 import {
   canAccessDashboard,
@@ -8,7 +14,6 @@ import {
   canReadQuestions,
   canReviewAssessments,
 } from '@/lib/auth-roles'
-import { usePathname } from '@/i18n/navigation'
 import {
   Sparkles,
   LogOut,
@@ -32,9 +37,18 @@ import { NavLink } from '@/components/ui/nav-link'
 import { BodyText } from '@/components/ui/text'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
 
+const LANGUAGE_OPTIONS = LOCALES.map((locale) => ({
+  locale,
+  label: LOCALE_LABELS[locale],
+}))
+
 export function NavHeader() {
   const { user, logout } = useAuth()
   const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const locale = useLocale() as Locale
+  const queryString = searchParams.toString()
+  const languageHref = queryString ? `${pathname}?${queryString}` : pathname
 
   if (pathname.startsWith('/take') || pathname.startsWith('/feedback')) {
     return null
@@ -101,6 +115,11 @@ export function NavHeader() {
         actions={
           user ? (
             <>
+              <LanguageSwitcher
+                currentLocale={locale}
+                href={languageHref}
+                options={LANGUAGE_OPTIONS}
+              />
               <SurfaceTile
                 tone="soft"
                 rounded="pill"
@@ -122,9 +141,16 @@ export function NavHeader() {
               </Button>
             </>
           ) : (
-            <Button asChild variant="gradient" size="sm">
-              <UnstyledLink href="/login">Sign In</UnstyledLink>
-            </Button>
+            <>
+              <LanguageSwitcher
+                currentLocale={locale}
+                href={languageHref}
+                options={LANGUAGE_OPTIONS}
+              />
+              <Button asChild variant="gradient" size="sm">
+                <UnstyledLink href="/login">Sign In</UnstyledLink>
+              </Button>
+            </>
           )
         }
       />

@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { Filter, Plus, Sparkles } from 'lucide-react'
 
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
@@ -17,6 +16,7 @@ import { Grid } from '@/components/ui/layout/grid'
 import { HeroGrid } from '@/components/ui/layout/hero-grid'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
+import { Link } from '@/i18n/navigation'
 
 interface QuestionsLibraryHeaderProps {
   loading: boolean

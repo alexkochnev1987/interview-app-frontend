@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import {
   ArrowRight,
   BriefcaseBusiness,
@@ -34,6 +33,7 @@ import { Section } from '@/components/ui/layout/section'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText, SectionHeading } from '@/components/ui/text'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
+import { Link } from '@/i18n/navigation'
 import type { Interview } from '@/lib/api'
 import {
   formatInterviewDate,

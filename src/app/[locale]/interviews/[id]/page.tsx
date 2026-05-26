@@ -2,6 +2,7 @@ import InterviewDetailClient from './interview-detail-client'
 
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
+import type { Locale } from '@/i18n/locales'
 import { type Interview, type InterviewResult } from '@/lib/api'
 import {
   loadAuthGate,
@@ -15,6 +16,7 @@ import { TOAST_MESSAGES } from '@/lib/toast-messages'
 interface InterviewDetailPageProps {
   params: Promise<{
     id: string
+    locale: Locale
   }>
 }
 
@@ -27,11 +29,11 @@ const UNAVAILABLE_TITLE = TOAST_MESSAGES.pageGate.interview.unavailableTitle
 export default async function InterviewDetailPage({
   params,
 }: InterviewDetailPageProps) {
-  const { id } = await params
+  const { id, locale } = await params
 
   const returnPath = `/interviews/${encodeURIComponent(id)}`
   const auth = await loadAuthGate(canConfigureInterview)
-  redirectIfUnauthenticated(auth, returnPath)
+  redirectIfUnauthenticated(auth, returnPath, locale)
   if (auth.kind === 'forbidden') {
     return (
       <ForbiddenAccessPage
@@ -77,7 +79,7 @@ export default async function InterviewDetailPage({
       }
     }
   } catch (err) {
-    redirectIfUnauthorizedError(err, returnPath)
+    redirectIfUnauthorizedError(err, returnPath, locale)
     if (isForbiddenError(err)) {
       return (
         <ForbiddenAccessPage

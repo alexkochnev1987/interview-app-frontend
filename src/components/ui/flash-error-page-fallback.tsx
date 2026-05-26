@@ -1,10 +1,10 @@
-import Link from 'next/link'
 import { AlertCircle } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { EmptyStateCard } from '@/components/ui/state-card'
+import { Link } from '@/i18n/navigation'
 
 type FlashErrorPageFallbackProps = {
   title: string

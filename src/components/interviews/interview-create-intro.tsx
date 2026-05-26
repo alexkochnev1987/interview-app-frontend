@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { CirclePlus, Sparkles } from 'lucide-react'
 
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
@@ -7,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
+import { Link } from '@/i18n/navigation'
 
 export function InterviewCreateIntro() {
   return (

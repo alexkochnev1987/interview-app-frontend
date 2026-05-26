@@ -1,12 +1,12 @@
 'use client'
 
-import Link from 'next/link'
 import { AlertCircle } from 'lucide-react'
 import type { ReactNode } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { EmptyStateCard, LoadingStateCard } from '@/components/ui/state-card'
+import { Link } from '@/i18n/navigation'
 import type { Question } from '@/lib/api'
 import type { QuestionView, QuestionsQueryState } from '@/lib/questions-query-state'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'

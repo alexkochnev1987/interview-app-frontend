@@ -1,12 +1,12 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { DeletedQuestionBanner } from '@/components/questions/detail/deleted-question-banner'
 import { QuestionDangerZone } from '@/components/questions/detail/question-danger-zone'
 import { QuestionEditor } from '@/components/questions/editor/question-editor'
+import { useRouter } from '@/i18n/navigation'
 import {
   deleteQuestion,
   QuestionInUseError,

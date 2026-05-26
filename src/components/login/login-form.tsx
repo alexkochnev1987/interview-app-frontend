@@ -2,7 +2,7 @@
 
 import { type FormEvent, useState } from 'react'
 import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -12,6 +12,8 @@ import { DividerLabel } from '@/components/ui/divider-label'
 import { FormField } from '@/components/ui/form-field'
 import { Input } from '@/components/ui/input'
 import { Stack } from '@/components/ui/layout/stack'
+import { useRouter } from '@/i18n/navigation'
+import { stripLocalePrefix } from '@/i18n/pathname'
 import { login } from '@/lib/api'
 import { useAuth } from '@/lib/auth-context'
 import { safeRedirectPath } from '@/lib/safe-redirect-path'
@@ -28,7 +30,7 @@ export function LoginForm() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const redirectPath = safeRedirectPath(searchParams.get('from'))
+  const redirectPath = stripLocalePrefix(safeRedirectPath(searchParams.get('from')))
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()

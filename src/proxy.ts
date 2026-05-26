@@ -6,37 +6,10 @@ import {
   loginReturnPath,
   safeRedirectPath,
 } from '@/lib/safe-redirect-path'
-import { DEFAULT_LOCALE, LOCALES, type Locale } from '@/i18n/locales'
+import { localizedPath, pathLocale } from '@/i18n/pathname'
 import { routing } from '@/i18n/routing'
 
 const handleI18nRouting = createMiddleware(routing)
-
-function pathLocale(pathname: string): {
-  locale: Locale
-  pathnameWithoutLocale: string
-} {
-  const [, segment] = pathname.split('/')
-  const hasLocalePrefix = LOCALES.includes(segment as Locale)
-  const locale = hasLocalePrefix ? (segment as Locale) : DEFAULT_LOCALE
-  const pathnameWithoutLocale = hasLocalePrefix
-    ? pathname.slice(segment.length + 1) || '/'
-    : pathname
-
-  return { locale, pathnameWithoutLocale }
-}
-
-function hasLocalePrefix(pathname: string) {
-  const [, segment] = pathname.split('/')
-  return LOCALES.includes(segment as Locale)
-}
-
-function localizedPath(pathname: string, locale: Locale) {
-  if (locale === DEFAULT_LOCALE || hasLocalePrefix(pathname)) {
-    return pathname
-  }
-
-  return pathname === '/' ? `/${locale}` : `/${locale}${pathname}`
-}
 
 function matchesPathSegment(pathname: string, segment: string) {
   return pathname === segment || pathname.startsWith(`${segment}/`)

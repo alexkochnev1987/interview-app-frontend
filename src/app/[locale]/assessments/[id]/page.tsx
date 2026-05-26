@@ -12,6 +12,7 @@ import { PageShell } from '@/components/ui/layout/page-shell'
 import { Section } from '@/components/ui/layout/section'
 import { Stack } from '@/components/ui/layout/stack'
 import { SectionHeading } from '@/components/ui/text'
+import type { Locale } from '@/i18n/locales'
 import { type Interview } from '@/lib/api'
 import { deriveReviewStatus } from '@/lib/assessment-status'
 import {
@@ -24,7 +25,7 @@ import { isForbiddenError, requestServer } from '@/lib/server-fetch'
 import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 interface AssessmentDetailPageProps {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string; locale: Locale }>
 }
 
 const FORBIDDEN_TITLE = "You don't have access to this assessment"
@@ -36,11 +37,11 @@ const UNAVAILABLE_TITLE = TOAST_MESSAGES.pageGate.assessments.unavailableTitle
 export default async function AssessmentDetailPage({
   params,
 }: AssessmentDetailPageProps) {
-  const { id } = await params
+  const { id, locale } = await params
 
   const returnPath = `/assessments/${encodeURIComponent(id)}`
   const auth = await loadAuthGate(canReviewAssessments)
-  redirectIfUnauthenticated(auth, returnPath)
+  redirectIfUnauthenticated(auth, returnPath, locale)
   if (auth.kind === 'forbidden') {
     return (
       <ForbiddenAccessPage
@@ -69,7 +70,7 @@ export default async function AssessmentDetailPage({
       (await requestServer<Interview>(`/interviews/${encodedId}`, auth.ctx)) ??
       null
   } catch (err) {
-    redirectIfUnauthorizedError(err, returnPath)
+    redirectIfUnauthorizedError(err, returnPath, locale)
     if (isForbiddenError(err)) {
       return (
         <ForbiddenAccessPage

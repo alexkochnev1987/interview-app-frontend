@@ -1,6 +1,6 @@
 'use client'
 
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import {
   useCallback,
   useEffect,
@@ -12,6 +12,7 @@ import {
 } from 'react'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 
+import { usePathname, useRouter } from '@/i18n/navigation'
 import {
   fetchQuestions,
   type Question,

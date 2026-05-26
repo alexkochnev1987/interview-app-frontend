@@ -1,7 +1,6 @@
 'use client'
 
 import { useMemo, useState, type FormEvent } from 'react'
-import { useRouter } from 'next/navigation'
 import { ArrowRight, BriefcaseBusiness, UserRound } from 'lucide-react'
 
 import { InfiniteCardsLoader } from '@/components/questions/library/infinite-cards-loader'
@@ -35,6 +34,7 @@ import { Stack } from '@/components/ui/layout/stack'
 import { Input } from '@/components/ui/input'
 import { Pagination } from '@/components/ui/pagination'
 import { BodyText, SectionHeading } from '@/components/ui/text'
+import { useRouter } from '@/i18n/navigation'
 import { createInterview, type Question } from '@/lib/api'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
 import { runMutation } from '@/lib/run-mutation'
