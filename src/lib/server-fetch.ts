@@ -1,22 +1,34 @@
 import { cookies, headers } from 'next/headers'
 import { cache } from 'react'
 
-import type { TakeInterviewData } from './api'
 import { ApiError } from './api-error'
 
 export { isForbiddenError } from './api-error'
 
-const DEFAULT_BACKEND_URL = 'http://localhost:3000'
+function firstForwardedValue(value: string | null): string | null {
+  if (!value) return null
+  const first = value.split(',')[0].trim()
+  return first || null
+}
 
-function resolveTrustedApiBase(): string {
-  const configured = process.env.BACKEND_URL?.trim()
-  const base = configured || DEFAULT_BACKEND_URL
-  return base.replace(/\/$/, '')
+
+function resolveRequestOrigin(headerStore: Headers): string {
+  const forwardedProto = firstForwardedValue(
+    headerStore.get('x-forwarded-proto'),
+  )
+  const forwardedHost = firstForwardedValue(headerStore.get('x-forwarded-host'))
+  const host = forwardedHost ?? headerStore.get('host')
+  if (!host) {
+    throw new Error('Unable to resolve request host for server-side API fetch.')
+  }
+  const protocol =
+    forwardedProto ?? (host.includes('localhost') ? 'http' : 'https')
+  return `${protocol}://${host}`
 }
 
 export interface ServerRequestContext {
   cookieHeader: string
-  apiBase: string
+  origin: string
 }
 
 export const getServerRequestContext = cache(
@@ -24,7 +36,7 @@ export const getServerRequestContext = cache(
     const headerStore = await headers()
     const rawCookieHeader = headerStore.get('cookie')
     const cookieHeader = rawCookieHeader ?? (await buildCookieHeaderFallback())
-    return { cookieHeader, apiBase: resolveTrustedApiBase() }
+    return { cookieHeader, origin: resolveRequestOrigin(headerStore) }
   },
 )
 
@@ -97,7 +109,7 @@ export async function requestServer<T>(
   ctx: ServerRequestContext,
   options?: { method?: 'GET' | 'POST'; query?: Record<string, unknown> },
 ): Promise<T | undefined> {
-  const res = await fetch(buildServerApiUrl(path, ctx.apiBase, options?.query), {
+  const res = await fetch(buildServerApiUrl(path, ctx.origin, options?.query), {
     method: options?.method ?? 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -112,10 +124,10 @@ export async function requestServer<T>(
 
 function buildServerApiUrl(
   path: string,
-  apiBase: string,
+  origin: string,
   query?: Record<string, unknown>,
 ): string {
-  const base = `${apiBase}${path}`
+  const base = `${origin}/api${path}`
   if (!query) return base
 
   const params = new URLSearchParams()
