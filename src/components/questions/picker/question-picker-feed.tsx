@@ -9,7 +9,7 @@ import { EmptyStateCard, LoadingStateCard } from '@/components/ui/state-card'
 import { Link } from '@/i18n/navigation'
 import type { Question } from '@/lib/api'
 import type { QuestionView, QuestionsQueryState } from '@/lib/questions-query-state'
-import { TOAST_MESSAGES } from '@/lib/toast-messages'
+import { useToastMessages } from '@/lib/use-toast-messages'
 
 import { isQuestionsBankFullyEmpty } from './is-questions-bank-fully-empty'
 
@@ -74,6 +74,7 @@ export function QuestionPickerFeed({
   renderTable,
   renderCards,
 }: QuestionPickerFeedProps) {
+  const toastMessages = useToastMessages()
   const copy = COPY[copyVariant]
   const allEmpty = isQuestionsBankFullyEmpty({
     items,
@@ -93,7 +94,7 @@ export function QuestionPickerFeed({
             <AlertCircle />
           </Icon>
         }
-        title={TOAST_MESSAGES.questionFeed.unavailableTitle}
+        title={toastMessages.questionFeed.unavailableTitle}
         description={error}
         action={
           <Button type="button" variant="outline-pill" shape="pill" onClick={onRetry}>

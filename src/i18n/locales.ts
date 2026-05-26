@@ -4,9 +4,9 @@ export type Locale = (typeof LOCALES)[number]
 
 export const DEFAULT_LOCALE: Locale = 'en'
 
-export const LOCALE_LABELS: Record<Locale, string> = {
-  en: 'English',
-  be: 'Беларуская',
-  ru: 'Русский',
-  pl: 'Polski',
+export const LOCALE_FORMATS: Record<Locale, string> = {
+  en: 'en-US',
+  be: 'be-BY',
+  ru: 'ru-RU',
+  pl: 'pl-PL',
 }

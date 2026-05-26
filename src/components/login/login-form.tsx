@@ -2,6 +2,7 @@
 
 import { type FormEvent, useState } from 'react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { useSearchParams } from 'next/navigation'
 
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
@@ -17,11 +18,11 @@ import { stripLocalePrefix } from '@/i18n/pathname'
 import { login } from '@/lib/api'
 import { useAuth } from '@/lib/auth-context'
 import { safeRedirectPath } from '@/lib/safe-redirect-path'
-import { TOAST_MESSAGES } from '@/lib/toast-messages'
-
-const LOGIN_MESSAGES = TOAST_MESSAGES.pageGate.login
+import { useToastMessages } from '@/lib/use-toast-messages'
 
 export function LoginForm() {
+  const t = useTranslations('login.form')
+  const toastMessages = useToastMessages()
   const router = useRouter()
   const searchParams = useSearchParams()
   const { establishSession } = useAuth()
@@ -43,7 +44,7 @@ export function LoginForm() {
       router.push(redirectPath)
       router.refresh()
     } catch (err) {
-      setError(err instanceof Error ? err.message : LOGIN_MESSAGES.failedFallback)
+      setError(err instanceof Error ? err.message : toastMessages.pageGate.login.failedFallback)
     } finally {
       setLoading(false)
     }
@@ -52,38 +53,38 @@ export function LoginForm() {
   return (
     <Card variant="floating" size="lg" effects="blur-strong">
       <CardHeader spacing="sm">
-        <EyebrowBadge size="sm">Recruiter access</EyebrowBadge>
-        <CardTitle size="xl">Sign in</CardTitle>
+        <EyebrowBadge size="sm">{t('eyebrow')}</EyebrowBadge>
+        <CardTitle size="xl">{t('title')}</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit}>
           <Stack gap={6}>
             {error ? (
               <Alert variant="danger">
-                <AlertTitle>{LOGIN_MESSAGES.failedTitle}</AlertTitle>
+                <AlertTitle>{toastMessages.pageGate.login.failedTitle}</AlertTitle>
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             ) : null}
             <Stack gap={4}>
-              <FormField htmlFor="email" label="Email">
+              <FormField htmlFor="email" label={t('emailLabel')}>
                 <Input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@interview-app.com"
+                  placeholder={t('emailPlaceholder')}
                   autoComplete="email"
                   required
                 />
               </FormField>
 
-              <FormField htmlFor="password" label="Password">
+              <FormField htmlFor="password" label={t('passwordLabel')}>
                 <Input
                   id="password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Password"
+                  placeholder={t('passwordPlaceholder')}
                   autoComplete="current-password"
                   required
                 />
@@ -97,14 +98,16 @@ export function LoginForm() {
               width="full"
               disabled={loading}
             >
-              {loading ? LOGIN_MESSAGES.signingInLabel : LOGIN_MESSAGES.signInLabel}
+              {loading
+                ? toastMessages.pageGate.login.signingInLabel
+                : toastMessages.pageGate.login.signInLabel}
             </Button>
 
-            <DividerLabel>Or</DividerLabel>
+            <DividerLabel>{t('or')}</DividerLabel>
 
             <Button asChild variant="outline-pill" size="xl" width="full">
               <Link href="/api/auth/google" prefetch={false}>
-                Sign in with Google
+                {t('google')}
               </Link>
             </Button>
           </Stack>

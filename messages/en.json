@@ -4,6 +4,290 @@
     "description": "AI-powered interview platform"
   },
   "common": {
-    "appName": "AI Interview Architect"
+    "appName": "AI Interview Architect",
+    "brandEyebrow": "Intelligent Conductor",
+    "loading": "Loading...",
+    "notAvailable": "Not available",
+    "backToHome": "Back to home",
+    "serviceUnavailable": "Service is unavailable",
+    "sessionVerificationFailed": "We could not verify your session or permissions."
+  },
+  "languageSwitcher": {
+    "label": "Language",
+    "locales": {
+      "en": "English",
+      "be": "Беларуская",
+      "ru": "Русский",
+      "pl": "Polski"
+    }
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "questions": "Questions",
+    "assessments": "Assessments",
+    "newInterview": "New Interview",
+    "team": "Team",
+    "logout": "Logout",
+    "signIn": "Sign In"
+  },
+  "login": {
+    "marketingEyebrow": "Conductor AI",
+    "title": "Review candidate performance with the calm of an editorial workspace.",
+    "lead": "The new design system trades brittle admin chrome for layered surfaces, sharper hierarchy, and faster decision-making during interview review.",
+    "cards": {
+      "protectedAccess": {
+        "title": "Protected access",
+        "description": "Session-based auth for recruiter-only workflows."
+      },
+      "unifiedShell": {
+        "title": "Unified shell",
+        "description": "Shared tokens across dashboard, library, and interview flows."
+      },
+      "fastTriage": {
+        "title": "Fast triage",
+        "description": "Move from sign-in straight into active interviews and scorecards."
+      }
+    },
+    "form": {
+      "eyebrow": "Recruiter access",
+      "title": "Sign in",
+      "emailLabel": "Email",
+      "emailPlaceholder": "admin@interview-app.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Password",
+      "or": "Or",
+      "google": "Sign in with Google"
+    }
+  },
+  "dashboard": {
+    "demoMode": {
+      "title": "Demo mode",
+      "description": "Sample interviews only — no live backend.",
+      "signInPrefix": "",
+      "signInAction": "Sign in",
+      "signInSuffix": "for your workspace dashboard."
+    },
+    "hero": {
+      "eyebrow": "Recruiter Dashboard",
+      "title": "Run your interview pipeline from one editorial command surface.",
+      "lead": "Monitor active sessions, spot stalled candidates, and keep scoring flows moving without dropping into separate admin tools.",
+      "newInterview": "New Interview",
+      "questionBank": "Question Bank"
+    },
+    "metrics": {
+      "active": {
+        "label": "Active",
+        "description": "Interviews currently waiting on answers, uploads, or scoring."
+      },
+      "candidates": {
+        "label": "Candidates",
+        "description": "Total candidate records visible in the current workspace."
+      },
+      "questionLoad": {
+        "label": "Question Load",
+        "description": "Questions currently attached across all visible interviews."
+      },
+      "completed": {
+        "label": "Completed interviews",
+        "description": "Finished sessions with scorecards ready for review and handoff."
+      },
+      "lastSync": {
+        "label": "Last sync",
+        "demo": "Demo",
+        "live": "Live",
+        "demoDescription": "Showing sample interviews for demonstration.",
+        "liveDescription": "Updated against the live backend just now."
+      }
+    },
+    "snapshot": {
+      "eyebrow": "Snapshot",
+      "title": "Today's pipeline",
+      "description": "The redesigned shell uses tonal layers instead of hard separators, so activity stays readable even when the data density grows."
+    },
+    "empty": {
+      "title": "No interviews yet",
+      "description": "Start with a candidate, attach questions from the bank, and this dashboard becomes your operating surface.",
+      "action": "Create your first interview"
+    },
+    "recent": {
+      "eyebrow": "Active records",
+      "title": "Recent interviews",
+      "createQuestion": "Create a new question",
+      "questions": "Questions",
+      "uploaded": "Uploaded",
+      "updated": "Updated {date}",
+      "open": "Open"
+    }
+  },
+  "shared": {
+    "fallback": {
+      "backToDashboard": "Back to dashboard",
+      "backToQuestionLibrary": "Back to question library",
+      "backToAssessments": "Back to assessments"
+    },
+    "labels": {
+      "roles": {
+        "super_admin": "Super Admin",
+        "admin": "Admin",
+        "hr": "HR Specialist",
+        "candidate": "Candidate",
+        "interviewer": "Interviewer",
+        "system": "System",
+        "assistant": "Assistant"
+      },
+      "roleFilters": {
+        "all": "All Roles"
+      },
+      "difficulty": {
+        "easy": "Easy",
+        "medium": "Medium",
+        "hard": "Hard"
+      },
+      "interviewStatus": {
+        "pending": "Pending",
+        "in_progress": "In progress",
+        "processing": "Processing",
+        "completed": "Completed",
+        "failed": "Failed"
+      },
+      "reviewStatus": {
+        "ready": "Ready for review",
+        "scoring": "Scoring still catching up",
+        "in_progress": "Candidate in progress",
+        "pending": "Awaiting candidate",
+        "failed": "Failed"
+      },
+      "decision": {
+        "proceed": "Proceed",
+        "review": "Review",
+        "reject": "Reject"
+      },
+      "behaviorRisk": {
+        "high": "High risk",
+        "medium": "Medium risk",
+        "low": "Low risk",
+        "none": "No risk"
+      }
+    }
+  },
+  "toast": {
+    "defaults": {
+      "success": "Done",
+      "error": "Something went wrong",
+      "info": "Notice",
+      "actionCompleted": "Action completed",
+      "actionFailed": "Action failed"
+    },
+    "question": {
+      "createSuccess": "Question created",
+      "createError": "Failed to create question",
+      "saveSuccess": "Question saved",
+      "saveError": "Failed to save question",
+      "restoreSuccess": "Question restored",
+      "restoreError": "Failed to restore question",
+      "deleteSuccess": "Question deleted",
+      "deleteError": "Failed to delete question"
+    },
+    "interview": {
+      "createSuccess": "Interview created",
+      "createError": "Failed to create interview",
+      "refreshLinkSuccess": "Candidate link refreshed",
+      "refreshLinkError": "Failed to refresh candidate link",
+      "validationStartSuccess": "Validation started",
+      "validationStartError": "Failed to start interview validation",
+      "uploadSuccess": "Upload completed for question {questionNumber}",
+      "uploadError": "Upload failed for question {questionNumber}"
+    },
+    "take": {
+      "submitSuccess": "Answer submitted",
+      "submitError": "Failed to submit answer"
+    },
+    "bulkDelete": {
+      "failedTitle": "Bulk delete failed",
+      "partialTitle": "Deleted {deletedCount}, blocked {blockedCount}",
+      "successTitle": "Deleted {count, plural, one {# question} other {# questions}}",
+      "successDescription": "The library is up to date.",
+      "noopTitle": "No questions deleted",
+      "noopDescription": "None of the selected questions were removed.",
+      "blockedIntro": "These questions are used in active interviews and were not deleted:"
+    },
+    "questionFeed": {
+      "unavailableTitle": "Question feed unavailable"
+    },
+    "questionFacets": {
+      "unavailableTitle": "Filter options unavailable"
+    },
+    "similarity": {
+      "searchFailedTitle": "Similarity search failed",
+      "noMatches": "No close matches crossed the current similarity threshold."
+    },
+    "pageGate": {
+      "login": {
+        "failedTitle": "Authentication failed",
+        "failedFallback": "Login failed",
+        "signingInLabel": "Signing in...",
+        "signInLabel": "Sign In"
+      },
+      "dashboard": {
+        "forbiddenTitle": "You don't have access to the dashboard",
+        "forbiddenDescription": "The dashboard is reserved for HR, admin, and super-admin users. If you think this is a mistake, contact your workspace owner.",
+        "unavailableTitle": "Dashboard is unavailable right now",
+        "loadFailedTitle": "Could not load dashboard",
+        "loadFailedFallback": "Failed to load interviews.",
+        "signInActionLabel": "Sign in",
+        "questionBankActionLabel": "Go to question bank"
+      },
+      "assessments": {
+        "forbiddenTitle": "You don't have access to assessments",
+        "forbiddenDescription": "This area is reserved for HR and admin reviewers. If you think this is a mistake, contact your workspace owner.",
+        "loadFailedTitle": "Could not load assessments",
+        "loadFailedFallback": "Failed to load assessments.",
+        "unavailableTitle": "Assessment unavailable",
+        "loadDetailFallback": "Failed to load assessment.",
+        "notFoundFallback": "The requested assessment could not be loaded."
+      },
+      "interview": {
+        "forbiddenTitle": "You don't have access to this interview",
+        "forbiddenDescription": "Configuring interviews is reserved for HR, admin, and super-admin users. If you think this is a mistake, contact your workspace owner.",
+        "createUnavailableTitle": "Interview setup is unavailable right now",
+        "unavailableTitle": "Interview unavailable",
+        "loadFailedFallback": "Failed to load interview.",
+        "notFoundFallback": "The requested interview could not be loaded.",
+        "setupBlockedTitle": "Interview setup blocked",
+        "candidateNameRequired": "Candidate name is required.",
+        "positionRequired": "Position is required.",
+        "questionsRequired": "Select at least one question.",
+        "creatingLabel": "Creating..."
+      },
+      "feedback": {
+        "unavailableTitle": "Feedback unavailable",
+        "loadFailedFallback": "Failed to load"
+      },
+      "questions": {
+        "editorIssueTitle": "Question editor issue",
+        "unavailableTitle": "Question unavailable",
+        "loadFailedFallback": "Failed to load questions.",
+        "notFoundFallback": "Question not found.",
+        "loadFailedCardDescription": "The editor could not load this question, so the route stops here instead of rendering a partially broken form.",
+        "libraryForbiddenTitle": "You don't have access to the question library",
+        "libraryForbiddenDescription": "The question library is reserved for HR, admin, and super-admin users. If you think this is a mistake, contact your workspace owner.",
+        "libraryUnavailableTitle": "Question library is unavailable right now",
+        "createForbiddenTitle": "You don't have access to create questions",
+        "createForbiddenDescription": "Creating questions is reserved for admin and super-admin users. If you think this is a mistake, contact your workspace owner.",
+        "createUnavailableTitle": "Question creation is unavailable right now"
+      }
+    },
+    "rerun": {
+      "alreadyInProgressTitle": "Re-evaluation already in progress",
+      "startFailedTitle": "Could not start re-evaluation",
+      "allFailedFallback": "Failed to start re-evaluation.",
+      "answerFailedFallback": "Failed to start re-evaluation for this answer.",
+      "nothingToReevaluateTitle": "Nothing to re-evaluate",
+      "nothingToReevaluateMessage": "No submitted answers to score yet. The candidate has not finished any answers.",
+      "queuedLabel": "Re-evaluation queued"
+    },
+    "deleteQuestion": {
+      "cannotDeleteTitle": "Cannot delete"
+    }
   }
 }

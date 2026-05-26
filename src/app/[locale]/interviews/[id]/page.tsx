@@ -1,5 +1,7 @@
 import InterviewDetailClient from './interview-detail-client'
 
+import { getTranslations } from 'next-intl/server'
+
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import type { Locale } from '@/i18n/locales'
@@ -11,7 +13,6 @@ import {
 } from '@/lib/auth-gate'
 import { canConfigureInterview } from '@/lib/auth-roles'
 import { isForbiddenError, requestServer } from '@/lib/server-fetch'
-import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 interface InterviewDetailPageProps {
   params: Promise<{
@@ -20,16 +21,12 @@ interface InterviewDetailPageProps {
   }>
 }
 
-const FORBIDDEN_TITLE = "You don't have access to this interview"
-const FORBIDDEN_DESCRIPTION =
-  'Configuring interviews is reserved for HR, admin, and super-admin users. If you think this is a mistake, contact your workspace owner.'
-
-const UNAVAILABLE_TITLE = TOAST_MESSAGES.pageGate.interview.unavailableTitle
-
 export default async function InterviewDetailPage({
   params,
 }: InterviewDetailPageProps) {
   const { id, locale } = await params
+  const t = await getTranslations({ locale, namespace: 'toast.pageGate.interview' })
+  const tCommon = await getTranslations({ locale, namespace: 'common' })
 
   const returnPath = `/interviews/${encodeURIComponent(id)}`
   const auth = await loadAuthGate(canConfigureInterview)
@@ -37,16 +34,16 @@ export default async function InterviewDetailPage({
   if (auth.kind === 'forbidden') {
     return (
       <ForbiddenAccessPage
-        title={FORBIDDEN_TITLE}
-        description={FORBIDDEN_DESCRIPTION}
+        title={t('forbiddenTitle')}
+        description={t('forbiddenDescription')}
       />
     )
   }
   if (auth.kind === 'error') {
     return (
       <FlashErrorPageFallback
-        title="This interview is unavailable right now"
-        description={`We could not verify your session or permissions. ${auth.message}`}
+        title={t('unavailableTitle')}
+        description={`${tCommon('sessionVerificationFailed')} ${auth.message}`}
       />
     )
   }
@@ -83,24 +80,22 @@ export default async function InterviewDetailPage({
     if (isForbiddenError(err)) {
       return (
         <ForbiddenAccessPage
-          title={FORBIDDEN_TITLE}
-          description={FORBIDDEN_DESCRIPTION}
+          title={t('forbiddenTitle')}
+          description={t('forbiddenDescription')}
         />
       )
     }
     error =
       err instanceof Error
         ? err.message
-        : TOAST_MESSAGES.pageGate.interview.loadFailedFallback
+        : t('loadFailedFallback')
   }
 
   if (error || !interview) {
     return (
       <FlashErrorPageFallback
-        title={UNAVAILABLE_TITLE}
-        description={
-          error ?? TOAST_MESSAGES.pageGate.interview.notFoundFallback
-        }
+        title={t('unavailableTitle')}
+        description={error ?? t('notFoundFallback')}
       />
     )
   }

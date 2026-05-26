@@ -4,6 +4,290 @@
     "description": "AI-powered interview platform"
   },
   "common": {
-    "appName": "AI Interview Architect"
+    "appName": "AI Interview Architect",
+    "brandEyebrow": "Intelligent Conductor",
+    "loading": "Загрузка...",
+    "notAvailable": "Недаступна",
+    "backToHome": "На галоўную",
+    "serviceUnavailable": "Сэрвіс недаступны",
+    "sessionVerificationFailed": "Не ўдалося праверыць вашу сесію або правы доступу."
+  },
+  "languageSwitcher": {
+    "label": "Мова",
+    "locales": {
+      "en": "English",
+      "be": "Беларуская",
+      "ru": "Русский",
+      "pl": "Polski"
+    }
+  },
+  "nav": {
+    "dashboard": "Панэль",
+    "questions": "Пытанні",
+    "assessments": "Ацэнкі",
+    "newInterview": "Новае інтэрв’ю",
+    "team": "Каманда",
+    "logout": "Выйсці",
+    "signIn": "Увайсці"
+  },
+  "login": {
+    "marketingEyebrow": "Conductor AI",
+    "title": "Ацэньвайце вынікі кандыдатаў у спакойнай працоўнай прасторы для аналізу.",
+    "lead": "Новая дызайн-сістэма замяняе крохкі адміністрацыйны інтэрфейс на шматслойныя паверхні, выразную іерархію і хутчэйшае прыняцце рашэнняў падчас разгляду інтэрв’ю.",
+    "cards": {
+      "protectedAccess": {
+        "title": "Абаронены доступ",
+        "description": "Сесійная аўтарызацыя для працэсаў, даступных толькі рэкрутэрам."
+      },
+      "unifiedShell": {
+        "title": "Адзіная абалонка",
+        "description": "Агульныя токены для панэлі, бібліятэкі і працэсаў інтэрв’ю."
+      },
+      "fastTriage": {
+        "title": "Хуткі разбор",
+        "description": "Пераходзьце ад уваходу адразу да актыўных інтэрв’ю і картак ацэнкі."
+      }
+    },
+    "form": {
+      "eyebrow": "Доступ рэкрутэра",
+      "title": "Увайсці",
+      "emailLabel": "Email",
+      "emailPlaceholder": "admin@interview-app.com",
+      "passwordLabel": "Пароль",
+      "passwordPlaceholder": "Пароль",
+      "or": "Або",
+      "google": "Увайсці праз Google"
+    }
+  },
+  "dashboard": {
+    "demoMode": {
+      "title": "Дэма-рэжым",
+      "description": "Толькі прыклады інтэрв’ю — без live backend.",
+      "signInPrefix": "",
+      "signInAction": "Увайдзіце",
+      "signInSuffix": "для доступу да панэлі вашай працоўнай прасторы."
+    },
+    "hero": {
+      "eyebrow": "Панэль рэкрутэра",
+      "title": "Кіруйце варонкай інтэрв’ю з адзінай рэдакцыйнай прасторы.",
+      "lead": "Адсочвайце актыўныя сесіі, знаходзьце кандыдатаў, якія спыніліся, і падтрымлівайце працэс ацэнкі без пераходу паміж асобнымі адміністрацыйнымі інструментамі.",
+      "newInterview": "Новае інтэрв’ю",
+      "questionBank": "Банк пытанняў"
+    },
+    "metrics": {
+      "active": {
+        "label": "Актыўныя",
+        "description": "Інтэрв’ю, якія чакаюць адказаў, загрузак або ацэнкі."
+      },
+      "candidates": {
+        "label": "Кандыдаты",
+        "description": "Усе запісы кандыдатаў, даступныя ў гэтай працоўнай прасторы."
+      },
+      "questionLoad": {
+        "label": "Аб’ём пытанняў",
+        "description": "Пытанні, далучаныя да ўсіх бачных інтэрв’ю."
+      },
+      "completed": {
+        "label": "Завершаныя інтэрв’ю",
+        "description": "Завершаныя сесіі з карткамі ацэнкі, гатовымі да прагляду і перадачы далей."
+      },
+      "lastSync": {
+        "label": "Апошняя сінхранізацыя",
+        "demo": "Дэма",
+        "live": "Live",
+        "demoDescription": "Паказаны дэманстрацыйныя інтэрв’ю.",
+        "liveDescription": "Даныя толькі што абноўлены з live backend."
+      }
+    },
+    "snapshot": {
+      "eyebrow": "Зводка",
+      "title": "Сённяшняя варонка",
+      "description": "Абноўленая абалонка выкарыстоўвае танальныя пласты замест жорсткіх раздзяляльнікаў, таму актыўнасць застаецца чытэльнай нават пры высокай шчыльнасці даных."
+    },
+    "empty": {
+      "title": "Інтэрв’ю пакуль няма",
+      "description": "Пачніце з кандыдата, дадайце пытанні з банка, і гэтая панэль стане вашай рабочай паверхняй.",
+      "action": "Стварыць першае інтэрв’ю"
+    },
+    "recent": {
+      "eyebrow": "Актыўныя запісы",
+      "title": "Апошнія інтэрв’ю",
+      "createQuestion": "Стварыць новае пытанне",
+      "questions": "Пытанні",
+      "uploaded": "Загружана",
+      "updated": "Абноўлена {date}",
+      "open": "Адкрыць"
+    }
+  },
+  "shared": {
+    "fallback": {
+      "backToDashboard": "Вярнуцца на панэль",
+      "backToQuestionLibrary": "Вярнуцца ў банк пытанняў",
+      "backToAssessments": "Вярнуцца да ацэнак"
+    },
+    "labels": {
+      "roles": {
+        "super_admin": "Суперадміністратар",
+        "admin": "Адміністратар",
+        "hr": "HR-спецыяліст",
+        "candidate": "Кандыдат",
+        "interviewer": "Інтэрв’юер",
+        "system": "Сістэма",
+        "assistant": "Асістэнт"
+      },
+      "roleFilters": {
+        "all": "Усе ролі"
+      },
+      "difficulty": {
+        "easy": "Лёгкае",
+        "medium": "Сярэдняе",
+        "hard": "Складанае"
+      },
+      "interviewStatus": {
+        "pending": "Чакае",
+        "in_progress": "У працэсе",
+        "processing": "Апрацоўваецца",
+        "completed": "Завершана",
+        "failed": "Памылка"
+      },
+      "reviewStatus": {
+        "ready": "Гатова да прагляду",
+        "scoring": "Ацэнка яшчэ абнаўляецца",
+        "in_progress": "Кандыдат праходзіць інтэрв’ю",
+        "pending": "Чакае кандыдата",
+        "failed": "Памылка"
+      },
+      "decision": {
+        "proceed": "Працягнуць",
+        "review": "Праверыць",
+        "reject": "Адхіліць"
+      },
+      "behaviorRisk": {
+        "high": "Высокая рызыка",
+        "medium": "Сярэдняя рызыка",
+        "low": "Нізкая рызыка",
+        "none": "Няма рызыкі"
+      }
+    }
+  },
+  "toast": {
+    "defaults": {
+      "success": "Гатова",
+      "error": "Нешта пайшло не так",
+      "info": "Паведамленне",
+      "actionCompleted": "Дзеянне выканана",
+      "actionFailed": "Дзеянне не выканана"
+    },
+    "question": {
+      "createSuccess": "Пытанне створана",
+      "createError": "Не ўдалося стварыць пытанне",
+      "saveSuccess": "Пытанне захавана",
+      "saveError": "Не ўдалося захаваць пытанне",
+      "restoreSuccess": "Пытанне адноўлена",
+      "restoreError": "Не ўдалося аднавіць пытанне",
+      "deleteSuccess": "Пытанне выдалена",
+      "deleteError": "Не ўдалося выдаліць пытанне"
+    },
+    "interview": {
+      "createSuccess": "Інтэрв’ю створана",
+      "createError": "Не ўдалося стварыць інтэрв’ю",
+      "refreshLinkSuccess": "Спасылка кандыдата абноўлена",
+      "refreshLinkError": "Не ўдалося абнавіць спасылку кандыдата",
+      "validationStartSuccess": "Праверка запушчана",
+      "validationStartError": "Не ўдалося запусціць праверку інтэрв’ю",
+      "uploadSuccess": "Загрузка завершана для пытання {questionNumber}",
+      "uploadError": "Загрузка не ўдалася для пытання {questionNumber}"
+    },
+    "take": {
+      "submitSuccess": "Адказ адпраўлены",
+      "submitError": "Не ўдалося адправіць адказ"
+    },
+    "bulkDelete": {
+      "failedTitle": "Масавае выдаленне не ўдалося",
+      "partialTitle": "Выдалена: {deletedCount}, заблакіравана: {blockedCount}",
+      "successTitle": "Выдалена пытанняў: {count}",
+      "successDescription": "Бібліятэка абноўлена.",
+      "noopTitle": "Пытанні не выдалены",
+      "noopDescription": "Выбраныя пытанні не былі выдалены.",
+      "blockedIntro": "Гэтыя пытанні выкарыстоўваюцца ў актыўных інтэрв’ю і не былі выдалены:"
+    },
+    "questionFeed": {
+      "unavailableTitle": "Стужка пытанняў недаступна"
+    },
+    "questionFacets": {
+      "unavailableTitle": "Параметры фільтраў недаступныя"
+    },
+    "similarity": {
+      "searchFailedTitle": "Пошук падобных пытанняў не ўдаўся",
+      "noMatches": "Няма блізкіх супадзенняў вышэй за бягучы парог падобнасці."
+    },
+    "pageGate": {
+      "login": {
+        "failedTitle": "Памылка аўтэнтыфікацыі",
+        "failedFallback": "Уваход не выкананы",
+        "signingInLabel": "Уваход...",
+        "signInLabel": "Увайсці"
+      },
+      "dashboard": {
+        "forbiddenTitle": "У вас няма доступу да панэлі",
+        "forbiddenDescription": "Панэль даступная толькі HR, адміністратарам і суперадміністратарам. Калі гэта памылка, звярніцеся да ўладальніка працоўнай прасторы.",
+        "unavailableTitle": "Панэль зараз недаступна",
+        "loadFailedTitle": "Не ўдалося загрузіць панэль",
+        "loadFailedFallback": "Не ўдалося загрузіць інтэрв’ю.",
+        "signInActionLabel": "Увайсці",
+        "questionBankActionLabel": "Перайсці ў банк пытанняў"
+      },
+      "assessments": {
+        "forbiddenTitle": "У вас няма доступу да ацэнак",
+        "forbiddenDescription": "Гэтая вобласць даступная толькі HR і адміністратарам. Калі гэта памылка, звярніцеся да ўладальніка працоўнай прасторы.",
+        "loadFailedTitle": "Не ўдалося загрузіць ацэнкі",
+        "loadFailedFallback": "Не ўдалося загрузіць ацэнкі.",
+        "unavailableTitle": "Ацэнка недаступна",
+        "loadDetailFallback": "Не ўдалося загрузіць ацэнку.",
+        "notFoundFallback": "Запытаную ацэнку не ўдалося загрузіць."
+      },
+      "interview": {
+        "forbiddenTitle": "У вас няма доступу да гэтага інтэрв’ю",
+        "forbiddenDescription": "Наладжванне інтэрв’ю даступнае толькі HR, адміністратарам і суперадміністратарам. Калі гэта памылка, звярніцеся да ўладальніка працоўнай прасторы.",
+        "createUnavailableTitle": "Наладжванне інтэрв’ю зараз недаступнае",
+        "unavailableTitle": "Інтэрв’ю недаступнае",
+        "loadFailedFallback": "Не ўдалося загрузіць інтэрв’ю.",
+        "notFoundFallback": "Запытанае інтэрв’ю не ўдалося загрузіць.",
+        "setupBlockedTitle": "Наладжванне інтэрв’ю заблакіравана",
+        "candidateNameRequired": "Укажыце імя кандыдата.",
+        "positionRequired": "Укажыце пазіцыю.",
+        "questionsRequired": "Выберыце хаця б адно пытанне.",
+        "creatingLabel": "Стварэнне..."
+      },
+      "feedback": {
+        "unavailableTitle": "Зваротная сувязь недаступна",
+        "loadFailedFallback": "Не ўдалося загрузіць"
+      },
+      "questions": {
+        "editorIssueTitle": "Праблема рэдактара пытанняў",
+        "unavailableTitle": "Пытанне недаступнае",
+        "loadFailedFallback": "Не ўдалося загрузіць пытанні.",
+        "notFoundFallback": "Пытанне не знойдзена.",
+        "loadFailedCardDescription": "Рэдактар не змог загрузіць гэтае пытанне, таму маршрут спыняецца тут замест часткова зламанай формы.",
+        "libraryForbiddenTitle": "У вас няма доступу да банка пытанняў",
+        "libraryForbiddenDescription": "Банк пытанняў даступны толькі HR, адміністратарам і суперадміністратарам. Калі гэта памылка, звярніцеся да ўладальніка працоўнай прасторы.",
+        "libraryUnavailableTitle": "Банк пытанняў зараз недаступны",
+        "createForbiddenTitle": "У вас няма доступу да стварэння пытанняў",
+        "createForbiddenDescription": "Стварэнне пытанняў даступнае толькі адміністратарам і суперадміністратарам. Калі гэта памылка, звярніцеся да ўладальніка працоўнай прасторы.",
+        "createUnavailableTitle": "Стварэнне пытання зараз недаступнае"
+      }
+    },
+    "rerun": {
+      "alreadyInProgressTitle": "Паўторная ацэнка ўжо выконваецца",
+      "startFailedTitle": "Не ўдалося запусціць паўторную ацэнку",
+      "allFailedFallback": "Не ўдалося запусціць паўторную ацэнку.",
+      "answerFailedFallback": "Не ўдалося запусціць паўторную ацэнку для гэтага адказу.",
+      "nothingToReevaluateTitle": "Няма чаго ацэньваць паўторна",
+      "nothingToReevaluateMessage": "Пакуль няма адпраўленых адказаў для ацэнкі. Кандыдат яшчэ не завяршыў ніводнага адказу.",
+      "queuedLabel": "Паўторная ацэнка пастаўлена ў чаргу"
+    },
+    "deleteQuestion": {
+      "cannotDeleteTitle": "Нельга выдаліць"
+    }
   }
 }

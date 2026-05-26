@@ -63,7 +63,7 @@ import {
   getCandidateInitials,
 } from "@/lib/interview-formatters";
 import { runMutation } from "@/lib/run-mutation";
-import { TOAST_MESSAGES } from "@/lib/toast-messages";
+import { useToastMessages } from "@/lib/use-toast-messages";
 
 type UploadStatus = "idle" | "uploading" | "uploaded" | "error";
 
@@ -174,6 +174,7 @@ export default function InterviewDetailClient({
   initialInterview,
   initialResults,
 }: InterviewDetailClientProps) {
+  const toastMessages = useToastMessages();
   const [interview, setInterview] = useState<Interview | null>(initialInterview);
   const [results, setResults] = useState<InterviewResult | null>(initialResults);
   const [loading] = useState(false);
@@ -220,8 +221,8 @@ export default function InterviewDetailClient({
         const data = await runMutation(() => generateCandidateLink(id), {
           showSuccessToast: mode === "refresh",
           showErrorToast: mode === "refresh",
-          successMessage: TOAST_MESSAGES.interview.refreshLinkSuccess,
-          errorMessage: TOAST_MESSAGES.interview.refreshLinkError,
+          successMessage: toastMessages.interview.refreshLinkSuccess,
+          errorMessage: toastMessages.interview.refreshLinkError,
         });
         setCandidateLink(buildCandidateUrl(data.candidateLink));
         setCandidateLinkStatus("ready");
@@ -234,11 +235,11 @@ export default function InterviewDetailClient({
         setCandidateLinkError(
           err instanceof Error
             ? err.message
-            : "Failed to generate candidate link.",
+            : toastMessages.interview.refreshLinkError,
         );
       }
     },
-    [buildCandidateUrl, id],
+    [buildCandidateUrl, id, toastMessages.interview.refreshLinkError, toastMessages.interview.refreshLinkSuccess],
   );
 
   useEffect(() => {
@@ -419,8 +420,8 @@ export default function InterviewDetailClient({
           );
         },
         {
-          successMessage: TOAST_MESSAGES.interview.uploadSuccess(questionIndex + 1),
-          errorMessage: TOAST_MESSAGES.interview.uploadError(questionIndex + 1),
+          successMessage: toastMessages.interview.uploadSuccess(questionIndex + 1),
+          errorMessage: toastMessages.interview.uploadError(questionIndex + 1),
         },
       );
       setInterview(refreshedInterview);
@@ -453,8 +454,8 @@ export default function InterviewDetailClient({
 
     try {
       await runMutation(() => validateInterview(interview.id, { force: true }), {
-        successMessage: TOAST_MESSAGES.interview.validationStartSuccess,
-        errorMessage: TOAST_MESSAGES.interview.validationStartError,
+        successMessage: toastMessages.interview.validationStartSuccess,
+        errorMessage: toastMessages.interview.validationStartError,
       });
       const refreshedInterview = await getInterview(interview.id);
       setInterview(refreshedInterview);

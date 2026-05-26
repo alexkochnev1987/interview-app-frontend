@@ -36,7 +36,7 @@ import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
 import { notifyBulkDeleteOutcome } from '@/lib/notify-bulk-delete'
 import { notifyError } from '@/lib/toast'
 import { runMutation } from '@/lib/run-mutation'
-import { TOAST_MESSAGES } from '@/lib/toast-messages'
+import { useToastMessages } from '@/lib/use-toast-messages'
 
 type QuestionsLibraryClientProps = {
   isSuperAdmin: boolean
@@ -48,6 +48,7 @@ export function QuestionsLibraryClient({
   initialPrefetch,
 }: QuestionsLibraryClientProps) {
   const router = useRouter()
+  const toastMessages = useToastMessages()
   const queryClient = useQueryClient()
 
   const query = useQuestionsQuery({
@@ -194,17 +195,17 @@ export function QuestionsLibraryClient({
         showSuccessToast: false,
         showErrorToast: false,
       })
-      notifyBulkDeleteOutcome(result)
+      notifyBulkDeleteOutcome(result, toastMessages.bulkDelete)
       setSelectedIds(new Set())
       setBulkConfirmOpen(false)
       setBulkResult(result)
       void queryClient.invalidateQueries({ queryKey: questionsRootQueryKey() })
     } catch (error) {
       setBulkResult(null)
-      notifyError(TOAST_MESSAGES.bulkDelete.failedTitle, {
+      notifyError(toastMessages.bulkDelete.failedTitle, {
         id: 'bulk-delete-error',
         description:
-          error instanceof Error ? error.message : 'Bulk delete failed.',
+          error instanceof Error ? error.message : toastMessages.bulkDelete.failedTitle,
       })
       setBulkConfirmOpen(false)
     } finally {

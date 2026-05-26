@@ -26,19 +26,21 @@ type LanguageOption = {
 }
 
 interface LanguageSwitcherProps {
+  ariaLabel: string
   currentLocale: Locale
   href: string
   options: LanguageOption[]
 }
 
 export function LanguageSwitcher({
+  ariaLabel,
   currentLocale,
   href,
   options,
 }: LanguageSwitcherProps) {
   return (
     <div
-      aria-label="Language"
+      aria-label={ariaLabel}
       className="flex items-center gap-1 rounded-full border border-border/60 bg-background/70 p-1 shadow-sm"
       role="group"
     >

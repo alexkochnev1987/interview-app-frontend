@@ -1,11 +1,12 @@
 'use client'
 
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useSearchParams } from 'next/navigation'
 
 import { LanguageSwitcher } from '@/components/ui/language-switcher'
-import { LOCALE_LABELS, LOCALES, type Locale } from '@/i18n/locales'
+import { LOCALES, type Locale } from '@/i18n/locales'
 import { usePathname } from '@/i18n/navigation'
+import { useSharedLabels } from '@/i18n/use-shared-labels'
 import { useAuth } from '@/lib/auth-context'
 import {
   canAccessDashboard,
@@ -37,18 +38,21 @@ import { NavLink } from '@/components/ui/nav-link'
 import { BodyText } from '@/components/ui/text'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
 
-const LANGUAGE_OPTIONS = LOCALES.map((locale) => ({
-  locale,
-  label: LOCALE_LABELS[locale],
-}))
-
 export function NavHeader() {
   const { user, logout } = useAuth()
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const locale = useLocale() as Locale
+  const tNav = useTranslations('nav')
+  const tCommon = useTranslations('common')
+  const tLanguage = useTranslations('languageSwitcher')
+  const labels = useSharedLabels()
   const queryString = searchParams.toString()
   const languageHref = queryString ? `${pathname}?${queryString}` : pathname
+  const languageOptions = LOCALES.map((optionLocale) => ({
+    locale: optionLocale,
+    label: tLanguage(`locales.${optionLocale}`),
+  }))
 
   if (pathname.startsWith('/take') || pathname.startsWith('/feedback')) {
     return null
@@ -56,19 +60,19 @@ export function NavHeader() {
 
   const links = [
     ...(canAccessDashboard(user?.role)
-      ? [{ href: '/', label: 'Dashboard', icon: LayoutDashboard }]
+      ? [{ href: '/', label: tNav('dashboard'), icon: LayoutDashboard }]
       : []),
     ...(canReadQuestions(user?.role)
-      ? [{ href: '/questions', label: 'Questions', icon: LibraryBig }]
+      ? [{ href: '/questions', label: tNav('questions'), icon: LibraryBig }]
       : []),
     ...(canReviewAssessments(user?.role)
-      ? [{ href: '/assessments', label: 'Assessments', icon: ClipboardList }]
+      ? [{ href: '/assessments', label: tNav('assessments'), icon: ClipboardList }]
       : []),
     ...(canConfigureInterview(user?.role)
-      ? [{ href: '/interviews/new', label: 'New Interview', icon: Plus }]
+      ? [{ href: '/interviews/new', label: tNav('newInterview'), icon: Plus }]
       : []),
     ...(canManageTeam(user?.role)
-      ? [{ href: '/team', label: 'Team', icon: Users }]
+      ? [{ href: '/team', label: tNav('team'), icon: Users }]
       : []),
   ]
 
@@ -89,7 +93,7 @@ export function NavHeader() {
                 <Icon size="lg"><Sparkles /></Icon>
               </IconBadge>
               <Stack gap={0}>
-                <EyebrowLabel size="lg">Intelligent Conductor</EyebrowLabel>
+                <EyebrowLabel size="lg">{tCommon('brandEyebrow')}</EyebrowLabel>
                 <BodyText
                   as="span"
                   size="responsive-sm"
@@ -116,9 +120,10 @@ export function NavHeader() {
           user ? (
             <>
               <LanguageSwitcher
+                ariaLabel={tLanguage('label')}
                 currentLocale={locale}
                 href={languageHref}
-                options={LANGUAGE_OPTIONS}
+                options={languageOptions}
               />
               <SurfaceTile
                 tone="soft"
@@ -126,7 +131,7 @@ export function NavHeader() {
                 padding="sm"
                 visibility="sm-only"
               >
-                <IdentityBadge name={user.name} role={user.role} />
+                <IdentityBadge name={user.name} role={labels.role(user.role)} />
               </SurfaceTile>
               <Button
                 type="button"
@@ -137,18 +142,19 @@ export function NavHeader() {
                 onClick={logout}
               >
                 <Icon size="md"><LogOut /></Icon>
-                Logout
+                {tNav('logout')}
               </Button>
             </>
           ) : (
             <>
               <LanguageSwitcher
+                ariaLabel={tLanguage('label')}
                 currentLocale={locale}
                 href={languageHref}
-                options={LANGUAGE_OPTIONS}
+                options={languageOptions}
               />
               <Button asChild variant="gradient" size="sm">
-                <UnstyledLink href="/login">Sign In</UnstyledLink>
+                <UnstyledLink href="/login">{tNav('signIn')}</UnstyledLink>
               </Button>
             </>
           )

@@ -1,3 +1,5 @@
+import { getTranslations } from 'next-intl/server'
+
 import { AssessmentsListClient } from '@/components/assessments/list/assessments-list-client'
 import { AssessmentsListHeader } from '@/components/assessments/list/assessments-list-header'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
@@ -13,20 +15,12 @@ import {
 } from '@/lib/auth-gate'
 import { canReviewAssessments } from '@/lib/auth-roles'
 import { isForbiddenError, requestServer } from '@/lib/server-fetch'
-import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 const HR_VISIBLE_STATUSES: ReadonlySet<Interview['status']> = new Set<
   Interview['status']
 >(['processing', 'completed', 'failed'])
 
-const FORBIDDEN_TITLE = "You don't have access to assessments"
-const FORBIDDEN_DESCRIPTION =
-  'This area is reserved for HR and admin reviewers. If you think this is a mistake, contact your workspace owner.'
-
-const LOAD_FAILED_TITLE = TOAST_MESSAGES.pageGate.assessments.loadFailedTitle
-
 const ERROR_BACK_HREF = '/'
-const ERROR_BACK_LABEL = 'Back to dashboard'
 
 function sortByCompletion(a: Interview, b: Interview): number {
   const ca = getCompletionDate(a)
@@ -48,23 +42,26 @@ export default async function AssessmentsPage({
   params,
 }: AssessmentsPageProps) {
   const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'toast.pageGate.assessments' })
+  const tCommon = await getTranslations({ locale, namespace: 'common' })
+  const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
   const auth = await loadAuthGate(canReviewAssessments)
   redirectIfUnauthenticated(auth, '/assessments', locale)
   if (auth.kind === 'forbidden') {
     return (
       <ForbiddenAccessPage
-        title={FORBIDDEN_TITLE}
-        description={FORBIDDEN_DESCRIPTION}
+        title={t('forbiddenTitle')}
+        description={t('forbiddenDescription')}
       />
     )
   }
   if (auth.kind === 'error') {
     return (
       <FlashErrorPageFallback
-        title="Assessments are unavailable right now"
-        description={`We could not verify your session or permissions. ${auth.message}`}
+        title={t('unavailableTitle')}
+        description={`${tCommon('sessionVerificationFailed')} ${auth.message}`}
         backHref={ERROR_BACK_HREF}
-        backLabel={ERROR_BACK_LABEL}
+        backLabel={tFallback('backToDashboard')}
       />
     )
   }
@@ -80,24 +77,24 @@ export default async function AssessmentsPage({
     if (isForbiddenError(err)) {
       return (
         <ForbiddenAccessPage
-          title={FORBIDDEN_TITLE}
-          description={FORBIDDEN_DESCRIPTION}
+          title={t('forbiddenTitle')}
+          description={t('forbiddenDescription')}
         />
       )
     }
     error =
       err instanceof Error
         ? err.message
-        : TOAST_MESSAGES.pageGate.assessments.loadFailedFallback
+        : t('loadFailedFallback')
   }
 
   if (error) {
     return (
       <FlashErrorPageFallback
-        title={LOAD_FAILED_TITLE}
+        title={t('loadFailedTitle')}
         description={error}
         backHref={ERROR_BACK_HREF}
-        backLabel={ERROR_BACK_LABEL}
+        backLabel={tFallback('backToDashboard')}
       />
     )
   }

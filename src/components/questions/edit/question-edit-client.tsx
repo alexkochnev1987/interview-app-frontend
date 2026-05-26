@@ -17,7 +17,7 @@ import {
 } from '@/lib/api'
 import { questionToEditorInput } from '@/lib/question-editor/parsers'
 import { runMutation } from '@/lib/run-mutation'
-import { TOAST_MESSAGES } from '@/lib/toast-messages'
+import { useToastMessages } from '@/lib/use-toast-messages'
 
 type QuestionEditClientProps = {
   id: string
@@ -33,6 +33,7 @@ export function QuestionEditClient({
   canDelete,
 }: QuestionEditClientProps) {
   const router = useRouter()
+  const toastMessages = useToastMessages()
   const [question, setQuestion] = useState(initialQuestion)
   const [deleting, setDeleting] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -51,8 +52,8 @@ export function QuestionEditClient({
     setRestoring(true)
     try {
       const restored = await runMutation(() => restoreQuestion(id), {
-        successMessage: TOAST_MESSAGES.question.restoreSuccess,
-        errorMessage: TOAST_MESSAGES.question.restoreError,
+        successMessage: toastMessages.question.restoreSuccess,
+        errorMessage: toastMessages.question.restoreError,
       })
       setQuestion(restored)
       setRestoreOpen(false)
@@ -67,12 +68,12 @@ export function QuestionEditClient({
     setDeleting(true)
     try {
       await runMutation(() => deleteQuestion(id), {
-        successMessage: TOAST_MESSAGES.question.deleteSuccess,
-        errorMessage: TOAST_MESSAGES.question.deleteError,
+        successMessage: toastMessages.question.deleteSuccess,
+        errorMessage: toastMessages.question.deleteError,
         getErrorTitle: (err) =>
           err instanceof QuestionInUseError
-            ? TOAST_MESSAGES.deleteQuestion.cannotDeleteTitle
-            : TOAST_MESSAGES.question.deleteError,
+            ? toastMessages.deleteQuestion.cannotDeleteTitle
+            : toastMessages.question.deleteError,
       })
       setConfirmOpen(false)
       router.push('/questions')

@@ -1,3 +1,5 @@
+import { getTranslations } from 'next-intl/server'
+
 import { QuestionEditClient } from '@/components/questions/edit/question-edit-client'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
@@ -14,19 +16,18 @@ import {
   canUpdateQuestions,
 } from '@/lib/auth-roles'
 import { isForbiddenError, requestServer } from '@/lib/server-fetch'
-import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 interface EditQuestionPageProps {
   params: Promise<{ id: string; locale: Locale }>
 }
 
-const QUESTIONS_GATE = TOAST_MESSAGES.pageGate.questions
-
 const ERROR_BACK_HREF = '/questions'
-const ERROR_BACK_LABEL = 'Back to question library'
 
 export default async function EditQuestionPage({ params }: EditQuestionPageProps) {
   const { id, locale } = await params
+  const t = await getTranslations({ locale, namespace: 'toast.pageGate.questions' })
+  const tCommon = await getTranslations({ locale, namespace: 'common' })
+  const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
 
   const returnPath = `/questions/${encodeURIComponent(id)}`
   const auth = await loadAuthGate(canReadQuestions)
@@ -34,18 +35,18 @@ export default async function EditQuestionPage({ params }: EditQuestionPageProps
   if (auth.kind === 'forbidden') {
     return (
       <ForbiddenAccessPage
-        title={QUESTIONS_GATE.libraryForbiddenTitle}
-        description={QUESTIONS_GATE.libraryForbiddenDescription}
+        title={t('libraryForbiddenTitle')}
+        description={t('libraryForbiddenDescription')}
       />
     )
   }
   if (auth.kind === 'error') {
     return (
       <FlashErrorPageFallback
-        title={QUESTIONS_GATE.unavailableTitle}
-        description={`We could not verify your session or permissions. ${auth.message}`}
+        title={t('unavailableTitle')}
+        description={`${tCommon('sessionVerificationFailed')} ${auth.message}`}
         backHref={ERROR_BACK_HREF}
-        backLabel={ERROR_BACK_LABEL}
+        backLabel={tFallback('backToQuestionLibrary')}
       />
     )
   }
@@ -64,24 +65,24 @@ export default async function EditQuestionPage({ params }: EditQuestionPageProps
     if (isForbiddenError(err)) {
       return (
         <ForbiddenAccessPage
-          title={QUESTIONS_GATE.libraryForbiddenTitle}
-          description={QUESTIONS_GATE.libraryForbiddenDescription}
+          title={t('libraryForbiddenTitle')}
+          description={t('libraryForbiddenDescription')}
         />
       )
     }
     error =
       err instanceof Error
         ? err.message
-        : QUESTIONS_GATE.loadFailedCardDescription
+        : t('loadFailedCardDescription')
   }
 
   if (error || !question) {
     return (
       <FlashErrorPageFallback
-        title={QUESTIONS_GATE.unavailableTitle}
-        description={error ?? 'Question not found.'}
+        title={t('unavailableTitle')}
+        description={error ?? t('notFoundFallback')}
         backHref={ERROR_BACK_HREF}
-        backLabel={ERROR_BACK_LABEL}
+        backLabel={tFallback('backToQuestionLibrary')}
       />
     )
   }

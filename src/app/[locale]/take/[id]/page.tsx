@@ -1,16 +1,17 @@
 import { AlertCircle } from 'lucide-react'
+import { getTranslations } from 'next-intl/server'
 
 import { PageContent, PageMainLayout } from '@/components/layout/page-shell'
 import { Icon } from '@/components/ui/icon'
 import { EmptyStateCard } from '@/components/ui/state-card'
+import type { Locale } from '@/i18n/locales'
 import { type TakeInterviewData } from '@/lib/api'
 import { getServerRequestContext, requestServer } from '@/lib/server-fetch'
 import { readSearchParamToken } from '@/lib/text'
-import { TOAST_MESSAGES } from '@/lib/toast-messages'
 import { TakeInterviewClient } from './take-interview-client'
 
 interface TakeInterviewPageProps {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string; locale: Locale }>
   searchParams: Promise<{ token?: string | string[] }>
 }
 
@@ -18,7 +19,8 @@ export default async function TakeInterviewPage({
   params,
   searchParams,
 }: TakeInterviewPageProps) {
-  const { id } = await params
+  const { id, locale } = await params
+  const t = await getTranslations({ locale, namespace: 'toast.pageGate.interview' })
   const token = readSearchParamToken((await searchParams).token)
 
   if (token) {
@@ -38,7 +40,7 @@ export default async function TakeInterviewPage({
     error =
       err instanceof Error
         ? err.message
-        : 'Failed to load interview.'
+        : t('loadFailedFallback')
   }
 
   if (error || !interview) {
@@ -51,8 +53,8 @@ export default async function TakeInterviewPage({
                 <AlertCircle />
               </Icon>
             }
-            title={TOAST_MESSAGES.pageGate.interview.unavailableTitle}
-            description={error ?? 'Failed to load interview.'}
+            title={t('unavailableTitle')}
+            description={error ?? t('loadFailedFallback')}
           />
         </PageContent>
       </PageMainLayout>

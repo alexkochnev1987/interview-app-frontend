@@ -1,6 +1,7 @@
 'use client'
 
 import { AlertCircle } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { PageContent, PageMainLayout } from '@/components/layout/page-shell'
 import {
@@ -16,7 +17,6 @@ import {
   useTakeOrchestrator,
 } from '@/features/take'
 import type { TakeInterviewData } from '@/lib/api'
-import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
 type TakeInterviewClientProps = {
   id: string
@@ -29,6 +29,8 @@ export function TakeInterviewClient({
   candidateToken = '',
   initialInterview,
 }: TakeInterviewClientProps) {
+  const t = useTranslations('toast.pageGate.interview')
+  const tCommon = useTranslations('common')
   const {
     stage,
     interview,
@@ -86,7 +88,7 @@ export function TakeInterviewClient({
                 <AlertCircle />
               </Icon>
             }
-            title={TOAST_MESSAGES.pageGate.interview.unavailableTitle}
+            title={t('unavailableTitle')}
             description={error}
           />
         </PageContent>
@@ -97,7 +99,7 @@ export function TakeInterviewClient({
   if (stage === 'loading' || !interview) {
     return (
       <PageMainLayout>
-        <LoadingStateCard label="Loading interview..." />
+        <LoadingStateCard label={tCommon('loading')} />
       </PageMainLayout>
     )
   }

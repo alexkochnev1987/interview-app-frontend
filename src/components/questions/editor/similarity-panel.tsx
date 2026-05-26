@@ -24,8 +24,8 @@ import {
   type SimilarStatus,
   type SimilaritySignalSummary,
 } from '@/lib/question-editor/parsers'
-import { TOAST_MESSAGES } from '@/lib/toast-messages'
 import { truncateText } from '@/lib/text'
+import { useToastMessages } from '@/lib/use-toast-messages'
 import { SIMILARITY_MIN_QUESTION_TEXT_LENGTH } from './use-similarity-search'
 
 interface SimilarityPanelProps {
@@ -51,6 +51,8 @@ export function SimilarityPanel({
   disabled,
   onRunSearch,
 }: SimilarityPanelProps) {
+  const toastMessages = useToastMessages()
+
   return (
     <Card variant="surface">
       <CardHeader spacing="lg">
@@ -103,7 +105,7 @@ export function SimilarityPanel({
         {status === 'error' ? (
           <Stack gap={2}>
             <BodyText size="sm" weight="semibold">
-              {TOAST_MESSAGES.similarity.searchFailedTitle}
+              {toastMessages.similarity.searchFailedTitle}
             </BodyText>
             {error ? (
               <BodyText size="sm" tone="muted">
@@ -126,7 +128,7 @@ export function SimilarityPanel({
 
         {status === 'success' && matches.length === 0 ? (
           <PanelMessage>
-            {TOAST_MESSAGES.similarity.noMatches}
+            {toastMessages.similarity.noMatches}
           </PanelMessage>
         ) : null}
 

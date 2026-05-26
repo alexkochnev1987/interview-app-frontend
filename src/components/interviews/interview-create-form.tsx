@@ -38,9 +38,7 @@ import { useRouter } from '@/i18n/navigation'
 import { createInterview, type Question } from '@/lib/api'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
 import { runMutation } from '@/lib/run-mutation'
-import { TOAST_MESSAGES } from '@/lib/toast-messages'
-
-const INTERVIEW_GATE = TOAST_MESSAGES.pageGate.interview
+import { useToastMessages } from '@/lib/use-toast-messages'
 
 type InterviewCreateFormProps = {
   initialPrefetch: QuestionsLibraryPrefetch
@@ -48,6 +46,7 @@ type InterviewCreateFormProps = {
 
 export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProps) {
   const router = useRouter()
+  const toastMessages = useToastMessages()
   const [candidateName, setCandidateName] = useState('')
   const [position, setPosition] = useState('')
   const [selectedById, setSelectedById] = useState<Map<string, Question>>(new Map())
@@ -144,15 +143,15 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
     setError(null)
 
     if (!candidateName.trim()) {
-      setError(INTERVIEW_GATE.candidateNameRequired)
+      setError(toastMessages.pageGate.interview.candidateNameRequired)
       return
     }
     if (!position.trim()) {
-      setError(INTERVIEW_GATE.positionRequired)
+      setError(toastMessages.pageGate.interview.positionRequired)
       return
     }
     if (selectedCount === 0) {
-      setError(INTERVIEW_GATE.questionsRequired)
+      setError(toastMessages.pageGate.interview.questionsRequired)
       return
     }
 
@@ -167,8 +166,8 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
             questionIds: Array.from(selectedById.keys()),
           }),
         {
-          successMessage: TOAST_MESSAGES.interview.createSuccess,
-          errorMessage: TOAST_MESSAGES.interview.createError,
+          successMessage: toastMessages.interview.createSuccess,
+          errorMessage: toastMessages.interview.createError,
         },
       )
       router.push(`/interviews/${interview.id}`)
@@ -183,7 +182,7 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
     <>
       {error ? (
         <Alert variant="danger">
-          <AlertTitle>{INTERVIEW_GATE.setupBlockedTitle}</AlertTitle>
+          <AlertTitle>{toastMessages.pageGate.interview.setupBlockedTitle}</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       ) : null}
@@ -233,7 +232,7 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
                   disabled={submitting || selectedCount === 0}
                 >
                   {submitting
-                    ? INTERVIEW_GATE.creatingLabel
+                    ? toastMessages.pageGate.interview.creatingLabel
                     : `Create Interview${selectedCount > 0 ? ` (${selectedCount})` : ''}`}
                   <ArrowRight className="size-4" />
                 </Button>

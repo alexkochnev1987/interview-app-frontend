@@ -33,7 +33,7 @@ import {
 } from '@/lib/question-editor/parsers'
 import { FEEDBACK_POLICY } from '@/lib/feedback-policy'
 import { runMutation } from '@/lib/run-mutation'
-import { TOAST_MESSAGES } from '@/lib/toast-messages'
+import { useToastMessages } from '@/lib/use-toast-messages'
 
 type AiStatus = 'idle' | 'loading' | 'error'
 type QuestionFormField = 'questionText' | 'metadata'
@@ -61,6 +61,7 @@ export function QuestionEditor({
   readOnly = false,
   saveToastOptions,
 }: QuestionEditorProps) {
+  const toastMessages = useToastMessages()
   const [value, setValue] = useState<QuestionInput>(normalizeInitialValue(initialValue))
   const [metadataText, setMetadataText] = useState(
     formatMetadata(initialValue?.metadata ?? {}),
@@ -228,8 +229,8 @@ export function QuestionEditor({
       const persisted = normalizeInitialValue(
         await runMutation(() => onSubmit(payload), {
           showSuccessToast: saveToastOptions?.enabled ?? true,
-          successMessage: saveToastOptions?.successMessage ?? TOAST_MESSAGES.question.saveSuccess,
-          errorMessage: saveToastOptions?.errorMessage ?? TOAST_MESSAGES.question.saveError,
+          successMessage: saveToastOptions?.successMessage ?? toastMessages.question.saveSuccess,
+          errorMessage: saveToastOptions?.errorMessage ?? toastMessages.question.saveError,
         }),
       )
       const normalizedMetadataText = formatMetadata(persisted.metadata ?? {})

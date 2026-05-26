@@ -6,14 +6,16 @@ import { Stack } from '@/components/ui/layout/stack'
 import { SurfaceTile } from '@/components/ui/surface-tile'
 import { BodyText } from '@/components/ui/text'
 import { type BulkDeleteResult } from '@/lib/api'
-import { TOAST_MESSAGES } from '@/lib/toast-messages'
 import { truncateText } from '@/lib/text'
+import { useToastMessages } from '@/lib/use-toast-messages'
 
 interface BulkDeleteResultAlertsProps {
   result: BulkDeleteResult | null
 }
 
 export function BulkDeleteResultAlerts({ result }: BulkDeleteResultAlertsProps) {
+  const toastMessages = useToastMessages()
+
   if (!result || result.blocked.length === 0) {
     return null
   }
@@ -22,7 +24,7 @@ export function BulkDeleteResultAlerts({ result }: BulkDeleteResultAlertsProps) 
     <Card variant="warning" size="sm">
       <CardContent spacing="md">
         <Stack gap={2}>
-          <BodyText size="sm">{TOAST_MESSAGES.bulkDelete.blockedIntro}</BodyText>
+          <BodyText size="sm">{toastMessages.bulkDelete.blockedIntro}</BodyText>
           <SurfaceTile tone="soft" padding="md" rounded="lg" width="full">
             <BulletList>
               {result.blocked.map((item) => (

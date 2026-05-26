@@ -20,7 +20,7 @@ import type {
   QuestionDifficulty,
   QuestionStatusFilter,
 } from '@/lib/api'
-import { TOAST_MESSAGES } from '@/lib/toast-messages'
+import { useToastMessages } from '@/lib/use-toast-messages'
 
 const COLLAPSED_LIMIT = 6
 const TAG_COLLAPSED_LIMIT = 12
@@ -74,6 +74,7 @@ export function QuestionFacetSidebar(props: QuestionFacetSidebarProps) {
     error,
     onRetry,
   } = props
+  const toastMessages = useToastMessages()
 
   const activeFilterCount =
     (selected.difficulty ? 1 : 0) +
@@ -120,7 +121,7 @@ export function QuestionFacetSidebar(props: QuestionFacetSidebarProps) {
           {error ? (
             <Stack gap={2}>
               <BodyText size="sm" weight="semibold">
-                {TOAST_MESSAGES.questionFacets.unavailableTitle}
+                {toastMessages.questionFacets.unavailableTitle}
               </BodyText>
               <BodyText size="sm" tone="muted">
                 {error}

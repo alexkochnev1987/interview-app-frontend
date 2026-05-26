@@ -1,3 +1,5 @@
+import { getTranslations } from 'next-intl/server'
+
 import { DashboardView } from '@/components/dashboard/dashboard-view'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
@@ -10,9 +12,6 @@ import {
   redirectIfUnauthorizedError,
 } from '@/lib/auth-gate'
 import { isForbiddenError, requestServer } from '@/lib/server-fetch'
-import { TOAST_MESSAGES } from '@/lib/toast-messages'
-
-const DASHBOARD_GATE = TOAST_MESSAGES.pageGate.dashboard
 
 const ERROR_SIGN_IN_HREF = '/login'
 const ERROR_ESCAPE_HREF = '/questions'
@@ -23,23 +22,25 @@ interface DashboardPageProps {
 
 export default async function DashboardPage({ params }: DashboardPageProps) {
   const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'toast.pageGate.dashboard' })
+  const tCommon = await getTranslations({ locale, namespace: 'common' })
   const auth = await loadAuthGate(canAccessDashboard)
   redirectIfUnauthenticated(auth, '/', locale)
   if (auth.kind === 'forbidden') {
     return (
       <ForbiddenAccessPage
-        title={DASHBOARD_GATE.forbiddenTitle}
-        description={DASHBOARD_GATE.forbiddenDescription}
+        title={t('forbiddenTitle')}
+        description={t('forbiddenDescription')}
       />
     )
   }
   if (auth.kind === 'error') {
     return (
       <FlashErrorPageFallback
-        title={DASHBOARD_GATE.unavailableTitle}
-        description={`We could not verify your session. ${auth.message}`}
+        title={t('unavailableTitle')}
+        description={`${tCommon('sessionVerificationFailed')} ${auth.message}`}
         backHref={ERROR_SIGN_IN_HREF}
-        backLabel={DASHBOARD_GATE.signInActionLabel}
+        backLabel={t('signInActionLabel')}
       />
     )
   }
@@ -55,22 +56,22 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
     if (isForbiddenError(err)) {
       return (
         <ForbiddenAccessPage
-          title={DASHBOARD_GATE.forbiddenTitle}
-          description={DASHBOARD_GATE.forbiddenDescription}
+          title={t('forbiddenTitle')}
+          description={t('forbiddenDescription')}
         />
       )
     }
     error =
-      err instanceof Error ? err.message : DASHBOARD_GATE.loadFailedFallback
+      err instanceof Error ? err.message : t('loadFailedFallback')
   }
 
   if (error) {
     return (
       <FlashErrorPageFallback
-        title={DASHBOARD_GATE.loadFailedTitle}
+        title={t('loadFailedTitle')}
         description={error}
         backHref={ERROR_ESCAPE_HREF}
-        backLabel={DASHBOARD_GATE.questionBankActionLabel}
+        backLabel={t('questionBankActionLabel')}
       />
     )
   }

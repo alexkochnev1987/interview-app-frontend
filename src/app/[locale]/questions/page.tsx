@@ -1,3 +1,5 @@
+import { getTranslations } from 'next-intl/server'
+
 import { QuestionsLibraryClient } from '@/components/questions/library/questions-library-client'
 import { QueryHydrationBoundary } from '@/components/questions/query-hydration-boundary'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
@@ -8,12 +10,8 @@ import { loadAuthGate, redirectIfUnauthenticated } from '@/lib/auth-gate'
 import { canReadQuestions, isSuperAdmin } from '@/lib/auth-roles'
 import { prefetchQuestionsLibrary } from '@/lib/questions-library-prefetch'
 import { toQuestionsSearchParams } from '@/lib/questions-query-state'
-import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
-
-const QUESTIONS_GATE = TOAST_MESSAGES.pageGate.questions
 const ERROR_BACK_HREF = '/'
-const ERROR_BACK_LABEL = 'Back to dashboard'
 
 interface QuestionsPageProps {
   params: Promise<{ locale: Locale }>
@@ -25,14 +23,17 @@ export default async function QuestionsPage({
   searchParams,
 }: QuestionsPageProps) {
   const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'toast.pageGate.questions' })
+  const tCommon = await getTranslations({ locale, namespace: 'common' })
+  const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
   const auth = await loadAuthGate(canReadQuestions)
   redirectIfUnauthenticated(auth, '/questions', locale)
 
   if (auth.kind === 'forbidden') {
     return (
       <ForbiddenAccessPage
-        title={QUESTIONS_GATE.libraryForbiddenTitle}
-        description={QUESTIONS_GATE.libraryForbiddenDescription}
+        title={t('libraryForbiddenTitle')}
+        description={t('libraryForbiddenDescription')}
       />
     )
   }
@@ -40,10 +41,10 @@ export default async function QuestionsPage({
   if (auth.kind === 'error') {
     return (
       <FlashErrorPageFallback
-        title={QUESTIONS_GATE.libraryUnavailableTitle}
-        description={`We could not verify your session or permissions. ${auth.message}`}
+        title={t('libraryUnavailableTitle')}
+        description={`${tCommon('sessionVerificationFailed')} ${auth.message}`}
         backHref={ERROR_BACK_HREF}
-        backLabel={ERROR_BACK_LABEL}
+        backLabel={tFallback('backToDashboard')}
       />
     )
   }
@@ -58,14 +59,14 @@ export default async function QuestionsPage({
     })
   } catch (err) {
     const message =
-      err instanceof Error ? err.message : 'Failed to load questions.'
+      err instanceof Error ? err.message : t('loadFailedFallback')
 
     return (
       <FlashErrorPageFallback
-        title={QUESTIONS_GATE.libraryUnavailableTitle}
+        title={t('libraryUnavailableTitle')}
         description={message}
         backHref={ERROR_BACK_HREF}
-        backLabel={ERROR_BACK_LABEL}
+        backLabel={tFallback('backToDashboard')}
       />
     )
   }

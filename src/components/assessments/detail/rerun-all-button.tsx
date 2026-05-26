@@ -2,7 +2,7 @@
 
 import { RerunButton } from '@/components/assessments/detail/rerun-button'
 import { validateInterview } from '@/lib/api'
-import { TOAST_MESSAGES } from '@/lib/toast-messages'
+import { useToastMessages } from '@/lib/use-toast-messages'
 
 interface RerunAllButtonProps {
   interviewId: string
@@ -19,6 +19,8 @@ export function RerunAllButton({
   variant = 'gradient',
   label = 'Re-run AI evaluation',
 }: RerunAllButtonProps) {
+  const toastMessages = useToastMessages()
+
   return (
     <RerunButton
       toastId={`rerun-all-${interviewId}`}
@@ -26,15 +28,15 @@ export function RerunAllButton({
       size={size}
       variant={variant}
       idleLabel={label}
-      submittedLabel={TOAST_MESSAGES.rerun.queuedLabel}
-      errorTitle={TOAST_MESSAGES.rerun.startFailedTitle}
-      errorFallback={TOAST_MESSAGES.rerun.allFailedFallback}
+      submittedLabel={toastMessages.rerun.queuedLabel}
+      errorTitle={toastMessages.rerun.startFailedTitle}
+      errorFallback={toastMessages.rerun.allFailedFallback}
       onRun={async () => {
         const res = await validateInterview(interviewId, { force: true })
         if (res.requestedCount === 0) {
           return {
-            title: TOAST_MESSAGES.rerun.nothingToReevaluateTitle,
-            message: TOAST_MESSAGES.rerun.nothingToReevaluateMessage,
+            title: toastMessages.rerun.nothingToReevaluateTitle,
+            message: toastMessages.rerun.nothingToReevaluateMessage,
           }
         }
         return undefined

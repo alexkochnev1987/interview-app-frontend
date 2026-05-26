@@ -5,7 +5,7 @@ import type { TakeInterviewData } from '@/lib/api';
 import { submitTakeAnswer } from '@/lib/api';
 import type { TakeStage } from '@/components/take/types';
 import { runMutation } from '@/lib/run-mutation';
-import { TOAST_MESSAGES } from '@/lib/toast-messages';
+import { useToastMessages } from '@/lib/use-toast-messages';
 
 import {
   getMultipartSession,
@@ -81,6 +81,7 @@ export function useTakeVersionPersistence({
   clearRecordingArtifacts,
   invokeBeginRecording,
 }: UseTakeVersionPersistenceParams) {
+  const toastMessages = useToastMessages();
   const persistInFlightRef = useRef(false);
 
   const persistCurrentVersion = useCallback(
@@ -195,9 +196,9 @@ export function useTakeVersionPersistence({
           await runMutation(
             () => handleSubmit(),
             {
-              successMessage: TOAST_MESSAGES.take.submitSuccess,
+              successMessage: toastMessages.take.submitSuccess,
               showSuccessToast: showSubmitSuccessToast,
-              errorMessage: TOAST_MESSAGES.take.submitError,
+              errorMessage: toastMessages.take.submitError,
               getErrorMessage: () => SUBMIT_PERSIST_FALLBACK_DETAIL,
             },
           );
@@ -247,6 +248,8 @@ export function useTakeVersionPersistence({
       loadInterview,
       clearRecordingArtifacts,
       invokeBeginRecording,
+      toastMessages.take.submitError,
+      toastMessages.take.submitSuccess,
     ],
   );
 

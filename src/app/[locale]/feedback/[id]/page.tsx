@@ -1,14 +1,14 @@
+import { getTranslations } from 'next-intl/server'
+
 import { FeedbackView } from '@/components/feedback/feedback-view'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
+import type { Locale } from '@/i18n/locales'
 import { type FeedbackResponse } from '@/lib/api'
 import { getServerRequestContext, requestServer } from '@/lib/server-fetch'
 import { readSearchParamToken } from '@/lib/text'
-import { TOAST_MESSAGES } from '@/lib/toast-messages'
-
-const FEEDBACK_GATE = TOAST_MESSAGES.pageGate.feedback
 
 interface FeedbackPageProps {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string; locale: Locale }>
   searchParams: Promise<{ token?: string | string[] }>
 }
 
@@ -16,7 +16,8 @@ export default async function FeedbackPage({
   params,
   searchParams,
 }: FeedbackPageProps) {
-  const { id } = await params
+  const { id, locale } = await params
+  const t = await getTranslations({ locale, namespace: 'toast.pageGate.feedback' })
   const token = readSearchParamToken((await searchParams).token)
 
   const ctx = await getServerRequestContext()
@@ -34,14 +35,14 @@ export default async function FeedbackPage({
     error =
       err instanceof Error
         ? err.message
-        : FEEDBACK_GATE.loadFailedFallback
+        : t('loadFailedFallback')
   }
 
   if (error || !feedback) {
     return (
       <FlashErrorPageFallback
-        title={FEEDBACK_GATE.unavailableTitle}
-        description={error ?? FEEDBACK_GATE.loadFailedFallback}
+        title={t('unavailableTitle')}
+        description={error ?? t('loadFailedFallback')}
       />
     )
   }
