@@ -32,6 +32,9 @@ export function useSharedLabels() {
     role(role: string) {
       return t.has(`roles.${role}`) ? t(`roles.${role as RoleKey}`) : fallbackLabel(role)
     },
+    roleFilterAll() {
+      return t('roleFilters.all')
+    },
     difficulty(difficulty: string) {
       return t.has(`difficulty.${difficulty}`)
         ? t(`difficulty.${difficulty as DifficultyKey}`)
@@ -46,8 +49,10 @@ export function useSharedLabels() {
     decision(decision: DecisionKey) {
       return t(`decision.${decision}`)
     },
-    behaviorRisk(risk: BehaviorRiskKey) {
-      return t(`behaviorRisk.${risk}`)
+    behaviorRisk(risk: string) {
+      return t.has(`behaviorRisk.${risk}`)
+        ? t(`behaviorRisk.${risk as BehaviorRiskKey}`)
+        : fallbackLabel(risk)
     },
   }
 }

@@ -3,6 +3,7 @@ import { Inline, Stack } from '@/components/ui/layout';
 import { Label } from '@/components/ui/label';
 import { Panel } from '@/components/ui/panel';
 import { Text } from '@/components/ui/text';
+import { takeMessage } from '@/features/take';
 
 interface TakeConsentCheckboxBlockProps {
   consent: boolean;
@@ -25,10 +26,10 @@ export function TakeConsentCheckboxBlock({
         <Stack gap={2}>
           <Label htmlFor="consent">
             <Text as="span" variant="labelSmStrong">
-              I agree to the recording and data collection terms.
+              {takeMessage('consentCheckboxLabel')}
             </Text>
           </Label>
-          <Text variant="bodyMutedSm">Data is used only for interview evaluation and is stored for 90 days.</Text>
+          <Text variant="bodyMutedSm">{takeMessage('consentCheckboxHint')}</Text>
         </Stack>
       </Inline>
     </Panel>

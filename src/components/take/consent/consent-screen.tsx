@@ -16,7 +16,7 @@ import { Icon } from '@/components/ui/icon';
 import { TextList, TextListItem } from '@/components/ui/text-list';
 import { Text } from '@/components/ui/text';
 import type { InterviewDataView } from '@/components/take/types';
-import { formatTakeQuestionCountLabel, TAKE_MESSAGES } from '@/features/take';
+import { formatTakeQuestionCountLabel, takeMessage } from '@/features/take';
 
 interface TakeConsentScreenProps {
   interview: InterviewDataView;
@@ -43,14 +43,17 @@ export function TakeConsentScreen({
     <PageMainViewport>
       <SurfaceCard tone="glassFloat" grow="fill" size="lg">
         <CardContent layout="fill-column" spacing="xl">
-          <EyebrowBadge icon={<ListVideo size={14} strokeWidth={2} />}>Candidate interview</EyebrowBadge>
+          <EyebrowBadge icon={<ListVideo size={14} strokeWidth={2} />}>{takeMessage('consentEyebrow')}</EyebrowBadge>
           <Grid columns="consent-shell" gap={10} grow="fill">
             <Stack gap={5} height="full">
               <Stack gap={3}>
-                <Heading variant="sectionHeroTitle">Interview for {interview.position}</Heading>
+                <Heading variant="sectionHeroTitle">
+                  {takeMessage('consentInterviewFor').replace('{position}', interview.position)}
+                </Heading>
                 <Text variant="heroDescription">
-                  Welcome, <strong>{interview.candidateName}</strong>. You will answer{' '}
-                  {formatTakeQuestionCountLabel(interview.totalQuestions)}, with up to four minutes for each response.
+                  {takeMessage('consentWelcome')
+                    .replace('{candidateName}', interview.candidateName)
+                    .replace('{questionCount}', formatTakeQuestionCountLabel(interview.totalQuestions))}
                 </Text>
               </Stack>
               <TakeCapabilityCards />
@@ -58,29 +61,29 @@ export function TakeConsentScreen({
 
             <Stack gap={5} height="full">
               <Stack gap={2}>
-                <CardTitle size="lg">Before you start</CardTitle>
-                <Text variant="bodyMutedSm">{TAKE_MESSAGES.consentPrepHint}</Text>
+                <CardTitle size="lg">{takeMessage('consentBeforeStart')}</CardTitle>
+                <Text variant="bodyMutedSm">{takeMessage('consentPrepHint')}</Text>
               </Stack>
               <Stack gap={5}>
                 <Panel radius="lg" padding="lg">
                   <Stack gap={3}>
                     <Text as="span" variant="eyebrowLabel">
-                      Data collected
+                      {takeMessage('consentDataCollected')}
                     </Text>
                     <TextList>
                       <TextListItem>
-                        <Text variant="bodyMutedSm">Camera video and microphone audio for each answer</Text>
+                        <Text variant="bodyMutedSm">{takeMessage('consentDataCameraMic')}</Text>
                       </TextListItem>
                       <TextListItem>
                         <Text variant="bodyMutedSm">
-                          Full-monitor screen recording in parallel with each answer
+                          {takeMessage('consentDataScreen')}
                         </Text>
                       </TextListItem>
                       <TextListItem>
-                        <Text variant="bodyMutedSm">Browser activity such as tab switches</Text>
+                        <Text variant="bodyMutedSm">{takeMessage('consentDataBrowser')}</Text>
                       </TextListItem>
                       <TextListItem>
-                        <Text variant="bodyMutedSm">Session metadata including answer timing</Text>
+                        <Text variant="bodyMutedSm">{takeMessage('consentDataMetadata')}</Text>
                       </TextListItem>
                     </TextList>
                   </Stack>
@@ -88,7 +91,7 @@ export function TakeConsentScreen({
 
                 {sessionSyncError && onRetrySessionSync ? (
                   <Alert variant="danger">
-                    <AlertTitle>{TAKE_MESSAGES.sessionSyncFailedTitle}</AlertTitle>
+                    <AlertTitle>{takeMessage('sessionSyncFailedTitle')}</AlertTitle>
                     <AlertDescription>
                       <Inline gap={3} align="center" wrap="wrap">
                         <span>{sessionSyncError}</span>
@@ -102,7 +105,7 @@ export function TakeConsentScreen({
                           <Icon size="sm">
                             <RefreshCw />
                           </Icon>
-                          Retry
+                          {takeMessage('retry')}
                         </Button>
                       </Inline>
                     </AlertDescription>
@@ -111,7 +114,7 @@ export function TakeConsentScreen({
 
                 {setupError ? (
                   <Alert variant="destructive">
-                    <AlertTitle>Setup incomplete</AlertTitle>
+                    <AlertTitle>{takeMessage('setupIncomplete')}</AlertTitle>
                     <AlertDescription>{setupError}</AlertDescription>
                   </Alert>
                 ) : null}
@@ -127,7 +130,7 @@ export function TakeConsentScreen({
                     size="2xl"
                     shape="rounded"
                   >
-                    {TAKE_MESSAGES.consentContinue}
+                    {takeMessage('consentContinue')}
                   </Button>
                 </Stack>
               </Stack>

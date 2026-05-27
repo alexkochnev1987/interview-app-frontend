@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { RerunButton } from '@/components/assessments/detail/rerun-button'
 import { validateInterview } from '@/lib/api'
 import { useToastMessages } from '@/lib/use-toast-messages'
@@ -17,9 +19,11 @@ export function RerunAllButton({
   disabled,
   size = 'sm',
   variant = 'gradient',
-  label = 'Re-run AI evaluation',
+  label,
 }: RerunAllButtonProps) {
+  const t = useTranslations('assessments.rerun')
   const toastMessages = useToastMessages()
+  const idleLabel = label ?? t('all')
 
   return (
     <RerunButton
@@ -27,8 +31,9 @@ export function RerunAllButton({
       disabled={disabled}
       size={size}
       variant={variant}
-      idleLabel={label}
-      submittedLabel={toastMessages.rerun.queuedLabel}
+      idleLabel={idleLabel}
+      submittedLabel={t('queued')}
+      startingLabel={t('starting')}
       errorTitle={toastMessages.rerun.startFailedTitle}
       errorFallback={toastMessages.rerun.allFailedFallback}
       onRun={async () => {

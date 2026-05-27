@@ -87,11 +87,8 @@ export function assignableRoleRadioOptionsForActor(
   return assignableRoleRadioOptions().filter((o) => allowed.has(o.value))
 }
 
-export function badgeMetaForRole(role: string): {
-  label: string
-  tone: StatusTone
-} {
+export function badgeToneForRole(role: string): StatusTone {
   const row = TEAM_ROLE_ROWS.find((r) => r.id === role)
-  if (row) return { label: row.label, tone: row.badgeTone }
-  return { label: role, tone: 'neutral' }
+  if (row) return row.badgeTone
+  return 'neutral'
 }

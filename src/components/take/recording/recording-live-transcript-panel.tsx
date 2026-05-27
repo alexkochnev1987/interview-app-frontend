@@ -2,6 +2,7 @@ import { Stack } from '@/components/ui/layout';
 import { Panel } from '@/components/ui/panel';
 import { Text } from '@/components/ui/text';
 import type { TakeStage } from '@/components/take/types';
+import { takeMessage } from '@/features/take';
 
 interface LiveTranscriptPanelProps {
   isSupported: boolean;
@@ -22,12 +23,12 @@ export function LiveTranscriptPanel({
     <Panel minHeight="transcript">
       <Stack gap={2} grow="fill" height="full">
         <Text as="span" variant="eyebrowLabel">
-          Live transcript
+          {takeMessage('liveTranscriptTitle')}
         </Text>
         <Stack gap={2} grow="fill" overflow="y">
           {!isSupported ? (
             <Text variant="bodyMutedSm">
-              Live transcript is unavailable in this browser. Recording continues as usual.
+              {takeMessage('liveTranscriptUnavailable')}
             </Text>
           ) : (
             <Text variant="bodySm">
@@ -36,12 +37,12 @@ export function LiveTranscriptPanel({
                   {finalTranscript}
                   {interimTranscript ? (
                     <Text as="span" variant="transcriptDraft">
-                      {interimTranscript} (draft)
+                      {interimTranscript} {takeMessage('liveTranscriptDraftSuffix')}
                     </Text>
                   ) : null}
                 </>
               ) : (
-                'Transcript will appear while you speak...'
+                takeMessage('liveTranscriptPlaceholder')
               )}
             </Text>
           )}

@@ -15,7 +15,7 @@ import { TakeRecordingActions } from './recording-actions';
 import { TakeRecordingGuidance } from './recording-guidance';
 import type { InterviewDataView, TakeStage } from '@/components/take/types';
 import type { InterviewerPresence } from '@/features/take/use-take-question-tts';
-import { TAKE_MESSAGES } from '@/features/take';
+import { takeMessage } from '@/features/take';
 
 interface TakeRecordingHeroColumnProps {
   stage: TakeStage;
@@ -108,7 +108,9 @@ export function TakeRecordingSidebarColumn({
               <Stack gap={2}>
                 <Inline align="center" justify="between" gap={3}>
                   <Text as="span" variant="labelSm">
-                    Question {interview.currentQuestionIndex + 1} of {interview.totalQuestions}
+                    {takeMessage('questionProgress')
+                      .replace('{current}', String(interview.currentQuestionIndex + 1))
+                      .replace('{total}', String(interview.totalQuestions))}
                   </Text>
                   <StatusPill tone="neutral">{progressValue}%</StatusPill>
                 </Inline>
@@ -147,7 +149,7 @@ export function TakeRecordingSidebarColumn({
 
             {submitError ? (
               <Alert variant="destructive">
-                <AlertTitle>{TAKE_MESSAGES.submitFailedTitle}</AlertTitle>
+                <AlertTitle>{takeMessage('submitFailedTitle')}</AlertTitle>
                 <AlertDescription>{submitError}</AlertDescription>
               </Alert>
             ) : null}

@@ -22,7 +22,7 @@ import { CardContent, CardTitle } from '@/components/ui/card';
 import { Grid, Stack } from '@/components/ui/layout';
 import { Text } from '@/components/ui/text';
 import type { PermissionStatus } from '@/components/take/types';
-import { TAKE_MESSAGES } from '@/features/take';
+import { takeMessage } from '@/features/take';
 
 interface TakeLobbyScreenProps {
   cameraStatus: PermissionStatus;
@@ -61,21 +61,21 @@ export function TakeLobbyScreen({
 }: TakeLobbyScreenProps) {
   const permissionGranted = cameraStatus === 'granted';
   const screenShareReady = screenStatus === 'granted' && screenSurface === 'monitor';
-  const joinLabel = setupBusy ? TAKE_MESSAGES.lobbyJoinBusy : TAKE_MESSAGES.lobbyJoin;
+  const joinLabel = setupBusy ? takeMessage('lobbyJoinBusy') : takeMessage('lobbyJoin');
 
   let previewOverlay: ReactNode = null;
   if (!permissionGranted) {
     previewOverlay = (
       <LobbyPreviewPlaceholder
-        title={TAKE_MESSAGES.lobbyPreviewMutedTitle}
-        description={TAKE_MESSAGES.lobbyPreviewMutedLead}
+        title={takeMessage('lobbyPreviewMutedTitle')}
+        description={takeMessage('lobbyPreviewMutedLead')}
       />
     );
   } else if (!lobbyCameraOn) {
     previewOverlay = (
       <LobbyPreviewPlaceholder
-        title={TAKE_MESSAGES.lobbyPreviewCameraOffTitle}
-        description={TAKE_MESSAGES.lobbyPreviewCameraOffLead}
+        title={takeMessage('lobbyPreviewCameraOffTitle')}
+        description={takeMessage('lobbyPreviewCameraOffLead')}
       />
     );
   }
@@ -84,10 +84,10 @@ export function TakeLobbyScreen({
     <PageMainViewport>
       <SurfaceCard tone="glassFloat" grow="fill" size="lg">
         <CardContent layout="fill-column" spacing="xl">
-          <EyebrowBadge icon={<Video size={14} />}>{TAKE_MESSAGES.lobbyEyebrow}</EyebrowBadge>
+          <EyebrowBadge icon={<Video size={14} />}>{takeMessage('lobbyEyebrow')}</EyebrowBadge>
           <Grid columns="lobby-shell" gap={10} grow="fill">
             <Stack gap={5} width="full" height="full">
-              <Text variant="heroDescription">{TAKE_MESSAGES.lobbyLead}</Text>
+              <Text variant="heroDescription">{takeMessage('lobbyLead')}</Text>
               <Stack grow="fill" width="full">
                 <LobbyPreviewFrame>
                   <LobbyScreenVideo videoRef={videoRef} />
@@ -109,8 +109,8 @@ export function TakeLobbyScreen({
 
             <Stack width="full" placeSelf="start">
               <Stack gap={2}>
-                <CardTitle size="lg">Devices & screens</CardTitle>
-                <Text variant="bodyMutedSm">{TAKE_MESSAGES.lobbyDevicesHelp}</Text>
+                <CardTitle size="lg">{takeMessage('lobbyDevicesAndScreens')}</CardTitle>
+                <Text variant="bodyMutedSm">{takeMessage('lobbyDevicesHelp')}</Text>
               </Stack>
               <Stack gap={5}>
                 <TakePermissionStatusList
@@ -123,7 +123,7 @@ export function TakeLobbyScreen({
 
                 {setupError ? (
                   <Alert variant="destructive">
-                    <AlertTitle>Could not finish setup</AlertTitle>
+                    <AlertTitle>{takeMessage('lobbySetupFailed')}</AlertTitle>
                     <AlertDescription>{setupError}</AlertDescription>
                   </Alert>
                 ) : null}

@@ -5,31 +5,13 @@ import type { ReactNode } from 'react';
 import { Grid, Stack } from '@/components/ui/layout';
 import { Text } from '@/components/ui/text';
 import { Panel } from '@/components/ui/panel';
+import { takeMessage } from '@/features/take';
 
 interface CapabilityCardProps {
   icon: LucideIcon;
   title: string;
   description: ReactNode;
 }
-
-const CAPABILITY_ITEMS: CapabilityCardProps[] = [
-  { icon: Camera, title: 'Camera', description: 'Recorded separately for every answer.' },
-  { icon: Mic, title: 'Microphone', description: 'Captured together with your camera feed.' },
-  {
-    icon: Video,
-    title: 'Entire screen',
-    description: (
-      <>
-        Must be shared as <strong>Entire screen</strong>, not a tab or app window.
-      </>
-    ),
-  },
-  {
-    icon: ShieldCheck,
-    title: 'Fairness checks',
-    description: 'Session and browser activity may be stored for evaluation integrity.',
-  },
-];
 
 function CapabilityCard({ icon: Icon, title, description }: CapabilityCardProps) {
   return (
@@ -50,9 +32,24 @@ function CapabilityCard({ icon: Icon, title, description }: CapabilityCardProps)
 }
 
 export function TakeCapabilityCards() {
+  const capabilityItems: CapabilityCardProps[] = [
+    { icon: Camera, title: takeMessage('capabilityCameraTitle'), description: takeMessage('capabilityCameraDescription') },
+    { icon: Mic, title: takeMessage('capabilityMicTitle'), description: takeMessage('capabilityMicDescription') },
+    {
+      icon: Video,
+      title: takeMessage('capabilityScreenTitle'),
+      description: takeMessage('capabilityScreenDescription'),
+    },
+    {
+      icon: ShieldCheck,
+      title: takeMessage('capabilityFairnessTitle'),
+      description: takeMessage('capabilityFairnessDescription'),
+    },
+  ];
+
   return (
     <Grid columns={2} gap={6}>
-      {CAPABILITY_ITEMS.map((item) => (
+      {capabilityItems.map((item) => (
         <CapabilityCard key={item.title} icon={item.icon} title={item.title} description={item.description} />
       ))}
     </Grid>

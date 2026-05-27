@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { RefreshCw, ShieldAlert, Sparkles } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -46,6 +47,7 @@ const MAX_POLL_DURATION_MS = 3 * 60 * 1000
 export function EvaluationProgressBanner({
   interview,
 }: EvaluationProgressBannerProps) {
+  const t = useTranslations('assessments.banner')
   const router = useRouter()
   const counts = countAnswers(interview)
   const inFlight = counts.queued + counts.processing > 0
@@ -88,13 +90,14 @@ export function EvaluationProgressBanner({
         <Icon size="md">
           <ShieldAlert />
         </Icon>
-        <AlertTitle>Scoring is taking longer than usual</AlertTitle>
+        <AlertTitle>{t('slowTitle')}</AlertTitle>
         <AlertDescription>
           <Inline gap={3} align="center" wrap="wrap">
             <span>
-              {counts.queued + counts.processing} of {counts.total} answers are
-              still being scored after several minutes. The worker may be stuck.
-              Refresh manually to check, or re-run the affected answers.
+              {t('slowDescription', {
+                inFlight: counts.queued + counts.processing,
+                total: counts.total,
+              })}
             </span>
             <Button
               type="button"
@@ -106,7 +109,7 @@ export function EvaluationProgressBanner({
               <Icon size="md">
                 <RefreshCw />
               </Icon>
-              Refresh now
+              {t('refreshNow')}
             </Button>
           </Inline>
         </AlertDescription>
@@ -128,11 +131,9 @@ export function EvaluationProgressBanner({
         <Icon size="md">
           <ShieldAlert />
         </Icon>
-        <AlertTitle>AI scoring failed for every answer</AlertTitle>
+        <AlertTitle>{t('allFailedTitle')}</AlertTitle>
         <AlertDescription>
-          None of the {counts.total} submitted answers produced an evaluation.
-          See the per-question error messages below for details, then re-run
-          once the underlying issue is resolved.
+          {t('allFailedDescription', { total: counts.total })}
         </AlertDescription>
       </Alert>
     )
@@ -144,10 +145,13 @@ export function EvaluationProgressBanner({
         <Icon size="md">
           <ShieldAlert />
         </Icon>
-        <AlertTitle>Some answers failed to score</AlertTitle>
+        <AlertTitle>{t('someFailedTitle')}</AlertTitle>
         <AlertDescription>
-          {counts.scored} of {counts.total} scored, {counts.failed} failed. You
-          can re-run the failed answers individually below.
+          {t('someFailedDescription', {
+            scored: counts.scored,
+            total: counts.total,
+            failed: counts.failed,
+          })}
         </AlertDescription>
       </Alert>
     )
@@ -159,10 +163,9 @@ export function EvaluationProgressBanner({
         <Icon size="md">
           <Sparkles />
         </Icon>
-        <AlertTitle>No AI evaluation has been run yet</AlertTitle>
+        <AlertTitle>{t('noneYetTitle')}</AlertTitle>
         <AlertDescription>
-          {counts.total} answers submitted, none evaluated. Click &quot;Re-run AI
-          evaluation&quot; to start scoring.
+          {t('noneYetDescription', { total: counts.total })}
         </AlertDescription>
       </Alert>
     )

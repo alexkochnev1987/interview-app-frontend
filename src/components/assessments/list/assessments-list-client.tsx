@@ -2,6 +2,7 @@
 
 import { useDeferredValue, useMemo, useState } from 'react'
 import { Search } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { AssessmentCard } from '@/components/assessments/list/assessment-card'
 import {
@@ -28,6 +29,7 @@ function matchesQuery(interview: Interview, normalizedQuery: string): boolean {
 export function AssessmentsListClient({
   interviews,
 }: AssessmentsListClientProps) {
+  const t = useTranslations('assessments.list')
   const [query, setQuery] = useState('')
   const [status, setStatus] = useState<StatusFilter>('all')
   const deferredQuery = useDeferredValue(query)
@@ -56,13 +58,13 @@ export function AssessmentsListClient({
           icon={<Icon size="lg"><Search /></Icon>}
           title={
             interviews.length === 0
-              ? 'No assessments yet'
-              : 'No assessments match the current filters'
+              ? t('emptyTitle')
+              : t('emptyFilteredTitle')
           }
           description={
             interviews.length === 0
-              ? 'Once a candidate submits an interview, it will appear here for review.'
-              : 'Try widening the search or reset the status filter to bring more interviews back in.'
+              ? t('emptyDescription')
+              : t('emptyFilteredDescription')
           }
         />
       ) : (

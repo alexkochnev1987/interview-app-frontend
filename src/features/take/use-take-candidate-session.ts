@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { syncCandidateSession } from '@/lib/api';
 
-import { TAKE_MESSAGES } from './messages';
+import { takeMessage } from './messages';
 
 interface UseTakeCandidateSessionParams {
   interviewId: string;
@@ -67,7 +67,7 @@ export function useTakeCandidateSession({
           return;
         }
         const description =
-          err instanceof Error ? err.message : TAKE_MESSAGES.sessionSyncFailed;
+          err instanceof Error ? err.message : takeMessage('sessionSyncFailed');
         setSessionSyncError(description);
         setCandidateSessionReady(false);
       }

@@ -1,3 +1,7 @@
+'use client'
+
+import { useTranslations } from 'next-intl'
+
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { BehaviorSignalStat } from '@/components/ui/behavior-signal-stat'
@@ -18,6 +22,7 @@ import {
   type AnswerDecisionHint,
   type InterviewQuestion,
 } from '@/lib/api'
+import { useSharedLabels } from '@/i18n/use-shared-labels'
 import { behaviorRiskTone } from '@/lib/assessment-status'
 
 interface QuestionSectionProps {
@@ -35,13 +40,6 @@ function decisionHintTone(hint: AnswerDecisionHint | undefined) {
   return 'neutral' as const
 }
 
-function decisionHintLabel(hint: AnswerDecisionHint | undefined) {
-  if (hint === 'pass') return 'Pass'
-  if (hint === 'fail') return 'Fail'
-  if (hint === 'review') return 'Review'
-  return 'No hint'
-}
-
 function answerStateTone(answer: Answer | undefined) {
   if (!answer) return 'pending' as const
   if (answer.validation?.status === 'failed') return 'failed' as const
@@ -55,19 +53,6 @@ function answerStateTone(answer: Answer | undefined) {
   return 'in_progress' as const
 }
 
-function answerStateLabel(answer: Answer | undefined) {
-  if (!answer) return 'No answer submitted'
-  if (answer.validation?.status === 'failed') return 'AI evaluation failed'
-  if (
-    answer.validation?.status === 'queued' ||
-    answer.validation?.status === 'processing'
-  ) {
-    return 'Scoring in progress'
-  }
-  if (answer.evaluation?.overallScore !== undefined) return 'Scored'
-  return 'Awaiting evaluation'
-}
-
 export function QuestionSection({
   interviewId,
   questionIndex,
@@ -75,6 +60,29 @@ export function QuestionSection({
   answer,
   canRerun,
 }: QuestionSectionProps) {
+  const t = useTranslations('assessments.question')
+  const sharedLabels = useSharedLabels()
+
+  function decisionHintLabel(hint: AnswerDecisionHint | undefined) {
+    if (hint === 'pass') return t('decisionPass')
+    if (hint === 'fail') return t('decisionFail')
+    if (hint === 'review') return t('decisionReview')
+    return t('decisionNone')
+  }
+
+  function answerStateLabel(answer: Answer | undefined) {
+    if (!answer) return t('noAnswerSubmitted')
+    if (answer.validation?.status === 'failed') return t('scoringFailed')
+    if (
+      answer.validation?.status === 'queued' ||
+      answer.validation?.status === 'processing'
+    ) {
+      return t('scoringInProgress')
+    }
+    if (answer.evaluation?.overallScore !== undefined) return t('scored')
+    return t('awaitingEvaluation')
+  }
+
   const evaluation = answer?.evaluation
   const signals = answer?.behaviorSignals
   const hasCamera = Boolean(answer?.mediaKey || answer?.camera?.mediaKey)
@@ -105,10 +113,10 @@ export function QuestionSection({
         <Stack gap={3}>
           <PillRow>
             <StatusPill tone="neutral" casing="chip">
-              Q{questionIndex + 1}
+              {t('questionBadge', { n: questionIndex + 1 })}
             </StatusPill>
             <StatusPill tone={question.difficulty} casing="chip">
-              {question.difficulty}
+              {sharedLabels.difficulty(question.difficulty)}
             </StatusPill>
             {question.category ? (
               <StatusPill tone="neutral" casing="chip">
@@ -128,13 +136,11 @@ export function QuestionSection({
       <CardContent spacing="xl">
         <Stack gap={5}>
           <Stack gap={3}>
-            <EyebrowLabel size="sm">Candidate transcript</EyebrowLabel>
+            <EyebrowLabel size="sm">{t('transcriptEyebrow')}</EyebrowLabel>
             <TranscriptBlock
               text={answer?.transcript?.text}
               emptyLabel={
-                answer
-                  ? 'Transcript is still being generated.'
-                  : 'No answer was submitted for this question.'
+                answer ? t('transcriptPending') : t('noAnswer')
               }
             />
           </Stack>
@@ -148,32 +154,32 @@ export function QuestionSection({
 
           {signals ? (
             <Stack gap={3}>
-              <EyebrowLabel size="sm">Behavior signals</EyebrowLabel>
+              <EyebrowLabel size="sm">{t('behaviorSignals')}</EyebrowLabel>
               <Grid columns="metrics-5" gap={3}>
                 <BehaviorSignalStat
-                  label="Tab hidden"
+                  label={t('tabHidden')}
                   value={signals.tabHiddenCount}
                   watchAt={1}
                   riskAt={3}
                 />
                 <BehaviorSignalStat
-                  label="Window blur"
+                  label={t('windowBlur')}
                   value={signals.windowBlurCount}
                   watchAt={2}
                   riskAt={5}
                 />
                 <BehaviorSignalStat
-                  label="Paste"
+                  label={t('paste')}
                   value={signals.pasteCount}
                   watchAt={1}
                   riskAt={3}
                 />
                 <BehaviorSignalStat
-                  label="Keydown"
+                  label={t('keydown')}
                   value={signals.keydownCount}
                 />
                 <BehaviorSignalStat
-                  label="Resize"
+                  label={t('resize')}
                   value={signals.resizeCount}
                   watchAt={2}
                   riskAt={5}
@@ -185,7 +191,7 @@ export function QuestionSection({
           {evaluation ? (
             <Stack gap={4}>
               <Inline gap={3} align="center" justify="between" wrap="wrap">
-                <SectionHeading size="sm">AI evaluation</SectionHeading>
+                <SectionHeading size="sm">{t('aiEvaluation')}</SectionHeading>
                 <Inline gap={2} wrap="wrap">
                   <StatusPill
                     tone={decisionHintTone(evaluation.decisionHint)}
@@ -198,7 +204,8 @@ export function QuestionSection({
                       tone={behaviorRiskTone(evaluation.behaviorRisk)}
                       casing="chip"
                     >
-                      Behavior risk: {evaluation.behaviorRisk}
+                      {t('behaviorRiskPrefix')}{' '}
+                      {sharedLabels.behaviorRisk(evaluation.behaviorRisk)}
                     </StatusPill>
                   ) : null}
                 </Inline>
@@ -207,7 +214,7 @@ export function QuestionSection({
               <Grid columns={3} gap={3}>
                 <MetricPanel
                   tone="compact"
-                  label="Score"
+                  label={t('score')}
                   value={
                     evaluation.overallScore !== undefined
                       ? Math.round(evaluation.overallScore)
@@ -215,17 +222,17 @@ export function QuestionSection({
                   }
                   valueSize="md"
                   valueTone="primary"
-                  description="out of 100"
+                  description={t('outOf100')}
                 />
                 <MetricPanel
                   tone="compact"
-                  label="Concepts covered"
+                  label={t('conceptsCovered')}
                   value={evaluation.coveredConceptIds?.length ?? 0}
                   valueSize="md"
                 />
                 <MetricPanel
                   tone="compact"
-                  label="Concepts missed"
+                  label={t('conceptsMissed')}
                   value={evaluation.missedConceptIds?.length ?? 0}
                   valueSize="md"
                 />
@@ -239,12 +246,12 @@ export function QuestionSection({
 
               <Grid columns={2} gap={4}>
                 <ConceptList
-                  label="Covered concepts"
+                  label={t('coveredConcepts')}
                   tone="covered"
                   items={coveredLabels}
                 />
                 <ConceptList
-                  label="Missed concepts"
+                  label={t('missedConcepts')}
                   tone="missed"
                   items={missedLabels}
                 />
@@ -252,7 +259,7 @@ export function QuestionSection({
 
               {redFlagLabels.length > 0 ? (
                 <ConceptList
-                  label="Red flags raised"
+                  label={t('redFlagsRaised')}
                   tone="flag"
                   items={redFlagLabels}
                 />
@@ -260,13 +267,13 @@ export function QuestionSection({
             </Stack>
           ) : (
             <BodyText size="sm" tone="muted" italic>
-              No AI evaluation available for this answer yet.
+              {t('noEvaluationYet')}
             </BodyText>
           )}
 
           {answer?.validation?.errorMessage ? (
             <Alert variant="danger">
-              <AlertTitle>AI scoring failed for this answer</AlertTitle>
+              <AlertTitle>{t('scoringFailedTitle')}</AlertTitle>
               <AlertDescription>
                 {answer.validation.errorMessage}
               </AlertDescription>

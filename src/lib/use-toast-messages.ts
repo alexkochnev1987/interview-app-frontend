@@ -72,6 +72,12 @@ export function useToastMessages() {
         creatingLabel: t('pageGate.interview.creatingLabel'),
       },
     },
+    team: {
+      updateSuccess: t('team.updateSuccess'),
+      updateError: t('team.updateError'),
+      updateSuccessDescription: (name: string, role: string) =>
+        t('team.updateSuccessDescription', { name, role }),
+    },
     rerun: {
       alreadyInProgressTitle: t('rerun.alreadyInProgressTitle'),
       startFailedTitle: t('rerun.startFailedTitle'),

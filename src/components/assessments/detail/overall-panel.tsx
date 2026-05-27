@@ -1,4 +1,7 @@
+'use client'
+
 import { ChartColumnBig, ShieldAlert, Sparkles } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Card, CardContent } from '@/components/ui/card'
@@ -13,10 +16,10 @@ import { Stack } from '@/components/ui/layout/stack'
 import { MetricPanel } from '@/components/ui/metric-panel'
 import { StatusPill } from '@/components/ui/status-pill'
 import { BodyText, SectionHeading } from '@/components/ui/text'
+import { useSharedLabels } from '@/i18n/use-shared-labels'
 import { type InterviewResult } from '@/lib/api'
 import {
   behaviorRiskTone,
-  decisionLabel,
   decisionTone,
   isPlaceholderResult,
 } from '@/lib/assessment-status'
@@ -27,6 +30,8 @@ interface OverallPanelProps {
 }
 
 export function OverallPanel({ result }: OverallPanelProps) {
+  const t = useTranslations('assessments.overall')
+  const sharedLabels = useSharedLabels()
   const decision = result.decision
   const behaviorSummary = result.behaviorSummary
   const trustFlags = result.trustFlags ?? []
@@ -44,12 +49,8 @@ export function OverallPanel({ result }: OverallPanelProps) {
           <Icon size="md">
             <Sparkles />
           </Icon>
-          <AlertTitle>Placeholder evaluation</AlertTitle>
-          <AlertDescription>
-            This interview was completed before AI evaluation ran. The score
-            and summary below are placeholder values from a simulated rollup.
-            Click &quot;Re-run AI evaluation&quot; to generate a real result.
-          </AlertDescription>
+          <AlertTitle>{t('placeholderTitle')}</AlertTitle>
+          <AlertDescription>{t('placeholderDescription')}</AlertDescription>
         </Alert>
       ) : null}
       <Grid columns="split-115-85" gap={4}>
@@ -65,7 +66,7 @@ export function OverallPanel({ result }: OverallPanelProps) {
                     </Icon>
                   }
                 >
-                  Overall result
+                  {t('resultEyebrow')}
                 </EyebrowBadge>
                 {summaryLines.length > 1 ? (
                   <Stack gap={3} as="ul">
@@ -86,7 +87,7 @@ export function OverallPanel({ result }: OverallPanelProps) {
                 <Inline gap={2} wrap="wrap">
                   {decision ? (
                     <StatusPill tone={decisionTone(decision)} casing="chip">
-                      {decisionLabel(decision)}
+                      {sharedLabels.decision(decision)}
                     </StatusPill>
                   ) : null}
                   {result.rubricVersion ? (
@@ -99,7 +100,7 @@ export function OverallPanel({ result }: OverallPanelProps) {
 
               {categoryEntries.length > 0 ? (
                 <Stack gap={3}>
-                  <EyebrowLabel size="sm">Category scores</EyebrowLabel>
+                  <EyebrowLabel size="sm">{t('categoryScores')}</EyebrowLabel>
                   <Grid columns="metrics-3" gap={3}>
                     {categoryEntries.map(([category, score]) => (
                       <MetricPanel
@@ -109,7 +110,7 @@ export function OverallPanel({ result }: OverallPanelProps) {
                         value={Math.round(score)}
                         valueSize="md"
                         valueTone="primary"
-                        description="out of 100"
+                        description={t('outOf100')}
                       />
                     ))}
                   </Grid>
@@ -122,13 +123,14 @@ export function OverallPanel({ result }: OverallPanelProps) {
                     <Icon size="sm">
                       <ShieldAlert />
                     </Icon>
-                    <EyebrowLabel size="sm">Behavior summary</EyebrowLabel>
+                    <EyebrowLabel size="sm">{t('behaviorSummary')}</EyebrowLabel>
                     {behaviorSummary.riskLevel ? (
                       <StatusPill
                         tone={behaviorRiskTone(behaviorSummary.riskLevel)}
                         casing="chip"
                       >
-                        Risk: {behaviorSummary.riskLevel}
+                        {t('riskPrefix')}{' '}
+                        {sharedLabels.behaviorRisk(behaviorSummary.riskLevel)}
                       </StatusPill>
                     ) : null}
                   </Inline>
@@ -147,7 +149,7 @@ export function OverallPanel({ result }: OverallPanelProps) {
                     </Stack>
                   ) : (
                     <BodyText size="sm" tone="muted">
-                      No behavior notes recorded.
+                      {t('noBehaviorNotes')}
                     </BodyText>
                   )}
                 </Stack>
@@ -167,11 +169,11 @@ export function OverallPanel({ result }: OverallPanelProps) {
                   </Icon>
                 }
               >
-                Overall score
+                {t('overallScore')}
               </EyebrowBadge>
               <HeroNumber>{Math.round(result.overallScore)}</HeroNumber>
               <BodyText size="sm" tone="muted">
-                Out of 100
+                {t('outOf100')}
               </BodyText>
             </CardContent>
           </Card>
@@ -179,18 +181,18 @@ export function OverallPanel({ result }: OverallPanelProps) {
           {result.trustScore !== undefined ? (
             <MetricPanel
               tone="surface"
-              label="Trust score"
+              label={t('trustScore')}
               value={Math.round(result.trustScore)}
               valueSize="hero"
               valueTone="primary"
               description={
-                trustFlags.length === 0 ? 'No trust flags raised.' : undefined
+                trustFlags.length === 0 ? t('noTrustFlags') : undefined
               }
             />
           ) : null}
 
           {trustFlags.length > 0 ? (
-            <ConceptList label="Trust flags" tone="flag" items={trustFlags} />
+            <ConceptList label={t('trustFlags')} tone="flag" items={trustFlags} />
           ) : null}
         </Stack>
       </Grid>

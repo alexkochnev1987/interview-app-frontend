@@ -1,4 +1,7 @@
+'use client'
+
 import { ArrowLeft, ClipboardList } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Card, CardContent } from '@/components/ui/card'
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
@@ -10,12 +13,11 @@ import { Stack } from '@/components/ui/layout/stack'
 import { StatusPill } from '@/components/ui/status-pill'
 import { TimestampRow } from '@/components/ui/timestamp-row'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
+import { useSharedLabels } from '@/i18n/use-shared-labels'
 import { type Interview } from '@/lib/api'
 import {
-  decisionLabel,
   decisionTone,
   deriveReviewStatus,
-  reviewStatusLabel,
   reviewStatusTone,
 } from '@/lib/assessment-status'
 import {
@@ -41,6 +43,8 @@ function findSubmittedAt(interview: Interview): string | null {
 }
 
 export function DetailHeader({ interview }: DetailHeaderProps) {
+  const t = useTranslations('assessments.detail')
+  const sharedLabels = useSharedLabels()
   const reviewStatus = deriveReviewStatus(interview)
   const decision = interview.result?.decision
   const submittedAt = findSubmittedAt(interview)
@@ -59,7 +63,7 @@ export function DetailHeader({ interview }: DetailHeaderProps) {
                 </Icon>
               }
             >
-              Back to assessments
+              {t('backToAssessments')}
             </EyebrowBadge>
           </UnstyledLink>
 
@@ -76,31 +80,31 @@ export function DetailHeader({ interview }: DetailHeaderProps) {
 
             <Inline gap={2} wrap="wrap" align="center">
               <StatusPill tone={reviewStatusTone(reviewStatus)} casing="chip">
-                {reviewStatusLabel(reviewStatus)}
+                {sharedLabels.reviewStatus(reviewStatus)}
               </StatusPill>
               {decision ? (
                 <StatusPill tone={decisionTone(decision)} casing="chip">
-                  {decisionLabel(decision)}
+                  {sharedLabels.decision(decision)}
                 </StatusPill>
               ) : null}
               <StatusPill tone="neutral" casing="chip">
                 <Icon size="xs">
                   <ClipboardList />
                 </Icon>
-                {interview.questions.length} questions
+                {t('questionsCount', { count: interview.questions.length })}
               </StatusPill>
             </Inline>
           </Inline>
 
           <TimestampRow
             items={[
-              { label: 'Created', value: formatInterviewDate(interview.createdAt) },
+              { label: t('created'), value: formatInterviewDate(interview.createdAt) },
               {
-                label: 'Submitted',
+                label: t('submitted'),
                 value: submittedAt ? formatInterviewDate(submittedAt) : null,
               },
               {
-                label: 'Scored',
+                label: t('scored'),
                 value: scoredAt ? formatInterviewDate(scoredAt) : null,
               },
             ]}

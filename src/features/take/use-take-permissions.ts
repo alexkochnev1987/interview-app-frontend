@@ -2,7 +2,7 @@ import type { Dispatch, MutableRefObject, RefObject, SetStateAction } from 'reac
 
 import type { PermissionStatus } from '@/components/take/types';
 import type { TakeStage } from '@/components/take/types';
-import { TAKE_MESSAGES } from './messages';
+import { takeMessage } from './messages';
 
 type ScreenTrackSettings = MediaTrackSettings & { displaySurface?: string };
 
@@ -76,7 +76,7 @@ export function useTakePermissions({
 }: UseTakePermissionsParams) {
   async function restartFullInterviewCapture() {
     if (!navigator.mediaDevices?.getUserMedia || !navigator.mediaDevices?.getDisplayMedia) {
-      setSetupError(TAKE_MESSAGES.browserUnsupported);
+      setSetupError(takeMessage('browserUnsupported'));
       return;
     }
 
@@ -105,7 +105,7 @@ export function useTakePermissions({
       const screenTrack = screenStream.getVideoTracks()[0];
       if (!screenTrack) {
         stopMediaStream(screenStream);
-        throw new Error('Screen sharing did not provide a video track.');
+        throw new Error(takeMessage('screenTrackMissing'));
       }
 
       const displaySurface = readDisplaySurface(screenTrack);
@@ -136,7 +136,7 @@ export function useTakePermissions({
 
   async function prepareLobbyDevices() {
     if (!navigator.mediaDevices?.getUserMedia) {
-      setSetupError(TAKE_MESSAGES.browserUnsupported);
+      setSetupError(takeMessage('browserUnsupported'));
       return;
     }
 
@@ -165,14 +165,14 @@ export function useTakePermissions({
 
   async function attachLobbyScreenShare() {
     if (!navigator.mediaDevices?.getDisplayMedia) {
-      setSetupError(TAKE_MESSAGES.browserUnsupported);
+      setSetupError(takeMessage('browserUnsupported'));
       return;
     }
 
     const liveTracks =
       cameraStreamRef.current?.getTracks().filter((t) => t.readyState === 'live') ?? [];
     if (liveTracks.length === 0) {
-      setSetupError(TAKE_MESSAGES.lobbyEnableCameraMicFirst);
+      setSetupError(takeMessage('lobbyEnableCameraMicFirst'));
       return;
     }
 
@@ -193,7 +193,7 @@ export function useTakePermissions({
       const screenTrack = screenStream.getVideoTracks()[0];
       if (!screenTrack) {
         stopMediaStream(screenStream);
-        throw new Error('Screen sharing did not provide a video track.');
+        throw new Error(takeMessage('screenTrackMissing'));
       }
 
       const displaySurface = readDisplaySurface(screenTrack);
@@ -221,13 +221,13 @@ export function useTakePermissions({
   function enterInterviewFromLobby(): boolean {
     const cam = cameraStreamRef.current;
     if (!cam?.getTracks().some((t) => t.readyState === 'live')) {
-      setSetupError(TAKE_MESSAGES.lobbyInterviewStartBlocked);
+      setSetupError(takeMessage('lobbyInterviewStartBlocked'));
       return false;
     }
     const screen = screenStreamRef.current;
     const screenTrack = screen?.getVideoTracks()[0];
     if (!screen?.active || !screenTrack || screenTrack.readyState !== 'live') {
-      setSetupError(TAKE_MESSAGES.lobbyInterviewStartBlocked);
+      setSetupError(takeMessage('lobbyInterviewStartBlocked'));
       return false;
     }
     const displaySurface = readDisplaySurface(screenTrack);

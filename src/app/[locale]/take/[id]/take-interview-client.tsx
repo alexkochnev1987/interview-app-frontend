@@ -13,6 +13,9 @@ import {
 import { Icon } from '@/components/ui/icon'
 import { EmptyStateCard, LoadingStateCard } from '@/components/ui/state-card'
 import {
+  TAKE_MESSAGES,
+  configureTakeMessages,
+  takeMessage,
   useTakeInterviewBeforeUnload,
   useTakeOrchestrator,
 } from '@/features/take'
@@ -29,8 +32,17 @@ export function TakeInterviewClient({
   candidateToken = '',
   initialInterview,
 }: TakeInterviewClientProps) {
-  const t = useTranslations('toast.pageGate.interview')
+  const t = useTranslations('toast.pageGate.take')
   const tCommon = useTranslations('common')
+  const tTake = useTranslations('takeFlow')
+
+  const patch: Partial<Record<keyof typeof TAKE_MESSAGES, string>> = {}
+  ;(Object.keys(TAKE_MESSAGES) as (keyof typeof TAKE_MESSAGES)[]).forEach((key) => {
+    if (tTake.has(key)) {
+      patch[key] = tTake(key)
+    }
+  })
+  configureTakeMessages(patch)
   const {
     stage,
     interview,
@@ -76,7 +88,7 @@ export function TakeInterviewClient({
     interviewerPresence,
   } = useTakeOrchestrator({ id, candidateToken, initialInterview })
 
-  useTakeInterviewBeforeUnload(stage)
+  useTakeInterviewBeforeUnload(stage, takeMessage('beforeUnloadLeaveInterview'))
 
   if (error && !interview) {
     return (

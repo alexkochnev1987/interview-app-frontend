@@ -34,6 +34,7 @@ export default async function AssessmentDetailPage({
 }: AssessmentDetailPageProps) {
   const { id, locale } = await params
   const t = await getTranslations({ locale, namespace: 'toast.pageGate.assessments' })
+  const tAssessments = await getTranslations({ locale, namespace: 'assessments' })
   const tCommon = await getTranslations({ locale, namespace: 'common' })
   const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
 
@@ -120,11 +121,9 @@ export default async function AssessmentDetailPage({
 
       {isFailed ? (
         <Alert variant="danger">
-          <AlertTitle>This interview failed to complete</AlertTitle>
+          <AlertTitle>{tAssessments('detail.failedTitle')}</AlertTitle>
           <AlertDescription>
-            The take ended in a failed state. Some answers, transcripts, or
-            evaluations may be missing. You can re-run AI evaluation for any
-            answer that does have a transcript below.
+            {tAssessments('detail.failedDescription')}
           </AlertDescription>
         </Alert>
       ) : null}
@@ -132,8 +131,12 @@ export default async function AssessmentDetailPage({
       <Section gap={4}>
         <Inline gap={4} align="end" justify="between" wrap="wrap">
           <Stack gap={2}>
-            <EyebrowLabel size="lg">Per-question review</EyebrowLabel>
-            <SectionHeading>Questions and answers</SectionHeading>
+            <EyebrowLabel size="lg">
+              {tAssessments('detail.perQuestionEyebrow')}
+            </EyebrowLabel>
+            <SectionHeading>
+              {tAssessments('detail.perQuestionHeading')}
+            </SectionHeading>
           </Stack>
           {canRerun ? (
             <RerunAllButton
@@ -161,8 +164,12 @@ export default async function AssessmentDetailPage({
       {interview.result ? (
         <Section gap={4}>
           <Stack gap={2}>
-            <EyebrowLabel size="lg">Scorecard</EyebrowLabel>
-            <SectionHeading>Overall result</SectionHeading>
+            <EyebrowLabel size="lg">
+              {tAssessments('detail.scorecardEyebrow')}
+            </EyebrowLabel>
+            <SectionHeading>
+              {tAssessments('detail.scorecardHeading')}
+            </SectionHeading>
           </Stack>
           <OverallPanel result={interview.result} />
         </Section>

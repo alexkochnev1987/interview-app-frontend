@@ -12,7 +12,7 @@ import {
   type AnswerBehaviorEvent,
   type MultipartUploadState,
 } from './runtime';
-import { TAKE_MESSAGES, isLastInterviewQuestion } from './messages';
+import { isLastInterviewQuestion, takeMessage } from './messages';
 import type { TakeBehaviorSignals } from './utils';
 import type { PendingVersionAction, VersionPersistKind } from './session-machine';
 
@@ -52,8 +52,6 @@ export interface UseTakeVersionPersistenceParams {
   invokeBeginRecording: (nextVersionNumber: number, currentQuestionIndex: number) => Promise<void>;
 }
 
-const SUBMIT_PERSIST_FALLBACK_DETAIL = 'Please review recording data and try again.';
-
 export function useTakeVersionPersistence({
   id,
   interview,
@@ -82,6 +80,7 @@ export function useTakeVersionPersistence({
   invokeBeginRecording,
 }: UseTakeVersionPersistenceParams) {
   const toastMessages = useToastMessages();
+  const submitFallbackDetail = takeMessage('submitFallbackDetail');
   const persistInFlightRef = useRef(false);
 
   const persistCurrentVersion = useCallback(
@@ -104,7 +103,7 @@ export function useTakeVersionPersistence({
         const hasUploadedAllParts = hasUploadedCameraParts && hasUploadedScreenParts;
 
         if (action === 'submit' && (!hasUploadedCameraParts || !hasUploadedScreenParts)) {
-          throw new Error(TAKE_MESSAGES.shortRecordingSubmit);
+          throw new Error(takeMessage('shortRecordingSubmit'));
         }
 
         const startNextRerecordVersion = async () => {
@@ -199,7 +198,7 @@ export function useTakeVersionPersistence({
               successMessage: toastMessages.take.submitSuccess,
               showSuccessToast: showSubmitSuccessToast,
               errorMessage: toastMessages.take.submitError,
-              getErrorMessage: () => SUBMIT_PERSIST_FALLBACK_DETAIL,
+              getErrorMessage: () => submitFallbackDetail,
             },
           );
         } else {
@@ -209,10 +208,10 @@ export function useTakeVersionPersistence({
         await abortMultipartUploads();
         if (action === 'submit') {
           setSubmitError(
-            err instanceof Error && err.message.trim() ? err.message : SUBMIT_PERSIST_FALLBACK_DETAIL,
+            err instanceof Error && err.message.trim() ? err.message : submitFallbackDetail,
           );
         } else {
-          setSubmitError(err instanceof Error ? err.message : TAKE_MESSAGES.uploadFailedFallback);
+          setSubmitError(err instanceof Error ? err.message : takeMessage('uploadFailedFallback'));
         }
         autoStartedQuestionKeyRef.current = '';
         setStage('interview');
@@ -250,6 +249,7 @@ export function useTakeVersionPersistence({
       invokeBeginRecording,
       toastMessages.take.submitError,
       toastMessages.take.submitSuccess,
+      submitFallbackDetail,
     ],
   );
 

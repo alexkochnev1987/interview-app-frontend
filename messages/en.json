@@ -263,6 +263,13 @@
         "unavailableTitle": "Feedback unavailable",
         "loadFailedFallback": "Failed to load"
       },
+      "team": {
+        "forbiddenTitle": "You don't have access to team management",
+        "forbiddenDescription": "This area is reserved for admins and super admins. If you think this is a mistake, contact your workspace owner.",
+        "unavailableTitle": "Team management is unavailable right now",
+        "loadFailedTitle": "Could not load team members",
+        "loadFailedFallback": "Failed to load team members."
+      },
       "questions": {
         "editorIssueTitle": "Question editor issue",
         "unavailableTitle": "Question unavailable",
@@ -275,6 +282,10 @@
         "createForbiddenTitle": "You don't have access to create questions",
         "createForbiddenDescription": "Creating questions is reserved for admin and super-admin users. If you think this is a mistake, contact your workspace owner.",
         "createUnavailableTitle": "Question creation is unavailable right now"
+      },
+      "take": {
+        "unavailableTitle": "Interview unavailable",
+        "loadFailedFallback": "Failed to load interview."
       }
     },
     "rerun": {
@@ -288,6 +299,11 @@
     },
     "deleteQuestion": {
       "cannotDeleteTitle": "Cannot delete"
+    },
+    "team": {
+      "updateSuccess": "Role updated",
+      "updateError": "Could not update role",
+      "updateSuccessDescription": "{name} is now {role}."
     }
   },
   "questions": {
@@ -646,12 +662,11 @@
       "paste": "paste",
       "keydown": "Keydown",
       "resize": "resize",
-      "workflowStatus": "Status",
+      "workflowStatus": "Status:",
       "stage": "stage",
       "lastUpdate": "Last update",
       "validationProgress": "Validation progress",
       "validatedOf": "{validated} of {answered} submitted answers validated.",
-      "workflowStatus": "Status:",
       "workflowStage": "stage:",
       "workflowLastUpdate": "Last update",
       "answerDuration": "Duration {duration} • retakes {count}",
@@ -728,6 +743,182 @@
       "positionPlaceholder": "e.g. Senior Frontend Engineer"
     }
   },
+  "assessments": {
+    "list": {
+      "eyebrow": "Assessments",
+      "title": "Review submitted interviews and AI evaluations.",
+      "lead": "Open a finished interview to see candidate answers, per-question scoring, behavior signals, and the overall result.",
+      "searchPlaceholder": "Search by candidate name or position",
+      "allStatuses": "All statuses",
+      "statusScoring": "Scoring",
+      "emptyTitle": "No assessments yet",
+      "emptyDescription": "Once a candidate submits an interview, it will appear here for review.",
+      "emptyFilteredTitle": "No assessments match the current filters",
+      "emptyFilteredDescription": "Try widening the search or reset the status filter to bring more interviews back in.",
+      "overallScore": "Overall score",
+      "completed": "Completed"
+    },
+    "detail": {
+      "backToAssessments": "Back to assessments",
+      "created": "Created",
+      "submitted": "Submitted",
+      "scored": "Scored",
+      "questionsCount": "{count} questions",
+      "failedTitle": "This interview failed to complete",
+      "failedDescription": "The take ended in a failed state. Some answers, transcripts, or evaluations may be missing. You can re-run AI evaluation for any answer that does have a transcript below.",
+      "perQuestionEyebrow": "Per-question review",
+      "perQuestionHeading": "Questions and answers",
+      "scorecardEyebrow": "Scorecard",
+      "scorecardHeading": "Overall result"
+    },
+    "banner": {
+      "slowTitle": "Scoring is taking longer than usual",
+      "slowDescription": "{inFlight} of {total} answers are still being scored after several minutes. The worker may be stuck. Refresh manually to check, or re-run the affected answers.",
+      "refreshNow": "Refresh now",
+      "allFailedTitle": "AI scoring failed for every answer",
+      "allFailedDescription": "None of the {total} submitted answers produced an evaluation. See the per-question error messages below for details, then re-run once the underlying issue is resolved.",
+      "someFailedTitle": "Some answers failed to score",
+      "someFailedDescription": "{scored} of {total} scored, {failed} failed. You can re-run the failed answers individually below.",
+      "noneYetTitle": "No AI evaluation has been run yet",
+      "noneYetDescription": "{total} answers submitted, none evaluated. Click \"Re-run AI evaluation\" to start scoring."
+    },
+    "overall": {
+      "placeholderTitle": "Placeholder evaluation",
+      "placeholderDescription": "This interview was completed before AI evaluation ran. The score and summary below are placeholder values from a simulated rollup. Click \"Re-run AI evaluation\" to generate a real result.",
+      "resultEyebrow": "Overall result",
+      "categoryScores": "Category scores",
+      "behaviorSummary": "Behavior summary",
+      "riskPrefix": "Risk:",
+      "noBehaviorNotes": "No behavior notes recorded.",
+      "overallScore": "Overall score",
+      "outOf100": "Out of 100",
+      "trustScore": "Trust score",
+      "noTrustFlags": "No trust flags raised.",
+      "trustFlags": "Trust flags"
+    },
+    "question": {
+      "questionBadge": "Q{n}",
+      "transcriptEyebrow": "Candidate transcript",
+      "transcriptPending": "Transcript is still being generated.",
+      "noAnswer": "No answer was submitted for this question.",
+      "behaviorSignals": "Behavior signals",
+      "tabHidden": "Tab hidden",
+      "windowBlur": "Window blur",
+      "paste": "Paste",
+      "keydown": "Keydown",
+      "resize": "Resize",
+      "aiEvaluation": "AI evaluation",
+      "decisionPass": "Pass",
+      "decisionFail": "Fail",
+      "decisionReview": "Review",
+      "decisionNone": "No hint",
+      "behaviorRiskPrefix": "Behavior risk:",
+      "score": "Score",
+      "outOf100": "out of 100",
+      "conceptsCovered": "Concepts covered",
+      "conceptsMissed": "Concepts missed",
+      "coveredConcepts": "Covered concepts",
+      "missedConcepts": "Missed concepts",
+      "redFlagsRaised": "Red flags raised",
+      "noEvaluationYet": "No AI evaluation available for this answer yet.",
+      "scoringFailedTitle": "AI scoring failed for this answer",
+      "noAnswerSubmitted": "No answer submitted",
+      "scoringFailed": "AI evaluation failed",
+      "scoringInProgress": "Scoring in progress",
+      "scored": "Scored",
+      "awaitingEvaluation": "Awaiting evaluation"
+    },
+    "media": {
+      "noRecording": "No recording was uploaded for this answer.",
+      "recordingEyebrow": "Recording",
+      "cameraAndScreen": "Camera and screen recordings are available.",
+      "cameraOnly": "Camera recording is available.",
+      "screenOnly": "Screen recording is available.",
+      "loadRecording": "Load recording",
+      "loading": "Loading recording...",
+      "unavailableTitle": "Recording unavailable",
+      "loadFailed": "Failed to load media URLs.",
+      "expiredTitle": "Recording links may have expired",
+      "expiredDescription": "Signed URLs are valid for one hour. Refresh to get new playback links.",
+      "refreshLinks": "Refresh links",
+      "candidateCamera": "Candidate camera",
+      "candidateScreen": "Candidate screen"
+    },
+    "rerun": {
+      "starting": "Starting…",
+      "all": "Re-run AI evaluation",
+      "answer": "Re-run this answer",
+      "queued": "Queued"
+    }
+  },
+  "team": {
+    "heading": "Team Members",
+    "lead": "Manage your workspace collaborators and their access levels.",
+    "filters": {
+      "label": "Filters:"
+    },
+    "searchPlaceholder": "Search by name or email",
+    "table": {
+      "memberName": "Member Name",
+      "email": "Email Address",
+      "accessRole": "Access Role",
+      "joined": "Joined",
+      "actions": "Actions"
+    },
+    "empty": {
+      "title": "No members found",
+      "description": "Try changing the role filter to see more results."
+    },
+    "pagination": {
+      "showing": "Showing {from} to {to} of {total} members"
+    },
+    "stats": {
+      "totalMembers": "Total Members",
+      "allRoles": "All roles",
+      "superAdmins": "Super Admins",
+      "fullAccess": "Full access",
+      "admins": "Admins",
+      "adminRole": "Admin role",
+      "hrSpecialists": "HR Specialists",
+      "hrRole": "HR role",
+      "candidates": "Candidates",
+      "candidateRole": "Candidate role"
+    },
+    "changeRole": {
+      "title": "Change role",
+      "accessibilityTitle": "Change role",
+      "currentRole": "Current Role",
+      "newRole": "New Role",
+      "noRoles": "No roles are available for your account to assign. If this looks wrong, try again signed in as a higher-level administrator.",
+      "applying": "Applying role change...",
+      "apply": "Apply role change",
+      "cancel": "Cancel",
+      "footnote": "This change takes effect immediately. The user keeps their session until next request."
+    },
+    "actions": {
+      "changeRole": "Change role",
+      "editAccount": "Edit account",
+      "deleteUser": "Delete user",
+      "menuAria": "Open actions menu for {name}"
+    }
+  },
+  "feedback": {
+    "eyebrow": "Interview feedback",
+    "title": "Your interview summary",
+    "lead": "This page shares the reviewed outcome for the <strong>{position}</strong> interview and highlights both strengths and next areas to improve.",
+    "outOf100": "out of 100",
+    "reviewed": "Reviewed {date}",
+    "snapshotTitle": "Snapshot",
+    "snapshotDescription": "A compact overview of your current outcome and when this shared link expires.",
+    "overallScore": "Overall score",
+    "linkExpiry": "Link expiry",
+    "categoryScoresEyebrow": "Category scores",
+    "breakdownTitle": "Breakdown",
+    "feedbackEyebrow": "Feedback",
+    "wentWellTitle": "What went well",
+    "recommendationsEyebrow": "Recommendations",
+    "improveTitle": "What to improve next"
+  },
   "interviews": {
     "createIntro": {
       "eyebrow": "Create Interview Flow",
@@ -746,5 +937,98 @@
         "failed": "Failed"
       }
     }
+  },
+  "takeFlow": {
+    "questionCountOne": "{count} question",
+    "questionCountOther": "{count} questions",
+    "browserUnsupported": "This browser must support camera, microphone, and full-screen sharing.",
+    "shortRecordingSubmit": "Recording is too short to submit yet. Please record a bit longer and try again.",
+    "syncingInProgress": "Recording is still syncing for this question. Try submitting again in a moment.",
+    "screenShareStopped": "Screen sharing stopped. Reconnect camera and entire-screen sharing to continue this question.",
+    "recordingStoppedWithoutAction": "Recording stopped without a follow-up action. Start a new version for this answer.",
+    "uploadFailedFallback": "Upload failed",
+    "submitFailedTitle": "Submit failed",
+    "reconnectCameraAndScreen": "Reconnect camera + screen",
+    "rerecordAsNewVersion": "Retake",
+    "submitAndNext": "Submit & Next",
+    "submitCompleteInterview": "Submit & Finish",
+    "lobbyEnableCameraMicFirst": "Enable your microphone and camera first, then share your entire screen.",
+    "lobbyInterviewStartBlocked": "Could not start the interview. Keep microphone, camera, and entire-screen sharing active, then try again.",
+    "lobbyEyebrow": "Prep room",
+    "lobbyLead": "Enable mic and camera, share your full screen, then select Start Interview when all checks are ready.",
+    "lobbyJoin": "Start Interview",
+    "lobbyJoinBusy": "One moment…",
+    "lobbyDevicesHelp": "Status updates as you connect. In the system share dialog, choose Entire screen.",
+    "lobbyToolbarMic": "Microphone",
+    "lobbyToolbarCamera": "Camera",
+    "lobbyToolbarScreen": "Entire screen share",
+    "lobbyPreviewCameraOffTitle": "Camera is off",
+    "lobbyPreviewCameraOffLead": "Tap the camera icon in the controls to turn your preview back on.",
+    "lobbyPreviewMutedTitle": "Camera preview paused",
+    "lobbyPreviewMutedLead": "Tap the microphone or camera icon in the controls to allow access and show your preview.",
+    "sessionSyncFailedTitle": "Session could not start",
+    "sessionSyncFailed": "Could not establish your interview session. Refresh the invite link or open it again in this browser.",
+    "consentContinue": "Continue to device check",
+    "consentPrepHint": "Next you'll activate your microphone and camera, preview yourself, then share your entire screen to join.",
+    "guidanceInterview": "While recording, tap Submit when you are finished, or Retake to record another attempt.",
+    "guidanceBeforeRecording": "Your camera and full screen share stay on. Recording starts automatically when this question is ready.",
+    "guidanceInterviewerSpeaking": "The interviewer is reading the question aloud. Recording will start automatically when they finish.",
+    "recordingSessionTitleInterview": "Interview",
+    "recordingHeaderCameraMic": "Camera + mic",
+    "sessionReadyLabel": "Ready to record",
+    "recordingPrepLabel": "Preparing session…",
+    "recordingStartingBusy": "Starting recording…",
+    "recordingGuidanceTitle": "Guidance",
+    "recordingSubmitInProgress": "Submitting…",
+    "recordingState": "Recording",
+    "screenShareFull": "Full screen",
+    "screenSharePending": "Screen pending",
+    "permissionPending": "Pending",
+    "permissionReady": "Ready",
+    "permissionBlocked": "Blocked",
+    "permissionIdle": "Idle",
+    "chooseEntireScreen": "Choose Entire screen / Screen in the share picker. Browser tabs and app windows are not accepted.",
+    "permissionNotAllowed": "Camera, microphone, and screen sharing must be allowed to continue.",
+    "permissionNotFound": "A camera, microphone, or shareable display source was not found on this device.",
+    "permissionAborted": "Permission setup was interrupted. Please try again.",
+    "permissionGeneric": "Camera, microphone, and screen sharing must be enabled before the interview can start.",
+    "screenTrackMissing": "Screen sharing did not provide a video track.",
+    "takeLoadFailed": "Failed to load interview",
+    "submitFallbackDetail": "Please review recording data and try again.",
+    "consentEyebrow": "Candidate interview",
+    "consentInterviewFor": "Interview for {position}",
+    "consentWelcome": "Welcome, {candidateName}. You will answer {questionCount}, with up to four minutes for each response.",
+    "consentBeforeStart": "Before you start",
+    "consentDataCollected": "Data collected",
+    "consentDataCameraMic": "Camera video and microphone audio for each answer",
+    "consentDataScreen": "Full-monitor screen recording in parallel with each answer",
+    "consentDataBrowser": "Browser activity such as tab switches",
+    "consentDataMetadata": "Session metadata including answer timing",
+    "retry": "Retry",
+    "setupIncomplete": "Setup incomplete",
+    "consentCheckboxLabel": "I agree to the recording and data collection terms.",
+    "consentCheckboxHint": "Data is used only for interview evaluation and is stored for 90 days.",
+    "lobbyDevicesAndScreens": "Devices & screens",
+    "lobbySetupFailed": "Could not finish setup",
+    "permissionCameraMicTitle": "Camera and microphone",
+    "permissionCameraMicDescription": "Required before recording can begin.",
+    "permissionScreenTitle": "Entire screen share",
+    "permissionScreenReady": "Entire screen is confirmed and ready.",
+    "capabilityCameraTitle": "Camera",
+    "capabilityCameraDescription": "Recorded separately for every answer.",
+    "capabilityMicTitle": "Microphone",
+    "capabilityMicDescription": "Captured together with your camera feed.",
+    "capabilityScreenTitle": "Entire screen",
+    "capabilityScreenDescription": "Must be shared as Entire screen, not a tab or app window.",
+    "capabilityFairnessTitle": "Fairness checks",
+    "capabilityFairnessDescription": "Session and browser activity may be stored for evaluation integrity.",
+    "completeTitle": "Thank you, {candidateName}",
+    "completeDescription": "Your interview for {position} is submitted and saved securely for review. If you are selected to continue, our team will reach out within a few business days with next steps.",
+    "liveTranscriptTitle": "Live transcript",
+    "liveTranscriptUnavailable": "Live transcript is unavailable in this browser. Recording continues as usual.",
+    "liveTranscriptDraftSuffix": "(draft)",
+    "liveTranscriptPlaceholder": "Transcript will appear while you speak...",
+    "questionProgress": "Question {current} of {total}",
+    "beforeUnloadLeaveInterview": "If you reload or leave now, you will exit this interview and may lose your progress. Are you sure?"
   }
 }

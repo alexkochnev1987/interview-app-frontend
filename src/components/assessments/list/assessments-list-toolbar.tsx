@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { Card, CardContent } from '@/components/ui/card'
 import { Grid } from '@/components/ui/layout/grid'
 import { SearchInput } from '@/components/ui/search-input'
@@ -10,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { useSharedLabels } from '@/i18n/use-shared-labels'
 
 export type StatusFilter = 'all' | 'ready' | 'scoring' | 'failed'
 
@@ -26,6 +29,9 @@ export function AssessmentsListToolbar({
   status,
   onStatusChange,
 }: AssessmentsListToolbarProps) {
+  const t = useTranslations('assessments.list')
+  const sharedLabels = useSharedLabels()
+
   return (
     <Card variant="surface" size="xs">
       <CardContent>
@@ -33,20 +39,24 @@ export function AssessmentsListToolbar({
           <SearchInput
             value={query}
             onChange={(event) => onQueryChange(event.target.value)}
-            placeholder="Search by candidate name or position"
+            placeholder={t('searchPlaceholder')}
           />
           <Select
             value={status}
             onValueChange={(value) => onStatusChange(value as StatusFilter)}
           >
             <SelectTrigger variant="surface" size="lg" shape="pill">
-              <SelectValue placeholder="All statuses" />
+              <SelectValue placeholder={t('allStatuses')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All statuses</SelectItem>
-              <SelectItem value="ready">Ready for review</SelectItem>
-              <SelectItem value="scoring">Scoring</SelectItem>
-              <SelectItem value="failed">Failed</SelectItem>
+              <SelectItem value="all">{t('allStatuses')}</SelectItem>
+              <SelectItem value="ready">
+                {sharedLabels.reviewStatus('ready')}
+              </SelectItem>
+              <SelectItem value="scoring">{t('statusScoring')}</SelectItem>
+              <SelectItem value="failed">
+                {sharedLabels.reviewStatus('failed')}
+              </SelectItem>
             </SelectContent>
           </Select>
         </Grid>

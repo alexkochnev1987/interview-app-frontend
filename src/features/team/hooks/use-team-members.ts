@@ -1,12 +1,12 @@
 'use client'
 
 import { useCallback, useDeferredValue, useMemo, useState } from 'react'
+import { useTranslations } from 'next-intl'
 
 import type { TeamMember } from '@/lib/api'
 import { useAuth } from '@/lib/auth-context'
 
 import {
-  buildTeamStatCards,
   filterAndSortTeamMembers,
   getTeamPaginationItems,
   type TeamRoleFilter,
@@ -27,8 +27,52 @@ export function useTeamMembers(initialMembers: TeamMember[]) {
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null)
 
   const deferredQuery = useDeferredValue(query)
+  const t = useTranslations('team.stats')
 
-  const statCards = buildTeamStatCards(members)
+  const statCards = useMemo(() => {
+    const adminCount = members.filter((m) => m.role === 'admin').length
+    const superAdminCount = members.filter((m) => m.role === 'super_admin').length
+    const hrCount = members.filter((m) => m.role === 'hr').length
+    const candidateCount = members.filter((m) => m.role === 'candidate').length
+
+    return [
+      {
+        label: t('totalMembers'),
+        value: members.length,
+        annotation: t('allRoles'),
+        tone: 'primary' as const,
+        accent: 'primary' as const,
+      },
+      {
+        label: t('superAdmins'),
+        value: superAdminCount,
+        annotation: t('fullAccess'),
+        tone: 'info' as const,
+        accent: 'info' as const,
+      },
+      {
+        label: t('admins'),
+        value: adminCount,
+        annotation: t('adminRole'),
+        tone: 'neutral' as const,
+        accent: 'neutral' as const,
+      },
+      {
+        label: t('hrSpecialists'),
+        value: hrCount,
+        annotation: t('hrRole'),
+        tone: 'warning' as const,
+        accent: 'warning' as const,
+      },
+      {
+        label: t('candidates'),
+        value: candidateCount,
+        annotation: t('candidateRole'),
+        tone: 'success' as const,
+        accent: 'success' as const,
+      },
+    ]
+  }, [members, t])
 
   const filteredMembers = useMemo(() => {
     const normalizedQuery = deferredQuery.trim().toLowerCase()

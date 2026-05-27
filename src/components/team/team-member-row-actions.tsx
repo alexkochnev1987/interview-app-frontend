@@ -2,6 +2,7 @@
 
 import type { LucideIcon } from 'lucide-react'
 import { MoreVertical, Pencil, Trash2, UserCog } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import type { DropdownMenuItemTone } from '@/components/ui/dropdown-menu'
@@ -23,7 +24,7 @@ import {
 
 type RowActionConfig = {
   id: TeamRowActionId
-  label: string
+  labelKey: 'changeRole' | 'editAccount' | 'deleteUser'
   Icon: LucideIcon
   tone: DropdownMenuItemTone
 }
@@ -31,19 +32,19 @@ type RowActionConfig = {
 const ROW_ACTIONS: readonly RowActionConfig[] = [
   {
     id: 'change-role',
-    label: 'Change role',
+    labelKey: 'changeRole',
     Icon: UserCog,
     tone: 'primary',
   },
   {
     id: 'edit-account',
-    label: 'Edit account',
+    labelKey: 'editAccount',
     Icon: Pencil,
     tone: 'success',
   },
   {
     id: 'delete-user',
-    label: 'Delete user',
+    labelKey: 'deleteUser',
     Icon: Trash2,
     tone: 'danger',
   },
@@ -62,6 +63,8 @@ export function TeamMemberRowActions({
   actorRole,
   onChangeRole,
 }: TeamMemberRowActionsProps) {
+  const t = useTranslations('team.actions')
+
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
@@ -70,7 +73,7 @@ export function TeamMemberRowActions({
           variant="ghost"
           size="icon-sm"
           aria-haspopup="menu"
-          aria-label={`Open actions menu for ${member.name}`}
+          aria-label={t('menuAria', { name: member.name })}
         >
           <MoreVertical />
         </Button>
@@ -78,7 +81,7 @@ export function TeamMemberRowActions({
       <DropdownMenuContent align="end" sideOffset={6}>
         {ROW_ACTIONS.filter(({ id }) =>
           isTeamRowActionVisible(id, actorId, member),
-        ).map(({ id, label, Icon, tone }) => {
+        ).map(({ id, labelKey, Icon, tone }) => {
           const enabled = isTeamRowActionEnabled(
             id,
             actorId,
@@ -97,7 +100,7 @@ export function TeamMemberRowActions({
             >
               <Inline gap={3} align="center">
                 <Icon aria-hidden />
-                {label}
+                {t(labelKey)}
               </Inline>
             </DropdownMenuItem>
           )

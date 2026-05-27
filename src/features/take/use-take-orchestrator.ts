@@ -3,7 +3,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { useBrowserTranscript } from '@/lib/use-browser-transcript';
 import { type TakeInterviewData } from '@/lib/api';
 import type { PermissionStatus, TakeStage } from '@/components/take/types';
-import { TAKE_MESSAGES } from './messages';
+import { takeMessage } from './messages';
 import { progressValueForStage, stageAfterInterviewLoad, type VersionPersistKind } from './session-machine';
 import {
   clearProgressTimers,
@@ -382,7 +382,7 @@ export function useTakeOrchestrator({ id, candidateToken, initialInterview }: Us
     const pendingAction = pendingVersionActionRef.current;
     if (!pendingAction) {
       clearRecordingArtifacts();
-      setSetupError(TAKE_MESSAGES.recordingStoppedWithoutAction);
+      setSetupError(takeMessage('recordingStoppedWithoutAction'));
       setStage('interview');
       return;
     }
@@ -433,7 +433,7 @@ export function useTakeOrchestrator({ id, candidateToken, initialInterview }: Us
         releaseScreenCapture(screenStreamRef, screenVideoRef);
         setScreenStatus('denied');
         setScreenSurface('');
-        setSetupError(TAKE_MESSAGES.screenShareStopped);
+        setSetupError(takeMessage('screenShareStopped'));
         return;
       }
 
@@ -445,7 +445,7 @@ export function useTakeOrchestrator({ id, candidateToken, initialInterview }: Us
       setScreenStatus('denied');
       setScreenSurface('');
       setSetupBusy(false);
-      setSetupError(TAKE_MESSAGES.screenShareStopped);
+      setSetupError(takeMessage('screenShareStopped'));
       setVersionPersistKind(null);
       autoStartedQuestionKeyRef.current = '';
       releaseScreenCapture(screenStreamRef, screenVideoRef);
@@ -494,7 +494,7 @@ export function useTakeOrchestrator({ id, candidateToken, initialInterview }: Us
       activeScreenUpload?.questionIndex === currentQuestionIndex;
 
     if (!isUploadSessionSynced) {
-      setSubmitError(TAKE_MESSAGES.syncingInProgress);
+      setSubmitError(takeMessage('syncingInProgress'));
       return;
     }
 

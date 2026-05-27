@@ -3,6 +3,7 @@ import { StatusPill, type StatusTone } from '@/components/ui/status-pill';
 import { Panel } from '@/components/ui/panel';
 import { Inline, Stack } from '@/components/ui/layout';
 import { Text } from '@/components/ui/text';
+import { takeMessage } from '@/features/take';
 
 interface TakePermissionStatusListProps {
   cameraStatus: PermissionStatus;
@@ -54,18 +55,18 @@ export function TakePermissionStatusList({
   return (
     <Stack gap={4} width="full">
       <PermissionRow
-        title="Camera and microphone"
-        description="Required before recording can begin."
+        title={takeMessage('permissionCameraMicTitle')}
+        description={takeMessage('permissionCameraMicDescription')}
         status={cameraStatus}
         permissionLabel={permissionLabel}
         permissionTone={permissionTone}
       />
       <PermissionRow
-        title="Entire screen share"
+        title={takeMessage('permissionScreenTitle')}
         description={
           screenSurface === 'monitor'
-            ? 'Entire screen is confirmed and ready.'
-            : 'In the share picker, choose Entire screen / Screen.'
+            ? takeMessage('permissionScreenReady')
+            : takeMessage('chooseEntireScreen')
         }
         status={screenStatus}
         permissionLabel={permissionLabel}

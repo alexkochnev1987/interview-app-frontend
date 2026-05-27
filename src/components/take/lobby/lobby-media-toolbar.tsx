@@ -2,7 +2,7 @@ import { Mic, MicOff, SquareArrowUp, Video, VideoOff } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Inline } from '@/components/ui/layout';
-import { TAKE_MESSAGES } from '@/features/take';
+import { takeMessage } from '@/features/take';
 
 interface TakeLobbyMediaToolbarProps {
   setupBusy: boolean;
@@ -32,7 +32,7 @@ export function TakeLobbyMediaToolbar({
         shape="pill"
         disabled={setupBusy}
         aria-pressed={micOn}
-        aria-label={TAKE_MESSAGES.lobbyToolbarMic}
+        aria-label={takeMessage('lobbyToolbarMic')}
         onClick={() => void onToggleMic()}
       >
         {micOn ? <Mic /> : <MicOff />}
@@ -44,7 +44,7 @@ export function TakeLobbyMediaToolbar({
         shape="pill"
         disabled={setupBusy}
         aria-pressed={cameraOn}
-        aria-label={TAKE_MESSAGES.lobbyToolbarCamera}
+        aria-label={takeMessage('lobbyToolbarCamera')}
         onClick={() => void onToggleCamera()}
       >
         {cameraOn ? <Video /> : <VideoOff />}
@@ -56,7 +56,7 @@ export function TakeLobbyMediaToolbar({
         shape="pill"
         disabled={setupBusy}
         aria-pressed={screenShareReady}
-        aria-label={TAKE_MESSAGES.lobbyToolbarScreen}
+        aria-label={takeMessage('lobbyToolbarScreen')}
         onClick={() => void onScreenShare()}
       >
         <SquareArrowUp />

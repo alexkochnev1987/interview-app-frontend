@@ -27,6 +27,7 @@ interface RerunButtonProps {
   onRun: () => Promise<RerunResult>
   idleLabel: string
   submittedLabel: string
+  startingLabel: string
   errorTitle: string
   errorFallback: string
   variant?: ButtonVariant
@@ -40,6 +41,7 @@ export function RerunButton({
   onRun,
   idleLabel,
   submittedLabel,
+  startingLabel,
   errorTitle,
   errorFallback,
   variant = 'outline-pill',
@@ -114,7 +116,7 @@ export function RerunButton({
         <RefreshCw />
       </Icon>
       {phase === 'submitting'
-        ? 'Starting…'
+        ? startingLabel
         : phase === 'submitted'
           ? submittedLabel
           : idleLabel}

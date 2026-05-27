@@ -1,6 +1,7 @@
 'use client'
 
 import { Users } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { CardContent } from '@/components/ui/card'
 import {
@@ -32,13 +33,15 @@ export function TeamMembersTableSection({
   actorRole,
   onRequestChangeRole,
 }: TeamMembersTableSectionProps) {
+  const t = useTranslations('team')
+
   if (!hasResults) {
     return (
       <CardContent spacing="lg">
         <EmptyStateCard
           icon={<Users size={20} />}
-          title="No members found"
-          description="Try changing the role filter to see more results."
+          title={t('empty.title')}
+          description={t('empty.description')}
         />
       </CardContent>
     )
@@ -48,11 +51,11 @@ export function TeamMembersTableSection({
     <Table minRows={4} tabularWidth="wide">
       <TableHeader>
         <TableRow>
-          <TableHead>Member Name</TableHead>
-          <TableHead>Email Address</TableHead>
-          <TableHead>Access Role</TableHead>
-          <TableHead>Joined</TableHead>
-          <TableHead>Actions</TableHead>
+          <TableHead>{t('table.memberName')}</TableHead>
+          <TableHead>{t('table.email')}</TableHead>
+          <TableHead>{t('table.accessRole')}</TableHead>
+          <TableHead>{t('table.joined')}</TableHead>
+          <TableHead>{t('table.actions')}</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>

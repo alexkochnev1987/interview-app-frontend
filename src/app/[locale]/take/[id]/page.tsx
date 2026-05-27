@@ -20,7 +20,7 @@ export default async function TakeInterviewPage({
   searchParams,
 }: TakeInterviewPageProps) {
   const { id, locale } = await params
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.interview' })
+  const t = await getTranslations({ locale, namespace: 'toast.pageGate.take' })
   const token = readSearchParamToken((await searchParams).token)
 
   if (token) {

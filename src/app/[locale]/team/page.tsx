@@ -1,3 +1,5 @@
+import { getTranslations } from 'next-intl/server'
+
 import { TeamMembersContainer } from '@/features/team/team-members-container'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
@@ -12,35 +14,30 @@ import {
 import { canManageTeam } from '@/lib/auth-roles'
 import { isForbiddenError, requestServer } from '@/lib/server-fetch'
 
-const FORBIDDEN_TITLE = "You don't have access to team management"
-const FORBIDDEN_DESCRIPTION =
-  'This area is reserved for admins and super admins. If you think this is a mistake, contact your workspace owner.'
-
-function teamForbiddenPage() {
-  return (
-    <ForbiddenAccessPage
-      title={FORBIDDEN_TITLE}
-      description={FORBIDDEN_DESCRIPTION}
-    />
-  )
-}
-
 interface TeamPageProps {
   params: Promise<{ locale: Locale }>
 }
 
 export default async function TeamPage({ params }: TeamPageProps) {
   const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'toast.pageGate.team' })
+  const tCommon = await getTranslations({ locale, namespace: 'common' })
+
   const auth = await loadAuthGate(canManageTeam)
   redirectIfUnauthenticated(auth, '/team', locale)
   if (auth.kind === 'forbidden') {
-    return teamForbiddenPage()
+    return (
+      <ForbiddenAccessPage
+        title={t('forbiddenTitle')}
+        description={t('forbiddenDescription')}
+      />
+    )
   }
   if (auth.kind === 'error') {
     return (
       <FlashErrorPageFallback
-        title="Team management is unavailable right now"
-        description={`We could not verify your session or permissions. ${auth.message}`}
+        title={t('unavailableTitle')}
+        description={`${tCommon('sessionVerificationFailed')} ${auth.message}`}
       />
     )
   }
@@ -53,15 +50,21 @@ export default async function TeamPage({ params }: TeamPageProps) {
   } catch (err) {
     redirectIfUnauthorizedError(err, '/team', locale)
     if (isForbiddenError(err)) {
-      return teamForbiddenPage()
+      return (
+        <ForbiddenAccessPage
+          title={t('forbiddenTitle')}
+          description={t('forbiddenDescription')}
+        />
+      )
     }
-    error = err instanceof Error ? err.message : 'Failed to load team members.'
+    error =
+      err instanceof Error ? err.message : t('loadFailedFallback')
   }
 
   if (error) {
     return (
       <FlashErrorPageFallback
-        title="Could not load team members"
+        title={t('loadFailedTitle')}
         description={error}
       />
     )
