@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   ArrowLeft,
   ChartColumnBig,
@@ -59,9 +60,9 @@ import {
 import {
   formatInterviewDate,
   formatInterviewDateTime,
-  formatInterviewStatusLabel,
   getCandidateInitials,
 } from "@/lib/interview-formatters";
+import { useSharedLabels } from "@/i18n/use-shared-labels";
 import { runMutation } from "@/lib/run-mutation";
 import { useToastMessages } from "@/lib/use-toast-messages";
 
@@ -85,9 +86,9 @@ interface InterviewDetailClientProps {
   initialResults: InterviewResult | null;
 }
 
-function formatAnswerDuration(seconds?: number) {
+function formatAnswerDuration(seconds: number | undefined, emptyLabel: string) {
   if (!seconds || seconds < 1) {
-    return "n/a";
+    return emptyLabel;
   }
 
   const minutes = Math.floor(seconds / 60);
@@ -95,9 +96,9 @@ function formatAnswerDuration(seconds?: number) {
   return `${minutes}:${remainder.toString().padStart(2, "0")}`;
 }
 
-function formatFileSize(bytes?: number) {
+function formatFileSize(bytes: number | undefined, emptyLabel: string) {
   if (!bytes || bytes < 1) {
-    return "n/a";
+    return emptyLabel;
   }
 
   if (bytes < 1024 * 1024) {
@@ -107,20 +108,12 @@ function formatFileSize(bytes?: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-function formatWorkflowStage(stage?: string) {
+function formatWorkflowStage(stage: string | undefined, idleLabel: string) {
   if (!stage) {
-    return "idle";
+    return idleLabel;
   }
 
   return stage.replaceAll("_", " ");
-}
-
-function formatValidationStatusLabel(status?: string) {
-  if (!status) {
-    return "idle";
-  }
-
-  return status.replaceAll("_", " ");
 }
 
 function formatMetricLabel(value: string) {
@@ -174,7 +167,26 @@ export default function InterviewDetailClient({
   initialInterview,
   initialResults,
 }: InterviewDetailClientProps) {
+  const t = useTranslations("questions.common");
+  const tDetail = useTranslations("interviews.detail");
+  const sharedLabels = useSharedLabels();
   const toastMessages = useToastMessages();
+
+  function validationStatusLabel(status?: string) {
+    if (!status) {
+      return tDetail("validationStatus.idle");
+    }
+    if (
+      status === "idle" ||
+      status === "queued" ||
+      status === "processing" ||
+      status === "completed" ||
+      status === "failed"
+    ) {
+      return tDetail(`validationStatus.${status}`);
+    }
+    return status.replaceAll("_", " ");
+  }
   const [interview, setInterview] = useState<Interview | null>(initialInterview);
   const [results, setResults] = useState<InterviewResult | null>(initialResults);
   const [loading] = useState(false);
@@ -282,7 +294,7 @@ export default function InterviewDetailClient({
             setResults(nextResults);
           } catch (resultsError) {
             console.warn(
-              "Results not yet available after validation",
+              t("resultsNotAfterValidation"),
               resultsError,
             );
           }
@@ -297,7 +309,7 @@ export default function InterviewDetailClient({
         stopValidationPolling();
       }
     }, 2500);
-  }, [id, stopValidationPolling]);
+  }, [id, stopValidationPolling, t]);
 
   useEffect(() => {
     return () => {
@@ -360,12 +372,12 @@ export default function InterviewDetailClient({
               errorMessage:
                 mediaError instanceof Error
                   ? mediaError.message
-                  : "Failed to load media.",
+                  : t("failedLoadMedia"),
             },
           }));
         });
     });
-  }, [id, interview]);
+  }, [id, interview, t]);
 
   async function handleCopyCandidateLink() {
     if (!candidateLink) {
@@ -410,7 +422,7 @@ export default function InterviewDetailClient({
           });
 
           if (!uploadResponse.ok) {
-            throw new Error("Upload to storage failed");
+            throw new Error(t("uploadToStorageFailed"));
           }
 
           return completeUploadAndFetchInterview(
@@ -437,7 +449,7 @@ export default function InterviewDetailClient({
             ? {
                 status: "error",
                 errorMessage:
-                  err instanceof Error ? err.message : "Upload failed",
+                  err instanceof Error ? err.message : t("uploadFailed"),
               }
             : state,
         ),
@@ -469,7 +481,7 @@ export default function InterviewDetailClient({
   if (loading) {
     return (
       <PageShell>
-        <LoadingStateCard label="Loading interview..." />
+        <LoadingStateCard label={t("loadingInterview")} />
       </PageShell>
     );
   }
@@ -520,7 +532,7 @@ export default function InterviewDetailClient({
                     tone="default"
                     icon={<ArrowLeft className="size-3.5" />}
                   >
-                    Back to dashboard
+                    {tDetail("backToDashboard")}
                   </EyebrowBadge>
                 </UnstyledLink>
 
@@ -536,10 +548,10 @@ export default function InterviewDetailClient({
 
                 <Inline gap={3} align="center" wrap="wrap">
                   <StatusPill tone={interview.status}>
-                    {formatInterviewStatusLabel(interview.status)}
+                    {sharedLabels.interviewStatus(interview.status)}
                   </StatusPill>
                   <StatusPill tone="neutral">
-                    Created {formatInterviewDate(interview.createdAt)}
+                    {t("createdPrefix")} {formatInterviewDate(interview.createdAt)}
                   </StatusPill>
                 </Inline>
               </Stack>
@@ -553,8 +565,8 @@ export default function InterviewDetailClient({
                     disabled={!canValidate || validating || hasActiveValidation}
                   >
                     {validating || hasActiveValidation
-                      ? "Validating..."
-                      : "Validate"}
+                      ? t("validating")
+                      : t("validate")}
                   </Button>
                 ) : null}
               </Inline>
@@ -562,17 +574,17 @@ export default function InterviewDetailClient({
 
             <Grid columns="metrics-3" gap={4}>
               <MetricPanel
-                label="Questions"
+                label={t("metricsQuestions")}
                 value={totalQuestions}
                 valueSize="lg"
               />
               <MetricPanel
-                label="Uploaded"
+                label={t("metricsUploaded")}
                 value={answeredCount}
                 valueSize="lg"
               />
               <MetricPanel
-                label="Overall score"
+                label={t("metricsOverallScore")}
                 value={results ? results.overallScore : "--"}
                 valueSize="lg"
               />
@@ -583,20 +595,17 @@ export default function InterviewDetailClient({
         <Card variant="tinted">
           <CardHeader spacing="sm">
             <EyebrowBadge icon={<Sparkles className="size-3.5" />} tone="muted">
-              Candidate access
+              {t("candidateAccessEyebrow")}
             </EyebrowBadge>
-            <CardTitle size="lg">Interview link</CardTitle>
-            <CardDescription>
-              Share this link with the candidate to start the recording flow
-              without recruiter sign-in.
-            </CardDescription>
+            <CardTitle size="lg">{t("interviewLinkTitle")}</CardTitle>
+            <CardDescription>{t("interviewLinkDescription")}</CardDescription>
           </CardHeader>
           <CardContent spacing="xl">
             <SurfaceTile tone="glass" padding="lg">
               <Stack gap={3}>
                 <Inline gap={3} align="center" justify="between" wrap="wrap">
                   <BodyText as="span" size="sm-tight" tone="foreground">
-                    Candidate link
+                    {t("candidateLinkLabel")}
                   </BodyText>
                   <Inline gap={2} wrap="wrap">
                     <Button
@@ -608,8 +617,8 @@ export default function InterviewDetailClient({
                       disabled={candidateLinkStatus === "loading"}
                     >
                       {candidateLinkStatus === "loading"
-                        ? "Generating..."
-                        : "Refresh link"}
+                        ? t("generating")
+                        : t("refreshLink")}
                     </Button>
                     <Button
                       type="button"
@@ -623,26 +632,24 @@ export default function InterviewDetailClient({
                     >
                       <Copy className="size-4" />
                       {copyStatus === "copied"
-                        ? "Copied"
+                        ? t("copied")
                         : copyStatus === "error"
-                          ? "Copy failed"
-                          : "Copy link"}
+                          ? t("copyFailed")
+                          : t("copyLink")}
                     </Button>
                   </Inline>
                 </Inline>
 
                 <BodyText size="sm">
                   {candidateLinkStatus === "loading"
-                    ? "Generating a fresh candidate link..."
+                    ? t("generatingLink")
                     : candidateLinkStatus === "error"
                       ? candidateLinkError
-                      : candidateLinkPreview ||
-                        "Candidate link is not available yet."}
+                      : candidateLinkPreview || t("linkNotReady")}
                 </BodyText>
                 {candidateLinkStatus === "ready" && candidateLink ? (
                   <BodyText size="xs" title={candidateLink}>
-                    Showing a shortened preview here. `Copy link` copies the
-                    full secure URL.
+                    {t("linkPreviewHelp")}
                   </BodyText>
                 ) : null}
               </Stack>
@@ -659,14 +666,14 @@ export default function InterviewDetailClient({
                     )
                   }
                 >
-                  Ready state
+                  {t("readyState")}
                 </IconLabel>
                 <BodyText size="sm">
                   {hasActiveValidation
-                    ? "Validation is running. Re-submit is blocked until the current pass finishes."
+                    ? t("readyValidationRunning")
                     : canValidate
-                      ? "All submitted answers are ready for one-click validation."
-                      : "Validation stays locked until every question has a submitted answer."}
+                      ? t("readyCanValidate")
+                      : t("readyLocked")}
                 </BodyText>
               </Stack>
             </SurfaceTile>
@@ -675,14 +682,16 @@ export default function InterviewDetailClient({
               <Stack gap={3}>
                 <Inline gap={3} align="center" justify="between">
                   <BodyText as="span" size="sm-tight" tone="foreground">
-                    Validation progress
+                    {t("validationProgress")}
                   </BodyText>
                   <StatusPill tone="neutral">{progressValue}%</StatusPill>
                 </Inline>
                 <Progress value={progressValue} density="thick" />
                 <BodyText size="sm">
-                  {validatedCount} of {answeredCount} submitted answers
-                  validated.
+                  {t("validatedOf", {
+                    validated: validatedCount,
+                    answered: answeredCount,
+                  })}
                 </BodyText>
               </Stack>
             </SurfaceTile>
@@ -691,19 +700,19 @@ export default function InterviewDetailClient({
               <SurfaceTile tone="glass" padding="lg">
                 <Stack gap={3}>
                   <IconLabel icon={<Workflow className="size-4" />} tone="primary">
-                    Workflow
+                    {t("workflowLabel")}
                   </IconLabel>
                   <BodyText size="sm">
-                    Status:{" "}
+                    {t("workflowStatus")}{" "}
                     <strong>
                       {interview.workflow.status.replace("_", " ")}
                     </strong>
                     {interview.workflow.currentStage
-                      ? ` • stage: ${formatWorkflowStage(interview.workflow.currentStage)}`
+                      ? ` • ${t("workflowStage")} ${formatWorkflowStage(interview.workflow.currentStage, t("idle"))}`
                       : ""}
                   </BodyText>
                   <BodyText size="sm">
-                    Last update{" "}
+                    {t("workflowLastUpdate")}{" "}
                     {formatInterviewDateTime(interview.workflow.lastUpdatedAt)}
                   </BodyText>
                   {interview.workflow.errorMessage ? (
@@ -721,13 +730,10 @@ export default function InterviewDetailClient({
       <Section gap={4}>
         <Inline gap={4} align="end" justify="between" wrap="wrap">
           <Stack gap={2}>
-            <EyebrowLabel size="lg">Candidate packet</EyebrowLabel>
-            <SectionHeading>Questions and uploads</SectionHeading>
+            <EyebrowLabel size="lg">{t("packetEyebrow")}</EyebrowLabel>
+            <SectionHeading>{t("packetHeading")}</SectionHeading>
           </Stack>
-          <BodyText size="sm">
-            Upload audio/video manually if the candidate flow was completed
-            outside the browser.
-          </BodyText>
+          <BodyText size="sm">{t("packetLead")}</BodyText>
         </Inline>
 
         <Stack gap={4}>
@@ -750,7 +756,7 @@ export default function InterviewDetailClient({
                             Q{questionIndex + 1}
                           </StatusPill>
                           <StatusPill tone={question.difficulty}>
-                            {question.difficulty}
+                            {sharedLabels.difficulty(question.difficulty)}
                           </StatusPill>
                           {question.category ? (
                             <StatusPill tone="neutral" casing="chip">
@@ -758,7 +764,7 @@ export default function InterviewDetailClient({
                             </StatusPill>
                           ) : null}
                           <StatusPill tone="neutral">
-                            weight {question.weight}
+                            {t("weightInline", { weight: question.weight })}
                           </StatusPill>
                         </Inline>
                         <CardTitle size="md" width="xl">
@@ -768,23 +774,21 @@ export default function InterviewDetailClient({
 
                       <Stack gap={2} align="end">
                         {answer?.status === "submitted" ? (
-                          <StatusPill tone="completed">Submitted</StatusPill>
+                          <StatusPill tone="completed">{t("answerSubmitted")}</StatusPill>
                         ) : hasAnswer || uploadState.status === "uploaded" ? (
-                          <StatusPill tone="processing">Draft saved</StatusPill>
+                          <StatusPill tone="processing">{t("answerDraft")}</StatusPill>
                         ) : uploadState.status === "uploading" ? (
-                          <StatusPill tone="processing">Uploading</StatusPill>
+                          <StatusPill tone="processing">{t("answerUploading")}</StatusPill>
                         ) : uploadState.status === "error" ? (
-                          <StatusPill tone="failed">Upload failed</StatusPill>
+                          <StatusPill tone="failed">{t("answerUploadFailed")}</StatusPill>
                         ) : (
-                          <StatusPill tone="pending">Pending</StatusPill>
+                          <StatusPill tone="pending">{t("answerPending")}</StatusPill>
                         )}
                         {answer?.validation ? (
                           <StatusPill
                             tone={getValidationTone(answer.validation.status)}
                           >
-                            {formatValidationStatusLabel(
-                              answer.validation.status,
-                            )}
+                            {validationStatusLabel(answer.validation.status)}
                           </StatusPill>
                         ) : null}
 
@@ -812,8 +816,8 @@ export default function InterviewDetailClient({
                             >
                               <Upload className="size-4" />
                               {uploadState.status === "error"
-                                ? "Retry upload"
-                                : "Upload file"}
+                                ? t("retryUpload")
+                                : t("uploadManualHint")}
                             </Button>
                           </>
                         ) : null}
@@ -825,31 +829,43 @@ export default function InterviewDetailClient({
                       <Grid columns="metrics-2-md" gap={4}>
                         <SurfaceTile rounded="xl">
                           <Stack gap={3}>
-                            <EyebrowLabel>Recorded answer</EyebrowLabel>
+                            <EyebrowLabel>{t("recordedAnswer")}</EyebrowLabel>
                             <BodyText size="sm">
-                              Duration{" "}
-                              {formatAnswerDuration(answer.durationSeconds)} •
-                              retakes {answer.retakeCount ?? 0}
+                              {t("answerDuration", {
+                                duration: formatAnswerDuration(
+                                  answer.durationSeconds,
+                                  t("notAvailable"),
+                                ),
+                                count: answer.retakeCount ?? 0,
+                              })}
                             </BodyText>
                             <BodyText size="sm">
-                              Camera{" "}
-                              {formatFileSize(answer.camera?.fileSizeBytes)} •
-                              screen{" "}
-                              {formatFileSize(answer.screen?.fileSizeBytes)}
+                              {t("answerMediaSizes", {
+                                camera: formatFileSize(
+                                  answer.camera?.fileSizeBytes,
+                                  t("notAvailable"),
+                                ),
+                                screen: formatFileSize(
+                                  answer.screen?.fileSizeBytes,
+                                  t("notAvailable"),
+                                ),
+                              })}
                             </BodyText>
                             <BodyText size="sm">
-                              Status {answer.status} • versions{" "}
-                              {answer.versions?.length ?? 1}
+                              {t("answerMeta", {
+                                status: answer.status,
+                                versions: answer.versions?.length ?? 1,
+                              })}
                             </BodyText>
                             <BodyText size="sm">
-                              Uploaded{" "}
+                              {t("uploaded")}{" "}
                               {formatInterviewDateTime(answer.uploadedAt)}
                             </BodyText>
                             {media?.loading ? (
                               <Inline gap={2} align="center">
                                 <LoaderCircle className="size-4 animate-spin text-muted-foreground" />
                                 <BodyText size="sm">
-                                  Loading candidate media...
+                                  {t("loadingMedia")}
                                 </BodyText>
                               </Inline>
                             ) : null}
@@ -862,27 +878,29 @@ export default function InterviewDetailClient({
                         </SurfaceTile>
                         <SurfaceTile rounded="xl">
                           <Stack gap={3}>
-                            <EyebrowLabel>Validation status</EyebrowLabel>
+                            <EyebrowLabel>{t("validationStatus")}</EyebrowLabel>
                             <BodyText size="sm">
-                              Hidden tabs{" "}
-                              {answer.behaviorSignals?.tabHiddenCount ?? 0} •
-                              blur{" "}
-                              {answer.behaviorSignals?.windowBlurCount ?? 0} •
-                              copy {answer.behaviorSignals?.copyCount ?? 0} •
-                              paste {answer.behaviorSignals?.pasteCount ?? 0}
+                              {t("hiddenTabs")}{" "}
+                              {answer.behaviorSignals?.tabHiddenCount ?? 0} •{" "}
+                              {t("blur")}{" "}
+                              {answer.behaviorSignals?.windowBlurCount ?? 0} •{" "}
+                              {t("copy")} {answer.behaviorSignals?.copyCount ?? 0} •{" "}
+                              {t("paste")}{" "}
+                              {answer.behaviorSignals?.pasteCount ?? 0}
                             </BodyText>
                             <BodyText size="sm">
-                              Keydown{" "}
-                              {answer.behaviorSignals?.keydownCount ?? 0} •
-                              resize {answer.behaviorSignals?.resizeCount ?? 0}
+                              {t("keydown")}{" "}
+                              {answer.behaviorSignals?.keydownCount ?? 0} •{" "}
+                              {t("resize")}{" "}
+                              {answer.behaviorSignals?.resizeCount ?? 0}
                             </BodyText>
                             <BodyText size="sm">
-                              Transcript{" "}
-                              {answer.transcript?.text ? "ready" : "pending"} •
-                              evaluation{" "}
+                              {t("transcript")}{" "}
+                              {answer.transcript?.text ? t("ready") : t("pending")}{" "}
+                              • {t("evaluation")}{" "}
                               {answer.evaluation?.overallScore !== undefined
-                                ? "ready"
-                                : "pending"}
+                                ? t("ready")
+                                : t("pending")}
                             </BodyText>
                             {answer.validation?.errorMessage ? (
                               <BodyText size="sm" tone="danger">
@@ -898,11 +916,11 @@ export default function InterviewDetailClient({
                       <Grid columns="metrics-2-md" gap={4}>
                         <SurfaceTile rounded="xl">
                           <Stack gap={3}>
-                            <EyebrowLabel>Short result</EyebrowLabel>
+                            <EyebrowLabel>{t("shortResult")}</EyebrowLabel>
                             <Inline gap={2} align="center" wrap="wrap">
                               {answer.evaluation.overallScore !== undefined ? (
                                 <StatusPill tone="neutral">
-                                  score {answer.evaluation.overallScore}
+                                  {t("scorePrefix")} {answer.evaluation.overallScore}
                                 </StatusPill>
                               ) : null}
                               {answer.evaluation.decisionHint ? (
@@ -912,13 +930,13 @@ export default function InterviewDetailClient({
                               ) : null}
                               {answer.evaluation.behaviorRisk ? (
                                 <StatusPill tone="neutral">
-                                  risk {answer.evaluation.behaviorRisk}
+                                  {t("riskPrefix")} {answer.evaluation.behaviorRisk}
                                 </StatusPill>
                               ) : null}
                             </Inline>
                             <BodyText size="sm">
                               {answer.evaluation.summary ??
-                                "Summary is not available yet."}
+                                t("summaryUnavailable")}
                             </BodyText>
                             {answer.evaluation.categoryScores &&
                             Object.keys(answer.evaluation.categoryScores)
@@ -938,24 +956,24 @@ export default function InterviewDetailClient({
                         </SurfaceTile>
                         <SurfaceTile rounded="xl">
                           <Stack gap={3}>
-                            <EyebrowLabel>Detailed rubric result</EyebrowLabel>
+                            <EyebrowLabel>{t("detailedRubric")}</EyebrowLabel>
                             <BodyText size="sm">
-                              Covered:{" "}
+                              {t("covered")}:{" "}
                               {answer.evaluation.coveredConceptIds?.length
                                 ? answer.evaluation.coveredConceptIds.join(", ")
-                                : "none"}
+                                : t("none")}
                             </BodyText>
                             <BodyText size="sm">
-                              Missed:{" "}
+                              {t("missed")}:{" "}
                               {answer.evaluation.missedConceptIds?.length
                                 ? answer.evaluation.missedConceptIds.join(", ")
-                                : "none"}
+                                : t("none")}
                             </BodyText>
                             <BodyText size="sm">
-                              Red flags:{" "}
+                              {t("redFlags")}:{" "}
                               {answer.evaluation.redFlagIds?.length
                                 ? answer.evaluation.redFlagIds.join(", ")
-                                : "none"}
+                                : t("none")}
                             </BodyText>
                           </Stack>
                         </SurfaceTile>
@@ -965,7 +983,7 @@ export default function InterviewDetailClient({
                     {answer?.transcript?.text ? (
                       <SurfaceTile rounded="xl">
                         <Stack gap={3}>
-                          <EyebrowLabel>Full result</EyebrowLabel>
+                          <EyebrowLabel>{t("fullResult")}</EyebrowLabel>
                           <BodyText size="sm">
                             {answer.transcript.text}
                           </BodyText>
@@ -978,7 +996,7 @@ export default function InterviewDetailClient({
                         {media.cameraUrl ? (
                           <SurfaceTile rounded="xl">
                             <Stack gap={3}>
-                              <EyebrowLabel>Candidate camera</EyebrowLabel>
+                              <EyebrowLabel>{t("candidateCamera")}</EyebrowLabel>
                               <VideoFrame className="my-0 rounded-2xl">
                                 <VideoSurface
                                   controls
@@ -993,7 +1011,7 @@ export default function InterviewDetailClient({
                         {media.screenUrl ? (
                           <SurfaceTile rounded="xl">
                             <Stack gap={3}>
-                              <EyebrowLabel>Candidate screen</EyebrowLabel>
+                              <EyebrowLabel>{t("candidateScreen")}</EyebrowLabel>
                               <VideoFrame className="my-0 rounded-2xl">
                                 <VideoSurface
                                   controls
@@ -1011,25 +1029,25 @@ export default function InterviewDetailClient({
                     <Grid columns="metrics-2-md" gap={4}>
                       <SurfaceTile rounded="xl">
                         <Stack gap={3}>
-                          <EyebrowLabel>Expected concepts</EyebrowLabel>
+                          <EyebrowLabel>{t("expectedConcepts")}</EyebrowLabel>
                           <BodyText size="sm">
                             {question.expectedConcepts.length > 0
                               ? question.expectedConcepts
                                   .map((item) => item.label)
                                   .join(", ")
-                              : "Not specified"}
+                              : t("notSpecified")}
                           </BodyText>
                         </Stack>
                       </SurfaceTile>
                       <SurfaceTile rounded="xl">
                         <Stack gap={3}>
-                          <EyebrowLabel>Red flags</EyebrowLabel>
+                          <EyebrowLabel>{t("redFlags")}</EyebrowLabel>
                           <BodyText size="sm">
                             {question.redFlags.length > 0
                               ? question.redFlags
                                   .map((item) => item.label)
                                   .join(", ")
-                              : "Not specified"}
+                              : t("notSpecified")}
                           </BodyText>
                         </Stack>
                       </SurfaceTile>
@@ -1039,7 +1057,7 @@ export default function InterviewDetailClient({
                     uploadState.errorMessage ? (
                       <Alert variant="danger">
                         <CircleAlert className="size-4" />
-                        <AlertTitle>Upload error</AlertTitle>
+                        <AlertTitle>{t("uploadErrorTitle")}</AlertTitle>
                         <AlertDescription>
                           {uploadState.errorMessage}
                         </AlertDescription>
@@ -1057,13 +1075,10 @@ export default function InterviewDetailClient({
         <Section gap={4}>
           <Inline gap={4} align="end" justify="between" wrap="wrap">
             <Stack gap={2}>
-              <EyebrowLabel size="lg">Scorecard</EyebrowLabel>
-              <SectionHeading>Interview results</SectionHeading>
+              <EyebrowLabel size="lg">{t("scorecardEyebrow")}</EyebrowLabel>
+              <SectionHeading>{t("scorecardHeading")}</SectionHeading>
             </Stack>
-            <BodyText size="sm">
-              Candidate feedback remains a tokenized route shared separately
-              from the recruiter UI.
-            </BodyText>
+            <BodyText size="sm">{t("scorecardFootnote")}</BodyText>
           </Inline>
 
           <Grid columns="split-115-85" gap={4}>
@@ -1075,7 +1090,7 @@ export default function InterviewDetailClient({
                       icon={<ChartColumnBig className="size-3.5" />}
                       tone="primary"
                     >
-                      Results summary
+                      {t("resultsSummaryEyebrow")}
                     </EyebrowBadge>
                     <BodyText size="lead">{results.summary}</BodyText>
                     <Inline gap={2} wrap="wrap">
@@ -1086,7 +1101,7 @@ export default function InterviewDetailClient({
                       ) : null}
                       {results.trustScore !== undefined ? (
                         <StatusPill tone="neutral">
-                          trust {results.trustScore}
+                          {t("trustPrefix")} {results.trustScore}
                         </StatusPill>
                       ) : null}
                       {results.rubricVersion ? (
@@ -1097,7 +1112,7 @@ export default function InterviewDetailClient({
                     </Inline>
                     {results.trustFlags?.length ? (
                       <BodyText size="lead">
-                        Flags: {results.trustFlags.join(", ")}
+                        {t("flagsPrefix")}: {results.trustFlags.join(", ")}
                       </BodyText>
                     ) : null}
                   </Stack>
@@ -1105,7 +1120,7 @@ export default function InterviewDetailClient({
                   {results.questionResults?.length ? (
                     <Stack gap={4}>
                       <IconLabel icon={<FileVideo2 className="size-4" />} tone="primary">
-                        Question breakdown
+                        {t("questionBreakdown")}
                       </IconLabel>
                       <Stack gap={3}>
                         {results.questionResults.map((questionResult) => (
@@ -1124,7 +1139,9 @@ export default function InterviewDetailClient({
                               >
                                 <Stack gap={1}>
                                   <EyebrowLabel>
-                                    Question {questionResult.questionIndex + 1}
+                                    {t("questionLabel", {
+                                      n: questionResult.questionIndex + 1,
+                                    })}
                                   </EyebrowLabel>
                                   {questionResult.summary ? (
                                     <BodyText size="sm">
@@ -1140,7 +1157,7 @@ export default function InterviewDetailClient({
                                   ) : null}
                                   {questionResult.score !== undefined ? (
                                     <StatusPill tone="completed">
-                                      score {questionResult.score}
+                                      {t("scorePrefix")} {questionResult.score}
                                     </StatusPill>
                                   ) : null}
                                 </Inline>
@@ -1160,7 +1177,7 @@ export default function InterviewDetailClient({
                                       value={score}
                                       valueSize="md"
                                       valueTone="primary"
-                                      description="out of 100"
+                                      description={t("outOf100")}
                                     />
                                   ))}
                                 </Grid>
@@ -1182,7 +1199,7 @@ export default function InterviewDetailClient({
                     icon={<FileVideo2 className="size-3.5" />}
                     tone="primary"
                   >
-                    Overall score
+                    {t("overallScoreCard")}
                   </EyebrowBadge>
                   <HeroNumber>{results.overallScore}</HeroNumber>
                 </CardContent>
@@ -1196,7 +1213,7 @@ export default function InterviewDetailClient({
                       tone="surface"
                       label={formatMetricLabel(category)}
                       value={score}
-                      description="out of 100"
+                      description={t("outOf100")}
                       valueSize="hero"
                       valueTone="primary"
                     />

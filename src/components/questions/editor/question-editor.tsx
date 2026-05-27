@@ -2,6 +2,8 @@
 
 import { useState, type FormEvent } from 'react'
 
+import { useQuestionEditorLabels } from '@/i18n/use-question-editor-labels'
+
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { Stack } from '@/components/ui/layout/stack'
 import { TwoColumnLayout } from '@/components/ui/layout/two-column-layout'
@@ -25,12 +27,11 @@ import {
 import { clearFieldError, type FieldErrors } from '@/lib/clear-field-error'
 import { validateQuestionForm } from '@/lib/question-editor/validate-question-form'
 import {
-  DRAFT_FIELDS,
   areEqual,
   formatMetadata,
   normalizeInitialValue,
-  type DraftFieldKey,
 } from '@/lib/question-editor/parsers'
+import { type DraftFieldKey } from '@/lib/question-editor/field-keys'
 import { FEEDBACK_POLICY } from '@/lib/feedback-policy'
 import { runMutation } from '@/lib/run-mutation'
 import { useToastMessages } from '@/lib/use-toast-messages'
@@ -62,6 +63,7 @@ export function QuestionEditor({
   saveToastOptions,
 }: QuestionEditorProps) {
   const toastMessages = useToastMessages()
+  const editorLabels = useQuestionEditorLabels()
   const [value, setValue] = useState<QuestionInput>(normalizeInitialValue(initialValue))
   const [metadataText, setMetadataText] = useState(
     formatMetadata(initialValue?.metadata ?? {}),
@@ -74,7 +76,7 @@ export function QuestionEditor({
   const [aiError, setAiError] = useState<string | null>(null)
   const fieldsDisabled = submitting || readOnly
 
-  const { dirtyFields, isDirty, markSaved } = useDirtyTracking({
+  const { dirtyFieldKeys, isDirty, markSaved } = useDirtyTracking({
     value,
     metadataText,
     initialValue,
@@ -112,7 +114,7 @@ export function QuestionEditor({
       setAiError(null)
       setFieldErrors((prev) => ({
         ...prev,
-        questionText: 'Question text is required before AI generation.',
+        questionText: editorLabels.validation.questionTextRequiredForAi,
       }))
       return
     }
@@ -162,7 +164,7 @@ export function QuestionEditor({
 
   const pendingDraftFields = !aiDraft
     ? []
-    : DRAFT_FIELDS.filter(
+    : editorLabels.draftFields.filter(
         ({ key }) =>
           !dismissedDraftFields.includes(key) &&
           aiDraft[key] !== undefined &&
@@ -190,10 +192,13 @@ export function QuestionEditor({
     event.preventDefault()
     if (readOnly) return
 
-    const { errors, metadata } = validateQuestionForm({
-      questionText: value.questionText,
-      metadataText,
-    })
+    const { errors, metadata } = validateQuestionForm(
+      {
+        questionText: value.questionText,
+        metadataText,
+      },
+      editorLabels.validation,
+    )
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors)
       return
@@ -290,7 +295,9 @@ export function QuestionEditor({
               {!readOnly ? (
                 <QuestionEditorSaveBar
                   isDirty={isDirty}
-                  dirtyFieldLabels={dirtyFields.map((f) => f.label)}
+                  dirtyFieldLabels={dirtyFieldKeys.map((key) =>
+                    editorLabels.fieldLabel(key),
+                  )}
                   submitting={submitting}
                   submitLabel={submitLabel}
                 />

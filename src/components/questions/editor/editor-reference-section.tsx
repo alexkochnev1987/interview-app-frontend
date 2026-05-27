@@ -2,15 +2,17 @@
 
 import { Save } from 'lucide-react'
 import { type ReactNode } from 'react'
+import { useTranslations } from 'next-intl'
 
+import { Grid } from '@/components/ui/layout/grid'
 import { Stack } from '@/components/ui/layout/stack'
 import { Textarea } from '@/components/ui/textarea'
 import { type QuestionInput } from '@/lib/api'
 import {
   joinStringList,
   parseStringList,
-  type DraftFieldKey,
 } from '@/lib/question-editor/parsers'
+import { type DraftFieldKey } from '@/lib/question-editor/field-keys'
 import { EditorSectionCard } from './editor-section-card'
 import { QuestionEditorField } from './question-editor-field'
 
@@ -33,66 +35,71 @@ export function EditorReferenceSection({
   renderAiSuggestion,
   metadataError,
 }: EditorReferenceSectionProps) {
+  const tFields = useTranslations('questions.fields')
+  const t = useTranslations('questions.sections.reference')
+
   return (
     <EditorSectionCard
-      title="Reference material"
-      description="Store extra context for future reviewers, exports, and scoring experiments."
+      title={t('title')}
+      description={t('description')}
       icon={<Save className="size-4" />}
     >
-      <Stack gap={5}>
+      <Grid columns="editor-2" gap={6}>
         <Stack gap={2}>
           <QuestionEditorField
             htmlFor="sampleGoodAnswer"
-            label="Sample good answer"
-            hint="Target depth reference for evaluation."
+            label={t('sampleGoodAnswer')}
+            hint={t('sampleGoodAnswerHint')}
           >
             <Textarea
               id="sampleGoodAnswer"
-              size="md"
+              size="xl"
               value={value.sampleGoodAnswer ?? ''}
               onChange={(event) => onUpdate({ sampleGoodAnswer: event.target.value })}
-              placeholder="Target depth reference for evaluation"
+              placeholder={t('sampleGoodAnswerPlaceholder')}
               disabled={submitting}
             />
           </QuestionEditorField>
           {renderAiSuggestion('sampleGoodAnswer')}
         </Stack>
 
-        <Stack gap={2}>
+        <Stack gap={6}>
+          <Stack gap={2}>
+            <QuestionEditorField
+              htmlFor="tags"
+              label={tFields('tags')}
+              hint={t('tagsHint')}
+            >
+              <Textarea
+                id="tags"
+                size="sm"
+                value={joinStringList(value.tags || [])}
+                onChange={(event) => onUpdate({ tags: parseStringList(event.target.value) })}
+                placeholder={t('tagsPlaceholder')}
+                disabled={submitting}
+              />
+            </QuestionEditorField>
+            {renderAiSuggestion('tags')}
+          </Stack>
+
           <QuestionEditorField
-            htmlFor="tags"
-            label="Tags"
-            hint="Comma or newline separated tags used for filtering and imports."
+            htmlFor="metadata"
+            label={t('metadata')}
+            hint={t('metadataHint')}
+            error={metadataError}
           >
             <Textarea
-              id="tags"
-              size="xs"
-              value={joinStringList(value.tags || [])}
-              onChange={(event) => onUpdate({ tags: parseStringList(event.target.value) })}
-              placeholder="Comma or newline separated"
+              id="metadata"
+              size="lg"
+              tone="code"
+              value={metadataText}
+              onChange={(event) => onMetadataTextChange(event.target.value)}
+              placeholder={t('metadataPlaceholder')}
               disabled={submitting}
             />
           </QuestionEditorField>
-          {renderAiSuggestion('tags')}
         </Stack>
-
-        <QuestionEditorField
-          htmlFor="metadata"
-          label="Additional metadata"
-          hint="Valid JSON object that can carry rubric or source information."
-          error={metadataError}
-        >
-          <Textarea
-            id="metadata"
-            size="md"
-            tone="code"
-            value={metadataText}
-            onChange={(event) => onMetadataTextChange(event.target.value)}
-            placeholder='{"rubricVersion":"v1"}'
-            disabled={submitting}
-          />
-        </QuestionEditorField>
-      </Stack>
+      </Grid>
     </EditorSectionCard>
   )
 }

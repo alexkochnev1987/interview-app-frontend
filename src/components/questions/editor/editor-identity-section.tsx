@@ -2,10 +2,10 @@
 
 import { BrainCircuit } from 'lucide-react'
 import { type ReactNode } from 'react'
+import { useTranslations } from 'next-intl'
 
 import { Input } from '@/components/ui/input'
 import { Grid } from '@/components/ui/layout/grid'
-import { Spacer } from '@/components/ui/layout/spacer'
 import { Stack } from '@/components/ui/layout/stack'
 import {
   Select,
@@ -18,7 +18,8 @@ import {
   type QuestionDifficulty,
   type QuestionInput,
 } from '@/lib/api'
-import { type DraftFieldKey } from '@/lib/question-editor/parsers'
+import { useSharedLabels } from '@/i18n/use-shared-labels'
+import { type DraftFieldKey } from '@/lib/question-editor/field-keys'
 import { EditorSectionCard } from './editor-section-card'
 import { QuestionEditorField } from './question-editor-field'
 
@@ -35,78 +36,71 @@ export function EditorIdentitySection({
   onUpdate,
   renderAiSuggestion,
 }: EditorIdentitySectionProps) {
+  const tFields = useTranslations('questions.fields')
+  const tIdentity = useTranslations('questions.sections.identity')
+  const tEditor = useTranslations('questions.editor')
+  const sharedLabels = useSharedLabels()
+
   return (
     <EditorSectionCard
-      title="Question identity"
-      description="Anchor the prompt in the role and taxonomy you expect recruiters to search later."
+      title={tIdentity('title')}
+      description={tIdentity('description')}
       icon={<BrainCircuit className="size-4" />}
     >
+      <Grid columns="identity-4" gap={5}>
+        <QuestionEditorField
+          htmlFor="externalId"
+          label={tFields('externalId')}
+          hint={tIdentity('externalIdHint')}
+        >
+          <Input
+            id="externalId"
+            value={value.externalId ?? ''}
+            onChange={(event) => onUpdate({ externalId: event.target.value })}
+            placeholder={tIdentity('externalIdPlaceholder')}
+            disabled={submitting}
+          />
+        </QuestionEditorField>
+
+        <QuestionEditorField htmlFor="role" label={tFields('role')}>
+          <Input
+            id="role"
+            value={value.role ?? ''}
+            onChange={(event) => onUpdate({ role: event.target.value })}
+            placeholder={tIdentity('rolePlaceholder')}
+            disabled={submitting}
+          />
+        </QuestionEditorField>
+
+        <QuestionEditorField htmlFor="focus" label={tFields('focus')}>
+          <Input
+            id="focus"
+            value={value.focus ?? ''}
+            onChange={(event) => onUpdate({ focus: event.target.value })}
+            placeholder={tIdentity('focusPlaceholder')}
+            disabled={submitting}
+          />
+        </QuestionEditorField>
+
+        <QuestionEditorField htmlFor="outputLanguage" label={tFields('outputLanguage')}>
+          <Input
+            id="outputLanguage"
+            value={value.outputLanguage}
+            onChange={(event) => onUpdate({ outputLanguage: event.target.value })}
+            placeholder={tIdentity('outputLanguagePlaceholder')}
+            disabled={submitting}
+          />
+        </QuestionEditorField>
+      </Grid>
+
       <Grid columns="identity-5" gap={5}>
         <Stack gap={2}>
-          <QuestionEditorField
-            htmlFor="externalId"
-            label="External ID"
-            labelTooltip="Optional stable identifier for imports."
-          >
-            <Input
-              id="externalId"
-              value={value.externalId ?? ''}
-              onChange={(event) => onUpdate({ externalId: event.target.value })}
-              placeholder="frontend_closure_v1"
-              disabled={submitting}
-            />
-          </QuestionEditorField>
-          {renderAiSuggestion('externalId')}
-        </Stack>
-
-        <Stack gap={2}>
-          <QuestionEditorField htmlFor="role" label="Role">
-            <Input
-              id="role"
-              value={value.role ?? ''}
-              onChange={(event) => onUpdate({ role: event.target.value })}
-              placeholder="frontend intern"
-              disabled={submitting}
-            />
-          </QuestionEditorField>
-          {renderAiSuggestion('role')}
-        </Stack>
-
-        <Stack gap={2}>
-          <QuestionEditorField htmlFor="focus" label="Focus">
-            <Input
-              id="focus"
-              value={value.focus ?? ''}
-              onChange={(event) => onUpdate({ focus: event.target.value })}
-              placeholder="fundamentals"
-              disabled={submitting}
-            />
-          </QuestionEditorField>
-          {renderAiSuggestion('focus')}
-        </Stack>
-
-        <Stack gap={2}>
-          <QuestionEditorField htmlFor="outputLanguage" label="Output language">
-            <Input
-              id="outputLanguage"
-              value={value.outputLanguage}
-              onChange={(event) => onUpdate({ outputLanguage: event.target.value })}
-              placeholder="English"
-              disabled={submitting}
-            />
-          </QuestionEditorField>
-          {renderAiSuggestion('outputLanguage')}
-        </Stack>
-
-        <Spacer visibility="xl-only" />
-
-        <Stack gap={2}>
-          <QuestionEditorField htmlFor="category" label="Category">
+          <QuestionEditorField htmlFor="category" label={tFields('category')}>
             <Input
               id="category"
               value={value.category ?? ''}
               onChange={(event) => onUpdate({ category: event.target.value })}
-              placeholder="javascript"
+              placeholder={tIdentity('categoryPlaceholder')}
               disabled={submitting}
             />
           </QuestionEditorField>
@@ -114,12 +108,12 @@ export function EditorIdentitySection({
         </Stack>
 
         <Stack gap={2}>
-          <QuestionEditorField htmlFor="subcategory" label="Subcategory">
+          <QuestionEditorField htmlFor="subcategory" label={tFields('subcategory')}>
             <Input
               id="subcategory"
               value={value.subcategory ?? ''}
               onChange={(event) => onUpdate({ subcategory: event.target.value })}
-              placeholder="closures"
+              placeholder={tIdentity('subcategoryPlaceholder')}
               disabled={submitting}
             />
           </QuestionEditorField>
@@ -127,7 +121,7 @@ export function EditorIdentitySection({
         </Stack>
 
         <Stack gap={2}>
-          <QuestionEditorField htmlFor="difficulty" label="Difficulty">
+          <QuestionEditorField htmlFor="difficulty" label={tFields('difficulty')}>
             <Select
               value={value.difficulty}
               onValueChange={(next) =>
@@ -136,12 +130,12 @@ export function EditorIdentitySection({
               disabled={submitting}
             >
               <SelectTrigger variant="surface" size="md" shape="rounded">
-                <SelectValue placeholder="Select difficulty" />
+                <SelectValue placeholder={tEditor('selectDifficultyPlaceholder')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="easy">easy</SelectItem>
-                <SelectItem value="medium">medium</SelectItem>
-                <SelectItem value="hard">hard</SelectItem>
+                <SelectItem value="easy">{sharedLabels.difficulty('easy')}</SelectItem>
+                <SelectItem value="medium">{sharedLabels.difficulty('medium')}</SelectItem>
+                <SelectItem value="hard">{sharedLabels.difficulty('hard')}</SelectItem>
               </SelectContent>
             </Select>
           </QuestionEditorField>
@@ -149,7 +143,7 @@ export function EditorIdentitySection({
         </Stack>
 
         <Stack gap={2}>
-          <QuestionEditorField htmlFor="weight" label="Weight">
+          <QuestionEditorField htmlFor="weight" label={tFields('weight')}>
             <Input
               id="weight"
               type="number"
@@ -167,7 +161,7 @@ export function EditorIdentitySection({
         </Stack>
 
         <Stack gap={2}>
-          <QuestionEditorField htmlFor="minimumPassScore" label="Minimum pass score">
+          <QuestionEditorField htmlFor="minimumPassScore" label={tFields('minimumPassScore')}>
             <Input
               id="minimumPassScore"
               type="number"

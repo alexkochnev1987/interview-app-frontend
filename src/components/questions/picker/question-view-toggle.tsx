@@ -2,6 +2,7 @@
 
 import { type KeyboardEvent } from 'react'
 import { LayoutGrid, Rows3 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { SegmentedGroup } from '@/components/ui/segmented-group'
@@ -14,6 +15,8 @@ export type QuestionViewToggleProps = {
 }
 
 export function QuestionViewToggle({ view, onViewChange }: QuestionViewToggleProps) {
+  const t = useTranslations('questions.picker.viewToggle')
+
   function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     const isHorizontal = event.key === 'ArrowRight' || event.key === 'ArrowLeft'
     const isVertical = event.key === 'ArrowDown' || event.key === 'ArrowUp'
@@ -24,12 +27,12 @@ export function QuestionViewToggle({ view, onViewChange }: QuestionViewTogglePro
         ? view === 'cards' ? 'table' : 'cards'
         : view === 'table' ? 'cards' : 'table'
     onViewChange(next)
-    const label = next === 'cards' ? 'Card view' : 'Table view'
+    const label = next === 'cards' ? t('switchToCards') : t('switchToTable')
     event.currentTarget.querySelector<HTMLElement>(`[aria-label="${label}"]`)?.focus()
   }
 
   return (
-    <SegmentedGroup ariaLabel="View mode" onKeyDown={handleKeyDown}>
+    <SegmentedGroup ariaLabel={t('viewModeAria')} onKeyDown={handleKeyDown}>
       <Button
         type="button"
         variant={view === 'cards' ? 'secondary' : 'ghost'}
@@ -37,12 +40,12 @@ export function QuestionViewToggle({ view, onViewChange }: QuestionViewTogglePro
         size="sm"
         role="radio"
         aria-checked={view === 'cards'}
-        aria-label="Card view"
+        aria-label={t('switchToCards')}
         tabIndex={view === 'cards' ? 0 : -1}
         onClick={() => onViewChange('cards')}
       >
         <LayoutGrid />
-        Cards
+        {t('cards')}
       </Button>
       <Button
         type="button"
@@ -51,12 +54,12 @@ export function QuestionViewToggle({ view, onViewChange }: QuestionViewTogglePro
         size="sm"
         role="radio"
         aria-checked={view === 'table'}
-        aria-label="Table view"
+        aria-label={t('switchToTable')}
         tabIndex={view === 'table' ? 0 : -1}
         onClick={() => onViewChange('table')}
       >
         <Rows3 />
-        Table
+        {t('table')}
       </Button>
     </SegmentedGroup>
   )

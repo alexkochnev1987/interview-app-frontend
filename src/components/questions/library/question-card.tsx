@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { EyebrowLabel } from '@/components/ui/eyebrow-label'
 import { MetricPanel } from '@/components/ui/metric-panel'
 import { StatusPill } from '@/components/ui/status-pill'
@@ -17,6 +19,7 @@ import { PillRow } from '@/components/ui/pill-row'
 import { SelectableOverlay } from '@/components/ui/selectable-overlay'
 import { BodyText } from '@/components/ui/text'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
+import { useSharedLabels } from '@/i18n/use-shared-labels'
 import { type Question } from '@/lib/api'
 import { truncateText } from '@/lib/text'
 
@@ -32,6 +35,9 @@ function CardBody({
   selectable,
   selected,
 }: Omit<QuestionCardProps, 'onToggleSelected'>) {
+  const t = useTranslations('questions.library.card')
+  const sharedLabels = useSharedLabels()
+
   return (
     <UnstyledLink href={`/questions/${question.id}`}>
       <Card
@@ -48,8 +54,12 @@ function CardBody({
       >
         <CardHeader spacing="md">
           <PillRow reserveCorner={selectable}>
-            {question.deleted ? <StatusPill tone="failed">Deleted</StatusPill> : null}
-            <StatusPill tone={question.difficulty}>{question.difficulty}</StatusPill>
+            {question.deleted ? (
+              <StatusPill tone="failed">{t('deleted')}</StatusPill>
+            ) : null}
+            <StatusPill tone={question.difficulty}>
+              {sharedLabels.difficulty(question.difficulty)}
+            </StatusPill>
             {question.category ? (
               <StatusPill tone="neutral" casing="chip">
                 {question.category}
@@ -62,7 +72,7 @@ function CardBody({
             </CardTitle>
             <CardDescription>
               {question.role ? `${question.role} · ` : ''}
-              weight {question.weight}
+              {t('weightLabel', { weight: question.weight })}
             </CardDescription>
           </Stack>
         </CardHeader>
@@ -70,13 +80,13 @@ function CardBody({
           <Grid columns={2} gap={3}>
             <MetricPanel
               tone="compact"
-              label="Concepts"
+              label={t('conceptsMetric')}
               value={question.expectedConcepts.length}
               valueSize="md"
             />
             <MetricPanel
               tone="compact"
-              label="Red flags"
+              label={t('redFlagsMetric')}
               value={question.redFlags.length}
               valueSize="md"
             />
@@ -84,25 +94,25 @@ function CardBody({
 
           <Stack gap={3}>
             <Stack gap={2}>
-              <EyebrowLabel>Expected concepts</EyebrowLabel>
+              <EyebrowLabel>{t('expectedConcepts')}</EyebrowLabel>
               <BodyText size="sm">
                 {question.expectedConcepts.length > 0
                   ? question.expectedConcepts
                       .slice(0, 3)
                       .map((item) => item.label)
                       .join(', ')
-                  : 'Not specified'}
+                  : t('notSpecified')}
               </BodyText>
             </Stack>
             <Stack gap={2}>
-              <EyebrowLabel>Red flag signals</EyebrowLabel>
+              <EyebrowLabel>{t('redFlagSignals')}</EyebrowLabel>
               <BodyText size="sm">
                 {question.redFlags.length > 0
                   ? question.redFlags
                       .slice(0, 2)
                       .map((item) => item.label)
                       .join(', ')
-                  : 'Not specified'}
+                  : t('notSpecified')}
               </BodyText>
             </Stack>
           </Stack>
@@ -118,6 +128,8 @@ export function QuestionCard({
   selected,
   onToggleSelected,
 }: QuestionCardProps) {
+  const t = useTranslations('questions.library.table')
+
   if (!selectable) {
     return <CardBody question={question} selectable={false} selected={false} />
   }
@@ -129,7 +141,7 @@ export function QuestionCard({
           surface="card"
           checked={selected}
           onCheckedChange={() => onToggleSelected(question.id)}
-          aria-label="Select question for bulk delete"
+          aria-label={t('selectQuestion')}
         />
       }
     >

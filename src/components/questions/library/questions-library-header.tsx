@@ -1,6 +1,7 @@
 'use client'
 
 import { Filter, Plus, Sparkles } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
 import { HeroLead, HeroTitle } from '@/components/ui/hero-text'
@@ -29,28 +30,25 @@ export function QuestionsLibraryHeader({
   totalCount,
   visibleCount,
 }: QuestionsLibraryHeaderProps) {
+  const t = useTranslations('questions.library.header')
+
   return (
     <HeroGrid
       primary={
         <Card variant="floating" size="lg">
           <CardContent layout="fill-column" spacing="xl">
             <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
-              Question Library
+              {t('eyebrow')}
             </EyebrowBadge>
             <Stack gap={3}>
-              <HeroTitle>
-                Curate the question bank before AI scoring ever sees a candidate.
-              </HeroTitle>
-              <HeroLead width="prose">
-                Store reusable prompts, codify expected concepts and red flags,
-                and keep your evaluation rubric visible instead of buried in JSON.
-              </HeroLead>
+              <HeroTitle>{t('title')}</HeroTitle>
+              <HeroLead width="prose">{t('lead')}</HeroLead>
             </Stack>
             <Inline>
               <Button asChild variant="gradient" size="hero" shape="pill">
                 <Link href="/questions/new">
                   <Plus className="size-5" />
-                  New Question
+                  {t('newQuestion')}
                 </Link>
               </Button>
             </Inline>
@@ -61,24 +59,21 @@ export function QuestionsLibraryHeader({
         <Card variant="tinted" size="lg">
           <CardContent layout="fill-column" spacing="xl">
             <EyebrowBadge icon={<Filter className="size-3.5" />} tone="muted">
-              Overview
+              {t('overviewEyebrow')}
             </EyebrowBadge>
             <Stack gap={3}>
-              <CardTitle size="lg">Library health</CardTitle>
-              <CardDescription>
-                The new surface emphasizes utility metadata and evaluation depth
-                rather than generic admin cards.
-              </CardDescription>
+              <CardTitle size="lg">{t('healthTitle')}</CardTitle>
+              <CardDescription>{t('healthDescription')}</CardDescription>
             </Stack>
             <Grid columns="metrics-2-md" gap={4}>
               <MetricPanel
                 tone="elevated"
-                label="Total questions"
+                label={t('totalQuestions')}
                 value={loading ? '...' : totalCount}
               />
               <MetricPanel
                 tone="elevated"
-                label="Visible now"
+                label={t('visibleNow')}
                 value={loading ? '...' : visibleCount}
               />
             </Grid>

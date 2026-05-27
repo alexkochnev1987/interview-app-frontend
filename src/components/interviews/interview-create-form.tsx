@@ -2,6 +2,7 @@
 
 import { useMemo, useState, type FormEvent } from 'react'
 import { ArrowRight, BriefcaseBusiness, UserRound } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { InfiniteCardsLoader } from '@/components/questions/library/infinite-cards-loader'
 import { QuestionTable } from '@/components/questions/library/question-table'
@@ -35,6 +36,8 @@ import { Input } from '@/components/ui/input'
 import { Pagination } from '@/components/ui/pagination'
 import { BodyText, SectionHeading } from '@/components/ui/text'
 import { useRouter } from '@/i18n/navigation'
+import { useQuestionChipLabels } from '@/i18n/use-question-chip-labels'
+import { useSharedLabels } from '@/i18n/use-shared-labels'
 import { createInterview, type Question } from '@/lib/api'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
 import { runMutation } from '@/lib/run-mutation'
@@ -45,7 +48,10 @@ type InterviewCreateFormProps = {
 }
 
 export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProps) {
+  const t = useTranslations('questions.common')
   const router = useRouter()
+  const getChipLabel = useQuestionChipLabels()
+  const sharedLabels = useSharedLabels()
   const toastMessages = useToastMessages()
   const [candidateName, setCandidateName] = useState('')
   const [position, setPosition] = useState('')
@@ -96,6 +102,7 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
       setStatus: query.setStatus,
     },
     { showStatusFilter: false },
+    getChipLabel,
   )
 
   const selectedCount = selectedById.size
@@ -192,34 +199,34 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
           <Stack gap={4}>
             <Card variant="surface">
               <CardHeader spacing="xs">
-                <CardTitle size="lg">Candidate brief</CardTitle>
+                <CardTitle size="lg">{t('candidateBriefTitle')}</CardTitle>
                 <CardDescription>
-                  This metadata will anchor the scoring context once answers arrive.
+                  {t('candidateBriefDescription')}
                 </CardDescription>
               </CardHeader>
               <CardContent spacing="lg">
-                <FormField htmlFor="candidateName" label="Candidate name">
+                <FormField htmlFor="candidateName" label={t('candidateNameLabel')}>
                   <IconAffix icon={<UserRound className="size-4" />}>
                     <Input
                       id="candidateName"
                       iconAffix="leading"
                       value={candidateName}
                       onChange={(event) => setCandidateName(event.target.value)}
-                      placeholder="e.g. Jane Doe"
+                      placeholder={t('candidateNamePlaceholder')}
                       autoComplete="name"
                       disabled={submitting}
                     />
                   </IconAffix>
                 </FormField>
 
-                <FormField htmlFor="position" label="Position">
+                <FormField htmlFor="position" label={t('positionLabel')}>
                   <IconAffix icon={<BriefcaseBusiness className="size-4" />}>
                     <Input
                       id="position"
                       iconAffix="leading"
                       value={position}
                       onChange={(event) => setPosition(event.target.value)}
-                      placeholder="e.g. Senior Frontend Engineer"
+                      placeholder={t('positionPlaceholder')}
                       disabled={submitting}
                     />
                   </IconAffix>
@@ -233,7 +240,12 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
                 >
                   {submitting
                     ? toastMessages.pageGate.interview.creatingLabel
-                    : `Create Interview${selectedCount > 0 ? ` (${selectedCount})` : ''}`}
+                    : t(
+                        selectedCount > 0
+                          ? 'createInterviewCtaWithCount'
+                          : 'createInterviewCta',
+                        { count: selectedCount },
+                      )}
                   <ArrowRight className="size-4" />
                 </Button>
               </CardContent>
@@ -274,13 +286,12 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
             <CardHeader spacing="xs">
               <Inline gap={4} align="start" justify="between">
                 <Stack gap={1.5}>
-                  <CardTitle size="lg">Question selection</CardTitle>
+                  <CardTitle size="lg">{t('selectionTitle')}</CardTitle>
                   <CardDescription>
-                    Pick the prompts that actually differentiate the candidate. Your selection is
-                    kept even when filters hide a question from the list.
+                    {t('selectionDescription')}
                   </CardDescription>
                 </Stack>
-                <StatusPill tone="neutral">{selectedCount} selected</StatusPill>
+                <StatusPill tone="neutral">{t('selectedCount', { count: selectedCount })}</StatusPill>
               </Inline>
             </CardHeader>
             <CardContent spacing="md">
@@ -344,7 +355,7 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
                         <Stack gap={3} grow="fill">
                           <Inline gap={2} align="center" wrap="wrap">
                             <StatusPill tone={question.difficulty}>
-                              {question.difficulty}
+                              {sharedLabels.difficulty(question.difficulty)}
                             </StatusPill>
                             {question.category ? (
                               <StatusPill tone="neutral" casing="chip">
@@ -363,28 +374,31 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
                               {question.questionText}
                             </SectionHeading>
                             <BodyText size="sm">
-                              {question.role ? `${question.role} · ` : ''}
-                              used {question.usageCount}× · weight {question.weight}
+                              {t('usageLine', {
+                                rolePart: question.role ? `${question.role} · ` : '',
+                                count: question.usageCount,
+                                weight: question.weight,
+                              })}
                             </BodyText>
                           </Stack>
 
                           <Grid columns="metrics-2-md" gap={3}>
                             <Stack gap={2}>
-                              <EyebrowLabel>Concepts</EyebrowLabel>
+                              <EyebrowLabel>{t('conceptsEyebrow')}</EyebrowLabel>
                               <BodyText size="sm">
                                 {question.expectedConcepts.length > 0
                                   ? question.expectedConcepts
                                       .map((item) => item.label)
                                       .join(', ')
-                                  : 'Not specified'}
+                                  : t('notSpecified')}
                               </BodyText>
                             </Stack>
                             <Stack gap={2}>
-                              <EyebrowLabel>Red flags</EyebrowLabel>
+                              <EyebrowLabel>{t('redFlagsLabel')}</EyebrowLabel>
                               <BodyText size="sm">
                                 {question.redFlags.length > 0
                                   ? question.redFlags.map((item) => item.label).join(', ')
-                                  : 'Not specified'}
+                                  : t('notSpecified')}
                               </BodyText>
                             </Stack>
                           </Grid>

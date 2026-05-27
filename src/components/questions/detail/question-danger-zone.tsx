@@ -1,6 +1,7 @@
 'use client'
 
 import { LoaderCircle, Trash2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -21,16 +22,14 @@ export function QuestionDangerZone({
   deleting,
   onRequestDelete,
 }: QuestionDangerZoneProps) {
+  const t = useTranslations('questions.dangerZone')
+
   return (
     <PageShell as="section" spacing="compact" padding="bottom">
       <Card variant="danger-soft">
         <CardHeader spacing="xs">
-          <CardTitle size="md">Danger zone</CardTitle>
-          <CardDescription>
-            Deleting hides this question from the library and from new
-            interviews. Past interviews keep their snapshot. Active interviews
-            block deletion.
-          </CardDescription>
+          <CardTitle size="md">{t('title')}</CardTitle>
+          <CardDescription>{t('description')}</CardDescription>
         </CardHeader>
         <CardContent spacing="md">
           <Button
@@ -45,7 +44,7 @@ export function QuestionDangerZone({
             ) : (
               <Trash2 className="size-4" />
             )}
-            {deleting ? 'Deleting...' : 'Delete question'}
+            {deleting ? t('deleting') : t('delete')}
           </Button>
         </CardContent>
       </Card>

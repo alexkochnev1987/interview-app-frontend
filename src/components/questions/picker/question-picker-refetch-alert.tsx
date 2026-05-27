@@ -1,6 +1,7 @@
 'use client'
 
 import { RefreshCw } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -16,11 +17,14 @@ export function QuestionPickerRefetchAlert({
   error,
   onRetry,
 }: QuestionPickerRefetchAlertProps) {
+  const t = useTranslations('questions.picker')
+  const tFeed = useTranslations('questions.picker.feed')
+
   if (!error) return null
 
   return (
     <Alert variant="danger">
-      <AlertTitle>Couldn&apos;t refresh questions</AlertTitle>
+      <AlertTitle>{t('refetch.genericTitle')}</AlertTitle>
       <AlertDescription>
         <Inline gap={3} align="center" wrap="wrap">
           <span>{error}</span>
@@ -34,7 +38,7 @@ export function QuestionPickerRefetchAlert({
             <Icon size="sm">
               <RefreshCw />
             </Icon>
-            Retry
+            {tFeed('retry')}
           </Button>
         </Inline>
       </AlertDescription>

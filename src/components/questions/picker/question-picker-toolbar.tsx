@@ -2,6 +2,7 @@
 
 import { X } from 'lucide-react'
 import { type ReactNode } from 'react'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { Inline } from '@/components/ui/layout/inline'
@@ -20,17 +21,17 @@ import type {
   QuestionSortOrder,
 } from '@/lib/api'
 
-const SORT_OPTIONS: Array<{ value: `${QuestionSortField}:${QuestionSortOrder}`; label: string }> = [
-  { value: 'updatedAt:desc', label: 'Recently updated' },
-  { value: 'updatedAt:asc', label: 'Oldest updated' },
-  { value: 'createdAt:desc', label: 'Newest first' },
-  { value: 'createdAt:asc', label: 'Oldest first' },
-  { value: 'difficulty:asc', label: 'Easy → Hard' },
-  { value: 'difficulty:desc', label: 'Hard → Easy' },
-  { value: 'questionText:asc', label: 'Alphabetical (A–Z)' },
-  { value: 'questionText:desc', label: 'Alphabetical (Z–A)' },
-  { value: 'popularity:desc', label: 'Most used' },
-  { value: 'popularity:asc', label: 'Least used' },
+const SORT_OPTIONS: Array<{ value: `${QuestionSortField}:${QuestionSortOrder}`; key: string }> = [
+  { value: 'updatedAt:desc', key: 'updatedAt_desc' },
+  { value: 'updatedAt:asc', key: 'updatedAt_asc' },
+  { value: 'createdAt:desc', key: 'createdAt_desc' },
+  { value: 'createdAt:asc', key: 'createdAt_asc' },
+  { value: 'difficulty:asc', key: 'difficulty_asc' },
+  { value: 'difficulty:desc', key: 'difficulty_desc' },
+  { value: 'questionText:asc', key: 'questionText_asc' },
+  { value: 'questionText:desc', key: 'questionText_desc' },
+  { value: 'popularity:desc', key: 'popularity_desc' },
+  { value: 'popularity:asc', key: 'popularity_asc' },
 ]
 
 export type ActiveFilterChip = {
@@ -67,19 +68,21 @@ export function QuestionPickerToolbar(props: QuestionPickerToolbarProps) {
   } = props
 
   const sortValue = `${sortBy}:${sortOrder}` as `${QuestionSortField}:${QuestionSortOrder}`
+  const tToolbar = useTranslations('questions.picker.toolbar')
+  const tSort = useTranslations('questions.picker.sort')
 
   return (
     <Stack gap={3}>
       <SearchInput
         value={q}
         onChange={(event) => onQChange(event.target.value)}
-        placeholder="Search by prompt, role, category, or tag"
+        placeholder={tToolbar('searchPlaceholder')}
       />
 
       <Inline gap={3} align="center" justify="between" wrap="wrap">
         <Inline gap={2} align="center" wrap="wrap">
           <StatusPill tone="neutral">
-            {loading ? '…' : `${resultCount} ${resultCount === 1 ? 'question' : 'questions'}`}
+            {loading ? '…' : tToolbar('resultCount', { count: resultCount })}
           </StatusPill>
           {activeChips.map((chip) => (
             <StatusPill key={chip.key} tone="neutral" casing="chip">
@@ -90,7 +93,7 @@ export function QuestionPickerToolbar(props: QuestionPickerToolbarProps) {
                   variant="ghost"
                   shape="pill"
                   size="icon-xxs"
-                  aria-label={`Remove ${chip.label}`}
+                  aria-label={tToolbar('removeChipAria', { label: chip.label })}
                   onClick={chip.onRemove}
                 >
                   <X className="size-3" />
@@ -118,7 +121,7 @@ export function QuestionPickerToolbar(props: QuestionPickerToolbarProps) {
             <SelectContent>
               {SORT_OPTIONS.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
-                  {option.label}
+                  {tSort(option.key)}
                 </SelectItem>
               ))}
             </SelectContent>

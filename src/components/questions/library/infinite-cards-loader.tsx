@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { LoaderCircle, RefreshCw } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -27,6 +28,8 @@ export function InfiniteCardsLoader({
   error,
   onLoadMore,
 }: InfiniteCardsLoaderProps) {
+  const t = useTranslations('questions.library.infinite')
+  const tFeed = useTranslations('questions.picker.feed')
   const sentinelRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -50,7 +53,7 @@ export function InfiniteCardsLoader({
   if (error) {
     return (
       <Alert variant="danger">
-        <AlertTitle>Couldn&apos;t load more questions</AlertTitle>
+        <AlertTitle>{t('loadErrorTitle')}</AlertTitle>
         <AlertDescription>
           <Inline gap={3} align="center" wrap="wrap">
             <span>{error}</span>
@@ -64,7 +67,7 @@ export function InfiniteCardsLoader({
               <Icon size="sm">
                 <RefreshCw />
               </Icon>
-              Retry
+              {tFeed('retry')}
             </Button>
           </Inline>
         </AlertDescription>
@@ -76,7 +79,7 @@ export function InfiniteCardsLoader({
     return (
       <Stack gap={2} align="center">
         <BodyText size="sm" tone="muted">
-          All {total} {total === 1 ? 'question' : 'questions'} loaded
+          {t('allLoaded', { count: total })}
         </BodyText>
       </Stack>
     )
@@ -98,10 +101,10 @@ export function InfiniteCardsLoader({
             <LoaderCircle />
           </Icon>
         ) : null}
-        {isFetchingNextPage ? 'Loading…' : 'Load more'}
+        {isFetchingNextPage ? t('loadingMore') : t('loadMore')}
       </Button>
       <BodyText size="xs" tone="muted">
-        Showing {totalLoaded} of {total}
+        {t('showing', { loaded: totalLoaded, total })}
       </BodyText>
     </Stack>
   )

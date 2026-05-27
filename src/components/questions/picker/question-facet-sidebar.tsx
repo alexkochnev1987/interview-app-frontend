@@ -2,6 +2,7 @@
 
 import { RotateCcw, Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -75,6 +76,7 @@ export function QuestionFacetSidebar(props: QuestionFacetSidebarProps) {
     onRetry,
   } = props
   const toastMessages = useToastMessages()
+  const t = useTranslations('questions.picker.facet')
 
   const activeFilterCount =
     (selected.difficulty ? 1 : 0) +
@@ -95,11 +97,11 @@ export function QuestionFacetSidebar(props: QuestionFacetSidebarProps) {
               tone="foreground"
               weight="semibold"
             >
-              Filters
+              {t('filtersTitle')}
             </BodyText>
             {activeFilterCount > 0 ? (
               <BodyText as="span" size="xs" tone="muted">
-                {activeFilterCount} active
+                {t('activeFilters', { count: activeFilterCount })}
               </BodyText>
             ) : null}
           </Inline>
@@ -112,10 +114,12 @@ export function QuestionFacetSidebar(props: QuestionFacetSidebarProps) {
             width="full"
             disabled={!canReset}
             onClick={onReset}
-            title="Clear all filters, search, and sort"
+            title={t('resetTitle')}
           >
             <RotateCcw className="size-4" />
-            {activeFilterCount > 0 ? `Reset all (${activeFilterCount})` : 'Reset all'}
+            {activeFilterCount > 0
+              ? t('resetAllWithCount', { count: activeFilterCount })
+              : t('resetAll')}
           </Button>
 
           {error ? (
@@ -133,7 +137,7 @@ export function QuestionFacetSidebar(props: QuestionFacetSidebarProps) {
                 size="sm"
                 onClick={onRetry}
               >
-                Retry
+                {t('retry')}
               </Button>
             </Stack>
           ) : null}
@@ -148,7 +152,7 @@ export function QuestionFacetSidebar(props: QuestionFacetSidebarProps) {
           ) : null}
 
           <ScalarFacetSection
-            title="Difficulty"
+            title={t('difficultyTitle')}
             values={difficulties}
             selected={selected.difficulty}
             onChange={(value) =>
@@ -157,21 +161,21 @@ export function QuestionFacetSidebar(props: QuestionFacetSidebarProps) {
             loading={loading && difficulties.length === 0}
           />
           <ScalarFacetSection
-            title="Category"
+            title={t('categoryTitle')}
             values={categories}
             selected={selected.category}
             onChange={onCategoryChange}
             loading={loading && categories.length === 0}
           />
           <ScalarFacetSection
-            title="Type"
+            title={t('typeTitle')}
             values={subcategories}
             selected={selected.subcategory}
             onChange={onSubcategoryChange}
             loading={loading && subcategories.length === 0}
           />
           <ScalarFacetSection
-            title="Role"
+            title={t('roleTitle')}
             values={roles}
             selected={selected.role}
             onChange={onRoleChange}
@@ -197,6 +201,7 @@ function ScalarFacetSection(props: {
   loading: boolean
 }) {
   const { title, values, selected, onChange, loading } = props
+  const t = useTranslations('questions.picker.facet')
   const [expanded, setExpanded] = useState(false)
 
   const visible = expanded ? values : values.slice(0, COLLAPSED_LIMIT)
@@ -207,11 +212,11 @@ function ScalarFacetSection(props: {
     <FacetSection title={title} activeCount={activeCount}>
       {loading ? (
         <BodyText size="sm" tone="muted">
-          Loading…
+          {t('loading')}
         </BodyText>
       ) : values.length === 0 ? (
         <BodyText size="sm" tone="muted">
-          No values match the current filters.
+          {t('noValues')}
         </BodyText>
       ) : (
         <Stack gap={1}>
@@ -229,12 +234,12 @@ function ScalarFacetSection(props: {
           })}
           {hidden > 0 ? (
             <ShowMoreToggle expanded={false} onClick={() => setExpanded(true)}>
-              Show all {values.length}
+              {t('showAll', { count: values.length })}
             </ShowMoreToggle>
           ) : null}
           {expanded && values.length > COLLAPSED_LIMIT ? (
             <ShowMoreToggle expanded onClick={() => setExpanded(false)}>
-              Show fewer
+              {t('showFewer')}
             </ShowMoreToggle>
           ) : null}
         </Stack>
@@ -250,6 +255,7 @@ function TagsFacetSection(props: {
   loading: boolean
 }) {
   const { values, selected, onChange, loading } = props
+  const t = useTranslations('questions.picker.facet')
   const [search, setSearch] = useState('')
   const [expanded, setExpanded] = useState(false)
 
@@ -277,7 +283,7 @@ function TagsFacetSection(props: {
   }
 
   return (
-    <FacetSection title="Tags" activeCount={selected.length}>
+    <FacetSection title={t('tagsTitle')} activeCount={selected.length}>
       <Stack gap={2}>
         <IconAffix icon={<Search className="size-3.5" />}>
           <Input
@@ -287,16 +293,16 @@ function TagsFacetSection(props: {
             iconAffix="leading"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Filter tags…"
+            placeholder={t('tagSearchPlaceholder')}
           />
         </IconAffix>
         {loading ? (
           <BodyText size="sm" tone="muted">
-            Loading…
+            {t('loading')}
           </BodyText>
         ) : filtered.length === 0 ? (
           <BodyText size="sm" tone="muted">
-            {trimmed.length > 0 ? 'No tags match this search.' : 'No tags yet.'}
+            {trimmed.length > 0 ? t('noMatchingTags') : t('noTagsInWorkspace')}
           </BodyText>
         ) : (
           <Stack gap={1}>
@@ -314,14 +320,14 @@ function TagsFacetSection(props: {
             })}
             {hidden > 0 && trimmed.length === 0 ? (
               <ShowMoreToggle expanded={false} onClick={() => setExpanded(true)}>
-                Show all {filtered.length}
+                {t('showAll', { count: filtered.length })}
               </ShowMoreToggle>
             ) : null}
             {expanded &&
             filtered.length > TAG_COLLAPSED_LIMIT &&
             trimmed.length === 0 ? (
               <ShowMoreToggle expanded onClick={() => setExpanded(false)}>
-                Show fewer
+                {t('showFewer')}
               </ShowMoreToggle>
             ) : null}
           </Stack>
@@ -336,14 +342,15 @@ function StatusFacetSection(props: {
   onChange: (value: QuestionStatusFilter) => void
 }) {
   const { selected, onChange } = props
+  const t = useTranslations('questions.picker.facet')
   const options: Array<{ value: QuestionStatusFilter; label: string }> = [
-    { value: 'active', label: 'Active only' },
-    { value: 'inactive', label: 'Deleted only' },
-    { value: 'all', label: 'Active + deleted' },
+    { value: 'active', label: t('activeOnly') },
+    { value: 'inactive', label: t('deletedOnly') },
+    { value: 'all', label: t('statusActiveDeleted') },
   ]
   const activeCount = selected !== 'active' ? 1 : 0
   return (
-    <FacetSection title="Status" activeCount={activeCount}>
+    <FacetSection title={t('statusTitle')} activeCount={activeCount}>
       <Stack gap={1}>
         {options.map((option) => (
           <FacetRowButton

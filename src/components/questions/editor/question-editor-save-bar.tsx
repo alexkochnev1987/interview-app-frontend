@@ -1,6 +1,7 @@
 'use client'
 
 import { Save } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { StatusPill } from '@/components/ui/status-pill'
 import { Button } from '@/components/ui/button'
@@ -16,18 +17,13 @@ interface QuestionEditorSaveBarProps {
   submitLabel: string
 }
 
-const formatter = new Intl.PluralRules('en-US')
-
-function pluralize(count: number, singular: string, plural: string) {
-  return formatter.select(count) === 'one' ? singular : plural
-}
-
 export function QuestionEditorSaveBar({
   isDirty,
   dirtyFieldLabels,
   submitting,
   submitLabel,
 }: QuestionEditorSaveBarProps) {
+  const t = useTranslations('questions.saveBar')
   const fieldCount = dirtyFieldLabels.length
   return (
     <Card variant={isDirty ? 'warning' : 'surface'} size="lg">
@@ -35,21 +31,21 @@ export function QuestionEditorSaveBar({
         <Stack gap={2}>
           <Inline gap={2} align="center" wrap="wrap">
             <StatusPill tone={isDirty ? 'pending' : 'completed'}>
-              {isDirty ? 'Unsaved changes' : 'All changes saved'}
+              {isDirty ? t('statusUnsaved') : t('statusSaved')}
             </StatusPill>
             {isDirty && (
               <BodyText as="span" size="xs" weight="medium">
-                {fieldCount} {pluralize(fieldCount, 'field', 'fields')} changed
+                {t('fieldsChanged', { count: fieldCount })}
               </BodyText>
             )}
           </Inline>
           <SectionHeading size="sm" as="h3">
-            {isDirty ? 'Save your edits' : 'Nothing to save right now'}
+            {isDirty ? t('headlineDirty') : t('headlineClean')}
           </SectionHeading>
           <BodyText size="sm">
             {isDirty
-              ? `Modified: ${dirtyFieldLabels.join(', ')}.`
-              : 'Editor matches the saved version. Make a change to enable Save.'}
+              ? t('descriptionDirty', { fields: dirtyFieldLabels.join(', ') })
+              : t('descriptionClean')}
           </BodyText>
         </Stack>
         <Button
@@ -59,7 +55,7 @@ export function QuestionEditorSaveBar({
           disabled={submitting || !isDirty}
         >
           <Save className="size-4" />
-          {submitting ? 'Saving...' : submitLabel}
+          {submitting ? t('saving') : submitLabel}
         </Button>
       </CardContent>
     </Card>

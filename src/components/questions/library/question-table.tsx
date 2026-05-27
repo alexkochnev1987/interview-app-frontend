@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useRef, type MouseEvent, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, type MouseEvent, type ReactNode } from 'react'
+import { useTranslations } from 'next-intl'
 
 import { Card } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -21,6 +22,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { BodyText } from '@/components/ui/text'
+import { useSharedLabels } from '@/i18n/use-shared-labels'
 import { formatInterviewDate } from '@/lib/interview-formatters'
 import type {
   Question,
@@ -35,14 +37,6 @@ type SortableField = Extract<
   QuestionSortField,
   'questionText' | 'difficulty' | 'updatedAt' | 'createdAt' | 'popularity'
 >
-
-const SORT_LABEL: Record<SortableField, string> = {
-  questionText: 'Question',
-  difficulty: 'Difficulty',
-  updatedAt: 'Updated',
-  createdAt: 'Created',
-  popularity: 'Popularity',
-}
 
 export type QuestionTableProps = {
   items: Question[]
@@ -145,6 +139,19 @@ export function QuestionTable({
   page,
   loading,
 }: QuestionTableProps) {
+  const t = useTranslations('questions.library.table')
+  const tFields = useTranslations('questions.fields')
+  const sharedLabels = useSharedLabels()
+  const sortLabel = useMemo(
+    (): Record<SortableField, string> => ({
+      questionText: t('question'),
+      difficulty: tFields('difficulty'),
+      updatedAt: t('updated'),
+      createdAt: t('created'),
+      popularity: t('popularity'),
+    }),
+    [t, tFields],
+  )
   const rootRef = useRef<HTMLDivElement>(null)
   const firstRenderRef = useRef(true)
   useEffect(() => {
@@ -186,48 +193,48 @@ export function QuestionTable({
                   onCheckedChange={(checked) =>
                     onToggleSelectAll(items, checked === true)
                   }
-                  aria-label="Select all visible"
+                  aria-label={t('selectAllVisible')}
                 />
               </TableHead>
             ) : null}
             <SortableTableHead
               width="fill"
-              label={SORT_LABEL.questionText}
+              label={sortLabel.questionText}
               direction={directionFor(sortBy, sortOrder, 'questionText')}
               onSortClick={() => handleSortClick('questionText')}
             />
             <SortableTableHead
-              label={SORT_LABEL.difficulty}
+              label={sortLabel.difficulty}
               direction={directionFor(sortBy, sortOrder, 'difficulty')}
               onSortClick={() => handleSortClick('difficulty')}
             />
-            <TableHead>Category</TableHead>
-            <TableHead>Type</TableHead>
+            <TableHead>{t('category')}</TableHead>
+            <TableHead>{t('type')}</TableHead>
             <TableHead visibility="md-up" nowrap>
-              Role
+              {t('role')}
             </TableHead>
-            <TableHead visibility="md-up">Tags</TableHead>
+            <TableHead visibility="md-up">{t('tags')}</TableHead>
             <TableHead visibility="lg-up" align="right">
-              Weight
+              {t('weight')}
             </TableHead>
             <SortableTableHead
               visibility="md-up"
               align="right"
-              label={SORT_LABEL.popularity}
+              label={sortLabel.popularity}
               direction={directionFor(sortBy, sortOrder, 'popularity')}
               onSortClick={() => handleSortClick('popularity')}
             />
             <SortableTableHead
               visibility="md-up"
               nowrap
-              label={SORT_LABEL.updatedAt}
+              label={sortLabel.updatedAt}
               direction={directionFor(sortBy, sortOrder, 'updatedAt')}
               onSortClick={() => handleSortClick('updatedAt')}
             />
             <SortableTableHead
               visibility="lg-up"
               nowrap
-              label={SORT_LABEL.createdAt}
+              label={sortLabel.createdAt}
               direction={directionFor(sortBy, sortOrder, 'createdAt')}
               onSortClick={() => handleSortClick('createdAt')}
             />
@@ -255,7 +262,7 @@ export function QuestionTable({
                       size="sm"
                       checked={selected}
                       onCheckedChange={() => onToggleSelected(question)}
-                      aria-label="Select question"
+                      aria-label={t('selectQuestion')}
                     />
                   </TableCell>
                 ) : null}
@@ -263,7 +270,7 @@ export function QuestionTable({
                   <Inline gap={2} align="start" wrap="nowrap">
                     {question.deleted ? (
                       <StatusPill tone="failed" size="compact">
-                        Deleted
+                        {t('deleted')}
                       </StatusPill>
                     ) : null}
                     <BodyText
@@ -279,7 +286,7 @@ export function QuestionTable({
                 </TableCell>
                 <TableCell>
                   <StatusPill tone={question.difficulty} size="compact">
-                    {question.difficulty}
+                    {sharedLabels.difficulty(question.difficulty)}
                   </StatusPill>
                 </TableCell>
                 <TableCell truncate title={question.category || undefined}>

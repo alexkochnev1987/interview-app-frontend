@@ -30,7 +30,10 @@ import {
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { Pagination } from '@/components/ui/pagination'
+import { useTranslations } from 'next-intl'
+
 import { useRouter } from '@/i18n/navigation'
+import { useQuestionChipLabels } from '@/i18n/use-question-chip-labels'
 import { deleteQuestionsBulk, type BulkDeleteResult, type Question } from '@/lib/api'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
 import { notifyBulkDeleteOutcome } from '@/lib/notify-bulk-delete'
@@ -48,6 +51,8 @@ export function QuestionsLibraryClient({
   initialPrefetch,
 }: QuestionsLibraryClientProps) {
   const router = useRouter()
+  const t = useTranslations('questions.library.client')
+  const getChipLabel = useQuestionChipLabels()
   const toastMessages = useToastMessages()
   const queryClient = useQueryClient()
 
@@ -121,6 +126,7 @@ export function QuestionsLibraryClient({
       setStatus: query.setStatus,
     },
     { showStatusFilter: isSuperAdmin },
+    getChipLabel,
   )
 
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
@@ -265,7 +271,9 @@ export function QuestionsLibraryClient({
               shape="pill"
               size="icon-sm"
               onClick={toggleSidebar}
-              aria-label={sidebarHidden ? 'Show filters sidebar' : 'Hide filters sidebar'}
+              aria-label={
+                sidebarHidden ? t('showFiltersSidebar') : t('hideFiltersSidebar')
+              }
               aria-pressed={sidebarHidden}
             >
               {sidebarHidden ? <PanelLeftOpen /> : <PanelLeftClose />}
@@ -295,10 +303,10 @@ export function QuestionsLibraryClient({
                 <Icon size="md"><Trash2 /></Icon>
               )}
               {bulkDeleting
-                ? 'Deleting...'
+                ? t('deleting')
                 : selectedCount > 0
-                  ? `Delete selected (${selectedCount})`
-                  : 'Delete selected'}
+                  ? t('bulkDeleteWithCount', { count: selectedCount })
+                  : t('bulkDelete')}
             </Button>
           ) : null
         }
@@ -402,10 +410,10 @@ export function QuestionsLibraryClient({
       <ConfirmDialog
         open={bulkConfirmOpen}
         destructive
-        title={`Delete ${selectedCount} question${selectedCount === 1 ? '' : 's'}?`}
-        description="Selected questions will be hidden from the library and from new interviews. Past interviews keep their snapshot. Questions used by active interviews will be skipped."
-        confirmLabel={bulkDeleting ? 'Deleting...' : 'Delete'}
-        cancelLabel="Cancel"
+        title={t('deleteTitle', { count: selectedCount })}
+        description={t('bulkDeleteDescription')}
+        confirmLabel={bulkDeleting ? t('deleting') : t('confirmBulkDelete')}
+        cancelLabel={t('cancel')}
         loading={bulkDeleting}
         onConfirm={performBulkDelete}
         onCancel={() => {

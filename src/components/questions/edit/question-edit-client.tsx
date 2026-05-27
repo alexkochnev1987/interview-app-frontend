@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { DeletedQuestionBanner } from '@/components/questions/detail/deleted-question-banner'
@@ -32,6 +33,7 @@ export function QuestionEditClient({
   canUpdate,
   canDelete,
 }: QuestionEditClientProps) {
+  const t = useTranslations('questions.editPage')
   const router = useRouter()
   const toastMessages = useToastMessages()
   const [question, setQuestion] = useState(initialQuestion)
@@ -93,10 +95,10 @@ export function QuestionEditClient({
       ) : null}
       <QuestionEditor
         questionId={id}
-        title={canUpdate ? 'Edit Question' : 'View Question'}
+        title={canUpdate ? t('title') : t('viewTitle')}
         readOnly={!canUpdate}
         initialValue={questionToEditorInput(question)}
-        submitLabel="Save Changes"
+        submitLabel={t('submit')}
         onSubmit={handleSubmit}
       />
       {!question.deleted && canDelete ? (
@@ -108,10 +110,10 @@ export function QuestionEditClient({
       <ConfirmDialog
         open={confirmOpen}
         destructive
-        title="Delete this question?"
-        description="It will be hidden from the library and from new interviews. Past interviews keep their snapshot. Active interviews block deletion."
-        confirmLabel={deleting ? 'Deleting...' : 'Delete'}
-        cancelLabel="Cancel"
+        title={t('deleteTitle')}
+        description={t('deleteDescription')}
+        confirmLabel={deleting ? t('deleting') : t('confirmDelete')}
+        cancelLabel={t('cancel')}
         loading={deleting}
         onConfirm={performDelete}
         onCancel={() => {
@@ -120,10 +122,10 @@ export function QuestionEditClient({
       />
       <ConfirmDialog
         open={restoreOpen}
-        title="Restore this question?"
-        description="It will become visible in the library again and available for new interviews."
-        confirmLabel={restoring ? 'Restoring...' : 'Restore'}
-        cancelLabel="Cancel"
+        title={t('restoreTitle')}
+        description={t('restoreDescription')}
+        confirmLabel={restoring ? t('restoring') : t('restore')}
+        cancelLabel={t('cancel')}
         loading={restoring}
         onConfirm={performRestore}
         onCancel={() => {
