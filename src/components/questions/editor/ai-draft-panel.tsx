@@ -71,9 +71,10 @@ export function AiDraftPanel({
               type="button"
               variant="gradient"
               onClick={onGenerate}
-              disabled={disabled || loading}
+              disabled={disabled}
+              loading={loading}
             >
-              <WandSparkles className="size-4" />
+              {loading ? null : <WandSparkles className="size-4" />}
               {loading ? 'Generating...' : 'Generate AI Draft'}
             </Button>
           </Inline>

@@ -3,7 +3,6 @@
 import { Save } from 'lucide-react'
 import { type ReactNode } from 'react'
 
-import { Grid } from '@/components/ui/layout/grid'
 import { Stack } from '@/components/ui/layout/stack'
 import { Textarea } from '@/components/ui/textarea'
 import { type QuestionInput } from '@/lib/api'
@@ -40,7 +39,7 @@ export function EditorReferenceSection({
       description="Store extra context for future reviewers, exports, and scoring experiments."
       icon={<Save className="size-4" />}
     >
-      <Grid columns="editor-2" gap={6}>
+      <Stack gap={5}>
         <Stack gap={2}>
           <QuestionEditorField
             htmlFor="sampleGoodAnswer"
@@ -49,7 +48,7 @@ export function EditorReferenceSection({
           >
             <Textarea
               id="sampleGoodAnswer"
-              size="xl"
+              size="md"
               value={value.sampleGoodAnswer ?? ''}
               onChange={(event) => onUpdate({ sampleGoodAnswer: event.target.value })}
               placeholder="Target depth reference for evaluation"
@@ -59,43 +58,41 @@ export function EditorReferenceSection({
           {renderAiSuggestion('sampleGoodAnswer')}
         </Stack>
 
-        <Stack gap={6}>
-          <Stack gap={2}>
-            <QuestionEditorField
-              htmlFor="tags"
-              label="Tags"
-              hint="Comma or newline separated tags used for filtering and imports."
-            >
-              <Textarea
-                id="tags"
-                size="sm"
-                value={joinStringList(value.tags || [])}
-                onChange={(event) => onUpdate({ tags: parseStringList(event.target.value) })}
-                placeholder="Comma or newline separated"
-                disabled={submitting}
-              />
-            </QuestionEditorField>
-            {renderAiSuggestion('tags')}
-          </Stack>
-
+        <Stack gap={2}>
           <QuestionEditorField
-            htmlFor="metadata"
-            label="Additional metadata"
-            hint="Valid JSON object that can carry rubric or source information."
-            error={metadataError}
+            htmlFor="tags"
+            label="Tags"
+            hint="Comma or newline separated tags used for filtering and imports."
           >
             <Textarea
-              id="metadata"
-              size="lg"
-              tone="code"
-              value={metadataText}
-              onChange={(event) => onMetadataTextChange(event.target.value)}
-              placeholder='{"rubricVersion":"v1"}'
+              id="tags"
+              size="xs"
+              value={joinStringList(value.tags || [])}
+              onChange={(event) => onUpdate({ tags: parseStringList(event.target.value) })}
+              placeholder="Comma or newline separated"
               disabled={submitting}
             />
           </QuestionEditorField>
+          {renderAiSuggestion('tags')}
         </Stack>
-      </Grid>
+
+        <QuestionEditorField
+          htmlFor="metadata"
+          label="Additional metadata"
+          hint="Valid JSON object that can carry rubric or source information."
+          error={metadataError}
+        >
+          <Textarea
+            id="metadata"
+            size="md"
+            tone="code"
+            value={metadataText}
+            onChange={(event) => onMetadataTextChange(event.target.value)}
+            placeholder='{"rubricVersion":"v1"}'
+            disabled={submitting}
+          />
+        </QuestionEditorField>
+      </Stack>
     </EditorSectionCard>
   )
 }

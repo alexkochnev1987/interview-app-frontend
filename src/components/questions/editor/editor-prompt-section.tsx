@@ -43,6 +43,7 @@ export function EditorPromptSection({
         >
           <Textarea
             id="questionText"
+            size="xs"
             value={value.questionText}
             onChange={(event) => onUpdate({ questionText: event.target.value })}
             placeholder="e.g. What is a closure in JavaScript?"
@@ -60,7 +61,7 @@ export function EditorPromptSection({
         >
           <Textarea
             id="followUpQuestions"
-            size="sm"
+            size="xs"
             value={joinStringList(value.followUpQuestions || [])}
             onChange={(event) =>
               onUpdate({ followUpQuestions: parseStringList(event.target.value) })

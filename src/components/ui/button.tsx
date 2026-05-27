@@ -1,5 +1,6 @@
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
+import { Loader2 } from "lucide-react"
 import { Slot } from "radix-ui"
 
 import { cn } from "@/lib/utils"
@@ -132,21 +133,63 @@ function Button({
   effects,
   width,
   asChild = false,
+  loading = false,
+  disabled,
+  children,
   ...props
 }: React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean
+    loading?: boolean
   }) {
-  const Comp = asChild ? Slot.Root : "button"
+  const classes = cn(buttonVariants({ variant, size, shape, effects, width, className }))
+
+  if (asChild) {
+    const isDisabled = disabled || loading
+    const disabledOverrides = isDisabled
+      ? {
+          tabIndex: -1,
+          onClick: (event: React.MouseEvent<HTMLElement>) => {
+            event.preventDefault()
+            event.stopPropagation()
+          },
+          onKeyDown: (event: React.KeyboardEvent<HTMLElement>) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault()
+              event.stopPropagation()
+            }
+          },
+        }
+      : {}
+    return (
+      <Slot.Root
+        data-slot="button"
+        data-variant={variant}
+        data-size={size}
+        aria-busy={loading || undefined}
+        aria-disabled={isDisabled || undefined}
+        className={cn(classes, isDisabled && 'pointer-events-none opacity-50')}
+        {...props}
+        {...disabledOverrides}
+      >
+        {children}
+      </Slot.Root>
+    )
+  }
 
   return (
-    <Comp
+    <button
       data-slot="button"
       data-variant={variant}
       data-size={size}
-      className={cn(buttonVariants({ variant, size, shape, effects, width, className }))}
+      aria-busy={loading || undefined}
+      disabled={disabled || loading}
+      className={classes}
       {...props}
-    />
+    >
+      {loading ? <Loader2 className="animate-spin" /> : null}
+      {children}
+    </button>
   )
 }
 

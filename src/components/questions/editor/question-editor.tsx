@@ -5,6 +5,7 @@ import { useState, type FormEvent } from 'react'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { Stack } from '@/components/ui/layout/stack'
 import { TwoColumnLayout } from '@/components/ui/layout/two-column-layout'
+import { AiAgreesPill } from '@/components/questions/editor/ai-agrees-pill'
 import { AiDraftPanel } from '@/components/questions/editor/ai-draft-panel'
 import { AiSuggestionRow } from '@/components/questions/editor/ai-suggestion-row'
 import { EditorIdentitySection } from '@/components/questions/editor/editor-identity-section'
@@ -86,6 +87,17 @@ export function QuestionEditor({
       clearFieldError('questionText', setFieldErrors)
     }
     setValue((current) => ({ ...current, ...patch }))
+    if (aiDraft) {
+      const dismissKeys = (Object.keys(patch) as DraftFieldKey[]).filter(
+        (key) => !areEqual(patch[key], aiDraft[key]),
+      )
+      if (dismissKeys.length > 0) {
+        setDismissedDraftFields((current) => {
+          const additions = dismissKeys.filter((k) => !current.includes(k))
+          return additions.length === 0 ? current : [...current, ...additions]
+        })
+      }
+    }
   }
 
   function handleMetadataTextChange(next: string) {
@@ -128,7 +140,6 @@ export function QuestionEditor({
   function applyDraftField(field: DraftFieldKey) {
     if (!aiDraft || readOnly) return
     update({ [field]: aiDraft[field] } as Partial<QuestionInput>)
-    setDismissedDraftFields((current) => current.filter((item) => item !== field))
   }
 
   function keepCurrentField(field: DraftFieldKey) {
@@ -152,20 +163,26 @@ export function QuestionEditor({
     ? []
     : DRAFT_FIELDS.filter(
         ({ key }) =>
-          !dismissedDraftFields.includes(key) && !areEqual(value[key], aiDraft[key]),
+          !dismissedDraftFields.includes(key) &&
+          aiDraft[key] !== undefined &&
+          !areEqual(value[key], aiDraft[key]),
       )
 
   function renderAiSuggestion(field: DraftFieldKey) {
-    if (readOnly || !aiDraft || !pendingDraftFields.some((p) => p.key === field)) {
-      return null
+    if (readOnly || !aiDraft) return null
+    if (pendingDraftFields.some((p) => p.key === field)) {
+      return (
+        <AiSuggestionRow
+          value={aiDraft[field]}
+          onApply={() => applyDraftField(field)}
+          onKeep={() => keepCurrentField(field)}
+        />
+      )
     }
-    return (
-      <AiSuggestionRow
-        value={aiDraft[field]}
-        onApply={() => applyDraftField(field)}
-        onKeep={() => keepCurrentField(field)}
-      />
-    )
+    if (areEqual(value[field], aiDraft[field])) {
+      return <AiAgreesPill />
+    }
+    return null
   }
 
   async function handleSubmit(event: FormEvent) {

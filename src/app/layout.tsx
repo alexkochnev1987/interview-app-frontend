@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 
 import { AppBody, AppShellRoot } from "@/components/ui/app-shell"
 import { Toaster } from "@/components/ui/toaster"
+import { TooltipProvider } from "@/components/ui/tooltip"
 import { AuthProvider } from "@/lib/auth-context"
 import { getServerSessionSnapshot } from "@/lib/auth-server"
 import { AppQueryClientProvider } from "@/lib/query-client-provider"
@@ -26,11 +27,13 @@ export default async function RootLayout({
       <AppBody>
         <AppQueryClientProvider>
           <AuthProvider initialUser={session.user}>
-            <AppShellRoot>
-              <NavHeader />
-              {children}
-            </AppShellRoot>
-            <Toaster />
+            <TooltipProvider>
+              <AppShellRoot>
+                <NavHeader />
+                {children}
+              </AppShellRoot>
+              <Toaster />
+            </TooltipProvider>
           </AuthProvider>
         </AppQueryClientProvider>
       </AppBody>

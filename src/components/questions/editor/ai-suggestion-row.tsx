@@ -1,6 +1,5 @@
 'use client'
 
-import { EyebrowLabel } from '@/components/ui/eyebrow-label'
 import { SurfaceTile } from '@/components/ui/surface-tile'
 import { Button } from '@/components/ui/button'
 import { CodeBlock } from '@/components/ui/code-block'
@@ -15,32 +14,30 @@ interface AiSuggestionRowProps {
   onKeep: () => void
 }
 
-export function AiSuggestionRow({
-  value,
-  onApply,
-  onKeep,
-}: AiSuggestionRowProps) {
+export function AiSuggestionRow({ value, onApply, onKeep }: AiSuggestionRowProps) {
   return (
-    <SurfaceTile tone="primary-soft" rounded="xl" padding="md">
-      <Stack gap={3}>
-        <Inline gap={3} align="center" justify="between" wrap="wrap">
-          <EyebrowLabel tone="primary">AI suggestion</EyebrowLabel>
-          <Inline gap={2} wrap="wrap">
-            <Button type="button" size="sm" variant="gradient" onClick={onApply}>
-              Use AI value
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant="outline-pill"
-              shape="pill"
-              onClick={onKeep}
-            >
-              Keep current
-            </Button>
-          </Inline>
+    <SurfaceTile
+      tone="primary-soft"
+      rounded="xl"
+      padding="sm"
+      onDismiss={onKeep}
+      dismissLabel="Dismiss AI suggestion"
+    >
+      <Stack gap={2}>
+        <CodeBlock size="sm" inset="dismiss-affordance">
+          {previewValue(value)}
+        </CodeBlock>
+        <Inline gap={1} align="center" justify="end">
+          <Button
+            type="button"
+            size="xs"
+            variant="gradient"
+            shape="pill"
+            onClick={onApply}
+          >
+            Use AI
+          </Button>
         </Inline>
-        <CodeBlock>{previewValue(value)}</CodeBlock>
       </Stack>
     </SurfaceTile>
   )
