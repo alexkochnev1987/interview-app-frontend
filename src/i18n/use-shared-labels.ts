@@ -15,6 +15,8 @@ type RoleKey =
 type DifficultyKey = 'easy' | 'medium' | 'hard'
 type DecisionKey = 'proceed' | 'review' | 'reject'
 type BehaviorRiskKey = 'high' | 'medium' | 'low' | 'none'
+type InterviewStatusKey = Interview['status']
+type ReviewStatusKey = ReviewStatus
 
 function fallbackLabel(value: string) {
   return value
@@ -27,6 +29,12 @@ function fallbackLabel(value: string) {
 
 export function useSharedLabels() {
   const t = useTranslations('shared.labels')
+  const safeLabel = (prefix: string, value: string) => {
+    if (t.has(`${prefix}.${value}`)) {
+      return t(`${prefix}.${value}`)
+    }
+    return fallbackLabel(value)
+  }
 
   return {
     role(role: string) {
@@ -40,14 +48,14 @@ export function useSharedLabels() {
         ? t(`difficulty.${difficulty as DifficultyKey}`)
         : fallbackLabel(difficulty)
     },
-    interviewStatus(status: Interview['status']) {
-      return t(`interviewStatus.${status}`)
+    interviewStatus(status: string) {
+      return safeLabel('interviewStatus', status as InterviewStatusKey)
     },
-    reviewStatus(status: ReviewStatus) {
-      return t(`reviewStatus.${status}`)
+    reviewStatus(status: string) {
+      return safeLabel('reviewStatus', status as ReviewStatusKey)
     },
-    decision(decision: DecisionKey) {
-      return t(`decision.${decision}`)
+    decision(decision: string) {
+      return safeLabel('decision', decision as DecisionKey)
     },
     behaviorRisk(risk: string) {
       return t.has(`behaviorRisk.${risk}`)

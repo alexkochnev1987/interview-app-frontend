@@ -1,4 +1,5 @@
 import { CheckCircle2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { SurfaceCard } from '@/components/ui/surface-card';
 import { PageMain } from '@/components/layout/page-shell';
@@ -7,7 +8,6 @@ import { Heading } from '@/components/ui/heading';
 import { IconBox } from '@/components/ui/icon-box';
 import { Stack } from '@/components/ui/layout';
 import { Text } from '@/components/ui/text';
-import { takeMessage } from '@/features/take';
 
 interface TakeCompleteScreenProps {
   candidateName: string;
@@ -15,6 +15,7 @@ interface TakeCompleteScreenProps {
 }
 
 export function TakeCompleteScreen({ candidateName, position }: TakeCompleteScreenProps) {
+  const tTake = useTranslations('takeFlow');
   return (
     <PageMain>
       <SurfaceCard tone="glassFloat" size="lg">
@@ -25,10 +26,10 @@ export function TakeCompleteScreen({ candidateName, position }: TakeCompleteScre
             </IconBox>
             <Stack gap={3} align="center">
               <Heading variant="heroTitle">
-                {takeMessage('completeTitle').replace('{candidateName}', candidateName)}
+                {tTake('completeTitle', { candidateName })}
               </Heading>
               <Text variant="heroDescription">
-                {takeMessage('completeDescription').replace('{position}', position)}
+                {tTake('completeDescription', { position })}
               </Text>
             </Stack>
           </Stack>

@@ -1,8 +1,7 @@
 import { cva } from 'class-variance-authority'
-import Link from 'next/link'
 
 import type { Locale } from '@/i18n/locales'
-import { localizedPath } from '@/i18n/pathname'
+import { Link } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
 
 const languageSwitcherLinkVariants = cva(
@@ -52,7 +51,8 @@ export function LanguageSwitcher({
             key={locale}
             aria-current={active ? 'true' : undefined}
             className={cn(languageSwitcherLinkVariants({ active }))}
-            href={localizedPath(href, locale)}
+            href={href}
+            locale={locale}
             prefetch={false}
           >
             {label}

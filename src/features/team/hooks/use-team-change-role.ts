@@ -26,12 +26,10 @@ export function useTeamChangeRole(
   const sharedLabels = useSharedLabels()
 
   const roleOptions = useMemo(() => {
-    return assignableRoleRadioOptionsForActor(actorSessionRole, member.role).map(
-      (option) => ({
-        ...option,
-        label: sharedLabels.role(option.value),
-      }),
-    )
+    return assignableRoleRadioOptionsForActor(actorSessionRole, member.role).map((role) => ({
+      value: role,
+      label: sharedLabels.role(role),
+    }))
   }, [actorSessionRole, member.role, sharedLabels])
 
   const hasChange = selectedRole !== member.role

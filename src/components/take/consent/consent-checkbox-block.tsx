@@ -3,7 +3,7 @@ import { Inline, Stack } from '@/components/ui/layout';
 import { Label } from '@/components/ui/label';
 import { Panel } from '@/components/ui/panel';
 import { Text } from '@/components/ui/text';
-import { takeMessage } from '@/features/take';
+import { useTranslations } from 'next-intl';
 
 interface TakeConsentCheckboxBlockProps {
   consent: boolean;
@@ -14,6 +14,7 @@ export function TakeConsentCheckboxBlock({
   consent,
   onConsentChange,
 }: TakeConsentCheckboxBlockProps) {
+  const tTake = useTranslations('takeFlow');
   return (
     <Panel radius="lg" padding="lg">
       <Inline align="start" gap={3}>
@@ -26,10 +27,10 @@ export function TakeConsentCheckboxBlock({
         <Stack gap={2}>
           <Label htmlFor="consent">
             <Text as="span" variant="labelSmStrong">
-              {takeMessage('consentCheckboxLabel')}
+              {tTake('consentCheckboxLabel')}
             </Text>
           </Label>
-          <Text variant="bodyMutedSm">{takeMessage('consentCheckboxHint')}</Text>
+          <Text variant="bodyMutedSm">{tTake('consentCheckboxHint')}</Text>
         </Stack>
       </Inline>
     </Panel>

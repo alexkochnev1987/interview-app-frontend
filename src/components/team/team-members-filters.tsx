@@ -16,14 +16,7 @@ import { SearchInput } from '@/components/ui/search-input'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
 
 import type { TeamRoleFilter } from '@/features/team/team-member-list'
-import type { TeamMemberRole } from '@/features/team/team-roles'
-
-const FILTER_ROLE_VALUES: TeamMemberRole[] = [
-  'super_admin',
-  'admin',
-  'hr',
-  'candidate',
-]
+import { teamRoleFilterValues } from '@/features/team/team-roles'
 
 interface TeamMembersFiltersProps {
   roleFilter: TeamRoleFilter
@@ -61,7 +54,7 @@ export function TeamMembersFilters({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{sharedLabels.roleFilterAll()}</SelectItem>
-            {FILTER_ROLE_VALUES.map((value) => (
+            {teamRoleFilterValues().map((value) => (
               <SelectItem key={value} value={value}>
                 {sharedLabels.role(value)}
               </SelectItem>

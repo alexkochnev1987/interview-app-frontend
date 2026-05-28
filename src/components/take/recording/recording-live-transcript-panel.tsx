@@ -2,7 +2,7 @@ import { Stack } from '@/components/ui/layout';
 import { Panel } from '@/components/ui/panel';
 import { Text } from '@/components/ui/text';
 import type { TakeStage } from '@/components/take/types';
-import { takeMessage } from '@/features/take';
+import { useTranslations } from 'next-intl';
 
 interface LiveTranscriptPanelProps {
   isSupported: boolean;
@@ -19,16 +19,17 @@ export function LiveTranscriptPanel({
   warning,
   stage,
 }: LiveTranscriptPanelProps) {
+  const tTake = useTranslations('takeFlow');
   return (
     <Panel minHeight="transcript">
       <Stack gap={2} grow="fill" height="full">
         <Text as="span" variant="eyebrowLabel">
-          {takeMessage('liveTranscriptTitle')}
+          {tTake('liveTranscriptTitle')}
         </Text>
         <Stack gap={2} grow="fill" overflow="y">
           {!isSupported ? (
             <Text variant="bodyMutedSm">
-              {takeMessage('liveTranscriptUnavailable')}
+              {tTake('liveTranscriptUnavailable')}
             </Text>
           ) : (
             <Text variant="bodySm">
@@ -37,12 +38,12 @@ export function LiveTranscriptPanel({
                   {finalTranscript}
                   {interimTranscript ? (
                     <Text as="span" variant="transcriptDraft">
-                      {interimTranscript} {takeMessage('liveTranscriptDraftSuffix')}
+                      {interimTranscript} {tTake('liveTranscriptDraftSuffix')}
                     </Text>
                   ) : null}
                 </>
               ) : (
-                takeMessage('liveTranscriptPlaceholder')
+                tTake('liveTranscriptPlaceholder')
               )}
             </Text>
           )}

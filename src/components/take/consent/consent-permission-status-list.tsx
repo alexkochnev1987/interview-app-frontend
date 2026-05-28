@@ -3,7 +3,7 @@ import { StatusPill, type StatusTone } from '@/components/ui/status-pill';
 import { Panel } from '@/components/ui/panel';
 import { Inline, Stack } from '@/components/ui/layout';
 import { Text } from '@/components/ui/text';
-import { takeMessage } from '@/features/take';
+import { useTranslations } from 'next-intl';
 
 interface TakePermissionStatusListProps {
   cameraStatus: PermissionStatus;
@@ -52,21 +52,22 @@ export function TakePermissionStatusList({
   permissionLabel,
   permissionTone,
 }: TakePermissionStatusListProps) {
+  const tTake = useTranslations('takeFlow');
   return (
     <Stack gap={4} width="full">
       <PermissionRow
-        title={takeMessage('permissionCameraMicTitle')}
-        description={takeMessage('permissionCameraMicDescription')}
+        title={tTake('permissionCameraMicTitle')}
+        description={tTake('permissionCameraMicDescription')}
         status={cameraStatus}
         permissionLabel={permissionLabel}
         permissionTone={permissionTone}
       />
       <PermissionRow
-        title={takeMessage('permissionScreenTitle')}
+        title={tTake('permissionScreenTitle')}
         description={
           screenSurface === 'monitor'
-            ? takeMessage('permissionScreenReady')
-            : takeMessage('chooseEntireScreen')
+            ? tTake('permissionScreenReady')
+            : tTake('chooseEntireScreen')
         }
         status={screenStatus}
         permissionLabel={permissionLabel}

@@ -1,7 +1,7 @@
 import type { StatusTone } from '@/components/ui/status-pill';
 import type { TakeStage } from '@/components/take/types';
 
-import { takeMessage } from './messages';
+import type { TakeMessageGetter } from './messages';
 import type { VersionPersistKind } from './session-machine';
 
 export type TakeHeaderStatusDisplay = {
@@ -11,6 +11,7 @@ export type TakeHeaderStatusDisplay = {
 
 export function resolveTakeScreenShareStatus(
   screenSurface: string,
+  takeMessage: TakeMessageGetter,
 ): TakeHeaderStatusDisplay {
   if (screenSurface === 'monitor') {
     return { label: takeMessage('screenShareFull'), tone: 'completed' };
@@ -23,8 +24,9 @@ export function resolveTakeSessionStatus(params: {
   recording: boolean;
   recordingStartBusy: boolean;
   versionPersistKind: VersionPersistKind | null;
+  takeMessage: TakeMessageGetter;
 }): TakeHeaderStatusDisplay {
-  const { stage, recording, recordingStartBusy, versionPersistKind } = params;
+  const { stage, recording, recordingStartBusy, versionPersistKind, takeMessage } = params;
 
   if (stage === 'transition') {
     const submitting = versionPersistKind === 'submit';

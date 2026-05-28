@@ -12,7 +12,7 @@ import {
   type AnswerBehaviorEvent,
   type MultipartUploadState,
 } from './runtime';
-import { isLastInterviewQuestion, takeMessage } from './messages';
+import { isLastInterviewQuestion, type TakeMessageGetter } from './messages';
 import type { TakeBehaviorSignals } from './utils';
 import type { PendingVersionAction, VersionPersistKind } from './session-machine';
 
@@ -50,6 +50,7 @@ export interface UseTakeVersionPersistenceParams {
   loadInterview: (mode?: 'initial' | 'resume', tokenOverride?: string) => Promise<void>;
   clearRecordingArtifacts: () => void;
   invokeBeginRecording: (nextVersionNumber: number, currentQuestionIndex: number) => Promise<void>;
+  takeMessage: TakeMessageGetter;
 }
 
 export function useTakeVersionPersistence({
@@ -78,6 +79,7 @@ export function useTakeVersionPersistence({
   loadInterview,
   clearRecordingArtifacts,
   invokeBeginRecording,
+  takeMessage,
 }: UseTakeVersionPersistenceParams) {
   const toastMessages = useToastMessages();
   const submitFallbackDetail = takeMessage('submitFallbackDetail');
@@ -250,6 +252,7 @@ export function useTakeVersionPersistence({
       toastMessages.take.submitError,
       toastMessages.take.submitSuccess,
       submitFallbackDetail,
+      takeMessage,
     ],
   );
 

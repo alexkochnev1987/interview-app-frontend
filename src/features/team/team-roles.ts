@@ -5,53 +5,34 @@ export type TeamMemberRole = 'super_admin' | 'admin' | 'hr' | 'candidate'
 
 type RoleRow = {
   id: TeamMemberRole
-  label: string
-  filterLabel: string
   badgeTone: StatusTone
 }
 
 const TEAM_ROLE_ROWS: readonly RoleRow[] = [
   {
     id: 'super_admin',
-    label: 'Super Admin',
-    filterLabel: 'Super Admin',
     badgeTone: 'in_progress',
   },
   {
     id: 'admin',
-    label: 'Admin',
-    filterLabel: 'Admin',
     badgeTone: 'neutral_meta',
   },
   {
     id: 'hr',
-    label: 'HR',
-    filterLabel: 'HR Specialist',
     badgeTone: 'pending',
   },
   {
     id: 'candidate',
-    label: 'Candidate',
-    filterLabel: 'Candidate',
     badgeTone: 'completed',
   },
 ] as const
 
-export function teamRoleFilterSelectOptions(): {
-  value: TeamMemberRole | 'all'
-  label: string
-}[] {
-  return [
-    { value: 'all', label: 'All Roles' },
-    ...TEAM_ROLE_ROWS.map((r) => ({ value: r.id, label: r.filterLabel })),
-  ]
+export function teamRoleFilterValues(): TeamMemberRole[] {
+  return TEAM_ROLE_ROWS.map((r) => r.id)
 }
 
-function assignableRoleRadioOptions(): {
-  value: TeamMemberRole
-  label: string
-}[] {
-  return TEAM_ROLE_ROWS.map((r) => ({ value: r.id, label: r.label }))
+function assignableRoleValues(): TeamMemberRole[] {
+  return TEAM_ROLE_ROWS.map((r) => r.id)
 }
 
 const TEAM_ROLES_ASSIGNABLE_BY_ACTOR: Record<
@@ -67,7 +48,7 @@ const TEAM_ROLES_ASSIGNABLE_BY_ACTOR: Record<
 export function assignableRoleRadioOptionsForActor(
   actorRole: string | null | undefined,
   targetMemberRole: string | null | undefined,
-): { value: TeamMemberRole; label: string }[] {
+): TeamMemberRole[] {
   const memberRole = targetMemberRole as TeamMemberRole | undefined
   if (
     actorRole &&
@@ -84,7 +65,7 @@ export function assignableRoleRadioOptionsForActor(
       : []
   const allowed = new Set<TeamMemberRole>(assignList)
 
-  return assignableRoleRadioOptions().filter((o) => allowed.has(o.value))
+  return assignableRoleValues().filter((role) => allowed.has(role))
 }
 
 export function badgeToneForRole(role: string): StatusTone {

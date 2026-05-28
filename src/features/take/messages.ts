@@ -113,23 +113,16 @@ export const TAKE_MESSAGES = {
 
 export type TakeMessageKey = keyof typeof TAKE_MESSAGES;
 export type TakeMessages = Record<TakeMessageKey, string>;
+export type TakeMessageGetter = (key: TakeMessageKey) => string;
 
-let takeMessagesState: TakeMessages = { ...TAKE_MESSAGES };
-
-export function configureTakeMessages(patch: Partial<TakeMessages>) {
-  takeMessagesState = { ...takeMessagesState, ...patch };
-}
-
-export function resetTakeMessages() {
-  takeMessagesState = { ...TAKE_MESSAGES };
-}
-
-export function takeMessage(key: TakeMessageKey) {
-  return takeMessagesState[key];
-}
-
-export function formatTakeQuestionCountLabel(count: number): string {
-  const template = count === 1 ? takeMessage('questionCountOne') : takeMessage('questionCountOther');
+export function formatTakeQuestionCountLabel(
+  count: number,
+  takeMessage: TakeMessageGetter,
+): string {
+  const template =
+    count === 1
+      ? takeMessage('questionCountOne')
+      : takeMessage('questionCountOther');
   return template.replace('{count}', String(count));
 }
 
@@ -141,7 +134,11 @@ export function isLastInterviewQuestion(
   return currentQuestionIndex + 1 >= totalQuestions;
 }
 
-export function submitAnswerActionLabel(currentQuestionIndex: number, totalQuestions: number): string {
+export function submitAnswerActionLabel(
+  currentQuestionIndex: number,
+  totalQuestions: number,
+  takeMessage: TakeMessageGetter,
+): string {
   if (totalQuestions <= 0) return takeMessage('submitAndNext');
   return isLastInterviewQuestion(currentQuestionIndex, totalQuestions)
     ? takeMessage('submitCompleteInterview')

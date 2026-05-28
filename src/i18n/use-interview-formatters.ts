@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 
 import { LOCALE_FORMATS, type Locale } from './locales'
@@ -11,20 +12,29 @@ function localeFormat(locale: string) {
 export function useInterviewFormatters() {
   const locale = useLocale()
   const t = useTranslations('dashboard.recent')
-  const dateFormatter = new Intl.DateTimeFormat(localeFormat(locale), {
-    timeZone: DISPLAY_TIME_ZONE,
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  })
-  const dateTimeFormatter = new Intl.DateTimeFormat(localeFormat(locale), {
-    timeZone: DISPLAY_TIME_ZONE,
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-  })
+  const formatLocale = localeFormat(locale)
+  const dateFormatter = useMemo(
+    () =>
+      new Intl.DateTimeFormat(formatLocale, {
+        timeZone: DISPLAY_TIME_ZONE,
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      }),
+    [formatLocale],
+  )
+  const dateTimeFormatter = useMemo(
+    () =>
+      new Intl.DateTimeFormat(formatLocale, {
+        timeZone: DISPLAY_TIME_ZONE,
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+      }),
+    [formatLocale],
+  )
 
   return {
     date(iso: string) {

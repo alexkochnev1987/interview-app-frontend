@@ -1,11 +1,11 @@
 import { Camera, Mic, ShieldCheck, Video } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
 
 import { Grid, Stack } from '@/components/ui/layout';
 import { Text } from '@/components/ui/text';
 import { Panel } from '@/components/ui/panel';
-import { takeMessage } from '@/features/take';
 
 interface CapabilityCardProps {
   icon: LucideIcon;
@@ -32,18 +32,19 @@ function CapabilityCard({ icon: Icon, title, description }: CapabilityCardProps)
 }
 
 export function TakeCapabilityCards() {
+  const tTake = useTranslations('takeFlow');
   const capabilityItems: CapabilityCardProps[] = [
-    { icon: Camera, title: takeMessage('capabilityCameraTitle'), description: takeMessage('capabilityCameraDescription') },
-    { icon: Mic, title: takeMessage('capabilityMicTitle'), description: takeMessage('capabilityMicDescription') },
+    { icon: Camera, title: tTake('capabilityCameraTitle'), description: tTake('capabilityCameraDescription') },
+    { icon: Mic, title: tTake('capabilityMicTitle'), description: tTake('capabilityMicDescription') },
     {
       icon: Video,
-      title: takeMessage('capabilityScreenTitle'),
-      description: takeMessage('capabilityScreenDescription'),
+      title: tTake('capabilityScreenTitle'),
+      description: tTake('capabilityScreenDescription'),
     },
     {
       icon: ShieldCheck,
-      title: takeMessage('capabilityFairnessTitle'),
-      description: takeMessage('capabilityFairnessDescription'),
+      title: tTake('capabilityFairnessTitle'),
+      description: tTake('capabilityFairnessDescription'),
     },
   ];
 

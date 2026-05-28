@@ -1,6 +1,6 @@
 import type { PermissionStatus } from '@/components/take/types';
 import type { StatusTone } from '@/components/ui/status-pill';
-import { takeMessage } from './messages';
+import type { TakeMessageGetter } from './messages';
 
 export const TAKE_RECORDING_LIMIT_SECONDS = 240;
 
@@ -60,7 +60,7 @@ export function createEmptyBehaviorSignals(): TakeBehaviorSignals {
   };
 }
 
-export function permissionLabel(status: PermissionStatus) {
+export function permissionLabel(status: PermissionStatus, takeMessage: TakeMessageGetter) {
   switch (status) {
     case 'pending':
       return takeMessage('permissionPending');
@@ -86,7 +86,11 @@ export function permissionTone(status: PermissionStatus): StatusTone {
   }
 }
 
-export function getPermissionErrorMessage(error: unknown, requiresEntireScreen = false) {
+export function getPermissionErrorMessage(
+  error: unknown,
+  requiresEntireScreen = false,
+  takeMessage: TakeMessageGetter,
+) {
   if (requiresEntireScreen) {
     return takeMessage('chooseEntireScreen');
   }

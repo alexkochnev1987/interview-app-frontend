@@ -3,7 +3,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { useBrowserTranscript } from '@/lib/use-browser-transcript';
 import { type TakeInterviewData } from '@/lib/api';
 import type { PermissionStatus, TakeStage } from '@/components/take/types';
-import { takeMessage } from './messages';
+import type { TakeMessageGetter } from './messages';
 import { progressValueForStage, stageAfterInterviewLoad, type VersionPersistKind } from './session-machine';
 import {
   clearProgressTimers,
@@ -49,6 +49,7 @@ interface UseTakeOrchestratorParams {
   id: string;
   candidateToken: string;
   initialInterview?: TakeInterviewData;
+  takeMessage: TakeMessageGetter;
 }
 
 function syncVideoPreview(node: HTMLVideoElement | null, stream: MediaStream | null) {
@@ -70,7 +71,12 @@ function setStreamTracksEnabled(stream: MediaStream, kind: 'audio' | 'video', en
   });
 }
 
-export function useTakeOrchestrator({ id, candidateToken, initialInterview }: UseTakeOrchestratorParams) {
+export function useTakeOrchestrator({
+  id,
+  candidateToken,
+  initialInterview,
+  takeMessage,
+}: UseTakeOrchestratorParams) {
   const {
     isSupported: isBrowserTranscriptSupported,
     interimTranscript,
@@ -131,6 +137,7 @@ export function useTakeOrchestrator({ id, candidateToken, initialInterview }: Us
     interviewId: id,
     candidateToken,
     sessionReady: !candidateToken || Boolean(initialInterview),
+    takeMessage,
   });
 
   const [interviewerPresence, questionSpeechRecordingAllowedRef] = useTakeQuestionTts(
@@ -245,7 +252,13 @@ export function useTakeOrchestrator({ id, candidateToken, initialInterview }: Us
       setError('');
       setInterview(data);
       if (mode === 'initial' && tokenOverride && typeof window !== 'undefined') {
-        window.history.replaceState(null, '', `/take/${id}`);
+        const url = new URL(window.location.href);
+        if (url.searchParams.has('token')) {
+          url.searchParams.delete('token');
+          const nextSearch = url.searchParams.toString();
+          const next = nextSearch ? `${url.pathname}?${nextSearch}` : url.pathname;
+          window.history.replaceState(null, '', next);
+        }
       }
       if (data.completed) {
         releaseAllCaptures();
@@ -258,6 +271,7 @@ export function useTakeOrchestrator({ id, candidateToken, initialInterview }: Us
       void abortMultipartUploads();
       releaseAllCaptures();
     },
+    takeMessage,
   });
 
   const {
@@ -277,10 +291,12 @@ export function useTakeOrchestrator({ id, candidateToken, initialInterview }: Us
     releaseLobbyCameraOnly: () => releaseCameraCapture(cameraStreamRef, videoRef),
     attachCameraPreview,
     stopMediaStream,
-    getPermissionErrorMessage,
+    getPermissionErrorMessage: (error, requiresEntireScreen) =>
+      getPermissionErrorMessage(error, requiresEntireScreen, takeMessage),
     screenStreamRef,
     cameraStreamRef,
     screenVideoRef,
+    takeMessage,
   });
 
   async function bootstrapLobbyMedia(openedVia: 'mic' | 'camera') {
@@ -369,6 +385,7 @@ export function useTakeOrchestrator({ id, candidateToken, initialInterview }: Us
     clearRecordingArtifacts,
     invokeBeginRecording: (nextVersionNumber, currentQuestionIndex) =>
       beginRecordingRef.current(nextVersionNumber, currentQuestionIndex),
+    takeMessage,
   });
 
   const onRecordersStopped = useCallback(() => {
@@ -388,7 +405,7 @@ export function useTakeOrchestrator({ id, candidateToken, initialInterview }: Us
     }
 
     void persistCurrentVersion(pendingAction);
-  }, [clearRecordingArtifacts, persistCurrentVersion]);
+  }, [clearRecordingArtifacts, persistCurrentVersion, takeMessage]);
 
   const stopActiveRecorders = useCallback(() => {
     clearProgressTimers(timerRef, progressHeartbeatRef, progressFlushTimeoutRef);
@@ -459,7 +476,7 @@ export function useTakeOrchestrator({ id, candidateToken, initialInterview }: Us
         screenTrack.onended = null;
       }
     };
-  }, [stage, abortMultipartUploads, clearRecordingArtifacts, stopActiveRecorders]);
+  }, [stage, abortMultipartUploads, clearRecordingArtifacts, stopActiveRecorders, takeMessage]);
 
   useTakeBehaviorTracking({
     recording,
@@ -543,6 +560,7 @@ export function useTakeOrchestrator({ id, candidateToken, initialInterview }: Us
     handleRecordedChunk,
     onRecordersStopped,
     primeBrowserTranscriptForRecordingSession: primeRecordingSession,
+    takeMessage,
   });
 
   useEffect(() => {
@@ -624,6 +642,7 @@ export function useTakeOrchestrator({ id, candidateToken, initialInterview }: Us
     candidateSessionReady,
     interviewerPresence,
     questionSpeechRecordingAllowedRef,
+    takeMessage,
   ]);
 
   return {
@@ -666,7 +685,7 @@ export function useTakeOrchestrator({ id, candidateToken, initialInterview }: Us
     recordingStartBusy,
     capturePipelineReady,
     requestVersionAction,
-    permissionLabel,
+    permissionLabel: (status: PermissionStatus) => permissionLabel(status, takeMessage),
     permissionTone,
     formatTime,
     interviewerPresence,

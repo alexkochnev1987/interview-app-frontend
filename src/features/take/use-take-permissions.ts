@@ -2,7 +2,7 @@ import type { Dispatch, MutableRefObject, RefObject, SetStateAction } from 'reac
 
 import type { PermissionStatus } from '@/components/take/types';
 import type { TakeStage } from '@/components/take/types';
-import { takeMessage } from './messages';
+import type { TakeMessageGetter } from './messages';
 
 type ScreenTrackSettings = MediaTrackSettings & { displaySurface?: string };
 
@@ -55,6 +55,7 @@ interface UseTakePermissionsParams {
   screenStreamRef: MutableRefObject<MediaStream | null>;
   cameraStreamRef: MutableRefObject<MediaStream | null>;
   screenVideoRef: RefObject<HTMLVideoElement | null>;
+  takeMessage: TakeMessageGetter;
 }
 
 export function useTakePermissions({
@@ -73,6 +74,7 @@ export function useTakePermissions({
   screenStreamRef,
   cameraStreamRef,
   screenVideoRef,
+  takeMessage,
 }: UseTakePermissionsParams) {
   async function restartFullInterviewCapture() {
     if (!navigator.mediaDevices?.getUserMedia || !navigator.mediaDevices?.getDisplayMedia) {

@@ -3,6 +3,7 @@
 import type { ReactNode, RefObject } from 'react';
 
 import { Video } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge';
 import type { StatusTone } from '@/components/ui/status-pill';
@@ -22,7 +23,6 @@ import { CardContent, CardTitle } from '@/components/ui/card';
 import { Grid, Stack } from '@/components/ui/layout';
 import { Text } from '@/components/ui/text';
 import type { PermissionStatus } from '@/components/take/types';
-import { takeMessage } from '@/features/take';
 
 interface TakeLobbyScreenProps {
   cameraStatus: PermissionStatus;
@@ -59,23 +59,24 @@ export function TakeLobbyScreen({
   onScreenShare,
   onJoin,
 }: TakeLobbyScreenProps) {
+  const tTake = useTranslations('takeFlow');
   const permissionGranted = cameraStatus === 'granted';
   const screenShareReady = screenStatus === 'granted' && screenSurface === 'monitor';
-  const joinLabel = setupBusy ? takeMessage('lobbyJoinBusy') : takeMessage('lobbyJoin');
+  const joinLabel = setupBusy ? tTake('lobbyJoinBusy') : tTake('lobbyJoin');
 
   let previewOverlay: ReactNode = null;
   if (!permissionGranted) {
     previewOverlay = (
       <LobbyPreviewPlaceholder
-        title={takeMessage('lobbyPreviewMutedTitle')}
-        description={takeMessage('lobbyPreviewMutedLead')}
+        title={tTake('lobbyPreviewMutedTitle')}
+        description={tTake('lobbyPreviewMutedLead')}
       />
     );
   } else if (!lobbyCameraOn) {
     previewOverlay = (
       <LobbyPreviewPlaceholder
-        title={takeMessage('lobbyPreviewCameraOffTitle')}
-        description={takeMessage('lobbyPreviewCameraOffLead')}
+        title={tTake('lobbyPreviewCameraOffTitle')}
+        description={tTake('lobbyPreviewCameraOffLead')}
       />
     );
   }
@@ -84,10 +85,10 @@ export function TakeLobbyScreen({
     <PageMainViewport>
       <SurfaceCard tone="glassFloat" grow="fill" size="lg">
         <CardContent layout="fill-column" spacing="xl">
-          <EyebrowBadge icon={<Video size={14} />}>{takeMessage('lobbyEyebrow')}</EyebrowBadge>
+          <EyebrowBadge icon={<Video size={14} />}>{tTake('lobbyEyebrow')}</EyebrowBadge>
           <Grid columns="lobby-shell" gap={10} grow="fill">
             <Stack gap={5} width="full" height="full">
-              <Text variant="heroDescription">{takeMessage('lobbyLead')}</Text>
+              <Text variant="heroDescription">{tTake('lobbyLead')}</Text>
               <Stack grow="fill" width="full">
                 <LobbyPreviewFrame>
                   <LobbyScreenVideo videoRef={videoRef} />
@@ -109,8 +110,8 @@ export function TakeLobbyScreen({
 
             <Stack width="full" placeSelf="start">
               <Stack gap={2}>
-                <CardTitle size="lg">{takeMessage('lobbyDevicesAndScreens')}</CardTitle>
-                <Text variant="bodyMutedSm">{takeMessage('lobbyDevicesHelp')}</Text>
+                <CardTitle size="lg">{tTake('lobbyDevicesAndScreens')}</CardTitle>
+                <Text variant="bodyMutedSm">{tTake('lobbyDevicesHelp')}</Text>
               </Stack>
               <Stack gap={5}>
                 <TakePermissionStatusList
@@ -123,7 +124,7 @@ export function TakeLobbyScreen({
 
                 {setupError ? (
                   <Alert variant="destructive">
-                    <AlertTitle>{takeMessage('lobbySetupFailed')}</AlertTitle>
+                    <AlertTitle>{tTake('lobbySetupFailed')}</AlertTitle>
                     <AlertDescription>{setupError}</AlertDescription>
                   </Alert>
                 ) : null}

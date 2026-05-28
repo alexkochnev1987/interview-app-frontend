@@ -1,5 +1,6 @@
 'use client'
 
+import { useCallback } from 'react'
 import { AlertCircle } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
@@ -14,8 +15,7 @@ import { Icon } from '@/components/ui/icon'
 import { EmptyStateCard, LoadingStateCard } from '@/components/ui/state-card'
 import {
   TAKE_MESSAGES,
-  configureTakeMessages,
-  takeMessage,
+  type TakeMessageKey,
   useTakeInterviewBeforeUnload,
   useTakeOrchestrator,
 } from '@/features/take'
@@ -36,13 +36,11 @@ export function TakeInterviewClient({
   const tCommon = useTranslations('common')
   const tTake = useTranslations('takeFlow')
 
-  const patch: Partial<Record<keyof typeof TAKE_MESSAGES, string>> = {}
-  ;(Object.keys(TAKE_MESSAGES) as (keyof typeof TAKE_MESSAGES)[]).forEach((key) => {
-    if (tTake.has(key)) {
-      patch[key] = tTake(key)
-    }
-  })
-  configureTakeMessages(patch)
+  const takeMessage = useCallback(
+    (key: TakeMessageKey) => (tTake.has(key) ? tTake(key) : TAKE_MESSAGES[key]),
+    [tTake],
+  )
+
   const {
     stage,
     interview,
@@ -86,7 +84,7 @@ export function TakeInterviewClient({
     permissionTone,
     formatTime,
     interviewerPresence,
-  } = useTakeOrchestrator({ id, candidateToken, initialInterview })
+  } = useTakeOrchestrator({ id, candidateToken, initialInterview, takeMessage })
 
   useTakeInterviewBeforeUnload(stage, takeMessage('beforeUnloadLeaveInterview'))
 

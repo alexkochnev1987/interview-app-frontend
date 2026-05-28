@@ -1,8 +1,8 @@
 import { Mic, MicOff, SquareArrowUp, Video, VideoOff } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { Button } from '@/components/ui/button';
 import { Inline } from '@/components/ui/layout';
-import { takeMessage } from '@/features/take';
 
 interface TakeLobbyMediaToolbarProps {
   setupBusy: boolean;
@@ -23,6 +23,7 @@ export function TakeLobbyMediaToolbar({
   onToggleCamera,
   onScreenShare,
 }: TakeLobbyMediaToolbarProps) {
+  const tTake = useTranslations('takeFlow');
   return (
     <Inline justify="center" gap={3}>
       <Button
@@ -32,7 +33,7 @@ export function TakeLobbyMediaToolbar({
         shape="pill"
         disabled={setupBusy}
         aria-pressed={micOn}
-        aria-label={takeMessage('lobbyToolbarMic')}
+        aria-label={tTake('lobbyToolbarMic')}
         onClick={() => void onToggleMic()}
       >
         {micOn ? <Mic /> : <MicOff />}
@@ -44,7 +45,7 @@ export function TakeLobbyMediaToolbar({
         shape="pill"
         disabled={setupBusy}
         aria-pressed={cameraOn}
-        aria-label={takeMessage('lobbyToolbarCamera')}
+        aria-label={tTake('lobbyToolbarCamera')}
         onClick={() => void onToggleCamera()}
       >
         {cameraOn ? <Video /> : <VideoOff />}
@@ -56,7 +57,7 @@ export function TakeLobbyMediaToolbar({
         shape="pill"
         disabled={setupBusy}
         aria-pressed={screenShareReady}
-        aria-label={takeMessage('lobbyToolbarScreen')}
+        aria-label={tTake('lobbyToolbarScreen')}
         onClick={() => void onScreenShare()}
       >
         <SquareArrowUp />

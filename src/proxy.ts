@@ -20,7 +20,10 @@ export function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname
   const { locale, pathnameWithoutLocale } = pathLocale(path)
 
-  if (path.startsWith('/api') || path.startsWith('/_next')) {
+  if (
+    pathnameWithoutLocale.startsWith('/api') ||
+    pathnameWithoutLocale.startsWith('/_next')
+  ) {
     return NextResponse.next()
   }
 
