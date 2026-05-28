@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl'
 
 import { Input } from '@/components/ui/input'
 import { Grid } from '@/components/ui/layout/grid'
+import { Spacer } from '@/components/ui/layout/spacer'
 import { Stack } from '@/components/ui/layout/stack'
 import {
   Select,
@@ -47,53 +48,61 @@ export function EditorIdentitySection({
       description={tIdentity('description')}
       icon={<BrainCircuit className="size-4" />}
     >
-      <Grid columns="identity-4" gap={5}>
-        <QuestionEditorField
-          htmlFor="externalId"
-          label={tFields('externalId')}
-          hint={tIdentity('externalIdHint')}
-        >
-          <Input
-            id="externalId"
-            value={value.externalId ?? ''}
-            onChange={(event) => onUpdate({ externalId: event.target.value })}
-            placeholder={tIdentity('externalIdPlaceholder')}
-            disabled={submitting}
-          />
-        </QuestionEditorField>
-
-        <QuestionEditorField htmlFor="role" label={tFields('role')}>
-          <Input
-            id="role"
-            value={value.role ?? ''}
-            onChange={(event) => onUpdate({ role: event.target.value })}
-            placeholder={tIdentity('rolePlaceholder')}
-            disabled={submitting}
-          />
-        </QuestionEditorField>
-
-        <QuestionEditorField htmlFor="focus" label={tFields('focus')}>
-          <Input
-            id="focus"
-            value={value.focus ?? ''}
-            onChange={(event) => onUpdate({ focus: event.target.value })}
-            placeholder={tIdentity('focusPlaceholder')}
-            disabled={submitting}
-          />
-        </QuestionEditorField>
-
-        <QuestionEditorField htmlFor="outputLanguage" label={tFields('outputLanguage')}>
-          <Input
-            id="outputLanguage"
-            value={value.outputLanguage}
-            onChange={(event) => onUpdate({ outputLanguage: event.target.value })}
-            placeholder={tIdentity('outputLanguagePlaceholder')}
-            disabled={submitting}
-          />
-        </QuestionEditorField>
-      </Grid>
-
       <Grid columns="identity-5" gap={5}>
+        <Stack gap={2}>
+          <QuestionEditorField
+            htmlFor="externalId"
+            label={tFields('externalId')}
+            hint={tIdentity('externalIdHint')}
+          >
+            <Input
+              id="externalId"
+              value={value.externalId ?? ''}
+              onChange={(event) => onUpdate({ externalId: event.target.value })}
+              placeholder={tIdentity('externalIdPlaceholder')}
+              disabled={submitting}
+            />
+          </QuestionEditorField>
+        </Stack>
+
+        <Stack gap={2}>
+          <QuestionEditorField htmlFor="role" label={tFields('role')}>
+            <Input
+              id="role"
+              value={value.role ?? ''}
+              onChange={(event) => onUpdate({ role: event.target.value })}
+              placeholder={tIdentity('rolePlaceholder')}
+              disabled={submitting}
+            />
+          </QuestionEditorField>
+        </Stack>
+
+        <Stack gap={2}>
+          <QuestionEditorField htmlFor="focus" label={tFields('focus')}>
+            <Input
+              id="focus"
+              value={value.focus ?? ''}
+              onChange={(event) => onUpdate({ focus: event.target.value })}
+              placeholder={tIdentity('focusPlaceholder')}
+              disabled={submitting}
+            />
+          </QuestionEditorField>
+        </Stack>
+
+        <Stack gap={2}>
+          <QuestionEditorField htmlFor="outputLanguage" label={tFields('outputLanguage')}>
+            <Input
+              id="outputLanguage"
+              value={value.outputLanguage}
+              onChange={(event) => onUpdate({ outputLanguage: event.target.value })}
+              placeholder={tIdentity('outputLanguagePlaceholder')}
+              disabled={submitting}
+            />
+          </QuestionEditorField>
+        </Stack>
+
+        <Spacer visibility="xl-only" />
+
         <Stack gap={2}>
           <QuestionEditorField htmlFor="category" label={tFields('category')}>
             <Input
