@@ -1,7 +1,9 @@
+import { NextIntlClientProvider } from 'next-intl'
 import { getTranslations } from 'next-intl/server'
 
 import { FeedbackView } from '@/components/feedback/feedback-view'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
+import { loadLocaleMessages } from '@/i18n/load-messages'
 import type { Locale } from '@/i18n/locales'
 import { type FeedbackResponse } from '@/lib/api'
 import { getServerRequestContext, requestServer } from '@/lib/server-fetch'
@@ -16,8 +18,9 @@ export default async function FeedbackPage({
   params,
   searchParams,
 }: FeedbackPageProps) {
-  const { id, locale } = await params
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.feedback' })
+  const { id } = await params
+  const t = await getTranslations({ locale: 'en', namespace: 'toast.pageGate.feedback' })
+  const englishMessages = await loadLocaleMessages('en')
   const token = readSearchParamToken((await searchParams).token)
 
   const ctx = await getServerRequestContext()
@@ -47,5 +50,9 @@ export default async function FeedbackPage({
     )
   }
 
-  return <FeedbackView feedback={feedback} />
+  return (
+    <NextIntlClientProvider locale="en" messages={englishMessages}>
+      <FeedbackView feedback={feedback} />
+    </NextIntlClientProvider>
+  )
 }

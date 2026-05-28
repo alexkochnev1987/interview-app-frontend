@@ -21,11 +21,16 @@
     "validation": {
       "questionTextRequired": "Тэкст пытання абавязковы.",
       "metadataInvalidJson": "Метададзеныя павінны быць сапраўднымі ў фармаце JSON.",
-      "metadataMustBeObject": "Метададзеныя павінны быць аб'ектам JSON (а не масівам або прымітывам)."
+      "metadataMustBeObject": "Метададзеныя павінны быць аб'ектам JSON (а не масівам або прымітывам).",
+      "englishOnlyField": "Поле «{field}» павінна быць на англійскай мове.",
+      "englishOnlyTitle": "Толькі англійская"
     },
     "editor": {
       "previewEmpty": "Пусты",
       "aiQuestionTextRequired": "Перад стварэннем штучнага інтэлекту патрабуецца тэкст пытання.",
+      "aiQuestionTextEnglishOnly": "Перад генерацыяй штучнага інтэлекту тэкст пытання павінен быць на англійскай мове.",
+      "englishOnlyNoticeTitle": "Палітыка кантэнту: толькі англійская",
+      "englishOnlyNoticeDescription": "Запаўняйце ўсе палі пытання на англійскай, незалежна ад бягучай лакалі інтэрфейсу.",
       "conceptDescriptionFallback": "{label} павінна быць ахоплена ў адказе.",
       "headerEyebrow": "Адзіны рэдактар ​​пытанняў",
       "headerLead": "Сфармуйце падказку, вызначыце рубрыку і захавайце згенераваныя штучным інтэлектам чарнавікі бачнымі як відавочныя адрозненні замест нябачных фонавых мутацый.",
@@ -76,7 +81,7 @@
         "tagsPlaceholder": "Падзеленыя коскай або новым радком",
         "metadata": "Дадатковыя метаданыя",
         "metadataHint": "Сапраўдны аб'ект JSON, які можа несці рубрыку або зыходную інфармацыю.",
-        "metadataPlaceholder": "{\"rubricVersion\":\"v1\"}"
+        "metadataPlaceholder": "'{'\"rubricVersion\":\"v1\"'}'"
       }
     },
     "aiDraft": {

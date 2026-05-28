@@ -3,14 +3,14 @@ import { hasLocale, NextIntlClientProvider } from "next-intl"
 import { getMessages, setRequestLocale } from "next-intl/server"
 import { notFound } from "next/navigation"
 
-import { AppBody, AppShellRoot } from "@/components/ui/app-shell"
+import { AppShellRoot } from "@/components/ui/app-shell"
 import { Toaster } from "@/components/ui/toaster"
+import { TooltipProvider } from "@/components/ui/tooltip"
 import { routing } from "@/i18n/routing"
 import { AuthProvider } from "@/lib/auth-context"
 import { getServerSessionSnapshot } from "@/lib/auth-server"
 import { AppQueryClientProvider } from "@/lib/query-client-provider"
 
-import "../globals.css"
 import { NavHeader } from "./nav-header"
 
 export const metadata: Metadata = {
@@ -39,20 +39,18 @@ export default async function RootLayout({
   const session = await getServerSessionSnapshot()
 
   return (
-    <html lang={locale}>
-      <AppBody>
-        <NextIntlClientProvider messages={messages}>
-          <AppQueryClientProvider>
-            <AuthProvider initialUser={session.user}>
-              <AppShellRoot>
-                <NavHeader />
-                {children}
-              </AppShellRoot>
-              <Toaster />
-            </AuthProvider>
-          </AppQueryClientProvider>
-        </NextIntlClientProvider>
-      </AppBody>
-    </html>
+    <NextIntlClientProvider messages={messages}>
+      <AppQueryClientProvider>
+        <AuthProvider initialUser={session.user}>
+          <TooltipProvider>
+            <AppShellRoot>
+              <NavHeader />
+              {children}
+            </AppShellRoot>
+            <Toaster />
+          </TooltipProvider>
+        </AuthProvider>
+      </AppQueryClientProvider>
+    </NextIntlClientProvider>
   )
 }

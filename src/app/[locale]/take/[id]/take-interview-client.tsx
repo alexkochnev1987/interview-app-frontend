@@ -16,6 +16,7 @@ import { EmptyStateCard, LoadingStateCard } from '@/components/ui/state-card'
 import {
   TAKE_MESSAGES,
   type TakeMessageKey,
+  type TakeMessageValues,
   useTakeInterviewBeforeUnload,
   useTakeOrchestrator,
 } from '@/features/take'
@@ -37,7 +38,15 @@ export function TakeInterviewClient({
   const tTake = useTranslations('takeFlow')
 
   const takeMessage = useCallback(
-    (key: TakeMessageKey) => (tTake.has(key) ? tTake(key) : TAKE_MESSAGES[key]),
+    (key: TakeMessageKey, values?: TakeMessageValues) =>
+      tTake.has(key)
+        ? values
+          ? tTake(key, values)
+          : tTake(key)
+        : TAKE_MESSAGES[key].replace(
+            /\{(\w+)\}/g,
+            (_, token) => String(values?.[token] ?? `{${token}}`),
+          ),
     [tTake],
   )
 

@@ -32,7 +32,15 @@ export function useQuestionEditorLabels() {
         questionTextRequired: tValidation('questionTextRequired'),
         metadataInvalidJson: tValidation('metadataInvalidJson'),
         metadataMustBeObject: tValidation('metadataMustBeObject'),
+        englishOnlyField: ({ field }: { field: string }) =>
+          tValidation('englishOnlyField', { field }),
+        englishOnlyTitle: tValidation('englishOnlyTitle'),
         questionTextRequiredForAi: tEditor('aiQuestionTextRequired'),
+        questionTextEnglishOnlyForAi: tEditor('aiQuestionTextEnglishOnly'),
+      },
+      authoringNotice: {
+        title: tEditor('englishOnlyNoticeTitle'),
+        description: tEditor('englishOnlyNoticeDescription'),
       },
       previewEmpty: tEditor('previewEmpty'),
       conceptDescriptionFallback: (label: string) =>

@@ -66,6 +66,12 @@ Team workflow (short):
 
 Detailed process: `I18N_MESSAGE_MODULE_STRUCTURE.md`.
 
+Product language policy (current stage):
+- Internal app surfaces are multilingual (`en/be/ru/pl`).
+- Candidate flow pages (`/<locale>/take/[id]`, `/<locale>/feedback/[id]`) are intentionally English-only, including candidate TTS (`en-US`).
+- Backend locale-aware AI/dynamic multilingual candidate content is out of scope for now.
+- Decision log, scope boundaries, and future backend requirements: `DOCUMENTATION.md` -> `Candidate flow is intentionally English-only`.
+
 ---
 
 **Full documentation:** [DOCUMENTATION.md](DOCUMENTATION.md)

@@ -8,6 +8,11 @@ Define and maintain a consistent modular message layout for all locales:
 - `ru`
 - `pl`
 
+Scope note (current product stage):
+- This document governs modular i18n structure and parity for the internal app and shared message modules.
+- Candidate flow (`take`, `feedback`) is intentionally English-only in runtime behavior at this stage, even though locale files include `takeFlow` and `feedback` modules for structural consistency.
+- Source of truth for product decision and scope boundaries: `DOCUMENTATION.md` -> `Candidate flow is intentionally English-only`.
+
 Target domain modules:
 - `common`
 - `nav`

@@ -21,11 +21,16 @@
     "validation": {
       "questionTextRequired": "Tekst pytania jest wymagany.",
       "metadataInvalidJson": "Metadane muszą mieć prawidłowy format JSON.",
-      "metadataMustBeObject": "Metadane muszą być obiektem JSON (nie tablicą ani elementem pierwotnym)."
+      "metadataMustBeObject": "Metadane muszą być obiektem JSON (nie tablicą ani elementem pierwotnym).",
+      "englishOnlyField": "Pole „{field}” musi być w języku angielskim.",
+      "englishOnlyTitle": "Tylko angielski"
     },
     "editor": {
       "previewEmpty": "Pusty",
       "aiQuestionTextRequired": "Tekst pytania jest wymagany przed wygenerowaniem AI.",
+      "aiQuestionTextEnglishOnly": "Przed generowaniem AI tekst pytania musi być w języku angielskim.",
+      "englishOnlyNoticeTitle": "Zasada treści: tylko angielski",
+      "englishOnlyNoticeDescription": "Wypełniaj wszystkie pola pytania po angielsku, niezależnie od bieżącej lokalizacji interfejsu.",
       "conceptDescriptionFallback": "W odpowiedzi należy uwzględnić {label}.",
       "headerEyebrow": "Ujednolicony edytor pytań",
       "headerLead": "Ukształtuj monit, zdefiniuj rubrykę i przechowuj sugestie wygenerowane przez sztuczną inteligencję widoczne jako wyraźne różnice, a nie niewidoczne mutacje w tle.",
@@ -76,7 +81,7 @@
         "tagsPlaceholder": "Oddzielone przecinkiem lub nową linią",
         "metadata": "Dodatkowe metadane",
         "metadataHint": "Prawidłowy obiekt JSON, który może zawierać informacje rubrykowe lub źródłowe.",
-        "metadataPlaceholder": "{\"rubricVersion\":\"v1\"}"
+        "metadataPlaceholder": "'{'\"rubricVersion\":\"v1\"'}'"
       }
     },
     "aiDraft": {

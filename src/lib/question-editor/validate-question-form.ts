@@ -10,6 +10,33 @@ type ValidateQuestionFormMessages = {
   metadataMustBeObject: string
 }
 
+type EnglishOnlyFieldCheck = {
+  fieldLabel: string
+  value: string | string[] | undefined
+}
+
+function hasNonEnglishCharacters(value: string): boolean {
+  return /[^\u0000-\u007F]/.test(value)
+}
+
+export function getFirstNonEnglishField(
+  checks: EnglishOnlyFieldCheck[],
+): string | null {
+  for (const check of checks) {
+    if (!check.value) continue
+
+    const values = Array.isArray(check.value) ? check.value : [check.value]
+    const hasNonEnglish = values.some((item) =>
+      hasNonEnglishCharacters(item.trim()),
+    )
+    if (hasNonEnglish) {
+      return check.fieldLabel
+    }
+  }
+
+  return null
+}
+
 export function validateQuestionForm(
   values: {
     questionText: string

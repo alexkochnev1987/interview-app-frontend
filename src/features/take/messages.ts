@@ -113,7 +113,11 @@ export const TAKE_MESSAGES = {
 
 export type TakeMessageKey = keyof typeof TAKE_MESSAGES;
 export type TakeMessages = Record<TakeMessageKey, string>;
-export type TakeMessageGetter = (key: TakeMessageKey) => string;
+export type TakeMessageValues = Record<string, string | number | Date>;
+export type TakeMessageGetter = (
+  key: TakeMessageKey,
+  values?: TakeMessageValues,
+) => string;
 
 export function formatTakeQuestionCountLabel(
   count: number,
@@ -121,9 +125,9 @@ export function formatTakeQuestionCountLabel(
 ): string {
   const template =
     count === 1
-      ? takeMessage('questionCountOne')
-      : takeMessage('questionCountOther');
-  return template.replace('{count}', String(count));
+      ? takeMessage('questionCountOne', { count })
+      : takeMessage('questionCountOther', { count });
+  return template;
 }
 
 export function isLastInterviewQuestion(

@@ -21,11 +21,16 @@
     "validation": {
       "questionTextRequired": "Question text is required.",
       "metadataInvalidJson": "Metadata must be valid JSON.",
-      "metadataMustBeObject": "Metadata must be a JSON object (not an array or primitive)."
+      "metadataMustBeObject": "Metadata must be a JSON object (not an array or primitive).",
+      "englishOnlyField": "{field} must be in English.",
+      "englishOnlyTitle": "English-only authoring"
     },
     "editor": {
       "previewEmpty": "Empty",
       "aiQuestionTextRequired": "Question text is required before AI generation.",
+      "aiQuestionTextEnglishOnly": "Question text must be in English before AI generation.",
+      "englishOnlyNoticeTitle": "English-only content policy",
+      "englishOnlyNoticeDescription": "Fill all question fields in English regardless of your current UI locale.",
       "conceptDescriptionFallback": "{label} should be covered in the answer.",
       "headerEyebrow": "Unified Question Editor",
       "headerLead": "Shape the prompt, define the rubric, and keep AI-generated draft suggestions visible as explicit diffs instead of invisible background mutations.",
@@ -76,7 +81,7 @@
         "tagsPlaceholder": "Comma or newline separated",
         "metadata": "Additional metadata",
         "metadataHint": "Valid JSON object that can carry rubric or source information.",
-        "metadataPlaceholder": "{\"rubricVersion\":\"v1\"}"
+        "metadataPlaceholder": "'{'\"rubricVersion\":\"v1\"'}'"
       }
     },
     "aiDraft": {

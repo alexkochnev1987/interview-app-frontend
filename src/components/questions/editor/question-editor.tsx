@@ -4,6 +4,7 @@ import { useState, type FormEvent } from 'react'
 
 import { useQuestionEditorLabels } from '@/i18n/use-question-editor-labels'
 
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { Stack } from '@/components/ui/layout/stack'
 import { TwoColumnLayout } from '@/components/ui/layout/two-column-layout'
@@ -25,7 +26,10 @@ import {
   type QuestionInput,
 } from '@/lib/api'
 import { clearFieldError, type FieldErrors } from '@/lib/clear-field-error'
-import { validateQuestionForm } from '@/lib/question-editor/validate-question-form'
+import {
+  getFirstNonEnglishField,
+  validateQuestionForm,
+} from '@/lib/question-editor/validate-question-form'
 import {
   areEqual,
   formatMetadata,
@@ -73,6 +77,7 @@ export function QuestionEditor({
   const [aiDraft, setAiDraft] = useState<QuestionDraft | null>(null)
   const [dismissedDraftFields, setDismissedDraftFields] = useState<DraftFieldKey[]>([])
   const [fieldErrors, setFieldErrors] = useState<FieldErrors<QuestionFormField>>({})
+  const [englishOnlyError, setEnglishOnlyError] = useState<string | null>(null)
   const [aiError, setAiError] = useState<string | null>(null)
   const fieldsDisabled = submitting || readOnly
 
@@ -89,6 +94,7 @@ export function QuestionEditor({
     if ('questionText' in patch) {
       clearFieldError('questionText', setFieldErrors)
     }
+    setEnglishOnlyError(null)
     setValue((current) => ({ ...current, ...patch }))
     if (aiDraft) {
       const dismissKeys = (Object.keys(patch) as DraftFieldKey[]).filter(
@@ -105,6 +111,7 @@ export function QuestionEditor({
 
   function handleMetadataTextChange(next: string) {
     clearFieldError('metadata', setFieldErrors)
+    setEnglishOnlyError(null)
     setMetadataText(next)
   }
 
@@ -119,7 +126,34 @@ export function QuestionEditor({
       return
     }
 
+    const nonEnglishFieldForGeneration = getFirstNonEnglishField([
+      { fieldLabel: editorLabels.fieldLabel('questionText'), value: value.questionText },
+      { fieldLabel: editorLabels.fieldLabel('role'), value: value.role },
+      { fieldLabel: editorLabels.fieldLabel('focus'), value: value.focus },
+      { fieldLabel: editorLabels.fieldLabel('outputLanguage'), value: value.outputLanguage },
+      { fieldLabel: editorLabels.fieldLabel('category'), value: value.category },
+      { fieldLabel: editorLabels.fieldLabel('subcategory'), value: value.subcategory },
+      { fieldLabel: editorLabels.fieldLabel('followUpQuestions'), value: value.followUpQuestions },
+      { fieldLabel: editorLabels.fieldLabel('sampleGoodAnswer'), value: value.sampleGoodAnswer },
+      { fieldLabel: editorLabels.fieldLabel('tags'), value: value.tags },
+    ])
+    if (nonEnglishFieldForGeneration) {
+      setAiError(null)
+      setEnglishOnlyError(
+        editorLabels.validation.englishOnlyField({ field: nonEnglishFieldForGeneration }),
+      )
+      setFieldErrors((prev) => ({
+        ...prev,
+        questionText:
+          nonEnglishFieldForGeneration === editorLabels.fieldLabel('questionText')
+            ? editorLabels.validation.questionTextEnglishOnlyForAi
+            : prev.questionText,
+      }))
+      return
+    }
+
     clearFieldError('questionText', setFieldErrors)
+    setEnglishOnlyError(null)
     setAiError(null)
     setAiStatus('loading')
 
@@ -199,7 +233,27 @@ export function QuestionEditor({
       },
       editorLabels.validation,
     )
+
+    const nonEnglishField = getFirstNonEnglishField([
+      { fieldLabel: editorLabels.fieldLabel('questionText'), value: value.questionText },
+      { fieldLabel: editorLabels.fieldLabel('role'), value: value.role },
+      { fieldLabel: editorLabels.fieldLabel('focus'), value: value.focus },
+      { fieldLabel: editorLabels.fieldLabel('outputLanguage'), value: value.outputLanguage },
+      { fieldLabel: editorLabels.fieldLabel('category'), value: value.category },
+      { fieldLabel: editorLabels.fieldLabel('subcategory'), value: value.subcategory },
+      { fieldLabel: editorLabels.fieldLabel('followUpQuestions'), value: value.followUpQuestions },
+      { fieldLabel: editorLabels.fieldLabel('sampleGoodAnswer'), value: value.sampleGoodAnswer },
+      { fieldLabel: editorLabels.fieldLabel('tags'), value: value.tags },
+    ])
+    if (nonEnglishField) {
+      setEnglishOnlyError(
+        editorLabels.validation.englishOnlyField({ field: nonEnglishField }),
+      )
+      return
+    }
+
     if (Object.keys(errors).length > 0) {
+      setEnglishOnlyError(null)
       setFieldErrors(errors)
       return
     }
@@ -228,6 +282,7 @@ export function QuestionEditor({
     }
 
     setFieldErrors({})
+    setEnglishOnlyError(null)
     setSubmitting(true)
 
     try {
@@ -262,6 +317,16 @@ export function QuestionEditor({
         main={(
           <form onSubmit={handleSubmit}>
             <Stack gap={6}>
+              <Alert>
+                <AlertTitle>{editorLabels.authoringNotice.title}</AlertTitle>
+                <AlertDescription>{editorLabels.authoringNotice.description}</AlertDescription>
+              </Alert>
+              {englishOnlyError ? (
+                <Alert variant="warning">
+                  <AlertTitle>{editorLabels.validation.englishOnlyTitle}</AlertTitle>
+                  <AlertDescription>{englishOnlyError}</AlertDescription>
+                </Alert>
+              ) : null}
               <EditorPromptSection
                 value={value}
                 submitting={fieldsDisabled}

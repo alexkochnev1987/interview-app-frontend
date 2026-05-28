@@ -21,11 +21,16 @@
     "validation": {
       "questionTextRequired": "Текст вопроса обязателен.",
       "metadataInvalidJson": "Метаданные должны быть действительными в формате JSON.",
-      "metadataMustBeObject": "Метаданные должны быть объектом JSON (а не массивом или примитивом)."
+      "metadataMustBeObject": "Метаданные должны быть объектом JSON (а не массивом или примитивом).",
+      "englishOnlyField": "Поле «{field}» должно быть на английском языке.",
+      "englishOnlyTitle": "Только английский"
     },
     "editor": {
       "previewEmpty": "Пустой",
       "aiQuestionTextRequired": "Текст вопроса необходим перед созданием ИИ.",
+      "aiQuestionTextEnglishOnly": "Перед генерацией ИИ текст вопроса должен быть на английском языке.",
+      "englishOnlyNoticeTitle": "Политика контента: только английский",
+      "englishOnlyNoticeDescription": "Заполняйте все поля вопроса на английском вне зависимости от текущей локали интерфейса.",
       "conceptDescriptionFallback": "{label} должно быть указано в ответе.",
       "headerEyebrow": "Единый редактор вопросов",
       "headerLead": "Формируйте подсказку, определите критерии и сохраняйте черновые предложения, созданные ИИ, видимыми в виде явных различий, а не невидимых фоновых мутаций.",
@@ -76,7 +81,7 @@
         "tagsPlaceholder": "Разделенные запятой или новой строкой",
         "metadata": "Дополнительные метаданные",
         "metadataHint": "Действительный объект JSON, который может содержать рубрику или исходную информацию.",
-        "metadataPlaceholder": "{\"rubricVersion\":\"v1\"}"
+        "metadataPlaceholder": "'{'\"rubricVersion\":\"v1\"'}'"
       }
     },
     "aiDraft": {

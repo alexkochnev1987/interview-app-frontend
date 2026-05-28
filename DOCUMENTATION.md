@@ -183,6 +183,15 @@ Do not use `useEffect` + module-level dedupe to fire toasts when `error` or `res
 
 Do not remove remaining `Alert` usages to “finish” the migration unless the UX above is preserved another way. Field error state uses `FieldErrors` from `src/lib/clear-field-error.ts`; question editor validation lives in `src/lib/question-editor/validate-question-form.ts`. Copy lives in `src/lib/toast-messages.ts` for toasts; whitelisted Alerts may stay hardcoded or use `TOAST_MESSAGES` where shared.
 
+### Candidate flow is intentionally English-only
+
+Candidate-facing pages `/<locale>/take/[id]` and `/<locale>/feedback/[id]` are intentionally locked to English UI copy, regardless of the locale segment in the URL.
+
+Policy:
+- Locale switching must not change candidate UI language on take/feedback pages.
+- The app header is hidden on candidate flow, so `LanguageSwitcher` is not shown there.
+- Question TTS in candidate flow is intentionally fixed to `en-US` (see `src/features/take/use-take-question-tts.ts`).
+
 ### Что запускается в Docker
 ```
 PostgreSQL   localhost:5433   (БД, данные сохраняются в volume)

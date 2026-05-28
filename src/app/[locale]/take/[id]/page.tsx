@@ -1,9 +1,11 @@
 import { AlertCircle } from 'lucide-react'
+import { NextIntlClientProvider } from 'next-intl'
 import { getTranslations } from 'next-intl/server'
 
 import { PageContent, PageMainLayout } from '@/components/layout/page-shell'
 import { Icon } from '@/components/ui/icon'
 import { EmptyStateCard } from '@/components/ui/state-card'
+import { loadLocaleMessages } from '@/i18n/load-messages'
 import type { Locale } from '@/i18n/locales'
 import { type TakeInterviewData } from '@/lib/api'
 import { getServerRequestContext, requestServer } from '@/lib/server-fetch'
@@ -19,12 +21,17 @@ export default async function TakeInterviewPage({
   params,
   searchParams,
 }: TakeInterviewPageProps) {
-  const { id, locale } = await params
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.take' })
+  const { id } = await params
+  const t = await getTranslations({ locale: 'en', namespace: 'toast.pageGate.take' })
+  const englishMessages = await loadLocaleMessages('en')
   const token = readSearchParamToken((await searchParams).token)
 
   if (token) {
-    return <TakeInterviewClient id={id} candidateToken={token} />
+    return (
+      <NextIntlClientProvider locale="en" messages={englishMessages}>
+        <TakeInterviewClient id={id} candidateToken={token} />
+      </NextIntlClientProvider>
+    )
   }
 
   const ctx = await getServerRequestContext()
@@ -62,6 +69,8 @@ export default async function TakeInterviewPage({
   }
 
   return (
-    <TakeInterviewClient id={id} initialInterview={interview} />
+    <NextIntlClientProvider locale="en" messages={englishMessages}>
+      <TakeInterviewClient id={id} initialInterview={interview} />
+    </NextIntlClientProvider>
   )
 }
