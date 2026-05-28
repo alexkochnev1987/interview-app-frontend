@@ -1,0 +1,75 @@
+{
+  "metadata": {
+    "title": "AI Interview Architect",
+    "description": "AI-powered interview platform"
+  },
+  "common": {
+    "appName": "AI Interview Architect",
+    "brandEyebrow": "Intelligent Conductor",
+    "loading": "Загрузка...",
+    "notAvailable": "Недоступно",
+    "backToHome": "На главную",
+    "serviceUnavailable": "Сервис недоступен",
+    "sessionVerificationFailed": "Не удалось проверить вашу сессию или права доступа."
+  },
+  "languageSwitcher": {
+    "label": "Язык",
+    "locales": {
+      "en": "English",
+      "be": "Беларуская",
+      "ru": "Русский",
+      "pl": "Polski"
+    }
+  },
+  "shared": {
+    "fallback": {
+      "backToDashboard": "Вернуться на панель",
+      "backToQuestionLibrary": "Вернуться в банк вопросов",
+      "backToAssessments": "Вернуться к оценкам"
+    },
+    "labels": {
+      "roles": {
+        "super_admin": "Суперадминистратор",
+        "admin": "Администратор",
+        "hr": "HR-специалист",
+        "candidate": "Кандидат",
+        "interviewer": "Интервьюер",
+        "system": "Система",
+        "assistant": "Ассистент"
+      },
+      "roleFilters": {
+        "all": "Все роли"
+      },
+      "difficulty": {
+        "easy": "Лёгкий",
+        "medium": "Средний",
+        "hard": "Сложный"
+      },
+      "interviewStatus": {
+        "pending": "Ожидает",
+        "in_progress": "В процессе",
+        "processing": "Обрабатывается",
+        "completed": "Завершено",
+        "failed": "Ошибка"
+      },
+      "reviewStatus": {
+        "ready": "Готово к просмотру",
+        "scoring": "Оценка ещё обновляется",
+        "in_progress": "Кандидат проходит интервью",
+        "pending": "Ожидает кандидата",
+        "failed": "Ошибка"
+      },
+      "decision": {
+        "proceed": "Продолжить",
+        "review": "На рассмотрение",
+        "reject": "Отклонить"
+      },
+      "behaviorRisk": {
+        "high": "Высокий риск",
+        "medium": "Средний риск",
+        "low": "Низкий риск",
+        "none": "Нет риска"
+      }
+    }
+  }
+}

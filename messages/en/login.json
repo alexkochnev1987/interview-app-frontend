@@ -1,0 +1,31 @@
+{
+  "login": {
+    "marketingEyebrow": "Conductor AI",
+    "title": "Review candidate performance with the calm of an editorial workspace.",
+    "lead": "The new design system trades brittle admin chrome for layered surfaces, sharper hierarchy, and faster decision-making during interview review.",
+    "cards": {
+      "protectedAccess": {
+        "title": "Protected access",
+        "description": "Session-based auth for recruiter-only workflows."
+      },
+      "unifiedShell": {
+        "title": "Unified shell",
+        "description": "Shared tokens across dashboard, library, and interview flows."
+      },
+      "fastTriage": {
+        "title": "Fast triage",
+        "description": "Move from sign-in straight into active interviews and scorecards."
+      }
+    },
+    "form": {
+      "eyebrow": "Recruiter access",
+      "title": "Sign in",
+      "emailLabel": "Email",
+      "emailPlaceholder": "admin@interview-app.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Password",
+      "or": "Or",
+      "google": "Sign in with Google"
+    }
+  }
+}

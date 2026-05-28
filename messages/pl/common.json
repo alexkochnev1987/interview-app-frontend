@@ -1,0 +1,75 @@
+{
+  "metadata": {
+    "title": "AI Interview Architect",
+    "description": "AI-powered interview platform"
+  },
+  "common": {
+    "appName": "AI Interview Architect",
+    "brandEyebrow": "Intelligent Conductor",
+    "loading": "Ładowanie...",
+    "notAvailable": "Niedostępne",
+    "backToHome": "Wróć do strony głównej",
+    "serviceUnavailable": "Usługa jest niedostępna",
+    "sessionVerificationFailed": "Nie udało się zweryfikować sesji lub uprawnień."
+  },
+  "languageSwitcher": {
+    "label": "Język",
+    "locales": {
+      "en": "English",
+      "be": "Беларуская",
+      "ru": "Русский",
+      "pl": "Polski"
+    }
+  },
+  "shared": {
+    "fallback": {
+      "backToDashboard": "Wróć do panelu",
+      "backToQuestionLibrary": "Wróć do bazy pytań",
+      "backToAssessments": "Wróć do ocen"
+    },
+    "labels": {
+      "roles": {
+        "super_admin": "Superadministrator",
+        "admin": "Administrator",
+        "hr": "Specjalista HR",
+        "candidate": "Kandydat",
+        "interviewer": "Prowadzący rozmowę",
+        "system": "System",
+        "assistant": "Asystent"
+      },
+      "roleFilters": {
+        "all": "Wszystkie role"
+      },
+      "difficulty": {
+        "easy": "Łatwe",
+        "medium": "Średnie",
+        "hard": "Trudne"
+      },
+      "interviewStatus": {
+        "pending": "Oczekuje",
+        "in_progress": "W toku",
+        "processing": "Przetwarzanie",
+        "completed": "Zakończone",
+        "failed": "Nieudane"
+      },
+      "reviewStatus": {
+        "ready": "Gotowe do przeglądu",
+        "scoring": "Ocena nadal się aktualizuje",
+        "in_progress": "Kandydat jest w trakcie",
+        "pending": "Oczekuje na kandydata",
+        "failed": "Nieudane"
+      },
+      "decision": {
+        "proceed": "Kontynuować",
+        "review": "Do przeglądu",
+        "reject": "Odrzucić"
+      },
+      "behaviorRisk": {
+        "high": "Wysokie ryzyko",
+        "medium": "Średnie ryzyko",
+        "low": "Niskie ryzyko",
+        "none": "Brak ryzyka"
+      }
+    }
+  }
+}

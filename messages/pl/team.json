@@ -1,0 +1,53 @@
+{
+  "team": {
+    "heading": "Członkowie zespołu",
+    "lead": "Zarządzaj współpracownikami w przestrzeni roboczej i poziomami dostępu.",
+    "filters": {
+      "label": "Filtry:"
+    },
+    "searchPlaceholder": "Szukaj według nazwy lub adresu e-mail",
+    "table": {
+      "memberName": "Imię i nazwisko",
+      "email": "Adres e-mail",
+      "accessRole": "Rola dostępu",
+      "joined": "Data dołączenia",
+      "actions": "Działania"
+    },
+    "empty": {
+      "title": "Nie znaleziono żadnych członków",
+      "description": "Spróbuj zmienić filtr roli, aby zobaczyć więcej wyników."
+    },
+    "pagination": {
+      "showing": "Wyświetlono {from}–{to} z {total} członków"
+    },
+    "stats": {
+      "totalMembers": "Całkowita liczba członków",
+      "allRoles": "Wszystkie role",
+      "superAdmins": "Superadministratorzy",
+      "fullAccess": "Pełny dostęp",
+      "admins": "Administratorzy",
+      "adminRole": "Rola administratora",
+      "hrSpecialists": "Specjaliści HR",
+      "hrRole": "Rola HR",
+      "candidates": "Kandydaci",
+      "candidateRole": "Rola kandydata"
+    },
+    "changeRole": {
+      "title": "Zmień rolę",
+      "accessibilityTitle": "Zmień rolę",
+      "currentRole": "Obecna rola",
+      "newRole": "Nowa rola",
+      "noRoles": "Żadne role nie są dostępne do przypisania do Twojego konta. Jeśli wygląda to nieprawidłowo, spróbuj ponownie zalogować się jako administrator wyższego poziomu.",
+      "applying": "Stosowanie zmiany roli...",
+      "apply": "Zastosuj zmianę roli",
+      "cancel": "Anuluj",
+      "footnote": "Zmiana ta wchodzi w życie natychmiast. Użytkownik utrzymuje swoją sesję do następnego żądania."
+    },
+    "actions": {
+      "changeRole": "Zmień rolę",
+      "editAccount": "Edytuj konto",
+      "deleteUser": "Usuń użytkownika",
+      "menuAria": "Otwórz menu akcji dla {name}"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "feedback": {
+    "eyebrow": "Interview feedback",
+    "title": "Your interview summary",
+    "lead": "This page shares the reviewed outcome for the <strong>{position}</strong> interview and highlights both strengths and next areas to improve.",
+    "outOf100": "out of 100",
+    "reviewed": "Reviewed {date}",
+    "snapshotTitle": "Snapshot",
+    "snapshotDescription": "A compact overview of your current outcome and when this shared link expires.",
+    "overallScore": "Overall score",
+    "linkExpiry": "Link expiry",
+    "categoryScoresEyebrow": "Category scores",
+    "breakdownTitle": "Breakdown",
+    "feedbackEyebrow": "Feedback",
+    "wentWellTitle": "What went well",
+    "recommendationsEyebrow": "Recommendations",
+    "improveTitle": "What to improve next"
+  }
+}

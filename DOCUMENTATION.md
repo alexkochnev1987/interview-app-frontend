@@ -134,6 +134,46 @@ npm run dev
 # Frontend: http://localhost:3001
 ```
 
+### i18n структура переводов
+
+Используется только модульный формат (legacy `messages/*.json` удалены):
+
+```text
+messages/
+  en|be|ru|pl/
+    common.json
+    nav.json
+    login.json
+    dashboard.json
+    questions.json
+    interviews.json
+    assessments.json
+    team.json
+    feedback.json
+    takeFlow.json
+    toast.json
+```
+
+Проверка соответствия ключей между локалями:
+
+```bash
+npm run i18n:check
+```
+
+`en` — source of truth. Скрипт проверяет `missing`, `extra` и `type mismatch` для `be/ru/pl`.
+
+Policy (single source of truth):
+- Legacy flat файлы `messages/en.json`, `messages/be.json`, `messages/ru.json`, `messages/pl.json` запрещены.
+- Разрешено редактировать только `messages/<locale>/*.json`.
+- Runtime loader работает только с модульными файлами `messages/<locale>/*.json` (fallback на legacy отключен).
+- Техническая защита:
+
+```bash
+npm run i18n:legacy:guard
+```
+
+Проверка включена в CI через `npm run lint:ci`.
+
 ### Alert vs toast (frontend feedback)
 
 After the alert → toast migration, use this split:

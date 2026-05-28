@@ -1,0 +1,11 @@
+{
+  "nav": {
+    "dashboard": "Панель",
+    "questions": "Вопросы",
+    "assessments": "Оценки",
+    "newInterview": "Новое интервью",
+    "team": "Команда",
+    "logout": "Выйти",
+    "signIn": "Войти"
+  }
+}
