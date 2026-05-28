@@ -154,7 +154,7 @@ messages/
     toast.json
 ```
 
-Проверка соответствия ключей между локалями:
+Проверка соответствия ключей между локалями (обязательная):
 
 ```bash
 npm run i18n:check
@@ -166,13 +166,7 @@ Policy (single source of truth):
 - Legacy flat файлы `messages/en.json`, `messages/be.json`, `messages/ru.json`, `messages/pl.json` запрещены.
 - Разрешено редактировать только `messages/<locale>/*.json`.
 - Runtime loader работает только с модульными файлами `messages/<locale>/*.json` (fallback на legacy отключен).
-- Техническая защита:
-
-```bash
-npm run i18n:legacy:guard
-```
-
-Проверка включена в CI через `npm run lint:ci`.
+- Проверка включена в CI через `npm run lint:ci`.
 
 ### Alert vs toast (frontend feedback)
 

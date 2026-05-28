@@ -248,18 +248,9 @@ export function useTakeOrchestrator({
     id,
     candidateToken,
     skipInitialLoad: Boolean(initialInterview),
-    onData: (data, mode, tokenOverride) => {
+    onData: (data, mode) => {
       setError('');
       setInterview(data);
-      if (mode === 'initial' && tokenOverride && typeof window !== 'undefined') {
-        const url = new URL(window.location.href);
-        if (url.searchParams.has('token')) {
-          url.searchParams.delete('token');
-          const nextSearch = url.searchParams.toString();
-          const next = nextSearch ? `${url.pathname}?${nextSearch}` : url.pathname;
-          window.history.replaceState(null, '', next);
-        }
-      }
       if (data.completed) {
         releaseAllCaptures();
       }

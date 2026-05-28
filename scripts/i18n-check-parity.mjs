@@ -1,42 +1,35 @@
-import fs from 'node:fs'
+import fs from 'node:fs/promises'
 import path from 'node:path'
 
+import { mergeLocaleModules } from '../src/i18n/module-loader-core.mjs'
+
 const ROOT = process.cwd()
+const MESSAGES_DIR = path.join(ROOT, 'messages')
 const SOURCE_LOCALE = 'en'
 const TARGET_LOCALES = ['be', 'ru', 'pl']
-const MODULE_ORDER = readJson(path.join(ROOT, 'messages', 'module-order.json'))
 
-function readJson(filePath) {
-  return JSON.parse(fs.readFileSync(filePath, 'utf8'))
+let moduleOrderCache = null
+
+async function readJsonFile(filePath) {
+  return JSON.parse(await fs.readFile(filePath, 'utf8'))
 }
 
-function loadLocaleMessages(locale) {
-  const localeDir = path.join(ROOT, 'messages', locale)
-  const hasModules = fs.existsSync(localeDir)
-
-  if (hasModules) {
-    const merged = {}
-
-    for (const moduleName of MODULE_ORDER) {
-      const modulePath = path.join(localeDir, `${moduleName}.json`)
-      if (!fs.existsSync(modulePath)) {
-        throw new Error(
-          `Locale '${locale}' is missing module file: messages/${locale}/${moduleName}.json`,
-        )
-      }
-      Object.assign(merged, readJson(modulePath))
-    }
-
-    return merged
+async function getModuleOrder() {
+  if (moduleOrderCache) {
+    return moduleOrderCache
   }
+  moduleOrderCache = await readJsonFile(path.join(MESSAGES_DIR, 'module-order.json'))
+  return moduleOrderCache
+}
 
-  const legacyPath = path.join(ROOT, 'messages', `${locale}.json`)
-  if (!fs.existsSync(legacyPath)) {
-    throw new Error(
-      `Locale '${locale}' has neither modules nor legacy file messages/${locale}.json`,
-    )
-  }
-  return readJson(legacyPath)
+async function loadLocaleMessages(locale) {
+  const moduleOrder = await getModuleOrder()
+  return mergeLocaleModules({
+    locale,
+    moduleOrder,
+    loadModule: async (moduleName) =>
+      readJsonFile(path.join(MESSAGES_DIR, locale, `${moduleName}.json`)),
+  })
 }
 
 function valueKind(value) {
@@ -123,14 +116,14 @@ function printIssues(locale, issues) {
   return total
 }
 
-function main() {
-  const sourceMessages = loadLocaleMessages(SOURCE_LOCALE)
+async function main() {
+  const sourceMessages = await loadLocaleMessages(SOURCE_LOCALE)
   let failures = 0
 
   console.log(`Checking i18n key parity against source locale '${SOURCE_LOCALE}'...`)
 
   for (const locale of TARGET_LOCALES) {
-    const localeMessages = loadLocaleMessages(locale)
+    const localeMessages = await loadLocaleMessages(locale)
     const issues = {
       missing: [],
       extra: [],
@@ -149,4 +142,4 @@ function main() {
   console.log('\nAll locale parity checks passed.')
 }
 
-main()
+void main()

@@ -57,7 +57,6 @@ When adding a new domain module, follow all steps (no hidden actions):
 2. Create `messages/<locale>/<new-module>.json` for **all** locales: `en`, `be`, `ru`, `pl`.
 3. Add corresponding keys with the same structure/type across locales.
 4. Run:
-   - `npm run i18n:legacy:guard`
    - `npm run i18n:check`
    - `npm run lint:ci`
 
@@ -74,7 +73,6 @@ When adding a new domain module, follow all steps (no hidden actions):
    - object in `en` -> object in all locales
    - do not change nesting only in one locale
 5. Run checks:
-   - `npm run i18n:legacy:guard`
    - `npm run i18n:check`
    - `npm run lint:ci` (recommended before push)
 
@@ -92,14 +90,13 @@ When adding a new domain module, follow all steps (no hidden actions):
   - Meaning: same path has different types (e.g. `string` vs `object`).
   - Action: align locale type to match `en` at the same path.
 
-## Legacy Policy (Frozen)
+## Format Policy
 
 - Legacy flat files are forbidden:
   - `messages/en.json`
   - `messages/be.json`
   - `messages/ru.json`
   - `messages/pl.json`
-- Technical guard: `npm run i18n:legacy:guard`
 - Only modular files `messages/<locale>/*.json` are allowed for edits.
 - Runtime loader is strict modular-only; legacy fallback is disabled.
 

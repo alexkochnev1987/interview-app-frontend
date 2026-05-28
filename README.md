@@ -28,7 +28,7 @@ Run the API separately — [interview-app-backend](https://github.com/alexkochne
 
 ## i18n messages
 
-Translations are modular per locale (legacy flat files were removed):
+Translations are modular per locale:
 
 ```text
 messages/
@@ -51,9 +51,8 @@ Loader policy:
 - Legacy flat files are disabled and must not exist.
 
 Validation:
-- `npm run i18n:legacy:guard` — blocks legacy flat files (`messages/en.json`, `be.json`, `ru.json`, `pl.json`).
 - `npm run i18n:check` — checks parity against `en` (missing/extra/type mismatch).
-- `npm run lint:ci` — runs ESLint + legacy guard + i18n parity check (used in CI).
+- `npm run lint:ci` — runs ESLint + i18n parity check (used in CI).
 
 Team workflow (short):
 - Add new keys in `messages/en/<module>.json` first, then mirror the same key path in `be/ru/pl`.
