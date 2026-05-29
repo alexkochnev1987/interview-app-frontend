@@ -13,6 +13,7 @@ Scope note (current product stage):
 - Candidate flow (`take`, `feedback`) is intentionally English-only in runtime behavior at this stage, even though locale files include `takeFlow` and `feedback` modules for structural consistency.
 - Source of truth for product decision and scope boundaries: `DOCUMENTATION.md` -> `Candidate flow is intentionally English-only`.
 - App `<title>` / meta description are localized via `generateMetadata` in `src/app/[locale]/layout.tsx` (`metadata` namespace). `<html lang>` follows the active locale, except candidate `/take` and `/feedback` routes (`lang="en"`).
+- `common.appName` and `common.brandEyebrow` intentionally stay English in all locales (product brand). Localize `metadata.*` per locale.
 
 Target domain modules:
 - `common`

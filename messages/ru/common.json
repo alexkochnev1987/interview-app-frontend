@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "AI Interview Architect",
-    "description": "AI-powered interview platform"
+    "title": "AI Interview Architect — платформа интервью",
+    "description": "Платформа для проведения и оценки интервью с поддержкой ИИ"
   },
   "common": {
     "appName": "AI Interview Architect",

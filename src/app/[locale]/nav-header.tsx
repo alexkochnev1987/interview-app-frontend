@@ -99,6 +99,7 @@ export function NavHeader() {
                   size="responsive-sm"
                   weight="semibold"
                   tone="foreground"
+                  className="whitespace-nowrap"
                 >
                   {tCommon('appName')}
                 </BodyText>
