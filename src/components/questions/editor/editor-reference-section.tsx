@@ -4,7 +4,6 @@ import { Save } from 'lucide-react'
 import { type ReactNode } from 'react'
 import { useTranslations } from 'next-intl'
 
-import { Grid } from '@/components/ui/layout/grid'
 import { Stack } from '@/components/ui/layout/stack'
 import { Textarea } from '@/components/ui/textarea'
 import { type QuestionInput } from '@/lib/api'
@@ -44,7 +43,7 @@ export function EditorReferenceSection({
       description={t('description')}
       icon={<Save className="size-4" />}
     >
-      <Grid columns="editor-2" gap={6}>
+      <Stack gap={5}>
         <Stack gap={2}>
           <QuestionEditorField
             htmlFor="sampleGoodAnswer"
@@ -53,7 +52,7 @@ export function EditorReferenceSection({
           >
             <Textarea
               id="sampleGoodAnswer"
-              size="xl"
+              size="md"
               value={value.sampleGoodAnswer ?? ''}
               onChange={(event) => onUpdate({ sampleGoodAnswer: event.target.value })}
               placeholder={t('sampleGoodAnswerPlaceholder')}
@@ -63,43 +62,41 @@ export function EditorReferenceSection({
           {renderAiSuggestion('sampleGoodAnswer')}
         </Stack>
 
-        <Stack gap={6}>
-          <Stack gap={2}>
-            <QuestionEditorField
-              htmlFor="tags"
-              label={tFields('tags')}
-              hint={t('tagsHint')}
-            >
-              <Textarea
-                id="tags"
-                size="sm"
-                value={joinStringList(value.tags || [])}
-                onChange={(event) => onUpdate({ tags: parseStringList(event.target.value) })}
-                placeholder={t('tagsPlaceholder')}
-                disabled={submitting}
-              />
-            </QuestionEditorField>
-            {renderAiSuggestion('tags')}
-          </Stack>
-
+        <Stack gap={2}>
           <QuestionEditorField
-            htmlFor="metadata"
-            label={t('metadata')}
-            hint={t('metadataHint')}
-            error={metadataError}
+            htmlFor="tags"
+            label={tFields('tags')}
+            hint={t('tagsHint')}
           >
             <Textarea
-              id="metadata"
-              size="lg"
-              tone="code"
-              value={metadataText}
-              onChange={(event) => onMetadataTextChange(event.target.value)}
-              placeholder={t('metadataPlaceholder')}
+              id="tags"
+              size="sm"
+              value={joinStringList(value.tags || [])}
+              onChange={(event) => onUpdate({ tags: parseStringList(event.target.value) })}
+              placeholder={t('tagsPlaceholder')}
               disabled={submitting}
             />
           </QuestionEditorField>
+          {renderAiSuggestion('tags')}
         </Stack>
-      </Grid>
+
+        <QuestionEditorField
+          htmlFor="metadata"
+          label={t('metadata')}
+          hint={t('metadataHint')}
+          error={metadataError}
+        >
+          <Textarea
+            id="metadata"
+            size="lg"
+            tone="code"
+            value={metadataText}
+            onChange={(event) => onMetadataTextChange(event.target.value)}
+            placeholder={t('metadataPlaceholder')}
+            disabled={submitting}
+          />
+        </QuestionEditorField>
+      </Stack>
     </EditorSectionCard>
   )
 }

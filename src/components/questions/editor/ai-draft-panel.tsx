@@ -72,7 +72,8 @@ export function AiDraftPanel({
               type="button"
               variant="gradient"
               onClick={onGenerate}
-              disabled={disabled || loading}
+              disabled={disabled}
+              loading={loading}
             >
               <WandSparkles className="size-4" />
               {loading ? t('generating') : t('generate')}
