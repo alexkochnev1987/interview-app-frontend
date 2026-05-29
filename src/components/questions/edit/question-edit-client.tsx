@@ -1,12 +1,13 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { DeletedQuestionBanner } from '@/components/questions/detail/deleted-question-banner'
 import { QuestionDangerZone } from '@/components/questions/detail/question-danger-zone'
 import { QuestionEditor } from '@/components/questions/editor/question-editor'
+import { useRouter } from '@/i18n/navigation'
 import {
   deleteQuestion,
   QuestionInUseError,
@@ -17,7 +18,7 @@ import {
 } from '@/lib/api'
 import { questionToEditorInput } from '@/lib/question-editor/parsers'
 import { runMutation } from '@/lib/run-mutation'
-import { TOAST_MESSAGES } from '@/lib/toast-messages'
+import { useToastMessages } from '@/lib/use-toast-messages'
 
 type QuestionEditClientProps = {
   id: string
@@ -32,7 +33,9 @@ export function QuestionEditClient({
   canUpdate,
   canDelete,
 }: QuestionEditClientProps) {
+  const t = useTranslations('questions.editPage')
   const router = useRouter()
+  const toastMessages = useToastMessages()
   const [question, setQuestion] = useState(initialQuestion)
   const [deleting, setDeleting] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -51,8 +54,8 @@ export function QuestionEditClient({
     setRestoring(true)
     try {
       const restored = await runMutation(() => restoreQuestion(id), {
-        successMessage: TOAST_MESSAGES.question.restoreSuccess,
-        errorMessage: TOAST_MESSAGES.question.restoreError,
+        successMessage: toastMessages.question.restoreSuccess,
+        errorMessage: toastMessages.question.restoreError,
       })
       setQuestion(restored)
       setRestoreOpen(false)
@@ -67,12 +70,12 @@ export function QuestionEditClient({
     setDeleting(true)
     try {
       await runMutation(() => deleteQuestion(id), {
-        successMessage: TOAST_MESSAGES.question.deleteSuccess,
-        errorMessage: TOAST_MESSAGES.question.deleteError,
+        successMessage: toastMessages.question.deleteSuccess,
+        errorMessage: toastMessages.question.deleteError,
         getErrorTitle: (err) =>
           err instanceof QuestionInUseError
-            ? TOAST_MESSAGES.deleteQuestion.cannotDeleteTitle
-            : TOAST_MESSAGES.question.deleteError,
+            ? toastMessages.deleteQuestion.cannotDeleteTitle
+            : toastMessages.question.deleteError,
       })
       setConfirmOpen(false)
       router.push('/questions')
@@ -92,10 +95,10 @@ export function QuestionEditClient({
       ) : null}
       <QuestionEditor
         questionId={id}
-        title={canUpdate ? 'Edit Question' : 'View Question'}
+        title={canUpdate ? t('title') : t('viewTitle')}
         readOnly={!canUpdate}
         initialValue={questionToEditorInput(question)}
-        submitLabel="Save Changes"
+        submitLabel={t('submit')}
         onSubmit={handleSubmit}
       />
       {!question.deleted && canDelete ? (
@@ -107,10 +110,10 @@ export function QuestionEditClient({
       <ConfirmDialog
         open={confirmOpen}
         destructive
-        title="Delete this question?"
-        description="It will be hidden from the library and from new interviews. Past interviews keep their snapshot. Active interviews block deletion."
-        confirmLabel={deleting ? 'Deleting...' : 'Delete'}
-        cancelLabel="Cancel"
+        title={t('deleteTitle')}
+        description={t('deleteDescription')}
+        confirmLabel={deleting ? t('deleting') : t('confirmDelete')}
+        cancelLabel={t('cancel')}
         loading={deleting}
         onConfirm={performDelete}
         onCancel={() => {
@@ -119,10 +122,10 @@ export function QuestionEditClient({
       />
       <ConfirmDialog
         open={restoreOpen}
-        title="Restore this question?"
-        description="It will become visible in the library again and available for new interviews."
-        confirmLabel={restoring ? 'Restoring...' : 'Restore'}
-        cancelLabel="Cancel"
+        title={t('restoreTitle')}
+        description={t('restoreDescription')}
+        confirmLabel={restoring ? t('restoring') : t('restore')}
+        cancelLabel={t('cancel')}
         loading={restoring}
         onConfirm={performRestore}
         onCancel={() => {

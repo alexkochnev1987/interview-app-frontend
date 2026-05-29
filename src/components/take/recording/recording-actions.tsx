@@ -1,10 +1,10 @@
 import { ArrowRight, RotateCcw } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { Button } from '@/components/ui/button';
 import { Stack } from '@/components/ui/layout';
 import type { TakeStage } from '@/components/take/types';
 import type { InterviewerPresence } from '@/features/take/use-take-question-tts';
-import { TAKE_MESSAGES } from '@/features/take';
 
 interface TakeRecordingActionsProps {
   stage: TakeStage;
@@ -33,6 +33,7 @@ export function TakeRecordingActions({
   onSubmit,
   submitAnswerLabel,
 }: TakeRecordingActionsProps) {
+  const tTake = useTranslations('takeFlow');
   const versionActionsEnabled =
     recording &&
     !uploading &&
@@ -51,7 +52,7 @@ export function TakeRecordingActions({
           onClick={onReconnect}
           disabled={uploading}
         >
-          {TAKE_MESSAGES.reconnectCameraAndScreen}
+          {tTake('reconnectCameraAndScreen')}
         </Button>
       ) : null}
 
@@ -64,7 +65,7 @@ export function TakeRecordingActions({
         disabled={!versionActionsEnabled}
       >
         <RotateCcw size={18} strokeWidth={2} aria-hidden />
-        {TAKE_MESSAGES.rerecordAsNewVersion}
+        {tTake('rerecordAsNewVersion')}
       </Button>
       <Button
         type="button"

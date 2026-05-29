@@ -1,8 +1,10 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { RerunButton } from '@/components/assessments/detail/rerun-button'
 import { validateInterviewQuestion } from '@/lib/api'
-import { TOAST_MESSAGES } from '@/lib/toast-messages'
+import { useToastMessages } from '@/lib/use-toast-messages'
 
 interface RerunAnswerButtonProps {
   interviewId: string
@@ -15,6 +17,9 @@ export function RerunAnswerButton({
   questionIndex,
   disabled,
 }: RerunAnswerButtonProps) {
+  const t = useTranslations('assessments.rerun')
+  const toastMessages = useToastMessages()
+
   return (
     <RerunButton
       toastId={`rerun-answer-${interviewId}-${questionIndex}`}
@@ -22,10 +27,11 @@ export function RerunAnswerButton({
       size="sm"
       variant="outline-pill"
       iconSize="sm"
-      idleLabel="Re-run this answer"
-      submittedLabel="Queued"
-      errorTitle={TOAST_MESSAGES.rerun.startFailedTitle}
-      errorFallback={TOAST_MESSAGES.rerun.answerFailedFallback}
+      idleLabel={t('answer')}
+      submittedLabel={t('queued')}
+      startingLabel={t('starting')}
+      errorTitle={toastMessages.rerun.startFailedTitle}
+      errorFallback={toastMessages.rerun.answerFailedFallback}
       onRun={async () => {
         await validateInterviewQuestion(interviewId, questionIndex, { force: true })
         return undefined

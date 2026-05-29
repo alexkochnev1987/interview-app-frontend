@@ -1,5 +1,7 @@
-import Link from 'next/link'
+'use client'
+
 import { CirclePlus, Sparkles } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
 import { HeroLead, HeroTitle } from '@/components/ui/hero-text'
@@ -7,32 +9,30 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
+import { Link } from '@/i18n/navigation'
 
 export function InterviewCreateIntro() {
+  const t = useTranslations('interviews.createIntro')
+
   return (
     <Card variant="floating" size="lg">
       <CardContent spacing="xl">
         <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
-          Create Interview Flow
+          {t('eyebrow')}
         </EyebrowBadge>
         <Stack gap={3}>
-          <HeroTitle>
-            Assemble the candidate packet before you send the interview link.
-          </HeroTitle>
-          <HeroLead width="prose">
-            Capture the role, choose only the questions that matter, and keep the decision
-            criteria explicit before the recording session starts.
-          </HeroLead>
+          <HeroTitle>{t('title')}</HeroTitle>
+          <HeroLead width="prose">{t('lead')}</HeroLead>
         </Stack>
         <Inline gap={3} wrap="wrap">
           <Button asChild variant="gradient">
             <Link href="/questions/new">
               <CirclePlus className="size-4" />
-              Create Question
+              {t('createQuestion')}
             </Link>
           </Button>
           <Button asChild variant="outline-pill" shape="pill">
-            <Link href="/questions">Open Question Bank</Link>
+            <Link href="/questions">{t('openBank')}</Link>
           </Button>
         </Inline>
       </CardContent>

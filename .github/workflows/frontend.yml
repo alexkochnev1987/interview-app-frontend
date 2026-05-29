@@ -19,7 +19,7 @@ jobs:
         run: npm run openapi:generate
       - name: Ensure generated types match committed spec
         run: git diff --exit-code -- src/lib/api-types.ts
-      - run: npm run lint
+      - run: npm run lint:ci
       - run: npx next build --webpack
 
 # Deploy is handled by AWS Amplify auto-build (connected to GitHub repo).

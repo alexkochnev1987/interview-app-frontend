@@ -2,6 +2,7 @@
 
 import { Save } from 'lucide-react'
 import { type ReactNode } from 'react'
+import { useTranslations } from 'next-intl'
 
 import { Stack } from '@/components/ui/layout/stack'
 import { Textarea } from '@/components/ui/textarea'
@@ -9,8 +10,8 @@ import { type QuestionInput } from '@/lib/api'
 import {
   joinStringList,
   parseStringList,
-  type DraftFieldKey,
 } from '@/lib/question-editor/parsers'
+import { type DraftFieldKey } from '@/lib/question-editor/field-keys'
 import { EditorSectionCard } from './editor-section-card'
 import { QuestionEditorField } from './question-editor-field'
 
@@ -33,25 +34,28 @@ export function EditorReferenceSection({
   renderAiSuggestion,
   metadataError,
 }: EditorReferenceSectionProps) {
+  const tFields = useTranslations('questions.fields')
+  const t = useTranslations('questions.sections.reference')
+
   return (
     <EditorSectionCard
-      title="Reference material"
-      description="Store extra context for future reviewers, exports, and scoring experiments."
+      title={t('title')}
+      description={t('description')}
       icon={<Save className="size-4" />}
     >
       <Stack gap={5}>
         <Stack gap={2}>
           <QuestionEditorField
             htmlFor="sampleGoodAnswer"
-            label="Sample good answer"
-            hint="Target depth reference for evaluation."
+            label={t('sampleGoodAnswer')}
+            hint={t('sampleGoodAnswerHint')}
           >
             <Textarea
               id="sampleGoodAnswer"
               size="md"
               value={value.sampleGoodAnswer ?? ''}
               onChange={(event) => onUpdate({ sampleGoodAnswer: event.target.value })}
-              placeholder="Target depth reference for evaluation"
+              placeholder={t('sampleGoodAnswerPlaceholder')}
               disabled={submitting}
             />
           </QuestionEditorField>
@@ -61,15 +65,15 @@ export function EditorReferenceSection({
         <Stack gap={2}>
           <QuestionEditorField
             htmlFor="tags"
-            label="Tags"
-            hint="Comma or newline separated tags used for filtering and imports."
+            label={tFields('tags')}
+            hint={t('tagsHint')}
           >
             <Textarea
               id="tags"
-              size="xs"
+              size="sm"
               value={joinStringList(value.tags || [])}
               onChange={(event) => onUpdate({ tags: parseStringList(event.target.value) })}
-              placeholder="Comma or newline separated"
+              placeholder={t('tagsPlaceholder')}
               disabled={submitting}
             />
           </QuestionEditorField>
@@ -78,17 +82,17 @@ export function EditorReferenceSection({
 
         <QuestionEditorField
           htmlFor="metadata"
-          label="Additional metadata"
-          hint="Valid JSON object that can carry rubric or source information."
+          label={t('metadata')}
+          hint={t('metadataHint')}
           error={metadataError}
         >
           <Textarea
             id="metadata"
-            size="md"
+            size="lg"
             tone="code"
             value={metadataText}
             onChange={(event) => onMetadataTextChange(event.target.value)}
-            placeholder='{"rubricVersion":"v1"}'
+            placeholder={t('metadataPlaceholder')}
             disabled={submitting}
           />
         </QuestionEditorField>

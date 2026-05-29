@@ -1,6 +1,7 @@
 'use client'
 
 import { LoaderCircle, RotateCcw } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -17,18 +18,19 @@ export function DeletedQuestionBanner({
   restoring,
   onRestore,
 }: DeletedQuestionBannerProps) {
+  const tBanner = useTranslations('questions.deletedBanner')
+  const tEdit = useTranslations('questions.editPage')
+
   return (
     <PageShell as="section" spacing="compact" padding="top">
       <Card variant="danger-soft" size="sm" role="alert">
         <CardContent layout="split-row" spacing="sm">
           <Stack gap={1}>
             <BodyText size="sm" tone="foreground" weight="medium">
-              This question is deleted
+              {tBanner('title')}
             </BodyText>
             <BodyText size="sm" tone="foreground">
-              Only super admins can see deleted questions. It is hidden from the
-              library for everyone else and excluded from new interviews and
-              similarity search. Restore it to make it visible again.
+              {tBanner('description')}
             </BodyText>
           </Stack>
           <Button
@@ -43,7 +45,7 @@ export function DeletedQuestionBanner({
             ) : (
               <RotateCcw className="size-4" />
             )}
-            {restoring ? 'Restoring...' : 'Restore question'}
+            {restoring ? tEdit('restoring') : tBanner('restore')}
           </Button>
         </CardContent>
       </Card>

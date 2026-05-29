@@ -3,8 +3,8 @@
 import { useEffect, useMemo, useState } from 'react'
 
 import { type QuestionInput } from '@/lib/api'
+import { EDITABLE_FIELD_KEYS } from '@/lib/question-editor/field-keys'
 import {
-  EDITABLE_FIELDS,
   areEqual,
   formatMetadata,
   normalizeInitialValue,
@@ -17,7 +17,7 @@ interface UseDirtyTrackingOptions {
 }
 
 interface UseDirtyTrackingResult {
-  dirtyFields: typeof EDITABLE_FIELDS
+  dirtyFieldKeys: Array<keyof QuestionInput>
   isDirty: boolean
   markSaved: (savedValue: QuestionInput, savedMetadataText: string) => void
 }
@@ -34,15 +34,15 @@ export function useDirtyTracking({
     formatMetadata(initialValue?.metadata ?? {}),
   )
 
-  const dirtyFields = useMemo(
+  const dirtyFieldKeys = useMemo(
     () =>
-      EDITABLE_FIELDS.filter(({ key }) => {
+      EDITABLE_FIELD_KEYS.filter((key) => {
         if (key === 'metadata') return metadataText !== savedMetadataText
         return !areEqual(value[key], savedValue[key])
       }),
     [value, savedValue, metadataText, savedMetadataText],
   )
-  const isDirty = dirtyFields.length > 0
+  const isDirty = dirtyFieldKeys.length > 0
 
   useEffect(() => {
     if (!isDirty) return
@@ -59,5 +59,5 @@ export function useDirtyTracking({
     setSavedMetadataText(nextMetadataText)
   }
 
-  return { dirtyFields, isDirty, markSaved }
+  return { dirtyFieldKeys, isDirty, markSaved }
 }

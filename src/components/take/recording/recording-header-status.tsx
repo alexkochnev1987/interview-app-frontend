@@ -6,6 +6,7 @@ import {
   resolveTakeSessionStatus,
 } from '@/features/take/recording-header-status';
 import type { VersionPersistKind } from '@/features/take/session-machine';
+import { useTranslations } from 'next-intl';
 
 interface TakeRecordingHeaderStatusProps {
   screenSurface: string;
@@ -22,12 +23,14 @@ export function TakeRecordingHeaderStatus({
   recordingStartBusy,
   versionPersistKind,
 }: TakeRecordingHeaderStatusProps) {
-  const screen = resolveTakeScreenShareStatus(screenSurface);
+  const tTake = useTranslations('takeFlow');
+  const screen = resolveTakeScreenShareStatus(screenSurface, tTake);
   const session = resolveTakeSessionStatus({
     stage,
     recording,
     recordingStartBusy,
     versionPersistKind,
+    takeMessage: tTake,
   });
 
   return (

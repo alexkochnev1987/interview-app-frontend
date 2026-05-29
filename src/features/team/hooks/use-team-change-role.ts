@@ -4,6 +4,8 @@ import { useMemo, useState } from 'react'
 
 import { updateUserRole, type TeamMember } from '@/lib/api'
 import { runMutation } from '@/lib/run-mutation'
+import { useToastMessages } from '@/lib/use-toast-messages'
+import { useSharedLabels } from '@/i18n/use-shared-labels'
 
 import {
   assignableRoleRadioOptionsForActor,
@@ -20,12 +22,15 @@ export function useTeamChangeRole(
     member.role as TeamMemberRole,
   )
   const [loading, setLoading] = useState(false)
+  const toastMessages = useToastMessages()
+  const sharedLabels = useSharedLabels()
 
-  const roleOptions = useMemo(
-    () =>
-      assignableRoleRadioOptionsForActor(actorSessionRole, member.role),
-    [actorSessionRole, member.role],
-  )
+  const roleOptions = useMemo(() => {
+    return assignableRoleRadioOptionsForActor(actorSessionRole, member.role).map((role) => ({
+      value: role,
+      label: sharedLabels.role(role),
+    }))
+  }, [actorSessionRole, member.role, sharedLabels])
 
   const hasChange = selectedRole !== member.role
 
@@ -37,9 +42,13 @@ export function useTeamChangeRole(
       const updated = await runMutation(
         () => updateUserRole(member.id, selectedRole),
         {
-          successMessage: 'Role updated',
-          errorMessage: 'Could not update role',
-          getSuccessDescription: (data) => `${data.name} is now ${data.role}.`,
+          successMessage: toastMessages.team.updateSuccess,
+          errorMessage: toastMessages.team.updateError,
+          getSuccessDescription: (data) =>
+            toastMessages.team.updateSuccessDescription(
+              data.name,
+              sharedLabels.role(data.role),
+            ),
         },
       )
       onRoleChanged(updated)

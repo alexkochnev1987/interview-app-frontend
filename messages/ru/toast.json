@@ -1,0 +1,138 @@
+{
+  "toast": {
+    "defaults": {
+      "success": "Готово",
+      "error": "Что-то пошло не так",
+      "info": "Уведомление",
+      "actionCompleted": "Действие выполнено",
+      "actionFailed": "Действие не выполнено"
+    },
+    "question": {
+      "createSuccess": "Вопрос создан",
+      "createError": "Не удалось создать вопрос",
+      "saveSuccess": "Вопрос сохранён",
+      "saveError": "Не удалось сохранить вопрос",
+      "restoreSuccess": "Вопрос восстановлен",
+      "restoreError": "Не удалось восстановить вопрос",
+      "deleteSuccess": "Вопрос удалён",
+      "deleteError": "Не удалось удалить вопрос"
+    },
+    "interview": {
+      "createSuccess": "Интервью создано",
+      "createError": "Не удалось создать интервью",
+      "refreshLinkSuccess": "Ссылка кандидата обновлена",
+      "refreshLinkError": "Не удалось обновить ссылку кандидата",
+      "validationStartSuccess": "Проверка запущена",
+      "validationStartError": "Не удалось запустить проверку интервью",
+      "uploadSuccess": "Загрузка завершена для вопроса {questionNumber}",
+      "uploadError": "Загрузка не удалась для вопроса {questionNumber}"
+    },
+    "take": {
+      "submitSuccess": "Ответ отправлен",
+      "submitError": "Не удалось отправить ответ"
+    },
+    "bulkDelete": {
+      "failedTitle": "Массовое удаление не удалось",
+      "partialTitle": "Удалено: {deletedCount}, заблокировано: {blockedCount}",
+      "successTitle": "{count, plural, one {Удалён # вопрос} few {Удалено # вопроса} many {Удалено # вопросов} other {Удалено # вопросов}}",
+      "successDescription": "Библиотека обновлена.",
+      "noopTitle": "Вопросы не удалены",
+      "noopDescription": "Выбранные вопросы не были удалены.",
+      "blockedIntro": "Эти вопросы используются в активных интервью и не были удалены:"
+    },
+    "questionFeed": {
+      "unavailableTitle": "Лента вопросов недоступна"
+    },
+    "questionFacets": {
+      "unavailableTitle": "Параметры фильтров недоступны"
+    },
+    "similarity": {
+      "searchFailedTitle": "Поиск похожих вопросов не удался",
+      "noMatches": "Нет близких совпадений выше текущего порога похожести."
+    },
+    "pageGate": {
+      "login": {
+        "failedTitle": "Ошибка аутентификации",
+        "failedFallback": "Вход не выполнен",
+        "signingInLabel": "Вход...",
+        "signInLabel": "Войти"
+      },
+      "dashboard": {
+        "forbiddenTitle": "У вас нет доступа к панели",
+        "forbiddenDescription": "Панель доступна только HR, администраторам и суперадминистраторам. Если это ошибка, обратитесь к владельцу рабочей области.",
+        "unavailableTitle": "Панель сейчас недоступна",
+        "loadFailedTitle": "Не удалось загрузить панель",
+        "loadFailedFallback": "Не удалось загрузить интервью.",
+        "signInActionLabel": "Войти",
+        "questionBankActionLabel": "Перейти в банк вопросов"
+      },
+      "assessments": {
+        "forbiddenTitle": "У вас нет доступа к оценкам",
+        "forbiddenDescription": "Этот раздел доступен только HR и администраторам. Если это ошибка, обратитесь к владельцу рабочей области.",
+        "loadFailedTitle": "Не удалось загрузить оценки",
+        "loadFailedFallback": "Не удалось загрузить оценки.",
+        "unavailableTitle": "Оценка недоступна",
+        "loadDetailFallback": "Не удалось загрузить оценку.",
+        "notFoundFallback": "Запрошенную оценку не удалось загрузить."
+      },
+      "interview": {
+        "forbiddenTitle": "У вас нет доступа к этому интервью",
+        "forbiddenDescription": "Настройка интервью доступна только HR, администраторам и суперадминистраторам. Если это ошибка, обратитесь к владельцу рабочей области.",
+        "createUnavailableTitle": "Настройка интервью сейчас недоступна",
+        "unavailableTitle": "Интервью недоступно",
+        "loadFailedFallback": "Не удалось загрузить интервью.",
+        "notFoundFallback": "Запрошенное интервью не удалось загрузить.",
+        "setupBlockedTitle": "Настройка интервью заблокирована",
+        "candidateNameRequired": "Укажите имя кандидата.",
+        "positionRequired": "Укажите позицию.",
+        "questionsRequired": "Выберите хотя бы один вопрос.",
+        "creatingLabel": "Создание..."
+      },
+      "feedback": {
+        "unavailableTitle": "Обратная связь недоступна",
+        "loadFailedFallback": "Не удалось загрузить"
+      },
+      "team": {
+        "forbiddenTitle": "У вас нет доступа к управлению командой",
+        "forbiddenDescription": "Эта область доступна только администраторам и суперадминистраторам. Если это ошибка, обратитесь к владельцу рабочей области.",
+        "unavailableTitle": "Управление командой сейчас недоступно",
+        "loadFailedTitle": "Не удалось загрузить участников",
+        "loadFailedFallback": "Не удалось загрузить участников команды."
+      },
+      "questions": {
+        "editorIssueTitle": "Проблема редактора вопросов",
+        "unavailableTitle": "Вопрос недоступен",
+        "loadFailedFallback": "Не удалось загрузить вопросы.",
+        "notFoundFallback": "Вопрос не найден.",
+        "loadFailedCardDescription": "Редактор не смог загрузить этот вопрос, поэтому маршрут останавливается здесь вместо частично сломанной формы.",
+        "libraryForbiddenTitle": "У вас нет доступа к банку вопросов",
+        "libraryForbiddenDescription": "Банк вопросов доступен только HR, администраторам и суперадминистраторам. Если это ошибка, обратитесь к владельцу рабочей области.",
+        "libraryUnavailableTitle": "Банк вопросов сейчас недоступен",
+        "createForbiddenTitle": "У вас нет доступа к созданию вопросов",
+        "createForbiddenDescription": "Создание вопросов доступно только администраторам и суперадминистраторам. Если это ошибка, обратитесь к владельцу рабочей области.",
+        "createUnavailableTitle": "Создание вопроса сейчас недоступно"
+      },
+      "take": {
+        "unavailableTitle": "Интервью недоступно",
+        "loadFailedFallback": "Не удалось загрузить интервью."
+      }
+    },
+    "rerun": {
+      "alreadyInProgressTitle": "Повторная оценка уже выполняется",
+      "startFailedTitle": "Не удалось запустить повторную оценку",
+      "allFailedFallback": "Не удалось запустить повторную оценку.",
+      "answerFailedFallback": "Не удалось запустить повторную оценку для этого ответа.",
+      "nothingToReevaluateTitle": "Нечего оценивать повторно",
+      "nothingToReevaluateMessage": "Пока нет отправленных ответов для оценки. Кандидат ещё не завершил ни один ответ.",
+      "queuedLabel": "Повторная оценка поставлена в очередь"
+    },
+    "deleteQuestion": {
+      "cannotDeleteTitle": "Нельзя удалить"
+    },
+    "team": {
+      "updateSuccess": "Роль обновлена",
+      "updateError": "Не удалось обновить роль",
+      "updateSuccessDescription": "{name} теперь {role}."
+    }
+  }
+}

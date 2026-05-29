@@ -1,10 +1,11 @@
-import Link from 'next/link'
 import { AlertCircle } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { EmptyStateCard } from '@/components/ui/state-card'
+import { Link } from '@/i18n/navigation'
 
 type FlashErrorPageFallbackProps = {
   title: string
@@ -17,8 +18,10 @@ export function FlashErrorPageFallback({
   title,
   description,
   backHref = '/',
-  backLabel = 'Back to home',
+  backLabel,
 }: FlashErrorPageFallbackProps) {
+  const t = useTranslations('common')
+
   return (
     <PageShell>
       <EmptyStateCard
@@ -31,7 +34,7 @@ export function FlashErrorPageFallback({
         description={description}
         action={
           <Button variant="outline" shape="pill" asChild>
-            <Link href={backHref}>{backLabel}</Link>
+            <Link href={backHref}>{backLabel ?? t('backToHome')}</Link>
           </Button>
         }
       />

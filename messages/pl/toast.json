@@ -1,0 +1,138 @@
+{
+  "toast": {
+    "defaults": {
+      "success": "Gotowe",
+      "error": "Coś poszło nie tak",
+      "info": "Informacja",
+      "actionCompleted": "Akcja zakończona",
+      "actionFailed": "Akcja nie powiodła się"
+    },
+    "question": {
+      "createSuccess": "Pytanie utworzone",
+      "createError": "Nie udało się utworzyć pytania",
+      "saveSuccess": "Pytanie zapisane",
+      "saveError": "Nie udało się zapisać pytania",
+      "restoreSuccess": "Pytanie przywrócone",
+      "restoreError": "Nie udało się przywrócić pytania",
+      "deleteSuccess": "Pytanie usunięte",
+      "deleteError": "Nie udało się usunąć pytania"
+    },
+    "interview": {
+      "createSuccess": "Interview utworzone",
+      "createError": "Nie udało się utworzyć interview",
+      "refreshLinkSuccess": "Link kandydata odświeżony",
+      "refreshLinkError": "Nie udało się odświeżyć linku kandydata",
+      "validationStartSuccess": "Walidacja rozpoczęta",
+      "validationStartError": "Nie udało się rozpocząć walidacji interview",
+      "uploadSuccess": "Upload zakończony dla pytania {questionNumber}",
+      "uploadError": "Upload nie powiódł się dla pytania {questionNumber}"
+    },
+    "take": {
+      "submitSuccess": "Odpowiedź wysłana",
+      "submitError": "Nie udało się wysłać odpowiedzi"
+    },
+    "bulkDelete": {
+      "failedTitle": "Usuwanie zbiorcze nie powiodło się",
+      "partialTitle": "Usunięto: {deletedCount}, zablokowano: {blockedCount}",
+      "successTitle": "{count, plural, one {Usunięto # pytanie} few {Usunięto # pytania} many {Usunięto # pytań} other {Usunięto # pytania}}",
+      "successDescription": "Biblioteka jest aktualna.",
+      "noopTitle": "Nie usunięto pytań",
+      "noopDescription": "Żadne z wybranych pytań nie zostało usunięte.",
+      "blockedIntro": "Te pytania są używane w aktywnych interview i nie zostały usunięte:"
+    },
+    "questionFeed": {
+      "unavailableTitle": "Lista pytań jest niedostępna"
+    },
+    "questionFacets": {
+      "unavailableTitle": "Opcje filtrów są niedostępne"
+    },
+    "similarity": {
+      "searchFailedTitle": "Wyszukiwanie podobieństw nie powiodło się",
+      "noMatches": "Brak bliskich dopasowań powyżej bieżącego progu podobieństwa."
+    },
+    "pageGate": {
+      "login": {
+        "failedTitle": "Uwierzytelnianie nie powiodło się",
+        "failedFallback": "Logowanie nie powiodło się",
+        "signingInLabel": "Logowanie...",
+        "signInLabel": "Zaloguj się"
+      },
+      "dashboard": {
+        "forbiddenTitle": "Brak dostępu do panelu",
+        "forbiddenDescription": "Panel jest dostępny dla HR, administratorów i superadministratorów. Jeśli to błąd, skontaktuj się z właścicielem workspace.",
+        "unavailableTitle": "Panel jest teraz niedostępny",
+        "loadFailedTitle": "Nie udało się załadować panelu",
+        "loadFailedFallback": "Nie udało się załadować interview.",
+        "signInActionLabel": "Zaloguj się",
+        "questionBankActionLabel": "Przejdź do bazy pytań"
+      },
+      "assessments": {
+        "forbiddenTitle": "Brak dostępu do ocen",
+        "forbiddenDescription": "Ten obszar jest dostępny dla HR i administratorów. Jeśli to błąd, skontaktuj się z właścicielem workspace.",
+        "loadFailedTitle": "Nie udało się załadować ocen",
+        "loadFailedFallback": "Nie udało się załadować ocen.",
+        "unavailableTitle": "Ocena niedostępna",
+        "loadDetailFallback": "Nie udało się załadować oceny.",
+        "notFoundFallback": "Nie udało się załadować wybranej oceny."
+      },
+      "interview": {
+        "forbiddenTitle": "Brak dostępu do tego interview",
+        "forbiddenDescription": "Konfiguracja interview jest dostępna dla HR, administratorów i superadministratorów. Jeśli to błąd, skontaktuj się z właścicielem workspace.",
+        "createUnavailableTitle": "Konfiguracja interview jest teraz niedostępna",
+        "unavailableTitle": "Interview niedostępne",
+        "loadFailedFallback": "Nie udało się załadować interview.",
+        "notFoundFallback": "Nie udało się załadować wybranego interview.",
+        "setupBlockedTitle": "Konfiguracja interview zablokowana",
+        "candidateNameRequired": "Imię i nazwisko kandydata jest wymagane.",
+        "positionRequired": "Stanowisko jest wymagane.",
+        "questionsRequired": "Wybierz co najmniej jedno pytanie.",
+        "creatingLabel": "Tworzenie..."
+      },
+      "feedback": {
+        "unavailableTitle": "Feedback niedostępny",
+        "loadFailedFallback": "Nie udało się załadować"
+      },
+      "team": {
+        "forbiddenTitle": "Brak dostępu do zarządzania zespołem",
+        "forbiddenDescription": "Ten obszar jest dostępny tylko dla administratorów i superadministratorów. Jeśli to błąd, skontaktuj się z właścicielem workspace.",
+        "unavailableTitle": "Zarządzanie zespołem jest teraz niedostępne",
+        "loadFailedTitle": "Nie udało się załadować członków zespołu",
+        "loadFailedFallback": "Nie udało się załadować członków zespołu."
+      },
+      "questions": {
+        "editorIssueTitle": "Problem z edytorem pytań",
+        "unavailableTitle": "Pytanie niedostępne",
+        "loadFailedFallback": "Nie udało się załadować pytań.",
+        "notFoundFallback": "Pytanie nie znalezione.",
+        "loadFailedCardDescription": "Edytor nie mógł załadować tego pytania, więc trasa kończy się tutaj zamiast renderować częściowo uszkodzony formularz.",
+        "libraryForbiddenTitle": "Brak dostępu do bazy pytań",
+        "libraryForbiddenDescription": "Baza pytań jest dostępna dla HR, administratorów i superadministratorów. Jeśli to błąd, skontaktuj się z właścicielem workspace.",
+        "libraryUnavailableTitle": "Baza pytań jest teraz niedostępna",
+        "createForbiddenTitle": "Brak dostępu do tworzenia pytań",
+        "createForbiddenDescription": "Tworzenie pytań jest dostępne dla administratorów i superadministratorów. Jeśli to błąd, skontaktuj się z właścicielem workspace.",
+        "createUnavailableTitle": "Tworzenie pytania jest teraz niedostępne"
+      },
+      "take": {
+        "unavailableTitle": "Interview niedostępne",
+        "loadFailedFallback": "Nie udało się załadować interview."
+      }
+    },
+    "rerun": {
+      "alreadyInProgressTitle": "Ponowna ocena już trwa",
+      "startFailedTitle": "Nie udało się rozpocząć ponownej oceny",
+      "allFailedFallback": "Nie udało się rozpocząć ponownej oceny.",
+      "answerFailedFallback": "Nie udało się rozpocząć ponownej oceny dla tej odpowiedzi.",
+      "nothingToReevaluateTitle": "Nie ma czego oceniać ponownie",
+      "nothingToReevaluateMessage": "Nie ma jeszcze wysłanych odpowiedzi do oceny. Kandydat nie zakończył żadnej odpowiedzi.",
+      "queuedLabel": "Ponowna ocena w kolejce"
+    },
+    "deleteQuestion": {
+      "cannotDeleteTitle": "Nie można usunąć"
+    },
+    "team": {
+      "updateSuccess": "Rola zaktualizowana",
+      "updateError": "Nie udało się zaktualizować roli",
+      "updateSuccessDescription": "{name} ma teraz rolę {role}."
+    }
+  }
+}

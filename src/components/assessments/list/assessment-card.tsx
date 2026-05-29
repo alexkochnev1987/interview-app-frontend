@@ -1,3 +1,7 @@
+'use client'
+
+import { useTranslations } from 'next-intl'
+
 import {
   Card,
   CardContent,
@@ -11,13 +15,12 @@ import { MetricPanel } from '@/components/ui/metric-panel'
 import { PillRow } from '@/components/ui/pill-row'
 import { StatusPill } from '@/components/ui/status-pill'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
+import { useSharedLabels } from '@/i18n/use-shared-labels'
 import { type Interview } from '@/lib/api'
 import {
-  decisionLabel,
   decisionTone,
   deriveReviewStatus,
   getCompletionDate,
-  reviewStatusLabel,
   reviewStatusTone,
 } from '@/lib/assessment-status'
 import { formatInterviewDate } from '@/lib/interview-formatters'
@@ -27,6 +30,8 @@ interface AssessmentCardProps {
 }
 
 export function AssessmentCard({ interview }: AssessmentCardProps) {
+  const t = useTranslations('assessments.list')
+  const sharedLabels = useSharedLabels()
   const reviewStatus = deriveReviewStatus(interview)
   const completion = getCompletionDate(interview)
   const overallScore = interview.result?.overallScore ?? null
@@ -38,11 +43,11 @@ export function AssessmentCard({ interview }: AssessmentCardProps) {
         <CardHeader spacing="md">
           <PillRow>
             <StatusPill tone={reviewStatusTone(reviewStatus)} casing="chip">
-              {reviewStatusLabel(reviewStatus)}
+              {sharedLabels.reviewStatus(reviewStatus)}
             </StatusPill>
             {decision ? (
               <StatusPill tone={decisionTone(decision)} casing="chip">
-                {decisionLabel(decision)}
+                {sharedLabels.decision(decision)}
               </StatusPill>
             ) : null}
           </PillRow>
@@ -55,13 +60,13 @@ export function AssessmentCard({ interview }: AssessmentCardProps) {
           <Grid columns={2} gap={3}>
             <MetricPanel
               tone="compact"
-              label="Overall score"
+              label={t('overallScore')}
               value={overallScore != null ? Math.round(overallScore) : '—'}
               valueSize="md"
             />
             <MetricPanel
               tone="compact"
-              label="Completed"
+              label={t('completed')}
               value={completion ? formatInterviewDate(completion) : '—'}
               valueSize="sm"
             />

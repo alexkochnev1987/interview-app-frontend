@@ -2,6 +2,7 @@ import { type MutableRefObject } from 'react';
 
 import type { CaptureTarget, MultipartUploadSession, MultipartUploadState } from './runtime';
 import { buildMediaRecorderOptions, pickSupportedMediaRecorderMimeType, TAKE_RECORDING_LIMIT_SECONDS } from './utils';
+import type { TakeMessageGetter } from './messages';
 
 type PendingVersionAction = 'submit' | 'rerecord' | null;
 
@@ -41,6 +42,7 @@ interface UseTakeBeginRecordingParams {
   handleRecordedChunk: (target: CaptureTarget, blob: Blob) => void;
   onRecordersStopped: () => void;
   primeBrowserTranscriptForRecordingSession: () => void;
+  takeMessage: TakeMessageGetter;
 }
 
 interface BeginRecordingInput {
@@ -82,6 +84,7 @@ export function useTakeBeginRecording({
   handleRecordedChunk,
   onRecordersStopped,
   primeBrowserTranscriptForRecordingSession,
+  takeMessage,
 }: UseTakeBeginRecordingParams) {
   function handleRecorderStopped() {
     stoppedRecordersRef.current += 1;
@@ -97,7 +100,7 @@ export function useTakeBeginRecording({
     currentQuestionIndex,
   }: BeginRecordingInput) {
     if (!cameraStreamRef.current || !screenStreamRef.current) {
-      resetInterviewSetup('Camera, microphone, and entire-screen sharing must stay active before recording.');
+      resetInterviewSetup(takeMessage('lobbyInterviewStartBlocked'));
       return;
     }
 
@@ -132,7 +135,7 @@ export function useTakeBeginRecording({
     } catch (err) {
       await abortMultipartUploads();
       clearRecordingArtifacts();
-      setSetupError(err instanceof Error ? err.message : 'Failed to start recording.');
+      setSetupError(err instanceof Error ? err.message : takeMessage('uploadFailedFallback'));
       autoStartedQuestionKeyRef.current = '';
       setStage('interview');
       return;

@@ -11,6 +11,7 @@ import type { InterviewerPresence } from '@/features/take/use-take-question-tts'
 import type { VersionPersistKind } from '@/features/take/session-machine';
 import { Grid, Stack } from '@/components/ui/layout';
 import { submitAnswerActionLabel } from '@/features/take';
+import { useTranslations } from 'next-intl';
 
 interface TakeRecordingScreenProps {
   interview: InterviewDataView;
@@ -65,9 +66,11 @@ export function TakeRecordingScreen({
   onRerecord,
   onSubmit,
 }: TakeRecordingScreenProps) {
+  const tTake = useTranslations('takeFlow');
   const submitAnswerLabel = submitAnswerActionLabel(
     interview.currentQuestionIndex,
     interview.totalQuestions,
+    tTake,
   );
 
   return (

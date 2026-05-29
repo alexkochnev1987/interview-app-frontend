@@ -1,0 +1,76 @@
+{
+  "metadata": {
+    "title": "AI Interview Architect",
+    "description": "AI-powered interview platform"
+  },
+  "common": {
+    "appName": "AI Interview Architect",
+    "brandEyebrow": "Intelligent Conductor",
+    "loading": "Loading...",
+    "notAvailable": "Not available",
+    "backToHome": "Back to home",
+    "serviceUnavailable": "Service is unavailable",
+    "sessionVerificationFailed": "We could not verify your session or permissions.",
+    "profileLoadFailed": "Failed to load your profile."
+  },
+  "languageSwitcher": {
+    "label": "Language",
+    "locales": {
+      "en": "English",
+      "be": "Беларуская",
+      "ru": "Русский",
+      "pl": "Polski"
+    }
+  },
+  "shared": {
+    "fallback": {
+      "backToDashboard": "Back to dashboard",
+      "backToQuestionLibrary": "Back to question library",
+      "backToAssessments": "Back to assessments"
+    },
+    "labels": {
+      "roles": {
+        "super_admin": "Super Admin",
+        "admin": "Admin",
+        "hr": "HR Specialist",
+        "candidate": "Candidate",
+        "interviewer": "Interviewer",
+        "system": "System",
+        "assistant": "Assistant"
+      },
+      "roleFilters": {
+        "all": "All Roles"
+      },
+      "difficulty": {
+        "easy": "Easy",
+        "medium": "Medium",
+        "hard": "Hard"
+      },
+      "interviewStatus": {
+        "pending": "Pending",
+        "in_progress": "In progress",
+        "processing": "Processing",
+        "completed": "Completed",
+        "failed": "Failed"
+      },
+      "reviewStatus": {
+        "ready": "Ready for review",
+        "scoring": "Scoring still catching up",
+        "in_progress": "Candidate in progress",
+        "pending": "Awaiting candidate",
+        "failed": "Failed"
+      },
+      "decision": {
+        "proceed": "Proceed",
+        "review": "Review",
+        "reject": "Reject"
+      },
+      "behaviorRisk": {
+        "high": "High risk",
+        "medium": "Medium risk",
+        "low": "Low risk",
+        "none": "No risk"
+      }
+    }
+  }
+}

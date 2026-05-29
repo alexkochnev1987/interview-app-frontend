@@ -134,6 +134,40 @@ npm run dev
 # Frontend: http://localhost:3001
 ```
 
+### i18n структура переводов
+
+Используется только модульный формат (legacy `messages/*.json` удалены):
+
+```text
+messages/
+  en|be|ru|pl/
+    common.json
+    nav.json
+    login.json
+    dashboard.json
+    questions.json
+    interviews.json
+    assessments.json
+    team.json
+    feedback.json
+    takeFlow.json
+    toast.json
+```
+
+Проверка соответствия ключей между локалями (обязательная):
+
+```bash
+npm run i18n:check
+```
+
+`en` — source of truth. Скрипт проверяет `missing`, `extra` и `type mismatch` для `be/ru/pl`.
+
+Policy (single source of truth):
+- Legacy flat файлы `messages/en.json`, `messages/be.json`, `messages/ru.json`, `messages/pl.json` запрещены.
+- Разрешено редактировать только `messages/<locale>/*.json`.
+- Runtime loader работает только с модульными файлами `messages/<locale>/*.json` (fallback на legacy отключен).
+- Проверка включена в CI через `npm run lint:ci`.
+
 ### Alert vs toast (frontend feedback)
 
 After the alert → toast migration, use this split:
@@ -148,6 +182,17 @@ After the alert → toast migration, use this split:
 Do not use `useEffect` + module-level dedupe to fire toasts when `error` or `result` state changes.
 
 Do not remove remaining `Alert` usages to “finish” the migration unless the UX above is preserved another way. Field error state uses `FieldErrors` from `src/lib/clear-field-error.ts`; question editor validation lives in `src/lib/question-editor/validate-question-form.ts`. Copy lives in `src/lib/toast-messages.ts` for toasts; whitelisted Alerts may stay hardcoded or use `TOAST_MESSAGES` where shared.
+
+### Candidate flow is intentionally English-only
+
+Candidate-facing pages `/<locale>/take/[id]` and `/<locale>/feedback/[id]` are intentionally locked to English UI copy, regardless of the locale segment in the URL.
+
+Policy:
+- Locale switching must not change candidate UI language on take/feedback pages.
+- The app header is hidden on candidate flow, so `LanguageSwitcher` is not shown there.
+- Question TTS in candidate flow is intentionally fixed to `en-US` (see `src/features/take/use-take-question-tts.ts`).
+- Internal routes set `<html lang>` from the active locale; candidate routes force `lang="en"` to match English-only UI (see `src/i18n/html-lang.ts`).
+- Page metadata (`title`, `description`) is localized per locale via `generateMetadata` in `src/app/[locale]/layout.tsx`.
 
 ### Что запускается в Docker
 ```

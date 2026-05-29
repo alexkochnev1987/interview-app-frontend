@@ -1,4 +1,5 @@
 import { ListVideo, RefreshCw } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge';
 import { SurfaceCard } from '@/components/ui/surface-card';
@@ -16,7 +17,7 @@ import { Icon } from '@/components/ui/icon';
 import { TextList, TextListItem } from '@/components/ui/text-list';
 import { Text } from '@/components/ui/text';
 import type { InterviewDataView } from '@/components/take/types';
-import { formatTakeQuestionCountLabel, TAKE_MESSAGES } from '@/features/take';
+import { formatTakeQuestionCountLabel } from '@/features/take';
 
 interface TakeConsentScreenProps {
   interview: InterviewDataView;
@@ -39,18 +40,23 @@ export function TakeConsentScreen({
   onContinueToLobby,
   onRetrySessionSync,
 }: TakeConsentScreenProps) {
+  const tTake = useTranslations('takeFlow');
   return (
     <PageMainViewport>
       <SurfaceCard tone="glassFloat" grow="fill" size="lg">
         <CardContent layout="fill-column" spacing="xl">
-          <EyebrowBadge icon={<ListVideo size={14} strokeWidth={2} />}>Candidate interview</EyebrowBadge>
+          <EyebrowBadge icon={<ListVideo size={14} strokeWidth={2} />}>{tTake('consentEyebrow')}</EyebrowBadge>
           <Grid columns="consent-shell" gap={10} grow="fill">
             <Stack gap={5} height="full">
               <Stack gap={3}>
-                <Heading variant="sectionHeroTitle">Interview for {interview.position}</Heading>
+                <Heading variant="sectionHeroTitle">
+                  {tTake('consentInterviewFor', { position: interview.position })}
+                </Heading>
                 <Text variant="heroDescription">
-                  Welcome, <strong>{interview.candidateName}</strong>. You will answer{' '}
-                  {formatTakeQuestionCountLabel(interview.totalQuestions)}, with up to four minutes for each response.
+                  {tTake('consentWelcome', {
+                    candidateName: interview.candidateName,
+                    questionCount: formatTakeQuestionCountLabel(interview.totalQuestions, tTake),
+                  })}
                 </Text>
               </Stack>
               <TakeCapabilityCards />
@@ -58,29 +64,29 @@ export function TakeConsentScreen({
 
             <Stack gap={5} height="full">
               <Stack gap={2}>
-                <CardTitle size="lg">Before you start</CardTitle>
-                <Text variant="bodyMutedSm">{TAKE_MESSAGES.consentPrepHint}</Text>
+                <CardTitle size="lg">{tTake('consentBeforeStart')}</CardTitle>
+                <Text variant="bodyMutedSm">{tTake('consentPrepHint')}</Text>
               </Stack>
               <Stack gap={5}>
                 <Panel radius="lg" padding="lg">
                   <Stack gap={3}>
                     <Text as="span" variant="eyebrowLabel">
-                      Data collected
+                      {tTake('consentDataCollected')}
                     </Text>
                     <TextList>
                       <TextListItem>
-                        <Text variant="bodyMutedSm">Camera video and microphone audio for each answer</Text>
+                        <Text variant="bodyMutedSm">{tTake('consentDataCameraMic')}</Text>
                       </TextListItem>
                       <TextListItem>
                         <Text variant="bodyMutedSm">
-                          Full-monitor screen recording in parallel with each answer
+                          {tTake('consentDataScreen')}
                         </Text>
                       </TextListItem>
                       <TextListItem>
-                        <Text variant="bodyMutedSm">Browser activity such as tab switches</Text>
+                        <Text variant="bodyMutedSm">{tTake('consentDataBrowser')}</Text>
                       </TextListItem>
                       <TextListItem>
-                        <Text variant="bodyMutedSm">Session metadata including answer timing</Text>
+                        <Text variant="bodyMutedSm">{tTake('consentDataMetadata')}</Text>
                       </TextListItem>
                     </TextList>
                   </Stack>
@@ -88,7 +94,7 @@ export function TakeConsentScreen({
 
                 {sessionSyncError && onRetrySessionSync ? (
                   <Alert variant="danger">
-                    <AlertTitle>{TAKE_MESSAGES.sessionSyncFailedTitle}</AlertTitle>
+                    <AlertTitle>{tTake('sessionSyncFailedTitle')}</AlertTitle>
                     <AlertDescription>
                       <Inline gap={3} align="center" wrap="wrap">
                         <span>{sessionSyncError}</span>
@@ -102,7 +108,7 @@ export function TakeConsentScreen({
                           <Icon size="sm">
                             <RefreshCw />
                           </Icon>
-                          Retry
+                          {tTake('retry')}
                         </Button>
                       </Inline>
                     </AlertDescription>
@@ -111,7 +117,7 @@ export function TakeConsentScreen({
 
                 {setupError ? (
                   <Alert variant="destructive">
-                    <AlertTitle>Setup incomplete</AlertTitle>
+                    <AlertTitle>{tTake('setupIncomplete')}</AlertTitle>
                     <AlertDescription>{setupError}</AlertDescription>
                   </Alert>
                 ) : null}
@@ -127,7 +133,7 @@ export function TakeConsentScreen({
                     size="2xl"
                     shape="rounded"
                   >
-                    {TAKE_MESSAGES.consentContinue}
+                    {tTake('consentContinue')}
                   </Button>
                 </Stack>
               </Stack>

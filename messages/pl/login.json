@@ -1,0 +1,31 @@
+{
+  "login": {
+    "marketingEyebrow": "Conductor AI",
+    "title": "Oceniaj wyniki kandydatów w spokojnym, redakcyjnym środowisku pracy.",
+    "lead": "Nowy system projektowy zastępuje kruchy panel administracyjny warstwowymi powierzchniami, wyraźniejszą hierarchią i szybszym podejmowaniem decyzji podczas przeglądu interview.",
+    "cards": {
+      "protectedAccess": {
+        "title": "Chroniony dostęp",
+        "description": "Uwierzytelnianie sesyjne dla procesów dostępnych tylko rekruterom."
+      },
+      "unifiedShell": {
+        "title": "Wspólna powłoka",
+        "description": "Wspólne tokeny dla panelu, biblioteki i przepływów interview."
+      },
+      "fastTriage": {
+        "title": "Szybka selekcja",
+        "description": "Przejdź od logowania prosto do aktywnych interview i kart ocen."
+      }
+    },
+    "form": {
+      "eyebrow": "Dostęp rekrutera",
+      "title": "Zaloguj się",
+      "emailLabel": "Email",
+      "emailPlaceholder": "admin@interview-app.com",
+      "passwordLabel": "Hasło",
+      "passwordPlaceholder": "Hasło",
+      "or": "Lub",
+      "google": "Zaloguj przez Google"
+    }
+  }
+}

@@ -1,6 +1,7 @@
 'use client'
 
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { CardContent } from '@/components/ui/card'
@@ -31,11 +32,17 @@ export function TeamMembersPagination({
   onPageChange,
   onStepPage,
 }: TeamMembersPaginationProps) {
+  const t = useTranslations('team.pagination')
+
   return (
     <CardContent spacing="sm">
       <Grid columns="pagination-footer" gap={3} align="center">
         <BodyText size="sm">
-          Showing {showingFrom} to {showingTo} of {totalFiltered} members
+          {t('showing', {
+            from: showingFrom,
+            to: showingTo,
+            total: totalFiltered,
+          })}
         </BodyText>
         <Inline gap={1}>
           <Button

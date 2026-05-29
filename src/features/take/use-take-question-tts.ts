@@ -8,6 +8,7 @@ const QUESTION_SPEAK_MS_PER_CHAR = 100;
 const QUESTION_SPEAK_WATCHDOG_SLACK_MS = 15_000;
 const QUESTION_SPEAK_WATCHDOG_MIN_MS = 10_000;
 const QUESTION_SPEAK_WATCHDOG_MAX_MS = 25 * 60 * 1000;
+const CANDIDATE_FLOW_TTS_LOCALE = 'en-US';
 
 export type InterviewerPresence = 'speaking' | 'listening';
 
@@ -49,7 +50,8 @@ function speakQuestion(
   }
 
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = 'en-US';
+  // Candidate flow is intentionally English-only, including spoken prompts.
+  utterance.lang = CANDIDATE_FLOW_TTS_LOCALE;
   utterance.rate = 0.95;
   utterance.pitch = 1;
 

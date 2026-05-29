@@ -1,5 +1,6 @@
 import type { PermissionStatus } from '@/components/take/types';
 import type { StatusTone } from '@/components/ui/status-pill';
+import type { TakeMessageGetter } from './messages';
 
 export const TAKE_RECORDING_LIMIT_SECONDS = 240;
 
@@ -59,16 +60,16 @@ export function createEmptyBehaviorSignals(): TakeBehaviorSignals {
   };
 }
 
-export function permissionLabel(status: PermissionStatus) {
+export function permissionLabel(status: PermissionStatus, takeMessage: TakeMessageGetter) {
   switch (status) {
     case 'pending':
-      return 'Pending';
+      return takeMessage('permissionPending');
     case 'granted':
-      return 'Ready';
+      return takeMessage('permissionReady');
     case 'denied':
-      return 'Blocked';
+      return takeMessage('permissionBlocked');
     default:
-      return 'Idle';
+      return takeMessage('permissionIdle');
   }
 }
 
@@ -85,20 +86,24 @@ export function permissionTone(status: PermissionStatus): StatusTone {
   }
 }
 
-export function getPermissionErrorMessage(error: unknown, requiresEntireScreen = false) {
+export function getPermissionErrorMessage(
+  error: unknown,
+  requiresEntireScreen = false,
+  takeMessage: TakeMessageGetter,
+) {
   if (requiresEntireScreen) {
-    return 'Choose Entire screen / Screen in the share picker. Browser tabs and app windows are not accepted.';
+    return takeMessage('chooseEntireScreen');
   }
 
   if (error instanceof DOMException) {
     if (error.name === 'NotAllowedError') {
-      return 'Camera, microphone, and screen sharing must be allowed to continue.';
+      return takeMessage('permissionNotAllowed');
     }
     if (error.name === 'NotFoundError') {
-      return 'A camera, microphone, or shareable display source was not found on this device.';
+      return takeMessage('permissionNotFound');
     }
     if (error.name === 'AbortError') {
-      return 'Permission setup was interrupted. Please try again.';
+      return takeMessage('permissionAborted');
     }
   }
 
@@ -106,7 +111,7 @@ export function getPermissionErrorMessage(error: unknown, requiresEntireScreen =
     return error.message;
   }
 
-  return 'Camera, microphone, and screen sharing must be enabled before the interview can start.';
+  return takeMessage('permissionGeneric');
 }
 
 export function formatTime(seconds: number) {

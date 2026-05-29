@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 
 import { getTakeInterview, type TakeInterviewData } from '@/lib/api';
+import type { TakeMessageGetter } from './messages';
 
 interface UseTakeInterviewLoaderParams {
   id: string;
@@ -9,6 +10,7 @@ interface UseTakeInterviewLoaderParams {
   onData: (data: TakeInterviewData, mode: 'initial' | 'resume', tokenOverride?: string) => void;
   onError: (message: string) => void;
   onCleanup: () => void;
+  takeMessage: TakeMessageGetter;
 }
 
 export function useTakeInterviewLoader({
@@ -18,6 +20,7 @@ export function useTakeInterviewLoader({
   onData,
   onError,
   onCleanup,
+  takeMessage,
 }: UseTakeInterviewLoaderParams) {
   const candidateTokenRef = useRef(candidateToken);
   const onDataRef = useRef(onData);
@@ -40,10 +43,10 @@ export function useTakeInterviewLoader({
         const data = await getTakeInterview(id, effectiveToken);
         onDataRef.current(data, mode, tokenOverride);
       } catch (err) {
-        onErrorRef.current(err instanceof Error ? err.message : 'Failed to load interview');
+        onErrorRef.current(err instanceof Error ? err.message : takeMessage('takeLoadFailed'));
       }
     },
-    [id],
+    [id, takeMessage],
   );
 
   useEffect(() => {

@@ -4,8 +4,7 @@ import {
   type QuestionInput,
   type QuestionRedFlag,
 } from '@/lib/api'
-
-export type DraftFieldKey = keyof QuestionInput
+import { type DraftFieldKey } from '@/lib/question-editor/field-keys'
 
 export type SimilarStatus = 'idle' | 'loading' | 'success' | 'error'
 
@@ -36,10 +35,6 @@ const DEFAULT_VALUE: QuestionInput = {
 }
 
 export const DRAFT_FIELDS: Array<{ key: DraftFieldKey; label: string }> = [
-  { key: 'externalId', label: 'External ID' },
-  { key: 'role', label: 'Role' },
-  { key: 'focus', label: 'Focus' },
-  { key: 'outputLanguage', label: 'Output Language' },
   { key: 'questionText', label: 'Question Text' },
   { key: 'category', label: 'Category' },
   { key: 'subcategory', label: 'Subcategory' },
@@ -71,7 +66,6 @@ export const EDITABLE_FIELDS: Array<{ key: keyof QuestionInput; label: string }>
   { key: 'tags', label: 'Tags' },
   { key: 'metadata', label: 'Metadata' },
 ]
-
 export function normalizeComparable(value: string | undefined): string {
   return value?.trim().toLowerCase() ?? ''
 }
@@ -100,7 +94,10 @@ export function formatExpectedConcepts(items: QuestionExpectedConcept[]): string
     .join('\n')
 }
 
-export function parseExpectedConcepts(value: string): QuestionExpectedConcept[] {
+export function parseExpectedConcepts(
+  value: string,
+  defaultDescriptionForLabel: (label: string) => string,
+): QuestionExpectedConcept[] {
   return value
     .split('\n')
     .map((line) => line.trim())
@@ -117,7 +114,7 @@ export function parseExpectedConcepts(value: string): QuestionExpectedConcept[] 
         label: safeLabel,
         weight: Number.isFinite(numericWeight) && numericWeight > 0 ? numericWeight : 1,
         description:
-          descriptionParts.join(' | ') || `${safeLabel} should be covered in the answer.`,
+          descriptionParts.join(' | ') || defaultDescriptionForLabel(safeLabel),
       }
     })
 }
@@ -150,14 +147,17 @@ export function formatMetadata(value: Record<string, unknown>): string {
   return JSON.stringify(value, null, 2)
 }
 
-export function parseMetadata(value: string): Record<string, unknown> {
+export function parseMetadata(
+  value: string,
+  metadataMustBeObjectMessage: string,
+): Record<string, unknown> {
   if (!value.trim()) {
     return {}
   }
 
   const parsed = JSON.parse(value) as unknown
   if (!parsed || Array.isArray(parsed) || typeof parsed !== 'object') {
-    throw new Error('Metadata must be a JSON object')
+    throw new Error(metadataMustBeObjectMessage)
   }
 
   return parsed as Record<string, unknown>
@@ -203,21 +203,21 @@ export function areEqual(left: unknown, right: unknown): boolean {
   return JSON.stringify(left) === JSON.stringify(right)
 }
 
-export function previewValue(value: unknown): string {
+export function previewValue(value: unknown, emptyLabel: string): string {
   if (typeof value === 'string') {
-    return value || 'Empty'
+    return value || emptyLabel
   }
   if (typeof value === 'number') {
     return String(value)
   }
   if (Array.isArray(value)) {
     if (value.length === 0) {
-      return 'Empty'
+      return emptyLabel
     }
     return JSON.stringify(value, null, 2)
   }
   if (value && typeof value === 'object') {
     return JSON.stringify(value, null, 2)
   }
-  return 'Empty'
+  return emptyLabel
 }

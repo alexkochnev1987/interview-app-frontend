@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { ApiError } from '@/lib/api'
 import { notifyError, notifyInfo } from '@/lib/toast'
-import { TOAST_MESSAGES } from '@/lib/toast-messages'
+import { useToastMessages } from '@/lib/use-toast-messages'
 
 const SUCCESS_AUTORESET_MS = 2500
 
@@ -27,6 +27,7 @@ interface RerunButtonProps {
   onRun: () => Promise<RerunResult>
   idleLabel: string
   submittedLabel: string
+  startingLabel: string
   errorTitle: string
   errorFallback: string
   variant?: ButtonVariant
@@ -40,6 +41,7 @@ export function RerunButton({
   onRun,
   idleLabel,
   submittedLabel,
+  startingLabel,
   errorTitle,
   errorFallback,
   variant = 'outline-pill',
@@ -49,6 +51,7 @@ export function RerunButton({
   toastId,
 }: RerunButtonProps) {
   const router = useRouter()
+  const toastMessages = useToastMessages()
   const [phase, setPhase] = useState<'idle' | 'submitting' | 'submitted'>(
     'idle',
   )
@@ -76,7 +79,7 @@ export function RerunButton({
     } catch (err) {
       if (!mountedRef.current) return
       if (err instanceof ApiError && err.status === 409) {
-        notifyInfo(TOAST_MESSAGES.rerun.alreadyInProgressTitle, {
+        notifyInfo(toastMessages.rerun.alreadyInProgressTitle, {
           id: toastId ? `${toastId}-already-in-progress` : undefined,
           description: err.message,
         })
@@ -113,7 +116,7 @@ export function RerunButton({
         <RefreshCw />
       </Icon>
       {phase === 'submitting'
-        ? 'Starting…'
+        ? startingLabel
         : phase === 'submitted'
           ? submittedLabel
           : idleLabel}

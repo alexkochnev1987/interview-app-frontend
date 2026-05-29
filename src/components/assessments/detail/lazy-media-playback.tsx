@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Eye, LoaderCircle, RefreshCw } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -40,6 +41,7 @@ export function LazyMediaPlayback({
   hasCamera,
   hasScreen,
 }: LazyMediaPlaybackProps) {
+  const t = useTranslations('assessments.media')
   const [state, setState] = useState<LoadState>({ phase: 'idle' })
   const [isStale, setIsStale] = useState(false)
 
@@ -71,7 +73,7 @@ export function LazyMediaPlayback({
       setState({
         phase: 'error',
         message:
-          err instanceof Error ? err.message : 'Failed to load media URLs.',
+          err instanceof Error ? err.message : t('loadFailed'),
       })
     }
   }
@@ -80,7 +82,7 @@ export function LazyMediaPlayback({
     return (
       <SurfaceTile rounded="xl" padding="lg">
         <BodyText size="sm" tone="muted" italic>
-          No recording was uploaded for this answer.
+          {t('noRecording')}
         </BodyText>
       </SurfaceTile>
     )
@@ -91,13 +93,13 @@ export function LazyMediaPlayback({
       <SurfaceTile rounded="xl" padding="lg">
         <Inline gap={3} align="center" justify="between" wrap="wrap">
           <Stack gap={1}>
-            <EyebrowLabel size="sm">Recording</EyebrowLabel>
+            <EyebrowLabel size="sm">{t('recordingEyebrow')}</EyebrowLabel>
             <BodyText size="sm" tone="muted">
               {hasCamera && hasScreen
-                ? 'Camera and screen recordings are available.'
+                ? t('cameraAndScreen')
                 : hasCamera
-                  ? 'Camera recording is available.'
-                  : 'Screen recording is available.'}
+                  ? t('cameraOnly')
+                  : t('screenOnly')}
             </BodyText>
           </Stack>
           <Button
@@ -110,7 +112,7 @@ export function LazyMediaPlayback({
             <Icon size="md">
               <Eye />
             </Icon>
-            Load recording
+            {t('loadRecording')}
           </Button>
         </Inline>
       </SurfaceTile>
@@ -125,7 +127,7 @@ export function LazyMediaPlayback({
             <LoaderCircle />
           </Icon>
           <BodyText size="sm" tone="muted">
-            Loading recording...
+            {t('loading')}
           </BodyText>
         </Inline>
       </SurfaceTile>
@@ -135,7 +137,7 @@ export function LazyMediaPlayback({
   if (state.phase === 'error') {
     return (
       <Alert variant="danger">
-        <AlertTitle>Recording unavailable</AlertTitle>
+        <AlertTitle>{t('unavailableTitle')}</AlertTitle>
         <AlertDescription>{state.message}</AlertDescription>
       </Alert>
     )
@@ -147,13 +149,10 @@ export function LazyMediaPlayback({
     <Stack gap={3}>
       {isStale ? (
         <Alert variant="warning">
-          <AlertTitle>Recording links may have expired</AlertTitle>
+          <AlertTitle>{t('expiredTitle')}</AlertTitle>
           <AlertDescription>
             <Inline gap={3} align="center" wrap="wrap">
-              <span>
-                Signed URLs are valid for one hour. Refresh to get new playback
-                links.
-              </span>
+              <span>{t('expiredDescription')}</span>
               <Button
                 type="button"
                 variant="outline-pill"
@@ -164,7 +163,7 @@ export function LazyMediaPlayback({
                 <Icon size="md">
                   <RefreshCw />
                 </Icon>
-                Refresh links
+                {t('refreshLinks')}
               </Button>
             </Inline>
           </AlertDescription>
@@ -174,7 +173,7 @@ export function LazyMediaPlayback({
         {cameraUrl ? (
           <SurfaceTile rounded="xl" padding="lg">
             <Stack gap={3}>
-              <EyebrowLabel size="sm">Candidate camera</EyebrowLabel>
+              <EyebrowLabel size="sm">{t('candidateCamera')}</EyebrowLabel>
               <VideoFrame>
                 <VideoSurface
                   controls
@@ -189,7 +188,7 @@ export function LazyMediaPlayback({
         {screenUrl ? (
           <SurfaceTile rounded="xl" padding="lg">
             <Stack gap={3}>
-              <EyebrowLabel size="sm">Candidate screen</EyebrowLabel>
+              <EyebrowLabel size="sm">{t('candidateScreen')}</EyebrowLabel>
               <VideoFrame>
                 <VideoSurface
                   controls

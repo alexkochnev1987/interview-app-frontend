@@ -1,0 +1,21 @@
+{
+  "interviews": {
+    "createIntro": {
+      "eyebrow": "Create Interview Flow",
+      "title": "Assemble the candidate packet before you send the interview link.",
+      "lead": "Capture the role, choose only the questions that matter, and keep the decision criteria explicit before the recording session starts.",
+      "createQuestion": "Create Question",
+      "openBank": "Open Question Bank"
+    },
+    "detail": {
+      "backToDashboard": "Back to dashboard",
+      "validationStatus": {
+        "idle": "Idle",
+        "queued": "Queued",
+        "processing": "Processing",
+        "completed": "Completed",
+        "failed": "Failed"
+      }
+    }
+  }
+}

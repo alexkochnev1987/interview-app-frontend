@@ -2,6 +2,7 @@
 
 import { WandSparkles } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useTranslations } from 'next-intl'
 
 import { Grid } from '@/components/ui/layout/grid'
 import { Stack } from '@/components/ui/layout/stack'
@@ -36,8 +37,9 @@ import {
   formatRedFlags,
   parseExpectedConcepts,
   parseRedFlags,
-  type DraftFieldKey,
 } from '@/lib/question-editor/parsers'
+import { type DraftFieldKey } from '@/lib/question-editor/field-keys'
+import { useQuestionEditorLabels } from '@/i18n/use-question-editor-labels'
 import { EditorSectionCard } from './editor-section-card'
 import { QuestionEditorField } from './question-editor-field'
 
@@ -54,26 +56,29 @@ export function EditorRubricSection({
   onUpdate,
   renderAiSuggestion,
 }: EditorRubricSectionProps) {
+  const t = useTranslations('questions.sections.rubric')
+  const labels = useQuestionEditorLabels()
+
   return (
     <EditorSectionCard
-      title="Evaluation rubric"
-      description="Define what a good answer must cover and which signals should reduce confidence."
+      title={t('title')}
+      description={t('description')}
       icon={<WandSparkles className="size-4" />}
     >
       <Grid columns="editor-2" gap={6}>
         <Stack gap={2}>
           <QuestionEditorField
             htmlFor="expectedConcepts"
-            label="Expected concepts"
-            hint="Format: id | label | weight | description"
+            label={t('expectedConcepts')}
+            hint={t('expectedConceptsHint')}
           >
             <RawListTextarea
               id="expectedConcepts"
               parsedValue={coerceExpectedConcepts(value.expectedConcepts)}
               format={formatExpectedConcepts}
-              parse={parseExpectedConcepts}
+              parse={(text) => parseExpectedConcepts(text, labels.conceptDescriptionFallback)}
               onParsedChange={(next) => onUpdate({ expectedConcepts: next })}
-              placeholder="id | label | weight | description"
+              placeholder={t('expectedConceptsPlaceholder')}
               disabled={submitting}
             />
           </QuestionEditorField>
@@ -83,8 +88,8 @@ export function EditorRubricSection({
         <Stack gap={2}>
           <QuestionEditorField
             htmlFor="redFlags"
-            label="Red flags"
-            hint="Format: id | label | severity"
+            label={t('redFlags')}
+            hint={t('redFlagsHint')}
           >
             <RawListTextarea
               id="redFlags"
@@ -92,7 +97,7 @@ export function EditorRubricSection({
               format={formatRedFlags}
               parse={parseRedFlags}
               onParsedChange={(next) => onUpdate({ redFlags: next })}
-              placeholder="id | label | severity"
+              placeholder={t('redFlagsPlaceholder')}
               disabled={submitting}
             />
           </QuestionEditorField>

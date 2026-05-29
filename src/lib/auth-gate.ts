@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 
 import { ApiError } from './api-error'
 import type { MeResponse } from './api'
@@ -6,6 +7,8 @@ import { fetchCachedServerAuthMe } from './auth-server'
 import { loginReturnPath } from './safe-redirect-path'
 import { getServerRequestContext, type ServerRequestContext } from './server-fetch'
 import { isUnauthorizedError } from './api-error'
+import { localizedPath } from '@/i18n/pathname'
+import type { Locale } from '@/i18n/locales'
 
 export type AuthGate =
   | { kind: 'authorized'; ctx: ServerRequestContext; me: MeResponse }
@@ -13,33 +16,40 @@ export type AuthGate =
   | { kind: 'forbidden' }
   | { kind: 'error'; message: string }
 
-function loginRedirectUrl(returnPath: string): string {
+function loginRedirectUrl(returnPath: string, locale: Locale): string {
   const from = loginReturnPath(returnPath)
-  return from ? `/login?from=${encodeURIComponent(from)}` : '/login'
+  const loginPath = localizedPath('/login', locale)
+  return from
+    ? `${loginPath}?from=${encodeURIComponent(localizedPath(from, locale))}`
+    : loginPath
 }
 
 export function redirectIfUnauthenticated(
   auth: AuthGate,
   returnPath: string,
+  locale: Locale,
 ): asserts auth is Exclude<AuthGate, { kind: 'unauthenticated' }> {
   if (auth.kind === 'unauthenticated') {
-    redirect(loginRedirectUrl(returnPath))
+    redirect(loginRedirectUrl(returnPath, locale))
   }
 }
 
 export function redirectIfUnauthorizedError(
   err: unknown,
   returnPath: string,
+  locale: Locale,
 ): void {
   if (isUnauthorizedError(err)) {
-    redirect(loginRedirectUrl(returnPath))
+    redirect(loginRedirectUrl(returnPath, locale))
   }
 }
 
 export async function loadAuthGate(
   roleCheck: (role: string) => boolean,
+  locale: Locale,
 ): Promise<AuthGate> {
   const ctx = await getServerRequestContext()
+  const t = await getTranslations({ locale, namespace: 'common' })
 
   if (!ctx.cookieHeader) {
     return { kind: 'unauthenticated' }
@@ -64,7 +74,7 @@ export async function loadAuthGate(
       }
     }
     const message =
-      err instanceof Error ? err.message : 'Failed to load your profile.'
+      err instanceof Error ? err.message : t('profileLoadFailed')
     return { kind: 'error', message }
   }
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import { WandSparkles } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { StatusPill } from '@/components/ui/status-pill'
 import { Button } from '@/components/ui/button'
@@ -33,20 +34,20 @@ export function AiDraftPanel({
   onGenerate,
   onApplyAll,
 }: AiDraftPanelProps) {
+  const t = useTranslations('questions.aiDraft')
+
   return (
     <Card variant="surface">
       <CardHeader spacing="lg">
         <Stack gap={1.5}>
           <Inline gap={3} align="start" justify="between">
-            <CardTitle size="lg">AI draft</CardTitle>
+            <CardTitle size="lg">{t('title')}</CardTitle>
             {hasPendingDraft ? (
-              <StatusPill tone="neutral">{pendingCount} pending</StatusPill>
+              <StatusPill tone="neutral">{t('pending', { count: pendingCount })}</StatusPill>
             ) : null}
           </Inline>
           <CardDescription>
-            Let AI propose category, follow-up probes, expected concepts, red flags,
-            and tags based on your question text. Each change shows up as a
-            reviewable diff before anything is applied.
+            {t('description')}
           </CardDescription>
         </Stack>
 
@@ -64,7 +65,7 @@ export function AiDraftPanel({
                 shape="pill"
                 onClick={onApplyAll}
               >
-                Apply all
+                {t('applyAll')}
               </Button>
             ) : null}
             <Button
@@ -74,8 +75,8 @@ export function AiDraftPanel({
               disabled={disabled}
               loading={loading}
             >
-              {loading ? null : <WandSparkles className="size-4" />}
-              {loading ? 'Generating...' : 'Generate AI Draft'}
+              <WandSparkles className="size-4" />
+              {loading ? t('generating') : t('generate')}
             </Button>
           </Inline>
         </Stack>

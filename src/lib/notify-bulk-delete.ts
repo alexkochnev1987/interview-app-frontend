@@ -1,11 +1,21 @@
 import { type BulkDeleteResult } from '@/lib/api'
 import { notifyInfo, notifySuccess } from '@/lib/toast'
-import { TOAST_MESSAGES } from '@/lib/toast-messages'
 
-export function notifyBulkDeleteOutcome(result: BulkDeleteResult) {
+type BulkDeleteToastMessages = {
+  partialTitle: (deletedCount: number, blockedCount: number) => string
+  noopTitle: string
+  noopDescription: string
+  successTitle: (count: number) => string
+  successDescription: string
+}
+
+export function notifyBulkDeleteOutcome(
+  result: BulkDeleteResult,
+  messages: BulkDeleteToastMessages,
+) {
   if (result.blocked.length > 0) {
     notifyInfo(
-      TOAST_MESSAGES.bulkDelete.partialTitle(
+      messages.partialTitle(
         result.deleted.length,
         result.blocked.length,
       ),
@@ -15,15 +25,15 @@ export function notifyBulkDeleteOutcome(result: BulkDeleteResult) {
   }
 
   if (result.deleted.length === 0) {
-    notifyInfo(TOAST_MESSAGES.bulkDelete.noopTitle, {
+    notifyInfo(messages.noopTitle, {
       id: 'bulk-delete-noop',
-      description: TOAST_MESSAGES.bulkDelete.noopDescription,
+      description: messages.noopDescription,
     })
     return
   }
 
-  notifySuccess(TOAST_MESSAGES.bulkDelete.successTitle(result.deleted.length), {
+  notifySuccess(messages.successTitle(result.deleted.length), {
     id: 'bulk-delete-success',
-    description: TOAST_MESSAGES.bulkDelete.successDescription,
+    description: messages.successDescription,
   })
 }

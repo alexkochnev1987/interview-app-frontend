@@ -2,6 +2,7 @@
 
 import { Sparkles } from 'lucide-react'
 import { type ReactNode } from 'react'
+import { useTranslations } from 'next-intl'
 
 import { Stack } from '@/components/ui/layout/stack'
 import { Textarea } from '@/components/ui/textarea'
@@ -9,8 +10,8 @@ import { type QuestionInput } from '@/lib/api'
 import {
   joinStringList,
   parseStringList,
-  type DraftFieldKey,
 } from '@/lib/question-editor/parsers'
+import { type DraftFieldKey } from '@/lib/question-editor/field-keys'
 import { EditorSectionCard } from './editor-section-card'
 import { QuestionEditorField } from './question-editor-field'
 
@@ -29,16 +30,18 @@ export function EditorPromptSection({
   renderAiSuggestion,
   questionTextError,
 }: EditorPromptSectionProps) {
+  const t = useTranslations('questions.sections.prompt')
+
   return (
     <EditorSectionCard
-      title="Prompt and follow-up"
-      description="Write the core question clearly, then capture the follow-up probes that interviewers should keep ready."
+      title={t('title')}
+      description={t('description')}
       icon={<Sparkles className="size-4" />}
     >
       <Stack gap={2}>
         <QuestionEditorField
           htmlFor="questionText"
-          label="Question text"
+          label={t('questionText')}
           error={questionTextError}
         >
           <Textarea
@@ -46,7 +49,7 @@ export function EditorPromptSection({
             size="xs"
             value={value.questionText}
             onChange={(event) => onUpdate({ questionText: event.target.value })}
-            placeholder="e.g. What is a closure in JavaScript?"
+            placeholder={t('questionTextPlaceholder')}
             disabled={submitting}
           />
         </QuestionEditorField>
@@ -56,8 +59,8 @@ export function EditorPromptSection({
       <Stack gap={2}>
         <QuestionEditorField
           htmlFor="followUpQuestions"
-          label="Follow-up questions"
-          hint="Use one line per probe so the interviewer can keep cadence during the session."
+          label={t('followUpQuestions')}
+          hint={t('followUpHint')}
         >
           <Textarea
             id="followUpQuestions"
@@ -66,7 +69,7 @@ export function EditorPromptSection({
             onChange={(event) =>
               onUpdate({ followUpQuestions: parseStringList(event.target.value) })
             }
-            placeholder="One question per line"
+            placeholder={t('followUpPlaceholder')}
             disabled={submitting}
           />
         </QuestionEditorField>

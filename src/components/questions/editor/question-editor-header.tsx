@@ -1,6 +1,7 @@
 'use client'
 
 import { Sparkles } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
 import { HeroLead, HeroTitle } from '@/components/ui/hero-text'
@@ -10,6 +11,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Grid } from '@/components/ui/layout/grid'
 import { Stack } from '@/components/ui/layout/stack'
 import { type QuestionInput } from '@/lib/api'
+import { useSharedLabels } from '@/i18n/use-shared-labels'
 
 interface QuestionEditorHeaderProps {
   title: string
@@ -24,32 +26,39 @@ export function QuestionEditorHeader({
   weight,
   pendingDraftCount,
 }: QuestionEditorHeaderProps) {
+  const t = useTranslations('questions.editor')
+  const sharedLabels = useSharedLabels()
+
+  const normalizedDifficulty = difficulty ?? 'medium'
+
   return (
     <Card variant="floating" size="lg">
       <CardContent spacing="xl">
         <Stack gap={4}>
           <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
-            Unified Question Editor
+            {t('headerEyebrow')}
           </EyebrowBadge>
           <Stack gap={3}>
             <HeroTitle>{title}</HeroTitle>
             <HeroLead width="prose">
-              Shape the prompt, define the rubric, and keep AI-generated draft
-              suggestions visible as explicit diffs instead of invisible background
-              mutations.
+              {t('headerLead')}
             </HeroLead>
           </Stack>
         </Stack>
 
         <Grid columns="metrics-3" gap={4}>
           <MetricPanel
-            label="Difficulty"
-            value={<StatusPill tone={difficulty}>{difficulty}</StatusPill>}
+            label={t('metricDifficulty')}
+            value={
+              <StatusPill tone={normalizedDifficulty}>
+                {sharedLabels.difficulty(normalizedDifficulty)}
+              </StatusPill>
+            }
             valueSize="raw"
             valueTone="none"
           />
-          <MetricPanel label="Weight" value={weight} />
-          <MetricPanel label="Pending AI diffs" value={pendingDraftCount} />
+          <MetricPanel label={t('metricWeight')} value={weight} />
+          <MetricPanel label={t('metricPendingAi')} value={pendingDraftCount} />
         </Grid>
       </CardContent>
     </Card>

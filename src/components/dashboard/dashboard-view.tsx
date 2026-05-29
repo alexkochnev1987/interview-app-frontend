@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import {
   ArrowRight,
   BriefcaseBusiness,
@@ -8,6 +7,7 @@ import {
   Sparkles,
   Users,
 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
@@ -34,10 +34,11 @@ import { Section } from '@/components/ui/layout/section'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText, SectionHeading } from '@/components/ui/text'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
+import { Link } from '@/i18n/navigation'
+import { useInterviewFormatters } from '@/i18n/use-interview-formatters'
+import { useSharedLabels } from '@/i18n/use-shared-labels'
 import type { Interview } from '@/lib/api'
 import {
-  formatInterviewDate,
-  formatInterviewStatusLabel,
   getCandidateInitials,
 } from '@/lib/interview-formatters'
 
@@ -47,6 +48,9 @@ type DashboardViewProps = {
 }
 
 export function DashboardView({ interviews, demoMode = false }: DashboardViewProps) {
+  const t = useTranslations('dashboard')
+  const labels = useSharedLabels()
+  const formatters = useInterviewFormatters()
   const activeCount = interviews.filter((interview) =>
     ['pending', 'in_progress', 'processing'].includes(interview.status),
   ).length
@@ -63,10 +67,11 @@ export function DashboardView({ interviews, demoMode = false }: DashboardViewPro
       <Stack gap={6}>
         {demoMode ? (
           <Alert variant="warning">
-            <AlertTitle>Demo mode</AlertTitle>
+            <AlertTitle>{t('demoMode.title')}</AlertTitle>
             <AlertDescription>
-              Sample interviews only — no live backend.{' '}
-              <Link href="/login">Sign in</Link> for your workspace dashboard.
+              {t('demoMode.description')}{' '}
+              <Link href="/login">{t('demoMode.signInAction')}</Link>{' '}
+              {t('demoMode.signInSuffix')}
             </AlertDescription>
           </Alert>
         ) : null}
@@ -77,15 +82,14 @@ export function DashboardView({ interviews, demoMode = false }: DashboardViewPro
               <Inline gap={4} align="start" justify="between" wrap="wrap">
                 <Stack gap={4} width="lg">
                   <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
-                    Recruiter Dashboard
+                    {t('hero.eyebrow')}
                   </EyebrowBadge>
                   <Stack gap={3}>
                     <HeroTitle width="prose">
-                      Run your interview pipeline from one editorial command surface.
+                      {t('hero.title')}
                     </HeroTitle>
                     <HeroLead width="prose">
-                      Monitor active sessions, spot stalled candidates, and keep scoring flows moving
-                      without dropping into separate admin tools.
+                      {t('hero.lead')}
                     </HeroLead>
                   </Stack>
                 </Stack>
@@ -93,12 +97,12 @@ export function DashboardView({ interviews, demoMode = false }: DashboardViewPro
                 <Inline gap={3} wrap="wrap">
                   <Button asChild variant="gradient">
                     <Link href="/interviews/new">
-                      New Interview
+                      {t('hero.newInterview')}
                       <ArrowRight className="size-4" />
                     </Link>
                   </Button>
                   <Button asChild variant="outline-pill" shape="pill" effects="blur">
-                    <Link href="/questions">Question Bank</Link>
+                    <Link href="/questions">{t('hero.questionBank')}</Link>
                   </Button>
                 </Inline>
               </Inline>
@@ -106,21 +110,21 @@ export function DashboardView({ interviews, demoMode = false }: DashboardViewPro
               <Grid columns="metrics-3" gap={4}>
                 <MetricPanel
                   icon={<CircleDashed />}
-                  label="Active"
+                  label={t('metrics.active.label')}
                   value={activeCount}
-                  description="Interviews currently waiting on answers, uploads, or scoring."
+                  description={t('metrics.active.description')}
                 />
                 <MetricPanel
                   icon={<Users />}
-                  label="Candidates"
+                  label={t('metrics.candidates.label')}
                   value={interviews.length}
-                  description="Total candidate records visible in the current workspace."
+                  description={t('metrics.candidates.description')}
                 />
                 <MetricPanel
                   icon={<ListChecks />}
-                  label="Question Load"
+                  label={t('metrics.questionLoad.label')}
                   value={questionVolume}
-                  description="Questions currently attached across all visible interviews."
+                  description={t('metrics.questionLoad.description')}
                 />
               </Grid>
             </CardContent>
@@ -129,12 +133,11 @@ export function DashboardView({ interviews, demoMode = false }: DashboardViewPro
           <Card variant="tinted">
             <CardHeader spacing="sm">
               <EyebrowBadge icon={<BriefcaseBusiness className="size-3.5" />} tone="muted">
-                Snapshot
+                {t('snapshot.eyebrow')}
               </EyebrowBadge>
-              <CardTitle size="lg">Today&apos;s pipeline</CardTitle>
+              <CardTitle size="lg">{t('snapshot.title')}</CardTitle>
               <CardDescription width="sm">
-                The redesigned shell uses tonal layers instead of hard separators, so activity stays
-                readable even when the data density grows.
+                {t('snapshot.description')}
               </CardDescription>
             </CardHeader>
             <CardContent spacing="lg">
@@ -144,12 +147,12 @@ export function DashboardView({ interviews, demoMode = false }: DashboardViewPro
                 label={
                   <Inline gap={3} align="center" justify="between">
                     <BodyText as="span" size="sm-tight" tone="foreground">
-                      Completed interviews
+                      {t('metrics.completed.label')}
                     </BodyText>
                     <StatusPill tone="completed">{completedCount}</StatusPill>
                   </Inline>
                 }
-                description="Finished sessions with scorecards ready for review and handoff."
+                description={t('metrics.completed.description')}
               />
               <MetricPanel
                 tone="elevated"
@@ -157,18 +160,18 @@ export function DashboardView({ interviews, demoMode = false }: DashboardViewPro
                 label={
                   <Inline gap={3} align="center" justify="between">
                     <BodyText as="span" size="sm-tight" tone="foreground">
-                      Last sync
+                      {t('metrics.lastSync.label')}
                     </BodyText>
                     <StatusPill tone="neutral">
                       <Clock3 className="size-3" />
-                      {demoMode ? 'Demo' : 'Live'}
+                      {demoMode ? t('metrics.lastSync.demo') : t('metrics.lastSync.live')}
                     </StatusPill>
                   </Inline>
                 }
                 description={
                   demoMode
-                    ? 'Showing sample interviews for demonstration.'
-                    : 'Updated against the live backend just now.'
+                    ? t('metrics.lastSync.demoDescription')
+                    : t('metrics.lastSync.liveDescription')
                 }
               />
             </CardContent>
@@ -178,11 +181,11 @@ export function DashboardView({ interviews, demoMode = false }: DashboardViewPro
         {interviews.length === 0 ? (
           <EmptyStateCard
             icon={<Users className="size-5" />}
-            title="No interviews yet"
-            description="Start with a candidate, attach questions from the bank, and this dashboard becomes your operating surface."
+            title={t('empty.title')}
+            description={t('empty.description')}
             action={
               <Button asChild variant="gradient">
-                <Link href="/interviews/new">Create your first interview</Link>
+                <Link href="/interviews/new">{t('empty.action')}</Link>
               </Button>
             }
           />
@@ -190,11 +193,11 @@ export function DashboardView({ interviews, demoMode = false }: DashboardViewPro
           <Section gap={4}>
             <Inline gap={4} align="end" justify="between" wrap="wrap">
               <Stack gap={2}>
-                <EyebrowLabel size="lg">Active records</EyebrowLabel>
-                <SectionHeading>Recent interviews</SectionHeading>
+                <EyebrowLabel size="lg">{t('recent.eyebrow')}</EyebrowLabel>
+                <SectionHeading>{t('recent.title')}</SectionHeading>
               </Stack>
               <Button asChild variant="outline-pill" shape="pill" effects="blur">
-                <Link href="/questions/new">Create a new question</Link>
+                <Link href="/questions/new">{t('recent.createQuestion')}</Link>
               </Button>
             </Inline>
 
@@ -215,7 +218,7 @@ export function DashboardView({ interviews, demoMode = false }: DashboardViewPro
                             </Stack>
                           </Inline>
                           <StatusPill tone={interview.status}>
-                            {formatInterviewStatusLabel(interview.status)}
+                            {labels.interviewStatus(interview.status)}
                           </StatusPill>
                         </Inline>
                       </CardHeader>
@@ -223,13 +226,13 @@ export function DashboardView({ interviews, demoMode = false }: DashboardViewPro
                         <Grid columns={2} gap={3}>
                           <MetricPanel
                             tone="elevated"
-                            label="Questions"
+                            label={t('recent.questions')}
                             value={interview.questions.length}
                             valueSize="md"
                           />
                           <MetricPanel
                             tone="elevated"
-                            label="Uploaded"
+                            label={t('recent.uploaded')}
                             value={
                               interview.answers.filter(
                                 (answer) => answer.status === 'submitted',
@@ -241,10 +244,10 @@ export function DashboardView({ interviews, demoMode = false }: DashboardViewPro
 
                         <Inline gap={3} align="center" justify="between">
                           <BodyText as="span" size="sm">
-                            Updated {formatInterviewDate(interview.updatedAt)}
+                            {formatters.updated(interview.updatedAt)}
                           </BodyText>
                           <HoverCue>
-                            Open
+                            {t('recent.open')}
                             <ArrowRight className="size-4" />
                           </HoverCue>
                         </Inline>

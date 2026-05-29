@@ -1,4 +1,5 @@
 import type { RefObject } from 'react';
+import { useTranslations } from 'next-intl';
 
 import { SurfaceCard } from '@/components/ui/surface-card';
 import { CardContent } from '@/components/ui/card';
@@ -15,7 +16,6 @@ import { TakeRecordingActions } from './recording-actions';
 import { TakeRecordingGuidance } from './recording-guidance';
 import type { InterviewDataView, TakeStage } from '@/components/take/types';
 import type { InterviewerPresence } from '@/features/take/use-take-question-tts';
-import { TAKE_MESSAGES } from '@/features/take';
 
 interface TakeRecordingHeroColumnProps {
   stage: TakeStage;
@@ -97,6 +97,7 @@ export function TakeRecordingSidebarColumn({
   onRerecord,
   onSubmit,
 }: TakeRecordingSidebarColumnProps) {
+  const tTake = useTranslations('takeFlow');
   return (
     <SurfaceCard tone="glassSoft" height="full">
       <CardContent layout="fill-column" spacing="md">
@@ -108,7 +109,10 @@ export function TakeRecordingSidebarColumn({
               <Stack gap={2}>
                 <Inline align="center" justify="between" gap={3}>
                   <Text as="span" variant="labelSm">
-                    Question {interview.currentQuestionIndex + 1} of {interview.totalQuestions}
+                    {tTake('questionProgress', {
+                      current: interview.currentQuestionIndex + 1,
+                      total: interview.totalQuestions,
+                    })}
                   </Text>
                   <StatusPill tone="neutral">{progressValue}%</StatusPill>
                 </Inline>
@@ -147,7 +151,7 @@ export function TakeRecordingSidebarColumn({
 
             {submitError ? (
               <Alert variant="destructive">
-                <AlertTitle>{TAKE_MESSAGES.submitFailedTitle}</AlertTitle>
+                <AlertTitle>{tTake('submitFailedTitle')}</AlertTitle>
                 <AlertDescription>{submitError}</AlertDescription>
               </Alert>
             ) : null}

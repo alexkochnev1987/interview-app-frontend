@@ -1,44 +1,59 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import createMiddleware from 'next-intl/middleware'
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 
 import {
   loginReturnPath,
   safeRedirectPath,
-} from '@/lib/safe-redirect-path';
+} from '@/lib/safe-redirect-path'
+import { localizedPath, pathLocale } from '@/i18n/pathname'
+import { routing } from '@/i18n/routing'
+
+const handleI18nRouting = createMiddleware(routing)
+
+function matchesPathSegment(pathname: string, segment: string) {
+  return pathname === segment || pathname.startsWith(`${segment}/`)
+}
 
 export function proxy(request: NextRequest) {
-  const session = request.cookies.get('session');
-  const path = request.nextUrl.pathname;
+  const session = request.cookies.get('session')
+  const path = request.nextUrl.pathname
+  const { locale, pathnameWithoutLocale } = pathLocale(path)
 
-  if (path.startsWith('/api') || path.startsWith('/_next')) {
-    return NextResponse.next();
+  if (
+    pathnameWithoutLocale.startsWith('/api') ||
+    pathnameWithoutLocale.startsWith('/_next')
+  ) {
+    return NextResponse.next()
   }
 
   const isPublicPage =
-    path === '/login' ||
-    path.startsWith('/take') ||
-    path.startsWith('/feedback') ||
-    path.startsWith('/demo');
+    pathnameWithoutLocale === '/login' ||
+    matchesPathSegment(pathnameWithoutLocale, '/take') ||
+    matchesPathSegment(pathnameWithoutLocale, '/feedback') ||
+    matchesPathSegment(pathnameWithoutLocale, '/demo')
 
   if (!session && !isPublicPage) {
-    const loginUrl = new URL('/login', request.url);
-    const returnPath = `${path}${request.nextUrl.search}`;
-    const safeFrom = loginReturnPath(returnPath);
+    const loginUrl = new URL(localizedPath('/login', locale), request.url)
+    const returnPath = `${path}${request.nextUrl.search}`
+    const safeFrom = loginReturnPath(returnPath)
     if (safeFrom) {
-      loginUrl.searchParams.set('from', safeFrom);
+      loginUrl.searchParams.set('from', safeFrom)
     }
-    return NextResponse.redirect(loginUrl);
+    return NextResponse.redirect(loginUrl)
   }
 
-  if (session && path === '/login') {
-    const from = request.nextUrl.searchParams.get('from');
-    const destination = safeRedirectPath(from);
-    return NextResponse.redirect(new URL(destination, request.url));
+  if (session && pathnameWithoutLocale === '/login') {
+    const from = request.nextUrl.searchParams.get('from')
+    const destination = localizedPath(safeRedirectPath(from), locale)
+    return NextResponse.redirect(new URL(destination, request.url))
   }
 
-  return NextResponse.next();
+  const response = handleI18nRouting(request)
+  response.headers.set('x-pathname', pathnameWithoutLocale)
+  return response
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
-};
+  matcher: '/((?!api|trpc|_next|_vercel|.*\\..*).*)',
+}

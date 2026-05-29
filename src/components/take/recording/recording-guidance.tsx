@@ -2,8 +2,8 @@ import type { TakeStage } from '@/components/take/types';
 import { Panel } from '@/components/ui/panel';
 import { Stack } from '@/components/ui/layout';
 import { Text } from '@/components/ui/text';
-import { TAKE_MESSAGES } from '@/features/take';
 import type { InterviewerPresence } from '@/features/take/use-take-question-tts';
+import { useTranslations } from 'next-intl';
 
 interface TakeRecordingGuidanceProps {
   stage: TakeStage;
@@ -18,22 +18,23 @@ export function TakeRecordingGuidance({
   recordingStartBusy,
   interviewerPresence,
 }: TakeRecordingGuidanceProps) {
+  const tTake = useTranslations('takeFlow');
   return (
     <Panel>
       <Stack gap={3}>
         <Text as="span" variant="eyebrowLabel">
-          Guidance
+          {tTake('recordingGuidanceTitle')}
         </Text>
         <Text variant="bodyMutedSm">
           {stage === 'transition'
-            ? TAKE_MESSAGES.guidanceInterview
+            ? tTake('guidanceInterview')
             : stage === 'interview' && !recording
               ? recordingStartBusy
-                ? TAKE_MESSAGES.recordingStartingBusy
+                ? tTake('recordingStartingBusy')
                 : interviewerPresence === 'speaking'
-                  ? TAKE_MESSAGES.guidanceInterviewerSpeaking
-                  : TAKE_MESSAGES.guidanceBeforeRecording
-              : TAKE_MESSAGES.guidanceInterview}
+                  ? tTake('guidanceInterviewerSpeaking')
+                  : tTake('guidanceBeforeRecording')
+              : tTake('guidanceInterview')}
         </Text>
       </Stack>
     </Panel>

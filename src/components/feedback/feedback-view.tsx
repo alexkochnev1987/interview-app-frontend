@@ -1,4 +1,7 @@
+'use client'
+
 import { BadgeCheck, ChartColumnBig, Clock3, Sparkles, Target } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
 import { HeroLead, HeroTitle } from '@/components/ui/hero-text'
@@ -37,6 +40,8 @@ type FeedbackViewProps = {
 }
 
 export function FeedbackView({ feedback }: FeedbackViewProps) {
+  const t = useTranslations('feedback')
+
   return (
     <PageShell>
       <Section width="wide">
@@ -44,14 +49,16 @@ export function FeedbackView({ feedback }: FeedbackViewProps) {
           <Card variant="floating" size="lg">
             <CardContent spacing="xl">
               <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
-                Interview feedback
+                {t('eyebrow')}
               </EyebrowBadge>
 
               <Stack gap={3}>
-                <HeroTitle>Your interview summary</HeroTitle>
+                <HeroTitle>{t('title')}</HeroTitle>
                 <HeroLead>
-                  This page shares the reviewed outcome for the <strong>{feedback.position}</strong>{' '}
-                  interview and highlights both strengths and next areas to improve.
+                  {t.rich('lead', {
+                    position: feedback.position,
+                    strong: (chunks) => <strong>{chunks}</strong>,
+                  })}
                 </HeroLead>
               </Stack>
 
@@ -62,7 +69,7 @@ export function FeedbackView({ feedback }: FeedbackViewProps) {
                   </StatusPill>
                 ) : null}
                 <StatusPill tone="neutral">
-                  Reviewed {formatInterviewDate(feedback.date)}
+                  {t('reviewed', { date: formatInterviewDate(feedback.date) })}
                 </StatusPill>
               </Inline>
             </CardContent>
@@ -70,24 +77,22 @@ export function FeedbackView({ feedback }: FeedbackViewProps) {
 
           <Card variant="tinted">
             <CardHeader spacing="xs">
-              <CardTitle size="lg">Snapshot</CardTitle>
-              <CardDescription>
-                A compact overview of your current outcome and when this shared link expires.
-              </CardDescription>
+              <CardTitle size="lg">{t('snapshotTitle')}</CardTitle>
+              <CardDescription>{t('snapshotDescription')}</CardDescription>
             </CardHeader>
             <CardContent>
               <Grid columns="metrics-2-md" gap={4}>
                 <MetricPanel
                   tone="elevated"
                   icon={<BadgeCheck className="size-4" />}
-                  label="Overall score"
+                  label={t('overallScore')}
                   value={feedback.overallScore ?? '--'}
                   valueTone="primary"
                 />
                 <MetricPanel
                   tone="elevated"
                   icon={<Clock3 className="size-4" />}
-                  label="Link expiry"
+                  label={t('linkExpiry')}
                   value={formatInterviewDate(feedback.expiresAt)}
                   valueSize="sm"
                 />
@@ -103,9 +108,9 @@ export function FeedbackView({ feedback }: FeedbackViewProps) {
             <Card variant="surface">
               <CardHeader spacing="xs">
                 <EyebrowBadge icon={<ChartColumnBig className="size-3.5" />} tone="primary">
-                  Category scores
+                  {t('categoryScoresEyebrow')}
                 </EyebrowBadge>
-                <CardTitle size="lg">Breakdown</CardTitle>
+                <CardTitle size="lg">{t('breakdownTitle')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <Grid columns="metrics-2-md" gap={4}>
@@ -117,7 +122,7 @@ export function FeedbackView({ feedback }: FeedbackViewProps) {
                       value={score}
                       valueSize="hero"
                       valueTone="primary"
-                      description="out of 100"
+                      description={t('outOf100')}
                     />
                   ))}
                 </Grid>
@@ -130,9 +135,9 @@ export function FeedbackView({ feedback }: FeedbackViewProps) {
               <Card variant="surface">
                 <CardHeader spacing="xs">
                   <EyebrowBadge icon={<BadgeCheck className="size-3.5" />}>
-                    Feedback
+                    {t('feedbackEyebrow')}
                   </EyebrowBadge>
-                  <CardTitle size="lg">What went well</CardTitle>
+                  <CardTitle size="lg">{t('wentWellTitle')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <BodyText size="lead">{feedback.generalFeedback}</BodyText>
@@ -144,9 +149,9 @@ export function FeedbackView({ feedback }: FeedbackViewProps) {
               <Card variant="surface">
                 <CardHeader spacing="xs">
                   <EyebrowBadge icon={<Target className="size-3.5" />}>
-                    Recommendations
+                    {t('recommendationsEyebrow')}
                   </EyebrowBadge>
-                  <CardTitle size="lg">What to improve next</CardTitle>
+                  <CardTitle size="lg">{t('improveTitle')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <BodyText size="lead">{feedback.improvements}</BodyText>

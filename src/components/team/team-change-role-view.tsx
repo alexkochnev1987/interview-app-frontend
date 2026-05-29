@@ -1,6 +1,7 @@
 'use client'
 
 import { X } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -38,17 +39,19 @@ export function TeamChangeRoleView({
   onApply,
   onDismiss,
 }: TeamChangeRoleViewProps) {
+  const t = useTranslations('team.changeRole')
+
   return (
     <ModalShell
       dismissDisabled={loading}
       onDismiss={onDismiss}
-      accessibilityTitle="Change role"
+      accessibilityTitle={t('accessibilityTitle')}
       accessibilityDescription={`${member.name}, ${member.email}`}
     >
       <CardHeader spacing="sm">
         <Inline justify="between" align="start">
           <Stack gap={1}>
-            <CardTitle size="lg">Change role</CardTitle>
+            <CardTitle size="lg">{t('title')}</CardTitle>
             <BodyText size="sm">
               {member.name} · {member.email}
             </BodyText>
@@ -69,16 +72,15 @@ export function TeamChangeRoleView({
 
       <CardContent spacing="md">
         <Stack gap={2}>
-          <EyebrowLabel size="sm">Current Role</EyebrowLabel>
+          <EyebrowLabel size="sm">{t('currentRole')}</EyebrowLabel>
           <TeamRoleBadge role={member.role} />
         </Stack>
 
         <Stack gap={2}>
-          <EyebrowLabel size="sm">New Role</EyebrowLabel>
+          <EyebrowLabel size="sm">{t('newRole')}</EyebrowLabel>
           {roleOptions.length === 0 ? (
             <BodyText size="sm" tone="muted">
-              No roles are available for your account to assign. If this looks wrong,
-              try again signed in as a higher-level administrator.
+              {t('noRoles')}
             </BodyText>
           ) : (
             <RadioGroup
@@ -102,7 +104,7 @@ export function TeamChangeRoleView({
             disabled={roleOptions.length === 0 || !hasChange || loading}
             onClick={() => { void onApply() }}
           >
-            {loading ? 'Applying role change...' : 'Apply role change'}
+            {loading ? t('applying') : t('apply')}
           </Button>
           <Button
             type="button"
@@ -111,12 +113,12 @@ export function TeamChangeRoleView({
             disabled={loading}
             onClick={onDismiss}
           >
-            Cancel
+            {t('cancel')}
           </Button>
         </Stack>
 
         <BodyText size="xs" tone="muted">
-          This change takes effect immediately. The user keeps their session until next request.
+          {t('footnote')}
         </BodyText>
       </CardContent>
     </ModalShell>

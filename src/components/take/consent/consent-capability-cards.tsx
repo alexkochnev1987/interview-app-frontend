@@ -1,6 +1,7 @@
 import { Camera, Mic, ShieldCheck, Video } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
 
 import { Grid, Stack } from '@/components/ui/layout';
 import { Text } from '@/components/ui/text';
@@ -11,25 +12,6 @@ interface CapabilityCardProps {
   title: string;
   description: ReactNode;
 }
-
-const CAPABILITY_ITEMS: CapabilityCardProps[] = [
-  { icon: Camera, title: 'Camera', description: 'Recorded separately for every answer.' },
-  { icon: Mic, title: 'Microphone', description: 'Captured together with your camera feed.' },
-  {
-    icon: Video,
-    title: 'Entire screen',
-    description: (
-      <>
-        Must be shared as <strong>Entire screen</strong>, not a tab or app window.
-      </>
-    ),
-  },
-  {
-    icon: ShieldCheck,
-    title: 'Fairness checks',
-    description: 'Session and browser activity may be stored for evaluation integrity.',
-  },
-];
 
 function CapabilityCard({ icon: Icon, title, description }: CapabilityCardProps) {
   return (
@@ -50,9 +32,25 @@ function CapabilityCard({ icon: Icon, title, description }: CapabilityCardProps)
 }
 
 export function TakeCapabilityCards() {
+  const tTake = useTranslations('takeFlow');
+  const capabilityItems: CapabilityCardProps[] = [
+    { icon: Camera, title: tTake('capabilityCameraTitle'), description: tTake('capabilityCameraDescription') },
+    { icon: Mic, title: tTake('capabilityMicTitle'), description: tTake('capabilityMicDescription') },
+    {
+      icon: Video,
+      title: tTake('capabilityScreenTitle'),
+      description: tTake('capabilityScreenDescription'),
+    },
+    {
+      icon: ShieldCheck,
+      title: tTake('capabilityFairnessTitle'),
+      description: tTake('capabilityFairnessDescription'),
+    },
+  ];
+
   return (
     <Grid columns={2} gap={6}>
-      {CAPABILITY_ITEMS.map((item) => (
+      {capabilityItems.map((item) => (
         <CapabilityCard key={item.title} icon={item.icon} title={item.title} description={item.description} />
       ))}
     </Grid>

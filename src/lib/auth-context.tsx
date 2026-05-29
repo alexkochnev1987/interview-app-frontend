@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/navigation';
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { logout as apiLogout, type AuthUserResponseDto as User } from '@/lib/api';
 

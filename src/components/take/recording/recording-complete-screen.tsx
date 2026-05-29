@@ -1,4 +1,5 @@
 import { CheckCircle2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { SurfaceCard } from '@/components/ui/surface-card';
 import { PageMain } from '@/components/layout/page-shell';
@@ -14,6 +15,7 @@ interface TakeCompleteScreenProps {
 }
 
 export function TakeCompleteScreen({ candidateName, position }: TakeCompleteScreenProps) {
+  const tTake = useTranslations('takeFlow');
   return (
     <PageMain>
       <SurfaceCard tone="glassFloat" size="lg">
@@ -23,11 +25,11 @@ export function TakeCompleteScreen({ candidateName, position }: TakeCompleteScre
               <CheckCircle2 size={32} />
             </IconBox>
             <Stack gap={3} align="center">
-              <Heading variant="heroTitle">Thank you, {candidateName}</Heading>
+              <Heading variant="heroTitle">
+                {tTake('completeTitle', { candidateName })}
+              </Heading>
               <Text variant="heroDescription">
-                Your interview for <strong>{position}</strong> is submitted and saved securely for
-                review. If you&apos;re selected to continue, our team will reach out within a few
-                business days with next steps.
+                {tTake('completeDescription', { position })}
               </Text>
             </Stack>
           </Stack>

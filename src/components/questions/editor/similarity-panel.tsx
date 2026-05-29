@@ -1,7 +1,7 @@
 'use client'
 
-import Link from 'next/link'
 import { Search } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
 import { MetricPanel } from '@/components/ui/metric-panel'
@@ -20,12 +20,14 @@ import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText } from '@/components/ui/text'
 import { type SimilarQuestionMatch } from '@/lib/api'
+import { Link } from '@/i18n/navigation'
 import {
   type SimilarStatus,
   type SimilaritySignalSummary,
 } from '@/lib/question-editor/parsers'
-import { TOAST_MESSAGES } from '@/lib/toast-messages'
 import { truncateText } from '@/lib/text'
+import { useToastMessages } from '@/lib/use-toast-messages'
+import { useSharedLabels } from '@/i18n/use-shared-labels'
 import { SIMILARITY_MIN_QUESTION_TEXT_LENGTH } from './use-similarity-search'
 
 interface SimilarityPanelProps {
@@ -51,27 +53,30 @@ export function SimilarityPanel({
   disabled,
   onRunSearch,
 }: SimilarityPanelProps) {
+  const toastMessages = useToastMessages()
+  const t = useTranslations('questions.similarity')
+  const sharedLabels = useSharedLabels()
+
   return (
     <Card variant="surface">
       <CardHeader spacing="lg">
         <Stack gap={1.5}>
-          <CardTitle size="lg">Similar questions</CardTitle>
+          <CardTitle size="lg">{t('title')}</CardTitle>
           <CardDescription>
-            Check for duplicates and near-duplicates against the current library
-            before you save a new prompt or update an old one.
+            {t('description')}
           </CardDescription>
         </Stack>
 
         <Grid columns={3} gap={3}>
-          <SignalTile label="Prompt" value={signalSummary.textTokenCount} />
-          <SignalTile label="Tags" value={signalSummary.tagCount} />
-          <SignalTile label="Rubric" value={signalSummary.conceptCount} />
+          <SignalTile label={t('signalPrompt')} value={signalSummary.textTokenCount} />
+          <SignalTile label={t('signalTags')} value={signalSummary.tagCount} />
+          <SignalTile label={t('signalRubric')} value={signalSummary.conceptCount} />
         </Grid>
 
         <Inline gap={2} align="center" justify="between" wrap="wrap">
           <Inline gap={2} align="center" wrap="wrap">
-            {resultsStale ? <StatusPill tone="neutral">Needs refresh</StatusPill> : null}
-            {isEditMode ? <StatusPill tone="neutral">Edit mode</StatusPill> : null}
+            {resultsStale ? <StatusPill tone="neutral">{t('needsRefresh')}</StatusPill> : null}
+            {isEditMode ? <StatusPill tone="neutral">{t('editMode')}</StatusPill> : null}
           </Inline>
           <Button
             type="button"
@@ -82,28 +87,27 @@ export function SimilarityPanel({
             disabled={disabled || status === 'loading' || !canSearch}
           >
             <Search className="size-3.5" />
-            {status === 'loading' ? 'Searching...' : 'Run search'}
+            {status === 'loading' ? t('searching') : t('runSearch')}
           </Button>
         </Inline>
       </CardHeader>
       <CardContent spacing="md">
         {status === 'idle' ? (
           <PanelMessage>
-            Add at least {SIMILARITY_MIN_QUESTION_TEXT_LENGTH} characters of question text, then search for duplicates
-            against the stored library via embeddings on the backend.
+            {t('idleHint', { min: SIMILARITY_MIN_QUESTION_TEXT_LENGTH })}
           </PanelMessage>
         ) : null}
 
         {status === 'loading' ? (
           <PanelMessage>
-            Comparing the current draft with the stored question library.
+            {t('loadingHint')}
           </PanelMessage>
         ) : null}
 
         {status === 'error' ? (
           <Stack gap={2}>
             <BodyText size="sm" weight="semibold">
-              {TOAST_MESSAGES.similarity.searchFailedTitle}
+              {toastMessages.similarity.searchFailedTitle}
             </BodyText>
             {error ? (
               <BodyText size="sm" tone="muted">
@@ -119,14 +123,14 @@ export function SimilarityPanel({
               disabled={disabled || !canSearch}
             >
               <Search className="size-3.5" />
-              Retry search
+              {t('rerunSearch')}
             </Button>
           </Stack>
         ) : null}
 
         {status === 'success' && matches.length === 0 ? (
           <PanelMessage>
-            {TOAST_MESSAGES.similarity.noMatches}
+            {toastMessages.similarity.noMatches}
           </PanelMessage>
         ) : null}
 
@@ -155,6 +159,8 @@ function PanelMessage({ children }: { children: React.ReactNode }) {
 }
 
 function SimilarMatchRow({ match }: { match: SimilarQuestionMatch }) {
+  const t = useTranslations('questions.similarity')
+  const sharedLabels = useSharedLabels()
   const taxonomy = [
     match.question.role,
     match.question.category,
@@ -170,10 +176,10 @@ function SimilarMatchRow({ match }: { match: SimilarQuestionMatch }) {
           <Stack gap={3}>
             <Inline gap={2} wrap="wrap">
               <StatusPill tone={match.question.difficulty}>
-                {match.question.difficulty}
+                {sharedLabels.difficulty(match.question.difficulty)}
               </StatusPill>
               <StatusPill tone="neutral">
-                {Math.round(match.score * 100)}% match
+                {t('matchScore', { score: `${Math.round(match.score * 100)}%` })}
               </StatusPill>
             </Inline>
 
@@ -181,7 +187,7 @@ function SimilarMatchRow({ match }: { match: SimilarQuestionMatch }) {
               <BodyText size="sm" weight="semibold" tone="foreground">
                 {truncateText(match.question.questionText)}
               </BodyText>
-              <BodyText size="sm">{taxonomy || 'No taxonomy attached'}</BodyText>
+              <BodyText size="sm">{taxonomy || t('noTaxonomy')}</BodyText>
             </Stack>
           </Stack>
 
@@ -192,7 +198,7 @@ function SimilarMatchRow({ match }: { match: SimilarQuestionMatch }) {
             size="sm"
             asChild
           >
-            <Link href={`/questions/${match.question.id}`}>Open</Link>
+            <Link href={`/questions/${match.question.id}`}>{t('openQuestion')}</Link>
           </Button>
         </Inline>
 
