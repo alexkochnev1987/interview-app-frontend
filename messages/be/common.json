@@ -10,7 +10,8 @@
     "notAvailable": "Недаступна",
     "backToHome": "На галоўную",
     "serviceUnavailable": "Сэрвіс недаступны",
-    "sessionVerificationFailed": "Не ўдалося праверыць вашу сесію або правы доступу."
+    "sessionVerificationFailed": "Не ўдалося праверыць вашу сесію або правы доступу.",
+    "profileLoadFailed": "Не ўдалося загрузіць ваш профіль."
   },
   "languageSwitcher": {
     "label": "Мова",

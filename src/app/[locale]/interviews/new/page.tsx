@@ -28,7 +28,7 @@ export default async function NewInterviewPage({
   })
   const tCommon = await getTranslations({ locale, namespace: 'common' })
   const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
-  const auth = await loadAuthGate(canConfigureInterview)
+  const auth = await loadAuthGate(canConfigureInterview, locale)
   redirectIfUnauthenticated(auth, '/interviews/new', locale)
   if (auth.kind === 'forbidden') {
     return (

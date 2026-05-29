@@ -29,7 +29,7 @@ export default async function InterviewDetailPage({
   const tCommon = await getTranslations({ locale, namespace: 'common' })
 
   const returnPath = `/interviews/${encodeURIComponent(id)}`
-  const auth = await loadAuthGate(canConfigureInterview)
+  const auth = await loadAuthGate(canConfigureInterview, locale)
   redirectIfUnauthenticated(auth, returnPath, locale)
   if (auth.kind === 'forbidden') {
     return (

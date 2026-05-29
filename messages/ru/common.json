@@ -10,7 +10,8 @@
     "notAvailable": "Недоступно",
     "backToHome": "На главную",
     "serviceUnavailable": "Сервис недоступен",
-    "sessionVerificationFailed": "Не удалось проверить вашу сессию или права доступа."
+    "sessionVerificationFailed": "Не удалось проверить вашу сессию или права доступа.",
+    "profileLoadFailed": "Не удалось загрузить ваш профиль."
   },
   "languageSwitcher": {
     "label": "Язык",

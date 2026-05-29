@@ -100,7 +100,7 @@ export function NavHeader() {
                   weight="semibold"
                   tone="foreground"
                 >
-                  AI Interview Architect
+                  {tCommon('appName')}
                 </BodyText>
               </Stack>
             </Inline>

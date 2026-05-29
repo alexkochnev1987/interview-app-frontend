@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 
 import { ApiError } from './api-error'
 import type { MeResponse } from './api'
@@ -45,8 +46,10 @@ export function redirectIfUnauthorizedError(
 
 export async function loadAuthGate(
   roleCheck: (role: string) => boolean,
+  locale: Locale,
 ): Promise<AuthGate> {
   const ctx = await getServerRequestContext()
+  const t = await getTranslations({ locale, namespace: 'common' })
 
   if (!ctx.cookieHeader) {
     return { kind: 'unauthenticated' }
@@ -71,7 +74,7 @@ export async function loadAuthGate(
       }
     }
     const message =
-      err instanceof Error ? err.message : 'Failed to load your profile.'
+      err instanceof Error ? err.message : t('profileLoadFailed')
     return { kind: 'error', message }
   }
 }

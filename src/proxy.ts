@@ -49,7 +49,9 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL(destination, request.url))
   }
 
-  return handleI18nRouting(request)
+  const response = handleI18nRouting(request)
+  response.headers.set('x-pathname', pathnameWithoutLocale)
+  return response
 }
 
 export const config = {

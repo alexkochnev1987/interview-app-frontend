@@ -34,7 +34,7 @@
     "bulkDelete": {
       "failedTitle": "Масавае выдаленне не ўдалося",
       "partialTitle": "Выдалена: {deletedCount}, заблакіравана: {blockedCount}",
-      "successTitle": "Выдалена пытанняў: {count}",
+      "successTitle": "{count, plural, one {Выдалена # пытанне} few {Выдалена # пытанні} many {Выдалена # пытанняў} other {Выдалена # пытання}}",
       "successDescription": "Бібліятэка абноўлена.",
       "noopTitle": "Пытанні не выдалены",
       "noopDescription": "Выбраныя пытанні не былі выдалены.",

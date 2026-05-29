@@ -10,7 +10,8 @@
     "notAvailable": "Niedostępne",
     "backToHome": "Wróć do strony głównej",
     "serviceUnavailable": "Usługa jest niedostępna",
-    "sessionVerificationFailed": "Nie udało się zweryfikować sesji lub uprawnień."
+    "sessionVerificationFailed": "Nie udało się zweryfikować sesji lub uprawnień.",
+    "profileLoadFailed": "Nie udało się załadować profilu."
   },
   "languageSwitcher": {
     "label": "Język",

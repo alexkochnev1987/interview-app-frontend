@@ -39,7 +39,7 @@ export default async function AssessmentDetailPage({
   const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
 
   const returnPath = `/assessments/${encodeURIComponent(id)}`
-  const auth = await loadAuthGate(canReviewAssessments)
+  const auth = await loadAuthGate(canReviewAssessments, locale)
   redirectIfUnauthenticated(auth, returnPath, locale)
   if (auth.kind === 'forbidden') {
     return (

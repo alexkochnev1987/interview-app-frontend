@@ -191,6 +191,8 @@ Policy:
 - Locale switching must not change candidate UI language on take/feedback pages.
 - The app header is hidden on candidate flow, so `LanguageSwitcher` is not shown there.
 - Question TTS in candidate flow is intentionally fixed to `en-US` (see `src/features/take/use-take-question-tts.ts`).
+- Internal routes set `<html lang>` from the active locale; candidate routes force `lang="en"` to match English-only UI (see `src/i18n/html-lang.ts`).
+- Page metadata (`title`, `description`) is localized per locale via `generateMetadata` in `src/app/[locale]/layout.tsx`.
 
 ### Что запускается в Docker
 ```

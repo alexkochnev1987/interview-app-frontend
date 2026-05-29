@@ -1,10 +1,11 @@
+import { cache } from 'react'
+
 import moduleOrder from '../../messages/module-order.json'
 import { mergeLocaleModules } from './module-loader-core.mjs'
 
 type Messages = Record<string, unknown>
 
 const MODULE_ORDER = moduleOrder as string[]
-const localeMessagesCache = new Map<string, Promise<Messages>>()
 
 function isMissingModuleImportError(error: unknown): boolean {
   if (!error || typeof error !== 'object') {
@@ -46,16 +47,4 @@ async function loadLocaleMessagesUncached(locale: string): Promise<Messages> {
   })) as Messages
 }
 
-export async function loadLocaleMessages(locale: string): Promise<Messages> {
-  const cached = localeMessagesCache.get(locale)
-  if (cached) {
-    return cached
-  }
-
-  const loading = loadLocaleMessagesUncached(locale).catch((error) => {
-    localeMessagesCache.delete(locale)
-    throw error
-  })
-  localeMessagesCache.set(locale, loading)
-  return loading
-}
+export const loadLocaleMessages = cache(loadLocaleMessagesUncached)

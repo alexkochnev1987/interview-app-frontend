@@ -23,7 +23,7 @@ export default async function TeamPage({ params }: TeamPageProps) {
   const t = await getTranslations({ locale, namespace: 'toast.pageGate.team' })
   const tCommon = await getTranslations({ locale, namespace: 'common' })
 
-  const auth = await loadAuthGate(canManageTeam)
+  const auth = await loadAuthGate(canManageTeam, locale)
   redirectIfUnauthenticated(auth, '/team', locale)
   if (auth.kind === 'forbidden') {
     return (

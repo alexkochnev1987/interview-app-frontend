@@ -30,7 +30,7 @@ export default async function EditQuestionPage({ params }: EditQuestionPageProps
   const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
 
   const returnPath = `/questions/${encodeURIComponent(id)}`
-  const auth = await loadAuthGate(canReadQuestions)
+  const auth = await loadAuthGate(canReadQuestions, locale)
   redirectIfUnauthenticated(auth, returnPath, locale)
   if (auth.kind === 'forbidden') {
     return (

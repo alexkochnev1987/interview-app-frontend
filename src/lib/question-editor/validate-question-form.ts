@@ -15,8 +15,11 @@ type EnglishOnlyFieldCheck = {
   value: string | string[] | undefined
 }
 
+const NON_ENGLISH_SCRIPT =
+  /[\u0400-\u04FF\u0500-\u052F\u0590-\u05FF\u0600-\u06FF\u4E00-\u9FFF\u3040-\u30FF\uAC00-\uD7AF]/
+
 function hasNonEnglishCharacters(value: string): boolean {
-  return /[^\u0000-\u007F]/.test(value)
+  return NON_ENGLISH_SCRIPT.test(value)
 }
 
 export function getFirstNonEnglishField(

@@ -1,4 +1,5 @@
 import { DEFAULT_LOCALE, LOCALES, type Locale } from './locales'
+import { normalizePathname } from './pathname-normalize'
 
 function splitPath(path: string): { pathname: string; suffix: string } {
   const suffixIndex = path.search(/[?#]/)
@@ -13,7 +14,8 @@ function splitPath(path: string): { pathname: string; suffix: string } {
 }
 
 export function hasLocalePrefix(pathname: string) {
-  const [, segment] = pathname.split('/')
+  const normalized = normalizePathname(pathname)
+  const [, segment] = normalized.split('/')
   return LOCALES.includes(segment as Locale)
 }
 
@@ -21,12 +23,13 @@ export function pathLocale(pathname: string): {
   locale: Locale
   pathnameWithoutLocale: string
 } {
-  const [, segment] = pathname.split('/')
+  const normalized = normalizePathname(pathname)
+  const [, segment] = normalized.split('/')
   const prefixed = LOCALES.includes(segment as Locale)
   const locale = prefixed ? (segment as Locale) : DEFAULT_LOCALE
   const pathnameWithoutLocale = prefixed
-    ? pathname.slice(segment.length + 1) || '/'
-    : pathname
+    ? normalized.slice(segment.length + 1) || '/'
+    : normalized
 
   return { locale, pathnameWithoutLocale }
 }

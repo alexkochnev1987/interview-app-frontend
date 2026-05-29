@@ -30,10 +30,16 @@ export function useTeamMembers(initialMembers: TeamMember[]) {
   const t = useTranslations('team.stats')
 
   const statCards = useMemo(() => {
-    const adminCount = members.filter((m) => m.role === 'admin').length
-    const superAdminCount = members.filter((m) => m.role === 'super_admin').length
-    const hrCount = members.filter((m) => m.role === 'hr').length
-    const candidateCount = members.filter((m) => m.role === 'candidate').length
+    const roleCounts = members.reduce(
+      (counts, member) => {
+        if (member.role === 'admin') counts.admin += 1
+        if (member.role === 'super_admin') counts.superAdmin += 1
+        if (member.role === 'hr') counts.hr += 1
+        if (member.role === 'candidate') counts.candidate += 1
+        return counts
+      },
+      { admin: 0, superAdmin: 0, hr: 0, candidate: 0 },
+    )
 
     return [
       {
@@ -45,28 +51,28 @@ export function useTeamMembers(initialMembers: TeamMember[]) {
       },
       {
         label: t('superAdmins'),
-        value: superAdminCount,
+        value: roleCounts.superAdmin,
         annotation: t('fullAccess'),
         tone: 'info' as const,
         accent: 'info' as const,
       },
       {
         label: t('admins'),
-        value: adminCount,
+        value: roleCounts.admin,
         annotation: t('adminRole'),
         tone: 'neutral' as const,
         accent: 'neutral' as const,
       },
       {
         label: t('hrSpecialists'),
-        value: hrCount,
+        value: roleCounts.hr,
         annotation: t('hrRole'),
         tone: 'warning' as const,
         accent: 'warning' as const,
       },
       {
         label: t('candidates'),
-        value: candidateCount,
+        value: roleCounts.candidate,
         annotation: t('candidateRole'),
         tone: 'success' as const,
         accent: 'success' as const,

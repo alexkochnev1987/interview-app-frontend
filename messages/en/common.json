@@ -10,7 +10,8 @@
     "notAvailable": "Not available",
     "backToHome": "Back to home",
     "serviceUnavailable": "Service is unavailable",
-    "sessionVerificationFailed": "We could not verify your session or permissions."
+    "sessionVerificationFailed": "We could not verify your session or permissions.",
+    "profileLoadFailed": "Failed to load your profile."
   },
   "languageSwitcher": {
     "label": "Language",

@@ -45,7 +45,7 @@ export default async function AssessmentsPage({
   const t = await getTranslations({ locale, namespace: 'toast.pageGate.assessments' })
   const tCommon = await getTranslations({ locale, namespace: 'common' })
   const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
-  const auth = await loadAuthGate(canReviewAssessments)
+  const auth = await loadAuthGate(canReviewAssessments, locale)
   redirectIfUnauthenticated(auth, '/assessments', locale)
   if (auth.kind === 'forbidden') {
     return (

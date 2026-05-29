@@ -34,7 +34,7 @@
     "bulkDelete": {
       "failedTitle": "Массовое удаление не удалось",
       "partialTitle": "Удалено: {deletedCount}, заблокировано: {blockedCount}",
-      "successTitle": "Удалено вопросов: {count}",
+      "successTitle": "{count, plural, one {Удалён # вопрос} few {Удалено # вопроса} many {Удалено # вопросов} other {Удалено # вопросов}}",
       "successDescription": "Библиотека обновлена.",
       "noopTitle": "Вопросы не удалены",
       "noopDescription": "Выбранные вопросы не были удалены.",

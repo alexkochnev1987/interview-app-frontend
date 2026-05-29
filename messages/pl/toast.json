@@ -34,7 +34,7 @@
     "bulkDelete": {
       "failedTitle": "Usuwanie zbiorcze nie powiodło się",
       "partialTitle": "Usunięto: {deletedCount}, zablokowano: {blockedCount}",
-      "successTitle": "Usunięto pytań: {count}",
+      "successTitle": "{count, plural, one {Usunięto # pytanie} few {Usunięto # pytania} many {Usunięto # pytań} other {Usunięto # pytania}}",
       "successDescription": "Biblioteka jest aktualna.",
       "noopTitle": "Nie usunięto pytań",
       "noopDescription": "Żadne z wybranych pytań nie zostało usunięte.",

@@ -26,7 +26,7 @@ export default async function QuestionsPage({
   const t = await getTranslations({ locale, namespace: 'toast.pageGate.questions' })
   const tCommon = await getTranslations({ locale, namespace: 'common' })
   const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
-  const auth = await loadAuthGate(canReadQuestions)
+  const auth = await loadAuthGate(canReadQuestions, locale)
   redirectIfUnauthenticated(auth, '/questions', locale)
 
   if (auth.kind === 'forbidden') {

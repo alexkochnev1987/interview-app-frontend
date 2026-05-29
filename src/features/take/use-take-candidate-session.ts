@@ -33,7 +33,10 @@ export function useTakeCandidateSession({
     if (!url.searchParams.has('token')) return;
     url.searchParams.delete('token');
     const nextSearch = url.searchParams.toString();
-    const next = nextSearch ? `${url.pathname}?${nextSearch}` : url.pathname;
+    const pathWithQuery = nextSearch
+      ? `${url.pathname}?${nextSearch}`
+      : url.pathname;
+    const next = `${pathWithQuery}${url.hash}`;
     window.history.replaceState(null, '', next);
   }, []);
 
