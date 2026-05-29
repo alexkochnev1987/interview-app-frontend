@@ -40,8 +40,9 @@ export function stripLocalePrefix(path: string) {
     return path
   }
 
-  const [, segment] = pathname.split('/')
-  return `${pathname.slice(segment.length + 1) || '/'}${suffix}`
+  const normalized = normalizePathname(pathname)
+  const [, segment] = normalized.split('/')
+  return `${normalized.slice(segment.length + 1) || '/'}${suffix}`
 }
 
 export function localizedPath(path: string, locale: Locale) {

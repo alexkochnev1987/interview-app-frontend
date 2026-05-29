@@ -21,11 +21,6 @@ type ReviewStatusKey = ReviewStatus
 
 function fallbackLabel(value: string) {
   return value
-    .replaceAll('_', ' ')
-    .split(' ')
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ')
 }
 
 export function useSharedLabels() {

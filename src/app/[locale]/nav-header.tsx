@@ -4,6 +4,7 @@ import { useLocale, useTranslations } from 'next-intl'
 import { useSearchParams } from 'next/navigation'
 
 import { LanguageSwitcher } from '@/components/ui/language-switcher'
+import { isCandidateFlowPath } from '@/i18n/html-lang'
 import { LOCALES, type Locale } from '@/i18n/locales'
 import { usePathname } from '@/i18n/navigation'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
@@ -54,7 +55,7 @@ export function NavHeader() {
     label: tLanguage(`locales.${optionLocale}`),
   }))
 
-  if (pathname.startsWith('/take') || pathname.startsWith('/feedback')) {
+  if (isCandidateFlowPath(pathname)) {
     return null
   }
 
