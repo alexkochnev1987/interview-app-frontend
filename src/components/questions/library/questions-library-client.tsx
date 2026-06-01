@@ -36,6 +36,7 @@ import { useRouter } from '@/i18n/navigation'
 import { useQuestionChipLabels } from '@/i18n/use-question-chip-labels'
 import { deleteQuestionsBulk, type BulkDeleteResult, type Question } from '@/lib/api'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
+import { buildQuestionsInfiniteParams } from '@/lib/questions-query-state'
 import { notifyBulkDeleteOutcome } from '@/lib/notify-bulk-delete'
 import { notifyError } from '@/lib/toast'
 import { runMutation } from '@/lib/run-mutation'
@@ -64,26 +65,10 @@ export function QuestionsLibraryClient({
     disableFetchInCardsView: true,
   })
   const isCardsView = query.state.view === 'cards'
-  const {
-    difficulty, category, subcategory, role, tags, status,
-    sortBy, sortOrder, limit,
-  } = query.state
-  const { debouncedQ } = query
-  const cardsInfiniteParams = useMemo(() => ({
-    q: debouncedQ || undefined,
-    difficulty,
-    category,
-    subcategory,
-    tags: tags.length > 0 ? tags : undefined,
-    role,
-    status,
-    sortBy,
-    sortOrder,
-    limit,
-  }), [
-    difficulty, category, subcategory, role, tags, status,
-    sortBy, sortOrder, limit, debouncedQ,
-  ])
+  const cardsInfiniteParams = useMemo(
+    () => buildQuestionsInfiniteParams(query.state, query.debouncedQ),
+    [query.state, query.debouncedQ],
+  )
   const infinite = useQuestionsInfinite({
     params: cardsInfiniteParams,
     enabled: isCardsView,
