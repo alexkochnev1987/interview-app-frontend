@@ -2,7 +2,9 @@
 
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { useQueryClient } from '@tanstack/react-query'
 
+import { questionsRootQueryKey } from '@/components/questions/picker/query-keys'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { DeletedQuestionBanner } from '@/components/questions/detail/deleted-question-banner'
 import { QuestionDangerZone } from '@/components/questions/detail/question-danger-zone'
@@ -36,6 +38,7 @@ export function QuestionEditClient({
   const t = useTranslations('questions.editPage')
   const router = useRouter()
   const toastMessages = useToastMessages()
+  const queryClient = useQueryClient()
   const [question, setQuestion] = useState(initialQuestion)
   const [deleting, setDeleting] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -45,6 +48,7 @@ export function QuestionEditClient({
   async function handleSubmit(value: QuestionInput) {
     const updated = await updateQuestion(id, value)
     setQuestion(updated)
+    void queryClient.invalidateQueries({ queryKey: questionsRootQueryKey() })
     router.refresh()
     return updated
   }
@@ -59,6 +63,7 @@ export function QuestionEditClient({
       })
       setQuestion(restored)
       setRestoreOpen(false)
+      void queryClient.invalidateQueries({ queryKey: questionsRootQueryKey() })
       router.refresh()
     } finally {
       setRestoring(false)
@@ -78,6 +83,7 @@ export function QuestionEditClient({
             : toastMessages.question.deleteError,
       })
       setConfirmOpen(false)
+      void queryClient.invalidateQueries({ queryKey: questionsRootQueryKey() })
       router.push('/questions')
       router.refresh()
     } finally {
