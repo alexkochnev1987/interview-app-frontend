@@ -50,6 +50,29 @@ function questionTextTooShort(
   return questionText.trim().length < minQuestionTextLength
 }
 
+function deriveSimilarStatus({
+  manualError,
+  canSearch,
+  matchCount,
+  isFetching,
+  queryErrorMessage,
+  hasData,
+}: {
+  manualError: string | null
+  canSearch: boolean
+  matchCount: number
+  isFetching: boolean
+  queryErrorMessage: string | null
+  hasData: boolean
+}): SimilarStatus {
+  if (manualError) return 'error'
+  if (!canSearch) return matchCount > 0 ? 'success' : 'idle'
+  if (isFetching) return 'loading'
+  if (queryErrorMessage) return 'error'
+  if (hasData) return 'success'
+  return 'idle'
+}
+
 export function useSimilaritySearch({
   value,
   questionId,
@@ -60,6 +83,8 @@ export function useSimilaritySearch({
   useEffect(() => {
     valueRef.current = value
   }, [value])
+
+  const debouncedValueRef = useRef(value)
 
   const [manualError, setManualError] = useState<string | null>(null)
 
@@ -132,6 +157,7 @@ export function useSimilaritySearch({
   useEffect(() => {
     if (signature === debouncedSignature) return
     const handle = window.setTimeout(() => {
+      debouncedValueRef.current = valueRef.current
       setDebouncedSignature(signature)
     }, debounceMs)
     return () => window.clearTimeout(handle)
@@ -144,7 +170,7 @@ export function useSimilaritySearch({
   const query = useQuery({
     queryKey: similarQuestionsQueryKey(debouncedSignature, questionId),
     queryFn: ({ signal }) =>
-      findSimilarQuestions(valueRef.current, questionId, 5, { signal }),
+      findSimilarQuestions(debouncedValueRef.current, questionId, 5, { signal }),
     enabled: canSearch,
     staleTime: Infinity,
     placeholderData: keepPreviousData,
@@ -164,12 +190,13 @@ export function useSimilaritySearch({
       return
     }
     setManualError(null)
+    debouncedValueRef.current = valueRef.current
     setDebouncedSignature(signature)
     try {
       await queryClient.fetchQuery({
         queryKey: similarQuestionsQueryKey(signature, questionId),
         queryFn: ({ signal }) =>
-          findSimilarQuestions(valueRef.current, questionId, 5, { signal }),
+          findSimilarQuestions(debouncedValueRef.current, questionId, 5, { signal }),
         staleTime: Infinity,
       })
     } catch (err) {
@@ -191,19 +218,14 @@ export function useSimilaritySearch({
     query.error instanceof Error ? query.error.message : null
   const error = manualError ?? queryErrorMessage
 
-  const status: SimilarStatus = manualError
-    ? 'error'
-    : !canSearch
-      ? matches.length > 0
-        ? 'success'
-        : 'idle'
-      : query.isFetching
-        ? 'loading'
-        : queryErrorMessage
-          ? 'error'
-          : query.data
-            ? 'success'
-            : 'idle'
+  const status = deriveSimilarStatus({
+    manualError,
+    canSearch,
+    matchCount: matches.length,
+    isFetching: query.isFetching,
+    queryErrorMessage,
+    hasData: Boolean(query.data),
+  })
 
   const resultsStale = query.isPlaceholderData || signature !== debouncedSignature
 
