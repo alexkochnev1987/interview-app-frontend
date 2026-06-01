@@ -40,6 +40,7 @@ import { useQuestionChipLabels } from '@/i18n/use-question-chip-labels'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
 import { createInterview, type Question } from '@/lib/api'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
+import { buildQuestionsInfiniteParams } from '@/lib/questions-query-state'
 import { runMutation } from '@/lib/run-mutation'
 import { useToastMessages } from '@/lib/use-toast-messages'
 
@@ -68,19 +69,8 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
   })
   const isCardsView = query.state.view === 'cards'
   const cardsInfiniteParams = useMemo(
-    () => ({
-      q: query.debouncedQ || undefined,
-      difficulty: query.state.difficulty,
-      category: query.state.category,
-      subcategory: query.state.subcategory,
-      tags: query.state.tags.length > 0 ? query.state.tags : undefined,
-      role: query.state.role,
-      status: query.state.status,
-      sortBy: query.state.sortBy,
-      sortOrder: query.state.sortOrder,
-      limit: query.state.limit,
-    }),
-    [query.debouncedQ, query.state],
+    () => buildQuestionsInfiniteParams(query.state, query.debouncedQ),
+    [query.state, query.debouncedQ],
   )
   const infinite = useQuestionsInfinite({
     params: cardsInfiniteParams,
@@ -206,7 +196,7 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
               </CardHeader>
               <CardContent spacing="lg">
                 <FormField htmlFor="candidateName" label={t('candidateNameLabel')}>
-                  <IconAffix icon={<UserRound className="size-4" />}>
+                  <IconAffix icon={<Icon size="md"><UserRound /></Icon>}>
                     <Input
                       id="candidateName"
                       iconAffix="leading"
@@ -220,7 +210,7 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
                 </FormField>
 
                 <FormField htmlFor="position" label={t('positionLabel')}>
-                  <IconAffix icon={<BriefcaseBusiness className="size-4" />}>
+                  <IconAffix icon={<Icon size="md"><BriefcaseBusiness /></Icon>}>
                     <Input
                       id="position"
                       iconAffix="leading"
@@ -246,7 +236,9 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
                           : 'createInterviewCta',
                         { count: selectedCount },
                       )}
-                  <ArrowRight className="size-4" />
+                  <Icon size="md">
+                    <ArrowRight />
+                  </Icon>
                 </Button>
               </CardContent>
             </Card>
