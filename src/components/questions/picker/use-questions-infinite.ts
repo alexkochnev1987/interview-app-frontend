@@ -1,7 +1,7 @@
 'use client'
 
 import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query'
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 import {
   fetchQuestions,
   type FetchQuestionsParams,
@@ -9,6 +9,7 @@ import {
 } from '@/lib/api'
 
 import { questionsInfiniteQueryKey } from './query-keys'
+import { useVoidCallback } from './query-hook-helpers'
 import { splitInfiniteQueryErrors } from './split-questions-query-errors'
 
 export type UseQuestionsInfiniteOptions = {
@@ -55,14 +56,8 @@ export function useQuestionsInfinite({
   )
   const total = query.data?.pages[0]?.total ?? 0
 
-  const queryFetchNextPage = query.fetchNextPage
-  const queryRefetch = query.refetch
-  const fetchNextPage = useCallback(() => {
-    void queryFetchNextPage()
-  }, [queryFetchNextPage])
-  const refetch = useCallback(() => {
-    void queryRefetch()
-  }, [queryRefetch])
+  const fetchNextPage = useVoidCallback(query.fetchNextPage)
+  const refetch = useVoidCallback(query.refetch)
 
   const errorMessage =
     query.error instanceof Error ? query.error.message : null
