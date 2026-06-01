@@ -24,6 +24,16 @@ npm run dev
 
 App: http://localhost:3001
 
+## Tests
+
+Unit tests (Vitest, `src/**/*.test.ts`) cover pure business logic: auth roles, redirect safety, assessment status, questions URL state, and question-editor parsing/validation. Service and page flows are covered in integration/E2E phases.
+
+```bash
+npm run test        
+npm run test:watch
+npm run test:cov  
+```
+
 Run the API separately — [interview-app-backend](https://github.com/alexkochnev1987/interview-app-backend) (`docker compose up -d`, `npm run start:dev`). Default in `.env.local`: `BACKEND_URL=http://localhost:3000`.
 
 ## i18n messages
