@@ -3,6 +3,12 @@ import { constants } from 'node:fs'
 import { access } from 'node:fs/promises'
 import { resolve } from 'node:path'
 
+import {
+  resolveBackendCwd,
+  resolveBackendMainPath,
+  resolveBackendMigratePath,
+} from './e2e-backend-paths.mjs'
+
 function runCommand(command, args, cwd, env) {
   return new Promise((resolvePromise, rejectPromise) => {
     const child = spawn(command, args, {
@@ -48,57 +54,8 @@ async function pathExists(targetPath) {
   }
 }
 
-async function resolveBackendCwd() {
-  const candidates = [
-    process.env.BACKEND_REPO_PATH,
-    'interview-app-backend',
-    '../interview-app-backend',
-  ].filter(Boolean)
-
-  for (const candidate of candidates) {
-    const backendCwd = resolve(process.cwd(), candidate)
-    if (await pathExists(resolve(backendCwd, 'package.json'))) {
-      console.log(`[e2e] Using backend repo at ${backendCwd}`)
-      return backendCwd
-    }
-  }
-
-  throw new Error(
-    '[e2e] Backend repo not found. Set BACKEND_REPO_PATH or place it at interview-app-backend.',
-  )
-}
-
-async function runMigrations(cwd, env) {
-  const migrateProdEntry = resolve(cwd, 'dist/database/migrate.js')
-  const migrateSrcEntry = resolve(cwd, 'src/database/migrate.ts')
-  const tsNodeBin = resolve(cwd, 'node_modules/ts-node/dist/bin.js')
-
-  if (await pathExists(migrateProdEntry)) {
-    console.log('[e2e] Running compiled migration')
-    await runCommand(process.execPath, [migrateProdEntry], cwd, env)
-    return
-  }
-
-  if (await pathExists(migrateSrcEntry) && (await pathExists(tsNodeBin))) {
-    console.log('[e2e] Running ts-node migration')
-    await runCommand(process.execPath, [tsNodeBin, migrateSrcEntry], cwd, env)
-    return
-  }
-
-  if (await pathExists(migrateSrcEntry)) {
-    console.log('[e2e] Running npx ts-node migration')
-    await runCommand('npx', ['ts-node', migrateSrcEntry], cwd, env)
-    return
-  }
-
-  throw new Error(`[e2e] No migration entrypoint found under ${cwd}`)
-}
-
-async function main() {
-  const backendCwd = await resolveBackendCwd()
-  const backendMain = resolve(backendCwd, 'dist/main.js')
-
-  const env = {
+function buildBackendEnv() {
+  return {
     ...process.env,
     NODE_ENV: 'production',
     PORT: '3000',
@@ -119,16 +76,48 @@ async function main() {
     GOOGLE_CALLBACK_URL:
       process.env.GOOGLE_CALLBACK_URL ?? 'http://localhost:3000/auth/google/callback',
   }
+}
 
-  if (process.env.CI || !(await pathExists(backendMain))) {
+async function runMigrations(backendCwd, env) {
+  const compiledMigrate = await resolveBackendMigratePath(backendCwd)
+  if (compiledMigrate) {
+    console.log(`[e2e] Running ${compiledMigrate}`)
+    await runCommand(process.execPath, [compiledMigrate], backendCwd, env)
+    return
+  }
+
+  const sourceMigrate = resolve(backendCwd, 'src/database/migrate.ts')
+  const tsNodeBin = resolve(backendCwd, 'node_modules/ts-node/dist/bin.js')
+
+  if (await pathExists(sourceMigrate) && (await pathExists(tsNodeBin))) {
+    console.log('[e2e] Running ts-node migration')
+    await runCommand(process.execPath, [tsNodeBin, sourceMigrate], backendCwd, env)
+    return
+  }
+
+  console.log('[e2e] Falling back to npm run db:migrate')
+  await runNpmScript('db:migrate', backendCwd, env)
+}
+
+async function main() {
+  const backendCwd = await resolveBackendCwd()
+  console.log(`[e2e] Using backend repo at ${backendCwd}`)
+
+  const env = buildBackendEnv()
+  const backendMain = resolve(backendCwd, 'dist/src/main.js')
+  const hasMain = await pathExists(backendMain)
+
+  if (process.env.CI || !(await pathExists(await resolveBackendMainPath(backendCwd)))) {
     console.log('[e2e] Building backend')
     await runNpmScript('build', backendCwd, env)
   }
 
   await runMigrations(backendCwd, env)
 
-  console.log('[e2e] Starting backend API')
-  const server = spawn(process.execPath, [backendMain], {
+  const mainPath = await resolveBackendMainPath(backendCwd)
+  console.log(`[e2e] Starting backend API at ${mainPath}`)
+
+  const server = spawn(process.execPath, [mainPath], {
     cwd: backendCwd,
     stdio: 'inherit',
     shell: false,

@@ -80,7 +80,13 @@ jobs:
           S3_FORCE_PATH_STYLE: 'true'
         run: |
           npm run build
-          node dist/database/migrate.js
+          if [ -f dist/src/database/migrate.js ]; then
+            node dist/src/database/migrate.js
+          elif [ -f dist/database/migrate.js ]; then
+            node dist/database/migrate.js
+          else
+            npm run db:migrate
+          fi
       - name: Start backend for E2E
         working-directory: interview-app-backend
         env:
@@ -99,7 +105,11 @@ jobs:
           S3_FORCE_PATH_STYLE: 'true'
           PORT: '3000'
         run: |
-          node dist/main &
+          if [ -f dist/src/main.js ]; then
+            node dist/src/main.js &
+          else
+            node dist/main.js &
+          fi
           for i in $(seq 1 60); do
             curl -sf http://localhost:3000/health && exit 0
             sleep 2
