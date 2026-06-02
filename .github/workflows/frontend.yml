@@ -42,6 +42,7 @@ jobs:
     env:
       CI: true
       BACKEND_REPO_PATH: interview-app-backend
+      E2E_BACKEND_REF: 91901e98254a31d5136b7e938e3ca9f8c81142fe
       E2E_DATABASE_URL: postgresql://interview_app:localpass@localhost:5433/interview_app_e2e
       E2E_JWT_SECRET: ci-e2e-jwt-secret
       BACKEND_URL: http://localhost:3000
@@ -53,7 +54,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: alexkochnev1987/interview-app-backend
-          ref: develop
+          ref: ${{ env.E2E_BACKEND_REF }}
           path: interview-app-backend
       - uses: actions/setup-node@v4
         with:
@@ -128,7 +129,7 @@ jobs:
         env:
           BACKEND_URL: http://localhost:3000
         run: |
-          npx next start -p 3001 --webpack &
+          npx next start -p 3001 &
           for i in $(seq 1 60); do
             curl -sf http://localhost:3001/login && exit 0
             sleep 2

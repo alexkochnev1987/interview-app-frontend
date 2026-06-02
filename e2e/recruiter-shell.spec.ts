@@ -1,17 +1,13 @@
 import { expect, test } from '@playwright/test'
 
+import { e2eTestIds } from './support/test-ids'
+
 test('loads core recruiter pages', async ({ page }) => {
   await page.goto('/questions')
-  await expect(
-    page.getByRole('heading', {
-      name: /Curate prompts with the same calm hierarchy as interview review/i,
-    }),
-  ).toBeVisible()
+  await expect(page).toHaveURL(/\/questions/)
+  await expect(page.getByTestId(e2eTestIds.questionsPage)).toBeVisible()
 
   await page.goto('/interviews/new')
-  await expect(
-    page.getByRole('heading', {
-      name: /Assemble the candidate packet before you send the interview link/i,
-    }),
-  ).toBeVisible()
+  await expect(page).toHaveURL(/\/interviews\/new/)
+  await expect(page.getByTestId(e2eTestIds.interviewCreatePage)).toBeVisible()
 })

@@ -52,7 +52,7 @@ export default defineConfig({
         },
         {
           command: process.env.CI
-            ? 'npm run build && npx next start -p 3001 --webpack'
+            ? 'npm run build && npx next start -p 3001'
             : 'npm run dev:server',
           url: `${baseURL}/login`,
           reuseExistingServer: !process.env.CI,

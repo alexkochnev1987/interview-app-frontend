@@ -97,6 +97,7 @@ export function LoginForm() {
               size="xl"
               width="full"
               disabled={loading}
+              data-testid="login-submit"
             >
               {loading
                 ? toastMessages.pageGate.login.signingInLabel

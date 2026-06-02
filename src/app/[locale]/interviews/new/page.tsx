@@ -66,7 +66,7 @@ export default async function NewInterviewPage({
   }
 
   return (
-    <PageShell>
+    <PageShell data-testid="interview-create-page">
       <InterviewCreateIntro />
       <QueryHydrationBoundary state={initialPrefetch.dehydratedState}>
         <InterviewCreateForm initialPrefetch={initialPrefetch} />
