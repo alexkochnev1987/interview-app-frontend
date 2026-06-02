@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process'
 import { constants } from 'node:fs'
-import { access } from 'node:fs/promises'
+import { access, readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 
 function runNpmScript(scriptName, cwd, env) {
@@ -48,6 +48,28 @@ async function pathExists(targetPath) {
   }
 }
 
+async function readPackageScripts(cwd) {
+  const packageJson = await readFile(resolve(cwd, 'package.json'), 'utf8')
+  return JSON.parse(packageJson).scripts ?? {}
+}
+
+async function runMigrations(cwd, env) {
+  const scripts = await readPackageScripts(cwd)
+  const migrateProdEntry = resolve(cwd, 'dist/database/migrate.js')
+
+  if (scripts['db:migrate:prod'] && (await pathExists(migrateProdEntry))) {
+    await runNpmScript('db:migrate:prod', cwd, env)
+    return
+  }
+
+  if (scripts['db:migrate']) {
+    await runNpmScript('db:migrate', cwd, env)
+    return
+  }
+
+  throw new Error('[e2e] No backend migration script found (db:migrate or db:migrate:prod)')
+}
+
 async function main() {
   const backendCwd = resolve(
     process.cwd(),
@@ -81,13 +103,17 @@ async function main() {
     S3_ENDPOINT: process.env.S3_ENDPOINT ?? 'http://localhost:9002',
     S3_FORCE_PATH_STYLE: 'true',
     SUPER_ADMIN_EMAILS: process.env.SUPER_ADMIN_EMAILS ?? 'admin@interview-app.com',
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID ?? 'e2e-google-client-id',
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET ?? 'e2e-google-client-secret',
+    GOOGLE_CALLBACK_URL:
+      process.env.GOOGLE_CALLBACK_URL ?? 'http://localhost:3000/auth/google/callback',
   }
 
   if (process.env.CI || !(await pathExists(backendMain))) {
     await runNpmScript('build', backendCwd, env)
   }
 
-  await runNpmScript('db:migrate:prod', backendCwd, env)
+  await runMigrations(backendCwd, env)
 
   const server = spawn(process.execPath, [backendMain], {
     cwd: backendCwd,
