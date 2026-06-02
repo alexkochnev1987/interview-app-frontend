@@ -1,3 +1,0 @@
-# Pinned interview-app-backend commit for reproducible frontend E2E CI.
-# Bump intentionally when the E2E API contract changes.
-91901e98254a31d5136b7e938e3ca9f8c81142fe
