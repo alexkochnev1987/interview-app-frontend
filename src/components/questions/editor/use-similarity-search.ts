@@ -53,20 +53,18 @@ function questionTextTooShort(
 function deriveSimilarStatus({
   manualError,
   canSearch,
-  matchCount,
   isFetching,
   queryErrorMessage,
   hasData,
 }: {
   manualError: string | null
   canSearch: boolean
-  matchCount: number
   isFetching: boolean
   queryErrorMessage: string | null
   hasData: boolean
 }): SimilarStatus {
   if (manualError) return 'error'
-  if (!canSearch) return matchCount > 0 ? 'success' : 'idle'
+  if (!canSearch) return 'idle'
   if (isFetching) return 'loading'
   if (queryErrorMessage) return 'error'
   if (hasData) return 'success'
@@ -221,7 +219,6 @@ export function useSimilaritySearch({
   const status = deriveSimilarStatus({
     manualError,
     canSearch,
-    matchCount: matches.length,
     isFetching: query.isFetching,
     queryErrorMessage,
     hasData: Boolean(query.data),
