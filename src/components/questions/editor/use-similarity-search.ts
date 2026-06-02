@@ -1,11 +1,7 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import {
-  keepPreviousData,
-  useQuery,
-  useQueryClient,
-} from '@tanstack/react-query'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 
 import { similarQuestionsQueryKey } from '@/components/questions/picker/query-keys'
 import {
@@ -35,7 +31,7 @@ interface UseSimilaritySearchResult {
   hasInput: boolean
   canSearch: boolean
   resultsStale: boolean
-  runManualSearch: () => Promise<void>
+  runManualSearch: () => void
 }
 
 export const SIMILARITY_MIN_QUESTION_TEXT_LENGTH = 20
@@ -50,25 +46,57 @@ function questionTextTooShort(
   return questionText.trim().length < minQuestionTextLength
 }
 
-function deriveSimilarStatus({
-  manualError,
-  canSearch,
-  isFetching,
-  queryErrorMessage,
-  hasData,
-}: {
+function buildSignature(value: QuestionInput): string {
+  return JSON.stringify({
+    category: normalizeComparable(value.category),
+    concepts: (value.expectedConcepts || []).map((item) =>
+      typeof item === 'string'
+        ? {
+            description: '',
+            id: normalizeComparable(item),
+            label: normalizeComparable(item),
+          }
+        : {
+            description: normalizeComparable(item.description),
+            id: normalizeComparable(item.id),
+            label: normalizeComparable(item.label),
+          },
+    ),
+    difficulty: value.difficulty,
+    focus: normalizeComparable(value.focus),
+    questionText: normalizeComparable(value.questionText),
+    role: normalizeComparable(value.role),
+    subcategory: normalizeComparable(value.subcategory),
+    tags: (value.tags || []).map((item) => normalizeComparable(item)).filter(Boolean),
+  })
+}
+
+type SimilarStatusState = {
   manualError: string | null
   canSearch: boolean
   isFetching: boolean
-  queryErrorMessage: string | null
+  queryError: string | null
   hasData: boolean
-}): SimilarStatus {
-  if (manualError) return 'error'
-  if (!canSearch) return 'idle'
-  if (isFetching) return 'loading'
-  if (queryErrorMessage) return 'error'
-  if (hasData) return 'success'
-  return 'idle'
+}
+
+const SIMILAR_STATUS_RULES: ReadonlyArray<{
+  status: SimilarStatus
+  when: (state: SimilarStatusState) => boolean
+}> = [
+  { status: 'error', when: (state) => Boolean(state.manualError) },
+  { status: 'idle', when: (state) => !state.canSearch },
+  { status: 'loading', when: (state) => state.isFetching },
+  { status: 'error', when: (state) => Boolean(state.queryError) },
+  { status: 'success', when: (state) => state.hasData },
+]
+
+function deriveSimilarStatus(state: SimilarStatusState): SimilarStatus {
+  return SIMILAR_STATUS_RULES.find((rule) => rule.when(state))?.status ?? 'idle'
+}
+
+type SimilarRequest = {
+  signature: string
+  value: QuestionInput
 }
 
 export function useSimilaritySearch({
@@ -77,13 +105,6 @@ export function useSimilaritySearch({
   debounceMs = DEFAULT_DEBOUNCE_MS,
   minQuestionTextLength = DEFAULT_MIN_TEXT_LENGTH,
 }: UseSimilaritySearchOptions): UseSimilaritySearchResult {
-  const valueRef = useRef(value)
-  useEffect(() => {
-    valueRef.current = value
-  }, [value])
-
-  const debouncedValueRef = useRef(value)
-
   const [manualError, setManualError] = useState<string | null>(null)
 
   const signalSummary = useMemo<SimilaritySignalSummary>(() => {
@@ -99,15 +120,7 @@ export function useSimilaritySearch({
       ).length,
       textTokenCount: textTokens.length,
     }
-  }, [
-    value.category,
-    value.expectedConcepts,
-    value.focus,
-    value.questionText,
-    value.role,
-    value.subcategory,
-    value.tags,
-  ])
+  }, [value])
 
   const hasInput =
     signalSummary.textTokenCount > 0 ||
@@ -115,68 +128,30 @@ export function useSimilaritySearch({
     signalSummary.conceptCount > 0 ||
     signalSummary.taxonomyCount > 0
 
-  const signature = useMemo(
-    () =>
-      JSON.stringify({
-        category: normalizeComparable(value.category),
-        concepts: (value.expectedConcepts || []).map((item) =>
-          typeof item === 'string'
-            ? {
-                description: '',
-                id: normalizeComparable(item),
-                label: normalizeComparable(item),
-              }
-            : {
-                description: normalizeComparable(item.description),
-                id: normalizeComparable(item.id),
-                label: normalizeComparable(item.label),
-              },
-        ),
-        difficulty: value.difficulty,
-        focus: normalizeComparable(value.focus),
-        questionText: normalizeComparable(value.questionText),
-        role: normalizeComparable(value.role),
-        subcategory: normalizeComparable(value.subcategory),
-        tags: (value.tags || []).map((item) => normalizeComparable(item)).filter(Boolean),
-      }),
-    [
-      value.category,
-      value.difficulty,
-      value.expectedConcepts,
-      value.focus,
-      value.questionText,
-      value.role,
-      value.subcategory,
-      value.tags,
-    ],
-  )
+  const signature = useMemo(() => buildSignature(value), [value])
+  const canSearch = !questionTextTooShort(value.questionText, minQuestionTextLength)
 
-  const [debouncedSignature, setDebouncedSignature] = useState(signature)
+  const [request, setRequest] = useState<SimilarRequest>(() => ({ signature, value }))
+
   useEffect(() => {
-    if (signature === debouncedSignature) return
+    if (signature === request.signature) return
     const handle = window.setTimeout(() => {
-      debouncedValueRef.current = valueRef.current
-      setDebouncedSignature(signature)
+      setRequest({ signature, value })
     }, debounceMs)
     return () => window.clearTimeout(handle)
-  }, [signature, debouncedSignature, debounceMs])
-
-  const trimmedQuestionText = value.questionText.trim()
-  const textLongEnough = trimmedQuestionText.length >= minQuestionTextLength
-  const canSearch = textLongEnough
+  }, [signature, value, request.signature, debounceMs])
 
   const query = useQuery({
-    queryKey: similarQuestionsQueryKey(debouncedSignature, questionId),
+    queryKey: similarQuestionsQueryKey(request.signature, questionId),
     queryFn: ({ signal }) =>
-      findSimilarQuestions(debouncedValueRef.current, questionId, 5, { signal }),
+      findSimilarQuestions(request.value, questionId, 5, { signal }),
     enabled: canSearch,
     staleTime: Infinity,
     placeholderData: keepPreviousData,
   })
 
-  const queryClient = useQueryClient()
-  const runManualSearch = useCallback(async () => {
-    const currentText = valueRef.current.questionText.trim()
+  const runManualSearch = useCallback(() => {
+    const currentText = value.questionText.trim()
     if (!currentText) {
       setManualError('Add question text before searching for similar questions.')
       return
@@ -188,21 +163,8 @@ export function useSimilaritySearch({
       return
     }
     setManualError(null)
-    debouncedValueRef.current = valueRef.current
-    setDebouncedSignature(signature)
-    try {
-      await queryClient.fetchQuery({
-        queryKey: similarQuestionsQueryKey(signature, questionId),
-        queryFn: ({ signal }) =>
-          findSimilarQuestions(debouncedValueRef.current, questionId, 5, { signal }),
-        staleTime: Infinity,
-      })
-    } catch (err) {
-      setManualError(
-        err instanceof Error ? err.message : 'Similarity search failed.',
-      )
-    }
-  }, [minQuestionTextLength, queryClient, questionId, signature])
+    setRequest({ signature, value })
+  }, [minQuestionTextLength, signature, value])
 
   useEffect(() => {
     if (manualError && canSearch) {
@@ -212,19 +174,18 @@ export function useSimilaritySearch({
   }, [manualError, canSearch])
 
   const matches: SimilarQuestionMatch[] = query.data ?? []
-  const queryErrorMessage =
-    query.error instanceof Error ? query.error.message : null
-  const error = manualError ?? queryErrorMessage
+  const queryError = query.error instanceof Error ? query.error.message : null
+  const error = manualError ?? queryError
 
   const status = deriveSimilarStatus({
     manualError,
     canSearch,
     isFetching: query.isFetching,
-    queryErrorMessage,
+    queryError,
     hasData: Boolean(query.data),
   })
 
-  const resultsStale = query.isPlaceholderData || signature !== debouncedSignature
+  const resultsStale = query.isPlaceholderData || signature !== request.signature
 
   return {
     status,
