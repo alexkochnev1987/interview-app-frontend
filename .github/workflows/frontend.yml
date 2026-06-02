@@ -53,6 +53,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: alexkochnev1987/interview-app-backend
+          ref: develop
           path: interview-app-backend
       - uses: actions/setup-node@v4
         with:
@@ -84,8 +85,11 @@ jobs:
             node dist/src/database/migrate.js
           elif [ -f dist/database/migrate.js ]; then
             node dist/database/migrate.js
+          elif [ -f src/database/migrate.ts ]; then
+            npx ts-node src/database/migrate.ts
           else
-            npm run db:migrate
+            echo "No migration entrypoint found"
+            exit 1
           fi
       - name: Start backend for E2E
         working-directory: interview-app-backend
