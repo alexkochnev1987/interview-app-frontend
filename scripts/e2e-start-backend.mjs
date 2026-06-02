@@ -1,42 +1,42 @@
 import { spawn } from 'node:child_process'
 import { constants } from 'node:fs'
-import { access, readFile } from 'node:fs/promises'
+import { access } from 'node:fs/promises'
 import { resolve } from 'node:path'
 
-function runNpmScript(scriptName, cwd, env) {
+function runCommand(command, args, cwd, env) {
   return new Promise((resolvePromise, rejectPromise) => {
-    const npmExecPath = process.env.npm_execpath
-    const child = npmExecPath
-      ? spawn(process.execPath, [npmExecPath, 'run', scriptName], {
-          cwd,
-          stdio: 'inherit',
-          shell: false,
-          env,
-        })
-      : spawn(
-          process.platform === 'win32' ? 'cmd.exe' : 'npm',
-          process.platform === 'win32'
-            ? ['/d', '/s', '/c', `npm run ${scriptName}`]
-            : ['run', scriptName],
-          {
-            cwd,
-            stdio: 'inherit',
-            shell: false,
-            env,
-            windowsVerbatimArguments: process.platform === 'win32',
-          },
-        )
+    const child = spawn(command, args, {
+      cwd,
+      stdio: 'inherit',
+      shell: false,
+      env,
+    })
 
     child.on('exit', (code) => {
       if (code === 0) {
         resolvePromise()
         return
       }
-      rejectPromise(new Error(`npm run ${scriptName} exited with code ${code ?? 'unknown'}`))
+      rejectPromise(
+        new Error(`${command} ${args.join(' ')} exited with code ${code ?? 'unknown'}`),
+      )
     })
 
     child.on('error', rejectPromise)
   })
+}
+
+function runNpmScript(scriptName, cwd, env) {
+  const npmExecPath = process.env.npm_execpath
+  if (npmExecPath) {
+    return runCommand(process.execPath, [npmExecPath, 'run', scriptName], cwd, env)
+  }
+
+  if (process.platform === 'win32') {
+    return runCommand('cmd.exe', ['/d', '/s', '/c', `npm run ${scriptName}`], cwd, env)
+  }
+
+  return runCommand('npm', ['run', scriptName], cwd, env)
 }
 
 async function pathExists(targetPath) {
@@ -48,44 +48,55 @@ async function pathExists(targetPath) {
   }
 }
 
-async function readPackageScripts(cwd) {
-  const packageJson = await readFile(resolve(cwd, 'package.json'), 'utf8')
-  return JSON.parse(packageJson).scripts ?? {}
+async function resolveBackendCwd() {
+  const candidates = [
+    process.env.BACKEND_REPO_PATH,
+    'interview-app-backend',
+    '../interview-app-backend',
+  ].filter(Boolean)
+
+  for (const candidate of candidates) {
+    const backendCwd = resolve(process.cwd(), candidate)
+    if (await pathExists(resolve(backendCwd, 'package.json'))) {
+      console.log(`[e2e] Using backend repo at ${backendCwd}`)
+      return backendCwd
+    }
+  }
+
+  throw new Error(
+    '[e2e] Backend repo not found. Set BACKEND_REPO_PATH or place it at interview-app-backend.',
+  )
 }
 
 async function runMigrations(cwd, env) {
-  const scripts = await readPackageScripts(cwd)
   const migrateProdEntry = resolve(cwd, 'dist/database/migrate.js')
+  const migrateSrcEntry = resolve(cwd, 'src/database/migrate.ts')
+  const tsNodeBin = resolve(cwd, 'node_modules/ts-node/dist/bin.js')
 
-  if (scripts['db:migrate:prod'] && (await pathExists(migrateProdEntry))) {
-    await runNpmScript('db:migrate:prod', cwd, env)
+  if (await pathExists(migrateProdEntry)) {
+    console.log('[e2e] Running compiled migration')
+    await runCommand(process.execPath, [migrateProdEntry], cwd, env)
     return
   }
 
-  if (scripts['db:migrate']) {
-    await runNpmScript('db:migrate', cwd, env)
+  if (await pathExists(migrateSrcEntry) && (await pathExists(tsNodeBin))) {
+    console.log('[e2e] Running ts-node migration')
+    await runCommand(process.execPath, [tsNodeBin, migrateSrcEntry], cwd, env)
     return
   }
 
-  throw new Error('[e2e] No backend migration script found (db:migrate or db:migrate:prod)')
+  if (await pathExists(migrateSrcEntry)) {
+    console.log('[e2e] Running npx ts-node migration')
+    await runCommand('npx', ['ts-node', migrateSrcEntry], cwd, env)
+    return
+  }
+
+  throw new Error(`[e2e] No migration entrypoint found under ${cwd}`)
 }
 
 async function main() {
-  const backendCwd = resolve(
-    process.cwd(),
-    process.env.BACKEND_REPO_PATH ?? '../interview-app-backend',
-  )
-  const backendPackageJson = resolve(backendCwd, 'package.json')
+  const backendCwd = await resolveBackendCwd()
   const backendMain = resolve(backendCwd, 'dist/main.js')
-
-  try {
-    await access(backendPackageJson, constants.F_OK)
-  } catch {
-    console.error(
-      `[e2e] Backend repo not found at ${backendCwd}. Set BACKEND_REPO_PATH or start the API on :3000.`,
-    )
-    process.exit(1)
-  }
 
   const env = {
     ...process.env,
@@ -110,11 +121,13 @@ async function main() {
   }
 
   if (process.env.CI || !(await pathExists(backendMain))) {
+    console.log('[e2e] Building backend')
     await runNpmScript('build', backendCwd, env)
   }
 
   await runMigrations(backendCwd, env)
 
+  console.log('[e2e] Starting backend API')
   const server = spawn(process.execPath, [backendMain], {
     cwd: backendCwd,
     stdio: 'inherit',
