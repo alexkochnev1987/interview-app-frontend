@@ -13,6 +13,10 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
+    "test:e2e": "node scripts/e2e-run.mjs",
+    "test:e2e:fast": "node scripts/e2e-run.mjs --fast",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:install": "playwright install chromium",
     "openapi:backend:generate": "node scripts/generate-backend-openapi.mjs",
     "openapi:sync": "node scripts/sync-openapi.mjs",
     "openapi:generate": "npx --yes openapi-typescript openapi/openapi.json -o src/lib/api-types.ts",
@@ -34,6 +38,7 @@
     "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@types/node": "^20.0.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",

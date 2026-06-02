@@ -23,5 +23,49 @@ jobs:
       - run: npm run test
       - run: npx next build --webpack
 
+  e2e:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: interview_app
+          POSTGRES_PASSWORD: localpass
+          POSTGRES_DB: interview_app_e2e
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U interview_app -d interview_app_e2e"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      CI: true
+      BACKEND_REPO_PATH: interview-app-backend
+      E2E_DATABASE_URL: postgresql://interview_app:localpass@localhost:5433/interview_app_e2e
+      E2E_JWT_SECRET: ci-e2e-jwt-secret
+      BACKEND_URL: http://localhost:3000
+      E2E_BASE_URL: http://localhost:3001
+      E2E_EMAIL: admin@interview-app.com
+      E2E_PASSWORD: admin123
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: alexkochnev1987/interview-app-backend
+          path: interview-app-backend
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install frontend dependencies
+        run: npm ci
+      - name: Install backend dependencies
+        working-directory: interview-app-backend
+        run: npm ci
+      - name: Install Playwright Chromium
+        run: npm run test:e2e:install
+      - name: Run E2E smoke tests
+        run: npm run test:e2e
+
 # Deploy is handled by AWS Amplify auto-build (connected to GitHub repo).
 # Amplify watches develop → dev, main → prod and builds automatically.

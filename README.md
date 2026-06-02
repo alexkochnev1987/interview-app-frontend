@@ -26,13 +26,40 @@ App: http://localhost:3001
 
 ## Tests
 
-Unit tests (Vitest, `src/**/*.test.ts`) cover pure business logic: auth roles, redirect safety, assessment status, questions URL state, and question-editor parsing/validation. Service and page flows are covered in integration/E2E phases.
+| Layer | Command | What it covers |
+|-------|---------|----------------|
+| **Unit** | `npm run test` | Pure UI helpers (redirect safety, assessment status, URL state, question-editor parsers/validation) |
+| **E2E** | `npm run test:e2e` | Browser smoke: auth gate + core recruiter pages |
+
+API contract flows are covered in the **backend** integration suite (`interview-app-backend` → `npm run test:integration`).
+
+### Unit
 
 ```bash
-npm run test        
-npm run test:watch
-npm run test:cov  
+npm run test
 ```
+
+### E2E (Playwright)
+
+**Requirements:** PostgreSQL on `:5433` (backend `docker compose up -d`), sibling backend repo at `../interview-app-backend` (or set `BACKEND_REPO_PATH`).
+
+Locally, tests use your installed **Google Chrome** — no browser download. CI installs Playwright Chromium via `npm run test:e2e:install`.
+
+If backend (`:3000`) and frontend (`:3001`) are already running:
+
+```bash
+npm run test:e2e:fast
+```
+
+Otherwise (auto-starts both):
+
+```bash
+npm run test:e2e
+```
+
+Default credentials: `admin@interview-app.com` / `admin123` (backend bootstrap user). Override with `E2E_EMAIL` / `E2E_PASSWORD` if needed.
+
+If services are already up, Playwright reuses them. To skip auto-start: `E2E_SKIP_WEBSERVER=1 npm run test:e2e`.
 
 Run the API separately — [interview-app-backend](https://github.com/alexkochnev1987/interview-app-backend) (`docker compose up -d`, `npm run start:dev`). Default in `.env.local`: `BACKEND_URL=http://localhost:3000`.
 
