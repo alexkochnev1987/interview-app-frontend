@@ -2,9 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { LoaderCircle, PanelLeftClose, PanelLeftOpen, Trash2 } from 'lucide-react'
-import { useQueryClient } from '@tanstack/react-query'
 
-import { questionsRootQueryKey } from '@/components/questions/picker/query-keys'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { CardGrid } from '@/components/ui/layout/card-grid'
 import { Grid } from '@/components/ui/layout/grid'
@@ -27,6 +25,7 @@ import {
   useQuestionsInfinite,
   useQuestionsQuery,
 } from '@/components/questions/picker'
+import { useBulkDeleteQuestions } from '@/components/questions/use-question-mutations'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { Pagination } from '@/components/ui/pagination'
@@ -34,8 +33,9 @@ import { useTranslations } from 'next-intl'
 
 import { useRouter } from '@/i18n/navigation'
 import { useQuestionChipLabels } from '@/i18n/use-question-chip-labels'
-import { deleteQuestionsBulk, type BulkDeleteResult, type Question } from '@/lib/api'
+import { type BulkDeleteResult, type Question } from '@/lib/api'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
+import { buildQuestionsInfiniteParams } from '@/lib/questions-query-state'
 import { notifyBulkDeleteOutcome } from '@/lib/notify-bulk-delete'
 import { notifyError } from '@/lib/toast'
 import { runMutation } from '@/lib/run-mutation'
@@ -54,7 +54,8 @@ export function QuestionsLibraryClient({
   const t = useTranslations('questions.library.client')
   const getChipLabel = useQuestionChipLabels()
   const toastMessages = useToastMessages()
-  const queryClient = useQueryClient()
+  const { mutateAsync: bulkDeleteQuestions, isPending: bulkDeleting } =
+    useBulkDeleteQuestions()
 
   const query = useQuestionsQuery({
     initial: initialPrefetch?.queryState,
@@ -64,26 +65,10 @@ export function QuestionsLibraryClient({
     disableFetchInCardsView: true,
   })
   const isCardsView = query.state.view === 'cards'
-  const {
-    difficulty, category, subcategory, role, tags, status,
-    sortBy, sortOrder, limit,
-  } = query.state
-  const { debouncedQ } = query
-  const cardsInfiniteParams = useMemo(() => ({
-    q: debouncedQ || undefined,
-    difficulty,
-    category,
-    subcategory,
-    tags: tags.length > 0 ? tags : undefined,
-    role,
-    status,
-    sortBy,
-    sortOrder,
-    limit,
-  }), [
-    difficulty, category, subcategory, role, tags, status,
-    sortBy, sortOrder, limit, debouncedQ,
-  ])
+  const cardsInfiniteParams = useMemo(
+    () => buildQuestionsInfiniteParams(query.state, query.debouncedQ),
+    [query.state, query.debouncedQ],
+  )
   const infinite = useQuestionsInfinite({
     params: cardsInfiniteParams,
     enabled: isCardsView,
@@ -139,7 +124,6 @@ export function QuestionsLibraryClient({
     prevSelectionFilterSigRef.current = cardsFilterSignature
   }, [cardsFilterSignature])
   const [bulkConfirmOpen, setBulkConfirmOpen] = useState(false)
-  const [bulkDeleting, setBulkDeleting] = useState(false)
   const [bulkResult, setBulkResult] = useState<BulkDeleteResult | null>(null)
   const [sidebarHidden, setSidebarHidden] = useState(false)
   const hydratedSidebarRef = useRef(false)
@@ -195,9 +179,8 @@ export function QuestionsLibraryClient({
     const ids = Array.from(selectedIds)
     if (ids.length === 0) return
 
-    setBulkDeleting(true)
     try {
-      const result = await runMutation(() => deleteQuestionsBulk(ids), {
+      const result = await runMutation(() => bulkDeleteQuestions(ids), {
         showSuccessToast: false,
         showErrorToast: false,
       })
@@ -205,7 +188,6 @@ export function QuestionsLibraryClient({
       setSelectedIds(new Set())
       setBulkConfirmOpen(false)
       setBulkResult(result)
-      void queryClient.invalidateQueries({ queryKey: questionsRootQueryKey() })
     } catch (error) {
       setBulkResult(null)
       notifyError(toastMessages.bulkDelete.failedTitle, {
@@ -214,8 +196,6 @@ export function QuestionsLibraryClient({
           error instanceof Error ? error.message : toastMessages.bulkDelete.failedTitle,
       })
       setBulkConfirmOpen(false)
-    } finally {
-      setBulkDeleting(false)
     }
   }
 

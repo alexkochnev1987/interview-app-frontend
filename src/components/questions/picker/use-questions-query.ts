@@ -31,6 +31,7 @@ import {
 } from '@/lib/questions-query-state'
 
 import { questionsListQueryKey } from './query-keys'
+import { isPlaceholderLoading, useVoidCallback } from './query-hook-helpers'
 import { splitListQueryErrors } from './split-questions-query-errors'
 
 const SEARCH_DEBOUNCE_MS = 300
@@ -205,8 +206,7 @@ export function useQuestionsQuery(
   }, [total])
 
   const items = query.data?.items ?? []
-  const loading =
-    query.isPending || (query.isFetching && query.isPlaceholderData)
+  const loading = isPlaceholderLoading(query)
   const errorMessage =
     query.error instanceof Error ? query.error.message : null
   const { blockingError, paginationError } = splitListQueryErrors(
@@ -283,13 +283,11 @@ export function useQuestionsQuery(
     () => {
       const base = withLockedDefaults(capturedInitial, lockStatus)
       setState((prev) => ({ ...base, view: prev.view }))
+      setDebouncedQ(base.q)
     },
     [capturedInitial, lockStatus],
   )
-  const queryRefetch = query.refetch
-  const refetch = useCallback(() => {
-    void queryRefetch()
-  }, [queryRefetch])
+  const refetch = useVoidCallback(query.refetch)
 
   const canReset = useMemo(() => {
     const base = withLockedDefaults(capturedInitial, lockStatus)

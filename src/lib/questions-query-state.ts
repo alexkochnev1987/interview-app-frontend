@@ -136,6 +136,17 @@ export function buildQuestionsFetchParams(
   }
 }
 
+export function buildQuestionsInfiniteParams(
+  state: QuestionsQueryState,
+  debouncedQ: string,
+): Omit<FetchQuestionsParams, 'page'> {
+  const { page: _page, ...infiniteParams } = buildQuestionsFetchParams(
+    state,
+    debouncedQ,
+  )
+  return infiniteParams
+}
+
 export function buildQuestionFacetsParams(
   state: Pick<
     QuestionsQueryState,

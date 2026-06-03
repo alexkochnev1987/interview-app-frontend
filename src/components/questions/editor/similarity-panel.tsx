@@ -4,6 +4,7 @@ import { Search } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
+import { Icon } from '@/components/ui/icon'
 import { MetricPanel } from '@/components/ui/metric-panel'
 import { StatusPill } from '@/components/ui/status-pill'
 import { SurfaceTile } from '@/components/ui/surface-tile'
@@ -55,7 +56,6 @@ export function SimilarityPanel({
 }: SimilarityPanelProps) {
   const toastMessages = useToastMessages()
   const t = useTranslations('questions.similarity')
-  const sharedLabels = useSharedLabels()
 
   return (
     <Card variant="surface">
@@ -86,7 +86,9 @@ export function SimilarityPanel({
             onClick={onRunSearch}
             disabled={disabled || status === 'loading' || !canSearch}
           >
-            <Search className="size-3.5" />
+            <Icon size="sm">
+              <Search />
+            </Icon>
             {status === 'loading' ? t('searching') : t('runSearch')}
           </Button>
         </Inline>
@@ -122,7 +124,9 @@ export function SimilarityPanel({
               onClick={onRunSearch}
               disabled={disabled || !canSearch}
             >
-              <Search className="size-3.5" />
+              <Icon size="sm">
+                <Search />
+              </Icon>
               {t('rerunSearch')}
             </Button>
           </Stack>
