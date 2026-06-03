@@ -26,20 +26,34 @@ App: http://localhost:3001
 
 ## Tests
 
-| Layer | Command | What it covers |
-|-------|---------|----------------|
-| **Unit** | `npm run test` | Pure UI helpers (redirect safety, assessment status, URL state, question-editor parsers/validation) |
-| **E2E** | `npm run test:e2e` | Browser smoke: auth gate + core recruiter pages |
+Testing pyramid for this repo:
 
-API contract flows are covered in the **backend** integration suite (`interview-app-backend` → `npm run test:integration`).
+| Layer | Repo | Command | What it covers |
+|-------|------|---------|----------------|
+| **Unit** | frontend | `npm run test` | Pure helpers: redirect safety, assessment status, URL state, question-editor parsers/validation, auth role matrix (`auth-roles`) |
+| **Integration** | frontend | `npm run test` | Middleware auth routing (`proxy`), server auth gate (`auth-gate`; mocked `/auth/me`) |
+| **Integration** | backend | `npm run test:integration` | API contracts, session auth, permissions by role, recruiter journey (question → interview → take link) |
+| **E2E** | frontend | `npm run test:e2e` | Two browser smokes: guest redirect to login, logged-in recruiter shell pages |
 
-### Unit
+**Out of scope (for now):** exhaustive per-route/per-locale browser matrix, visual regression, candidate take/feedback flows in Playwright, backend AI/LLM behavior. API contract and server-side permission rules live in backend integration tests; frontend integration tests own routing and RBAC helpers the backend suite cannot replace.
+
+### CI (approximate job wall time)
+
+| Job | When | Duration |
+|-----|------|----------|
+| Frontend `test` (lint + Vitest + build) | every PR and push | ~1–2 min |
+| Frontend `e2e` (Postgres, backend checkout, dual build, Playwright) | push to `develop`/`main`, nightly, manual | ~2–3 min |
+| Backend `test` (lint + build + unit + integration) | backend PR/push | ~3–5 min |
+
+PRs run frontend `test` only. E2E stays a thin smoke slice and is not on the PR critical path once Vitest integration covers middleware/RBAC.
+
+### Frontend unit & integration (Vitest)
 
 ```bash
 npm run test
 ```
 
-### E2E (Playwright)
+### Frontend E2E (Playwright)
 
 **Requirements:** PostgreSQL on `:5433` (backend `docker compose up -d`), sibling backend repo at `../interview-app-backend` (or set `BACKEND_REPO_PATH`).
 
@@ -61,7 +75,17 @@ Default credentials: `admin@interview-app.com` / `admin123` (backend bootstrap u
 
 If services are already up, Playwright reuses them. To skip auto-start: `E2E_SKIP_WEBSERVER=1 npm run test:e2e`.
 
-Run the API separately — [interview-app-backend](https://github.com/alexkochnev1987/interview-app-backend) (`docker compose up -d`, `npm run start:dev`). Default in `.env.local`: `BACKEND_URL=http://localhost:3000`.
+### Backend integration
+
+```bash
+cd ../interview-app-backend
+docker compose up -d
+npm run test:integration
+```
+
+See [interview-app-backend](https://github.com/alexkochnev1987/interview-app-backend) for seed users and coverage details.
+
+Run the API separately for local dev — [interview-app-backend](https://github.com/alexkochnev1987/interview-app-backend) (`docker compose up -d`, `npm run start:dev`). Default in `.env.local`: `BACKEND_URL=http://localhost:3000`.
 
 ## i18n messages
 
