@@ -13,14 +13,8 @@ import {
   useUpdateQuestion,
 } from '@/components/questions/use-question-mutations'
 import { useRouter } from '@/i18n/navigation'
-import {
-  QuestionInUseError,
-  type Question,
-  type QuestionInput,
-} from '@/lib/api'
+import { type Question, type QuestionInput } from '@/lib/api'
 import { questionToEditorInput } from '@/lib/question-editor/parsers'
-import { runMutation } from '@/lib/run-mutation'
-import { useToastMessages } from '@/lib/use-toast-messages'
 
 type QuestionEditClientProps = {
   id: string
@@ -37,7 +31,6 @@ export function QuestionEditClient({
 }: QuestionEditClientProps) {
   const t = useTranslations('questions.editPage')
   const router = useRouter()
-  const toastMessages = useToastMessages()
   const { mutateAsync: updateQuestion } = useUpdateQuestion()
   const { mutateAsync: deleteQuestion, isPending: deleting } = useDeleteQuestion()
   const { mutateAsync: restoreQuestion, isPending: restoring } = useRestoreQuestion()
@@ -55,10 +48,7 @@ export function QuestionEditClient({
   async function performRestore() {
     if (restoring) return
     try {
-      const restored = await runMutation(() => restoreQuestion(id), {
-        successMessage: toastMessages.question.restoreSuccess,
-        errorMessage: toastMessages.question.restoreError,
-      })
+      const restored = await restoreQuestion(id)
       setQuestion(restored)
       setRestoreOpen(false)
       router.refresh()
@@ -68,14 +58,7 @@ export function QuestionEditClient({
   async function performDelete() {
     if (deleting) return
     try {
-      await runMutation(() => deleteQuestion(id), {
-        successMessage: toastMessages.question.deleteSuccess,
-        errorMessage: toastMessages.question.deleteError,
-        getErrorTitle: (err) =>
-          err instanceof QuestionInUseError
-            ? toastMessages.deleteQuestion.cannotDeleteTitle
-            : toastMessages.question.deleteError,
-      })
+      await deleteQuestion(id)
       setConfirmOpen(false)
       router.push('/questions')
       router.refresh()

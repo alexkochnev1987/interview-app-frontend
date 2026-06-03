@@ -6,12 +6,10 @@ import { QuestionEditor } from '@/components/questions/editor/question-editor'
 import { useCreateQuestion } from '@/components/questions/use-question-mutations'
 import { useRouter } from '@/i18n/navigation'
 import { type QuestionInput } from '@/lib/api'
-import { useToastMessages } from '@/lib/use-toast-messages'
 
 export function QuestionNewClient() {
   const t = useTranslations('questions.newPage')
   const router = useRouter()
-  const toastMessages = useToastMessages()
   const { mutateAsync: createQuestion } = useCreateQuestion()
 
   async function handleSubmit(value: QuestionInput) {
@@ -25,10 +23,6 @@ export function QuestionNewClient() {
       title={t('title')}
       submitLabel={t('submit')}
       onSubmit={handleSubmit}
-      saveToastOptions={{
-        successMessage: toastMessages.question.createSuccess,
-        errorMessage: toastMessages.question.createError,
-      }}
     />
   )
 }

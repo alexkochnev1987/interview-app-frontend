@@ -1,3 +1,5 @@
+import { QuestionInUseError } from '@/lib/api'
+
 export class ApiError extends Error {
   constructor(
     public readonly status: number,
@@ -16,4 +18,16 @@ export function isUnauthorizedError(err: unknown): boolean {
 
 export function isForbiddenError(err: unknown): boolean {
   return err instanceof ApiError && err.status === 403
+}
+
+export function getErrorMessage(err: unknown): string | undefined {
+  return err instanceof Error ? err.message : undefined
+}
+
+export function getDeleteQuestionErrorTitle(
+  err: unknown,
+  defaultTitle: string,
+  inUseTitle: string,
+): string {
+  return err instanceof QuestionInUseError ? inUseTitle : defaultTitle
 }

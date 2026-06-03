@@ -37,6 +37,7 @@ import { type BulkDeleteResult, type Question } from '@/lib/api'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
 import { buildQuestionsInfiniteParams } from '@/lib/questions-query-state'
 import { notifyBulkDeleteOutcome } from '@/lib/notify-bulk-delete'
+import { getErrorMessage } from '@/lib/api-error'
 import { notifyError } from '@/lib/toast'
 import { runMutation } from '@/lib/run-mutation'
 import { useToastMessages } from '@/lib/use-toast-messages'
@@ -180,10 +181,7 @@ export function QuestionsLibraryClient({
     if (ids.length === 0) return
 
     try {
-      const result = await runMutation(() => bulkDeleteQuestions(ids), {
-        showSuccessToast: false,
-        showErrorToast: false,
-      })
+      const result = await bulkDeleteQuestions(ids)
       notifyBulkDeleteOutcome(result, toastMessages.bulkDelete)
       setSelectedIds(new Set())
       setBulkConfirmOpen(false)
@@ -193,7 +191,7 @@ export function QuestionsLibraryClient({
       notifyError(toastMessages.bulkDelete.failedTitle, {
         id: 'bulk-delete-error',
         description:
-          error instanceof Error ? error.message : toastMessages.bulkDelete.failedTitle,
+          getErrorMessage(error) ?? toastMessages.bulkDelete.failedTitle,
       })
       setBulkConfirmOpen(false)
     }

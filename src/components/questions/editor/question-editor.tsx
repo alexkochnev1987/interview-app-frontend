@@ -37,9 +37,6 @@ import {
 } from '@/lib/question-editor/parsers'
 import { type DraftFieldKey } from '@/lib/question-editor/field-keys'
 import { FEEDBACK_POLICY } from '@/lib/feedback-policy'
-import { runMutation } from '@/lib/run-mutation'
-import { useToastMessages } from '@/lib/use-toast-messages'
-
 type AiStatus = 'idle' | 'loading' | 'error'
 type QuestionFormField = 'questionText' | 'metadata'
 
@@ -50,11 +47,6 @@ interface QuestionEditorProps {
   submitLabel: string
   onSubmit: (value: QuestionInput) => Promise<QuestionInput>
   readOnly?: boolean
-  saveToastOptions?: {
-    enabled?: boolean
-    successMessage?: string
-    errorMessage?: string
-  }
 }
 
 export function QuestionEditor({
@@ -64,9 +56,7 @@ export function QuestionEditor({
   submitLabel,
   onSubmit,
   readOnly = false,
-  saveToastOptions,
 }: QuestionEditorProps) {
-  const toastMessages = useToastMessages()
   const editorLabels = useQuestionEditorLabels()
   const [value, setValue] = useState<QuestionInput>(normalizeInitialValue(initialValue))
   const [metadataText, setMetadataText] = useState(
@@ -286,13 +276,7 @@ export function QuestionEditor({
     setSubmitting(true)
 
     try {
-      const persisted = normalizeInitialValue(
-        await runMutation(() => onSubmit(payload), {
-          showSuccessToast: saveToastOptions?.enabled ?? true,
-          successMessage: saveToastOptions?.successMessage ?? toastMessages.question.saveSuccess,
-          errorMessage: saveToastOptions?.errorMessage ?? toastMessages.question.saveError,
-        }),
-      )
+      const persisted = normalizeInitialValue(await onSubmit(payload))
       const normalizedMetadataText = formatMetadata(persisted.metadata ?? {})
       setValue(persisted)
       setMetadataText(normalizedMetadataText)
