@@ -55,10 +55,10 @@ Durations below are full **job wall time** in GitHub Actions (checkout, `npm ci`
 | Job | When | Duration |
 |-----|------|----------|
 | Frontend `test` (lint + Vitest + build) | every PR and push | ~1–2 min |
-| Frontend `e2e` (Postgres, backend checkout, dual build, Playwright) | push to `develop`/`main`, nightly, manual | ~2–3 min |
+| Frontend `e2e` (Postgres, backend checkout, dual build, Playwright) | every PR and push, nightly, manual | ~2–3 min |
 | Backend `test` (lint + build + unit + integration) | backend PR/push | ~3–5 min |
 
-PRs run frontend `test` only. E2E stays a thin smoke slice and is not on the PR critical path once Vitest integration covers middleware/RBAC.
+PRs run frontend `test` and `e2e` in parallel. Vitest integration covers middleware/RBAC; E2E stays a thin smoke gate so failures block merge before code reaches `develop`.
 
 ### Frontend unit & integration (Vitest)
 
