@@ -35,9 +35,22 @@ Testing pyramid for this repo:
 | **Integration** | backend | `npm run test:integration` | API contracts, session auth, permissions by role, recruiter journey (question → interview → take link) |
 | **E2E** | frontend | `npm run test:e2e` | Two browser smokes: guest redirect to login, logged-in recruiter shell pages |
 
+### Test counts (current)
+
+| Repo | Layer | Tests | Notes |
+|------|-------|------:|-------|
+| frontend | Unit (Vitest) | 19 | Pure helpers + `auth-roles` matrix |
+| frontend | Integration (Vitest) | 12 | `proxy` (7), `auth-gate` (5) |
+| frontend | E2E (Playwright) | 2 | Guest redirect + recruiter shell; `auth.setup` is infra only |
+| backend | Unit | 2 | Behavior risk scoring |
+| backend | Integration | 7 | Auth, permissions, recruiter journey |
+| **Total** | | **42** | Excludes Playwright setup project |
+
 **Out of scope (for now):** exhaustive per-route/per-locale browser matrix, visual regression, candidate take/feedback flows in Playwright, backend AI/LLM behavior. API contract and server-side permission rules live in backend integration tests; frontend integration tests own routing and RBAC helpers the backend suite cannot replace.
 
-### CI (approximate job wall time)
+### CI (GitHub Actions job wall time)
+
+Durations below are full **job wall time** in GitHub Actions (checkout, `npm ci`, builds, services)—not Vitest/Playwright runner time alone (~1–2 s and ~20–30 s respectively).
 
 | Job | When | Duration |
 |-----|------|----------|

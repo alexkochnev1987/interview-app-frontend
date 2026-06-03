@@ -61,7 +61,7 @@ function buildBackendEnv() {
     PORT: '3000',
     DATABASE_URL:
       process.env.E2E_DATABASE_URL ??
-      'postgresql://interview_app:localpass@localhost:5433/interview_app_dev',
+      'postgresql://interview_app:localpass@localhost:5433/interview_app_e2e',
     JWT_SECRET: process.env.E2E_JWT_SECRET ?? 'e2e-local-jwt-secret',
     FRONTEND_URL: 'http://localhost:3001',
     AWS_S3_BUCKET: process.env.AWS_S3_BUCKET ?? 'interview-app-local',
