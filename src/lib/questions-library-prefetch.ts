@@ -14,6 +14,7 @@ import { getQueryClient } from '@/lib/get-query-client'
 import {
   buildQuestionFacetsParams,
   buildQuestionsFetchParams,
+  buildQuestionsInfiniteParams,
   emptyPaginatedQuestions,
   EMPTY_QUESTION_FACETS,
   resolveQuestionsQueryState,
@@ -58,10 +59,7 @@ async function hydrateQuestionsPicker(
   const debouncedQ = queryState.q
   const fetchParams = buildQuestionsFetchParams(queryState, debouncedQ)
   const facetsParams = buildQuestionFacetsParams(queryState, debouncedQ)
-  const {
-    page: _page,
-    ...infiniteParams
-  } = fetchParams
+  const infiniteParams = buildQuestionsInfiniteParams(queryState, debouncedQ)
 
   const prefetches: Promise<unknown>[] = [
     queryClient.prefetchQuery({

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import {
   fetchQuestionFacets,
@@ -12,6 +12,7 @@ import {
   type QuestionsQueryState,
 } from '@/lib/questions-query-state'
 import { questionFacetsQueryKey } from './query-keys'
+import { isPlaceholderLoading, useVoidCallback } from './query-hook-helpers'
 
 export type UseQuestionFacetsResult = {
   facets: QuestionFacetsResponse
@@ -46,15 +47,11 @@ export function useQuestionFacets(
     placeholderData: keepPreviousData,
   })
 
-  const queryRefetch = query.refetch
-  const refetch = useCallback(() => {
-    void queryRefetch()
-  }, [queryRefetch])
+  const refetch = useVoidCallback(query.refetch)
 
   return {
     facets: query.data ?? EMPTY_QUESTION_FACETS,
-    loading:
-      query.isPending || (query.isFetching && query.isPlaceholderData),
+    loading: isPlaceholderLoading(query),
     error: query.error instanceof Error ? query.error.message : null,
     refetch,
   }
