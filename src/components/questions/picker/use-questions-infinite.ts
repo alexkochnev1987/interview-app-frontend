@@ -11,6 +11,7 @@ import {
 import { questionsInfiniteQueryKey } from './query-keys'
 import { useVoidCallback } from './query-hook-helpers'
 import { splitInfiniteQueryErrors } from './split-questions-query-errors'
+import {getErrorMessage} from "@/lib/api-error";
 
 export type UseQuestionsInfiniteOptions = {
   params: Omit<FetchQuestionsParams, 'page'>
@@ -59,8 +60,7 @@ export function useQuestionsInfinite({
   const fetchNextPage = useVoidCallback(query.fetchNextPage)
   const refetch = useVoidCallback(query.refetch)
 
-  const errorMessage =
-    query.error instanceof Error ? query.error.message : null
+  const errorMessage = getErrorMessage(query.error) ?? null
   const { blockingError, paginationError } = splitInfiniteQueryErrors(
     errorMessage,
     items.length,

@@ -1,4 +1,6 @@
 import { notifyError, notifySuccess } from "@/lib/toast"
+import { getErrorMessage as getApiErrorMessage } from '@/lib/api-error'
+//do NOT try to change the name to getErrorMessage , that might break interview/team/take call sites
 
 type RunMutationOptions<TData> = {
   successMessage?: string
@@ -14,10 +16,6 @@ type RunMutationOptions<TData> = {
 
 const DEFAULT_SUCCESS_MESSAGE = "Action completed"
 const DEFAULT_ERROR_MESSAGE = "Action failed"
-
-function getErrorDescription(error: unknown) {
-  return error instanceof Error ? error.message : undefined
-}
 
 export async function runMutation<TData>(
   mutation: () => Promise<TData>,
@@ -44,7 +42,7 @@ export async function runMutation<TData>(
       options?.errorMessage ??
       DEFAULT_ERROR_MESSAGE
     const errorDescription =
-      options?.getErrorMessage?.(error) ?? getErrorDescription(error)
+      options?.getErrorMessage?.(error) ?? getApiErrorMessage(error)
 
     if (options?.showErrorToast !== false) {
       notifyError(errorMessage, { description: errorDescription })

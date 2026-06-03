@@ -15,6 +15,7 @@ import {
   type SimilaritySignalSummary,
   type SimilarStatus,
 } from '@/lib/question-editor/parsers'
+import {getErrorMessage} from "@/lib/api-error";
 
 interface UseSimilaritySearchOptions {
   value: QuestionInput
@@ -174,7 +175,7 @@ export function useSimilaritySearch({
   }, [manualError, canSearch])
 
   const matches: SimilarQuestionMatch[] = query.data ?? []
-  const queryError = query.error instanceof Error ? query.error.message : null
+  const queryError = getErrorMessage(query.error) ?? null
   const error = manualError ?? queryError
 
   const status = deriveSimilarStatus({

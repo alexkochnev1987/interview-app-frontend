@@ -13,6 +13,7 @@ import {
 } from '@/lib/questions-query-state'
 import { questionFacetsQueryKey } from './query-keys'
 import { isPlaceholderLoading, useVoidCallback } from './query-hook-helpers'
+import {getErrorMessage} from "@/lib/api-error";
 
 export type UseQuestionFacetsResult = {
   facets: QuestionFacetsResponse
@@ -52,7 +53,7 @@ export function useQuestionFacets(
   return {
     facets: query.data ?? EMPTY_QUESTION_FACETS,
     loading: isPlaceholderLoading(query),
-    error: query.error instanceof Error ? query.error.message : null,
+    error: getErrorMessage(query.error) ??null,
     refetch,
   }
 }

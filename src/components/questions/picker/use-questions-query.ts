@@ -33,6 +33,7 @@ import {
 import { questionsListQueryKey } from './query-keys'
 import { isPlaceholderLoading, useVoidCallback } from './query-hook-helpers'
 import { splitListQueryErrors } from './split-questions-query-errors'
+import {getErrorMessage} from "@/lib/api-error";
 
 const SEARCH_DEBOUNCE_MS = 300
 const VIEW_STORAGE_KEY = 'questions:view'
@@ -207,8 +208,7 @@ export function useQuestionsQuery(
 
   const items = query.data?.items ?? []
   const loading = isPlaceholderLoading(query)
-  const errorMessage =
-    query.error instanceof Error ? query.error.message : null
+  const errorMessage = getErrorMessage(query.error) ?? null
   const { blockingError, paginationError } = splitListQueryErrors(
     errorMessage,
     items.length,
