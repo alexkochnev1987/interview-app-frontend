@@ -32,8 +32,8 @@ export function QuestionEditClient({
   const t = useTranslations('questions.editPage')
   const router = useRouter()
   const { mutateAsync: updateQuestion } = useUpdateQuestion()
-  const { mutateAsync: deleteQuestion, isPending: deleting } = useDeleteQuestion()
-  const { mutateAsync: restoreQuestion, isPending: restoring } = useRestoreQuestion()
+  const { mutate: deleteQuestion, isPending: deleting } = useDeleteQuestion()
+  const { mutate: restoreQuestion, isPending: restoring } = useRestoreQuestion()
   const [question, setQuestion] = useState(initialQuestion)
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [restoreOpen, setRestoreOpen] = useState(false)
@@ -45,24 +45,28 @@ export function QuestionEditClient({
     return updated
   }
 
-  async function performRestore() {
+  function performRestore() {
     if (restoring) return
-    try {
-      const restored = await restoreQuestion(id)
-      setQuestion(restored)
-      setRestoreOpen(false)
-      router.refresh()
-    } catch {}
+
+    restoreQuestion(id, {
+      onSuccess: (restored)=>{
+        setQuestion(restored)
+        setRestoreOpen(false)
+        router.refresh()
+      }
+    })
   }
 
-  async function performDelete() {
+  function performDelete() {
     if (deleting) return
-    try {
-      await deleteQuestion(id)
-      setConfirmOpen(false)
-      router.push('/questions')
-      router.refresh()
-    } catch {}
+
+    deleteQuestion(id,{
+      onSuccess:()=>{
+        setConfirmOpen(false)
+        router.push('/questions')
+        router.refresh()
+      }
+    })
   }
 
   return (
