@@ -8,6 +8,7 @@ import type {
 export type ReviewStatus =
   | 'ready'
   | 'scoring'
+  | 'ready_to_score'
   | 'in_progress'
   | 'pending'
   | 'failed'
@@ -15,6 +16,7 @@ export type ReviewStatus =
 export type ReviewStatusTone =
   | 'completed'
   | 'processing'
+  | 'primary'
   | 'in_progress'
   | 'pending'
   | 'failed'
@@ -34,6 +36,15 @@ function isValidationInFlight(interview: Interview): boolean {
   )
 }
 
+function allAnswersSubmitted(interview: Interview): boolean {
+  if (interview.questions.length === 0) return false
+  return interview.questions.every((_question, index) =>
+    interview.answers.some(
+      (a) => a.questionIndex === index && a.status === 'submitted',
+    ),
+  )
+}
+
 export function deriveReviewStatus(interview: Interview): ReviewStatus {
   switch (interview.status) {
     case 'failed':
@@ -41,6 +52,13 @@ export function deriveReviewStatus(interview: Interview): ReviewStatus {
     case 'pending':
       return 'pending'
     case 'in_progress':
+      if (
+        allAnswersSubmitted(interview) &&
+        !isValidationInFlight(interview) &&
+        !interview.result
+      ) {
+        return 'ready_to_score'
+      }
       return 'in_progress'
     case 'processing':
       if (isValidationInFlight(interview)) return 'scoring'
@@ -59,6 +77,8 @@ export function reviewStatusLabel(status: ReviewStatus): string {
       return 'Ready for review'
     case 'scoring':
       return 'Scoring still catching up'
+    case 'ready_to_score':
+      return 'Ready for AI review'
     case 'in_progress':
       return 'Candidate in progress'
     case 'pending':
@@ -76,6 +96,8 @@ export function reviewStatusTone(status: ReviewStatus): ReviewStatusTone {
       return 'completed'
     case 'scoring':
       return 'processing'
+    case 'ready_to_score':
+      return 'primary'
     case 'in_progress':
       return 'in_progress'
     case 'pending':
@@ -134,6 +156,28 @@ export function getCompletionDate(interview: Interview): string | null {
   if (interview.result?.completedAt) return interview.result.completedAt
   if (interview.status === 'completed') return interview.updatedAt
   return null
+}
+
+export const HR_VISIBLE_REVIEW_STATUSES: ReadonlySet<ReviewStatus> =
+  new Set<ReviewStatus>(['ready_to_score', 'scoring', 'ready', 'failed'])
+
+export function isHrVisibleAssessment(interview: Interview): boolean {
+  return HR_VISIBLE_REVIEW_STATUSES.has(deriveReviewStatus(interview))
+}
+
+export function compareAssessmentsByCompletion(
+  a: Interview,
+  b: Interview,
+): number {
+  const ca = getCompletionDate(a)
+  const cb = getCompletionDate(b)
+
+  if (ca && !cb) return -1
+  if (!ca && cb) return 1
+
+  const da = ca ?? a.updatedAt
+  const db = cb ?? b.updatedAt
+  return new Date(db).getTime() - new Date(da).getTime()
 }
 
 const PLACEHOLDER_RESULT_SUMMARY = 'Simulated evaluation result'
