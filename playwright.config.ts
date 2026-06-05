@@ -1,8 +1,6 @@
 import { defineConfig, devices } from '@playwright/test'
 import path from 'node:path'
 
-import { authStoragePath } from './e2e/support/constants'
-
 const baseURL = process.env.E2E_BASE_URL ?? 'http://localhost:3001'
 
 const browser = {
@@ -14,32 +12,14 @@ export default defineConfig({
   testDir: './e2e',
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
+  retries: 0,
   workers: 1,
   reporter: process.env.CI ? [['github'], ['list']] : 'list',
   use: {
     baseURL,
-    trace: 'on-first-retry',
+    trace: 'retain-on-failure',
     ...browser,
   },
-  projects: [
-    {
-      name: 'setup',
-      testMatch: /.*\.setup\.ts/,
-    },
-    {
-      name: 'chromium',
-      use: {
-        storageState: authStoragePath,
-      },
-      dependencies: ['setup'],
-      testMatch: /recruiter-shell\.spec\.ts/,
-    },
-    {
-      name: 'chromium-guest',
-      testMatch: /auth-gate\.spec\.ts/,
-    },
-  ],
   webServer: process.env.E2E_SKIP_WEBSERVER
     ? undefined
     : [

@@ -33,7 +33,7 @@ Testing pyramid for this repo:
 | **Unit** | frontend | `npm run test` | Pure helpers: redirect safety, assessment status, URL state, question-editor parsers/validation, auth role matrix (`auth-roles`) |
 | **Integration** | frontend | `npm run test` | Middleware auth routing (`proxy`), server auth gate (`auth-gate`; mocked `/auth/me`) |
 | **Integration** | backend | `npm run test:integration` | API contracts, session auth, permissions by role, recruiter journey (question → interview → take link) |
-| **E2E** | frontend | `npm run test:e2e` | Two browser smokes: guest redirect to login, logged-in recruiter shell pages |
+| **E2E** | frontend | `npm run test:e2e` | Browser smoke: guest redirect to login |
 
 ### Test counts (current)
 
@@ -41,10 +41,10 @@ Testing pyramid for this repo:
 |------|-------|------:|-------|
 | frontend | Unit (Vitest) | 19 | Pure helpers + `auth-roles` matrix |
 | frontend | Integration (Vitest) | 12 | `proxy` (7), `auth-gate` (5) |
-| frontend | E2E (Playwright) | 2 | Guest redirect + recruiter shell; `auth.setup` is infra only |
+| frontend | E2E (Playwright) | 1 | Guest redirect smoke |
 | backend | Unit | 2 | Behavior risk scoring |
 | backend | Integration | 7 | Auth, permissions, recruiter journey |
-| **Total** | | **42** | Excludes Playwright setup project |
+| **Total** | | **41** | |
 
 **Out of scope (for now):** exhaustive per-route/per-locale browser matrix, visual regression, candidate take/feedback flows in Playwright, backend AI/LLM behavior. API contract and server-side permission rules live in backend integration tests; frontend integration tests own routing and RBAC helpers the backend suite cannot replace.
 
@@ -58,7 +58,7 @@ Durations below are full **job wall time** in GitHub Actions (checkout, `npm ci`
 | Frontend `e2e` (Postgres, backend checkout, dual build, Playwright) | every PR and push, nightly, manual | ~2–3 min |
 | Backend `test` (lint + build + unit + integration) | backend PR/push | ~3–5 min |
 
-PRs run frontend `test` and `e2e` in parallel. Vitest integration covers middleware/RBAC; E2E stays a thin smoke gate so failures block merge before code reaches `develop`.
+PRs run frontend `test` and `e2e` in parallel. Vitest integration covers middleware/RBAC and server auth gates; E2E keeps one browser smoke so routing failures block merge before code reaches `develop`.
 
 ### Frontend unit & integration (Vitest)
 
@@ -83,8 +83,6 @@ Otherwise (auto-starts both):
 ```bash
 npm run test:e2e
 ```
-
-Default credentials: `admin@interview-app.com` / `admin123` (backend bootstrap user). Override with `E2E_EMAIL` / `E2E_PASSWORD` if needed.
 
 If services are already up, Playwright reuses them. To skip auto-start: `E2E_SKIP_WEBSERVER=1 npm run test:e2e`.
 

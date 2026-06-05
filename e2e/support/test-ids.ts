@@ -1,5 +1,5 @@
 export const e2eTestIds = {
+  loginEmail: 'login-email',
+  loginPassword: 'login-password',
   loginSubmit: 'login-submit',
-  questionsPage: 'questions-page',
-  interviewCreatePage: 'interview-create-page',
 } as const

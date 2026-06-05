@@ -72,7 +72,7 @@ export default async function QuestionsPage({
   }
 
   return (
-    <PageShell data-testid="questions-page">
+    <PageShell>
       <QueryHydrationBoundary state={initialPrefetch.dehydratedState}>
         <QuestionsLibraryClient
           isSuperAdmin={superAdmin}
