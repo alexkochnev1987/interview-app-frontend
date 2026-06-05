@@ -20,6 +20,8 @@
       "submitted": "Przesłano",
       "scored": "Oceniono",
       "questionsCount": "{count} pytań",
+      "readyTitle": "Gotowe do oceny AI",
+      "readyDescription": "Kandydat przesłał wszystkie odpowiedzi. Rozpocznij ocenę AI, aby ocenić tę rozmowę i wygenerować kartę wyników.",
       "failedTitle": "Rozmowa nie została ukończona",
       "failedDescription": "Sesja zakończyła się niepowodzeniem. Część odpowiedzi, transkrypcji lub ocen może brakować. Możesz ponownie uruchomić ocenę AI dla odpowiedzi z transkryptem.",
       "perQuestionEyebrow": "Przegląd pytań",
@@ -29,7 +31,7 @@
     },
     "banner": {
       "slowTitle": "Punktowanie trwa dłużej niż zwykle",
-      "slowDescription": "{inFlight} z {total} odpowiedzi jest nadal ocenianych po kilku minutach. Proces mógł utknąć. Odśwież ręcznie, aby sprawdzić status, albo uruchom ponownie odpowiedzi, których dotyczy problem.",
+      "slowDescription": "Aktualizacje na żywo są wstrzymane. Odśwież, aby załadować najnowszy status oceny.",
       "refreshNow": "Odśwież teraz",
       "allFailedTitle": "Ocena AI nie powiodła się w przypadku każdej odpowiedzi",
       "allFailedDescription": "Żadna z przesłanych odpowiedzi {total} nie dała oceny. Aby uzyskać szczegółowe informacje, zapoznaj się z komunikatami o błędach poszczególnych pytań poniżej, a następnie uruchom ponownie po rozwiązaniu podstawowego problemu.",
@@ -102,6 +104,7 @@
     },
     "rerun": {
       "starting": "Startowy…",
+      "start": "Rozpocznij ocenę AI",
       "all": "Przeprowadź ponownie ocenę AI",
       "answer": "Uruchom ponownie tę odpowiedź",
       "queued": "W kolejce"

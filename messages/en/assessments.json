@@ -20,6 +20,8 @@
       "submitted": "Submitted",
       "scored": "Scored",
       "questionsCount": "{count} questions",
+      "readyTitle": "Ready for AI review",
+      "readyDescription": "The candidate has submitted every answer. Start AI evaluation to score this interview and generate the scorecard.",
       "failedTitle": "This interview failed to complete",
       "failedDescription": "The take ended in a failed state. Some answers, transcripts, or evaluations may be missing. You can re-run AI evaluation for any answer that does have a transcript below.",
       "perQuestionEyebrow": "Per-question review",
@@ -29,7 +31,7 @@
     },
     "banner": {
       "slowTitle": "Scoring is taking longer than usual",
-      "slowDescription": "{inFlight} of {total} answers are still being scored after several minutes. The worker may be stuck. Refresh manually to check, or re-run the affected answers.",
+      "slowDescription": "Live updates are paused. Refresh to load the latest scoring status.",
       "refreshNow": "Refresh now",
       "allFailedTitle": "AI scoring failed for every answer",
       "allFailedDescription": "None of the {total} submitted answers produced an evaluation. See the per-question error messages below for details, then re-run once the underlying issue is resolved.",
@@ -102,6 +104,7 @@
     },
     "rerun": {
       "starting": "Starting…",
+      "start": "Start AI evaluation",
       "all": "Re-run AI evaluation",
       "answer": "Re-run this answer",
       "queued": "Queued"
