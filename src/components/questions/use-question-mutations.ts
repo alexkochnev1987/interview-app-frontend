@@ -19,6 +19,7 @@ import {
 import { getDeleteQuestionErrorTitle, getErrorMessage } from '@/lib/api-error'
 import { notifyError, notifySuccess } from '@/lib/toast'
 import { useToastMessages } from '@/lib/use-toast-messages'
+import {notifyBulkDeleteOutcome} from "@/lib/notify-bulk-delete";
 
 export type MutationToastMeta = {
   hideSuccess?: boolean
@@ -165,11 +166,16 @@ export function useRestoreQuestion() {
 
 export function useBulkDeleteQuestions() {
   const invalidateQuestions = useInvalidateQuestions()
+  const {toastMessages, notifyMutationError}= useQuestionMutationToasts()
 
   return useMutation({
     mutationFn: (ids: string[]) => deleteQuestionsBulk(ids),
-    onSuccess: () => {
+    onSuccess: (result) => {
       invalidateQuestions()
+      notifyBulkDeleteOutcome(result, toastMessages.bulkDelete)
     },
+    onError: (error)=>{
+      notifyMutationError(toastMessages.bulkDelete.failedTitle, error)
+    }
   })
 }

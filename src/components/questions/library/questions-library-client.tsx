@@ -39,7 +39,6 @@ import { buildQuestionsInfiniteParams } from '@/lib/questions-query-state'
 import { notifyBulkDeleteOutcome } from '@/lib/notify-bulk-delete'
 import { getErrorMessage } from '@/lib/api-error'
 import { notifyError } from '@/lib/toast'
-import { runMutation } from '@/lib/run-mutation'
 import { useToastMessages } from '@/lib/use-toast-messages'
 
 type QuestionsLibraryClientProps = {
@@ -55,8 +54,9 @@ export function QuestionsLibraryClient({
   const t = useTranslations('questions.library.client')
   const getChipLabel = useQuestionChipLabels()
   const toastMessages = useToastMessages()
-  const { mutateAsync: bulkDeleteQuestions, isPending: bulkDeleting } =
+  const { mutate: bulkDeleteQuestions, isPending: bulkDeleting } =
     useBulkDeleteQuestions()
+  //callbacks handle succsess/fail ,await not needed
 
   const query = useQuestionsQuery({
     initial: initialPrefetch?.queryState,
@@ -175,26 +175,22 @@ export function QuestionsLibraryClient({
     })
   }
 
-  async function performBulkDelete() {
+  function performBulkDelete() {
     if (bulkDeleting) return
     const ids = Array.from(selectedIds)
     if (ids.length === 0) return
 
-    try {
-      const result = await bulkDeleteQuestions(ids)
-      notifyBulkDeleteOutcome(result, toastMessages.bulkDelete)
-      setSelectedIds(new Set())
-      setBulkConfirmOpen(false)
-      setBulkResult(result)
-    } catch (error) {
-      setBulkResult(null)
-      notifyError(toastMessages.bulkDelete.failedTitle, {
-        id: 'bulk-delete-error',
-        description:
-          getErrorMessage(error) ?? toastMessages.bulkDelete.failedTitle,
-      })
-      setBulkConfirmOpen(false)
-    }
+    bulkDeleteQuestions(ids, {
+      onSuccess: result=>{
+        setSelectedIds(new Set())
+        setBulkConfirmOpen(false)
+        setBulkResult(result)
+      },
+      onError: ()=>{
+        setBulkResult(null)
+        setBulkConfirmOpen(false)
+      }
+    })
   }
 
   const selectedCount = selectedIds.size
