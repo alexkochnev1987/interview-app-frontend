@@ -82,8 +82,10 @@ export function QuestionEditor({
   const aiStatus:AiStatus = draftMutation.isPending ? 'loading'
       : draftMutation.isError ? 'error' :  'idle'
   const aiError = draftMutation.isError
-      ? getErrorMessage(draftMutation.error) ??
-      FEEDBACK_POLICY.draftQuestion.inlineErrorFallback
+      ? getErrorMessage(
+          draftMutation.error,
+          FEEDBACK_POLICY.draftQuestion.inlineErrorFallback,
+      )
       : null
 
   function update(patch: Partial<QuestionInput>) {
@@ -112,7 +114,7 @@ export function QuestionEditor({
     setMetadataText(next)
   }
 
-  async function handleGenerate() {
+  function handleGenerate() {
     if (readOnly) return
     if (!value.questionText.trim()) {
       draftMutation.reset()

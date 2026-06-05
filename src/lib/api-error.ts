@@ -13,15 +13,19 @@ export class ApiError extends Error {
 }
 
 export function isUnauthorizedError(err: unknown): boolean {
-  return err instanceof ApiError && err.status === 401
+  return getApiErrorStatus(err) === 401
 }
 
 export function isForbiddenError(err: unknown): boolean {
-  return err instanceof ApiError && err.status === 403
+  return getApiErrorStatus(err) === 403
 }
 
-export function getErrorMessage(err: unknown): string | undefined {
-  return err instanceof Error ? err.message : undefined
+export function getErrorMessage(err: unknown,fallback?:string): string|undefined{
+  if(err==null)return undefined
+  if(err instanceof Error && err.message.trim().length>0){
+    return err.message
+  }
+  return fallback ?? 'Something went wrong'
 }
 
 export function getDeleteQuestionErrorTitle(
@@ -30,4 +34,16 @@ export function getDeleteQuestionErrorTitle(
   inUseTitle: string,
 ): string {
   return err instanceof QuestionInUseError ? inUseTitle : defaultTitle
+}
+
+export function isApiError(err:unknown): err is ApiError{
+  return err instanceof ApiError
+}
+
+export function getApiErrorStatus(err:unknown):number|undefined{
+ return isApiError(err) ? err.status :undefined
+}
+
+export function isConflictError(err:unknown):boolean{
+  return getApiErrorStatus(err)===409
 }
