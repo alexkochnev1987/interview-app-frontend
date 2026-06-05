@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl'
 
+import { StartEvaluationButton } from '@/components/assessments/detail/start-evaluation-button'
 import {
   Card,
   CardContent,
@@ -27,19 +28,24 @@ import { formatInterviewDate } from '@/lib/interview-formatters'
 
 interface AssessmentCardProps {
   interview: Interview
+  onSuccess?: () => void
 }
 
-export function AssessmentCard({ interview }: AssessmentCardProps) {
+export function AssessmentCard({ interview, onSuccess }: AssessmentCardProps) {
   const t = useTranslations('assessments.list')
   const sharedLabels = useSharedLabels()
   const reviewStatus = deriveReviewStatus(interview)
   const completion = getCompletionDate(interview)
   const overallScore = interview.result?.overallScore ?? null
   const decision = interview.result?.decision ?? null
+  const isReadyToScore = reviewStatus === 'ready_to_score'
 
   return (
-    <UnstyledLink href={`/assessments/${interview.id}`}>
-      <Card variant="surface" height="full" interaction="hover">
+    <Card variant="surface" height="full" interaction="hover">
+      {/* The link uses display:contents so the header + metrics stay direct
+          flex children of the Card (no overlay, no stacking/hover conflict).
+          The Start button is a sibling — not nested in the anchor. */}
+      <UnstyledLink href={`/assessments/${interview.id}`} className="contents">
         <CardHeader spacing="md">
           <PillRow>
             <StatusPill tone={reviewStatusTone(reviewStatus)} casing="chip">
@@ -72,7 +78,16 @@ export function AssessmentCard({ interview }: AssessmentCardProps) {
             />
           </Grid>
         </CardContent>
-      </Card>
-    </UnstyledLink>
+      </UnstyledLink>
+      {isReadyToScore ? (
+        <CardContent>
+          <StartEvaluationButton
+            interviewId={interview.id}
+            size="sm"
+            onSuccess={onSuccess}
+          />
+        </CardContent>
+      ) : null}
+    </Card>
   )
 }

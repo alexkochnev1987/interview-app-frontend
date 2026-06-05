@@ -1,6 +1,6 @@
 'use client'
 
-import { useDeferredValue, useMemo, useState } from 'react'
+import { useCallback, useDeferredValue, useMemo, useState } from 'react'
 import { Search } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
@@ -9,15 +9,29 @@ import {
   AssessmentsListToolbar,
   type StatusFilter,
 } from '@/components/assessments/list/assessments-list-toolbar'
+import { LiveRefreshNotice } from '@/components/assessments/live-refresh-notice'
 import { Icon } from '@/components/ui/icon'
 import { CardGrid } from '@/components/ui/layout/card-grid'
 import { Stack } from '@/components/ui/layout/stack'
 import { EmptyStateCard } from '@/components/ui/state-card'
-import { type Interview } from '@/lib/api'
-import { deriveReviewStatus } from '@/lib/assessment-status'
+import { getInterviews, type Interview } from '@/lib/api'
+import {
+  compareAssessmentsByCompletion,
+  deriveReviewStatus,
+  isHrVisibleAssessment,
+} from '@/lib/assessment-status'
+import { useLivePolling } from '@/lib/use-live-polling'
 
 interface AssessmentsListClientProps {
   interviews: Interview[]
+}
+
+function scoringKey(interviews: Interview[]): string {
+  return interviews
+    .filter((interview) => deriveReviewStatus(interview) === 'scoring')
+    .map((interview) => interview.id)
+    .sort()
+    .join(',')
 }
 
 function matchesQuery(interview: Interview, normalizedQuery: string): boolean {
@@ -27,12 +41,25 @@ function matchesQuery(interview: Interview, normalizedQuery: string): boolean {
 }
 
 export function AssessmentsListClient({
-  interviews,
+  interviews: initialInterviews,
 }: AssessmentsListClientProps) {
   const t = useTranslations('assessments.list')
   const [query, setQuery] = useState('')
   const [status, setStatus] = useState<StatusFilter>('all')
   const deferredQuery = useDeferredValue(query)
+
+  const fetcher = useCallback(
+    async () =>
+      (await getInterviews())
+        .filter(isHrVisibleAssessment)
+        .sort(compareAssessmentsByCompletion),
+    [],
+  )
+  const { data: interviews, refresh, paused } = useLivePolling(
+    initialInterviews,
+    fetcher,
+    scoringKey,
+  )
 
   const filtered = useMemo(() => {
     const normalizedQuery = deferredQuery.trim().toLowerCase()
@@ -53,6 +80,8 @@ export function AssessmentsListClient({
         onStatusChange={setStatus}
       />
 
+      {paused ? <LiveRefreshNotice onRefresh={refresh} /> : null}
+
       {filtered.length === 0 ? (
         <EmptyStateCard
           icon={<Icon size="lg"><Search /></Icon>}
@@ -70,7 +99,11 @@ export function AssessmentsListClient({
       ) : (
         <CardGrid>
           {filtered.map((interview) => (
-            <AssessmentCard key={interview.id} interview={interview} />
+            <AssessmentCard
+              key={interview.id}
+              interview={interview}
+              onSuccess={refresh}
+            />
           ))}
         </CardGrid>
       )}
