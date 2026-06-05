@@ -28,5 +28,5 @@ for (const step of steps) {
 
 console.log('\nAll frontend CI checks passed.')
 console.log(
-  'Optional E2E (requires docker + backend/frontend running): npm run test:e2e:fast',
+  'Optional E2E (requires frontend + mock API or real backend on :3000): npm run test:e2e:fast',
 )

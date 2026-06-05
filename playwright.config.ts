@@ -24,10 +24,10 @@ export default defineConfig({
     ? undefined
     : [
         {
-          command: 'node scripts/e2e-start-backend.mjs',
+          command: 'node scripts/e2e-start-mock-api.mjs',
           url: 'http://localhost:3000/health',
           reuseExistingServer: !process.env.CI,
-          timeout: 180_000,
+          timeout: 60_000,
           cwd: path.resolve(__dirname),
         },
         {
@@ -36,11 +36,12 @@ export default defineConfig({
             : 'npm run dev:server',
           url: `${baseURL}/login`,
           reuseExistingServer: !process.env.CI,
-          timeout: 180_000,
+          timeout: 120_000,
           cwd: path.resolve(__dirname),
           env: {
             ...process.env,
             BACKEND_URL: process.env.BACKEND_URL ?? 'http://localhost:3000',
+            E2E_MOCK_API_PORT: process.env.E2E_MOCK_API_PORT ?? '3000',
           },
         },
       ],

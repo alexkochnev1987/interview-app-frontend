@@ -55,7 +55,7 @@ Durations below are full **job wall time** in GitHub Actions (checkout, `npm ci`
 | Job | When | Duration |
 |-----|------|----------|
 | Frontend `test` (lint + Vitest + build) | every PR and push | ~1–2 min |
-| Frontend `e2e` (Postgres, backend checkout, dual build, Playwright) | every PR and push, nightly, manual | ~2–3 min |
+| Frontend `e2e` (mock API, Next build, Playwright) | every PR and push, nightly, manual | ~1–2 min |
 | Backend `test` (lint + build + unit + integration) | backend PR/push | ~3–5 min |
 
 PRs run frontend `test` and `e2e` in parallel. Vitest integration covers middleware/RBAC and server auth gates; E2E keeps one browser smoke so routing failures block merge before code reaches `develop`.
@@ -68,17 +68,17 @@ npm run test
 
 ### Frontend E2E (Playwright)
 
-**Requirements:** PostgreSQL on `:5433` (backend `docker compose up -d`), sibling backend repo at `../interview-app-backend` (or set `BACKEND_REPO_PATH`).
+E2E uses a **lightweight mock API** on `:3000` (no Postgres or real backend). It covers browser-level routing and auth gating; API contracts and persistence stay in backend integration tests.
 
 Locally, tests use your installed **Google Chrome** — no browser download. CI installs Playwright Chromium via `npm run test:e2e:install`.
 
-If backend (`:3000`) and frontend (`:3001`) are already running:
+If mock API (`:3000`) and frontend (`:3001`) are already running:
 
 ```bash
 npm run test:e2e:fast
 ```
 
-Otherwise (auto-starts both):
+Otherwise (auto-starts mock API + frontend):
 
 ```bash
 npm run test:e2e

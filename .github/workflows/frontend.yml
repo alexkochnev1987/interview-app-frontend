@@ -28,44 +28,18 @@ jobs:
 
   e2e:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: pgvector/pgvector:pg16
-        env:
-          POSTGRES_USER: interview_app
-          POSTGRES_PASSWORD: localpass
-          POSTGRES_DB: interview_app_e2e
-        ports:
-          - 5433:5432
-        options: >-
-          --health-cmd "pg_isready -U interview_app -d interview_app_e2e"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
     env:
       CI: true
-      BACKEND_REPO_PATH: interview-app-backend
-      E2E_BACKEND_REF: 91901e98254a31d5136b7e938e3ca9f8c81142fe
-      E2E_DATABASE_URL: postgresql://interview_app:localpass@localhost:5433/interview_app_e2e
-      E2E_JWT_SECRET: ci-e2e-jwt-secret
       BACKEND_URL: http://localhost:3000
       E2E_BASE_URL: http://localhost:3001
       E2E_EMAIL: admin@interview-app.com
       E2E_PASSWORD: admin123
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/checkout@v4
-        with:
-          repository: alexkochnev1987/interview-app-backend
-          ref: ${{ env.E2E_BACKEND_REF }}
-          path: interview-app-backend
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
       - name: Install frontend dependencies
-        run: npm ci
-      - name: Install backend dependencies
-        working-directory: interview-app-backend
         run: npm ci
       - name: Install Playwright Chromium
         run: npm run test:e2e:install
