@@ -41,12 +41,17 @@ import {getErrorMessage} from "@/lib/api-error";
 type AiStatus = 'idle' | 'loading' | 'error'
 type QuestionFormField = 'questionText' | 'metadata'
 
+export type QuestionSubmitCallbacks = {
+  onSuccess: (persisted: QuestionInput) => void
+}
+
 interface QuestionEditorProps {
   questionId?: string
   title: string
   initialValue?: QuestionInput
   submitLabel: string
-  onSubmit: (value: QuestionInput) => Promise<QuestionInput>
+  onSubmit: (value: QuestionInput, callbacks: QuestionSubmitCallbacks) => void
+  submitting?: boolean
   readOnly?: boolean
 }
 
@@ -57,13 +62,13 @@ export function QuestionEditor({
   submitLabel,
   onSubmit,
   readOnly = false,
+  submitting = false,
 }: QuestionEditorProps) {
   const editorLabels = useQuestionEditorLabels()
   const [value, setValue] = useState<QuestionInput>(normalizeInitialValue(initialValue))
   const [metadataText, setMetadataText] = useState(
     formatMetadata(initialValue?.metadata ?? {}),
   )
-  const [submitting, setSubmitting] = useState(false)
   const [aiDraft, setAiDraft] = useState<QuestionDraft | null>(null)
   const [dismissedDraftFields, setDismissedDraftFields] = useState<DraftFieldKey[]>([])
   const [fieldErrors, setFieldErrors] = useState<FieldErrors<QuestionFormField>>({})
@@ -277,19 +282,16 @@ export function QuestionEditor({
 
     setFieldErrors({})
     setEnglishOnlyError(null)
-    setSubmitting(true)
 
-    try {
-      const persisted = normalizeInitialValue(await onSubmit(payload))
-      const normalizedMetadataText = formatMetadata(persisted.metadata ?? {})
-      setValue(persisted)
-      setMetadataText(normalizedMetadataText)
-      markSaved(persisted, normalizedMetadataText)
-    } catch {
-      return
-    } finally {
-      setSubmitting(false)
-    }
+    onSubmit(payload, {
+      onSuccess: (persisted) => {
+        const normalized = normalizeInitialValue(persisted)
+        const normalizedMetadataText = formatMetadata(normalized.metadata ?? {})
+        setValue(normalized)
+        setMetadataText(normalizedMetadataText)
+        markSaved(normalized, normalizedMetadataText)
+      },
+    })
   }
 
   return (

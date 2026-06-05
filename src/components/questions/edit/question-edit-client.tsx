@@ -6,7 +6,10 @@ import { useTranslations } from 'next-intl'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { DeletedQuestionBanner } from '@/components/questions/detail/deleted-question-banner'
 import { QuestionDangerZone } from '@/components/questions/detail/question-danger-zone'
-import { QuestionEditor } from '@/components/questions/editor/question-editor'
+import {
+  QuestionEditor,
+  type QuestionSubmitCallbacks,
+} from '@/components/questions/editor/question-editor'
 import {
   useDeleteQuestion,
   useRestoreQuestion,
@@ -31,18 +34,24 @@ export function QuestionEditClient({
 }: QuestionEditClientProps) {
   const t = useTranslations('questions.editPage')
   const router = useRouter()
-  const { mutateAsync: updateQuestion } = useUpdateQuestion()
+  const { mutate: updateQuestion, isPending: submitting } = useUpdateQuestion()
   const { mutate: deleteQuestion, isPending: deleting } = useDeleteQuestion()
   const { mutate: restoreQuestion, isPending: restoring } = useRestoreQuestion()
   const [question, setQuestion] = useState(initialQuestion)
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [restoreOpen, setRestoreOpen] = useState(false)
 
-  async function handleSubmit(value: QuestionInput) {
-    const updated = await updateQuestion({ id, value })
-    setQuestion(updated)
-    router.refresh()
-    return updated
+  function handleSubmit(value: QuestionInput, { onSuccess }: QuestionSubmitCallbacks) {
+    updateQuestion(
+      { id, value },
+      {
+        onSuccess: (updated) => {
+          setQuestion(updated)
+          router.refresh()
+          onSuccess(questionToEditorInput(updated))
+        },
+      },
+    )
   }
 
   function performRestore() {
@@ -84,6 +93,7 @@ export function QuestionEditClient({
         initialValue={questionToEditorInput(question)}
         submitLabel={t('submit')}
         onSubmit={handleSubmit}
+        submitting={submitting}
       />
       {!question.deleted && canDelete ? (
         <QuestionDangerZone

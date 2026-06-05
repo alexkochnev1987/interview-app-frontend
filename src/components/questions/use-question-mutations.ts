@@ -70,11 +70,10 @@ export function useCreateQuestion() {
 
   return useMutation({
     mutationFn: (value: QuestionInput) => createQuestion(value),
-    onSuccess: (_data, _variables, _onMutateResult, context) => {
+    onSuccess: (_data, _variables, _onMutateResult ) => {
       invalidateQuestions()
       notifyMutationSuccess(
         toastMessages.question.createSuccess,
-        getToastMetaFromContext(context),
       )
     },
     onError: (error, _variables, _onMutateResult, context) => {
@@ -95,11 +94,10 @@ export function useUpdateQuestion() {
   return useMutation({
     mutationFn: ({ id, value }: { id: string; value: QuestionInput }) =>
       updateQuestion(id, value),
-    onSuccess: (_data, _variables, _onMutateResult, context) => {
+    onSuccess: (_data, _variables, _onMutateResult) => {
       invalidateQuestions()
       notifyMutationSuccess(
         toastMessages.question.saveSuccess,
-        getToastMetaFromContext(context),
       )
     },
     onError: (error, _variables, _onMutateResult, context) => {
@@ -119,11 +117,10 @@ export function useDeleteQuestion() {
 
   return useMutation({
     mutationFn: (id: string) => deleteQuestion(id),
-    onSuccess: (_data, _id, _onMutateResult, context) => {
+    onSuccess: (_data, _id, _onMutateResult) => {
       invalidateQuestions()
       notifyMutationSuccess(
         toastMessages.question.deleteSuccess,
-        getToastMetaFromContext(context),
       )
     },
     onError: (error, _id, _onMutateResult, context) => {
@@ -147,11 +144,10 @@ export function useRestoreQuestion() {
 
   return useMutation({
     mutationFn: (id: string) => restoreQuestion(id),
-    onSuccess: (_data, _id, _onMutateResult, context) => {
+    onSuccess: (_data, _id, _onMutateResult) => {
       invalidateQuestions()
       notifyMutationSuccess(
         toastMessages.question.restoreSuccess,
-        getToastMetaFromContext(context),
       )
     },
     onError: (error, _id, _onMutateResult, context) => {
