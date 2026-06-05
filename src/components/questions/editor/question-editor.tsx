@@ -21,7 +21,6 @@ import { SimilarityPanel } from '@/components/questions/editor/similarity-panel'
 import { useDirtyTracking } from '@/components/questions/editor/use-dirty-tracking'
 import { useSimilaritySearch } from '@/components/questions/editor/use-similarity-search'
 import {
-  draftQuestion,
   type QuestionDraft,
   type QuestionInput,
 } from '@/lib/api'
@@ -37,6 +36,8 @@ import {
 } from '@/lib/question-editor/parsers'
 import { type DraftFieldKey } from '@/lib/question-editor/field-keys'
 import { FEEDBACK_POLICY } from '@/lib/feedback-policy'
+import {useDraftQuestion} from "@/components/questions/editor/use-draft-question";
+import {getErrorMessage} from "@/lib/api-error";
 type AiStatus = 'idle' | 'loading' | 'error'
 type QuestionFormField = 'questionText' | 'metadata'
 
@@ -63,12 +64,10 @@ export function QuestionEditor({
     formatMetadata(initialValue?.metadata ?? {}),
   )
   const [submitting, setSubmitting] = useState(false)
-  const [aiStatus, setAiStatus] = useState<AiStatus>('idle')
   const [aiDraft, setAiDraft] = useState<QuestionDraft | null>(null)
   const [dismissedDraftFields, setDismissedDraftFields] = useState<DraftFieldKey[]>([])
   const [fieldErrors, setFieldErrors] = useState<FieldErrors<QuestionFormField>>({})
   const [englishOnlyError, setEnglishOnlyError] = useState<string | null>(null)
-  const [aiError, setAiError] = useState<string | null>(null)
   const fieldsDisabled = submitting || readOnly
 
   const { dirtyFieldKeys, isDirty, markSaved } = useDirtyTracking({
@@ -78,6 +77,14 @@ export function QuestionEditor({
   })
 
   const similarity = useSimilaritySearch({ value, questionId })
+  const draftMutation= useDraftQuestion()
+
+  const aiStatus:AiStatus = draftMutation.isPending ? 'loading'
+      : draftMutation.isError ? 'error' :  'idle'
+  const aiError = draftMutation.isError
+      ? getErrorMessage(draftMutation.error) ??
+      FEEDBACK_POLICY.draftQuestion.inlineErrorFallback
+      : null
 
   function update(patch: Partial<QuestionInput>) {
     if (readOnly) return
@@ -108,10 +115,10 @@ export function QuestionEditor({
   async function handleGenerate() {
     if (readOnly) return
     if (!value.questionText.trim()) {
-      setAiError(null)
-      setFieldErrors((prev) => ({
+      draftMutation.reset()
+      setFieldErrors(prev=>({
         ...prev,
-        questionText: editorLabels.validation.questionTextRequiredForAi,
+        questionText: editorLabels.validation.questionTextRequiredForAi
       }))
       return
     }
@@ -128,40 +135,35 @@ export function QuestionEditor({
       { fieldLabel: editorLabels.fieldLabel('tags'), value: value.tags },
     ])
     if (nonEnglishFieldForGeneration) {
-      setAiError(null)
+      draftMutation.reset()
       setEnglishOnlyError(
-        editorLabels.validation.englishOnlyField({ field: nonEnglishFieldForGeneration }),
+          editorLabels.validation.englishOnlyField({ field: nonEnglishFieldForGeneration }),
       )
       setFieldErrors((prev) => ({
         ...prev,
         questionText:
-          nonEnglishFieldForGeneration === editorLabels.fieldLabel('questionText')
-            ? editorLabels.validation.questionTextEnglishOnlyForAi
-            : prev.questionText,
+            nonEnglishFieldForGeneration === editorLabels.fieldLabel('questionText')
+                ? editorLabels.validation.questionTextEnglishOnlyForAi
+                : prev.questionText,
       }))
       return
     }
 
     clearFieldError('questionText', setFieldErrors)
     setEnglishOnlyError(null)
-    setAiError(null)
-    setAiStatus('loading')
 
-    try {
-      const draft = await draftQuestion(value)
-      setAiDraft(draft)
-      setDismissedDraftFields([])
-      setAiStatus('idle')
-    } catch (err) {
-      setAiDraft(null)
-      setDismissedDraftFields([])
-      setAiStatus('error')
-      setAiError(
-        err instanceof Error
-          ? err.message
-          : FEEDBACK_POLICY.draftQuestion.inlineErrorFallback,
-      )
-    }
+    draftMutation.reset()
+    draftMutation.mutate(value, {
+      onSuccess: draft=>{
+        setAiDraft(draft)
+        setDismissedDraftFields([])
+      },
+      onError:()=>{
+        setAiDraft(null)
+        setDismissedDraftFields([])
+      }
+    })
+
   }
 
   function applyDraftField(field: DraftFieldKey) {
