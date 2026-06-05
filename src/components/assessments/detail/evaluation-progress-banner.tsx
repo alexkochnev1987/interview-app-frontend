@@ -1,14 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { RefreshCw, ShieldAlert, Sparkles } from 'lucide-react'
+import { ShieldAlert, Sparkles } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
-import { Inline } from '@/components/ui/layout/inline'
 import { type Interview } from '@/lib/api'
 
 interface EvaluationProgressBannerProps {
@@ -41,89 +37,16 @@ function countAnswers(interview: Interview): Counts {
   return { total: submitted.length, scored, queued, processing, failed, awaiting }
 }
 
-const REFRESH_INTERVAL_MS = 4000
-const MAX_POLL_DURATION_MS = 3 * 60 * 1000
-
 export function EvaluationProgressBanner({
   interview,
 }: EvaluationProgressBannerProps) {
   const t = useTranslations('assessments.banner')
-  const router = useRouter()
   const counts = countAnswers(interview)
   const inFlight = counts.queued + counts.processing > 0
-  const inFlightSignature = interview.answers
-    .filter(
-      (a) =>
-        a.validation?.status === 'queued' ||
-        a.validation?.status === 'processing',
-    )
-    .map((a) => `${a.questionIndex}:${a.validation?.requestedAt ?? ''}`)
-    .sort()
-    .join(',')
-  const [pollExpired, setPollExpired] = useState(false)
-
-  useEffect(() => {
-    const resetHandle = setTimeout(() => setPollExpired(false), 0)
-    if (!inFlightSignature) {
-      return () => clearTimeout(resetHandle)
-    }
-    const startedAt = Date.now()
-    const id = setInterval(() => {
-      if (Date.now() - startedAt >= MAX_POLL_DURATION_MS) {
-        setPollExpired(true)
-        clearInterval(id)
-        return
-      }
-      router.refresh()
-    }, REFRESH_INTERVAL_MS)
-    return () => {
-      clearTimeout(resetHandle)
-      clearInterval(id)
-    }
-  }, [inFlightSignature, router])
 
   if (counts.total === 0) return null
-
-  if (inFlight && pollExpired) {
-    return (
-      <Alert variant="warning">
-        <Icon size="md">
-          <ShieldAlert />
-        </Icon>
-        <AlertTitle>{t('slowTitle')}</AlertTitle>
-        <AlertDescription>
-          <Inline gap={3} align="center" wrap="wrap">
-            <span>
-              {t('slowDescription', {
-                inFlight: counts.queued + counts.processing,
-                total: counts.total,
-              })}
-            </span>
-            <Button
-              type="button"
-              variant="outline-pill"
-              shape="pill"
-              size="sm"
-              onClick={() => router.refresh()}
-            >
-              <Icon size="md">
-                <RefreshCw />
-              </Icon>
-              {t('refreshNow')}
-            </Button>
-          </Inline>
-        </AlertDescription>
-      </Alert>
-    )
-  }
-
-  if (inFlight) {
-    return null
-  }
-
-  if (interview.status === 'failed') {
-    return null
-  }
+  if (inFlight) return null
+  if (interview.status === 'failed') return null
 
   if (counts.failed > 0 && counts.scored === 0) {
     return (

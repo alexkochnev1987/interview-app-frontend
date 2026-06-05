@@ -31,6 +31,7 @@ interface QuestionSectionProps {
   question: InterviewQuestion
   answer: Answer | undefined
   canRerun: boolean
+  onSuccess?: () => void
 }
 
 function decisionHintTone(hint: AnswerDecisionHint | undefined) {
@@ -59,6 +60,7 @@ export function QuestionSection({
   question,
   answer,
   canRerun,
+  onSuccess,
 }: QuestionSectionProps) {
   const t = useTranslations('assessments.question')
   const sharedLabels = useSharedLabels()
@@ -289,6 +291,7 @@ export function QuestionSection({
                   answer.validation?.status === 'queued' ||
                   answer.validation?.status === 'processing'
                 }
+                onSuccess={onSuccess}
               />
             </Inline>
           ) : null}
