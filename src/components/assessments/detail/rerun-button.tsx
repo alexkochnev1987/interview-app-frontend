@@ -1,7 +1,12 @@
 'use client'
 
-import { useEffect, useRef, useState, type ComponentProps } from 'react'
-import { useRouter } from 'next/navigation'
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ComponentProps,
+  type ReactElement,
+} from 'react'
 import { RefreshCw } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -33,8 +38,10 @@ interface RerunButtonProps {
   variant?: ButtonVariant
   size?: ButtonSize
   iconSize?: IconSize
+  icon?: ReactElement<{ className?: string }>
   disabled?: boolean
   toastId?: string
+  onSuccess?: () => void
 }
 
 export function RerunButton({
@@ -47,10 +54,11 @@ export function RerunButton({
   variant = 'outline-pill',
   size = 'sm',
   iconSize = 'md',
+  icon = <RefreshCw />,
   disabled,
   toastId,
+  onSuccess,
 }: RerunButtonProps) {
-  const router = useRouter()
   const toastMessages = useToastMessages()
   const [phase, setPhase] = useState<'idle' | 'submitting' | 'submitted'>(
     'idle',
@@ -75,7 +83,7 @@ export function RerunButton({
         })
       }
       setPhase('submitted')
-      router.refresh()
+      onSuccess?.()
     } catch (err) {
       if (!mountedRef.current) return
       if (err instanceof ApiError && err.status === 409) {
@@ -84,7 +92,7 @@ export function RerunButton({
           description: err.message,
         })
         setPhase('submitted')
-        router.refresh()
+        onSuccess?.()
         return
       }
       notifyError(errorTitle, {
@@ -112,9 +120,7 @@ export function RerunButton({
       onClick={handleClick}
       disabled={disabled || phase !== 'idle'}
     >
-      <Icon size={iconSize}>
-        <RefreshCw />
-      </Icon>
+      <Icon size={iconSize}>{icon}</Icon>
       {phase === 'submitting'
         ? startingLabel
         : phase === 'submitted'

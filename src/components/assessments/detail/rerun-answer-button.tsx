@@ -10,12 +10,14 @@ interface RerunAnswerButtonProps {
   interviewId: string
   questionIndex: number
   disabled?: boolean
+  onSuccess?: () => void
 }
 
 export function RerunAnswerButton({
   interviewId,
   questionIndex,
   disabled,
+  onSuccess,
 }: RerunAnswerButtonProps) {
   const t = useTranslations('assessments.rerun')
   const toastMessages = useToastMessages()
@@ -27,6 +29,7 @@ export function RerunAnswerButton({
       size="sm"
       variant="outline-pill"
       iconSize="sm"
+      onSuccess={onSuccess}
       idleLabel={t('answer')}
       submittedLabel={t('queued')}
       startingLabel={t('starting')}

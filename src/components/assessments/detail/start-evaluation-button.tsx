@@ -1,52 +1,45 @@
 'use client'
 
+import { Sparkles } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 import { RerunButton } from '@/components/assessments/detail/rerun-button'
 import { validateInterview } from '@/lib/api'
 import { useToastMessages } from '@/lib/use-toast-messages'
 
-interface RerunAllButtonProps {
+interface StartEvaluationButtonProps {
   interviewId: string
   disabled?: boolean
   size?: 'sm' | 'lg' | 'hero'
   variant?: 'gradient' | 'outline-pill'
-  label?: string
   onSuccess?: () => void
 }
 
-export function RerunAllButton({
+export function StartEvaluationButton({
   interviewId,
   disabled,
-  size = 'sm',
+  size = 'lg',
   variant = 'gradient',
-  label,
   onSuccess,
-}: RerunAllButtonProps) {
+}: StartEvaluationButtonProps) {
   const t = useTranslations('assessments.rerun')
   const toastMessages = useToastMessages()
-  const idleLabel = label ?? t('all')
 
   return (
     <RerunButton
-      toastId={`rerun-all-${interviewId}`}
+      toastId={`start-evaluation-${interviewId}`}
       disabled={disabled}
       size={size}
       variant={variant}
+      icon={<Sparkles />}
       onSuccess={onSuccess}
-      idleLabel={idleLabel}
+      idleLabel={t('start')}
       submittedLabel={t('queued')}
       startingLabel={t('starting')}
       errorTitle={toastMessages.rerun.startFailedTitle}
       errorFallback={toastMessages.rerun.allFailedFallback}
       onRun={async () => {
-        const res = await validateInterview(interviewId, { force: true })
-        if (res.requestedCount === 0) {
-          return {
-            title: toastMessages.rerun.nothingToReevaluateTitle,
-            message: toastMessages.rerun.nothingToReevaluateMessage,
-          }
-        }
+        await validateInterview(interviewId, { force: false })
         return undefined
       }}
     />
