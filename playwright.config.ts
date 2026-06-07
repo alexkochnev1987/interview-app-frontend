@@ -2,6 +2,9 @@ import { defineConfig, devices } from '@playwright/test'
 import path from 'node:path'
 
 const baseURL = process.env.E2E_BASE_URL ?? 'http://localhost:3001'
+const mockApiPort = process.env.E2E_MOCK_API_PORT ?? '3000'
+const mockApiUrl = `http://localhost:${mockApiPort}`
+const backendUrl = process.env.BACKEND_URL ?? mockApiUrl
 
 const browser = {
   ...devices['Desktop Chrome'],
@@ -25,10 +28,14 @@ export default defineConfig({
     : [
         {
           command: 'node scripts/e2e-start-mock-api.mjs',
-          url: 'http://localhost:3000/health',
+          url: `${mockApiUrl}/health`,
           reuseExistingServer: !process.env.CI,
           timeout: 60_000,
           cwd: path.resolve(__dirname),
+          env: {
+            ...process.env,
+            E2E_MOCK_API_PORT: mockApiPort,
+          },
         },
         {
           command: process.env.CI
@@ -40,8 +47,8 @@ export default defineConfig({
           cwd: path.resolve(__dirname),
           env: {
             ...process.env,
-            BACKEND_URL: process.env.BACKEND_URL ?? 'http://localhost:3000',
-            E2E_MOCK_API_PORT: process.env.E2E_MOCK_API_PORT ?? '3000',
+            BACKEND_URL: backendUrl,
+            E2E_MOCK_API_PORT: mockApiPort,
           },
         },
       ],
