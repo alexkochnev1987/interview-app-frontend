@@ -30,8 +30,6 @@ jobs:
       CI: true
       BACKEND_URL: http://localhost:3000
       E2E_BASE_URL: http://localhost:3001
-      E2E_EMAIL: admin@interview-app.com
-      E2E_PASSWORD: admin123
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
