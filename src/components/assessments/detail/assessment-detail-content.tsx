@@ -4,12 +4,13 @@ import { useCallback } from 'react'
 import { Sparkles } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
+import { EvaluationActionsProvider } from '@/components/assessments/actions/evaluation-actions-context'
+import { RerunAllButton } from '@/components/assessments/actions/rerun-all-button'
+import { StartEvaluationButton } from '@/components/assessments/actions/start-evaluation-button'
 import { DetailHeader } from '@/components/assessments/detail/detail-header'
-import { EvaluationProgressBanner } from '@/components/assessments/detail/evaluation-progress-banner'
+import { EvaluationStatusBanner } from '@/components/assessments/detail/evaluation-status-banner'
 import { OverallPanel } from '@/components/assessments/detail/overall-panel'
 import { QuestionSection } from '@/components/assessments/detail/question-section'
-import { RerunAllButton } from '@/components/assessments/detail/rerun-all-button'
-import { StartEvaluationButton } from '@/components/assessments/detail/start-evaluation-button'
 import { LiveRefreshNotice } from '@/components/assessments/live-refresh-notice'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Card, CardContent } from '@/components/ui/card'
@@ -20,15 +21,16 @@ import { Section } from '@/components/ui/layout/section'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText, SectionHeading } from '@/components/ui/text'
 import { getInterview, type Interview } from '@/lib/api'
-import { deriveReviewStatus } from '@/lib/assessment-status'
+import {
+  canRerunReview,
+  deriveReviewStatus,
+  isScoring,
+  isValidationInFlight,
+} from '@/lib/assessment-status'
 import { useLivePolling } from '@/lib/use-live-polling'
 
 interface AssessmentDetailContentProps {
   initialInterview: Interview
-}
-
-function scoringKey(interview: Interview): string {
-  return deriveReviewStatus(interview) === 'scoring' ? interview.id : ''
 }
 
 export function AssessmentDetailContent({
@@ -38,23 +40,22 @@ export function AssessmentDetailContent({
   const interviewId = initialInterview.id
 
   const fetcher = useCallback(() => getInterview(interviewId), [interviewId])
-  const { data: interview, refresh, paused } = useLivePolling(
+  const { data: interview, refresh, kick, paused } = useLivePolling(
     initialInterview,
     fetcher,
-    scoringKey,
+    isScoring,
   )
 
+  const onEvaluationStarted = useCallback(() => {
+    kick()
+    void refresh()
+  }, [kick, refresh])
+
   const reviewStatus = deriveReviewStatus(interview)
-  const validationInFlight = interview.answers.some(
-    (a) =>
-      a.validation?.status === 'queued' || a.validation?.status === 'processing',
-  )
+  const validationInFlight = isValidationInFlight(interview)
   const isFailed = reviewStatus === 'failed'
   const isReadyToScore = reviewStatus === 'ready_to_score'
-  const canRerun =
-    reviewStatus === 'ready' ||
-    reviewStatus === 'scoring' ||
-    reviewStatus === 'failed'
+  const canRerun = canRerunReview(reviewStatus)
 
   const answersByIndex = new Map(
     interview.answers.map((a) => [a.questionIndex, a]),
@@ -66,12 +67,10 @@ export function AssessmentDetailContent({
   }))
 
   return (
-    <>
+    <EvaluationActionsProvider onEvaluationStarted={onEvaluationStarted}>
       <DetailHeader interview={interview} />
 
-      {!isReadyToScore ? (
-        <EvaluationProgressBanner interview={interview} />
-      ) : null}
+      {!isReadyToScore ? <EvaluationStatusBanner interview={interview} /> : null}
 
       {paused ? <LiveRefreshNotice onRefresh={refresh} /> : null}
 
@@ -80,7 +79,7 @@ export function AssessmentDetailContent({
           <CardContent spacing="lg">
             <Inline gap={4} align="center" justify="between" wrap="wrap">
               <Inline gap={4} align="center">
-                <Icon size="lg" className="text-[hsl(var(--primary))]">
+                <Icon size="lg" tone="primary">
                   <Sparkles />
                 </Icon>
                 <Stack gap={1.5}>
@@ -92,11 +91,7 @@ export function AssessmentDetailContent({
                   </BodyText>
                 </Stack>
               </Inline>
-              <StartEvaluationButton
-                interviewId={interviewId}
-                size="lg"
-                onSuccess={refresh}
-              />
+              <StartEvaluationButton interviewId={interviewId} size="lg" />
             </Inline>
           </CardContent>
         </Card>
@@ -140,7 +135,6 @@ export function AssessmentDetailContent({
               interviewId={interviewId}
               size="sm"
               disabled={validationInFlight}
-              onSuccess={refresh}
             />
           ) : null}
         </Inline>
@@ -154,11 +148,10 @@ export function AssessmentDetailContent({
               question={question}
               answer={answer}
               canRerun={canRerun}
-              onSuccess={refresh}
             />
           ))}
         </Stack>
       </Section>
-    </>
+    </EvaluationActionsProvider>
   )
 }

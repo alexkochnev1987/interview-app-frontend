@@ -15,15 +15,20 @@ import { PillRow } from '@/components/ui/pill-row'
 import { StatusPill } from '@/components/ui/status-pill'
 import { BodyText, SectionHeading } from '@/components/ui/text'
 import { TranscriptBlock } from '@/components/ui/transcript-block'
+import { RerunAnswerButton } from '@/components/assessments/actions/rerun-answer-button'
 import { LazyMediaPlayback } from '@/components/assessments/detail/lazy-media-playback'
-import { RerunAnswerButton } from '@/components/assessments/detail/rerun-answer-button'
 import {
   type Answer,
   type AnswerDecisionHint,
   type InterviewQuestion,
 } from '@/lib/api'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
-import { behaviorRiskTone } from '@/lib/assessment-status'
+import {
+  answerStateTone,
+  behaviorRiskTone,
+  deriveAnswerState,
+  type AnswerState,
+} from '@/lib/assessment-status'
 
 interface QuestionSectionProps {
   interviewId: string
@@ -31,7 +36,6 @@ interface QuestionSectionProps {
   question: InterviewQuestion
   answer: Answer | undefined
   canRerun: boolean
-  onSuccess?: () => void
 }
 
 function decisionHintTone(hint: AnswerDecisionHint | undefined) {
@@ -41,26 +45,12 @@ function decisionHintTone(hint: AnswerDecisionHint | undefined) {
   return 'neutral' as const
 }
 
-function answerStateTone(answer: Answer | undefined) {
-  if (!answer) return 'pending' as const
-  if (answer.validation?.status === 'failed') return 'failed' as const
-  if (
-    answer.validation?.status === 'queued' ||
-    answer.validation?.status === 'processing'
-  ) {
-    return 'processing' as const
-  }
-  if (answer.evaluation?.overallScore !== undefined) return 'completed' as const
-  return 'in_progress' as const
-}
-
 export function QuestionSection({
   interviewId,
   questionIndex,
   question,
   answer,
   canRerun,
-  onSuccess,
 }: QuestionSectionProps) {
   const t = useTranslations('assessments.question')
   const sharedLabels = useSharedLabels()
@@ -72,17 +62,19 @@ export function QuestionSection({
     return t('decisionNone')
   }
 
-  function answerStateLabel(answer: Answer | undefined) {
-    if (!answer) return t('noAnswerSubmitted')
-    if (answer.validation?.status === 'failed') return t('scoringFailed')
-    if (
-      answer.validation?.status === 'queued' ||
-      answer.validation?.status === 'processing'
-    ) {
-      return t('scoringInProgress')
+  function answerStateLabel(state: AnswerState) {
+    switch (state) {
+      case 'none':
+        return t('noAnswerSubmitted')
+      case 'failed':
+        return t('scoringFailed')
+      case 'scoring':
+        return t('scoringInProgress')
+      case 'scored':
+        return t('scored')
+      case 'awaiting':
+        return t('awaitingEvaluation')
     }
-    if (answer.evaluation?.overallScore !== undefined) return t('scored')
-    return t('awaitingEvaluation')
   }
 
   const evaluation = answer?.evaluation
@@ -91,8 +83,9 @@ export function QuestionSection({
   const hasScreen = Boolean(
     answer?.screenMediaKey || answer?.screen?.mediaKey,
   )
-  const stateTone = answerStateTone(answer)
-  const stateLabel = answerStateLabel(answer)
+  const answerState = deriveAnswerState(answer)
+  const stateTone = answerStateTone(answerState)
+  const stateLabel = answerStateLabel(answerState)
   const conceptIdToLabel = new Map(
     question.expectedConcepts.map((concept) => [concept.id, concept.label]),
   )
@@ -287,11 +280,7 @@ export function QuestionSection({
               <RerunAnswerButton
                 interviewId={interviewId}
                 questionIndex={questionIndex}
-                disabled={
-                  answer.validation?.status === 'queued' ||
-                  answer.validation?.status === 'processing'
-                }
-                onSuccess={onSuccess}
+                disabled={answerState === 'scoring'}
               />
             </Inline>
           ) : null}

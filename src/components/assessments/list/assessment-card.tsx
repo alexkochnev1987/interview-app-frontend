@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl'
 
-import { StartEvaluationButton } from '@/components/assessments/detail/start-evaluation-button'
+import { StartEvaluationButton } from '@/components/assessments/actions/start-evaluation-button'
 import {
   Card,
   CardContent,
@@ -28,24 +28,27 @@ import { formatInterviewDate } from '@/lib/interview-formatters'
 
 interface AssessmentCardProps {
   interview: Interview
-  onSuccess?: () => void
 }
 
-export function AssessmentCard({ interview, onSuccess }: AssessmentCardProps) {
+export function AssessmentCard({ interview }: AssessmentCardProps) {
   const t = useTranslations('assessments.list')
   const sharedLabels = useSharedLabels()
   const reviewStatus = deriveReviewStatus(interview)
   const completion = getCompletionDate(interview)
-  const overallScore = interview.result?.overallScore ?? null
+  const overallScore = interview.result?.overallScore
   const decision = interview.result?.decision ?? null
   const isReadyToScore = reviewStatus === 'ready_to_score'
 
   return (
     <Card variant="surface" height="full" interaction="hover">
-      {/* The link uses display:contents so the header + metrics stay direct
-          flex children of the Card (no overlay, no stacking/hover conflict).
-          The Start button is a sibling — not nested in the anchor. */}
-      <UnstyledLink href={`/assessments/${interview.id}`} className="contents">
+      {/* display="contents" keeps the header + metrics as direct layout children
+          of the Card (no overlay, no stacking or hover conflict). The Start
+          button stays a sibling and is never nested inside the anchor. */}
+      <UnstyledLink
+        href={`/assessments/${interview.id}`}
+        display="contents"
+        aria-label={interview.candidateName}
+      >
         <CardHeader spacing="md">
           <PillRow>
             <StatusPill tone={reviewStatusTone(reviewStatus)} casing="chip">
@@ -67,7 +70,9 @@ export function AssessmentCard({ interview, onSuccess }: AssessmentCardProps) {
             <MetricPanel
               tone="compact"
               label={t('overallScore')}
-              value={overallScore != null ? Math.round(overallScore) : '—'}
+              value={
+                overallScore !== undefined ? Math.round(overallScore) : '—'
+              }
               valueSize="md"
             />
             <MetricPanel
@@ -81,11 +86,7 @@ export function AssessmentCard({ interview, onSuccess }: AssessmentCardProps) {
       </UnstyledLink>
       {isReadyToScore ? (
         <CardContent>
-          <StartEvaluationButton
-            interviewId={interview.id}
-            size="sm"
-            onSuccess={onSuccess}
-          />
+          <StartEvaluationButton interviewId={interview.id} size="sm" />
         </CardContent>
       ) : null}
     </Card>

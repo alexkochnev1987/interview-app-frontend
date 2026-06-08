@@ -4,6 +4,7 @@ import { useCallback, useDeferredValue, useMemo, useState } from 'react'
 import { Search } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
+import { EvaluationActionsProvider } from '@/components/assessments/actions/evaluation-actions-context'
 import { AssessmentCard } from '@/components/assessments/list/assessment-card'
 import {
   AssessmentsListToolbar,
@@ -18,20 +19,13 @@ import { getInterviews, type Interview } from '@/lib/api'
 import {
   compareAssessmentsByCompletion,
   deriveReviewStatus,
+  hasScoringInProgress,
   isHrVisibleAssessment,
 } from '@/lib/assessment-status'
 import { useLivePolling } from '@/lib/use-live-polling'
 
 interface AssessmentsListClientProps {
   interviews: Interview[]
-}
-
-function scoringKey(interviews: Interview[]): string {
-  return interviews
-    .filter((interview) => deriveReviewStatus(interview) === 'scoring')
-    .map((interview) => interview.id)
-    .sort()
-    .join(',')
 }
 
 function matchesQuery(interview: Interview, normalizedQuery: string): boolean {
@@ -55,11 +49,16 @@ export function AssessmentsListClient({
         .sort(compareAssessmentsByCompletion),
     [],
   )
-  const { data: interviews, refresh, paused } = useLivePolling(
+  const { data: interviews, refresh, kick, paused } = useLivePolling(
     initialInterviews,
     fetcher,
-    scoringKey,
+    hasScoringInProgress,
   )
+
+  const onEvaluationStarted = useCallback(() => {
+    kick()
+    void refresh()
+  }, [kick, refresh])
 
   const filtered = useMemo(() => {
     const normalizedQuery = deferredQuery.trim().toLowerCase()
@@ -72,41 +71,39 @@ export function AssessmentsListClient({
   }, [interviews, status, deferredQuery])
 
   return (
-    <Stack gap={6}>
-      <AssessmentsListToolbar
-        query={query}
-        onQueryChange={setQuery}
-        status={status}
-        onStatusChange={setStatus}
-      />
-
-      {paused ? <LiveRefreshNotice onRefresh={refresh} /> : null}
-
-      {filtered.length === 0 ? (
-        <EmptyStateCard
-          icon={<Icon size="lg"><Search /></Icon>}
-          title={
-            interviews.length === 0
-              ? t('emptyTitle')
-              : t('emptyFilteredTitle')
-          }
-          description={
-            interviews.length === 0
-              ? t('emptyDescription')
-              : t('emptyFilteredDescription')
-          }
+    <EvaluationActionsProvider onEvaluationStarted={onEvaluationStarted}>
+      <Stack gap={6}>
+        <AssessmentsListToolbar
+          query={query}
+          onQueryChange={setQuery}
+          status={status}
+          onStatusChange={setStatus}
         />
-      ) : (
-        <CardGrid>
-          {filtered.map((interview) => (
-            <AssessmentCard
-              key={interview.id}
-              interview={interview}
-              onSuccess={refresh}
-            />
-          ))}
-        </CardGrid>
-      )}
-    </Stack>
+
+        {paused ? <LiveRefreshNotice onRefresh={refresh} /> : null}
+
+        {filtered.length === 0 ? (
+          <EmptyStateCard
+            icon={<Icon size="lg"><Search /></Icon>}
+            title={
+              interviews.length === 0
+                ? t('emptyTitle')
+                : t('emptyFilteredTitle')
+            }
+            description={
+              interviews.length === 0
+                ? t('emptyDescription')
+                : t('emptyFilteredDescription')
+            }
+          />
+        ) : (
+          <CardGrid>
+            {filtered.map((interview) => (
+              <AssessmentCard key={interview.id} interview={interview} />
+            ))}
+          </CardGrid>
+        )}
+      </Stack>
+    </EvaluationActionsProvider>
   )
 }
