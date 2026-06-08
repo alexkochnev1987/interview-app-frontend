@@ -11,6 +11,13 @@ const browser = {
   ...(process.env.CI ? {} : { channel: 'chrome' as const }),
 }
 
+const frontendServerCommand =
+  process.env.E2E_PREBUILT === '1'
+    ? 'npx next start -p 3001'
+    : process.env.CI
+      ? 'npm run build && npx next start -p 3001'
+      : 'npm run dev:server'
+
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: false,
@@ -38,9 +45,7 @@ export default defineConfig({
           },
         },
         {
-          command: process.env.CI
-            ? 'npm run build && npx next start -p 3001'
-            : 'npm run dev:server',
+          command: frontendServerCommand,
           url: `${baseURL}/login`,
           reuseExistingServer: !process.env.CI,
           timeout: 120_000,
