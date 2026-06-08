@@ -6,46 +6,60 @@ import { useTranslations } from 'next-intl'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Icon } from '@/components/ui/icon'
 import { type Interview } from '@/lib/api'
+import { deriveAnswerState } from '@/lib/assessment-status'
 
-interface EvaluationProgressBannerProps {
+interface EvaluationStatusBannerProps {
   interview: Interview
 }
 
 interface Counts {
   total: number
   scored: number
-  queued: number
-  processing: number
+  scoring: number
   failed: number
   awaiting: number
 }
 
 function countAnswers(interview: Interview): Counts {
   const submitted = interview.answers.filter((a) => a.status === 'submitted')
-  let scored = 0
-  let queued = 0
-  let processing = 0
-  let failed = 0
-  let awaiting = 0
-  for (const a of submitted) {
-    if (a.validation?.status === 'queued') queued += 1
-    else if (a.validation?.status === 'processing') processing += 1
-    else if (a.validation?.status === 'failed') failed += 1
-    else if (a.evaluation?.overallScore !== undefined) scored += 1
-    else awaiting += 1
+  const counts: Counts = {
+    total: submitted.length,
+    scored: 0,
+    scoring: 0,
+    failed: 0,
+    awaiting: 0,
   }
-  return { total: submitted.length, scored, queued, processing, failed, awaiting }
+  for (const answer of submitted) {
+    switch (deriveAnswerState(answer)) {
+      case 'scored':
+        counts.scored += 1
+        break
+      case 'scoring':
+        counts.scoring += 1
+        break
+      case 'failed':
+        counts.failed += 1
+        break
+      default:
+        counts.awaiting += 1
+    }
+  }
+  return counts
 }
 
-export function EvaluationProgressBanner({
+/**
+ * Surfaces an attention-worthy scoring state (all failed, some failed, or
+ * submitted-but-none-scored). It deliberately renders nothing for the happy and
+ * in-flight cases, which are communicated elsewhere (status pill, live loop).
+ */
+export function EvaluationStatusBanner({
   interview,
-}: EvaluationProgressBannerProps) {
+}: EvaluationStatusBannerProps) {
   const t = useTranslations('assessments.banner')
   const counts = countAnswers(interview)
-  const inFlight = counts.queued + counts.processing > 0
 
   if (counts.total === 0) return null
-  if (inFlight) return null
+  if (counts.scoring > 0) return null
   if (interview.status === 'failed') return null
 
   if (counts.failed > 0 && counts.scored === 0) {
