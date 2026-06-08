@@ -1,6 +1,6 @@
 'use client'
 
-import { RefreshCw, ShieldAlert } from 'lucide-react'
+import { CirclePause, RefreshCw } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -13,17 +13,17 @@ interface LiveRefreshNoticeProps {
 }
 
 export function LiveRefreshNotice({ onRefresh }: LiveRefreshNoticeProps) {
-  const t = useTranslations('assessments.banner')
+  const t = useTranslations('assessments.liveRefresh')
 
   return (
     <Alert variant="warning">
       <Icon size="md">
-        <ShieldAlert />
+        <CirclePause />
       </Icon>
-      <AlertTitle>{t('slowTitle')}</AlertTitle>
+      <AlertTitle>{t('title')}</AlertTitle>
       <AlertDescription>
         <Inline gap={3} align="center" wrap="wrap">
-          <span>{t('slowDescription')}</span>
+          <span>{t('description')}</span>
           <Button
             type="button"
             variant="outline-pill"
@@ -34,7 +34,7 @@ export function LiveRefreshNotice({ onRefresh }: LiveRefreshNoticeProps) {
             <Icon size="md">
               <RefreshCw />
             </Icon>
-            {t('refreshNow')}
+            {t('refresh')}
           </Button>
         </Inline>
       </AlertDescription>

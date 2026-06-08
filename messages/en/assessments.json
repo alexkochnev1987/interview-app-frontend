@@ -29,10 +29,12 @@
       "scorecardEyebrow": "Scorecard",
       "scorecardHeading": "Overall result"
     },
+    "liveRefresh": {
+      "title": "Live updates are paused",
+      "description": "We stopped checking for new scoring updates. Refresh to load the latest status.",
+      "refresh": "Refresh now"
+    },
     "banner": {
-      "slowTitle": "Scoring is taking longer than usual",
-      "slowDescription": "Live updates are paused. Refresh to load the latest scoring status.",
-      "refreshNow": "Refresh now",
       "allFailedTitle": "AI scoring failed for every answer",
       "allFailedDescription": "None of the {total} submitted answers produced an evaluation. See the per-question error messages below for details, then re-run once the underlying issue is resolved.",
       "someFailedTitle": "Some answers failed to score",

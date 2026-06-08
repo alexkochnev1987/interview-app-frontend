@@ -29,10 +29,12 @@
       "scorecardEyebrow": "Karta wyników",
       "scorecardHeading": "Wynik ogólny"
     },
+    "liveRefresh": {
+      "title": "Aktualizacje na żywo są wstrzymane",
+      "description": "Przestaliśmy sprawdzać nowe aktualizacje oceny. Odśwież, aby załadować najnowszy status.",
+      "refresh": "Odśwież teraz"
+    },
     "banner": {
-      "slowTitle": "Punktowanie trwa dłużej niż zwykle",
-      "slowDescription": "Aktualizacje na żywo są wstrzymane. Odśwież, aby załadować najnowszy status oceny.",
-      "refreshNow": "Odśwież teraz",
       "allFailedTitle": "Ocena AI nie powiodła się w przypadku każdej odpowiedzi",
       "allFailedDescription": "Żadna z przesłanych odpowiedzi {total} nie dała oceny. Aby uzyskać szczegółowe informacje, zapoznaj się z komunikatami o błędach poszczególnych pytań poniżej, a następnie uruchom ponownie po rozwiązaniu podstawowego problemu.",
       "someFailedTitle": "Niektóre odpowiedzi nie zostały ocenione",
