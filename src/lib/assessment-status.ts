@@ -1,4 +1,5 @@
 import type {
+  Answer,
   Interview,
   InterviewBehaviorRisk,
   InterviewDecision,
@@ -23,16 +24,55 @@ export type ReviewStatusTone =
 
 export type DecisionTone = 'completed' | 'pending' | 'failed'
 
+/**
+ * The logical state of a single answer's AI scoring. This is the single source
+ * of truth for "what is happening with this answer" and must be the only place
+ * that interprets `validation.status` + `evaluation.overallScore` together.
+ */
+export type AnswerState = 'none' | 'awaiting' | 'scoring' | 'scored' | 'failed'
+
+export type AnswerStateTone =
+  | 'pending'
+  | 'in_progress'
+  | 'processing'
+  | 'completed'
+  | 'failed'
+
 function assertNever(value: never): never {
   throw new Error(`Unhandled interview status: ${String(value)}`)
 }
 
-function isValidationInFlight(interview: Interview): boolean {
+export function deriveAnswerState(answer: Answer | undefined): AnswerState {
+  if (!answer) return 'none'
+  const validationStatus = answer.validation?.status
+  if (validationStatus === 'failed') return 'failed'
+  if (validationStatus === 'queued' || validationStatus === 'processing') {
+    return 'scoring'
+  }
+  if (answer.evaluation?.overallScore !== undefined) return 'scored'
+  return 'awaiting'
+}
+
+export function answerStateTone(state: AnswerState): AnswerStateTone {
+  switch (state) {
+    case 'failed':
+      return 'failed'
+    case 'scoring':
+      return 'processing'
+    case 'scored':
+      return 'completed'
+    case 'awaiting':
+      return 'in_progress'
+    case 'none':
+      return 'pending'
+    default:
+      return assertNever(state)
+  }
+}
+
+export function isValidationInFlight(interview: Interview): boolean {
   return interview.answers.some(
-    (a) =>
-      a.status === 'submitted' &&
-      (a.validation?.status === 'queued' ||
-        a.validation?.status === 'processing'),
+    (a) => a.status === 'submitted' && deriveAnswerState(a) === 'scoring',
   )
 }
 
@@ -69,6 +109,24 @@ export function deriveReviewStatus(interview: Interview): ReviewStatus {
     default:
       return assertNever(interview.status)
   }
+}
+
+/**
+ * Whether the reviewer may (re)trigger AI evaluation from the current review
+ * state. Pending/awaiting-candidate and mid-interview states are not rerunnable.
+ */
+export function canRerunReview(status: ReviewStatus): boolean {
+  return status === 'ready' || status === 'scoring' || status === 'failed'
+}
+
+/** A single interview is actively being scored and worth live-polling. */
+export function isScoring(interview: Interview): boolean {
+  return deriveReviewStatus(interview) === 'scoring'
+}
+
+/** Any interview in the list is actively being scored. */
+export function hasScoringInProgress(interviews: Interview[]): boolean {
+  return interviews.some(isScoring)
 }
 
 export function reviewStatusLabel(status: ReviewStatus): string {
