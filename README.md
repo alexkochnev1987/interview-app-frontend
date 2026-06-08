@@ -55,7 +55,7 @@ Durations below are full **job wall time** in GitHub Actions (checkout, `npm ci`
 | Job | When | Duration |
 |-----|------|----------|
 | Frontend `test` (lint + Vitest + build) | every PR and push | ~1–2 min |
-| Frontend `e2e` (mock API, Next build, Playwright) | every PR and push, nightly, manual | ~1–2 min |
+| Frontend `e2e` (mock API, Next build, Playwright) | every PR and push, manual | ~1–2 min |
 | Backend `test` (lint + build + unit + integration) | backend PR/push | ~3–5 min |
 
 PRs run frontend `test` and `e2e` in parallel. Vitest integration covers middleware/RBAC and server auth gates; E2E keeps one browser smoke so routing failures block merge before code reaches `develop`.
