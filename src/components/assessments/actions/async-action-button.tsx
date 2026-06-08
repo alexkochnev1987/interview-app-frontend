@@ -13,7 +13,6 @@ import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { ApiError } from '@/lib/api'
 import { notifyError, notifyInfo } from '@/lib/toast'
-import { useToastMessages } from '@/lib/use-toast-messages'
 
 const SUCCESS_AUTORESET_MS = 2500
 
@@ -21,20 +20,23 @@ type ButtonVariant = ComponentProps<typeof Button>['variant']
 type ButtonSize = ComponentProps<typeof Button>['size']
 type IconSize = ComponentProps<typeof Icon>['size']
 
-interface RerunInfo {
+interface ActionInfo {
   title: string
   message: string
 }
 
-type RerunResult = RerunInfo | undefined
+type ActionResult = ActionInfo | undefined
 
-interface RerunButtonProps {
-  onRun: () => Promise<RerunResult>
+interface AsyncActionButtonProps {
+  /** Runs the action. Return an info payload to surface a toast on success. */
+  onRun: () => Promise<ActionResult>
   idleLabel: string
   submittedLabel: string
   startingLabel: string
   errorTitle: string
   errorFallback: string
+  /** Title shown when the backend reports the work is already running (409). */
+  inProgressTitle: string
   variant?: ButtonVariant
   size?: ButtonSize
   iconSize?: IconSize
@@ -44,13 +46,20 @@ interface RerunButtonProps {
   onSuccess?: () => void
 }
 
-export function RerunButton({
+/**
+ * A button for a one-shot async backend action with built-in phase handling
+ * (idle -> submitting -> submitted -> idle), 409 "already running" handling,
+ * and unmount safety. It is intentionally domain-agnostic; callers supply all
+ * labels and toast copy.
+ */
+export function AsyncActionButton({
   onRun,
   idleLabel,
   submittedLabel,
   startingLabel,
   errorTitle,
   errorFallback,
+  inProgressTitle,
   variant = 'outline-pill',
   size = 'sm',
   iconSize = 'md',
@@ -58,8 +67,7 @@ export function RerunButton({
   disabled,
   toastId,
   onSuccess,
-}: RerunButtonProps) {
-  const toastMessages = useToastMessages()
+}: AsyncActionButtonProps) {
   const [phase, setPhase] = useState<'idle' | 'submitting' | 'submitted'>(
     'idle',
   )
@@ -87,7 +95,7 @@ export function RerunButton({
     } catch (err) {
       if (!mountedRef.current) return
       if (err instanceof ApiError && err.status === 409) {
-        notifyInfo(toastMessages.rerun.alreadyInProgressTitle, {
+        notifyInfo(inProgressTitle, {
           id: toastId ? `${toastId}-already-in-progress` : undefined,
           description: err.message,
         })
