@@ -36,15 +36,20 @@ export function useLivePolling<T>(
   // Resync to fresh server-provided data (navigation / router.refresh) without
   // an effect. Reference comparison is intentional: a new prop means new data.
   const [syncedFrom, setSyncedFrom] = useState(initial)
-  if (syncedFrom !== initial) {
-    setSyncedFrom(initial)
-    setData(initial)
-  }
-
   const [paused, setPaused] = useState(false)
   const [kicking, setKicking] = useState(false)
   const inFlightRef = useRef(false)
   const failuresRef = useRef(0)
+  const [visible, setVisible] = useState(true)
+  if (syncedFrom !== initial) {
+    setSyncedFrom(initial)
+    setData(initial)
+    // Fresh authoritative data clears any prior pause/kick state so a lingering
+    // "paused" notice does not survive a navigation or router refresh. The
+    // failure counter is re-zeroed by the polling effect when it re-arms.
+    setPaused(false)
+    setKicking(false)
+  }
 
   const refresh = useCallback(async () => {
     if (inFlightRef.current) return
@@ -76,10 +81,21 @@ export function useLivePolling<T>(
     return () => clearTimeout(id)
   }, [kicking])
 
-  const active = !paused && (shouldPoll(data) || kicking)
+  // Pause the loop while the tab is hidden; resume (and refresh) on return.
+  useEffect(() => {
+    const sync = () => setVisible(document.visibilityState !== 'hidden')
+    sync()
+    document.addEventListener('visibilitychange', sync)
+    return () => document.removeEventListener('visibilitychange', sync)
+  }, [])
+
+  const active = !paused && visible && (shouldPoll(data) || kicking)
   useEffect(() => {
     if (!active) return
     failuresRef.current = 0
+    // Fetch once up front so an already-active assessment updates on open or on
+    // returning to the tab, instead of waiting a full interval.
+    const leading = setTimeout(() => void refresh(), 0)
     const startedAt = Date.now()
     const id = setInterval(() => {
       if (Date.now() - startedAt >= MAX_POLL_DURATION_MS) {
@@ -88,7 +104,10 @@ export function useLivePolling<T>(
       }
       void refresh()
     }, REFRESH_INTERVAL_MS)
-    return () => clearInterval(id)
+    return () => {
+      clearTimeout(leading)
+      clearInterval(id)
+    }
   }, [active, refresh])
 
   return { data, refresh, kick, paused }
