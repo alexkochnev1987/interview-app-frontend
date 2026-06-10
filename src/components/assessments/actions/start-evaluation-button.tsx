@@ -40,7 +40,13 @@ export function StartEvaluationButton({
       errorFallback={toastMessages.rerun.allFailedFallback}
       inProgressTitle={toastMessages.rerun.alreadyInProgressTitle}
       onRun={async () => {
-        await validateInterview(interviewId, { force: false })
+        const res = await validateInterview(interviewId, { force: false })
+        if (res.requestedCount === 0) {
+          return {
+            title: toastMessages.rerun.nothingToReevaluateTitle,
+            message: toastMessages.rerun.nothingToReevaluateMessage,
+          }
+        }
         return undefined
       }}
     />
