@@ -1,8 +1,8 @@
 import createClient from 'openapi-fetch';
 import { paths, components } from './api-types';
-import { ApiError } from './api-error';
+import { ApiError, QuestionInUseError } from './api-error';
 
-export { ApiError } from './api-error';
+export { ApiError, QuestionInUseError };
 
 const client = createClient<paths>({
   baseUrl: '/api',
@@ -196,12 +196,6 @@ export async function updateQuestion(
   }));
 }
 
-export class QuestionInUseError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'QuestionInUseError';
-  }
-}
 
 export async function deleteQuestion(
   id: string,

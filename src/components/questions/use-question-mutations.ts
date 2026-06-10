@@ -35,7 +35,9 @@ function useQuestionMutationResources() {
   const toastMessages=useToastMessages()
 
   const notifyMutationError= (title: string, error:unknown)=>{
-    notifyError(title, {description:getErrorMessage(error)})
+    notifyError(title, {
+      description: getErrorMessage(error, toastMessages.defaults.error),
+    })
   }
 
   const notifyMutationSuccess= (message:string)=>{

@@ -1,5 +1,3 @@
-import { QuestionInUseError } from '@/lib/api'
-
 export class ApiError extends Error {
   constructor(
     public readonly status: number,
@@ -9,6 +7,13 @@ export class ApiError extends Error {
   ) {
     super(message)
     this.name = 'ApiError'
+  }
+}
+
+export class QuestionInUseError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'QuestionInUseError'
   }
 }
 
@@ -25,7 +30,7 @@ export function getErrorMessage(err: unknown,fallback?:string): string|undefined
   if(err instanceof Error && err.message.trim().length>0){
     return err.message
   }
-  return fallback ?? 'Something went wrong'
+  return fallback
 }
 
 export function getDeleteQuestionErrorTitle(
