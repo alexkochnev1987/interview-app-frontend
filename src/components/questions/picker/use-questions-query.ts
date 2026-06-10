@@ -33,7 +33,8 @@ import {
 import { questionsListQueryKey } from './query-keys'
 import { isPlaceholderLoading, useVoidCallback } from './query-hook-helpers'
 import { splitListQueryErrors } from './split-questions-query-errors'
-import {getErrorMessage} from "@/lib/api-error";
+import {getErrorMessage} from '@/lib/api-error';
+import { useToastMessages } from '@/lib/use-toast-messages'
 
 const SEARCH_DEBOUNCE_MS = 300
 const VIEW_STORAGE_KEY = 'questions:view'
@@ -130,6 +131,8 @@ export function useQuestionsQuery(
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
+  const toastMessages = useToastMessages()
+
   const [state, setState] = useState<QuestionsQueryState>(() => {
     const base = withLockedDefaults(capturedInitial, lockStatus)
     const start =
@@ -208,7 +211,7 @@ export function useQuestionsQuery(
 
   const items = query.data?.items ?? []
   const loading = isPlaceholderLoading(query)
-  const errorMessage = getErrorMessage(query.error) ?? null
+  const errorMessage = getErrorMessage(query.error, toastMessages.questions.loadFailedFallback) ?? null
   const { blockingError, paginationError } = splitListQueryErrors(
     errorMessage,
     items.length,

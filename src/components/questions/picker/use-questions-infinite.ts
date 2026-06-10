@@ -11,7 +11,8 @@ import {
 import { questionsInfiniteQueryKey } from './query-keys'
 import { useVoidCallback } from './query-hook-helpers'
 import { splitInfiniteQueryErrors } from './split-questions-query-errors'
-import {getErrorMessage} from "@/lib/api-error";
+import {getErrorMessage} from '@/lib/api-error';
+import { useToastMessages } from '@/lib/use-toast-messages'
 
 export type UseQuestionsInfiniteOptions = {
   params: Omit<FetchQuestionsParams, 'page'>
@@ -37,6 +38,7 @@ export function useQuestionsInfinite({
   enabled,
   serverHydrated,
 }: UseQuestionsInfiniteOptions): UseQuestionsInfiniteResult {
+  const toastMessages = useToastMessages()
   const query = useInfiniteQuery({
     queryKey: questionsInfiniteQueryKey(params),
     queryFn: ({ pageParam, signal }) =>
@@ -60,7 +62,7 @@ export function useQuestionsInfinite({
   const fetchNextPage = useVoidCallback(query.fetchNextPage)
   const refetch = useVoidCallback(query.refetch)
 
-  const errorMessage = getErrorMessage(query.error) ?? null
+  const errorMessage = getErrorMessage(query.error, toastMessages.questions.loadFailedFallback) ?? null
   const { blockingError, paginationError } = splitInfiniteQueryErrors(
     errorMessage,
     items.length,
