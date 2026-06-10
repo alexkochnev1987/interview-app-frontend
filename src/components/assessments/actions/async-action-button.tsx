@@ -91,7 +91,9 @@ export function AsyncActionButton({
         })
       }
       setPhase('submitted')
-      onSuccess?.()
+      // An informational result means nothing was enqueued, so do not signal
+      // "work started" and kick live polling for a no-op.
+      if (!result) onSuccess?.()
     } catch (err) {
       if (!mountedRef.current) return
       if (err instanceof ApiError && err.status === 409) {
