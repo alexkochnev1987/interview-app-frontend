@@ -75,6 +75,7 @@ export function LoginForm() {
                   placeholder={t('emailPlaceholder')}
                   autoComplete="email"
                   required
+                  data-testid="login-email"
                 />
               </FormField>
 
@@ -87,6 +88,7 @@ export function LoginForm() {
                   placeholder={t('passwordPlaceholder')}
                   autoComplete="current-password"
                   required
+                  data-testid="login-password"
                 />
               </FormField>
             </Stack>
@@ -97,6 +99,7 @@ export function LoginForm() {
               size="xl"
               width="full"
               disabled={loading}
+              data-testid="login-submit"
             >
               {loading
                 ? toastMessages.pageGate.login.signingInLabel
