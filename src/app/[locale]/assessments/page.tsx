@@ -7,10 +7,7 @@ import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import type { Locale } from '@/i18n/locales'
 import { type Interview } from '@/lib/api'
-import {
-  compareAssessmentsByCompletion,
-  isHrVisibleAssessment,
-} from '@/lib/assessment-status'
+import { selectHrVisibleAssessments } from '@/lib/assessment-status'
 import {
   loadAuthGate,
   redirectIfUnauthenticated,
@@ -86,9 +83,7 @@ export default async function AssessmentsPage({
     )
   }
 
-  const sorted = interviews
-    .filter(isHrVisibleAssessment)
-    .sort(compareAssessmentsByCompletion)
+  const sorted = selectHrVisibleAssessments(interviews)
 
   return (
     <PageShell>

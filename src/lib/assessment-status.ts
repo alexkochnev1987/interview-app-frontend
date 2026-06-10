@@ -85,6 +85,13 @@ function allAnswersSubmitted(interview: Interview): boolean {
   )
 }
 
+/**
+ * Review state is derived solely from `interview.status` and the per-answer
+ * states. `interview.workflow` is intentionally not consumed: on the backend it
+ * is a secondary projection derived from `interview.status`, so reading it here
+ * cannot disagree with this function and would only duplicate the source of
+ * truth.
+ */
 export function deriveReviewStatus(interview: Interview): ReviewStatus {
   switch (interview.status) {
     case 'failed':
@@ -236,6 +243,19 @@ export function compareAssessmentsByCompletion(
   const da = ca ?? a.updatedAt
   const db = cb ?? b.updatedAt
   return new Date(db).getTime() - new Date(da).getTime()
+}
+
+/**
+ * The single ordering+visibility pass HR sees: keep only review-relevant
+ * assessments, most recently completed first. Shared by the server page and the
+ * client polling fetcher so the two never drift.
+ */
+export function selectHrVisibleAssessments(
+  interviews: Interview[],
+): Interview[] {
+  return interviews
+    .filter(isHrVisibleAssessment)
+    .sort(compareAssessmentsByCompletion)
 }
 
 const PLACEHOLDER_RESULT_SUMMARY = 'Simulated evaluation result'

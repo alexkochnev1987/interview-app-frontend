@@ -17,10 +17,9 @@ import { Stack } from '@/components/ui/layout/stack'
 import { EmptyStateCard } from '@/components/ui/state-card'
 import { getInterviews, type Interview } from '@/lib/api'
 import {
-  compareAssessmentsByCompletion,
   deriveReviewStatus,
   hasScoringInProgress,
-  isHrVisibleAssessment,
+  selectHrVisibleAssessments,
 } from '@/lib/assessment-status'
 import { useLivePolling } from '@/lib/use-live-polling'
 
@@ -43,10 +42,7 @@ export function AssessmentsListClient({
   const deferredQuery = useDeferredValue(query)
 
   const fetcher = useCallback(
-    async () =>
-      (await getInterviews())
-        .filter(isHrVisibleAssessment)
-        .sort(compareAssessmentsByCompletion),
+    async () => selectHrVisibleAssessments(await getInterviews()),
     [],
   )
   const { data: interviews, refresh, kick, paused } = useLivePolling(
