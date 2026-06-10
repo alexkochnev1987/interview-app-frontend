@@ -4,7 +4,6 @@ import { useCallback } from 'react'
 import {
   useMutation,
   useQueryClient,
-  type MutationFunctionContext,
 } from '@tanstack/react-query'
 
 import { questionsRootQueryKey } from '@/components/questions/picker/query-keys'
@@ -21,34 +20,14 @@ import { notifyError, notifySuccess } from '@/lib/toast'
 import { useToastMessages } from '@/lib/use-toast-messages'
 import {notifyBulkDeleteOutcome} from "@/lib/notify-bulk-delete";
 
-export type MutationToastMeta = {
-  hideSuccess?: boolean
-  hideError?: boolean
-}
-
-function getToastMetaFromContext(
-  context: MutationFunctionContext,
-): MutationToastMeta | undefined {
-  return context.meta as MutationToastMeta | undefined
-}
-
 function useQuestionMutationToasts() {
   const toastMessages = useToastMessages()
 
-  const notifyMutationError = (
-    title: string,
-    error: unknown,
-    meta?: MutationToastMeta,
-  ) => {
-    if (meta?.hideError) return
+  const notifyMutationError = (title: string, error: unknown) => {
     notifyError(title, { description: getErrorMessage(error) })
   }
 
-  const notifyMutationSuccess = (
-    message: string,
-    meta?: MutationToastMeta,
-  ) => {
-    if (meta?.hideSuccess) return
+  const notifyMutationSuccess = (message: string) => {
     notifySuccess(message)
   }
 
@@ -76,11 +55,10 @@ export function useCreateQuestion() {
         toastMessages.question.createSuccess,
       )
     },
-    onError: (error, _variables, _onMutateResult, context) => {
+    onError: (error, _variables, _onMutateResult) => {
       notifyMutationError(
         toastMessages.question.createError,
         error,
-        getToastMetaFromContext(context),
       )
     },
   })
@@ -100,11 +78,10 @@ export function useUpdateQuestion() {
         toastMessages.question.saveSuccess,
       )
     },
-    onError: (error, _variables, _onMutateResult, context) => {
+    onError: (error, _variables, _onMutateResult) => {
       notifyMutationError(
         toastMessages.question.saveError,
         error,
-        getToastMetaFromContext(context),
       )
     },
   })
@@ -123,7 +100,7 @@ export function useDeleteQuestion() {
         toastMessages.question.deleteSuccess,
       )
     },
-    onError: (error, _id, _onMutateResult, context) => {
+    onError: (error, _id, _onMutateResult) => {
       notifyMutationError(
         getDeleteQuestionErrorTitle(
           error,
@@ -131,7 +108,6 @@ export function useDeleteQuestion() {
           toastMessages.deleteQuestion.cannotDeleteTitle,
         ),
         error,
-        getToastMetaFromContext(context),
       )
     },
   })
@@ -150,11 +126,10 @@ export function useRestoreQuestion() {
         toastMessages.question.restoreSuccess,
       )
     },
-    onError: (error, _id, _onMutateResult, context) => {
+    onError: (error, _id, _onMutateResult) => {
       notifyMutationError(
         toastMessages.question.restoreError,
         error,
-        getToastMetaFromContext(context),
       )
     },
   })
