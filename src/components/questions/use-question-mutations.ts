@@ -34,8 +34,13 @@ function useQuestionMutationResources() {
   const invalidateQuestions=useInvalidateQuestions()
   const toastMessages=useToastMessages()
 
-  const notifyMutationError= (title: string, error:unknown)=>{
+  const notifyMutationError= (
+      title: string,
+      error:unknown,
+      options?:{id?:string}
+  )=>{
     notifyError(title, {
+      id: options?.id,
       description: getErrorMessage(error, toastMessages.defaults.error),
     })
   }
@@ -156,7 +161,9 @@ export function useBulkDeleteQuestions() {
       notifyBulkDeleteOutcome(result,toastMessages.bulkDelete)
     },
     onError: error=>{
-      notifyMutationError(toastMessages.bulkDelete.failedTitle,error)
+      notifyMutationError(toastMessages.bulkDelete.failedTitle,error,{
+        id: 'bulk-delete-error'
+      })
     }
   })
 }
