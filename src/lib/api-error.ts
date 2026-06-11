@@ -25,11 +25,10 @@ export function isForbiddenError(err: unknown): boolean {
   return getApiErrorStatus(err) === 403
 }
 
-export function getErrorMessage(err: unknown,fallback?:string): string|undefined{
-  if(err==null)return undefined
-  if(err instanceof Error && err.message.trim().length>0){
-    return err.message
-  }
+export function getErrorMessage(err: unknown, fallback?: string): string | undefined {
+  if (err == null) return undefined
+  if (!(err instanceof Error)) return undefined
+  if (err.message.trim().length > 0) return err.message
   return fallback
 }
 
