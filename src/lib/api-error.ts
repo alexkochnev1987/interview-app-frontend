@@ -37,7 +37,7 @@ export function getDeleteQuestionErrorTitle(
   defaultTitle: string,
   inUseTitle: string,
 ): string {
-  return err instanceof QuestionInUseError ? inUseTitle : defaultTitle
+  return isConflictError(err) ? inUseTitle : defaultTitle
 }
 
 export function isApiError(err:unknown): err is ApiError{
@@ -49,5 +49,5 @@ export function getApiErrorStatus(err:unknown):number|undefined{
 }
 
 export function isConflictError(err:unknown):boolean{
-  return getApiErrorStatus(err)===409
+  return err instanceof QuestionInUseError || getApiErrorStatus(err)===409
 }
