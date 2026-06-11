@@ -63,7 +63,7 @@ type BuildQuestionMutationOptionsConfig<TData, TVariables> = {
   errorTitle: QuestionMutationErrorTitle
 }
 
-function buildQuestionMutationOptions<TData,TVariables>(
+export function buildQuestionMutationOptions<TData, TVariables>(
     resources: ReturnType<typeof useQuestionMutationResources>,
     config: BuildQuestionMutationOptionsConfig<TData, TVariables>,
 ){
@@ -146,24 +146,27 @@ export function useRestoreQuestion() {
   )
 }
 
-export function useBulkDeleteQuestions() {
+export function buildBulkDeleteMutationOptions(
+  resources: ReturnType<typeof useQuestionMutationResources>,
+) {
+  const { toastMessages, invalidateQuestions, notifyMutationError } = resources
 
-  const {
-    toastMessages,
-    invalidateQuestions,
-    notifyMutationError,
-  } = useQuestionMutationResources()
-
-  return useMutation({
+  return {
     mutationFn: deleteQuestionsBulk,
-    onSuccess: result=>{
+    onSuccess: (result: Awaited<ReturnType<typeof deleteQuestionsBulk>>) => {
       invalidateQuestions()
-      notifyBulkDeleteOutcome(result,toastMessages.bulkDelete)
+      notifyBulkDeleteOutcome(result, toastMessages.bulkDelete)
     },
-    onError: error=>{
-      notifyMutationError(toastMessages.bulkDelete.failedTitle,error,{
-        id: 'bulk-delete-error'
+    onError: (error: unknown) => {
+      notifyMutationError(toastMessages.bulkDelete.failedTitle, error, {
+        id: 'bulk-delete-error',
       })
-    }
-  })
+    },
+  }
+}
+
+export function useBulkDeleteQuestions() {
+  const resources = useQuestionMutationResources()
+
+  return useMutation(buildBulkDeleteMutationOptions(resources))
 }
