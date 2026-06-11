@@ -40,14 +40,14 @@ export function getDeleteQuestionErrorTitle(
   return isConflictError(err) ? inUseTitle : defaultTitle
 }
 
-export function isApiError(err:unknown): err is ApiError{
+export function isApiError(err: unknown): err is ApiError {
   return err instanceof ApiError
 }
 
-export function getApiErrorStatus(err:unknown):number|undefined{
- return isApiError(err) ? err.status :undefined
+export function getApiErrorStatus(err: unknown): number | undefined {
+  return isApiError(err) ? err.status : undefined
 }
 
-export function isConflictError(err:unknown):boolean{
-  return err instanceof QuestionInUseError || getApiErrorStatus(err)===409
+export function isConflictError(err: unknown): boolean {
+  return err instanceof QuestionInUseError || getApiErrorStatus(err) === 409
 }
