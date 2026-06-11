@@ -50,7 +50,6 @@ export function QuestionsLibraryClient({
   const getChipLabel = useQuestionChipLabels()
   const { mutate: bulkDeleteQuestions, isPending: bulkDeleting } =
     useBulkDeleteQuestions()
-  //callbacks handle succsess/fail ,await not needed
 
   const query = useQuestionsQuery({
     initial: initialPrefetch?.queryState,

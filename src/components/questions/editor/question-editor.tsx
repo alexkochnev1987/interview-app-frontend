@@ -36,12 +36,13 @@ import {
 } from '@/lib/question-editor/parsers'
 import { type DraftFieldKey } from '@/lib/question-editor/field-keys'
 import { FEEDBACK_POLICY } from '@/lib/feedback-policy'
-import {useDraftQuestion} from "@/components/questions/editor/use-draft-question";
-import {getErrorMessage} from "@/lib/api-error";
+import {useDraftQuestion} from '@/components/questions/editor/use-draft-question';
+import {getErrorMessage} from '@/lib/api-error';
 type AiStatus = 'idle' | 'loading' | 'error'
 type QuestionFormField = 'questionText' | 'metadata'
 
 export type QuestionSubmitCallbacks = {
+  /** Save errors are surfaced by question mutation hooks (toast), not this callback. */
   onSuccess: (persisted: QuestionInput) => void
 }
 
