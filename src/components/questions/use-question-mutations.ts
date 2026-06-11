@@ -11,6 +11,7 @@ import {
   createQuestion,
   deleteQuestion,
   deleteQuestionsBulk,
+  draftQuestion,
   restoreQuestion,
   updateQuestion,
   type QuestionInput,
@@ -169,4 +170,11 @@ export function useBulkDeleteQuestions() {
   const resources = useQuestionMutationResources()
 
   return useMutation(buildBulkDeleteMutationOptions(resources))
+}
+
+/** Draft errors stay inline in QuestionEditor; this hook doesn't toast. */
+export function useDraftQuestion() {
+  return useMutation({
+    mutationFn: (value: QuestionInput) => draftQuestion(value),
+  })
 }

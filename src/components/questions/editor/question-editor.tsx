@@ -36,7 +36,7 @@ import {
 } from '@/lib/question-editor/parsers'
 import { type DraftFieldKey } from '@/lib/question-editor/field-keys'
 import { FEEDBACK_POLICY } from '@/lib/feedback-policy'
-import {useDraftQuestion} from '@/components/questions/editor/use-draft-question';
+import { useDraftQuestion } from '@/components/questions/use-question-mutations'
 import {getErrorMessage} from '@/lib/api-error';
 type AiStatus = 'idle' | 'loading' | 'error'
 type QuestionFormField = 'questionText' | 'metadata'
