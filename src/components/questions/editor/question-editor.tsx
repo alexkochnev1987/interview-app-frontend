@@ -1,9 +1,6 @@
 'use client'
-
 import { useState, type FormEvent } from 'react'
-
 import { useQuestionEditorLabels } from '@/i18n/use-question-editor-labels'
-
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { Stack } from '@/components/ui/layout/stack'
@@ -37,7 +34,8 @@ import {
 import { type DraftFieldKey } from '@/lib/question-editor/field-keys'
 import { FEEDBACK_POLICY } from '@/lib/feedback-policy'
 import { useDraftQuestion } from '@/components/questions/use-question-mutations'
-import {getErrorMessage} from '@/lib/api-error';
+import { getErrorMessage } from '@/lib/api-error';
+
 type AiStatus = 'idle' | 'loading' | 'error'
 type QuestionFormField = 'questionText' | 'metadata'
 

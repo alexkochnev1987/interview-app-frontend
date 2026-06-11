@@ -6,42 +6,51 @@ import {
 } from '@/components/questions/use-question-mutations'
 import { getDeleteQuestionErrorTitle, QuestionInUseError } from '@/lib/api-error'
 import { notifyBulkDeleteOutcome } from '@/lib/notify-bulk-delete'
+import type { useToastMessages } from '@/lib/use-toast-messages'
 
 vi.mock('@/lib/notify-bulk-delete', () => ({
   notifyBulkDeleteOutcome: vi.fn(),
 }))
 
 type MutationResources = Parameters<typeof buildQuestionMutationOptions>[0]
+type ToastMessages = ReturnType<typeof useToastMessages>
 
 function makeResources(): MutationResources {
-  return {
-    toastMessages: {
-      question: {
-        createSuccess: 'Created',
-        createError: 'Create failed',
-        saveSuccess: 'Saved',
-        saveError: 'Save failed',
-        deleteSuccess: 'Deleted',
-        deleteError: 'Delete failed',
-        restoreSuccess: 'Restored',
-        restoreError: 'Restore failed',
-      },
-      deleteQuestion: {
-        cannotDeleteTitle: 'Cannot delete',
-      },
-      defaults: {
-        error: 'Something went wrong',
-      },
-      bulkDelete: {
-        failedTitle: 'Bulk delete failed',
-        partialTitle: (deletedCount: number, blockedCount: number) =>
-          `Deleted ${deletedCount}, blocked ${blockedCount}`,
-        noopTitle: 'No questions deleted',
-        noopDescription: 'Nothing was removed.',
-        successTitle: (count: number) => `Deleted ${count}`,
-        successDescription: 'Library updated.',
-      },
+  const toastMessages = {
+    question: {
+      createSuccess: 'Created',
+      createError: 'Create failed',
+      saveSuccess: 'Saved',
+      saveError: 'Save failed',
+      deleteSuccess: 'Deleted',
+      deleteError: 'Delete failed',
+      restoreSuccess: 'Restored',
+      restoreError: 'Restore failed',
     },
+    deleteQuestion: {
+      cannotDeleteTitle: 'Cannot delete',
+    },
+    defaults: {
+      success: 'Done',
+      error: 'Something went wrong',
+      info: 'Notice',
+      actionCompleted: 'Action completed',
+      actionFailed: 'Action failed',
+    },
+    bulkDelete: {
+      failedTitle: 'Bulk delete failed',
+      partialTitle: (deletedCount: number, blockedCount: number) =>
+        `Deleted ${deletedCount}, blocked ${blockedCount}`,
+      noopTitle: 'No questions deleted',
+      noopDescription: 'Nothing was removed.',
+      successTitle: (count: number) => `Deleted ${count}`,
+      successDescription: 'Library updated.',
+      blockedIntro: 'These questions could not be deleted:',
+    },
+  } as ToastMessages
+
+  return {
+    toastMessages,
     invalidateQuestions: vi.fn(),
     notifyMutationSuccess: vi.fn(),
     notifyMutationError: vi.fn(),

@@ -1,6 +1,5 @@
 import { notifyError, notifySuccess } from "@/lib/toast"
 import { getErrorMessage as getApiErrorMessage } from '@/lib/api-error'
-//do NOT try to change the name to getErrorMessage , that might break interview/team/take call sites
 
 type RunMutationOptions<TData> = {
   successMessage?: string
