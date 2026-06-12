@@ -52,7 +52,7 @@
       "identity": {
         "title": "Pytanie o tożsamość",
         "description": "Zakotwicz zachętę w roli i taksonomii, których rekruterzy będą szukać później.",
-        "externalIdHint": "Opcjonalny stabilny identyfikator importu.",
+        "externalIdTooltip": "Opcjonalny stabilny identyfikator importu.",
         "externalIdPlaceholder": "frontend_closure_v1",
         "rolePlaceholder": "stażysta frontendowy",
         "focusPlaceholder": "podstawy",

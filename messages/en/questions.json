@@ -52,7 +52,7 @@
       "identity": {
         "title": "Question identity",
         "description": "Anchor the prompt in the role and taxonomy you expect recruiters to search later.",
-        "externalIdHint": "Optional stable identifier for imports.",
+        "externalIdTooltip": "Optional stable identifier for imports.",
         "externalIdPlaceholder": "frontend_closure_v1",
         "rolePlaceholder": "frontend intern",
         "focusPlaceholder": "fundamentals",

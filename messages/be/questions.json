@@ -52,7 +52,7 @@
       "identity": {
         "title": "Пытанне ідэнтычнасці",
         "description": "Прывяжыце падказку да ролі і таксанаміі, якія, як вы чакаеце, вярбоўшчыкі будуць шукаць пазней.",
-        "externalIdHint": "Неабавязковы стабільны ідэнтыфікатар для імпарту.",
+        "externalIdTooltip": "Неабавязковы стабільны ідэнтыфікатар для імпарту.",
         "externalIdPlaceholder": "frontend_closure_v1",
         "rolePlaceholder": "інтэрфейс міжнар",
         "focusPlaceholder": "асновы",

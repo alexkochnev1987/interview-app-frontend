@@ -52,7 +52,7 @@
       "identity": {
         "title": "Личность вопроса",
         "description": "Привяжите подсказку к роли и таксономии, которые рекрутеры будут искать позже.",
-        "externalIdHint": "Необязательный стабильный идентификатор для импорта.",
+        "externalIdTooltip": "Необязательный стабильный идентификатор для импорта.",
         "externalIdPlaceholder": "frontend_closure_v1",
         "rolePlaceholder": "стажер по интерфейсу",
         "focusPlaceholder": "основы",
