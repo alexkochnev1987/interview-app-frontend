@@ -54,6 +54,7 @@ export function EditorIdentitySection({
             htmlFor="externalId"
             label={tFields('externalId')}
             labelTooltip={tIdentity('externalIdTooltip')}
+            labelTooltipLabel={tEditor('moreInformation')}
           >
             <Input
               id="externalId"

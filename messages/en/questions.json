@@ -27,6 +27,7 @@
     },
     "editor": {
       "previewEmpty": "Empty",
+      "moreInformation": "More information",
       "aiQuestionTextRequired": "Question text is required before AI generation.",
       "aiQuestionTextEnglishOnly": "Question text must be in English before AI generation.",
       "englishOnlyNoticeTitle": "English-only content policy",
@@ -96,7 +97,8 @@
     "aiSuggestion": {
       "eyebrow": "AI suggestion",
       "useAi": "Use AI value",
-      "keepCurrent": "Keep current"
+      "keepCurrent": "Keep current",
+      "agrees": "AI agrees"
     },
     "saveBar": {
       "statusUnsaved": "Unsaved changes",

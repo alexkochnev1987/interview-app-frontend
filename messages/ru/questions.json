@@ -27,6 +27,7 @@
     },
     "editor": {
       "previewEmpty": "Пустой",
+      "moreInformation": "Больше информации",
       "aiQuestionTextRequired": "Текст вопроса необходим перед созданием ИИ.",
       "aiQuestionTextEnglishOnly": "Перед генерацией ИИ текст вопроса должен быть на английском языке.",
       "englishOnlyNoticeTitle": "Политика контента: только английский",
@@ -96,7 +97,8 @@
     "aiSuggestion": {
       "eyebrow": "предложение ИИ",
       "useAi": "Использовать значение AI",
-      "keepCurrent": "Оставить текущее"
+      "keepCurrent": "Оставить текущее",
+      "agrees": "ИИ согласен"
     },
     "saveBar": {
       "statusUnsaved": "Несохраненные изменения",

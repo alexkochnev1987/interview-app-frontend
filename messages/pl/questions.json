@@ -27,6 +27,7 @@
     },
     "editor": {
       "previewEmpty": "Pusty",
+      "moreInformation": "Więcej informacji",
       "aiQuestionTextRequired": "Tekst pytania jest wymagany przed wygenerowaniem AI.",
       "aiQuestionTextEnglishOnly": "Przed generowaniem AI tekst pytania musi być w języku angielskim.",
       "englishOnlyNoticeTitle": "Zasada treści: tylko angielski",
@@ -96,7 +97,8 @@
     "aiSuggestion": {
       "eyebrow": "Sugestia AI",
       "useAi": "Użyj wartości AI",
-      "keepCurrent": "Zachowaj bieżące"
+      "keepCurrent": "Zachowaj bieżące",
+      "agrees": "AI się zgadza"
     },
     "saveBar": {
       "statusUnsaved": "Niezapisane zmiany",

@@ -27,6 +27,7 @@
     },
     "editor": {
       "previewEmpty": "Пусты",
+      "moreInformation": "Больш інфармацыі",
       "aiQuestionTextRequired": "Перад стварэннем штучнага інтэлекту патрабуецца тэкст пытання.",
       "aiQuestionTextEnglishOnly": "Перад генерацыяй штучнага інтэлекту тэкст пытання павінен быць на англійскай мове.",
       "englishOnlyNoticeTitle": "Палітыка кантэнту: толькі англійская",
@@ -96,7 +97,8 @@
     "aiSuggestion": {
       "eyebrow": "Прапанова AI",
       "useAi": "Выкарыстоўвайце значэнне AI",
-      "keepCurrent": "Пакінуць як ёсць"
+      "keepCurrent": "Пакінуць як ёсць",
+      "agrees": "AI згаджаецца"
     },
     "saveBar": {
       "statusUnsaved": "Незахаваныя змены",
