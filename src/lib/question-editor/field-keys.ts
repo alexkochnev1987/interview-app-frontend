@@ -2,6 +2,10 @@ import type { QuestionInput } from '@/lib/api'
 
 export type DraftFieldKey = keyof Pick<
   QuestionInput,
+  | 'externalId'
+  | 'role'
+  | 'focus'
+  | 'outputLanguage'
   | 'questionText'
   | 'category'
   | 'subcategory'
@@ -16,6 +20,10 @@ export type DraftFieldKey = keyof Pick<
 >
 
 export const DRAFT_FIELD_KEYS: DraftFieldKey[] = [
+  'externalId',
+  'role',
+  'focus',
+  'outputLanguage',
   'questionText',
   'category',
   'subcategory',
