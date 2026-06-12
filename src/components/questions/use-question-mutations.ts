@@ -19,7 +19,7 @@ import {
 import { getDeleteQuestionErrorTitle, getErrorMessage } from '@/lib/api-error'
 import { notifyError, notifySuccess } from '@/lib/toast'
 import { useToastMessages } from '@/lib/use-toast-messages'
-import {notifyBulkDeleteOutcome} from "@/lib/notify-bulk-delete";
+import { notifyBulkDeleteOutcome } from '@/lib/notify-bulk-delete';
 
 type QuestionMutationErrorTitle = string | ((error: unknown) => string)
 
@@ -32,7 +32,7 @@ function useInvalidateQuestions() {
 }
 
 function useQuestionMutationResources() {
-  const invalidateQuestions=useInvalidateQuestions()
+  const invalidateQuestions =useInvalidateQuestions()
   const toastMessages=useToastMessages()
 
   const notifyMutationError= (
@@ -93,7 +93,7 @@ export function buildQuestionMutationOptions<TData, TVariables>(
 
 export function useCreateQuestion() {
 
-  const resources=useQuestionMutationResources()
+  const resources= useQuestionMutationResources()
 
   return useMutation(
       buildQuestionMutationOptions(resources, {
@@ -139,7 +139,7 @@ export function useRestoreQuestion() {
   const resources = useQuestionMutationResources()
 
   return useMutation(
-      buildQuestionMutationOptions(resources,{
+      buildQuestionMutationOptions( resources , {
         mutationFn:restoreQuestion,
         successMessage: resources.toastMessages.question.restoreSuccess,
         errorTitle: resources.toastMessages.question.restoreError,
