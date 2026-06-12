@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { QuestionEditor , type QuestionSubmitCallbacks} from '@/components/questions/editor/question-editor'
 import { useCreateQuestion } from '@/components/questions/use-question-mutations'
@@ -11,13 +12,13 @@ export function QuestionNewClient() {
   const t = useTranslations('questions.newPage')
   const router = useRouter()
   const { mutate: createQuestion, isPending: submitting } = useCreateQuestion()
-  const [ isNavgating , setIsNavigating ] = useState(false)
+  const [ isNavigating , setIsNavigating ] = useState(false)
 
-  function handleSubmit(value: QuestionInput , {onSuccsess}: QuestionSubmitCallbacks) {
+  function handleSubmit(value: QuestionInput , {onSuccess}: QuestionSubmitCallbacks) {
     createQuestion(value, {
       onSuccess: (question) => {
         setIsNavigating(true)
-        onSuccsess(questionToEditorInput(question))
+        onSuccess(questionToEditorInput(question))
         router.push(`/questions/${question.id}`)
       },
     })
@@ -27,7 +28,7 @@ export function QuestionNewClient() {
     <QuestionEditor
       title={t('title')}
       submitLabel={t('submit')}
-      submitting={ submitting || isNavgating }
+      submitting={ submitting || isNavigating }
       onSubmit={ handleSubmit }
     />
   )
