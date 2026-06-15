@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { EmptyStateCard, LoadingStateCard } from '@/components/ui/state-card'
 import { Link } from '@/i18n/navigation'
+import { routes } from '@/i18n/routes'
 import type { Question } from '@/lib/api'
 import type { QuestionView, QuestionsQueryState } from '@/lib/questions-query-state'
 import { useToastMessages } from '@/lib/use-toast-messages'
@@ -103,7 +104,7 @@ export function QuestionPickerFeed({
         action={
           allEmpty ? (
             <Button asChild variant="gradient">
-              <Link href="/questions/new">{t(`${copyPath}.createCta`)}</Link>
+              <Link href={routes.questions.new}>{t(`${copyPath}.createCta`)}</Link>
             </Button>
           ) : (
             <Button type="button" variant="outline-pill" shape="pill" onClick={onReset}>

@@ -31,6 +31,7 @@ import { Icon } from '@/components/ui/icon'
 import { Pagination } from '@/components/ui/pagination'
 import { useTranslations } from 'next-intl'
 import { useRouter } from '@/i18n/navigation'
+import { routes } from '@/i18n/routes'
 import { useQuestionChipLabels } from '@/i18n/use-question-chip-labels'
 import { type BulkDeleteResult, type Question } from '@/lib/api'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
@@ -302,7 +303,7 @@ export function QuestionsLibraryClient({
             selectedIds={selectedIds}
             onToggleSelected={toggleSelected}
             onToggleSelectAll={toggleSelectAll}
-            onRowClick={(q) => router.push(`/questions/${q.id}`)}
+            onRowClick={(q) => router.push(routes.questions.detail(q.id))}
             sortBy={query.state.sortBy}
             sortOrder={query.state.sortOrder}
             onSortChange={query.setSort}

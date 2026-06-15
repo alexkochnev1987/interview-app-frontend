@@ -10,6 +10,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { Link } from '@/i18n/navigation'
+import { routes } from '@/i18n/routes'
 
 export function InterviewCreateIntro() {
   const t = useTranslations('interviews.createIntro')
@@ -26,13 +27,13 @@ export function InterviewCreateIntro() {
         </Stack>
         <Inline gap={3} wrap="wrap">
           <Button asChild variant="gradient">
-            <Link href="/questions/new">
+            <Link href={routes.questions.new}>
               <CirclePlus className="size-4" />
               {t('createQuestion')}
             </Link>
           </Button>
           <Button asChild variant="outline-pill" shape="pill">
-            <Link href="/questions">{t('openBank')}</Link>
+            <Link href={routes.questions.list}>{t('openBank')}</Link>
           </Button>
         </Inline>
       </CardContent>

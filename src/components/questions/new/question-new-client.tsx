@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { QuestionEditor , type QuestionSubmitCallbacks} from '@/components/questions/editor/question-editor'
 import { useCreateQuestion } from '@/components/questions/use-question-mutations'
 import { useRouter } from '@/i18n/navigation'
+import { routes } from '@/i18n/routes'
 import { type QuestionInput } from '@/lib/api'
 import { questionToEditorInput } from '@/lib/question-editor/parsers'
 
@@ -19,7 +20,7 @@ export function QuestionNewClient() {
       onSuccess: (question) => {
         setIsNavigating(true)
         onSuccess(questionToEditorInput(question))
-        router.push(`/questions/${question.id}`)
+        router.push(routes.questions.detail(question.id))
       },
     })
   }

@@ -16,6 +16,7 @@ import {
   useUpdateQuestion,
 } from '@/components/questions/use-question-mutations'
 import { useRouter } from '@/i18n/navigation'
+import { routes } from '@/i18n/routes'
 import { type Question, type QuestionInput } from '@/lib/api'
 import { questionToEditorInput } from '@/lib/question-editor/parsers'
 
@@ -72,7 +73,7 @@ export function QuestionEditClient({
     deleteQuestion(id,{
       onSuccess:()=>{
         setConfirmOpen(false)
-        router.push('/questions')
+        router.push(routes.questions.list)
         router.refresh()
       }
     })

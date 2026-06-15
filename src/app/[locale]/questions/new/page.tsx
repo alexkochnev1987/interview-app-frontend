@@ -4,10 +4,11 @@ import { QuestionNewClient } from '@/components/questions/new/question-new-clien
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import type { Locale } from '@/i18n/locales'
+import { routes } from '@/i18n/routes'
 import { loadAuthGate, redirectIfUnauthenticated } from '@/lib/auth-gate'
 import { canCreateQuestions } from '@/lib/auth-roles'
 
-const ERROR_BACK_HREF = '/questions'
+const ERROR_BACK_HREF = routes.questions.list
 
 interface NewQuestionPageProps {
   params: Promise<{ locale: Locale }>
@@ -19,7 +20,7 @@ export default async function NewQuestionPage({ params }: NewQuestionPageProps) 
   const tCommon = await getTranslations({ locale, namespace: 'common' })
   const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
   const auth = await loadAuthGate(canCreateQuestions, locale)
-  redirectIfUnauthenticated(auth, '/questions/new', locale)
+  redirectIfUnauthenticated(auth, routes.questions.new, locale)
   if (auth.kind === 'forbidden') {
     return (
       <ForbiddenAccessPage

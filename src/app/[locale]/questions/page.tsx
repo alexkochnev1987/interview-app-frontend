@@ -6,6 +6,7 @@ import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallbac
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import type { Locale } from '@/i18n/locales'
+import { routes } from '@/i18n/routes'
 import { loadAuthGate, redirectIfUnauthenticated } from '@/lib/auth-gate'
 import { canReadQuestions, isSuperAdmin } from '@/lib/auth-roles'
 import { prefetchQuestionsLibrary } from '@/lib/questions-library-prefetch'
@@ -27,7 +28,7 @@ export default async function QuestionsPage({
   const tCommon = await getTranslations({ locale, namespace: 'common' })
   const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
   const auth = await loadAuthGate(canReadQuestions, locale)
-  redirectIfUnauthenticated(auth, '/questions', locale)
+  redirectIfUnauthenticated(auth, routes.questions.list, locale)
 
   if (auth.kind === 'forbidden') {
     return (

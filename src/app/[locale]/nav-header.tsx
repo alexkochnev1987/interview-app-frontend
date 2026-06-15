@@ -7,6 +7,7 @@ import { LanguageSwitcher } from '@/components/ui/language-switcher'
 import { isCandidateFlowPath } from '@/i18n/html-lang'
 import { LOCALES, type Locale } from '@/i18n/locales'
 import { usePathname } from '@/i18n/navigation'
+import { routes } from '@/i18n/routes'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
 import { useAuth } from '@/lib/auth-context'
 import {
@@ -64,7 +65,7 @@ export function NavHeader() {
       ? [{ href: '/', label: tNav('dashboard'), icon: LayoutDashboard }]
       : []),
     ...(canReadQuestions(user?.role)
-      ? [{ href: '/questions', label: tNav('questions'), icon: LibraryBig }]
+      ? [{ href: routes.questions.list, label: tNav('questions'), icon: LibraryBig }]
       : []),
     ...(canReviewAssessments(user?.role)
       ? [{ href: '/assessments', label: tNav('assessments'), icon: ClipboardList }]

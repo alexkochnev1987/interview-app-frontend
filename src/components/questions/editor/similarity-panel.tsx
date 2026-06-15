@@ -22,6 +22,7 @@ import { Stack } from '@/components/ui/layout/stack'
 import { BodyText } from '@/components/ui/text'
 import { type SimilarQuestionMatch } from '@/lib/api'
 import { Link } from '@/i18n/navigation'
+import { routes } from '@/i18n/routes'
 import {
   type SimilarStatus,
   type SimilaritySignalSummary,
@@ -202,7 +203,7 @@ function SimilarMatchRow({ match }: { match: SimilarQuestionMatch }) {
             size="sm"
             asChild
           >
-            <Link href={`/questions/${match.question.id}`}>{t('openQuestion')}</Link>
+            <Link href={routes.questions.detail(match.question.id)}>{t('openQuestion')}</Link>
           </Button>
         </Inline>
 
