@@ -32,11 +32,8 @@ import {
   normalizeInitialValue,
 } from '@/lib/question-editor/parsers'
 import { type DraftFieldKey } from '@/lib/question-editor/field-keys'
-import { FEEDBACK_POLICY } from '@/lib/feedback-policy'
 import { useDraftQuestion } from '@/components/questions/use-question-mutations'
-import { getErrorMessage } from '@/lib/api-error';
 
-type AiStatus = 'idle' | 'loading' | 'error'
 type QuestionFormField = 'questionText' | 'metadata'
 
 export type QuestionSubmitCallbacks = {
@@ -81,16 +78,7 @@ export function QuestionEditor({
   })
 
   const similarity = useSimilaritySearch({ value, questionId })
-  const draftMutation= useDraftQuestion()
-
-  const aiStatus:AiStatus = draftMutation.isPending ? 'loading'
-      : draftMutation.isError ? 'error' :  'idle'
-  const aiError = draftMutation.isError
-      ? getErrorMessage(
-          draftMutation.error,
-          FEEDBACK_POLICY.draftQuestion.inlineErrorFallback,
-      )
-      : null
+  const draft = useDraftQuestion()
 
   function update(patch: Partial<QuestionInput>) {
     if (readOnly) return
@@ -121,7 +109,7 @@ export function QuestionEditor({
   function handleGenerate() {
     if (readOnly) return
     if (!value.questionText.trim()) {
-      draftMutation.reset()
+      draft.reset()
       setFieldErrors(prev=>({
         ...prev,
         questionText: editorLabels.validation.questionTextRequiredForAi
@@ -141,7 +129,7 @@ export function QuestionEditor({
       { fieldLabel: editorLabels.fieldLabel('tags'), value: value.tags },
     ])
     if (nonEnglishFieldForGeneration) {
-      draftMutation.reset()
+      draft.reset()
       setEnglishOnlyError(
           editorLabels.validation.englishOnlyField({ field: nonEnglishFieldForGeneration }),
       )
@@ -158,8 +146,8 @@ export function QuestionEditor({
     clearFieldError('questionText', setFieldErrors)
     setEnglishOnlyError(null)
 
-    draftMutation.reset()
-    draftMutation.mutate(value, {
+    draft.reset()
+    draft.mutate(value, {
       onSuccess: draft=>{
         setAiDraft(draft)
         setDismissedDraftFields([])
@@ -365,9 +353,9 @@ export function QuestionEditor({
               <AiDraftPanel
                 hasPendingDraft={Boolean(aiDraft) && pendingDraftFields.length > 0}
                 pendingCount={pendingDraftFields.length}
-                loading={aiStatus === 'loading'}
+                loading={draft.status === 'loading'}
                 disabled={fieldsDisabled}
-                error={aiError ?? undefined}
+                error={draft.error ?? undefined}
                 onGenerate={handleGenerate}
                 onApplyAll={applyAllAiFields}
               />

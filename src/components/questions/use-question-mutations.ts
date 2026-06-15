@@ -20,6 +20,8 @@ import { getDeleteQuestionErrorTitle, getErrorMessage } from '@/lib/api-error'
 import { notifyError, notifySuccess } from '@/lib/toast'
 import { useToastMessages } from '@/lib/use-toast-messages'
 import { notifyBulkDeleteOutcome } from '@/lib/notify-bulk-delete';
+import { FEEDBACK_POLICY } from '@/lib/feedback-policy'
+import {deriveInlineAsyncStatus} from "./editor/async-status";
 
 type QuestionMutationErrorTitle = string | ((error: unknown) => string)
 
@@ -174,7 +176,20 @@ export function useBulkDeleteQuestions() {
 
 /** Draft errors stay inline in QuestionEditor; this hook doesn't toast. */
 export function useDraftQuestion() {
-  return useMutation({
-    mutationFn: (value: QuestionInput) => draftQuestion(value),
+  const mutation = useMutation({
+    mutationFn: (value: QuestionInput) => draftQuestion(value)
   })
+
+  const status = deriveInlineAsyncStatus(mutation)
+
+  const error = mutation.isError ? getErrorMessage(
+      mutation.error,
+      FEEDBACK_POLICY.draftQuestion.inlineErrorFallback
+  ) : null
+
+  return {
+    ...mutation,
+    status,
+    error,
+  }
 }
