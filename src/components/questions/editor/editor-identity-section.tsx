@@ -53,7 +53,8 @@ export function EditorIdentitySection({
           <QuestionEditorField
             htmlFor="externalId"
             label={tFields('externalId')}
-            hint={tIdentity('externalIdHint')}
+            labelTooltip={tIdentity('externalIdTooltip')}
+            labelTooltipLabel={tEditor('moreInformation')}
           >
             <Input
               id="externalId"
@@ -63,6 +64,7 @@ export function EditorIdentitySection({
               disabled={submitting}
             />
           </QuestionEditorField>
+          {renderAiSuggestion('externalId')}
         </Stack>
 
         <Stack gap={2}>
@@ -75,6 +77,7 @@ export function EditorIdentitySection({
               disabled={submitting}
             />
           </QuestionEditorField>
+          {renderAiSuggestion('role')}
         </Stack>
 
         <Stack gap={2}>
@@ -87,6 +90,7 @@ export function EditorIdentitySection({
               disabled={submitting}
             />
           </QuestionEditorField>
+          {renderAiSuggestion('focus')}
         </Stack>
 
         <Stack gap={2}>
@@ -99,6 +103,7 @@ export function EditorIdentitySection({
               disabled={submitting}
             />
           </QuestionEditorField>
+          {renderAiSuggestion('outputLanguage')}
         </Stack>
 
         <Spacer visibility="xl-only" />

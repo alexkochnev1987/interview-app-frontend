@@ -27,6 +27,7 @@
     },
     "editor": {
       "previewEmpty": "Пусты",
+      "moreInformation": "Больш інфармацыі",
       "aiQuestionTextRequired": "Перад стварэннем штучнага інтэлекту патрабуецца тэкст пытання.",
       "aiQuestionTextEnglishOnly": "Перад генерацыяй штучнага інтэлекту тэкст пытання павінен быць на англійскай мове.",
       "englishOnlyNoticeTitle": "Палітыка кантэнту: толькі англійская",
@@ -52,7 +53,7 @@
       "identity": {
         "title": "Пытанне ідэнтычнасці",
         "description": "Прывяжыце падказку да ролі і таксанаміі, якія, як вы чакаеце, вярбоўшчыкі будуць шукаць пазней.",
-        "externalIdHint": "Неабавязковы стабільны ідэнтыфікатар для імпарту.",
+        "externalIdTooltip": "Неабавязковы стабільны ідэнтыфікатар для імпарту.",
         "externalIdPlaceholder": "frontend_closure_v1",
         "rolePlaceholder": "інтэрфейс міжнар",
         "focusPlaceholder": "асновы",
@@ -96,7 +97,8 @@
     "aiSuggestion": {
       "eyebrow": "Прапанова AI",
       "useAi": "Выкарыстоўвайце значэнне AI",
-      "keepCurrent": "Пакінуць як ёсць"
+      "keepCurrent": "Пакінуць як ёсць",
+      "agrees": "AI згаджаецца"
     },
     "saveBar": {
       "statusUnsaved": "Незахаваныя змены",

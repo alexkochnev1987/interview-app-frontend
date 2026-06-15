@@ -27,6 +27,7 @@
     },
     "editor": {
       "previewEmpty": "Pusty",
+      "moreInformation": "Więcej informacji",
       "aiQuestionTextRequired": "Tekst pytania jest wymagany przed wygenerowaniem AI.",
       "aiQuestionTextEnglishOnly": "Przed generowaniem AI tekst pytania musi być w języku angielskim.",
       "englishOnlyNoticeTitle": "Zasada treści: tylko angielski",
@@ -52,7 +53,7 @@
       "identity": {
         "title": "Pytanie o tożsamość",
         "description": "Zakotwicz zachętę w roli i taksonomii, których rekruterzy będą szukać później.",
-        "externalIdHint": "Opcjonalny stabilny identyfikator importu.",
+        "externalIdTooltip": "Opcjonalny stabilny identyfikator importu.",
         "externalIdPlaceholder": "frontend_closure_v1",
         "rolePlaceholder": "stażysta frontendowy",
         "focusPlaceholder": "podstawy",
@@ -96,7 +97,8 @@
     "aiSuggestion": {
       "eyebrow": "Sugestia AI",
       "useAi": "Użyj wartości AI",
-      "keepCurrent": "Zachowaj bieżące"
+      "keepCurrent": "Zachowaj bieżące",
+      "agrees": "AI się zgadza"
     },
     "saveBar": {
       "statusUnsaved": "Niezapisane zmiany",

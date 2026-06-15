@@ -27,6 +27,7 @@
     },
     "editor": {
       "previewEmpty": "Empty",
+      "moreInformation": "More information",
       "aiQuestionTextRequired": "Question text is required before AI generation.",
       "aiQuestionTextEnglishOnly": "Question text must be in English before AI generation.",
       "englishOnlyNoticeTitle": "English-only content policy",
@@ -52,7 +53,7 @@
       "identity": {
         "title": "Question identity",
         "description": "Anchor the prompt in the role and taxonomy you expect recruiters to search later.",
-        "externalIdHint": "Optional stable identifier for imports.",
+        "externalIdTooltip": "Optional stable identifier for imports.",
         "externalIdPlaceholder": "frontend_closure_v1",
         "rolePlaceholder": "frontend intern",
         "focusPlaceholder": "fundamentals",
@@ -96,7 +97,8 @@
     "aiSuggestion": {
       "eyebrow": "AI suggestion",
       "useAi": "Use AI value",
-      "keepCurrent": "Keep current"
+      "keepCurrent": "Keep current",
+      "agrees": "AI agrees"
     },
     "saveBar": {
       "statusUnsaved": "Unsaved changes",

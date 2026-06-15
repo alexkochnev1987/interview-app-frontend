@@ -56,6 +56,7 @@
       "reviewStatus": {
         "ready": "Gotowe do przeglądu",
         "scoring": "Ocena nadal się aktualizuje",
+        "ready_to_score": "Gotowe do oceny AI",
         "in_progress": "Kandydat jest w trakcie",
         "pending": "Oczekuje na kandydata",
         "failed": "Nieudane"

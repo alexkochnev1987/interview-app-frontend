@@ -4,7 +4,6 @@ import {
   type QuestionInput,
   type QuestionRedFlag,
 } from '@/lib/api'
-import { type DraftFieldKey } from '@/lib/question-editor/field-keys'
 
 export type SimilarStatus = 'idle' | 'loading' | 'success' | 'error'
 
@@ -34,38 +33,6 @@ const DEFAULT_VALUE: QuestionInput = {
   metadata: {},
 }
 
-export const DRAFT_FIELDS: Array<{ key: DraftFieldKey; label: string }> = [
-  { key: 'questionText', label: 'Question Text' },
-  { key: 'category', label: 'Category' },
-  { key: 'subcategory', label: 'Subcategory' },
-  { key: 'difficulty', label: 'Difficulty' },
-  { key: 'weight', label: 'Weight' },
-  { key: 'followUpQuestions', label: 'Follow-up Questions' },
-  { key: 'expectedConcepts', label: 'Expected Concepts' },
-  { key: 'redFlags', label: 'Red Flags' },
-  { key: 'sampleGoodAnswer', label: 'Sample Good Answer' },
-  { key: 'minimumPassScore', label: 'Minimum Pass Score' },
-  { key: 'tags', label: 'Tags' },
-]
-
-export const EDITABLE_FIELDS: Array<{ key: keyof QuestionInput; label: string }> = [
-  { key: 'externalId', label: 'External ID' },
-  { key: 'role', label: 'Role' },
-  { key: 'focus', label: 'Focus' },
-  { key: 'outputLanguage', label: 'Output Language' },
-  { key: 'category', label: 'Category' },
-  { key: 'subcategory', label: 'Subcategory' },
-  { key: 'questionText', label: 'Question Text' },
-  { key: 'followUpQuestions', label: 'Follow-up Questions' },
-  { key: 'expectedConcepts', label: 'Expected Concepts' },
-  { key: 'redFlags', label: 'Red Flags' },
-  { key: 'difficulty', label: 'Difficulty' },
-  { key: 'weight', label: 'Weight' },
-  { key: 'sampleGoodAnswer', label: 'Sample Good Answer' },
-  { key: 'minimumPassScore', label: 'Minimum Pass Score' },
-  { key: 'tags', label: 'Tags' },
-  { key: 'metadata', label: 'Metadata' },
-]
 export function normalizeComparable(value: string | undefined): string {
   return value?.trim().toLowerCase() ?? ''
 }
