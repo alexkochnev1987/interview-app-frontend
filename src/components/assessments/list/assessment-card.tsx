@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl'
 
+import { StartEvaluationButton } from '@/components/assessments/actions/start-evaluation-button'
 import {
   Card,
   CardContent,
@@ -34,12 +35,20 @@ export function AssessmentCard({ interview }: AssessmentCardProps) {
   const sharedLabels = useSharedLabels()
   const reviewStatus = deriveReviewStatus(interview)
   const completion = getCompletionDate(interview)
-  const overallScore = interview.result?.overallScore ?? null
+  const overallScore = interview.result?.overallScore
   const decision = interview.result?.decision ?? null
+  const isReadyToScore = reviewStatus === 'ready_to_score'
 
   return (
-    <UnstyledLink href={`/assessments/${interview.id}`}>
-      <Card variant="surface" height="full" interaction="hover">
+    <Card variant="surface" height="full" interaction="hover">
+      {/* display="contents" keeps the header + metrics as direct layout children
+          of the Card (no overlay, no stacking or hover conflict). The Start
+          button stays a sibling and is never nested inside the anchor. */}
+      <UnstyledLink
+        href={`/assessments/${interview.id}`}
+        display="contents"
+        aria-label={interview.candidateName}
+      >
         <CardHeader spacing="md">
           <PillRow>
             <StatusPill tone={reviewStatusTone(reviewStatus)} casing="chip">
@@ -61,7 +70,9 @@ export function AssessmentCard({ interview }: AssessmentCardProps) {
             <MetricPanel
               tone="compact"
               label={t('overallScore')}
-              value={overallScore != null ? Math.round(overallScore) : '—'}
+              value={
+                overallScore !== undefined ? Math.round(overallScore) : '—'
+              }
               valueSize="md"
             />
             <MetricPanel
@@ -72,7 +83,12 @@ export function AssessmentCard({ interview }: AssessmentCardProps) {
             />
           </Grid>
         </CardContent>
-      </Card>
-    </UnstyledLink>
+      </UnstyledLink>
+      {isReadyToScore ? (
+        <CardContent>
+          <StartEvaluationButton interviewId={interview.id} size="sm" />
+        </CardContent>
+      ) : null}
+    </Card>
   )
 }

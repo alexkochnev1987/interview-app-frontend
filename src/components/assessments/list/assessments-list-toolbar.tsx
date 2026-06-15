@@ -14,7 +14,12 @@ import {
 } from '@/components/ui/select'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
 
-export type StatusFilter = 'all' | 'ready' | 'scoring' | 'failed'
+export type StatusFilter =
+  | 'all'
+  | 'ready_to_score'
+  | 'ready'
+  | 'scoring'
+  | 'failed'
 
 interface AssessmentsListToolbarProps {
   query: string
@@ -50,6 +55,9 @@ export function AssessmentsListToolbar({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">{t('allStatuses')}</SelectItem>
+              <SelectItem value="ready_to_score">
+                {sharedLabels.reviewStatus('ready_to_score')}
+              </SelectItem>
               <SelectItem value="ready">
                 {sharedLabels.reviewStatus('ready')}
               </SelectItem>

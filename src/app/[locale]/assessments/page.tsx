@@ -7,7 +7,7 @@ import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import type { Locale } from '@/i18n/locales'
 import { type Interview } from '@/lib/api'
-import { getCompletionDate } from '@/lib/assessment-status'
+import { selectHrVisibleAssessments } from '@/lib/assessment-status'
 import {
   loadAuthGate,
   redirectIfUnauthenticated,
@@ -16,23 +16,7 @@ import {
 import { canReviewAssessments } from '@/lib/auth-roles'
 import { isForbiddenError, requestServer } from '@/lib/server-fetch'
 
-const HR_VISIBLE_STATUSES: ReadonlySet<Interview['status']> = new Set<
-  Interview['status']
->(['processing', 'completed', 'failed'])
-
 const ERROR_BACK_HREF = '/'
-
-function sortByCompletion(a: Interview, b: Interview): number {
-  const ca = getCompletionDate(a)
-  const cb = getCompletionDate(b)
-
-  if (ca && !cb) return -1
-  if (!ca && cb) return 1
-
-  const da = ca ?? a.updatedAt
-  const db = cb ?? b.updatedAt
-  return new Date(db).getTime() - new Date(da).getTime()
-}
 
 interface AssessmentsPageProps {
   params: Promise<{ locale: Locale }>
@@ -99,9 +83,7 @@ export default async function AssessmentsPage({
     )
   }
 
-  const sorted = interviews
-    .filter((i) => HR_VISIBLE_STATUSES.has(i.status))
-    .sort(sortByCompletion)
+  const sorted = selectHrVisibleAssessments(interviews)
 
   return (
     <PageShell>
