@@ -25,9 +25,9 @@ export function isForbiddenError(err: unknown): boolean {
   return getApiErrorStatus(err) === 403
 }
 
-export function getErrorMessage(err: unknown, fallback?: string): string | undefined {
-  if (err == null) return undefined
-  if (!(err instanceof Error)) return undefined
+export function getErrorMessage(err: unknown, fallback = ''): string {
+  if (err == null) return ''
+  if (!(err instanceof Error)) return ''
   if (err.message.trim().length > 0) return err.message
   return fallback
 }

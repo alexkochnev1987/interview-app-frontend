@@ -9,10 +9,10 @@ import {
 } from '@/lib/api-error'
 
 describe('getErrorMessage', () => {
-  it('returns undefined for null and non-Error values', () => {
-    expect(getErrorMessage(null)).toBeUndefined()
-    expect(getErrorMessage(undefined)).toBeUndefined()
-    expect(getErrorMessage('network failed')).toBeUndefined()
+  it('returns empty string for null and non-Error values', () => {
+    expect(getErrorMessage(null)).toBe('')
+    expect(getErrorMessage(undefined)).toBe('')
+    expect(getErrorMessage('network failed')).toBe('')
   })
 
   it('returns Error.message when present', () => {
@@ -20,7 +20,7 @@ describe('getErrorMessage', () => {
   })
 
   it('returns fallback only for Error with empty message', () => {
-    expect(getErrorMessage(new Error('   '))).toBeUndefined()
+    expect(getErrorMessage(new Error('   '))).toBe('')
     expect(getErrorMessage(new Error(''), 'Fallback copy')).toBe('Fallback copy')
   })
 })
