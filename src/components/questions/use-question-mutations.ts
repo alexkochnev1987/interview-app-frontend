@@ -19,7 +19,10 @@ import {
 import { getDeleteQuestionErrorTitle, getErrorMessage } from '@/lib/api-error'
 import { notifyError, notifySuccess } from '@/lib/toast'
 import { useToastMessages } from '@/lib/use-toast-messages'
-import { notifyBulkDeleteOutcome } from '@/lib/notify-bulk-delete';
+import {
+  BULK_DELETE_TOAST_IDS,
+  notifyBulkDeleteOutcome,
+} from '@/lib/notify-bulk-delete'
 import { FEEDBACK_POLICY } from '@/lib/feedback-policy'
 import {deriveInlineAsyncStatus} from "./editor/async-status";
 
@@ -162,7 +165,7 @@ export function buildBulkDeleteMutationOptions(
     },
     onError: (error: unknown) => {
       notifyMutationError(toastMessages.bulkDelete.failedTitle, error, {
-        id: 'bulk-delete-error',
+        id: BULK_DELETE_TOAST_IDS.error,
       })
     },
   }

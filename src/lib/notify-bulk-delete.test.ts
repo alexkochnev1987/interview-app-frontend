@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { notifyBulkDeleteOutcome } from '@/lib/notify-bulk-delete'
+import { BULK_DELETE_TOAST_IDS, notifyBulkDeleteOutcome } from '@/lib/notify-bulk-delete'
 import { notifyInfo, notifySuccess } from '@/lib/toast'
 
 vi.mock('@/lib/toast', () => ({
@@ -30,7 +30,7 @@ describe('notifyBulkDeleteOutcome', () => {
     )
 
     expect(notifyInfo).toHaveBeenCalledWith('Deleted 1, blocked 1', {
-      id: 'bulk-delete-partial',
+      id: BULK_DELETE_TOAST_IDS.partial,
     })
     expect(notifySuccess).not.toHaveBeenCalled()
   })
@@ -39,7 +39,7 @@ describe('notifyBulkDeleteOutcome', () => {
     notifyBulkDeleteOutcome({ deleted: [], blocked: [] }, messages)
 
     expect(notifyInfo).toHaveBeenCalledWith('No questions deleted', {
-      id: 'bulk-delete-noop',
+      id: BULK_DELETE_TOAST_IDS.noop,
       description: 'Nothing was removed.',
     })
   })
@@ -48,7 +48,7 @@ describe('notifyBulkDeleteOutcome', () => {
     notifyBulkDeleteOutcome({ deleted: ['q-1', 'q-2'], blocked: [] }, messages)
 
     expect(notifySuccess).toHaveBeenCalledWith('Deleted 2', {
-      id: 'bulk-delete-success',
+      id: BULK_DELETE_TOAST_IDS.success,
       description: 'Library updated.',
     })
   })

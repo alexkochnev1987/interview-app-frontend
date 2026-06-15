@@ -5,12 +5,22 @@ import {
   buildQuestionMutationOptions,
 } from '@/components/questions/use-question-mutations'
 import { getDeleteQuestionErrorTitle, QuestionInUseError } from '@/lib/api-error'
-import { notifyBulkDeleteOutcome } from '@/lib/notify-bulk-delete'
+import {
+  BULK_DELETE_TOAST_IDS,
+  notifyBulkDeleteOutcome,
+} from '@/lib/notify-bulk-delete'
 import type { useToastMessages } from '@/lib/use-toast-messages'
 
-vi.mock('@/lib/notify-bulk-delete', () => ({
-  notifyBulkDeleteOutcome: vi.fn(),
-}))
+vi.mock('@/lib/notify-bulk-delete', async () => {
+  const actual = await vi.importActual<typeof import('@/lib/notify-bulk-delete')>(
+    '@/lib/notify-bulk-delete',
+  )
+
+  return {
+    ...actual,
+    notifyBulkDeleteOutcome: vi.fn(),
+  }
+})
 
 type MutationResources = Parameters<typeof buildQuestionMutationOptions>[0]
 type ToastMessages = ReturnType<typeof useToastMessages>
@@ -210,7 +220,7 @@ describe('buildBulkDeleteMutationOptions', () => {
     expect(resources.notifyMutationError).toHaveBeenCalledWith(
       'Bulk delete failed',
       error,
-      { id: 'bulk-delete-error' },
+      { id: BULK_DELETE_TOAST_IDS.error },
     )
   })
 })
