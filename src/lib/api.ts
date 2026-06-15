@@ -292,6 +292,10 @@ export async function getInterview(id: string): Promise<Interview> {
   }));
 }
 
+export async function getInterviews(): Promise<Interview[]> {
+  return handle(client.GET('/interviews'));
+}
+
 
 export async function generateCandidateLink(
   id: string,

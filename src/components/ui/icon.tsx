@@ -12,9 +12,14 @@ const iconVariants = cva('shrink-0', {
       lg: 'size-5',
       xl: 'size-6',
     },
+    tone: {
+      inherit: '',
+      primary: 'text-[hsl(var(--primary))]',
+    },
   },
   defaultVariants: {
     size: 'md',
+    tone: 'inherit',
   },
 })
 
@@ -24,10 +29,10 @@ interface IconProps extends VariantProps<typeof iconVariants> {
   spinning?: boolean
 }
 
-export function Icon({ children, size, className, spinning }: IconProps) {
+export function Icon({ children, size, tone, className, spinning }: IconProps) {
   if (!isValidElement<{ className?: string }>(children)) return children
   const merged = cn(
-    iconVariants({ size }),
+    iconVariants({ size, tone }),
     spinning ? 'animate-spin' : undefined,
     children.props.className,
     className,
