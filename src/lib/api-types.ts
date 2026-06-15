@@ -123,6 +123,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/me/onboarding": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Mark first-time onboarding as completed or skipped */
+        patch: operations["AuthController_completeOnboarding"];
+        trace?: never;
+    };
     "/users": {
         parameters: {
             query?: never;
@@ -865,6 +882,12 @@ export interface components {
              * @example 2026-05-05T12:00:00.000Z
              */
             createdAt: string;
+            /**
+             * Format: date-time
+             * @description When the user finished or skipped first-time onboarding. Null means onboarding is pending.
+             * @example 2026-06-10T14:30:00.000Z
+             */
+            onboardingCompletedAt?: string | null;
         };
         RegisterDto: {
             email: string;
@@ -877,6 +900,14 @@ export interface components {
         };
         /** @enum {string} */
         ApiErrorCode: "BAD_REQUEST" | "VALIDATION_ERROR" | "INVALID_LOCALE" | "REGISTRATION_FAILED" | "UPLOAD_FAILED" | "UPLOAD_NOT_ALLOWED" | "ANSWER_ATTEMPT_LIMIT_REACHED" | "UNAUTHORIZED" | "INVALID_CREDENTIALS" | "AUTHENTICATION_REQUIRED" | "CANDIDATE_SESSION_REQUIRED" | "INVALID_CANDIDATE_SESSION" | "INTERVIEW_TOKEN_REQUIRED" | "INVALID_INTERVIEW_TOKEN" | "FORBIDDEN" | "INSUFFICIENT_PERMISSIONS" | "ACCESS_DENIED" | "NOT_FOUND" | "QUESTION_NOT_FOUND" | "INTERVIEW_NOT_FOUND" | "USER_NOT_FOUND" | "FEEDBACK_NOT_FOUND" | "CONFLICT" | "QUESTION_IN_USE" | "VALIDATION_RUNNING" | "QUESTION_DUPLICATE" | "SERVICE_UNAVAILABLE" | "AI_PROVIDER_NOT_CONFIGURED" | "EMBEDDING_PROVIDER_NOT_CONFIGURED" | "INTERNAL_SERVER_ERROR";
+        CompleteOnboardingDto: {
+            /**
+             * @description How the user closed onboarding. Both values persist the same completion timestamp.
+             * @example completed
+             * @enum {string}
+             */
+            status?: "completed" | "skipped";
+        };
         ApiErrorResponseDto: {
             /** @example 400 */
             statusCode: number;
@@ -2002,6 +2033,36 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuthUserResponseDto"];
+                };
+            };
+            /** @description Missing or invalid session cookie */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AuthController_completeOnboarding: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CompleteOnboardingDto"];
+            };
+        };
         responses: {
             200: {
                 headers: {
