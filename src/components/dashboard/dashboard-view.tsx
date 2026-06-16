@@ -35,6 +35,7 @@ import { Stack } from '@/components/ui/layout/stack'
 import { BodyText, SectionHeading } from '@/components/ui/text'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
 import { Link } from '@/i18n/navigation'
+import { routes } from '@/i18n/routes'
 import { useInterviewFormatters } from '@/i18n/use-interview-formatters'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
 import type { Interview } from '@/lib/api'
@@ -102,7 +103,7 @@ export function DashboardView({ interviews, demoMode = false }: DashboardViewPro
                     </Link>
                   </Button>
                   <Button asChild variant="outline-pill" shape="pill" effects="blur">
-                    <Link href="/questions">{t('hero.questionBank')}</Link>
+                    <Link href={routes.questions.list}>{t('hero.questionBank')}</Link>
                   </Button>
                 </Inline>
               </Inline>
@@ -197,7 +198,7 @@ export function DashboardView({ interviews, demoMode = false }: DashboardViewPro
                 <SectionHeading>{t('recent.title')}</SectionHeading>
               </Stack>
               <Button asChild variant="outline-pill" shape="pill" effects="blur">
-                <Link href="/questions/new">{t('recent.createQuestion')}</Link>
+                <Link href={routes.questions.new}>{t('recent.createQuestion')}</Link>
               </Button>
             </Inline>
 

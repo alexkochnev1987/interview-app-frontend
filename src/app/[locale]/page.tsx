@@ -4,6 +4,7 @@ import { DashboardView } from '@/components/dashboard/dashboard-view'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import type { Locale } from '@/i18n/locales'
+import { routes } from '@/i18n/routes'
 import { type Interview } from '@/lib/api'
 import { canAccessDashboard } from '@/lib/auth-roles'
 import {
@@ -14,7 +15,7 @@ import {
 import { isForbiddenError, requestServer } from '@/lib/server-fetch'
 
 const ERROR_SIGN_IN_HREF = '/login'
-const ERROR_ESCAPE_HREF = '/questions'
+const ERROR_ESCAPE_HREF = routes.questions.list
 
 interface DashboardPageProps {
   params: Promise<{ locale: Locale }>

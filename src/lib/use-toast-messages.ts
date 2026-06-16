@@ -21,6 +21,9 @@ export function useToastMessages() {
       deleteSuccess: t('question.deleteSuccess'),
       deleteError: t('question.deleteError'),
     },
+    questions: {
+      loadFailedFallback: t('pageGate.questions.loadFailedFallback'),
+    },
     interview: {
       createSuccess: t('interview.createSuccess'),
       createError: t('interview.createError'),

@@ -4,6 +4,7 @@ import { QuestionEditClient } from '@/components/questions/edit/question-edit-cl
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import type { Locale } from '@/i18n/locales'
+import { routes } from '@/i18n/routes'
 import { type Question } from '@/lib/api'
 import {
   loadAuthGate,
@@ -21,7 +22,7 @@ interface EditQuestionPageProps {
   params: Promise<{ id: string; locale: Locale }>
 }
 
-const ERROR_BACK_HREF = '/questions'
+const ERROR_BACK_HREF = routes.questions.list
 
 export default async function EditQuestionPage({ params }: EditQuestionPageProps) {
   const { id, locale } = await params
@@ -29,7 +30,7 @@ export default async function EditQuestionPage({ params }: EditQuestionPageProps
   const tCommon = await getTranslations({ locale, namespace: 'common' })
   const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
 
-  const returnPath = `/questions/${encodeURIComponent(id)}`
+  const returnPath = routes.questions.detail(id)
   const auth = await loadAuthGate(canReadQuestions, locale)
   redirectIfUnauthenticated(auth, returnPath, locale)
   if (auth.kind === 'forbidden') {

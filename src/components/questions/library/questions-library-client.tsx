@@ -30,16 +30,12 @@ import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { Pagination } from '@/components/ui/pagination'
 import { useTranslations } from 'next-intl'
-
 import { useRouter } from '@/i18n/navigation'
+import { routes } from '@/i18n/routes'
 import { useQuestionChipLabels } from '@/i18n/use-question-chip-labels'
 import { type BulkDeleteResult, type Question } from '@/lib/api'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
 import { buildQuestionsInfiniteParams } from '@/lib/questions-query-state'
-import { notifyBulkDeleteOutcome } from '@/lib/notify-bulk-delete'
-import { notifyError } from '@/lib/toast'
-import { runMutation } from '@/lib/run-mutation'
-import { useToastMessages } from '@/lib/use-toast-messages'
 
 type QuestionsLibraryClientProps = {
   isSuperAdmin: boolean
@@ -53,8 +49,7 @@ export function QuestionsLibraryClient({
   const router = useRouter()
   const t = useTranslations('questions.library.client')
   const getChipLabel = useQuestionChipLabels()
-  const toastMessages = useToastMessages()
-  const { mutateAsync: bulkDeleteQuestions, isPending: bulkDeleting } =
+  const { mutate: bulkDeleteQuestions, isPending: bulkDeleting } =
     useBulkDeleteQuestions()
 
   const query = useQuestionsQuery({
@@ -174,29 +169,22 @@ export function QuestionsLibraryClient({
     })
   }
 
-  async function performBulkDelete() {
+  function performBulkDelete() {
     if (bulkDeleting) return
     const ids = Array.from(selectedIds)
     if (ids.length === 0) return
 
-    try {
-      const result = await runMutation(() => bulkDeleteQuestions(ids), {
-        showSuccessToast: false,
-        showErrorToast: false,
-      })
-      notifyBulkDeleteOutcome(result, toastMessages.bulkDelete)
-      setSelectedIds(new Set())
-      setBulkConfirmOpen(false)
-      setBulkResult(result)
-    } catch (error) {
-      setBulkResult(null)
-      notifyError(toastMessages.bulkDelete.failedTitle, {
-        id: 'bulk-delete-error',
-        description:
-          error instanceof Error ? error.message : toastMessages.bulkDelete.failedTitle,
-      })
-      setBulkConfirmOpen(false)
-    }
+    bulkDeleteQuestions(ids, {
+      onSuccess: result=>{
+        setSelectedIds(new Set())
+        setBulkConfirmOpen(false)
+        setBulkResult(result)
+      },
+      onError: ()=>{
+        setBulkResult(null)
+        setBulkConfirmOpen(false)
+      }
+    })
   }
 
   const selectedCount = selectedIds.size
@@ -315,7 +303,7 @@ export function QuestionsLibraryClient({
             selectedIds={selectedIds}
             onToggleSelected={toggleSelected}
             onToggleSelectAll={toggleSelectAll}
-            onRowClick={(q) => router.push(`/questions/${q.id}`)}
+            onRowClick={(q) => router.push(routes.questions.detail(q.id))}
             sortBy={query.state.sortBy}
             sortOrder={query.state.sortOrder}
             onSortChange={query.setSort}

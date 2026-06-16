@@ -19,6 +19,7 @@ import { PillRow } from '@/components/ui/pill-row'
 import { SelectableOverlay } from '@/components/ui/selectable-overlay'
 import { BodyText } from '@/components/ui/text'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
+import { routes } from '@/i18n/routes'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
 import { type Question } from '@/lib/api'
 import { truncateText } from '@/lib/text'
@@ -39,7 +40,7 @@ function CardBody({
   const sharedLabels = useSharedLabels()
 
   return (
-    <UnstyledLink href={`/questions/${question.id}`}>
+    <UnstyledLink href={routes.questions.detail(question.id)}>
       <Card
         variant={question.deleted ? 'danger-soft' : 'surface'}
         height="full"

@@ -1,9 +1,6 @@
 'use client'
-
 import { useState, type FormEvent } from 'react'
-
 import { useQuestionEditorLabels } from '@/i18n/use-question-editor-labels'
-
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { Stack } from '@/components/ui/layout/stack'
@@ -21,7 +18,6 @@ import { SimilarityPanel } from '@/components/questions/editor/similarity-panel'
 import { useDirtyTracking } from '@/components/questions/editor/use-dirty-tracking'
 import { useSimilaritySearch } from '@/components/questions/editor/use-similarity-search'
 import {
-  draftQuestion,
   type QuestionDraft,
   type QuestionInput,
 } from '@/lib/api'
@@ -36,25 +32,23 @@ import {
   normalizeInitialValue,
 } from '@/lib/question-editor/parsers'
 import { type DraftFieldKey } from '@/lib/question-editor/field-keys'
-import { FEEDBACK_POLICY } from '@/lib/feedback-policy'
-import { runMutation } from '@/lib/run-mutation'
-import { useToastMessages } from '@/lib/use-toast-messages'
+import { useDraftQuestion } from '@/components/questions/use-question-mutations'
 
-type AiStatus = 'idle' | 'loading' | 'error'
 type QuestionFormField = 'questionText' | 'metadata'
+
+export type QuestionSubmitCallbacks = {
+  /** Save errors are surfaced by question mutation hooks (toast), not this callback. */
+  onSuccess: (persisted: QuestionInput) => void
+}
 
 interface QuestionEditorProps {
   questionId?: string
   title: string
   initialValue?: QuestionInput
   submitLabel: string
-  onSubmit: (value: QuestionInput) => Promise<QuestionInput>
+  onSubmit: (value: QuestionInput, callbacks: QuestionSubmitCallbacks) => void
+  submitting?: boolean
   readOnly?: boolean
-  saveToastOptions?: {
-    enabled?: boolean
-    successMessage?: string
-    errorMessage?: string
-  }
 }
 
 export function QuestionEditor({
@@ -64,21 +58,17 @@ export function QuestionEditor({
   submitLabel,
   onSubmit,
   readOnly = false,
-  saveToastOptions,
+  submitting = false,
 }: QuestionEditorProps) {
-  const toastMessages = useToastMessages()
   const editorLabels = useQuestionEditorLabels()
   const [value, setValue] = useState<QuestionInput>(normalizeInitialValue(initialValue))
   const [metadataText, setMetadataText] = useState(
     formatMetadata(initialValue?.metadata ?? {}),
   )
-  const [submitting, setSubmitting] = useState(false)
-  const [aiStatus, setAiStatus] = useState<AiStatus>('idle')
   const [aiDraft, setAiDraft] = useState<QuestionDraft | null>(null)
   const [dismissedDraftFields, setDismissedDraftFields] = useState<DraftFieldKey[]>([])
   const [fieldErrors, setFieldErrors] = useState<FieldErrors<QuestionFormField>>({})
   const [englishOnlyError, setEnglishOnlyError] = useState<string | null>(null)
-  const [aiError, setAiError] = useState<string | null>(null)
   const fieldsDisabled = submitting || readOnly
 
   const { dirtyFieldKeys, isDirty, markSaved } = useDirtyTracking({
@@ -88,6 +78,7 @@ export function QuestionEditor({
   })
 
   const similarity = useSimilaritySearch({ value, questionId })
+  const draft = useDraftQuestion()
 
   function update(patch: Partial<QuestionInput>) {
     if (readOnly) return
@@ -115,13 +106,13 @@ export function QuestionEditor({
     setMetadataText(next)
   }
 
-  async function handleGenerate() {
+  function handleGenerate() {
     if (readOnly) return
     if (!value.questionText.trim()) {
-      setAiError(null)
-      setFieldErrors((prev) => ({
+      draft.reset()
+      setFieldErrors(prev=>({
         ...prev,
-        questionText: editorLabels.validation.questionTextRequiredForAi,
+        questionText: editorLabels.validation.questionTextRequiredForAi
       }))
       return
     }
@@ -138,40 +129,35 @@ export function QuestionEditor({
       { fieldLabel: editorLabels.fieldLabel('tags'), value: value.tags },
     ])
     if (nonEnglishFieldForGeneration) {
-      setAiError(null)
+      draft.reset()
       setEnglishOnlyError(
-        editorLabels.validation.englishOnlyField({ field: nonEnglishFieldForGeneration }),
+          editorLabels.validation.englishOnlyField({ field: nonEnglishFieldForGeneration }),
       )
       setFieldErrors((prev) => ({
         ...prev,
         questionText:
-          nonEnglishFieldForGeneration === editorLabels.fieldLabel('questionText')
-            ? editorLabels.validation.questionTextEnglishOnlyForAi
-            : prev.questionText,
+            nonEnglishFieldForGeneration === editorLabels.fieldLabel('questionText')
+                ? editorLabels.validation.questionTextEnglishOnlyForAi
+                : prev.questionText,
       }))
       return
     }
 
     clearFieldError('questionText', setFieldErrors)
     setEnglishOnlyError(null)
-    setAiError(null)
-    setAiStatus('loading')
 
-    try {
-      const draft = await draftQuestion(value)
-      setAiDraft(draft)
-      setDismissedDraftFields([])
-      setAiStatus('idle')
-    } catch (err) {
-      setAiDraft(null)
-      setDismissedDraftFields([])
-      setAiStatus('error')
-      setAiError(
-        err instanceof Error
-          ? err.message
-          : FEEDBACK_POLICY.draftQuestion.inlineErrorFallback,
-      )
-    }
+    draft.reset()
+    draft.mutate(value, {
+      onSuccess: draft=>{
+        setAiDraft(draft)
+        setDismissedDraftFields([])
+      },
+      onError:()=>{
+        setAiDraft(null)
+        setDismissedDraftFields([])
+      }
+    })
+
   }
 
   function applyDraftField(field: DraftFieldKey) {
@@ -283,25 +269,16 @@ export function QuestionEditor({
 
     setFieldErrors({})
     setEnglishOnlyError(null)
-    setSubmitting(true)
 
-    try {
-      const persisted = normalizeInitialValue(
-        await runMutation(() => onSubmit(payload), {
-          showSuccessToast: saveToastOptions?.enabled ?? true,
-          successMessage: saveToastOptions?.successMessage ?? toastMessages.question.saveSuccess,
-          errorMessage: saveToastOptions?.errorMessage ?? toastMessages.question.saveError,
-        }),
-      )
-      const normalizedMetadataText = formatMetadata(persisted.metadata ?? {})
-      setValue(persisted)
-      setMetadataText(normalizedMetadataText)
-      markSaved(persisted, normalizedMetadataText)
-    } catch {
-      return
-    } finally {
-      setSubmitting(false)
-    }
+    onSubmit(payload, {
+      onSuccess: (persisted) => {
+        const normalized = normalizeInitialValue(persisted)
+        const normalizedMetadataText = formatMetadata(normalized.metadata ?? {})
+        setValue(normalized)
+        setMetadataText(normalizedMetadataText)
+        markSaved(normalized, normalizedMetadataText)
+      },
+    })
   }
 
   return (
@@ -376,9 +353,9 @@ export function QuestionEditor({
               <AiDraftPanel
                 hasPendingDraft={Boolean(aiDraft) && pendingDraftFields.length > 0}
                 pendingCount={pendingDraftFields.length}
-                loading={aiStatus === 'loading'}
+                loading={draft.status === 'loading'}
                 disabled={fieldsDisabled}
-                error={aiError ?? undefined}
+                error={draft.error ?? undefined}
                 onGenerate={handleGenerate}
                 onApplyAll={applyAllAiFields}
               />

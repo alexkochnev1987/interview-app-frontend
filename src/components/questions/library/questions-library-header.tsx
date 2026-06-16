@@ -18,6 +18,7 @@ import { HeroGrid } from '@/components/ui/layout/hero-grid'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { Link } from '@/i18n/navigation'
+import { routes } from '@/i18n/routes'
 
 interface QuestionsLibraryHeaderProps {
   loading: boolean
@@ -46,7 +47,7 @@ export function QuestionsLibraryHeader({
             </Stack>
             <Inline>
               <Button asChild variant="gradient" size="hero" shape="pill">
-                <Link href="/questions/new">
+                <Link href={routes.questions.new}>
                   <Plus className="size-5" />
                   {t('newQuestion')}
                 </Link>

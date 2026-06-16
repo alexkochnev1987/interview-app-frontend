@@ -6,21 +6,19 @@ import { useTranslations } from 'next-intl'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { DeletedQuestionBanner } from '@/components/questions/detail/deleted-question-banner'
 import { QuestionDangerZone } from '@/components/questions/detail/question-danger-zone'
-import { QuestionEditor } from '@/components/questions/editor/question-editor'
+import {
+  QuestionEditor,
+  type QuestionSubmitCallbacks,
+} from '@/components/questions/editor/question-editor'
 import {
   useDeleteQuestion,
   useRestoreQuestion,
   useUpdateQuestion,
 } from '@/components/questions/use-question-mutations'
 import { useRouter } from '@/i18n/navigation'
-import {
-  QuestionInUseError,
-  type Question,
-  type QuestionInput,
-} from '@/lib/api'
+import { routes } from '@/i18n/routes'
+import { type Question, type QuestionInput } from '@/lib/api'
 import { questionToEditorInput } from '@/lib/question-editor/parsers'
-import { runMutation } from '@/lib/run-mutation'
-import { useToastMessages } from '@/lib/use-toast-messages'
 
 type QuestionEditClientProps = {
   id: string
@@ -37,49 +35,48 @@ export function QuestionEditClient({
 }: QuestionEditClientProps) {
   const t = useTranslations('questions.editPage')
   const router = useRouter()
-  const toastMessages = useToastMessages()
-  const { mutateAsync: updateQuestion } = useUpdateQuestion()
-  const { mutateAsync: deleteQuestion, isPending: deleting } = useDeleteQuestion()
-  const { mutateAsync: restoreQuestion, isPending: restoring } = useRestoreQuestion()
+  const { mutate: updateQuestion, isPending: submitting } = useUpdateQuestion()
+  const { mutate: deleteQuestion, isPending: deleting } = useDeleteQuestion()
+  const { mutate: restoreQuestion, isPending: restoring } = useRestoreQuestion()
   const [question, setQuestion] = useState(initialQuestion)
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [restoreOpen, setRestoreOpen] = useState(false)
 
-  async function handleSubmit(value: QuestionInput) {
-    const updated = await updateQuestion({ id, value })
-    setQuestion(updated)
-    router.refresh()
-    return updated
+  function handleSubmit(value: QuestionInput, { onSuccess }: QuestionSubmitCallbacks) {
+    updateQuestion(
+      { id, value },
+      {
+        onSuccess: (updated) => {
+          setQuestion(updated)
+          router.refresh()
+          onSuccess(questionToEditorInput(updated))
+        },
+      },
+    )
   }
 
-  async function performRestore() {
+  function performRestore() {
     if (restoring) return
-    try {
-      const restored = await runMutation(() => restoreQuestion(id), {
-        successMessage: toastMessages.question.restoreSuccess,
-        errorMessage: toastMessages.question.restoreError,
-      })
-      setQuestion(restored)
-      setRestoreOpen(false)
-      router.refresh()
-    } catch {}
+
+    restoreQuestion(id, {
+      onSuccess: (restored)=>{
+        setQuestion(restored)
+        setRestoreOpen(false)
+        router.refresh()
+      }
+    })
   }
 
-  async function performDelete() {
+  function performDelete() {
     if (deleting) return
-    try {
-      await runMutation(() => deleteQuestion(id), {
-        successMessage: toastMessages.question.deleteSuccess,
-        errorMessage: toastMessages.question.deleteError,
-        getErrorTitle: (err) =>
-          err instanceof QuestionInUseError
-            ? toastMessages.deleteQuestion.cannotDeleteTitle
-            : toastMessages.question.deleteError,
-      })
-      setConfirmOpen(false)
-      router.push('/questions')
-      router.refresh()
-    } catch {}
+
+    deleteQuestion(id,{
+      onSuccess:()=>{
+        setConfirmOpen(false)
+        router.push(routes.questions.list)
+        router.refresh()
+      }
+    })
   }
 
   return (
@@ -97,6 +94,7 @@ export function QuestionEditClient({
         initialValue={questionToEditorInput(question)}
         submitLabel={t('submit')}
         onSubmit={handleSubmit}
+        submitting={submitting}
       />
       {!question.deleted && canDelete ? (
         <QuestionDangerZone

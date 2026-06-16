@@ -13,6 +13,8 @@ import {
 } from '@/lib/questions-query-state'
 import { questionFacetsQueryKey } from './query-keys'
 import { isPlaceholderLoading, useVoidCallback } from './query-hook-helpers'
+import {getErrorMessage} from '@/lib/api-error';
+import { useToastMessages } from '@/lib/use-toast-messages'
 
 export type UseQuestionFacetsResult = {
   facets: QuestionFacetsResponse
@@ -36,6 +38,7 @@ export function useQuestionFacets(
   snapshot: FilterSnapshot,
   debouncedQ: string,
 ): UseQuestionFacetsResult {
+  const toastMessages = useToastMessages()
   const params = useMemo(
     () => buildQuestionFacetsParams(snapshot, debouncedQ),
     [snapshot, debouncedQ],
@@ -52,7 +55,7 @@ export function useQuestionFacets(
   return {
     facets: query.data ?? EMPTY_QUESTION_FACETS,
     loading: isPlaceholderLoading(query),
-    error: query.error instanceof Error ? query.error.message : null,
+    error: getErrorMessage(query.error, toastMessages.questions.loadFailedFallback) ?? null,
     refetch,
   }
 }

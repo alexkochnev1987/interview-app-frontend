@@ -1,17 +1,32 @@
 'use client'
 
 import { useCallback } from 'react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import {
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query'
 
 import { questionsRootQueryKey } from '@/components/questions/picker/query-keys'
 import {
   createQuestion,
   deleteQuestion,
   deleteQuestionsBulk,
+  draftQuestion,
   restoreQuestion,
   updateQuestion,
   type QuestionInput,
 } from '@/lib/api'
+import { getDeleteQuestionErrorTitle, getErrorMessage } from '@/lib/api-error'
+import { notifyError, notifySuccess } from '@/lib/toast'
+import { useToastMessages } from '@/lib/use-toast-messages'
+import {
+  BULK_DELETE_TOAST_IDS,
+  notifyBulkDeleteOutcome,
+} from '@/lib/notify-bulk-delete'
+import { FEEDBACK_POLICY } from '@/lib/feedback-policy'
+import {deriveInlineAsyncStatus} from "./editor/async-status";
+
+type QuestionMutationErrorTitle = string | ((error: unknown) => string)
 
 function useInvalidateQuestions() {
   const queryClient = useQueryClient()
@@ -21,48 +36,163 @@ function useInvalidateQuestions() {
   }, [queryClient])
 }
 
-export function useCreateQuestion() {
-  const invalidateQuestions = useInvalidateQuestions()
+function useQuestionMutationResources() {
+  const invalidateQuestions =useInvalidateQuestions()
+  const toastMessages=useToastMessages()
 
-  return useMutation({
-    mutationFn: (value: QuestionInput) => createQuestion(value),
-    onSuccess: invalidateQuestions,
-  })
+  const notifyMutationError= (
+      title: string,
+      error:unknown,
+      options?:{id?:string}
+  )=>{
+    notifyError(title, {
+      id: options?.id,
+      description: getErrorMessage(error, toastMessages.defaults.error),
+    })
+  }
+
+  const notifyMutationSuccess= (message:string)=>{
+    notifySuccess(message)
+  }
+
+  return {
+    toastMessages,
+    invalidateQuestions,
+    notifyMutationError,
+    notifyMutationSuccess,
+  }
+}
+
+type BuildQuestionMutationOptionsConfig<TData, TVariables> = {
+  mutationFn:(variables:TVariables)=> Promise<TData>
+  successMessage: string
+  errorTitle: QuestionMutationErrorTitle
+}
+
+export function buildQuestionMutationOptions<TData, TVariables>(
+    resources: ReturnType<typeof useQuestionMutationResources>,
+    config: BuildQuestionMutationOptionsConfig<TData, TVariables>,
+){
+  const {
+    invalidateQuestions,
+    notifyMutationError,
+    notifyMutationSuccess,
+  } = resources
+
+  return {
+    mutationFn: config.mutationFn,
+    onSuccess: ()=>{
+      invalidateQuestions()
+      notifyMutationSuccess(config.successMessage)
+    },
+    onError: (error: unknown) => {
+      const title =
+        typeof config.errorTitle === 'function'
+          ? config.errorTitle(error)
+          : config.errorTitle
+
+      notifyMutationError(title, error)
+    },
+  }
+}
+
+export function useCreateQuestion() {
+
+  const resources= useQuestionMutationResources()
+
+  return useMutation(
+      buildQuestionMutationOptions(resources, {
+        mutationFn:createQuestion,
+        successMessage:resources.toastMessages.question.createSuccess,
+        errorTitle:resources.toastMessages.question.createError
+      })
+  )
 }
 
 export function useUpdateQuestion() {
-  const invalidateQuestions = useInvalidateQuestions()
+  const resources = useQuestionMutationResources()
 
-  return useMutation({
-    mutationFn: ({ id, value }: { id: string; value: QuestionInput }) =>
-      updateQuestion(id, value),
-    onSuccess: invalidateQuestions,
-  })
+  return useMutation(
+      buildQuestionMutationOptions(resources,{
+        mutationFn: ({ id, value }: { id: string; value: QuestionInput }) =>
+          updateQuestion(id, value),
+        successMessage:resources.toastMessages.question.saveSuccess,
+        errorTitle:resources.toastMessages.question.saveError
+      })
+  )
 }
 
 export function useDeleteQuestion() {
-  const invalidateQuestions = useInvalidateQuestions()
 
-  return useMutation({
-    mutationFn: (id: string) => deleteQuestion(id),
-    onSuccess: invalidateQuestions,
-  })
+  const resources = useQuestionMutationResources()
+
+  return useMutation(
+      buildQuestionMutationOptions(resources,{
+        mutationFn: deleteQuestion,
+        successMessage:resources.toastMessages.question.deleteSuccess,
+        errorTitle:(error)=> getDeleteQuestionErrorTitle(
+            error,
+            resources.toastMessages.question.deleteError,
+            resources.toastMessages.deleteQuestion.cannotDeleteTitle,
+        )
+      })
+  )
 }
 
 export function useRestoreQuestion() {
-  const invalidateQuestions = useInvalidateQuestions()
 
-  return useMutation({
-    mutationFn: (id: string) => restoreQuestion(id),
-    onSuccess: invalidateQuestions,
-  })
+  const resources = useQuestionMutationResources()
+
+  return useMutation(
+      buildQuestionMutationOptions( resources , {
+        mutationFn:restoreQuestion,
+        successMessage: resources.toastMessages.question.restoreSuccess,
+        errorTitle: resources.toastMessages.question.restoreError,
+      })
+  )
+}
+
+export function buildBulkDeleteMutationOptions(
+  resources: ReturnType<typeof useQuestionMutationResources>,
+) {
+  const { toastMessages, invalidateQuestions, notifyMutationError } = resources
+
+  return {
+    mutationFn: deleteQuestionsBulk,
+    onSuccess: (result: Awaited<ReturnType<typeof deleteQuestionsBulk>>) => {
+      invalidateQuestions()
+      notifyBulkDeleteOutcome(result, toastMessages.bulkDelete)
+    },
+    onError: (error: unknown) => {
+      notifyMutationError(toastMessages.bulkDelete.failedTitle, error, {
+        id: BULK_DELETE_TOAST_IDS.error,
+      })
+    },
+  }
 }
 
 export function useBulkDeleteQuestions() {
-  const invalidateQuestions = useInvalidateQuestions()
+  const resources = useQuestionMutationResources()
 
-  return useMutation({
-    mutationFn: (ids: string[]) => deleteQuestionsBulk(ids),
-    onSuccess: invalidateQuestions,
+  return useMutation(buildBulkDeleteMutationOptions(resources))
+}
+
+/** Draft errors stay inline in QuestionEditor; this hook doesn't toast. */
+export function useDraftQuestion() {
+  const mutation = useMutation({
+    mutationFn: (value: QuestionInput) => draftQuestion(value)
   })
+
+  const status = deriveInlineAsyncStatus(mutation)
+
+  const error = mutation.isError ? getErrorMessage(
+      mutation.error,
+      FEEDBACK_POLICY.draftQuestion.inlineErrorFallback
+  ) : null
+
+  return {
+    ...mutation,
+    status,
+    error,
+  }
 }
