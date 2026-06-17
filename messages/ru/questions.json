@@ -274,7 +274,7 @@
         "endOfList": "Конец списка"
       },
       "bulkAlerts": {
-        "blockedHeading": "Пропущено (используется)",
+        "scheduledHeading": "Запланировано к удалению",
         "deletedHeading": "Удалено"
       }
     },

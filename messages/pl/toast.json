@@ -33,12 +33,12 @@
     },
     "bulkDelete": {
       "failedTitle": "Usuwanie zbiorcze nie powiodło się",
-      "partialTitle": "Usunięto: {deletedCount}, zablokowano: {blockedCount}",
+      "partialTitle": "Usunięto: {deletedCount}, zaplanowano: {scheduledCount}",
       "successTitle": "{count, plural, one {Usunięto # pytanie} few {Usunięto # pytania} many {Usunięto # pytań} other {Usunięto # pytania}}",
       "successDescription": "Biblioteka jest aktualna.",
       "noopTitle": "Nie usunięto pytań",
       "noopDescription": "Żadne z wybranych pytań nie zostało usunięte.",
-      "blockedIntro": "Te pytania są używane w aktywnych interview i nie zostały usunięte:"
+      "scheduledIntro": "Te pytania są nadal używane w aktywnych interview. Usunięcie nastąpi po ich zakończeniu:"
     },
     "questionFeed": {
       "unavailableTitle": "Lista pytań jest niedostępna"
@@ -127,7 +127,8 @@
       "queuedLabel": "Ponowna ocena w kolejce"
     },
     "deleteQuestion": {
-      "cannotDeleteTitle": "Nie można usunąć"
+      "scheduledTitle": "Usunięcie zaplanowane",
+      "scheduledIntro": "To pytanie jest nadal używane w aktywnych interview. Zostanie usunięte po ich zakończeniu:"
     },
     "team": {
       "updateSuccess": "Rola zaktualizowana",

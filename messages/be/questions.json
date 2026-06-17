@@ -274,7 +274,7 @@
         "endOfList": "Канец спісу"
       },
       "bulkAlerts": {
-        "blockedHeading": "Прапушчана (выкарыстоўваецца)",
+        "scheduledHeading": "Запланавана да выдалення",
         "deletedHeading": "Выдалены"
       }
     },

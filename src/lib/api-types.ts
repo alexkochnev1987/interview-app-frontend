@@ -280,7 +280,8 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        /** Update pending interview */
+        patch: operations["InterviewController_update"];
         trace?: never;
     };
     "/interviews/{id}/candidate-link": {
@@ -298,6 +299,23 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/interviews/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Cancel pending interview */
+        patch: operations["InterviewController_cancel"];
         trace?: never;
     };
     "/interviews/{id}/complete": {
@@ -780,6 +798,8 @@ export interface components {
             /** Format: date-time */
             updatedAt: string;
             deleted: boolean;
+            /** @description True when deletion is scheduled because the question is still used by active interviews. */
+            pendingDeletion: boolean;
             /** @description Number of times this question has been used in an interview. */
             usageCount: number;
         };
@@ -870,22 +890,35 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        QuestionDeleteBlockingInterviewDto: {
+            id: string;
+            candidateName: string;
+            /**
+             * @description Staff app path to open the blocking interview.
+             * @example /interviews/550e8400-e29b-41d4-a716-446655440000
+             */
+            href: string;
+        };
         DeleteQuestionResponseDto: {
             id: string;
             /** @example true */
-            deleted: boolean;
+            deleted?: boolean;
+            /** @example true */
+            scheduled?: boolean;
+            blockingInterviews?: components["schemas"]["QuestionDeleteBlockingInterviewDto"][];
         };
         BulkDeleteQuestionsDto: {
             ids: string[];
         };
-        BulkDeleteBlockedItemDto: {
+        BulkDeleteScheduledItemDto: {
             id: string;
             questionText: string;
             reason: string;
+            blockingInterviews: components["schemas"]["QuestionDeleteBlockingInterviewDto"][];
         };
         BulkDeleteQuestionsResponseDto: {
             deleted: string[];
-            blocked: components["schemas"]["BulkDeleteBlockedItemDto"][];
+            scheduled: components["schemas"]["BulkDeleteScheduledItemDto"][];
         };
         CreateInterviewDto: {
             candidateName: string;
@@ -1047,7 +1080,7 @@ export interface components {
             questions: components["schemas"]["QuestionResponseDto"][];
             answers: components["schemas"]["AnswerDto"][];
             /** @enum {string} */
-            status: "pending" | "in_progress" | "processing" | "completed" | "failed";
+            status: "pending" | "in_progress" | "processing" | "completed" | "failed" | "canceled";
             result?: components["schemas"]["InterviewResultResponseDto"];
             /** Format: date-time */
             createdAt: string;
@@ -1064,7 +1097,7 @@ export interface components {
             questions: components["schemas"]["QuestionResponseDto"][];
             answers: components["schemas"]["AnswerDto"][];
             /** @enum {string} */
-            status: "pending" | "in_progress" | "processing" | "completed" | "failed";
+            status: "pending" | "in_progress" | "processing" | "completed" | "failed" | "canceled";
             result?: components["schemas"]["InterviewResultResponseDto"];
             /** Format: date-time */
             createdAt: string;
@@ -1074,6 +1107,12 @@ export interface components {
         };
         CandidateLinkResponseDto: {
             candidateLink: string;
+        };
+        UpdateInterviewDto: {
+            candidateName?: string;
+            candidateEmail?: string;
+            position?: string;
+            questionIds?: string[];
         };
         StartAnswerValidationResultDto: {
             /** @enum {string} */
@@ -1776,14 +1815,6 @@ export interface operations {
                     "application/json": components["schemas"]["ApiErrorResponseDto"];
                 };
             };
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponseDto"];
-                };
-            };
         };
     };
     QuestionController_update: {
@@ -2085,6 +2116,63 @@ export interface operations {
             };
         };
     };
+    InterviewController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateInterviewDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterviewResponseDto"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
     InterviewController_generateCandidateLink: {
         parameters: {
             query?: never;
@@ -2113,6 +2201,51 @@ export interface operations {
                 };
             };
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    InterviewController_cancel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterviewResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

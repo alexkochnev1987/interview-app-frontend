@@ -274,7 +274,7 @@
         "endOfList": "End of list"
       },
       "bulkAlerts": {
-        "blockedHeading": "Skipped (in use)",
+        "scheduledHeading": "Scheduled for deletion",
         "deletedHeading": "Deleted"
       }
     },

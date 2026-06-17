@@ -33,12 +33,12 @@
     },
     "bulkDelete": {
       "failedTitle": "Bulk delete failed",
-      "partialTitle": "Deleted {deletedCount}, blocked {blockedCount}",
+      "partialTitle": "Deleted {deletedCount}, scheduled {scheduledCount}",
       "successTitle": "Deleted {count, plural, one {# question} other {# questions}}",
       "successDescription": "The library is up to date.",
       "noopTitle": "No questions deleted",
       "noopDescription": "None of the selected questions were removed.",
-      "blockedIntro": "These questions are used in active interviews and were not deleted:"
+      "scheduledIntro": "These questions are still used by active interviews. Deletion will run once they finish:"
     },
     "questionFeed": {
       "unavailableTitle": "Question feed unavailable"
@@ -127,7 +127,8 @@
       "queuedLabel": "Re-evaluation queued"
     },
     "deleteQuestion": {
-      "cannotDeleteTitle": "Cannot delete"
+      "scheduledTitle": "Deletion scheduled",
+      "scheduledIntro": "This question is still used by active interviews. It will be removed once they finish:"
     },
     "team": {
       "updateSuccess": "Role updated",

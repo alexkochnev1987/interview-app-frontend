@@ -42,13 +42,13 @@ export function useToastMessages() {
     },
     bulkDelete: {
       failedTitle: t('bulkDelete.failedTitle'),
-      partialTitle: (deletedCount: number, blockedCount: number) =>
-        t('bulkDelete.partialTitle', { deletedCount, blockedCount }),
+      partialTitle: (deletedCount: number, scheduledCount: number) =>
+        t('bulkDelete.partialTitle', { deletedCount, scheduledCount }),
       successTitle: (count: number) => t('bulkDelete.successTitle', { count }),
       successDescription: t('bulkDelete.successDescription'),
       noopTitle: t('bulkDelete.noopTitle'),
       noopDescription: t('bulkDelete.noopDescription'),
-      blockedIntro: t('bulkDelete.blockedIntro'),
+      scheduledIntro: t('bulkDelete.scheduledIntro'),
     },
     questionFeed: {
       unavailableTitle: t('questionFeed.unavailableTitle'),
@@ -91,7 +91,8 @@ export function useToastMessages() {
       queuedLabel: t('rerun.queuedLabel'),
     },
     deleteQuestion: {
-      cannotDeleteTitle: t('deleteQuestion.cannotDeleteTitle'),
+      scheduledTitle: t('deleteQuestion.scheduledTitle'),
+      scheduledIntro: t('deleteQuestion.scheduledIntro'),
     },
   }
 }

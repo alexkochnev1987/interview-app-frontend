@@ -1,8 +1,8 @@
 import createClient from 'openapi-fetch';
 import { paths, components } from './api-types';
-import { ApiError, QuestionInUseError } from './api-error';
+import { ApiError } from './api-error';
 
-export { ApiError, QuestionInUseError };
+export { ApiError } from './api-error';
 
 const client = createClient<paths>({
   baseUrl: '/api',
@@ -196,26 +196,25 @@ export async function updateQuestion(
   }));
 }
 
+export type QuestionDeleteBlockingInterview =
+  Schemas['QuestionDeleteBlockingInterviewDto'];
+
+export type DeleteQuestionResult =
+  | { id: string; deleted: true }
+  | {
+      id: string;
+      scheduled: true;
+      blockingInterviews: QuestionDeleteBlockingInterview[];
+    };
 
 export async function deleteQuestion(
   id: string,
-): Promise<{ id: string; deleted: true }> {
+): Promise<DeleteQuestionResult> {
   const { data, error, response } = await client.DELETE('/questions/{id}', {
     params: { path: { id } }
   });
   const status = response.status;
   const path = `/questions/${id}`;
-
-  if (status === 409) {
-    let message = 'Question is used by an active interview.';
-    if (error && typeof error === 'object' && error !== null && 'message' in error) {
-      const maybeMessage = (error as { message?: unknown }).message;
-      if (typeof maybeMessage === 'string') {
-        message = maybeMessage;
-      }
-    }
-    throw new QuestionInUseError(message);
-  }
 
   if (error) {
     throw new ApiError(status, messageFromError(error, status), path);
@@ -223,6 +222,14 @@ export async function deleteQuestion(
 
   if (!data) {
     throw new ApiError(status, 'API error: Empty response body', path);
+  }
+
+  if (data.scheduled === true) {
+    return {
+      id: data.id,
+      scheduled: true,
+      blockingInterviews: data.blockingInterviews ?? [],
+    };
   }
 
   if (data.deleted !== true) {
@@ -284,10 +291,6 @@ export async function getInterview(id: string): Promise<Interview> {
   return handle(client.GET('/interviews/{id}', {
     params: { path: { id } }
   }));
-}
-
-export async function getInterviews(): Promise<Interview[]> {
-  return handle(client.GET('/interviews'));
 }
 
 
