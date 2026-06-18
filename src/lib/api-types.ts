@@ -1614,7 +1614,7 @@ export interface operations {
                 role?: string;
                 outputLanguage?: string;
                 /** @description Non-super_admin callers are forced to "active" regardless of what they pass. */
-                status?: "active" | "inactive" | "all";
+                status?: "active" | "inactive" | "all" | "scheduled";
                 sortBy?: "createdAt" | "updatedAt" | "difficulty" | "questionText" | "popularity";
                 sortOrder?: "asc" | "desc";
                 page?: number;
@@ -1705,7 +1705,7 @@ export interface operations {
                 role?: string;
                 outputLanguage?: string;
                 /** @description Non-super_admin callers are forced to "active" regardless of what they pass. */
-                status?: "active" | "inactive" | "all";
+                status?: "active" | "inactive" | "all" | "scheduled";
                 sortBy?: "createdAt" | "updatedAt" | "difficulty" | "questionText" | "popularity";
                 sortOrder?: "asc" | "desc";
                 page?: number;
