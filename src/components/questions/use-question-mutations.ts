@@ -16,7 +16,7 @@ import {
   updateQuestion,
   type QuestionInput,
 } from '@/lib/api'
-import { getDeleteQuestionErrorTitle, getErrorMessage } from '@/lib/api-error'
+import { getErrorMessage } from '@/lib/api-error'
 import { notifyError, notifySuccess } from '@/lib/toast'
 import { useToastMessages } from '@/lib/use-toast-messages'
 import {
@@ -130,11 +130,7 @@ export function useDeleteQuestion() {
       buildQuestionMutationOptions(resources,{
         mutationFn: deleteQuestion,
         successMessage:resources.toastMessages.question.deleteSuccess,
-        errorTitle:(error)=> getDeleteQuestionErrorTitle(
-            error,
-            resources.toastMessages.question.deleteError,
-            resources.toastMessages.deleteQuestion.cannotDeleteTitle,
-        )
+        errorTitle: resources.toastMessages.question.deleteError,
       })
   )
 }

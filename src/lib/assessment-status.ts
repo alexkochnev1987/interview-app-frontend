@@ -13,6 +13,7 @@ export type ReviewStatus =
   | 'in_progress'
   | 'pending'
   | 'failed'
+  | 'canceled'
 
 export type ReviewStatusTone =
   | 'completed'
@@ -21,6 +22,7 @@ export type ReviewStatusTone =
   | 'in_progress'
   | 'pending'
   | 'failed'
+  | 'neutral'
 
 export type DecisionTone = 'completed' | 'pending' | 'failed'
 
@@ -113,6 +115,8 @@ export function deriveReviewStatus(interview: Interview): ReviewStatus {
       return 'scoring'
     case 'completed':
       return interview.result ? 'ready' : 'scoring'
+    case 'canceled':
+      return 'canceled'
     default:
       return assertNever(interview.status)
   }
@@ -150,6 +154,8 @@ export function reviewStatusLabel(status: ReviewStatus): string {
       return 'Awaiting candidate'
     case 'failed':
       return 'Failed'
+    case 'canceled':
+      return 'Canceled'
     default:
       return assertNever(status)
   }
@@ -169,6 +175,8 @@ export function reviewStatusTone(status: ReviewStatus): ReviewStatusTone {
       return 'pending'
     case 'failed':
       return 'failed'
+    case 'canceled':
+      return 'neutral'
     default:
       return assertNever(status)
   }

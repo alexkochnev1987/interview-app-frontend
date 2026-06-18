@@ -25,6 +25,7 @@ const statusPillVariants = cva(
         processing: "bg-orange-100 text-orange-800 ring-1 ring-orange-200",
         completed: "bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200",
         failed: "bg-rose-100 text-rose-800 ring-1 ring-rose-200",
+        canceled: "bg-slate-100 text-slate-700 ring-1 ring-slate-200",
         easy: "bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200",
         medium: "bg-amber-100 text-amber-800 ring-1 ring-amber-200",
         hard: "bg-violet-100 text-violet-800 ring-1 ring-violet-200",

@@ -4,6 +4,9 @@ import { ApiError } from './api-error';
 
 export { ApiError } from './api-error';
 
+export type UpdateInterviewPayload = Schemas['UpdateInterviewDto'];
+export type InterviewStatus = Interview['status'];
+
 const client = createClient<paths>({
   baseUrl: '/api',
   headers: {
@@ -293,6 +296,25 @@ export async function getInterview(id: string): Promise<Interview> {
   }));
 }
 
+export async function getInterviews(): Promise<Interview[]> {
+  return handle(client.GET('/interviews'));
+}
+
+export async function updateInterview(
+    id:string,
+    data:UpdateInterviewPayload,
+): Promise<Interview> {
+  return handle(client.PATCH('/interviews/{id}', {
+    params: {path: {id}},
+    body: data,
+  }));
+}
+
+export async function cancelInterview(id: string): Promise<Interview> {
+  return handle(client.PATCH('/interviews/{id}/cancel',{
+    params: {path: {id}},
+  }));
+}
 
 export async function generateCandidateLink(
   id: string,

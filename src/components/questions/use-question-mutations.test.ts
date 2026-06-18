@@ -4,7 +4,6 @@ import {
   buildBulkDeleteMutationOptions,
   buildQuestionMutationOptions,
 } from '@/components/questions/use-question-mutations'
-import { getDeleteQuestionErrorTitle, QuestionInUseError } from '@/lib/api-error'
 import {
   BULK_DELETE_TOAST_IDS,
   notifyBulkDeleteOutcome,
@@ -38,7 +37,8 @@ function makeResources(): MutationResources {
       restoreError: 'Restore failed',
     },
     deleteQuestion: {
-      cannotDeleteTitle: 'Cannot delete',
+      scheduledTitle: 'Deletion scheduled',
+      scheduledIntro: 'Deletion will run once active interviews finish.',
     },
     defaults: {
       success: 'Done',
@@ -49,13 +49,13 @@ function makeResources(): MutationResources {
     },
     bulkDelete: {
       failedTitle: 'Bulk delete failed',
-      partialTitle: (deletedCount: number, blockedCount: number) =>
-        `Deleted ${deletedCount}, blocked ${blockedCount}`,
+      partialTitle: (deletedCount: number, scheduledCount: number) =>
+        `Deleted ${deletedCount}, scheduled ${scheduledCount}`,
       noopTitle: 'No questions deleted',
       noopDescription: 'Nothing was removed.',
       successTitle: (count: number) => `Deleted ${count}`,
       successDescription: 'Library updated.',
-      blockedIntro: 'These questions could not be deleted:',
+      scheduledIntro: 'These questions are still used by active interviews.',
     },
   } as ToastMessages
 
@@ -131,12 +131,7 @@ describe('buildQuestionMutationOptions', () => {
     const options = buildQuestionMutationOptions(resources, {
       mutationFn: vi.fn(),
       successMessage: resources.toastMessages.question.deleteSuccess,
-      errorTitle: (error) =>
-        getDeleteQuestionErrorTitle(
-          error,
-          resources.toastMessages.question.deleteError,
-          resources.toastMessages.deleteQuestion.cannotDeleteTitle,
-        ),
+      errorTitle: resources.toastMessages.question.deleteError,
     })
 
     options.onSuccess()
@@ -145,22 +140,17 @@ describe('buildQuestionMutationOptions', () => {
     expect(resources.notifyMutationSuccess).toHaveBeenCalledWith('Deleted')
   })
 
-  it('delete error maps in-use conflicts to the dedicated title', () => {
+  it('delete error shows error toast', () => {
     const options = buildQuestionMutationOptions(resources, {
       mutationFn: vi.fn(),
       successMessage: resources.toastMessages.question.deleteSuccess,
-      errorTitle: (error) =>
-        getDeleteQuestionErrorTitle(
-          error,
-          resources.toastMessages.question.deleteError,
-          resources.toastMessages.deleteQuestion.cannotDeleteTitle,
-        ),
+      errorTitle: resources.toastMessages.question.deleteError,
     })
-    const error = new QuestionInUseError('Question is in use')
+    const error = new Error('Delete failed')
 
     options.onError(error)
 
-    expect(resources.notifyMutationError).toHaveBeenCalledWith('Cannot delete', error)
+    expect(resources.notifyMutationError).toHaveBeenCalledWith('Delete failed', error)
   })
 
   it('restore success invalidates and shows success toast', () => {
@@ -200,7 +190,7 @@ describe('buildBulkDeleteMutationOptions', () => {
 
   it('success invalidates and delegates bulk outcome handling', () => {
     const options = buildBulkDeleteMutationOptions(resources)
-    const result = { deleted: ['q-1'], blocked: [] }
+    const result = { deleted: ['q-1'], scheduled: [] }
 
     options.onSuccess(result)
 
