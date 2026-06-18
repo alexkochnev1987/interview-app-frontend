@@ -1,0 +1,77 @@
+{
+  "metadata": {
+    "title": "AI Interview Architect — платформа для інтэрв’ю",
+    "description": "Платформа для правядзення і ацэнкі інтэрв’ю з падтрымкай ІІ"
+  },
+  "common": {
+    "appName": "AI Interview Architect",
+    "brandEyebrow": "Intelligent Conductor",
+    "loading": "Загрузка...",
+    "notAvailable": "Недаступна",
+    "backToHome": "На галоўную",
+    "serviceUnavailable": "Сэрвіс недаступны",
+    "sessionVerificationFailed": "Не ўдалося праверыць вашу сесію або правы доступу.",
+    "profileLoadFailed": "Не ўдалося загрузіць ваш профіль."
+  },
+  "languageSwitcher": {
+    "label": "Мова",
+    "locales": {
+      "en": "English",
+      "be": "Беларуская",
+      "ru": "Русский",
+      "pl": "Polski"
+    }
+  },
+  "shared": {
+    "fallback": {
+      "backToDashboard": "Вярнуцца на панэль",
+      "backToQuestionLibrary": "Вярнуцца ў банк пытанняў",
+      "backToAssessments": "Вярнуцца да ацэнак"
+    },
+    "labels": {
+      "roles": {
+        "super_admin": "Суперадміністратар",
+        "admin": "Адміністратар",
+        "hr": "HR-спецыяліст",
+        "candidate": "Кандыдат",
+        "interviewer": "Інтэрв’юер",
+        "system": "Сістэма",
+        "assistant": "Асістэнт"
+      },
+      "roleFilters": {
+        "all": "Усе ролі"
+      },
+      "difficulty": {
+        "easy": "Лёгкае",
+        "medium": "Сярэдняе",
+        "hard": "Складанае"
+      },
+      "interviewStatus": {
+        "pending": "Чакае",
+        "in_progress": "У працэсе",
+        "processing": "Апрацоўваецца",
+        "completed": "Завершана",
+        "failed": "Памылка"
+      },
+      "reviewStatus": {
+        "ready": "Гатова да прагляду",
+        "scoring": "Ацэнка яшчэ абнаўляецца",
+        "ready_to_score": "Гатова да ацэнкі ШІ",
+        "in_progress": "Кандыдат праходзіць інтэрв’ю",
+        "pending": "Чакае кандыдата",
+        "failed": "Памылка"
+      },
+      "decision": {
+        "proceed": "Працягнуць",
+        "review": "На разгляд",
+        "reject": "Адхіліць"
+      },
+      "behaviorRisk": {
+        "high": "Высокая рызыка",
+        "medium": "Сярэдняя рызыка",
+        "low": "Нізкая рызыка",
+        "none": "Няма рызыкі"
+      }
+    }
+  }
+}

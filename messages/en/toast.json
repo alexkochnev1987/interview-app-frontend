@@ -1,0 +1,138 @@
+{
+  "toast": {
+    "defaults": {
+      "success": "Done",
+      "error": "Something went wrong",
+      "info": "Notice",
+      "actionCompleted": "Action completed",
+      "actionFailed": "Action failed"
+    },
+    "question": {
+      "createSuccess": "Question created",
+      "createError": "Failed to create question",
+      "saveSuccess": "Question saved",
+      "saveError": "Failed to save question",
+      "restoreSuccess": "Question restored",
+      "restoreError": "Failed to restore question",
+      "deleteSuccess": "Question deleted",
+      "deleteError": "Failed to delete question"
+    },
+    "interview": {
+      "createSuccess": "Interview created",
+      "createError": "Failed to create interview",
+      "refreshLinkSuccess": "Candidate link refreshed",
+      "refreshLinkError": "Failed to refresh candidate link",
+      "validationStartSuccess": "Validation started",
+      "validationStartError": "Failed to start interview validation",
+      "uploadSuccess": "Upload completed for question {questionNumber}",
+      "uploadError": "Upload failed for question {questionNumber}"
+    },
+    "take": {
+      "submitSuccess": "Answer submitted",
+      "submitError": "Failed to submit answer"
+    },
+    "bulkDelete": {
+      "failedTitle": "Bulk delete failed",
+      "partialTitle": "Deleted {deletedCount}, blocked {blockedCount}",
+      "successTitle": "Deleted {count, plural, one {# question} other {# questions}}",
+      "successDescription": "The library is up to date.",
+      "noopTitle": "No questions deleted",
+      "noopDescription": "None of the selected questions were removed.",
+      "blockedIntro": "These questions are used in active interviews and were not deleted:"
+    },
+    "questionFeed": {
+      "unavailableTitle": "Question feed unavailable"
+    },
+    "questionFacets": {
+      "unavailableTitle": "Filter options unavailable"
+    },
+    "similarity": {
+      "searchFailedTitle": "Similarity search failed",
+      "noMatches": "No close matches crossed the current similarity threshold."
+    },
+    "pageGate": {
+      "login": {
+        "failedTitle": "Authentication failed",
+        "failedFallback": "Login failed",
+        "signingInLabel": "Signing in...",
+        "signInLabel": "Sign In"
+      },
+      "dashboard": {
+        "forbiddenTitle": "You don't have access to the dashboard",
+        "forbiddenDescription": "The dashboard is reserved for HR, admin, and super-admin users. If you think this is a mistake, contact your workspace owner.",
+        "unavailableTitle": "Dashboard is unavailable right now",
+        "loadFailedTitle": "Could not load dashboard",
+        "loadFailedFallback": "Failed to load interviews.",
+        "signInActionLabel": "Sign in",
+        "questionBankActionLabel": "Go to question bank"
+      },
+      "assessments": {
+        "forbiddenTitle": "You don't have access to assessments",
+        "forbiddenDescription": "This area is reserved for HR and admin reviewers. If you think this is a mistake, contact your workspace owner.",
+        "loadFailedTitle": "Could not load assessments",
+        "loadFailedFallback": "Failed to load assessments.",
+        "unavailableTitle": "Assessment unavailable",
+        "loadDetailFallback": "Failed to load assessment.",
+        "notFoundFallback": "The requested assessment could not be loaded."
+      },
+      "interview": {
+        "forbiddenTitle": "You don't have access to this interview",
+        "forbiddenDescription": "Configuring interviews is reserved for HR, admin, and super-admin users. If you think this is a mistake, contact your workspace owner.",
+        "createUnavailableTitle": "Interview setup is unavailable right now",
+        "unavailableTitle": "Interview unavailable",
+        "loadFailedFallback": "Failed to load interview.",
+        "notFoundFallback": "The requested interview could not be loaded.",
+        "setupBlockedTitle": "Interview setup blocked",
+        "candidateNameRequired": "Candidate name is required.",
+        "positionRequired": "Position is required.",
+        "questionsRequired": "Select at least one question.",
+        "creatingLabel": "Creating..."
+      },
+      "feedback": {
+        "unavailableTitle": "Feedback unavailable",
+        "loadFailedFallback": "Failed to load"
+      },
+      "team": {
+        "forbiddenTitle": "You don't have access to team management",
+        "forbiddenDescription": "This area is reserved for admins and super admins. If you think this is a mistake, contact your workspace owner.",
+        "unavailableTitle": "Team management is unavailable right now",
+        "loadFailedTitle": "Could not load team members",
+        "loadFailedFallback": "Failed to load team members."
+      },
+      "questions": {
+        "editorIssueTitle": "Question editor issue",
+        "unavailableTitle": "Question unavailable",
+        "loadFailedFallback": "Failed to load questions.",
+        "notFoundFallback": "Question not found.",
+        "loadFailedCardDescription": "The editor could not load this question, so the route stops here instead of rendering a partially broken form.",
+        "libraryForbiddenTitle": "You don't have access to the question library",
+        "libraryForbiddenDescription": "The question library is reserved for HR, admin, and super-admin users. If you think this is a mistake, contact your workspace owner.",
+        "libraryUnavailableTitle": "Question library is unavailable right now",
+        "createForbiddenTitle": "You don't have access to create questions",
+        "createForbiddenDescription": "Creating questions is reserved for admin and super-admin users. If you think this is a mistake, contact your workspace owner.",
+        "createUnavailableTitle": "Question creation is unavailable right now"
+      },
+      "take": {
+        "unavailableTitle": "Interview unavailable",
+        "loadFailedFallback": "Failed to load interview."
+      }
+    },
+    "rerun": {
+      "alreadyInProgressTitle": "Re-evaluation already in progress",
+      "startFailedTitle": "Could not start re-evaluation",
+      "allFailedFallback": "Failed to start re-evaluation.",
+      "answerFailedFallback": "Failed to start re-evaluation for this answer.",
+      "nothingToReevaluateTitle": "Nothing to re-evaluate",
+      "nothingToReevaluateMessage": "No submitted answers to score yet. The candidate has not finished any answers.",
+      "queuedLabel": "Re-evaluation queued"
+    },
+    "deleteQuestion": {
+      "cannotDeleteTitle": "Cannot delete"
+    },
+    "team": {
+      "updateSuccess": "Role updated",
+      "updateError": "Could not update role",
+      "updateSuccessDescription": "{name} is now {role}."
+    }
+  }
+}

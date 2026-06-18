@@ -1,0 +1,196 @@
+import * as React from "react"
+import { cva, type VariantProps } from "class-variance-authority"
+import { Loader2 } from "lucide-react"
+import { Slot } from "radix-ui"
+
+import { cn } from "@/lib/utils"
+
+const buttonVariants = cva(
+  "group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground [a]:hover:bg-primary/80",
+        outline:
+          "border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
+        "outline-pill":
+          "border-border bg-surface-glass-soft hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
+        secondary:
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
+        ghost:
+          "hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50",
+        destructive:
+          "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
+        gradient:
+          "bg-primary-gradient text-primary-foreground hover:brightness-105",
+        link: "text-primary underline-offset-4 hover:underline",
+      },
+      size: {
+        default:
+          "h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
+        xs: "h-6 gap-1 px-2 text-xs has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
+        sm: "h-7 gap-1 px-2.5 text-[0.8rem] has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5",
+        lg: "h-9 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
+        xl: "h-11 gap-2 px-5 font-semibold has-data-[icon=inline-end]:pr-4 has-data-[icon=inline-start]:pl-4",
+        "2xl": "h-12 gap-2 px-5 font-semibold has-data-[icon=inline-end]:pr-4 has-data-[icon=inline-start]:pl-4",
+        hero: "h-14 gap-2 px-8 text-base font-semibold has-data-[icon=inline-end]:pr-6 has-data-[icon=inline-start]:pl-6",
+        icon: "size-8",
+        "icon-xxs":
+          "size-4 [&_svg:not([class*='size-'])]:size-3",
+        "icon-xs":
+          "size-6 [&_svg:not([class*='size-'])]:size-3",
+        "icon-sm": "size-7",
+        "icon-lg": "size-9",
+        "icon-xl":
+          "size-11 [&_svg:not([class*='size-'])]:size-5",
+        "icon-2xl":
+          "size-12 [&_svg:not([class*='size-'])]:size-[1.375rem]",
+        "icon-prep-room":
+          "size-10 [&_svg:not([class*='size-'])]:size-[1.125rem] sm:size-12 sm:[&_svg:not([class*='size-'])]:size-[1.375rem]",
+      },
+      shape: {
+        rounded: "rounded-lg",
+        pill: "rounded-full",
+      },
+      effects: {
+        none: "",
+        blur: "backdrop-blur-sm",
+        "blur-strong": "backdrop-blur-xl",
+      },
+      width: {
+        auto: "",
+        full: "w-full",
+      },
+    },
+    compoundVariants: [
+      {
+        size: "xs",
+        shape: "rounded",
+        className:
+          "rounded-[min(calc(var(--radius)-4px),10px)] in-data-[slot=button-group]:rounded-lg",
+      },
+      {
+        size: "sm",
+        shape: "rounded",
+        className:
+          "rounded-[min(calc(var(--radius)-2px),12px)] in-data-[slot=button-group]:rounded-lg",
+      },
+      {
+        size: "icon-xs",
+        shape: "rounded",
+        className:
+          "rounded-[min(calc(var(--radius)-4px),10px)] in-data-[slot=button-group]:rounded-lg",
+      },
+      {
+        size: "icon-sm",
+        shape: "rounded",
+        className:
+          "rounded-[min(calc(var(--radius)-2px),12px)] in-data-[slot=button-group]:rounded-lg",
+      },
+      {
+        size: "icon-xl",
+        shape: "rounded",
+        className:
+          "rounded-[min(var(--radius),14px)] in-data-[slot=button-group]:rounded-lg",
+      },
+      {
+        size: "icon-2xl",
+        shape: "rounded",
+        className:
+          "rounded-[min(var(--radius),14px)] in-data-[slot=button-group]:rounded-lg",
+      },
+      {
+        size: "icon-prep-room",
+        shape: "rounded",
+        className:
+          "rounded-[min(var(--radius),14px)] in-data-[slot=button-group]:rounded-lg",
+      },
+      {
+        variant: "gradient",
+        size: "default",
+        className: "px-5",
+      },
+      {
+        variant: "link",
+        className: "rounded-none",
+      },
+    ],
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+      shape: "rounded",
+      effects: "none",
+      width: "auto",
+    },
+  }
+)
+
+function Button({
+  className,
+  variant = "default",
+  size = "default",
+  shape,
+  effects,
+  width,
+  asChild = false,
+  loading = false,
+  disabled,
+  children,
+  ...props
+}: React.ComponentProps<"button"> &
+  VariantProps<typeof buttonVariants> & {
+    asChild?: boolean
+    loading?: boolean
+  }) {
+  const classes = cn(buttonVariants({ variant, size, shape, effects, width, className }))
+
+  if (asChild) {
+    const isDisabled = disabled || loading
+    const disabledOverrides = isDisabled
+      ? {
+          tabIndex: -1,
+          onClick: (event: React.MouseEvent<HTMLElement>) => {
+            event.preventDefault()
+            event.stopPropagation()
+          },
+          onKeyDown: (event: React.KeyboardEvent<HTMLElement>) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault()
+              event.stopPropagation()
+            }
+          },
+        }
+      : {}
+    return (
+      <Slot.Root
+        data-slot="button"
+        data-variant={variant}
+        data-size={size}
+        aria-busy={loading || undefined}
+        aria-disabled={isDisabled || undefined}
+        className={cn(classes, isDisabled && 'pointer-events-none opacity-50')}
+        {...props}
+        {...disabledOverrides}
+      >
+        {children}
+      </Slot.Root>
+    )
+  }
+
+  return (
+    <button
+      data-slot="button"
+      data-variant={variant}
+      data-size={size}
+      aria-busy={loading || undefined}
+      disabled={disabled || loading}
+      className={classes}
+      {...props}
+    >
+      {loading ? <Loader2 className="animate-spin" /> : null}
+      {children}
+    </button>
+  )
+}
+
+export { Button }

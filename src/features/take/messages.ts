@@ -1,0 +1,150 @@
+export const TAKE_MESSAGES = {
+  questionCountOne: '{count} question',
+  questionCountOther: '{count} questions',
+  browserUnsupported: 'This browser must support camera, microphone, and full-screen sharing.',
+  shortRecordingSubmit: 'Recording is too short to submit yet. Please record a bit longer and try again.',
+  syncingInProgress: 'Recording is still syncing for this question. Try submitting again in a moment.',
+  screenShareStopped:
+    'Screen sharing stopped. Reconnect camera and entire-screen sharing to continue this question.',
+  recordingStoppedWithoutAction:
+    'Recording stopped without a follow-up action. Start a new version for this answer.',
+  uploadFailedFallback: 'Upload failed',
+  submitFailedTitle: 'Submit failed',
+  reconnectCameraAndScreen: 'Reconnect camera + screen',
+  rerecordAsNewVersion: 'Retake',
+  submitAndNext: 'Submit & Next',
+  submitCompleteInterview: 'Submit & Finish',
+  lobbyEnableCameraMicFirst: 'Enable your microphone and camera first, then share your entire screen.',
+  lobbyInterviewStartBlocked:
+    'Could not start the interview. Keep microphone, camera, and entire-screen sharing active, then try again.',
+  lobbyEyebrow: 'Prep room',
+  lobbyLead:
+    'Enable mic and camera, share your full screen, then select Start Interview when all checks are ready.',
+  lobbyJoin: 'Start Interview',
+  lobbyJoinBusy: 'One moment…',
+  lobbyDevicesHelp:
+    'Status updates as you connect. In the system share dialog, choose Entire screen.',
+  lobbyToolbarMic: 'Microphone',
+  lobbyToolbarCamera: 'Camera',
+  lobbyToolbarScreen: 'Entire screen share',
+  lobbyPreviewCameraOffTitle: 'Camera is off',
+  lobbyPreviewCameraOffLead: 'Tap the camera icon in the controls to turn your preview back on.',
+  lobbyPreviewMutedTitle: 'Camera preview paused',
+  lobbyPreviewMutedLead: 'Tap the microphone or camera icon in the controls to allow access and show your preview.',
+  sessionSyncFailedTitle: 'Session could not start',
+  sessionSyncFailed:
+    'Could not establish your interview session. Refresh the invite link or open it again in this browser.',
+  consentContinue: 'Continue to device check',
+  consentPrepHint:
+    "Next you'll activate your microphone and camera, preview yourself, then share your entire screen to join.",
+  guidanceInterview:
+    'While recording, tap Submit when you are finished, or Retake to record another attempt.',
+  guidanceBeforeRecording:
+    'Your camera and full screen share stay on. Recording starts automatically when this question is ready.',
+  guidanceInterviewerSpeaking:
+    'The interviewer is reading the question aloud. Recording will start automatically when they finish.',
+  recordingSessionTitleInterview: 'Interview',
+  recordingHeaderCameraMic: 'Camera + mic',
+  sessionReadyLabel: 'Ready to record',
+  recordingPrepLabel: 'Preparing session…',
+  recordingStartingBusy: 'Starting recording…',
+  recordingGuidanceTitle: 'Guidance',
+  recordingSubmitInProgress: 'Submitting…',
+  recordingState: 'Recording',
+  screenShareFull: 'Full screen',
+  screenSharePending: 'Screen pending',
+  permissionPending: 'Pending',
+  permissionReady: 'Ready',
+  permissionBlocked: 'Blocked',
+  permissionIdle: 'Idle',
+  chooseEntireScreen:
+    'Choose Entire screen / Screen in the share picker. Browser tabs and app windows are not accepted.',
+  permissionNotAllowed: 'Camera, microphone, and screen sharing must be allowed to continue.',
+  permissionNotFound:
+    'A camera, microphone, or shareable display source was not found on this device.',
+  permissionAborted: 'Permission setup was interrupted. Please try again.',
+  permissionGeneric:
+    'Camera, microphone, and screen sharing must be enabled before the interview can start.',
+  screenTrackMissing: 'Screen sharing did not provide a video track.',
+  takeLoadFailed: 'Failed to load interview',
+  submitFallbackDetail: 'Please review recording data and try again.',
+  consentEyebrow: 'Candidate interview',
+  consentInterviewFor: 'Interview for {position}',
+  consentWelcome:
+    'Welcome, {candidateName}. You will answer {questionCount}, with up to four minutes for each response.',
+  consentBeforeStart: 'Before you start',
+  consentDataCollected: 'Data collected',
+  consentDataCameraMic: 'Camera video and microphone audio for each answer',
+  consentDataScreen: 'Full-monitor screen recording in parallel with each answer',
+  consentDataBrowser: 'Browser activity such as tab switches',
+  consentDataMetadata: 'Session metadata including answer timing',
+  retry: 'Retry',
+  setupIncomplete: 'Setup incomplete',
+  consentCheckboxLabel: 'I agree to the recording and data collection terms.',
+  consentCheckboxHint: 'Data is used only for interview evaluation and is stored for 90 days.',
+  lobbyDevicesAndScreens: 'Devices & screens',
+  lobbySetupFailed: 'Could not finish setup',
+  permissionCameraMicTitle: 'Camera and microphone',
+  permissionCameraMicDescription: 'Required before recording can begin.',
+  permissionScreenTitle: 'Entire screen share',
+  permissionScreenReady: 'Entire screen is confirmed and ready.',
+  capabilityCameraTitle: 'Camera',
+  capabilityCameraDescription: 'Recorded separately for every answer.',
+  capabilityMicTitle: 'Microphone',
+  capabilityMicDescription: 'Captured together with your camera feed.',
+  capabilityScreenTitle: 'Entire screen',
+  capabilityScreenDescription:
+    'Must be shared as Entire screen, not a tab or app window.',
+  capabilityFairnessTitle: 'Fairness checks',
+  capabilityFairnessDescription:
+    'Session and browser activity may be stored for evaluation integrity.',
+  completeTitle: 'Thank you, {candidateName}',
+  completeDescription:
+    'Your interview for {position} is submitted and saved securely for review. If you are selected to continue, our team will reach out within a few business days with next steps.',
+  liveTranscriptTitle: 'Live transcript',
+  liveTranscriptUnavailable:
+    'Live transcript is unavailable in this browser. Recording continues as usual.',
+  liveTranscriptDraftSuffix: '(draft)',
+  liveTranscriptPlaceholder: 'Transcript will appear while you speak...',
+  questionProgress: 'Question {current} of {total}',
+  beforeUnloadLeaveInterview:
+    'If you reload or leave now, you will exit this interview and may lose your progress. Are you sure?',
+} as const;
+
+export type TakeMessageKey = keyof typeof TAKE_MESSAGES;
+export type TakeMessages = Record<TakeMessageKey, string>;
+export type TakeMessageValues = Record<string, string | number | Date>;
+export type TakeMessageGetter = (
+  key: TakeMessageKey,
+  values?: TakeMessageValues,
+) => string;
+
+export function formatTakeQuestionCountLabel(
+  count: number,
+  takeMessage: TakeMessageGetter,
+): string {
+  const template =
+    count === 1
+      ? takeMessage('questionCountOne', { count })
+      : takeMessage('questionCountOther', { count });
+  return template;
+}
+
+export function isLastInterviewQuestion(
+  currentQuestionIndex: number,
+  totalQuestions: number,
+): boolean {
+  if (totalQuestions <= 0) return false;
+  return currentQuestionIndex + 1 >= totalQuestions;
+}
+
+export function submitAnswerActionLabel(
+  currentQuestionIndex: number,
+  totalQuestions: number,
+  takeMessage: TakeMessageGetter,
+): string {
+  if (totalQuestions <= 0) return takeMessage('submitAndNext');
+  return isLastInterviewQuestion(currentQuestionIndex, totalQuestions)
+    ? takeMessage('submitCompleteInterview')
+    : takeMessage('submitAndNext');
+}

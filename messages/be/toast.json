@@ -1,0 +1,138 @@
+{
+  "toast": {
+    "defaults": {
+      "success": "Гатова",
+      "error": "Нешта пайшло не так",
+      "info": "Паведамленне",
+      "actionCompleted": "Дзеянне выканана",
+      "actionFailed": "Дзеянне не выканана"
+    },
+    "question": {
+      "createSuccess": "Пытанне створана",
+      "createError": "Не ўдалося стварыць пытанне",
+      "saveSuccess": "Пытанне захавана",
+      "saveError": "Не ўдалося захаваць пытанне",
+      "restoreSuccess": "Пытанне адноўлена",
+      "restoreError": "Не ўдалося аднавіць пытанне",
+      "deleteSuccess": "Пытанне выдалена",
+      "deleteError": "Не ўдалося выдаліць пытанне"
+    },
+    "interview": {
+      "createSuccess": "Інтэрв’ю створана",
+      "createError": "Не ўдалося стварыць інтэрв’ю",
+      "refreshLinkSuccess": "Спасылка кандыдата абноўлена",
+      "refreshLinkError": "Не ўдалося абнавіць спасылку кандыдата",
+      "validationStartSuccess": "Праверка запушчана",
+      "validationStartError": "Не ўдалося запусціць праверку інтэрв’ю",
+      "uploadSuccess": "Загрузка завершана для пытання {questionNumber}",
+      "uploadError": "Загрузка не ўдалася для пытання {questionNumber}"
+    },
+    "take": {
+      "submitSuccess": "Адказ адпраўлены",
+      "submitError": "Не ўдалося адправіць адказ"
+    },
+    "bulkDelete": {
+      "failedTitle": "Масавае выдаленне не ўдалося",
+      "partialTitle": "Выдалена: {deletedCount}, заблакіравана: {blockedCount}",
+      "successTitle": "{count, plural, one {Выдалена # пытанне} few {Выдалена # пытанні} many {Выдалена # пытанняў} other {Выдалена # пытання}}",
+      "successDescription": "Бібліятэка абноўлена.",
+      "noopTitle": "Пытанні не выдалены",
+      "noopDescription": "Выбраныя пытанні не былі выдалены.",
+      "blockedIntro": "Гэтыя пытанні выкарыстоўваюцца ў актыўных інтэрв’ю і не былі выдалены:"
+    },
+    "questionFeed": {
+      "unavailableTitle": "Стужка пытанняў недаступна"
+    },
+    "questionFacets": {
+      "unavailableTitle": "Параметры фільтраў недаступныя"
+    },
+    "similarity": {
+      "searchFailedTitle": "Пошук падобных пытанняў не ўдаўся",
+      "noMatches": "Няма блізкіх супадзенняў вышэй за бягучы парог падобнасці."
+    },
+    "pageGate": {
+      "login": {
+        "failedTitle": "Памылка аўтэнтыфікацыі",
+        "failedFallback": "Уваход не выкананы",
+        "signingInLabel": "Уваход...",
+        "signInLabel": "Увайсці"
+      },
+      "dashboard": {
+        "forbiddenTitle": "У вас няма доступу да панэлі",
+        "forbiddenDescription": "Панэль даступная толькі HR, адміністратарам і суперадміністратарам. Калі гэта памылка, звярніцеся да ўладальніка працоўнай прасторы.",
+        "unavailableTitle": "Панэль зараз недаступна",
+        "loadFailedTitle": "Не ўдалося загрузіць панэль",
+        "loadFailedFallback": "Не ўдалося загрузіць інтэрв’ю.",
+        "signInActionLabel": "Увайсці",
+        "questionBankActionLabel": "Перайсці ў банк пытанняў"
+      },
+      "assessments": {
+        "forbiddenTitle": "У вас няма доступу да ацэнак",
+        "forbiddenDescription": "Гэтая вобласць даступная толькі HR і адміністратарам. Калі гэта памылка, звярніцеся да ўладальніка працоўнай прасторы.",
+        "loadFailedTitle": "Не ўдалося загрузіць ацэнкі",
+        "loadFailedFallback": "Не ўдалося загрузіць ацэнкі.",
+        "unavailableTitle": "Ацэнка недаступна",
+        "loadDetailFallback": "Не ўдалося загрузіць ацэнку.",
+        "notFoundFallback": "Запытаную ацэнку не ўдалося загрузіць."
+      },
+      "interview": {
+        "forbiddenTitle": "У вас няма доступу да гэтага інтэрв’ю",
+        "forbiddenDescription": "Наладжванне інтэрв’ю даступнае толькі HR, адміністратарам і суперадміністратарам. Калі гэта памылка, звярніцеся да ўладальніка працоўнай прасторы.",
+        "createUnavailableTitle": "Наладжванне інтэрв’ю зараз недаступнае",
+        "unavailableTitle": "Інтэрв’ю недаступнае",
+        "loadFailedFallback": "Не ўдалося загрузіць інтэрв’ю.",
+        "notFoundFallback": "Запытанае інтэрв’ю не ўдалося загрузіць.",
+        "setupBlockedTitle": "Наладжванне інтэрв’ю заблакіравана",
+        "candidateNameRequired": "Укажыце імя кандыдата.",
+        "positionRequired": "Укажыце пазіцыю.",
+        "questionsRequired": "Выберыце хаця б адно пытанне.",
+        "creatingLabel": "Стварэнне..."
+      },
+      "feedback": {
+        "unavailableTitle": "Зваротная сувязь недаступна",
+        "loadFailedFallback": "Не ўдалося загрузіць"
+      },
+      "team": {
+        "forbiddenTitle": "У вас няма доступу да кіравання камандай",
+        "forbiddenDescription": "Гэтая вобласць даступная толькі адміністратарам і суперадміністратарам. Калі гэта памылка, звярніцеся да ўладальніка працоўнай прасторы.",
+        "unavailableTitle": "Кіраванне камандай зараз недаступнае",
+        "loadFailedTitle": "Не ўдалося загрузіць удзельнікаў",
+        "loadFailedFallback": "Не ўдалося загрузіць удзельнікаў каманды."
+      },
+      "questions": {
+        "editorIssueTitle": "Праблема рэдактара пытанняў",
+        "unavailableTitle": "Пытанне недаступнае",
+        "loadFailedFallback": "Не ўдалося загрузіць пытанні.",
+        "notFoundFallback": "Пытанне не знойдзена.",
+        "loadFailedCardDescription": "Рэдактар не змог загрузіць гэтае пытанне, таму маршрут спыняецца тут замест часткова зламанай формы.",
+        "libraryForbiddenTitle": "У вас няма доступу да банка пытанняў",
+        "libraryForbiddenDescription": "Банк пытанняў даступны толькі HR, адміністратарам і суперадміністратарам. Калі гэта памылка, звярніцеся да ўладальніка працоўнай прасторы.",
+        "libraryUnavailableTitle": "Банк пытанняў зараз недаступны",
+        "createForbiddenTitle": "У вас няма доступу да стварэння пытанняў",
+        "createForbiddenDescription": "Стварэнне пытанняў даступнае толькі адміністратарам і суперадміністратарам. Калі гэта памылка, звярніцеся да ўладальніка працоўнай прасторы.",
+        "createUnavailableTitle": "Стварэнне пытання зараз недаступнае"
+      },
+      "take": {
+        "unavailableTitle": "Інтэрв’ю недаступнае",
+        "loadFailedFallback": "Не ўдалося загрузіць інтэрв’ю."
+      }
+    },
+    "rerun": {
+      "alreadyInProgressTitle": "Паўторная ацэнка ўжо выконваецца",
+      "startFailedTitle": "Не ўдалося запусціць паўторную ацэнку",
+      "allFailedFallback": "Не ўдалося запусціць паўторную ацэнку.",
+      "answerFailedFallback": "Не ўдалося запусціць паўторную ацэнку для гэтага адказу.",
+      "nothingToReevaluateTitle": "Няма чаго ацэньваць паўторна",
+      "nothingToReevaluateMessage": "Пакуль няма адпраўленых адказаў для ацэнкі. Кандыдат яшчэ не завяршыў ніводнага адказу.",
+      "queuedLabel": "Паўторная ацэнка пастаўлена ў чаргу"
+    },
+    "deleteQuestion": {
+      "cannotDeleteTitle": "Нельга выдаліць"
+    },
+    "team": {
+      "updateSuccess": "Роля абноўлена",
+      "updateError": "Не ўдалося абнавіць ролю",
+      "updateSuccessDescription": "{name} цяпер {role}."
+    }
+  }
+}

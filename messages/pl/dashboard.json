@@ -1,0 +1,62 @@
+{
+  "dashboard": {
+    "demoMode": {
+      "title": "Tryb demo",
+      "description": "Tylko przykładowe interview — bez działającego backendu.",
+      "signInPrefix": "",
+      "signInAction": "Zaloguj się",
+      "signInSuffix": "do panelu swojego workspace."
+    },
+    "hero": {
+      "eyebrow": "Panel rekrutera",
+      "title": "Prowadź pipeline interview z jednej, redakcyjnej przestrzeni.",
+      "lead": "Monitoruj aktywne sesje, wychwytuj zatrzymanych kandydatów i utrzymuj scoring w ruchu bez przechodzenia między osobnymi narzędziami administracyjnymi.",
+      "newInterview": "Nowe interview",
+      "questionBank": "Baza pytań"
+    },
+    "metrics": {
+      "active": {
+        "label": "Aktywne",
+        "description": "Interview oczekujące na odpowiedzi, uploady lub scoring."
+      },
+      "candidates": {
+        "label": "Kandydaci",
+        "description": "Wszystkie rekordy kandydatów widoczne w bieżącym workspace."
+      },
+      "questionLoad": {
+        "label": "Liczba pytań",
+        "description": "Pytania przypisane do wszystkich widocznych interview."
+      },
+      "completed": {
+        "label": "Zakończone interview",
+        "description": "Zakończone sesje z kartami ocen gotowymi do przeglądu i przekazania dalej."
+      },
+      "lastSync": {
+        "label": "Ostatnia synchronizacja",
+        "demo": "Demo",
+        "live": "Na żywo",
+        "demoDescription": "Wyświetlane są przykładowe interview.",
+        "liveDescription": "Dane zostały właśnie odświeżone z działającego backendu."
+      }
+    },
+    "snapshot": {
+      "eyebrow": "Podgląd",
+      "title": "Dzisiejszy pipeline",
+      "description": "Przeprojektowana powłoka używa warstw tonalnych zamiast twardych separatorów, dzięki czemu aktywność pozostaje czytelna nawet przy dużej gęstości danych."
+    },
+    "empty": {
+      "title": "Nie ma jeszcze interview",
+      "description": "Zacznij od kandydata, dodaj pytania z bazy, a ten panel stanie się Twoją przestrzenią operacyjną.",
+      "action": "Utwórz pierwsze interview"
+    },
+    "recent": {
+      "eyebrow": "Aktywne rekordy",
+      "title": "Ostatnie interview",
+      "createQuestion": "Utwórz nowe pytanie",
+      "questions": "Pytania",
+      "uploaded": "Przesłane",
+      "updated": "Zaktualizowano {date}",
+      "open": "Otwórz"
+    }
+  }
+}

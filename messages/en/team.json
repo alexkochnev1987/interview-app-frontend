@@ -1,0 +1,53 @@
+{
+  "team": {
+    "heading": "Team Members",
+    "lead": "Manage your workspace collaborators and their access levels.",
+    "filters": {
+      "label": "Filters:"
+    },
+    "searchPlaceholder": "Search by name or email",
+    "table": {
+      "memberName": "Member Name",
+      "email": "Email Address",
+      "accessRole": "Access Role",
+      "joined": "Joined",
+      "actions": "Actions"
+    },
+    "empty": {
+      "title": "No members found",
+      "description": "Try changing the role filter to see more results."
+    },
+    "pagination": {
+      "showing": "Showing {from} to {to} of {total} members"
+    },
+    "stats": {
+      "totalMembers": "Total Members",
+      "allRoles": "All roles",
+      "superAdmins": "Super Admins",
+      "fullAccess": "Full access",
+      "admins": "Admins",
+      "adminRole": "Admin role",
+      "hrSpecialists": "HR Specialists",
+      "hrRole": "HR role",
+      "candidates": "Candidates",
+      "candidateRole": "Candidate role"
+    },
+    "changeRole": {
+      "title": "Change role",
+      "accessibilityTitle": "Change role",
+      "currentRole": "Current Role",
+      "newRole": "New Role",
+      "noRoles": "No roles are available for your account to assign. If this looks wrong, try again signed in as a higher-level administrator.",
+      "applying": "Applying role change...",
+      "apply": "Apply role change",
+      "cancel": "Cancel",
+      "footnote": "This change takes effect immediately. The user keeps their session until next request."
+    },
+    "actions": {
+      "changeRole": "Change role",
+      "editAccount": "Edit account",
+      "deleteUser": "Delete user",
+      "menuAria": "Open actions menu for {name}"
+    }
+  }
+}

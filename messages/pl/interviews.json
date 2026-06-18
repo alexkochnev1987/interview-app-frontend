@@ -1,0 +1,21 @@
+{
+  "interviews": {
+    "createIntro": {
+      "eyebrow": "Utwórz przebieg rozmowy kwalifikacyjnej",
+      "title": "Zbierz pakiet kandydata przed wysłaniem linku do rozmowy kwalifikacyjnej.",
+      "lead": "Uchwyć rolę, wybierz tylko istotne pytania i określ jasne kryteria decyzji przed rozpoczęciem sesji nagraniowej.",
+      "createQuestion": "Utwórz pytanie",
+      "openBank": "Otwórz bank pytań"
+    },
+    "detail": {
+      "backToDashboard": "Powrót do deski rozdzielczej",
+      "validationStatus": {
+        "idle": "Bezczynny",
+        "queued": "W kolejce",
+        "processing": "Przetwarzanie",
+        "completed": "Zakończony",
+        "failed": "Przegrany"
+      }
+    }
+  }
+}

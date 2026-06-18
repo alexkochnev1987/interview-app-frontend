@@ -1,0 +1,62 @@
+{
+  "dashboard": {
+    "demoMode": {
+      "title": "Demo mode",
+      "description": "Sample interviews only — no live backend.",
+      "signInPrefix": "",
+      "signInAction": "Sign in",
+      "signInSuffix": "for your workspace dashboard."
+    },
+    "hero": {
+      "eyebrow": "Recruiter Dashboard",
+      "title": "Run your interview pipeline from one editorial command surface.",
+      "lead": "Monitor active sessions, spot stalled candidates, and keep scoring flows moving without dropping into separate admin tools.",
+      "newInterview": "New Interview",
+      "questionBank": "Question Bank"
+    },
+    "metrics": {
+      "active": {
+        "label": "Active",
+        "description": "Interviews currently waiting on answers, uploads, or scoring."
+      },
+      "candidates": {
+        "label": "Candidates",
+        "description": "Total candidate records visible in the current workspace."
+      },
+      "questionLoad": {
+        "label": "Question Load",
+        "description": "Questions currently attached across all visible interviews."
+      },
+      "completed": {
+        "label": "Completed interviews",
+        "description": "Finished sessions with scorecards ready for review and handoff."
+      },
+      "lastSync": {
+        "label": "Last sync",
+        "demo": "Demo",
+        "live": "Live",
+        "demoDescription": "Showing sample interviews for demonstration.",
+        "liveDescription": "Updated against the live backend just now."
+      }
+    },
+    "snapshot": {
+      "eyebrow": "Snapshot",
+      "title": "Today's pipeline",
+      "description": "The redesigned shell uses tonal layers instead of hard separators, so activity stays readable even when the data density grows."
+    },
+    "empty": {
+      "title": "No interviews yet",
+      "description": "Start with a candidate, attach questions from the bank, and this dashboard becomes your operating surface.",
+      "action": "Create your first interview"
+    },
+    "recent": {
+      "eyebrow": "Active records",
+      "title": "Recent interviews",
+      "createQuestion": "Create a new question",
+      "questions": "Questions",
+      "uploaded": "Uploaded",
+      "updated": "Updated {date}",
+      "open": "Open"
+    }
+  }
+}
