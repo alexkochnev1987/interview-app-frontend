@@ -58,6 +58,9 @@ function CardBody({
             {question.deleted ? (
               <StatusPill tone="failed">{t('deleted')}</StatusPill>
             ) : null}
+            {question.pendingDeletion && !question.deleted ? (
+                <StatusPill tone="canceled">{t('scheduled')}</StatusPill>
+            ) : null}
             <StatusPill tone={question.difficulty}>
               {sharedLabels.difficulty(question.difficulty)}
             </StatusPill>

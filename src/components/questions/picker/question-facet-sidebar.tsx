@@ -346,7 +346,8 @@ function StatusFacetSection(props: {
   const options: Array<{ value: QuestionStatusFilter; label: string }> = [
     { value: 'active', label: t('activeOnly') },
     { value: 'inactive', label: t('deletedOnly') },
-    { value: 'all', label: t('statusActiveDeleted') },
+    { value: 'scheduled', label: t('scheduledOnly') },
+    { value: 'all', label: t('allStatuses') },
   ]
   const activeCount = selected !== 'active' ? 1 : 0
   return (

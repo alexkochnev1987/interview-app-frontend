@@ -273,6 +273,9 @@ export function QuestionTable({
                         {t('deleted')}
                       </StatusPill>
                     ) : null}
+                    {question.pendingDeletion && !question.deleted ? (
+                        <StatusPill tone="canceled">{t('scheduled')}</StatusPill>
+                    ) : null}
                     <BodyText
                       size="sm"
                       tone="foreground"

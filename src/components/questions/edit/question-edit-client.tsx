@@ -90,6 +90,7 @@ export function QuestionEditClient({
         notifyInfo(toastMessages.deleteQuestion.scheduledTitle, {
           description: toastMessages.deleteQuestion.scheduledIntro,
         })
+        setQuestion((prev) => ({ ...prev, pendingDeletion: true }))
         return
       }
       notifySuccess(toastMessages.question.deleteSuccess)
@@ -106,6 +107,12 @@ export function QuestionEditClient({
           onRestore={() => setRestoreOpen(true)}
         />
       ) : null}
+      {!question.deleted && (question.pendingDeletion || scheduledDelete) ? (
+          <QuestionDeleteScheduledAlert
+            intro={toastMessages.deleteQuestion.scheduledIntro}
+            blockingInterviews={scheduledDelete?.blockingInterviews ?? []}
+          />
+      ) : null}
       <QuestionEditor
         questionId={id}
         title={canUpdate ? t('title') : t('viewTitle')}
@@ -116,12 +123,6 @@ export function QuestionEditClient({
       />
       {!question.deleted && canDelete ? (
         <Stack gap={4}>
-          {scheduledDelete ? (
-            <QuestionDeleteScheduledAlert
-              intro={toastMessages.deleteQuestion.scheduledIntro}
-              blockingInterviews={scheduledDelete.blockingInterviews}
-            />
-          ) : null}
           <QuestionDangerZone
             deleting={deleting}
             onRequestDelete={() => setConfirmOpen(true)}

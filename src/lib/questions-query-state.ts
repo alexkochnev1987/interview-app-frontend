@@ -77,7 +77,7 @@ export function readQuestionsFromSearchParams(
   const role = params.get('role')
   if (role) next.role = role
   const status = params.get('status')
-  if (status === 'active' || status === 'inactive' || status === 'all') {
+  if (status === 'active' || status === 'inactive' || status === 'scheduled' || status === 'all') {
     next.status = status
   }
   const sortBy = params.get('sortBy')
