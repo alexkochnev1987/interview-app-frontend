@@ -25,7 +25,11 @@
       "validationStartSuccess": "Праверка запушчана",
       "validationStartError": "Не ўдалося запусціць праверку інтэрв’ю",
       "uploadSuccess": "Загрузка завершана для пытання {questionNumber}",
-      "uploadError": "Загрузка не ўдалася для пытання {questionNumber}"
+      "uploadError": "Загрузка не ўдалася для пытання {questionNumber}",
+      "updateSuccess": "Інтэрв'ю абноўлена",
+      "updateError": "Не ўдалося абнавіць інтэрв'ю",
+      "cancelSuccess": "Інтэрв'ю адменена",
+      "cancelError": "Не ўдалося адмяніць інтэрв'ю"
     },
     "take": {
       "submitSuccess": "Адказ адпраўлены",

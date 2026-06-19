@@ -25,7 +25,11 @@
       "validationStartSuccess": "Walidacja rozpoczęta",
       "validationStartError": "Nie udało się rozpocząć walidacji interview",
       "uploadSuccess": "Upload zakończony dla pytania {questionNumber}",
-      "uploadError": "Upload nie powiódł się dla pytania {questionNumber}"
+      "uploadError": "Upload nie powiódł się dla pytania {questionNumber}",
+      "updateSuccess": "Interview zostało zaktualizowane",
+      "updateError": "Nie udało się zaktualizować interview",
+      "cancelSuccess": "Interview zostało anulowane",
+      "cancelError": "Nie udało się anulować interview"
     },
     "take": {
       "submitSuccess": "Odpowiedź wysłana",

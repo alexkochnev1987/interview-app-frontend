@@ -16,6 +16,29 @@
         "completed": "Completed",
         "failed": "Failed"
       }
+    },
+    "canceledBanner": {
+      "title": "This interview was canceled",
+      "description": "The candidate can no longer access the take link. You can create a new interview if needed."
+    },
+    "actions": {
+      "edit": "Edit interview",
+      "saveChanges": "Save changes",
+      "saving": "Saving...",
+      "cancelInterview": "Cancel interview",
+      "canceling": "Canceling...",
+      "cancelTitle": "Cancel this interview?",
+      "cancelDescription": "The candidate link will stop working. This cannot be undone.",
+      "confirmCancel": "Cancel interview",
+      "dismiss": "Keep interview"
+    },
+    "edit": {
+      "title": "Edit interview",
+      "candidateName": "Candidate name",
+      "candidateEmail": "Candidate email",
+      "position": "Position",
+      "questionsTitle": "Questions",
+      "pendingOnlyNotice": "Only pending interviews can be edited or canceled."
     }
   }
 }

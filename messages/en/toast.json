@@ -25,7 +25,11 @@
       "validationStartSuccess": "Validation started",
       "validationStartError": "Failed to start interview validation",
       "uploadSuccess": "Upload completed for question {questionNumber}",
-      "uploadError": "Upload failed for question {questionNumber}"
+      "uploadError": "Upload failed for question {questionNumber}",
+      "updateSuccess": "Interview updated",
+      "updateError": "Failed to update interview",
+      "cancelSuccess": "Interview canceled",
+      "cancelError": "Failed to cancel interview"
     },
     "take": {
       "submitSuccess": "Answer submitted",

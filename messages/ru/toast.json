@@ -25,7 +25,11 @@
       "validationStartSuccess": "Проверка запущена",
       "validationStartError": "Не удалось запустить проверку интервью",
       "uploadSuccess": "Загрузка завершена для вопроса {questionNumber}",
-      "uploadError": "Загрузка не удалась для вопроса {questionNumber}"
+      "uploadError": "Загрузка не удалась для вопроса {questionNumber}",
+      "updateSuccess": "Интервью обновлено",
+      "updateError": "Не удалось обновить интервью",
+      "cancelSuccess": "Интервью отменено",
+      "cancelError": "Не удалось отменить интервью"
     },
     "take": {
       "submitSuccess": "Ответ отправлен",

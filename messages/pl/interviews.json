@@ -16,6 +16,29 @@
         "completed": "Zakończony",
         "failed": "Przegrany"
       }
+    },
+    "canceledBanner": {
+      "title": "To interview zostało anulowane",
+      "description": "Kandydat nie ma już dostępu do linku do rozmowy. W razie potrzeby możesz utworzyć nowe interview."
+    },
+    "actions": {
+      "edit": "Edytuj interview",
+      "saveChanges": "Zapisz zmiany",
+      "saving": "Zapisywanie...",
+      "cancelInterview": "Anuluj interview",
+      "canceling": "Anulowanie...",
+      "cancelTitle": "Anulować to interview?",
+      "cancelDescription": "Link dla kandydata przestanie działać. Tej operacji nie można cofnąć.",
+      "confirmCancel": "Anuluj interview",
+      "dismiss": "Pozostaw interview"
+    },
+    "edit": {
+      "title": "Edycja interview",
+      "candidateName": "Imię i nazwisko kandydata",
+      "candidateEmail": "Email kandydata",
+      "position": "Stanowisko",
+      "questionsTitle": "Pytania",
+      "pendingOnlyNotice": "Tylko oczekujące interview można edytować lub anulować."
     }
   }
 }
