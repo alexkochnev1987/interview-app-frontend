@@ -65,6 +65,11 @@ import {
 import { useSharedLabels } from "@/i18n/use-shared-labels";
 import { runMutation } from "@/lib/run-mutation";
 import { useToastMessages } from "@/lib/use-toast-messages";
+import { InterviewCanceledBanner } from '@/components/interviews/interview-canceled-banner'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import { cancelInterview } from '@/lib/api'
+import { canManageInterview, isCanceledInterview } from '@/lib/interview-management'
+import { interviewStatusTone } from '@/lib/interview-status-ui'
 
 type UploadStatus = "idle" | "uploading" | "uploaded" | "error";
 
@@ -212,6 +217,11 @@ export default function InterviewDetailClient({
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "error">(
     "idle",
   );
+  const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false)
+  const [canceling, setCanceling] = useState(false)
+
+  const tActions = useTranslations('interviews.actions')
+
   const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const validationPollRef = useRef<number | null>(null);
   const requestedMediaRef = useRef<Map<number, string>>(new Map());
@@ -478,6 +488,25 @@ export default function InterviewDetailClient({
     }
   }
 
+  async function handleCancelInterview() {
+    if (canceling || !interview) return
+
+    setCanceling(true)
+
+    try {
+      const updated = await runMutation(() => cancelInterview(id), {
+        successMessage: toastMessages.interview.cancelSuccess,
+        errorMessage: toastMessages.interview.cancelError,
+      })
+      setInterview(updated)
+      setCancelConfirmOpen(false)
+    } catch {
+      /* toast handled by runMutation */
+    } finally {
+      setCanceling(false)
+    }
+  }
+
   if (loading) {
     return (
       <PageShell>
@@ -522,6 +551,9 @@ export default function InterviewDetailClient({
 
   return (
     <PageShell>
+      {interview && isCanceledInterview(interview) ? (
+          <InterviewCanceledBanner/>
+      ) : null}
       <Grid as="section" columns="split-115-85" gap={6}>
         <Card variant="floating" size="lg">
           <CardContent spacing="2xl">
@@ -547,7 +579,7 @@ export default function InterviewDetailClient({
                 </Inline>
 
                 <Inline gap={3} align="center" wrap="wrap">
-                  <StatusPill tone={interview.status}>
+                  <StatusPill tone={interviewStatusTone(interview.status)}>
                     {sharedLabels.interviewStatus(interview.status)}
                   </StatusPill>
                   <StatusPill tone="neutral">
@@ -557,17 +589,29 @@ export default function InterviewDetailClient({
               </Stack>
 
               <Inline gap={3} wrap="wrap">
-                {interview.status !== "completed" ? (
-                  <Button
-                    type="button"
-                    variant="gradient"
-                    onClick={handleValidate}
-                    disabled={!canValidate || validating || hasActiveValidation}
-                  >
-                    {validating || hasActiveValidation
-                      ? t("validating")
-                      : t("validate")}
-                  </Button>
+                {canManageInterview(interview) ? (
+                    <>
+                      <Button type="button" variant="outline" onClick={()=>{/*TODO*/}}>
+                        {tActions('edit')}
+                      </Button>
+                      <Button
+                          type="button"
+                          variant="destructive"
+                          onClick={()=>setCancelConfirmOpen(true)}
+                          disabled={canceling}
+                      >
+                        {canceling ? tActions('canceling') : tActions('cancelInterview')}
+                      </Button>
+                    </>
+                ) : null}
+                {!isCanceledInterview(interview) && interview.status !== 'completed' ? (
+                    <Button
+                        type="button"
+                        variant="gradient"
+                        onClick={handleValidate}
+                        disabled={!canValidate || validating || hasActiveValidation}
+                    >
+                      {validating || hasActiveValidation ? t('validating') : t('validate')}                    </Button>
                 ) : null}
               </Inline>
             </Inline>
@@ -614,7 +658,7 @@ export default function InterviewDetailClient({
                       shape="pill"
                       size="sm"
                       onClick={() => void loadCandidateLink("refresh")}
-                      disabled={candidateLinkStatus === "loading"}
+                      disabled={candidateLinkStatus === "loading" || isCanceledInterview(interview)}
                     >
                       {candidateLinkStatus === "loading"
                         ? t("generating")
@@ -1224,6 +1268,21 @@ export default function InterviewDetailClient({
           </Grid>
         </Section>
       ) : null}
+
+      <ConfirmDialog
+          open={cancelConfirmOpen}
+          destructive
+          title={tActions('cancelTitle')}
+          description={tActions('cancelDescription')}
+          confirmLabel={canceling ? tActions('canceling') : tActions('confirmCancel')}
+          cancelLabel={tActions('dismiss')}
+          loading={canceling}
+          onConfirm={() => void handleCancelInterview()}
+          onCancel={() => {
+            if (!canceling) setCancelConfirmOpen(false)
+          }}
+        />
+
     </PageShell>
   );
 }
