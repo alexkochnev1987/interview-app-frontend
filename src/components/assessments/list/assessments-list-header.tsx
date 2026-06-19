@@ -19,7 +19,7 @@ export function AssessmentsListHeader() {
   const isDemo = useIsDemo()
 
   return (
-    <Card variant="floating" size="lg">
+    <Card variant="floating" size="lg" data-tour="assessments-list">
       <CardContent layout="fill-column" spacing="xl">
         <EyebrowBadge icon={<Icon size="sm"><ClipboardList /></Icon>}>
           {t('eyebrow')}

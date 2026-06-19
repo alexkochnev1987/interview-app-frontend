@@ -13,6 +13,7 @@ import type { Locale } from '@/i18n/locales'
 import { routing } from '@/i18n/routing'
 import { AuthProvider } from '@/lib/auth-context'
 import { getServerSessionSnapshot } from '@/lib/auth-server'
+import { OnboardingProvider } from '@/features/onboarding/onboarding-provider'
 import { AppQueryClientProvider } from '@/lib/query-client-provider'
 
 import { SideNav } from './side-nav'
@@ -58,16 +59,18 @@ export default async function LocaleLayout({
         <NextIntlClientProvider locale={locale} messages={messages}>
           <AppQueryClientProvider>
             <AuthProvider initialUser={session.user}>
-              <TooltipProvider>
-                <AppShellRoot>
-                  <SideNav />
-                  <AppMain>
-                    <DemoModeBanner />
-                    {children}
-                  </AppMain>
-                </AppShellRoot>
-                <Toaster />
-              </TooltipProvider>
+              <OnboardingProvider>
+                <TooltipProvider>
+                  <AppShellRoot>
+                    <SideNav />
+                    <AppMain>
+                      <DemoModeBanner />
+                      {children}
+                    </AppMain>
+                  </AppShellRoot>
+                  <Toaster />
+                </TooltipProvider>
+              </OnboardingProvider>
             </AuthProvider>
           </AppQueryClientProvider>
         </NextIntlClientProvider>

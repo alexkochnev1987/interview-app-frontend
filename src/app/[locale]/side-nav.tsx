@@ -45,14 +45,17 @@ import {
 import { SurfaceTile } from '@/components/ui/surface-tile'
 import { BodyText } from '@/components/ui/text'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
+import { useOnboardingReplay } from '@/features/onboarding/onboarding-provider'
 
 export function SideNav() {
   const { user, logout } = useAuth()
   const isDemo = useIsDemo()
+  const { replayTour } = useOnboardingReplay()
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const locale = useLocale() as Locale
   const tNav = useTranslations('nav')
+  const tOnboarding = useTranslations('onboarding')
   const tCommon = useTranslations('common')
   const tLanguage = useTranslations('languageSwitcher')
   const labels = useSharedLabels()
@@ -150,6 +153,23 @@ export function SideNav() {
         user ? (
           <Stack gap={2} width="full">
             <Stack gap={2} className={sideNavRevealClass}>
+              {canAccessDashboard(user.role) ? (
+                <Button
+                  type="button"
+                  variant="outline-pill"
+                  shape="pill"
+                  size="sm"
+                  effects="blur"
+                  width="full"
+                  aria-label={tOnboarding('tour.replay')}
+                  title={tOnboarding('tour.replay')}
+                  onClick={() => void replayTour()}
+                >
+                  <BodyText as="span" size="sm-tight" tone="foreground" weight="semibold" aria-hidden>
+                    ?
+                  </BodyText>
+                </Button>
+              ) : null}
               {languageSwitcher}
               <SurfaceTile tone="soft" rounded="lg" padding="sm">
                 <IdentityBadge

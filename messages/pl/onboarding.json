@@ -1,0 +1,46 @@
+{
+  "onboarding": {
+    "welcome": {
+      "title": "Welcome to AI Interview Architect",
+      "description": "This quick tour walks through the core workflow on each page: question bank, assessments, new interviews, and team access.",
+      "start": "Start tour",
+      "skip": "Skip for now"
+    },
+    "complete": {
+      "title": "You're all set",
+      "description": "Start with New Interview when you're ready. You can replay this tour anytime from the header.",
+      "action": "Get started"
+    },
+    "tour": {
+      "next": "Next",
+      "back": "Back",
+      "done": "Get started",
+      "replay": "Product tour"
+    },
+    "errors": {
+      "persistFailed": "Could not save onboarding progress"
+    },
+    "steps": {
+      "dashboardHero": {
+        "title": "Your command center",
+        "description": "The dashboard shows active interviews, pipeline health, and what needs attention today."
+      },
+      "questionsPage": {
+        "title": "Question bank",
+        "description": "Build and organize questions here. You'll reuse them whenever you create a new interview."
+      },
+      "assessmentsPage": {
+        "title": "Review assessments",
+        "description": "After candidates finish, open Assessments to review scores, transcripts, and AI evaluation."
+      },
+      "newInterviewPage": {
+        "title": "Create an interview",
+        "description": "Pick a candidate, attach questions from the bank, and send the interview link in a few clicks."
+      },
+      "teamPage": {
+        "title": "Team access",
+        "description": "Manage who can create interviews, review assessments, and configure the workspace."
+      }
+    }
+  }
+}
