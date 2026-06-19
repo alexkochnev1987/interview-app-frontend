@@ -66,6 +66,7 @@ import { useSharedLabels } from "@/i18n/use-shared-labels";
 import { runMutation } from "@/lib/run-mutation";
 import { useToastMessages } from "@/lib/use-toast-messages";
 import { InterviewCanceledBanner } from '@/components/interviews/interview-canceled-banner'
+import { InterviewEditPanel } from '@/components/interviews/interview-edit-panel'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { cancelInterview } from '@/lib/api'
 import { canManageInterview, isCanceledInterview } from '@/lib/interview-management'
@@ -172,6 +173,11 @@ export default function InterviewDetailClient({
   initialInterview,
   initialResults,
 }: InterviewDetailClientProps) {
+
+  const [isEditing, setIsEditing] = useState(false)
+  const [discardOpen, setDiscardOpen] = useState(false)
+  const tEdit = useTranslations('interviews.edit')
+
   const t = useTranslations("questions.common");
   const tDetail = useTranslations("interviews.detail");
   const sharedLabels = useSharedLabels();
@@ -589,9 +595,9 @@ export default function InterviewDetailClient({
               </Stack>
 
               <Inline gap={3} wrap="wrap">
-                {canManageInterview(interview) ? (
+                {canManageInterview(interview) && !isEditing ? (
                     <>
-                      <Button type="button" variant="outline" onClick={()=>{/*TODO*/}}>
+                      <Button type="button" variant="outline" onClick={() => setIsEditing(true)}>
                         {tActions('edit')}
                       </Button>
                       <Button
@@ -604,7 +610,12 @@ export default function InterviewDetailClient({
                       </Button>
                     </>
                 ) : null}
-                {!isCanceledInterview(interview) && interview.status !== 'completed' ? (
+                {isEditing ? (
+                    <Button variant="outline" onClick={() => setDiscardOpen(true)}>
+                      {tActions('discardEdit')}
+                    </Button>
+                ) : null}
+                {!isEditing && !isCanceledInterview(interview) && interview.status !== 'completed' ? (
                     <Button
                         type="button"
                         variant="gradient"
@@ -636,6 +647,7 @@ export default function InterviewDetailClient({
           </CardContent>
         </Card>
 
+        {!isEditing ? (
         <Card variant="tinted">
           <CardHeader spacing="sm">
             <EyebrowBadge icon={<Sparkles className="size-3.5" />} tone="muted">
@@ -769,8 +781,20 @@ export default function InterviewDetailClient({
             ) : null}
           </CardContent>
         </Card>
+        ) : null}
       </Grid>
 
+      {isEditing ? (
+        <InterviewEditPanel
+          interview={interview}
+          onSaved={(updated) => {
+            setInterview(updated)
+            setIsEditing(false)
+          }}
+          onDiscard={() => setDiscardOpen(true)}
+        />
+      ) : (
+      <>
       <Section gap={4}>
         <Inline gap={4} align="end" justify="between" wrap="wrap">
           <Stack gap={2}>
@@ -1268,6 +1292,21 @@ export default function InterviewDetailClient({
           </Grid>
         </Section>
       ) : null}
+      </>
+      )}
+
+      <ConfirmDialog
+          open={discardOpen}
+          title={tEdit('discardTitle')}
+          description={tEdit('discardDescription')}
+          confirmLabel={tActions('discardEdit')}
+          cancelLabel={tActions('dismiss')}
+          onConfirm={() => {
+            setIsEditing(false)
+            setDiscardOpen(false)
+          }}
+          onCancel={() => setDiscardOpen(false)}
+        />
 
       <ConfirmDialog
           open={cancelConfirmOpen}
