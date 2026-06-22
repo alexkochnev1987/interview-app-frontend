@@ -22,10 +22,8 @@ import {
   type QuestionInput,
 } from '@/lib/api'
 import { clearFieldError, type FieldErrors } from '@/lib/clear-field-error'
-import {
-  getFirstNonEnglishField,
-  validateQuestionForm,
-} from '@/lib/question-editor/validate-question-form'
+import { validateQuestionForm } from '@/lib/question-editor/validate-question-form'
+import { validateEnglishOnly } from '@/lib/question-editor/english-check-fields'
 import {
   areEqual,
   formatMetadata,
@@ -117,17 +115,7 @@ export function QuestionEditor({
       return
     }
 
-    const nonEnglishFieldForGeneration = getFirstNonEnglishField([
-      { fieldLabel: editorLabels.fieldLabel('questionText'), value: value.questionText },
-      { fieldLabel: editorLabels.fieldLabel('role'), value: value.role },
-      { fieldLabel: editorLabels.fieldLabel('focus'), value: value.focus },
-      { fieldLabel: editorLabels.fieldLabel('outputLanguage'), value: value.outputLanguage },
-      { fieldLabel: editorLabels.fieldLabel('category'), value: value.category },
-      { fieldLabel: editorLabels.fieldLabel('subcategory'), value: value.subcategory },
-      { fieldLabel: editorLabels.fieldLabel('followUpQuestions'), value: value.followUpQuestions },
-      { fieldLabel: editorLabels.fieldLabel('sampleGoodAnswer'), value: value.sampleGoodAnswer },
-      { fieldLabel: editorLabels.fieldLabel('tags'), value: value.tags },
-    ])
+    const nonEnglishFieldForGeneration = validateEnglishOnly(value, editorLabels)
     if (nonEnglishFieldForGeneration) {
       draft.reset()
       setEnglishOnlyError(
@@ -220,17 +208,7 @@ export function QuestionEditor({
       editorLabels.validation,
     )
 
-    const nonEnglishField = getFirstNonEnglishField([
-      { fieldLabel: editorLabels.fieldLabel('questionText'), value: value.questionText },
-      { fieldLabel: editorLabels.fieldLabel('role'), value: value.role },
-      { fieldLabel: editorLabels.fieldLabel('focus'), value: value.focus },
-      { fieldLabel: editorLabels.fieldLabel('outputLanguage'), value: value.outputLanguage },
-      { fieldLabel: editorLabels.fieldLabel('category'), value: value.category },
-      { fieldLabel: editorLabels.fieldLabel('subcategory'), value: value.subcategory },
-      { fieldLabel: editorLabels.fieldLabel('followUpQuestions'), value: value.followUpQuestions },
-      { fieldLabel: editorLabels.fieldLabel('sampleGoodAnswer'), value: value.sampleGoodAnswer },
-      { fieldLabel: editorLabels.fieldLabel('tags'), value: value.tags },
-    ])
+    const nonEnglishField = validateEnglishOnly(value, editorLabels)
     if (nonEnglishField) {
       setEnglishOnlyError(
         editorLabels.validation.englishOnlyField({ field: nonEnglishField }),
