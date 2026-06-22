@@ -42,15 +42,17 @@ function CardBody({
   return (
     <UnstyledLink href={routes.questions.detail(question.id)}>
       <Card
-        variant={question.deleted ? 'danger-soft' : 'surface'}
+        variant={question.deleted ? 'danger-soft' : question.pendingDeletion ? 'scheduled-soft' : 'surface'}
         height="full"
         interaction="hover"
         state={
           question.deleted
             ? 'deleted'
-            : selected && selectable
-              ? 'selected'
-              : 'default'
+            : question.pendingDeletion
+                  ? 'scheduled'
+                  : selected && selectable
+                      ? 'selected'
+                      : 'default'
         }
       >
         <CardHeader spacing="md">
@@ -59,7 +61,7 @@ function CardBody({
               <StatusPill tone="failed">{t('deleted')}</StatusPill>
             ) : null}
             {question.pendingDeletion && !question.deleted ? (
-                <StatusPill tone="canceled">{t('scheduled')}</StatusPill>
+                <StatusPill tone="scheduled">{t('scheduled')}</StatusPill>
             ) : null}
             <StatusPill tone={question.difficulty}>
               {sharedLabels.difficulty(question.difficulty)}

@@ -41,6 +41,10 @@ const config: Config = {
           border: "hsl(var(--danger-soft-border))",
           foreground: "hsl(var(--danger-soft-foreground))",
         },
+        "scheduled-soft": {
+          DEFAULT: "hsl(var(--scheduled-soft))",
+          foreground: "hsl(var(--scheduled-soft-foreground))",
+        },
         "warning-soft": {
           DEFAULT: "hsl(var(--warning-soft))",
           border: "hsl(var(--warning-soft-border))",
