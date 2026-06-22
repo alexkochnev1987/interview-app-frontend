@@ -13,6 +13,7 @@ import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText } from '@/components/ui/text'
 import type { TeamMember } from '@/lib/api'
+import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 
 import type { TeamMemberRole } from '@/features/team/team-roles'
 
@@ -97,15 +98,16 @@ export function TeamChangeRoleView({
         </Stack>
 
         <Stack gap={2}>
-          <Button
-            type="button"
-            variant="gradient"
-            shape="pill"
-            disabled={roleOptions.length === 0 || !hasChange || loading}
-            onClick={() => { void onApply() }}
-          >
-            {loading ? t('applying') : t('apply')}
-          </Button>
+          <DemoWriteGuard disabled={roleOptions.length === 0 || !hasChange || loading}>
+            <Button
+              type="button"
+              variant="gradient"
+              shape="pill"
+              onClick={() => { void onApply() }}
+            >
+              {loading ? t('applying') : t('apply')}
+            </Button>
+          </DemoWriteGuard>
           <Button
             type="button"
             variant="ghost"

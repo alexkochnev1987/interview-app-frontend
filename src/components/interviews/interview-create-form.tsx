@@ -38,6 +38,7 @@ import { BodyText, SectionHeading } from '@/components/ui/text'
 import { useRouter } from '@/i18n/navigation'
 import { useQuestionChipLabels } from '@/i18n/use-question-chip-labels'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
+import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { createInterview, type Question } from '@/lib/api'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
 import { buildQuestionsInfiniteParams } from '@/lib/questions-query-state'
@@ -222,24 +223,25 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
                   </IconAffix>
                 </FormField>
 
-                <Button
-                  type="submit"
-                  variant="gradient"
-                  width="full"
-                  disabled={submitting || selectedCount === 0}
-                >
-                  {submitting
-                    ? toastMessages.pageGate.interview.creatingLabel
-                    : t(
-                        selectedCount > 0
-                          ? 'createInterviewCtaWithCount'
-                          : 'createInterviewCta',
-                        { count: selectedCount },
-                      )}
-                  <Icon size="md">
-                    <ArrowRight />
-                  </Icon>
-                </Button>
+                <DemoWriteGuard width="full" disabled={submitting || selectedCount === 0}>
+                  <Button
+                    type="submit"
+                    variant="gradient"
+                    width="full"
+                  >
+                    {submitting
+                      ? toastMessages.pageGate.interview.creatingLabel
+                      : t(
+                          selectedCount > 0
+                            ? 'createInterviewCtaWithCount'
+                            : 'createInterviewCta',
+                          { count: selectedCount },
+                        )}
+                    <Icon size="md">
+                      <ArrowRight />
+                    </Icon>
+                  </Button>
+                </DemoWriteGuard>
               </CardContent>
             </Card>
 
