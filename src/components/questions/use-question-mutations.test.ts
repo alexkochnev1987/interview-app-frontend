@@ -127,17 +127,32 @@ describe('buildQuestionMutationOptions', () => {
     expect(resources.notifyMutationError).toHaveBeenCalledWith('Save failed', error)
   })
 
-  it('delete success invalidates and shows success toast', () => {
+  it('delete success invalidates without success toast', () => {
     const options = buildQuestionMutationOptions(resources, {
       mutationFn: vi.fn(),
       successMessage: resources.toastMessages.question.deleteSuccess,
       errorTitle: resources.toastMessages.question.deleteError,
+      notifyOnSuccess: false,
     })
 
     options.onSuccess()
 
     expect(resources.invalidateQuestions).toHaveBeenCalledOnce()
-    expect(resources.notifyMutationSuccess).toHaveBeenCalledWith('Deleted')
+    expect(resources.notifyMutationSuccess).not.toHaveBeenCalled()
+  })
+
+  it('delete error skips toast when notifyOnError is false', () => {
+    const options = buildQuestionMutationOptions(resources, {
+      mutationFn: vi.fn(),
+      successMessage: resources.toastMessages.question.deleteSuccess,
+      errorTitle: resources.toastMessages.question.deleteError,
+      notifyOnError: false,
+    })
+    const error = new Error('Delete failed')
+
+    options.onError(error)
+
+    expect(resources.notifyMutationError).not.toHaveBeenCalled()
   })
 
   it('delete error shows error toast', () => {
@@ -153,17 +168,32 @@ describe('buildQuestionMutationOptions', () => {
     expect(resources.notifyMutationError).toHaveBeenCalledWith('Delete failed', error)
   })
 
-  it('restore success invalidates and shows success toast', () => {
+  it('restore success invalidates without success toast', () => {
     const options = buildQuestionMutationOptions(resources, {
       mutationFn: vi.fn(),
       successMessage: resources.toastMessages.question.restoreSuccess,
       errorTitle: resources.toastMessages.question.restoreError,
+      notifyOnSuccess: false,
     })
 
     options.onSuccess()
 
     expect(resources.invalidateQuestions).toHaveBeenCalledOnce()
-    expect(resources.notifyMutationSuccess).toHaveBeenCalledWith('Restored')
+    expect(resources.notifyMutationSuccess).not.toHaveBeenCalled()
+  })
+
+  it('restore error skips toast when notifyOnError is false', () => {
+    const options = buildQuestionMutationOptions(resources, {
+      mutationFn: vi.fn(),
+      successMessage: resources.toastMessages.question.restoreSuccess,
+      errorTitle: resources.toastMessages.question.restoreError,
+      notifyOnError: false,
+    })
+    const error = new Error('Restore failed')
+
+    options.onError(error)
+
+    expect(resources.notifyMutationError).not.toHaveBeenCalled()
   })
 
   it('restore error shows error toast', () => {
