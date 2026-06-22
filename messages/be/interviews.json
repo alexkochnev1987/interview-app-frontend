@@ -9,6 +9,7 @@
     },
     "detail": {
       "backToDashboard": "Назад да прыборнай панэлі",
+      "demoTryCandidateExperience": "Паспрабаваць вопыт кандыдата",
       "validationStatus": {
         "idle": "Бяздзейны",
         "queued": "У чарзе",

@@ -11,7 +11,13 @@
     "backToHome": "Back to home",
     "serviceUnavailable": "Service is unavailable",
     "sessionVerificationFailed": "We could not verify your session or permissions.",
-    "profileLoadFailed": "Failed to load your profile."
+    "profileLoadFailed": "Failed to load your profile.",
+    "demoMode": {
+      "bannerTitle": "Read-only demo",
+      "bannerDescription": "You are exploring a demo account. Browsing is fully enabled and saving is turned off. You can even try the candidate interview process from a pending interview.",
+      "readOnlyHint": "Disabled in the demo",
+      "exit": "Exit demo"
+    }
   },
   "languageSwitcher": {
     "label": "Language",

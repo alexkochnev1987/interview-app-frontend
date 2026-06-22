@@ -9,6 +9,7 @@
     },
     "detail": {
       "backToDashboard": "Вернуться к панели управления",
+      "demoTryCandidateExperience": "Попробовать как кандидат",
       "validationStatus": {
         "idle": "Праздный",
         "queued": "В очереди",

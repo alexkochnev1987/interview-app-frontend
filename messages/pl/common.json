@@ -11,7 +11,13 @@
     "backToHome": "Wróć do strony głównej",
     "serviceUnavailable": "Usługa jest niedostępna",
     "sessionVerificationFailed": "Nie udało się zweryfikować sesji lub uprawnień.",
-    "profileLoadFailed": "Nie udało się załadować profilu."
+    "profileLoadFailed": "Nie udało się załadować profilu.",
+    "demoMode": {
+      "bannerTitle": "Demo tylko do odczytu",
+      "bannerDescription": "Przeglądasz konto demo. Przeglądanie jest w pełni dostępne, a zapisywanie wyłączone. Możesz nawet wypróbować proces rozmowy kandydata z oczekującej rozmowy.",
+      "readOnlyHint": "Wyłączone w demo",
+      "exit": "Zakończ demo"
+    }
   },
   "languageSwitcher": {
     "label": "Język",

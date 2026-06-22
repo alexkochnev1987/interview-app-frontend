@@ -1,12 +1,5 @@
 {
   "dashboard": {
-    "demoMode": {
-      "title": "Tryb demo",
-      "description": "Tylko przykładowe interview — bez działającego backendu.",
-      "signInPrefix": "",
-      "signInAction": "Zaloguj się",
-      "signInSuffix": "do panelu swojego workspace."
-    },
     "hero": {
       "eyebrow": "Panel rekrutera",
       "title": "Prowadź pipeline interview z jednej, redakcyjnej przestrzeni.",
@@ -33,9 +26,7 @@
       },
       "lastSync": {
         "label": "Ostatnia synchronizacja",
-        "demo": "Demo",
         "live": "Na żywo",
-        "demoDescription": "Wyświetlane są przykładowe interview.",
         "liveDescription": "Dane zostały właśnie odświeżone z działającego backendu."
       }
     },
