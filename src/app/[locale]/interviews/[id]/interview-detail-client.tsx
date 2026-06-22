@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
+import { useRouter } from '@/i18n/navigation'
 import {
   ArrowLeft,
   ChartColumnBig,
@@ -15,7 +16,6 @@ import {
   Upload,
   Workflow,
 } from "lucide-react";
-
 import { EyebrowBadge } from "@/components/ui/eyebrow-badge";
 import { EyebrowLabel } from "@/components/ui/eyebrow-label";
 import { HeroLead, HeroTitle } from "@/components/ui/hero-text";
@@ -182,6 +182,8 @@ export default function InterviewDetailClient({
   const tDetail = useTranslations("interviews.detail");
   const sharedLabels = useSharedLabels();
   const toastMessages = useToastMessages();
+
+  const router = useRouter()
 
   function validationStatusLabel(status?: string) {
     if (!status) {
@@ -504,8 +506,8 @@ export default function InterviewDetailClient({
         successMessage: toastMessages.interview.cancelSuccess,
         errorMessage: toastMessages.interview.cancelError,
       })
-      setInterview(updated)
       setCancelConfirmOpen(false)
+      router.push('/')
     } catch {
       /* toast handled by runMutation */
     } finally {
