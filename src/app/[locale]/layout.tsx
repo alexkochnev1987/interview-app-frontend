@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation'
 
 import { AppBody } from '@/components/ui/app-shell'
 import { AppShellRoot } from '@/components/ui/app-shell'
+import { DemoModeBanner } from '@/components/demo/demo-mode-banner'
 import { Toaster } from '@/components/ui/toaster'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { resolveHtmlLang } from '@/i18n/html-lang'
@@ -62,6 +63,7 @@ export default async function LocaleLayout({
               <TooltipProvider>
                 <AppShellRoot>
                   <NavHeader />
+                  <DemoModeBanner />
                   {children}
                 </AppShellRoot>
                 <Toaster />
