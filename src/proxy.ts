@@ -30,8 +30,7 @@ export function proxy(request: NextRequest) {
   const isPublicPage =
     pathnameWithoutLocale === '/login' ||
     matchesPathSegment(pathnameWithoutLocale, '/take') ||
-    matchesPathSegment(pathnameWithoutLocale, '/feedback') ||
-    matchesPathSegment(pathnameWithoutLocale, '/demo')
+    matchesPathSegment(pathnameWithoutLocale, '/feedback')
 
   if (!session && !isPublicPage) {
     const loginUrl = new URL(localizedPath('/login', locale), request.url)

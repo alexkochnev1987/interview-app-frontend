@@ -59,11 +59,15 @@ describe('proxy', () => {
       '/login',
       '/take/abc',
       '/feedback/xyz',
-      '/demo',
     ] as const) {
       const response = proxy(createRequest(path))
       expect(response.status).not.toBe(307)
     }
+  })
+
+  it('no longer treats the removed /demo page as public', () => {
+    const response = proxy(createRequest('/demo'))
+    expect(response.status).toBe(307)
   })
 
   it('redirects logged-in users away from login', () => {

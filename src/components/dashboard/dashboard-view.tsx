@@ -9,7 +9,6 @@ import {
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
 import { EyebrowLabel } from '@/components/ui/eyebrow-label'
 import { HeroLead, HeroTitle } from '@/components/ui/hero-text'
@@ -45,10 +44,9 @@ import {
 
 type DashboardViewProps = {
   interviews: Interview[]
-  demoMode?: boolean
 }
 
-export function DashboardView({ interviews, demoMode = false }: DashboardViewProps) {
+export function DashboardView({ interviews }: DashboardViewProps) {
   const t = useTranslations('dashboard')
   const labels = useSharedLabels()
   const formatters = useInterviewFormatters()
@@ -66,17 +64,6 @@ export function DashboardView({ interviews, demoMode = false }: DashboardViewPro
   return (
     <PageShell>
       <Stack gap={6}>
-        {demoMode ? (
-          <Alert variant="warning">
-            <AlertTitle>{t('demoMode.title')}</AlertTitle>
-            <AlertDescription>
-              {t('demoMode.description')}{' '}
-              <Link href="/login">{t('demoMode.signInAction')}</Link>{' '}
-              {t('demoMode.signInSuffix')}
-            </AlertDescription>
-          </Alert>
-        ) : null}
-
         <Grid as="section" columns="split-13-7" gap={6}>
           <Card variant="floating" size="lg" effects="blur-strong">
             <CardContent layout="fill-column" spacing="2xl">
@@ -165,15 +152,11 @@ export function DashboardView({ interviews, demoMode = false }: DashboardViewPro
                     </BodyText>
                     <StatusPill tone="neutral">
                       <Clock3 className="size-3" />
-                      {demoMode ? t('metrics.lastSync.demo') : t('metrics.lastSync.live')}
+                      {t('metrics.lastSync.live')}
                     </StatusPill>
                   </Inline>
                 }
-                description={
-                  demoMode
-                    ? t('metrics.lastSync.demoDescription')
-                    : t('metrics.lastSync.liveDescription')
-                }
+                description={t('metrics.lastSync.liveDescription')}
               />
             </CardContent>
           </Card>
