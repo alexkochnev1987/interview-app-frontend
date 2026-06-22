@@ -69,6 +69,7 @@ import { InterviewCanceledBanner } from '@/components/interviews/interview-cance
 import { InterviewEditPanel } from '@/components/interviews/interview-edit-panel'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { cancelInterview } from '@/lib/api'
+import { runPostCancelInterviewSuccess } from '@/lib/interview-cancel-flow'
 import { canManageInterview, isCanceledInterview } from '@/lib/interview-management'
 import { interviewStatusTone } from '@/lib/interview-status-ui'
 
@@ -502,12 +503,15 @@ export default function InterviewDetailClient({
     setCanceling(true)
 
     try {
-      const updated = await runMutation(() => cancelInterview(id), {
+      await runMutation(() => cancelInterview(id), {
         successMessage: toastMessages.interview.cancelSuccess,
         errorMessage: toastMessages.interview.cancelError,
       })
-      setCancelConfirmOpen(false)
-      router.push('/')
+      runPostCancelInterviewSuccess({
+        closeConfirm: () => setCancelConfirmOpen(false),
+        push: router.push,
+        refresh: router.refresh,
+      })
     } catch {
       /* toast handled by runMutation */
     } finally {
