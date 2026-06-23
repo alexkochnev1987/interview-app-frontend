@@ -31,8 +31,6 @@ export function BulkDeleteResultAlerts({ result }: BulkDeleteResultAlertsProps) 
                 <Stack key={item.id} gap={1}>
                   <BodyText size="sm" weight="medium" tone="foreground">
                     {truncateText(item.questionText, 80)}
-                    {' — '}
-                    {item.reason}
                   </BodyText>
                   <QuestionDeleteBlockingInterviews
                     interviews={item.blockingInterviews}
