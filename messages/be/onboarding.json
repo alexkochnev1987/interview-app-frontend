@@ -1,65 +1,65 @@
 {
   "onboarding": {
     "welcome": {
-      "title": "Welcome to AI Interview Architect",
-      "description": "A quick tour of the core workflow: prepare questions, launch interviews, and review assessments.",
-      "start": "Start tour",
-      "skip": "Skip for now"
+      "title": "Сардэчна запрашаем у AI Interview Architect",
+      "description": "Кароткая экскурсія па асноўным працэсам — банк пытанняў, запуск інтэрв’ю, ацэнка вынікаў і кіраванне камандай.",
+      "start": "Пачаць тур",
+      "skip": "Прапусціць"
     },
     "complete": {
-      "title": "You're all set",
-      "description": "Start with New Interview when you're ready. You can replay this tour anytime from the header.",
-      "action": "Get started"
+      "title": "Усё гатова",
+      "description": "Стварыце першае інтэрв’ю, калі будзеце готовы. Паўтарыць тур можна ў любы час праз «Тур па прадукце» ў загалоўку.",
+      "action": "Пачаць працу"
     },
     "tour": {
-      "next": "Next",
-      "back": "Back",
-      "done": "Get started",
-      "replay": "Product tour"
+      "next": "Далей",
+      "back": "Назад",
+      "done": "Пачаць працу",
+      "replay": "Тур па прадукце"
     },
     "errors": {
-      "persistFailed": "Could not save onboarding progress"
+      "persistFailed": "Не ўдалося захаваць прогрес туру"
     },
     "steps": {
       "dashboardHero": {
-        "title": "Your command center",
-        "description": "The dashboard is your home base for pipeline health and daily priorities."
+        "title": "Ваша камандная панэль",
+        "description": "Адсочвайце актыўныя інтэрв’ю, метрыкі варонкі і дзённыя прыярытэты з аднаго галоўнага экрана."
       },
       "dashboardActions": {
-        "title": "Start the workflow",
-        "description": "Launch a new interview or jump straight into the question bank from here."
+        "title": "Хуткія дзеянні",
+        "description": "Запусціце новае інтэрв’ю або адкрыйце банк пытанняў, не пакідаючы панэль."
       },
       "questionsLibrary": {
-        "title": "Question bank",
-        "description": "Build and reuse interview questions here before you create a session."
+        "title": "Банк пытанняў",
+        "description": "Цэнтралізаваная бібліятэка пытанняў — структураваная, з пошукам і гатовая для любой сесіі."
       },
       "questionsCreate": {
-        "title": "Add a question",
-        "description": "Create a new question when you need something tailored to a role or skill area."
-      },
-      "interviewIntro": {
-        "title": "Create an interview",
-        "description": "Combine candidate details, question selection, and launch in one flow."
-      },
-      "interviewCandidate": {
-        "title": "Candidate details",
-        "description": "Enter the candidate name and role so the session is labeled correctly in your pipeline."
-      },
-      "interviewPicker": {
-        "title": "Pick questions and launch",
-        "description": "Select questions from the bank, then create the interview to send the candidate link."
+        "title": "Стварыць пытанне",
+        "description": "Дадайце пытанні пад роляў з узроўнем складанасці, катэгорыяй і крытэрыямі ацэнкі."
       },
       "assessmentsIntro": {
-        "title": "Assessment review",
-        "description": "After candidates submit responses, review and score interviews from this workspace."
+        "title": "Прастор агляду",
+        "description": "Калі кандыдаты завершваюць сесіі, вяртайцеся сюды для ацэнкі адказаў, балоў і AI-аналітыкі."
       },
       "assessmentsBrowse": {
-        "title": "Open an assessment",
-        "description": "Each card shows candidate progress — open one to review answers, scores, and AI feedback."
+        "title": "Варонка інтэрв’ю",
+        "description": "Праглядайце актыўныя і завершаныя ацэнкі. Адкрыйце картку, каб убачыць транскрыпты, запісы і вынікі."
+      },
+      "interviewIntro": {
+        "title": "Запуск інтэрв’ю",
+        "description": "Наладзьце сесію кандыдата ў адным месцы — профіль, выбар пытанняў і спасылка для кандыдата."
+      },
+      "interviewCandidate": {
+        "title": "Профіль кандыдата",
+        "description": "Укажыце імя і мэтавую ролю, каб кожная сесія была выразна пазначана ў варонцы."
+      },
+      "interviewPicker": {
+        "title": "Выбар пытанняў",
+        "description": "Знайдзіце пытанні ў банку, абярыце іх для сесіі і стварыце інтэрв’ю, каб адправіць спасылку кандыдату."
       },
       "teamHeading": {
-        "title": "Team access",
-        "description": "Manage who can create interviews, review assessments, and configure the workspace."
+        "title": "Каманда і правы доступу",
+        "description": "Кіруйце тым, хто можа ствараць інтэрв’ю, праводзіць ацэнку і адміністраваць працоўную прастору."
       }
     }
   }
