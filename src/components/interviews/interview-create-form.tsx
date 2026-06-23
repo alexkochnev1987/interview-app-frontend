@@ -130,7 +130,7 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
       <form onSubmit={handleSubmit}>
         <Grid columns="aside-22-left" gap={6}>
           <Stack gap={4}>
-            <Card variant="surface">
+            <Card variant="surface" data-tour="interview-candidate">
               <CardHeader spacing="xs">
                 <CardTitle size="lg">{t('candidateBriefTitle')}</CardTitle>
                 <CardDescription>{t('candidateBriefDescription')}</CardDescription>
@@ -210,6 +210,7 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
                     variant="gradient"
                     width="full"
                     disabled={submitting || selectedCount === 0}
+                    data-tour="interview-submit"
                   >
                     {submitting
                       ? toastMessages.pageGate.interview.creatingLabel
@@ -235,6 +236,7 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
             title={t('selectionTitle')}
             description={t('selectionDescription')}
             disabled={submitting || isDemo}
+            data-tour="interview-picker"
           />
         </Grid>
       </form>

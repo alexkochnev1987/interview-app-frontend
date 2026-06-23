@@ -16,7 +16,7 @@ export function InterviewCreateIntro() {
   const t = useTranslations('interviews.createIntro')
 
   return (
-    <Card variant="floating" size="lg" data-tour="interview-create">
+    <Card variant="floating" size="lg" data-tour="interview-intro">
       <CardContent spacing="xl">
         <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
           {t('eyebrow')}

@@ -9,7 +9,7 @@ export function TeamMembersHeading() {
   const t = useTranslations('team')
 
   return (
-    <Stack gap={2} width="full" data-tour="team-members">
+    <Stack gap={2} width="full" data-tour="team-heading">
       <SectionHeading size="xl">{t('heading')}</SectionHeading>
       <BodyText as="p" size="responsive-sm" width="prose">
         {t('lead')}

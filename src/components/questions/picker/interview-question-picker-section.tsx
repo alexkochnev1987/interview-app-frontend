@@ -83,13 +83,14 @@ type InterviewQuestionPickerMainProps = {
   title: string
   description: string
   disabled?: boolean
-}
+} & Pick<React.ComponentProps<typeof Card>, 'data-tour'>
 
 export function InterviewQuestionPickerMain({
   picker,
   title,
   description,
   disabled = false,
+  ...cardProps
 }: InterviewQuestionPickerMainProps) {
   const t = useTranslations('questions.common')
   const tToolbar = useTranslations('questions.picker.toolbar')
@@ -109,7 +110,7 @@ export function InterviewQuestionPickerMain({
 
   return (
     <Stack gap={4}>
-      <Card variant="surface">
+      <Card variant="surface" {...cardProps}>
         <CardHeader spacing="xs">
           <Inline gap={4} align="start" justify="between">
             <Stack gap={1.5}>

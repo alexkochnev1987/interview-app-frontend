@@ -49,7 +49,7 @@ export function QuestionsLibraryHeader({
             </Stack>
             {!isDemo ? (
               <Inline>
-                <Button asChild variant="gradient" size="hero" shape="pill">
+                <Button asChild variant="gradient" size="hero" shape="pill" data-tour="questions-create">
                   <Link href={routes.questions.new}>
                     <Plus className="size-5" />
                     {t('newQuestion')}

@@ -38,7 +38,7 @@ export function AssessmentsListToolbar({
   const sharedLabels = useSharedLabels()
 
   return (
-    <Card variant="surface" size="xs">
+    <Card variant="surface" size="xs" data-tour="assessments-filters">
       <CardContent>
         <Grid columns="toolbar-2" gap={4} align="center">
           <SearchInput

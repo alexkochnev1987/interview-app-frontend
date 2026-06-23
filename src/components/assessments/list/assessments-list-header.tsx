@@ -19,7 +19,7 @@ export function AssessmentsListHeader() {
   const isDemo = useIsDemo()
 
   return (
-    <Card variant="floating" size="lg" data-tour="assessments-list">
+    <Card variant="floating" size="lg" data-tour="assessments-intro">
       <CardContent layout="fill-column" spacing="xl">
         <EyebrowBadge icon={<Icon size="sm"><ClipboardList /></Icon>}>
           {t('eyebrow')}
@@ -30,7 +30,7 @@ export function AssessmentsListHeader() {
         </Stack>
         {!isDemo ? (
           <Inline>
-            <Button asChild variant="gradient" size="hero">
+            <Button asChild variant="gradient" size="hero" data-tour="assessments-create">
               <Link href="/interviews/new">
                 <Icon size="lg"><Plus /></Icon>
                 {tNav('newInterview')}

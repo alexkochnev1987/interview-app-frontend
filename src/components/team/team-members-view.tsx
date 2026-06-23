@@ -1,6 +1,7 @@
 'use client'
 
 import { Card, CardContent } from '@/components/ui/card'
+import { Stack } from '@/components/ui/layout/stack'
 import { Separator } from '@/components/ui/separator'
 import type { TeamMember } from '@/lib/api'
 
@@ -64,7 +65,7 @@ export function TeamMembersView({
       <TeamMemberStats statCards={statCards} />
 
       <Card variant="surface" flexChild="contain">
-        <CardContent spacing="sm">
+        <CardContent spacing="sm" data-tour="team-filters">
           <TeamMembersFilters
             roleFilter={roleFilter}
             onRoleFilterChange={onRoleFilterChange}
@@ -75,13 +76,15 @@ export function TeamMembersView({
 
         <Separator />
 
-        <TeamMembersTableSection
-          hasResults={hasResults}
-          members={paginatedMembers}
-          actorId={actorId}
-          actorRole={actorRole}
-          onRequestChangeRole={onRequestChangeRole}
-        />
+        <Stack data-tour="team-table">
+          <TeamMembersTableSection
+            hasResults={hasResults}
+            members={paginatedMembers}
+            actorId={actorId}
+            actorRole={actorRole}
+            onRequestChangeRole={onRequestChangeRole}
+          />
+        </Stack>
 
         {hasResults && (
           <>

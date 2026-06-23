@@ -68,7 +68,7 @@ export function AssessmentsListClient({
 
   return (
     <EvaluationActionsProvider onEvaluationStarted={onEvaluationStarted}>
-      <Stack gap={6}>
+      <Stack gap={6} data-tour="assessments-browse">
         <AssessmentsListToolbar
           query={query}
           onQueryChange={setQuery}
