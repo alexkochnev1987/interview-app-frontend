@@ -48,6 +48,8 @@ type InterviewEditPanelProps = {
   onDiscard: () => void
 }
 
+const INTERVIEW_PICKER_FETCH_OPTIONS = { eligibleForInterview: true } as const
+
 export function InterviewEditPanel({
   interview,
   onSaved,
@@ -72,10 +74,11 @@ export function InterviewEditPanel({
     syncUrl: false,
     lockStatus: 'active',
     disableFetchInCardsView: true,
+    eligibleForInterview: true,
   })
   const isCardsView = query.state.view === 'cards'
   const cardsInfiniteParams = useMemo(
-    () => buildQuestionsInfiniteParams(query.state, query.debouncedQ),
+    () => buildQuestionsInfiniteParams(query.state, query.debouncedQ, INTERVIEW_PICKER_FETCH_OPTIONS),
     [query.state, query.debouncedQ],
   )
   const infinite = useQuestionsInfinite({
@@ -84,7 +87,7 @@ export function InterviewEditPanel({
     serverHydrated: false,
   })
   const view = pickQuestionsViewSource(isCardsView, query, infinite)
-  const facetsResult = useQuestionFacets(query.state, query.debouncedQ)
+  const facetsResult = useQuestionFacets(query.state, query.debouncedQ, INTERVIEW_PICKER_FETCH_OPTIONS)
   const facets = facetsResult.facets
 
   const activeChips = buildActiveFilterChips(

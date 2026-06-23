@@ -42,6 +42,8 @@ export type QuestionsQueryState = {
   view: QuestionView
 }
 
+export type QuestionFetchOptions = { eligibleForInterview?: boolean }
+
 export const DEFAULT_QUESTIONS_QUERY: QuestionsQueryState = {
   q: '',
   difficulty: undefined,
@@ -126,6 +128,7 @@ function buildQuestionFilterParams(
 export function buildQuestionsFetchParams(
   state: QuestionsQueryState,
   debouncedQ: string,
+  options?: QuestionFetchOptions
 ): FetchQuestionsParams {
   return {
     ...buildQuestionFilterParams(state, debouncedQ),
@@ -133,16 +136,19 @@ export function buildQuestionsFetchParams(
     sortOrder: state.sortOrder,
     page: state.page,
     limit: state.limit,
+    ...(options?.eligibleForInterview ? { eligibleForInterview: true } : {}),
   }
 }
 
 export function buildQuestionsInfiniteParams(
   state: QuestionsQueryState,
   debouncedQ: string,
+  options?: QuestionFetchOptions
 ): Omit<FetchQuestionsParams, 'page'> {
   const { page: _page, ...infiniteParams } = buildQuestionsFetchParams(
     state,
     debouncedQ,
+    options,
   )
   return infiniteParams
 }
@@ -153,8 +159,13 @@ export function buildQuestionFacetsParams(
     'q' | 'difficulty' | 'category' | 'subcategory' | 'tags' | 'role' | 'status'
   >,
   debouncedQ: string,
+
+  options?: QuestionFetchOptions
 ): FetchQuestionFacetsParams {
-  return buildQuestionFilterParams(state, debouncedQ)
+  return {
+    ...buildQuestionFilterParams(state, debouncedQ),
+    ...(options?.eligibleForInterview ? { eligibleForInterview: true } : {}),
+  }
 }
 
 export function toQuestionsSearchParams(

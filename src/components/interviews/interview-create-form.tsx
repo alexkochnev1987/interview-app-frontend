@@ -48,6 +48,8 @@ type InterviewCreateFormProps = {
   initialPrefetch: QuestionsLibraryPrefetch
 }
 
+const INTERVIEW_PICKER_FETCH_OPTIONS = { eligibleForInterview: true } as const
+
 export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProps) {
   const t = useTranslations('questions.common')
   const router = useRouter()
@@ -65,11 +67,12 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
     serverHydrated: true,
     syncUrl: false,
     lockStatus: 'active',
+    eligibleForInterview: true,
     disableFetchInCardsView: true,
   })
   const isCardsView = query.state.view === 'cards'
   const cardsInfiniteParams = useMemo(
-    () => buildQuestionsInfiniteParams(query.state, query.debouncedQ),
+    () => buildQuestionsInfiniteParams(query.state, query.debouncedQ, INTERVIEW_PICKER_FETCH_OPTIONS),
     [query.state, query.debouncedQ],
   )
   const infinite = useQuestionsInfinite({
@@ -78,7 +81,7 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
     serverHydrated: true,
   })
   const view = pickQuestionsViewSource(isCardsView, query, infinite)
-  const facetsResult = useQuestionFacets(query.state, query.debouncedQ)
+  const facetsResult = useQuestionFacets(query.state, query.debouncedQ, INTERVIEW_PICKER_FETCH_OPTIONS)
   const facets = facetsResult.facets
 
   const activeChips = buildActiveFilterChips(
