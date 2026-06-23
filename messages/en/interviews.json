@@ -17,10 +17,6 @@
         "failed": "Failed"
       }
     },
-    "canceledBanner": {
-      "title": "This interview was canceled",
-      "description": "The candidate can no longer access the take link. You can create a new interview if needed."
-    },
     "actions": {
       "edit": "Edit interview",
       "saveChanges": "Save changes",

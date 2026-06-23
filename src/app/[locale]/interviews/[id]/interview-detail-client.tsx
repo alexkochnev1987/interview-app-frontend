@@ -65,12 +65,11 @@ import {
 import { useSharedLabels } from "@/i18n/use-shared-labels";
 import { runMutation } from "@/lib/run-mutation";
 import { useToastMessages } from "@/lib/use-toast-messages";
-import { InterviewCanceledBanner } from '@/components/interviews/interview-canceled-banner'
 import { InterviewEditPanel } from '@/components/interviews/interview-edit-panel'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { cancelInterview } from '@/lib/api'
 import { runPostCancelInterviewSuccess } from '@/lib/interview-cancel-flow'
-import { canManageInterview, isCanceledInterview } from '@/lib/interview-management'
+import { canManageInterview } from '@/lib/interview-management'
 import { interviewStatusTone } from '@/lib/interview-status-ui'
 
 type UploadStatus = "idle" | "uploading" | "uploaded" | "error";
@@ -169,6 +168,15 @@ function formatCandidateLinkPreview(candidateLink: string) {
   }
 }
 
+function buildUploadStates(interview: Interview): QuestionUploadState[] {
+  return (interview.questions ?? []).map((_, qi) => {
+    const hasAnswer = (interview.answers ?? []).some(
+      (answer) => answer.questionIndex === qi,
+    );
+    return { status: hasAnswer ? "uploaded" : "idle" } as QuestionUploadState;
+  });
+}
+
 export default function InterviewDetailClient({
   id,
   initialInterview,
@@ -185,6 +193,10 @@ export default function InterviewDetailClient({
   const toastMessages = useToastMessages();
 
   const router = useRouter()
+
+  const [uploadStates, setUploadStates] = useState<QuestionUploadState[]>(() =>
+      buildUploadStates(initialInterview),
+  );
 
   function validationStatusLabel(status?: string) {
     if (!status) {
@@ -205,16 +217,7 @@ export default function InterviewDetailClient({
   const [results, setResults] = useState<InterviewResult | null>(initialResults);
   const [loading] = useState(false);
   const [validating, setValidating] = useState(false);
-  const [uploadStates, setUploadStates] = useState<QuestionUploadState[]>(
-    initialInterview.questions.map((_, qi) => {
-      const hasAnswer = initialInterview.answers.some(
-        (answer) => answer.questionIndex === qi,
-      );
-      return {
-        status: hasAnswer ? "uploaded" : "idle",
-      } as QuestionUploadState;
-    }),
-  );
+
   const [mediaByQuestion, setMediaByQuestion] = useState<
     Record<number, AnswerMediaState>
   >({});
@@ -563,9 +566,6 @@ export default function InterviewDetailClient({
 
   return (
     <PageShell>
-      {interview && isCanceledInterview(interview) ? (
-          <InterviewCanceledBanner/>
-      ) : null}
       <Grid as="section" columns="split-115-85" gap={6}>
         <Card variant="floating" size="lg">
           <CardContent spacing="2xl">
@@ -621,7 +621,7 @@ export default function InterviewDetailClient({
                       {tActions('discardEdit')}
                     </Button>
                 ) : null}
-                {!isEditing && !isCanceledInterview(interview) && interview.status !== 'completed' ? (
+                {!isEditing && interview.status !== 'completed' ? (
                     <Button
                         type="button"
                         variant="gradient"
@@ -676,7 +676,7 @@ export default function InterviewDetailClient({
                       shape="pill"
                       size="sm"
                       onClick={() => void loadCandidateLink("refresh")}
-                      disabled={candidateLinkStatus === "loading" || isCanceledInterview(interview)}
+                      disabled={candidateLinkStatus === "loading"}
                     >
                       {candidateLinkStatus === "loading"
                         ? t("generating")
@@ -795,6 +795,9 @@ export default function InterviewDetailClient({
           interview={interview}
           onSaved={(updated) => {
             setInterview(updated)
+            setUploadStates(buildUploadStates(updated))
+            setMediaByQuestion({})
+            requestedMediaRef.current.clear()
             setIsEditing(false)
           }}
           onDiscard={() => setDiscardOpen(true)}

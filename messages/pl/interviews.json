@@ -17,10 +17,6 @@
         "failed": "Przegrany"
       }
     },
-    "canceledBanner": {
-      "title": "To interview zostało anulowane",
-      "description": "Kandydat nie ma już dostępu do linku do rozmowy. W razie potrzeby możesz utworzyć nowe interview."
-    },
     "actions": {
       "edit": "Edytuj interview",
       "saveChanges": "Zapisz zmiany",
