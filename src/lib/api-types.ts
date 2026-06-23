@@ -1619,6 +1619,8 @@ export interface operations {
                 sortOrder?: "asc" | "desc";
                 page?: number;
                 limit?: number;
+                /** @description When true, only interview-eligible (active) questions are returned */
+                eligibleForInterview?: boolean;
             };
             header?: never;
             path?: never;
@@ -1710,6 +1712,8 @@ export interface operations {
                 sortOrder?: "asc" | "desc";
                 page?: number;
                 limit?: number;
+                /** @description When true, only interview-eligible (active) questions are returned */
+                eligibleForInterview?: boolean;
             };
             header?: never;
             path?: never;
