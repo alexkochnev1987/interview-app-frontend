@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { useRouter } from '@/i18n/navigation'
 import {
   ArrowLeft,
   ChartColumnBig,
@@ -65,12 +64,12 @@ import {
 import { useSharedLabels } from "@/i18n/use-shared-labels";
 import { runMutation } from "@/lib/run-mutation";
 import { useToastMessages } from "@/lib/use-toast-messages";
-import { InterviewEditPanel } from '@/components/interviews/interview-edit-panel'
-import { ConfirmDialog } from '@/components/ui/confirm-dialog'
-import { cancelInterview } from '@/lib/api'
-import { runPostCancelInterviewSuccess } from '@/lib/interview-cancel-flow'
-import { canManageInterview } from '@/lib/interview-management'
+import { InterviewDetailCancelDialog } from '@/components/interviews/detail/interview-detail-cancel-dialog'
+import { InterviewDetailEditSection } from '@/components/interviews/detail/interview-detail-edit-section'
+import { InterviewDetailHeaderActions } from '@/components/interviews/detail/interview-detail-header-actions'
+import { useInterviewDetailManagement } from '@/components/interviews/detail/use-interview-detail-management'
 import { interviewStatusTone } from '@/lib/interview-status-ui'
+import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
 
 type UploadStatus = "idle" | "uploading" | "uploaded" | "error";
 
@@ -90,6 +89,7 @@ interface InterviewDetailClientProps {
   id: string;
   initialInterview: Interview;
   initialResults: InterviewResult | null;
+  editPickerPrefetch?: QuestionsLibraryPrefetch | null;
 }
 
 function formatAnswerDuration(seconds: number | undefined, emptyLabel: string) {
@@ -181,18 +181,12 @@ export default function InterviewDetailClient({
   id,
   initialInterview,
   initialResults,
+  editPickerPrefetch = null,
 }: InterviewDetailClientProps) {
-
-  const [isEditing, setIsEditing] = useState(false)
-  const [discardOpen, setDiscardOpen] = useState(false)
-  const tEdit = useTranslations('interviews.edit')
-
   const t = useTranslations("questions.common");
   const tDetail = useTranslations("interviews.detail");
   const sharedLabels = useSharedLabels();
   const toastMessages = useToastMessages();
-
-  const router = useRouter()
 
   const [uploadStates, setUploadStates] = useState<QuestionUploadState[]>(() =>
       buildUploadStates(initialInterview),
@@ -229,15 +223,30 @@ export default function InterviewDetailClient({
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "error">(
     "idle",
   );
-  const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false)
-  const [canceling, setCanceling] = useState(false)
-
-  const tActions = useTranslations('interviews.actions')
 
   const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const validationPollRef = useRef<number | null>(null);
   const requestedMediaRef = useRef<Map<number, string>>(new Map());
   const mediaFetchInterviewIdRef = useRef(id);
+
+  const {
+    isEditing,
+    startEditing,
+    exitEditing,
+    handleEditSaved,
+    cancelConfirmOpen,
+    setCancelConfirmOpen,
+    canceling,
+    handleCancelInterview,
+  } = useInterviewDetailManagement({
+    interviewId: id,
+    onInterviewUpdated: (updated) => {
+      setInterview(updated)
+      setUploadStates(buildUploadStates(updated))
+      setMediaByQuestion({})
+      requestedMediaRef.current.clear()
+    },
+  })
 
   const buildCandidateUrl = useCallback((relativeLink: string) => {
     if (typeof window === "undefined") {
@@ -500,28 +509,6 @@ export default function InterviewDetailClient({
     }
   }
 
-  async function handleCancelInterview() {
-    if (canceling || !interview) return
-
-    setCanceling(true)
-
-    try {
-      await runMutation(() => cancelInterview(id), {
-        successMessage: toastMessages.interview.cancelSuccess,
-        errorMessage: toastMessages.interview.cancelError,
-      })
-      runPostCancelInterviewSuccess({
-        closeConfirm: () => setCancelConfirmOpen(false),
-        push: router.push,
-        refresh: router.refresh,
-      })
-    } catch {
-      /* toast handled by runMutation */
-    } finally {
-      setCanceling(false)
-    }
-  }
-
   if (loading) {
     return (
       <PageShell>
@@ -600,37 +587,17 @@ export default function InterviewDetailClient({
                 </Inline>
               </Stack>
 
-              <Inline gap={3} wrap="wrap">
-                {canManageInterview(interview) && !isEditing ? (
-                    <>
-                      <Button type="button" variant="outline" onClick={() => setIsEditing(true)}>
-                        {tActions('edit')}
-                      </Button>
-                      <Button
-                          type="button"
-                          variant="destructive"
-                          onClick={()=>setCancelConfirmOpen(true)}
-                          disabled={canceling}
-                      >
-                        {canceling ? tActions('canceling') : tActions('cancelInterview')}
-                      </Button>
-                    </>
-                ) : null}
-                {isEditing ? (
-                    <Button variant="outline" onClick={() => setDiscardOpen(true)}>
-                      {tActions('discardEdit')}
-                    </Button>
-                ) : null}
-                {!isEditing && interview.status !== 'completed' ? (
-                    <Button
-                        type="button"
-                        variant="gradient"
-                        onClick={handleValidate}
-                        disabled={!canValidate || validating || hasActiveValidation}
-                    >
-                      {validating || hasActiveValidation ? t('validating') : t('validate')}                    </Button>
-                ) : null}
-              </Inline>
+              <InterviewDetailHeaderActions
+                interview={interview}
+                isEditing={isEditing}
+                canceling={canceling}
+                onStartEditing={startEditing}
+                onOpenCancelConfirm={() => setCancelConfirmOpen(true)}
+                onValidate={() => void handleValidate()}
+                canValidate={canValidate}
+                validating={validating}
+                hasActiveValidation={hasActiveValidation}
+              />
             </Inline>
 
             <Grid columns="metrics-3" gap={4}>
@@ -791,16 +758,11 @@ export default function InterviewDetailClient({
       </Grid>
 
       {isEditing ? (
-        <InterviewEditPanel
+        <InterviewDetailEditSection
           interview={interview}
-          onSaved={(updated) => {
-            setInterview(updated)
-            setUploadStates(buildUploadStates(updated))
-            setMediaByQuestion({})
-            requestedMediaRef.current.clear()
-            setIsEditing(false)
-          }}
-          onDiscard={() => setDiscardOpen(true)}
+          editPickerPrefetch={editPickerPrefetch}
+          onSaved={handleEditSaved}
+          onExitEdit={exitEditing}
         />
       ) : (
       <>
@@ -1304,32 +1266,14 @@ export default function InterviewDetailClient({
       </>
       )}
 
-      <ConfirmDialog
-          open={discardOpen}
-          title={tEdit('discardTitle')}
-          description={tEdit('discardDescription')}
-          confirmLabel={tActions('discardEdit')}
-          cancelLabel={tActions('dismiss')}
-          onConfirm={() => {
-            setIsEditing(false)
-            setDiscardOpen(false)
-          }}
-          onCancel={() => setDiscardOpen(false)}
-        />
-
-      <ConfirmDialog
-          open={cancelConfirmOpen}
-          destructive
-          title={tActions('cancelTitle')}
-          description={tActions('cancelDescription')}
-          confirmLabel={canceling ? tActions('canceling') : tActions('confirmCancel')}
-          cancelLabel={tActions('dismiss')}
-          loading={canceling}
-          onConfirm={() => void handleCancelInterview()}
-          onCancel={() => {
-            if (!canceling) setCancelConfirmOpen(false)
-          }}
-        />
+      <InterviewDetailCancelDialog
+        open={cancelConfirmOpen}
+        loading={canceling}
+        onConfirm={() => void handleCancelInterview()}
+        onCancel={() => {
+          if (!canceling) setCancelConfirmOpen(false)
+        }}
+      />
 
     </PageShell>
   );

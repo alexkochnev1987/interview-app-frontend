@@ -301,18 +301,18 @@ export async function getInterviews(): Promise<Interview[]> {
 }
 
 export async function updateInterview(
-    id:string,
-    data:UpdateInterviewPayload,
+  id: string,
+  data: UpdateInterviewPayload,
 ): Promise<Interview> {
   return handle(client.PATCH('/interviews/{id}', {
-    params: {path: {id}},
+    params: { path: { id } },
     body: data,
   }));
 }
 
 export async function cancelInterview(id: string): Promise<Interview> {
-  return handle(client.PATCH('/interviews/{id}/cancel',{
-    params: {path: {id}},
+  return handle(client.PATCH('/interviews/{id}/cancel', {
+    params: { path: { id } },
   }));
 }
 

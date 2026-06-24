@@ -1,10 +1,19 @@
 import type { Interview } from '@/lib/api'
 
-
-export function isPendingInterview (interview: Interview): boolean {
-    return interview.status === 'pending'
+export function isPendingInterview(interview: Interview): boolean {
+  return interview.status === 'pending'
 }
 
-export function canManageInterview (interview: Interview): boolean {
-    return isPendingInterview(interview)
+export function hasInterviewAnswers(interview: Interview): boolean {
+  return interview.answers.length > 0
+}
+
+/** Pending interviews with no uploaded answers can be edited safely. */
+export function canEditInterview(interview: Interview): boolean {
+  return isPendingInterview(interview) && !hasInterviewAnswers(interview)
+}
+
+/** Pending interviews can still be canceled even after uploads exist. */
+export function canManageInterview(interview: Interview): boolean {
+  return isPendingInterview(interview)
 }

@@ -7,7 +7,10 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { DeletedQuestionBanner } from '@/components/questions/detail/deleted-question-banner'
 import { QuestionDangerZone } from '@/components/questions/detail/question-danger-zone'
 import { QuestionDeleteScheduledAlert } from '@/components/questions/detail/question-delete-scheduled-alert'
-import { QuestionEditor } from '@/components/questions/editor/question-editor'
+import {
+  QuestionEditor,
+  type QuestionSubmitCallbacks,
+} from '@/components/questions/editor/question-editor'
 import {
   useDeleteQuestion,
   useRestoreQuestion,
@@ -47,7 +50,7 @@ export function QuestionEditClient({
   const t = useTranslations('questions.editPage')
   const router = useRouter()
   const toastMessages = useToastMessages()
-  const { mutateAsync: updateQuestion } = useUpdateQuestion()
+  const { mutate: updateQuestion, isPending: submitting } = useUpdateQuestion()
   const { mutateAsync: deleteQuestion, isPending: deleting } = useDeleteQuestion()
   const { mutateAsync: restoreQuestion, isPending: restoring } = useRestoreQuestion()
   const [question, setQuestion] = useState(initialQuestion)
@@ -57,11 +60,17 @@ export function QuestionEditClient({
     Extract<DeleteQuestionResult, { scheduled: true }> | null
   >(null)
 
-  async function handleSubmit(value: QuestionInput) {
-    const updated = await updateQuestion({ id, value })
-    setQuestion(updated)
-    router.refresh()
-    return updated
+  function handleSubmit(value: QuestionInput, { onSuccess }: QuestionSubmitCallbacks) {
+    updateQuestion(
+      { id, value },
+      {
+        onSuccess: (updated) => {
+          setQuestion(updated)
+          router.refresh()
+          onSuccess(questionToEditorInput(updated))
+        },
+      },
+    )
   }
 
   async function performRestore() {
@@ -119,6 +128,7 @@ export function QuestionEditClient({
         readOnly={!canUpdate}
         initialValue={questionToEditorInput(question)}
         submitLabel={t('submit')}
+        submitting={submitting}
         onSubmit={handleSubmit}
       />
       {!question.deleted && canDelete ? (

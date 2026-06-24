@@ -21,9 +21,11 @@ export function QuestionDeleteScheduledAlert({
       <CardContent spacing="md">
         <Stack gap={2}>
           <BodyText size="sm">{intro}</BodyText>
-          <SurfaceTile tone="soft" padding="md" rounded="lg" width="full">
-            <QuestionDeleteBlockingInterviews interviews={blockingInterviews} />
-          </SurfaceTile>
+          {blockingInterviews.length > 0 ? (
+            <SurfaceTile tone="soft" padding="md" rounded="lg" width="full">
+              <QuestionDeleteBlockingInterviews interviews={blockingInterviews} />
+            </SurfaceTile>
+          ) : null}
         </Stack>
       </CardContent>
     </Card>

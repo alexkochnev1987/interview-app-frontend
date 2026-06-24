@@ -27,7 +27,8 @@
       "cancelDescription": "Link dla kandydata przestanie działać. Tej operacji nie można cofnąć.",
       "confirmCancel": "Anuluj interview",
       "dismiss": "Pozostaw interview",
-      "discardEdit": "Odrzuć zmiany"
+      "discardEdit": "Odrzuć zmiany",
+      "keepEditing": "Kontynuuj edycję"
     },
     "edit": {
       "title": "Edycja interview",
@@ -35,7 +36,7 @@
       "candidateEmail": "Email kandydata",
       "position": "Stanowisko",
       "questionsTitle": "Pytania",
-      "pendingOnlyNotice": "Tylko oczekujące interview można edytować lub anulować.",
+      "answersBlockEditNotice": "Edycja jest wyłączona po przesłaniu odpowiedzi, ponieważ odpowiedzi są powiązane z kolejnością pytań.",
       "discardTitle": "Odrzucić niezapisane zmiany?",
       "discardDescription": "Twoje zmiany w tym interview zostaną utracone."
     }

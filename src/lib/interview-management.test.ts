@@ -1,10 +1,15 @@
 ﻿import { describe, expect, it } from 'vitest'
 
 import {
+  canEditInterview,
   canManageInterview,
+  hasInterviewAnswers,
   isPendingInterview,
 } from '@/lib/interview-management'
-import { interviewFixture } from '@/lib/test-fixtures/interview'
+import {
+  interviewFixture,
+  submittedAnswerFixture,
+} from '@/lib/test-fixtures/interview'
 
 describe('interview-management', () => {
   it('detects pending interviews', () => {
@@ -15,8 +20,40 @@ describe('interview-management', () => {
     expect(isPendingInterview(interviewFixture({ status: 'canceled' }))).toBe(false)
   })
 
+  it('detects interviews with uploaded answers', () => {
+    expect(hasInterviewAnswers(interviewFixture())).toBe(false)
+    expect(
+      hasInterviewAnswers(
+        interviewFixture({ answers: [submittedAnswerFixture()] }),
+      ),
+    ).toBe(true)
+  })
+
+  it('allows editing only for pending interviews without answers', () => {
+    expect(canEditInterview(interviewFixture({ status: 'pending' }))).toBe(true)
+    expect(
+      canEditInterview(
+        interviewFixture({
+          status: 'pending',
+          answers: [submittedAnswerFixture()],
+        }),
+      ),
+    ).toBe(false)
+    expect(canEditInterview(interviewFixture({ status: 'in_progress' }))).toBe(
+      false,
+    )
+  })
+
   it('allows management only for pending interviews', () => {
     expect(canManageInterview(interviewFixture({ status: 'pending' }))).toBe(true)
+    expect(
+      canManageInterview(
+        interviewFixture({
+          status: 'pending',
+          answers: [submittedAnswerFixture()],
+        }),
+      ),
+    ).toBe(true)
     expect(canManageInterview(interviewFixture({ status: 'in_progress' }))).toBe(
       false,
     )
