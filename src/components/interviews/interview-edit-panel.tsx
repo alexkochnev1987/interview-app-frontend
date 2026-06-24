@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { BriefcaseBusiness, UserRound } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
@@ -55,13 +55,7 @@ export function InterviewEditPanel({
     initialPrefetch,
     serverHydrated: Boolean(initialPrefetch),
   })
-  const { selectedCount, selectedById, replaceSelected } = picker
-
-  useEffect(() => {
-    setCandidateName(interview.candidateName)
-    setPosition(interview.position)
-    replaceSelected(interview.questions)
-  }, [interview.id, interview.updatedAt, replaceSelected])
+  const { selectedCount, selectedById } = picker
 
   function handleDiscardClick() {
     if (
