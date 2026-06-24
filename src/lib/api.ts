@@ -1,19 +1,65 @@
 import createClient from 'openapi-fetch';
 import { paths, components } from './api-types';
 import { ApiError, QuestionInUseError } from './api-error';
+import { extractApiErrorFields, extractApiErrorFieldsFromBody } from './api-error-fields';
+import { buildApiLocaleHeaders, resolveApiLocale } from './api-locale';
+import {
+  buildGenerateDraftRequestPayload,
+  buildTranslateDraftRequestPayload,
+} from './question-editor/ai-draft-request';
+import { LOCALES, type Locale } from '@/i18n/locales';
 
-export { ApiError, QuestionInUseError };
+export { ApiError, QuestionInUseError } from './api-error';
+export { resolveApiLocale } from './api-locale';
+export type LocaleCode = Locale;
+
+function getInitialClientApiLocale(): LocaleCode {
+  if (typeof document === 'undefined') {
+    return resolveApiLocale();
+  }
+  return resolveApiLocale(document.documentElement.lang);
+}
+
+let clientApiLocale = getInitialClientApiLocale();
+
+export function setClientApiLocale(locale?: string | null): void {
+  clientApiLocale = resolveApiLocale(locale);
+}
 
 const client = createClient<paths>({
   baseUrl: '/api',
-  headers: {
-    'Content-Type': 'application/json',
-  }
 });
+
+function buildClientApiHeaders(headers?: HeadersInit): Headers {
+  return buildApiLocaleHeaders(clientApiLocale, {
+    'Content-Type': 'application/json',
+    ...headers,
+  });
+}
+
+function buildClientBaseHeaders(headers?: HeadersInit): Headers {
+  return new Headers({
+    'Content-Type': 'application/json',
+    ...headers,
+  });
+}
+
+function fetchClientApi(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+  return fetch(input, {
+    ...init,
+    headers: buildClientApiHeaders(init?.headers),
+  });
+}
+
+const LOCALIZED_HEADERS = {
+  get headers() {
+    return buildClientApiHeaders();
+  },
+} as const;
 
 type Schemas = components['schemas'];
 
-export type QuestionDifficulty = Schemas['QuestionResponseDto']['difficulty'];
+export type QuestionDifficulty = Schemas['ResolvedQuestionResponseDto']['difficulty'];
 export type AuthUserResponseDto = Schemas['AuthUserResponseDto'];
 export type MeResponse = AuthUserResponseDto;
 export type LoginPayload = Schemas['LoginDto'];
@@ -23,10 +69,45 @@ export type FeedbackResponse = Schemas['FeedbackResponseDto'];
 export type QuestionExpectedConcept = Schemas['QuestionExpectedConceptDto'];
 export type QuestionRedFlag = Schemas['QuestionRedFlagDto'];
 
-export type QuestionDraft = Schemas['QuestionDraftResponseDto'];
-export type QuestionInput = Schemas['CreateQuestionDto'];
-export type UpdateQuestionInput = Schemas['UpdateQuestionDto'];
-export type Question = Schemas['QuestionResponseDto'];
+export type QuestionDraft = Schemas['QuestionDraftContentResponseDto'];
+export type QuestionGenerateDraft = Schemas['QuestionDraftGenerateResponseDto'];
+type LocaleQuestionTranslation = Schemas['QuestionTranslationDto'];
+type LocalizedQuestionTranslations =
+  Schemas['CreateQuestionDto']['translations'] &
+  Partial<Record<LocaleCode, LocaleQuestionTranslation>>;
+export type QuestionInput = {
+  primaryLocale?: Locale;
+  translations?: LocalizedQuestionTranslations;
+  externalId?: string;
+  role?: string;
+  focus?: string;
+  category?: string;
+  subcategory?: string;
+  questionText: string;
+  followUpQuestions?: string[];
+  expectedConcepts?: QuestionExpectedConcept[];
+  redFlags?: QuestionRedFlag[];
+  difficulty?: "easy" | "medium" | "hard";
+  weight?: number;
+  sampleGoodAnswer?: string;
+  minimumPassScore?: number;
+  tags?: string[];
+  metadata?: {
+    [key: string]: unknown;
+  };
+};
+export type UpdateQuestionInput = Partial<QuestionInput> & {
+  translationsMode?: "merge" | "replace";
+};
+export type Question = Omit<
+  Schemas['ResolvedQuestionResponseDto'],
+  'resolvedLocale' | 'availableLocales' | 'expectedConcepts' | 'redFlags'
+> & {
+  resolvedLocale?: Schemas['ResolvedQuestionResponseDto']['resolvedLocale'];
+  availableLocales?: Schemas['ResolvedQuestionResponseDto']['availableLocales'];
+  expectedConcepts: QuestionExpectedConcept[];
+  redFlags: QuestionRedFlag[];
+};
 export type PaginatedQuestions = Schemas['PaginatedQuestionsResponseDto'];
 export type QuestionFacetsResponse = Schemas['QuestionFacetsResponseDto'];
 export type FetchQuestionsParams = NonNullable<paths['/questions']['get']['parameters']['query']>;
@@ -34,7 +115,7 @@ export type QuestionSortField = NonNullable<FetchQuestionsParams['sortBy']>;
 export type QuestionSortOrder = NonNullable<FetchQuestionsParams['sortOrder']>;
 export type QuestionStatusFilter = NonNullable<FetchQuestionsParams['status']>;
 
-export type InterviewQuestion = Schemas['InterviewResponseDto']['questions'][number];
+export type InterviewQuestion = Question;
 
 export type InterviewBehaviorRisk = NonNullable<Schemas['InterviewResultResponseDto']['behaviorSummary']>['riskLevel'];
 export type InterviewDecision = NonNullable<Schemas['InterviewResultResponseDto']['decision']>;
@@ -50,6 +131,7 @@ type ValidateAllAnswersResponse = Schemas['StartAllAnswerValidationsResponseDto'
 export type StartAnswerValidationResult = Schemas['StartAnswerValidationResultDto'];
 export type InterviewAnswerMediaResponse = Schemas['InterviewAnswerMediaResponseDto'];
 export type CandidateLinkResponse = Schemas['CandidateLinkResponseDto'];
+export type FeedbackLinkResponse = Schemas['FeedbackLinkResponseDto'];
 
 export type CreateInterviewPayload = Schemas['CreateInterviewDto'];
 
@@ -95,7 +177,8 @@ async function handle<T>(promise: Promise<ApiResult<T>>): Promise<T> {
   if (error) {
     const message = messageFromError(error, response.status);
     const path = new URL(response.url).pathname;
-    throw new ApiError(response.status, message, path);
+    const { code, params } = extractApiErrorFields(error);
+    throw new ApiError(response.status, message, path, undefined, code, params);
   }
 
   if (data === undefined) {
@@ -111,14 +194,14 @@ async function postWithQuery<T>(
   query?: Record<string, string>,
 ): Promise<T> {
   const queryString = query ? '?' + new URLSearchParams(query).toString() : '';
-  const res = await fetch(`/api${path}${queryString}`, {
+  const res = await fetchClientApi(`/api${path}${queryString}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
   });
 
   if (!res.ok) {
     const body = await res.text();
-    throw new ApiError(res.status, messageFromBody(body, res.status), path, body);
+    const { code, params } = extractApiErrorFieldsFromBody(body);
+    throw new ApiError(res.status, messageFromBody(body, res.status), path, body, code, params);
   }
 
   if (res.status === 204) {
@@ -128,6 +211,85 @@ async function postWithQuery<T>(
   return (await res.json()) as T;
 }
 
+function normalizeTranslations(
+  translations?: LocalizedQuestionTranslations,
+): Schemas['CreateQuestionDto']['translations'] | Schemas['UpdateQuestionDto']['translations'] | undefined {
+  if (!translations) return undefined;
+
+  const entries = Object.entries(translations).filter(([locale]) =>
+    (LOCALES as readonly string[]).includes(locale),
+  );
+  if (entries.length === 0) return undefined;
+
+  return Object.fromEntries(entries);
+}
+
+function toCreateQuestionDto(data: QuestionInput): Schemas['CreateQuestionDto'] {
+  const {
+    primaryLocale,
+    translations,
+    externalId,
+    role,
+    focus,
+    category,
+    subcategory,
+    difficulty,
+    weight,
+    minimumPassScore,
+    tags,
+    metadata,
+  } = data;
+
+  return {
+    primaryLocale: primaryLocale ?? resolveApiLocale(),
+    translations: normalizeTranslations(translations) ?? {},
+    externalId,
+    role,
+    focus,
+    category,
+    subcategory,
+    difficulty,
+    weight,
+    minimumPassScore,
+    tags,
+    metadata,
+  };
+}
+
+function toUpdateQuestionDto(data: UpdateQuestionInput): Schemas['UpdateQuestionDto'] {
+  const {
+    primaryLocale,
+    translationsMode,
+    translations,
+    externalId,
+    role,
+    focus,
+    category,
+    subcategory,
+    difficulty,
+    weight,
+    minimumPassScore,
+    tags,
+    metadata,
+  } = data;
+
+  return {
+    primaryLocale,
+    translationsMode: translationsMode ?? 'merge',
+    translations: normalizeTranslations(translations),
+    externalId,
+    role,
+    focus,
+    category,
+    subcategory,
+    difficulty,
+    weight,
+    minimumPassScore,
+    tags,
+    metadata,
+  };
+}
+
 export type TeamMember = Schemas['AuthUserResponseDto'];
 
 export async function updateUserRole(
@@ -135,6 +297,7 @@ export async function updateUserRole(
   role: 'super_admin' | 'admin' | 'hr' | 'candidate',
 ): Promise<TeamMember> {
   return handle(client.PATCH('/users/{id}/role', {
+    ...LOCALIZED_HEADERS,
     params: { path: { id } },
     body: { role },
   }));
@@ -146,6 +309,7 @@ export async function fetchQuestions(
 ): Promise<PaginatedQuestions> {
   return handle(
     client.GET('/questions', {
+      ...LOCALIZED_HEADERS,
       params: { query: params ?? {} },
       signal: init?.signal,
     }),
@@ -164,6 +328,7 @@ export async function fetchQuestionFacets(
 ): Promise<QuestionFacetsResponse> {
   return handle(
     client.GET('/questions/facets', {
+      ...LOCALIZED_HEADERS,
       params: { query: params ?? {} },
       signal: init?.signal,
     }),
@@ -172,17 +337,19 @@ export async function fetchQuestionFacets(
 
 export async function login(data: LoginPayload): Promise<AuthUserResponseDto> {
   return handle(client.POST('/auth/login', {
+    ...LOCALIZED_HEADERS,
     body: data,
   }));
 }
 
 export async function logout(): Promise<LogoutResponse> {
-  return handle(client.POST('/auth/logout'));
+  return handle(client.POST('/auth/logout', LOCALIZED_HEADERS));
 }
 
 export async function createQuestion(data: QuestionInput): Promise<Question> {
   return handle(client.POST('/questions', {
-    body: data
+    ...LOCALIZED_HEADERS,
+    body: toCreateQuestionDto(data),
   }));
 }
 
@@ -190,9 +357,10 @@ export async function updateQuestion(
   id: string,
   data: UpdateQuestionInput,
 ): Promise<Question> {
-  return handle(client.PATCH('/questions/{id}', {
+  return handle(client.PUT('/questions/{id}', {
+    ...LOCALIZED_HEADERS,
     params: { path: { id } },
-    body: data
+    body: toUpdateQuestionDto(data),
   }));
 }
 
@@ -201,6 +369,7 @@ export async function deleteQuestion(
   id: string,
 ): Promise<{ id: string; deleted: true }> {
   const { data, error, response } = await client.DELETE('/questions/{id}', {
+    ...LOCALIZED_HEADERS,
     params: { path: { id } }
   });
   const status = response.status;
@@ -218,7 +387,8 @@ export async function deleteQuestion(
   }
 
   if (error) {
-    throw new ApiError(status, messageFromError(error, status), path);
+    const { code, params } = extractApiErrorFields(error);
+    throw new ApiError(status, messageFromError(error, status), path, undefined, code, params);
   }
 
   if (!data) {
@@ -235,6 +405,7 @@ export async function deleteQuestion(
 
 export async function restoreQuestion(id: string): Promise<Question> {
   return handle(client.PATCH('/questions/{id}/restore', {
+    ...LOCALIZED_HEADERS,
     params: { path: { id } }
   }));
 }
@@ -245,16 +416,47 @@ export async function deleteQuestionsBulk(
   ids: string[],
 ): Promise<BulkDeleteResult> {
   return handle(client.POST('/questions/bulk-delete', {
+    ...LOCALIZED_HEADERS,
     body: { ids }
   }));
 }
 
-export async function draftQuestion(
-  question: Schemas['DraftQuestionDto']['question'],
-): Promise<QuestionDraft> {
-  return handle(client.POST('/ai/question-draft', {
-    body: { question }
-  }));
+export type DraftQuestionMode = NonNullable<Schemas['DraftQuestionDto']['mode']>;
+
+export type DraftQuestionParams = {
+  mode: DraftQuestionMode;
+  question: QuestionInput;
+  targetLocale?: LocaleCode;
+};
+
+export async function draftQuestion({
+  mode,
+  question,
+  targetLocale,
+}: DraftQuestionParams): Promise<QuestionGenerateDraft | QuestionDraft> {
+  const resolvedTargetLocale = resolveApiLocale(
+    targetLocale ?? question.primaryLocale ?? clientApiLocale,
+  );
+
+  if (mode === 'translate') {
+    return handle(
+      client.POST('/questions/ai/draft', {
+        headers: buildApiLocaleHeaders(resolvedTargetLocale),
+        body: buildTranslateDraftRequestPayload(
+          resolveApiLocale(question.primaryLocale ?? clientApiLocale),
+          resolvedTargetLocale,
+          question,
+        ),
+      }),
+    );
+  }
+
+  return handle(
+    client.POST('/questions/ai/draft', {
+      headers: buildApiLocaleHeaders(resolvedTargetLocale),
+      body: buildGenerateDraftRequestPayload(resolvedTargetLocale, question),
+    }),
+  );
 }
 
 export type SimilarQuestionMatch = Schemas['SimilarQuestionMatchDto'];
@@ -266,6 +468,7 @@ export async function findSimilarQuestions(
   init?: { signal?: AbortSignal },
 ): Promise<SimilarQuestionMatch[]> {
   const data = await handle(client.POST('/questions/similar', {
+    ...LOCALIZED_HEADERS,
     body: { draft: draft as Schemas['FindSimilarDraftDto'], excludeQuestionId, limit },
     signal: init?.signal,
   }));
@@ -276,18 +479,21 @@ export async function createInterview(
   data: CreateInterviewPayload,
 ): Promise<Interview & CandidateLinkResponse> {
   return handle(client.POST('/interviews', {
+    ...LOCALIZED_HEADERS,
     body: data
   }));
 }
 
 export async function getInterview(id: string): Promise<Interview> {
   return handle(client.GET('/interviews/{id}', {
+    headers: buildClientBaseHeaders(),
     params: { path: { id } }
   }));
 }
 
 export async function getInterviews(): Promise<Interview[]> {
-  return handle(client.GET('/interviews'));
+  const data = await handle(client.GET('/interviews'));
+  return (Array.isArray(data) ? data : data.items) as Interview[];
 }
 
 
@@ -295,6 +501,16 @@ export async function generateCandidateLink(
   id: string,
 ): Promise<CandidateLinkResponse> {
   return handle(client.POST('/interviews/{id}/candidate-link', {
+    ...LOCALIZED_HEADERS,
+    params: { path: { id } }
+  }));
+}
+
+export async function generateFeedbackLink(
+  id: string,
+): Promise<FeedbackLinkResponse> {
+  return handle(client.POST('/interviews/{id}/feedback-link', {
+    ...LOCALIZED_HEADERS,
     params: { path: { id } }
   }));
 }
@@ -308,6 +524,7 @@ export async function getPresignedUrl(
 ): Promise<PresignedUrlResponse> {
   return handle(
     client.POST('/interviews/{id}/questions/{questionIndex}/upload-url', {
+      ...LOCALIZED_HEADERS,
       params: { path: { id: interviewId, questionIndex } },
       body: { contentType, mediaType },
     }),
@@ -321,6 +538,7 @@ async function completeUpload(
 ): Promise<Schemas['ConfirmUploadResponseDto']> {
   return handle(
     client.POST('/interviews/{id}/questions/{questionIndex}/complete-upload', {
+      ...LOCALIZED_HEADERS,
       params: { path: { id: interviewId, questionIndex } },
       body: { mediaKey },
     }),
@@ -362,12 +580,14 @@ export async function getInterviewAnswerMedia(
   questionIndex: number,
 ): Promise<InterviewAnswerMediaResponse> {
   return handle(client.GET('/interviews/{id}/questions/{questionIndex}/media', {
+    ...LOCALIZED_HEADERS,
     params: { path: { id: interviewId, questionIndex } }
   }));
 }
 
 export async function getResults(id: string): Promise<InterviewResult> {
   return handle(client.GET('/interviews/{id}/results', {
+    headers: buildClientBaseHeaders(),
     params: { path: { id } }
   }));
 }
@@ -375,23 +595,29 @@ export async function getResults(id: string): Promise<InterviewResult> {
 export async function getTakeInterview(
   id: string,
   token?: string,
+  contentLocale?: Locale,
 ): Promise<TakeInterviewData> {
   return handle(client.GET('/take/{id}', {
+    headers: buildClientBaseHeaders(),
     params: {
       path: { id },
-      query: token ? { token } : undefined
-    }
+      query: {
+        ...(token ? { token } : {}),
+        ...(contentLocale ? { contentLocale } : {}),
+      },
+    },
   }));
 }
 
 export async function syncCandidateSession(id: string, token: string): Promise<void> {
   const path = `/take/${encodeURIComponent(id)}`;
   const query = new URLSearchParams({ token });
-  const res = await fetch(`/api${path}?${query}`, { credentials: 'include' });
+  const res = await fetchClientApi(`/api${path}?${query}`, { credentials: 'include' });
 
   if (!res.ok) {
     const body = await res.text();
-    throw new ApiError(res.status, messageFromBody(body, res.status), path, body);
+    const { code, params } = extractApiErrorFieldsFromBody(body);
+    throw new ApiError(res.status, messageFromBody(body, res.status), path, body, code, params);
   }
 
   await res.text();
@@ -403,6 +629,7 @@ export async function startMultipartUpload(
   contentType: 'video/webm' = 'video/webm',
 ): Promise<MultipartUploadSessionResponse> {
   return handle(client.POST('/upload/multipart/start', {
+    ...LOCALIZED_HEADERS,
     body: {
       questionIndex,
       contentType,
@@ -416,6 +643,7 @@ export async function sendTakeAnswerProgress(
   payload: TakeProgressPayload,
 ): Promise<void> {
   await handle(client.POST('/take/{id}/answer/progress', {
+    ...LOCALIZED_HEADERS,
     params: { path: { id } },
     body: payload
   }));
@@ -428,6 +656,7 @@ export async function presignMultipartPart(
   partNumber: number,
 ): Promise<MultipartUploadPartResponse> {
   return handle(client.POST('/upload/multipart/part', {
+    ...LOCALIZED_HEADERS,
     body: {
       questionIndex,
       mediaKey,
@@ -454,6 +683,7 @@ export async function completeMultipartUpload(
   uploadId: string,
 ): Promise<void> {
   await handle(client.POST('/upload/multipart/complete', {
+    ...LOCALIZED_HEADERS,
     body: {
       questionIndex,
       mediaKey,
@@ -468,6 +698,7 @@ export async function abortMultipartUpload(
   uploadId: string,
 ): Promise<void> {
   await handle(client.POST('/upload/multipart/abort', {
+    ...LOCALIZED_HEADERS,
     body: {
       questionIndex,
       mediaKey,
@@ -481,6 +712,7 @@ export async function submitTakeAnswer(
   payload: SubmitTakeAnswerPayload,
 ): Promise<void> {
   await handle(client.POST('/take/{id}/answer', {
+    ...LOCALIZED_HEADERS,
     params: { path: { id } },
     body: payload
   }));

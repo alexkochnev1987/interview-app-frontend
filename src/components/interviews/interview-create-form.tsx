@@ -2,7 +2,7 @@
 
 import { useMemo, useState, type FormEvent } from 'react'
 import { ArrowRight, BriefcaseBusiness, UserRound } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { InfiniteCardsLoader } from '@/components/questions/library/infinite-cards-loader'
 import { QuestionTable } from '@/components/questions/library/question-table'
@@ -34,8 +34,16 @@ import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { Input } from '@/components/ui/input'
 import { Pagination } from '@/components/ui/pagination'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { BodyText, SectionHeading } from '@/components/ui/text'
 import { useRouter } from '@/i18n/navigation'
+import { LOCALES, type Locale } from '@/i18n/locales'
 import { useQuestionChipLabels } from '@/i18n/use-question-chip-labels'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
 import { createInterview, type Question } from '@/lib/api'
@@ -48,14 +56,27 @@ type InterviewCreateFormProps = {
   initialPrefetch: QuestionsLibraryPrefetch
 }
 
+function questionSupportsInterviewLocale(question: Question, locale: Locale): boolean {
+  const translatedQuestionText = question.translations?.[locale]?.questionText?.trim()
+  if (translatedQuestionText) {
+    return true
+  }
+
+  const available = question.availableLocales
+  if (!available || available.length === 0) return false
+  return available.includes(locale)
+}
+
 export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProps) {
   const t = useTranslations('questions.common')
+  const uiLocale = useLocale() as Locale
   const router = useRouter()
   const getChipLabel = useQuestionChipLabels()
   const sharedLabels = useSharedLabels()
   const toastMessages = useToastMessages()
   const [candidateName, setCandidateName] = useState('')
   const [position, setPosition] = useState('')
+  const [interviewLocale, setInterviewLocale] = useState<Locale>(uiLocale)
   const [selectedById, setSelectedById] = useState<Map<string, Question>>(new Map())
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -84,6 +105,7 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
   const activeChips = buildActiveFilterChips(
     query.state,
     {
+      setLocale: query.setLocale,
       setDifficulty: query.setDifficulty,
       setCategory: query.setCategory,
       setSubcategory: query.setSubcategory,
@@ -97,9 +119,17 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
 
   const selectedCount = selectedById.size
   const selectedQuestions = Array.from(selectedById.values())
+  const listLocale = query.state.locale ?? uiLocale
   const selectedIds = useMemo(
     () => new Set(selectedById.keys()),
     [selectedById],
+  )
+  const questionsMissingInterviewLocale = useMemo(
+    () =>
+      selectedQuestions.filter(
+        (question) => !questionSupportsInterviewLocale(question, interviewLocale),
+      ),
+    [selectedQuestions, interviewLocale],
   )
 
   function toggleQuestion(question: Question) {
@@ -160,11 +190,14 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
           createInterview({
             candidateName: candidateName.trim(),
             position: position.trim(),
+            interviewLocale,
             questionIds: Array.from(selectedById.keys()),
           }),
         {
           successMessage: toastMessages.interview.createSuccess,
           errorMessage: toastMessages.interview.createError,
+          getErrorMessage: (error) =>
+            toastMessages.apiError.message(error) ?? toastMessages.interview.createError,
         },
       )
       router.push(`/interviews/${interview.id}`)
@@ -222,6 +255,47 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
                   </IconAffix>
                 </FormField>
 
+                <FormField htmlFor="interviewLocale" label={t('interviewLocaleLabel')}>
+                  <Select
+                    value={interviewLocale}
+                    onValueChange={(value) => setInterviewLocale(value as Locale)}
+                    disabled={submitting}
+                  >
+                    <SelectTrigger
+                      id="interviewLocale"
+                      variant="surface"
+                      size="md"
+                      shape="rounded"
+                      width="full"
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {LOCALES.map((code) => (
+                        <SelectItem key={code} value={code}>
+                          {t('interviewLocaleOption', { locale: code.toUpperCase() })}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormField>
+
+                {questionsMissingInterviewLocale.length > 0 ? (
+                  <Alert variant="warning">
+                    <AlertTitle>
+                      {t('missingTranslationWarningTitle', {
+                        count: questionsMissingInterviewLocale.length,
+                      })}
+                    </AlertTitle>
+                    <AlertDescription>
+                      {t('missingTranslationWarningDescription', {
+                        locale: interviewLocale.toUpperCase(),
+                        count: questionsMissingInterviewLocale.length,
+                      })}
+                    </AlertDescription>
+                  </Alert>
+                ) : null}
+
                 <Button
                   type="submit"
                   variant="gradient"
@@ -244,12 +318,8 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
             </Card>
 
             <QuestionFacetSidebar
-              difficulties={facets.difficulties}
-              categories={facets.categories}
-              subcategories={facets.subcategories}
-              roles={facets.roles}
-              tags={facets.tags}
               selected={{
+                locale: query.state.locale,
                 difficulty: query.state.difficulty,
                 category: query.state.category,
                 subcategory: query.state.subcategory,
@@ -257,6 +327,12 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
                 tags: query.state.tags,
                 status: query.state.status,
               }}
+              onLocaleChange={query.setLocale}
+              difficulties={facets.difficulties}
+              categories={facets.categories}
+              subcategories={facets.subcategories}
+              roles={facets.roles}
+              tags={facets.tags}
               onDifficultyChange={query.setDifficulty}
               onCategoryChange={query.setCategory}
               onSubcategoryChange={query.setSubcategory}
@@ -319,6 +395,7 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
                 renderTable={() => (
                   <QuestionTable
                     items={query.items}
+                    listLocale={listLocale}
                     selectable
                     selectedIds={selectedIds}
                     onToggleSelected={toggleQuestion}
@@ -380,7 +457,7 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
                               <BodyText size="sm">
                                 {question.expectedConcepts.length > 0
                                   ? question.expectedConcepts
-                                      .map((item) => item.label)
+                                      .map((item: { label: string }) => item.label)
                                       .join(', ')
                                   : t('notSpecified')}
                               </BodyText>
@@ -389,7 +466,7 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
                               <EyebrowLabel>{t('redFlagsLabel')}</EyebrowLabel>
                               <BodyText size="sm">
                                 {question.redFlags.length > 0
-                                  ? question.redFlags.map((item) => item.label).join(', ')
+                                  ? question.redFlags.map((item: { label: string }) => item.label).join(', ')
                                   : t('notSpecified')}
                               </BodyText>
                             </Stack>

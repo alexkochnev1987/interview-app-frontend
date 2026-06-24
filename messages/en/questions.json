@@ -4,7 +4,7 @@
       "externalId": "External ID",
       "role": "Role",
       "focus": "Focus",
-      "outputLanguage": "Output language",
+      "primaryLocale": "Primary locale",
       "category": "Category",
       "subcategory": "Subcategory",
       "questionText": "Question text",
@@ -22,23 +22,50 @@
       "questionTextRequired": "Question text is required.",
       "metadataInvalidJson": "Metadata must be valid JSON.",
       "metadataMustBeObject": "Metadata must be a JSON object (not an array or primitive).",
-      "englishOnlyField": "{field} must be in English.",
-      "englishOnlyTitle": "English-only authoring"
+      "metadataEnglishOnly": "Role, category, tags, and other taxonomy fields must use English (Latin) characters.",
+      "primaryLocaleRequired": "Primary locale block is required.",
+      "primaryLocaleCannotBeRemoved": "Primary locale cannot be removed.",
+      "localeAlreadyAdded": "{locale} is already added.",
+      "localeNotAdded": "{locale} is not added yet.",
+      "localeBlockIncomplete": "{locale} block is incomplete. Fill: {fields}.",
+      "pendingAiDraft": "Apply or dismiss all AI suggestions before saving.",
+      "pendingTranslationDraft": "Apply or dismiss all translation suggestions before saving."
     },
     "editor": {
       "previewEmpty": "Empty",
       "moreInformation": "More information",
       "aiQuestionTextRequired": "Question text is required before AI generation.",
-      "aiQuestionTextEnglishOnly": "Question text must be in English before AI generation.",
-      "englishOnlyNoticeTitle": "English-only content policy",
-      "englishOnlyNoticeDescription": "Fill all question fields in English regardless of your current UI locale.",
       "conceptDescriptionFallback": "{label} should be covered in the answer.",
       "headerEyebrow": "Unified Question Editor",
       "headerLead": "Shape the prompt, define the rubric, and keep AI-generated draft suggestions visible as explicit diffs instead of invisible background mutations.",
       "metricDifficulty": "Difficulty",
       "metricWeight": "Weight",
       "metricPendingAi": "Pending AI diffs",
-      "selectDifficultyPlaceholder": "Select difficulty"
+      "selectDifficultyPlaceholder": "Select difficulty",
+      "primaryLocale": "Primary language",
+      "translateTo": "Translate to",
+      "translate": "Translate",
+      "applyAll": "Apply all",
+      "addLanguage": "Add language",
+      "removeLanguage": "Remove {locale}",
+      "emptyTabPlaceholder": "No translation yet. Enter text here or translate from the primary tab.",
+      "primaryChanged": "Primary language changed",
+      "primaryChangedDescription": "The primary content was updated after this translation was saved. Update the translation to match the current primary text.",
+      "updateTranslation": "Update translation",
+      "updatingTranslation": "Updating translation…",
+      "tabsAriaLabel": "Content languages",
+      "noLocalesToAdd": "All languages added",
+      "primaryBadge": "Primary",
+      "setPrimary": "Set {locale} as primary language",
+      "localeTranslateErrorFallback": "Could not generate translation.",
+      "removeLocaleConfirmTitle": "Remove {locale}?",
+      "removeLocaleConfirmDescription": "This translation will be removed from the editor. Save to apply the change on the server.",
+      "removeLocaleConfirmLabel": "Remove language",
+      "removeLocaleCancelLabel": "Cancel",
+      "refreshTranslationsTitle": "Primary content changed",
+      "refreshTranslationsDescription": "Update translations for {locales}?",
+      "refreshTranslationsConfirm": "Update translations",
+      "refreshTranslationsCancel": "Not now"
     },
     "sections": {
       "prompt": {
@@ -46,6 +73,7 @@
         "description": "Write the core question clearly, then capture the follow-up probes that interviewers should keep ready.",
         "questionText": "Question text",
         "questionTextPlaceholder": "e.g. What is a closure in JavaScript?",
+        "questionTextLocalePlaceholder": "Question translation in {locale}",
         "followUpQuestions": "Follow-up questions",
         "followUpHint": "Use one line per probe so the interviewer can keep cadence during the session.",
         "followUpPlaceholder": "One question per line"
@@ -53,11 +81,11 @@
       "identity": {
         "title": "Question identity",
         "description": "Anchor the prompt in the role and taxonomy you expect recruiters to search later.",
+        "taxonomyEnglishHint": "Taxonomy fields (role, category, tags, etc.) are stored in English and are not translated.",
         "externalIdTooltip": "Optional stable identifier for imports.",
         "externalIdPlaceholder": "frontend_closure_v1",
         "rolePlaceholder": "frontend intern",
         "focusPlaceholder": "fundamentals",
-        "outputLanguagePlaceholder": "English",
         "categoryPlaceholder": "javascript",
         "subcategoryPlaceholder": "closures"
       },
@@ -87,12 +115,22 @@
     },
     "aiDraft": {
       "title": "AI draft",
-      "description": "Let AI propose category, follow-up probes, expected concepts, red flags, and tags based on your question text. Each change shows up as a reviewable diff before anything is applied.",
+      "description": "Generate follow-up probes, expected concepts, red flags, and a sample answer from your primary question text. Each suggestion appears under its field for review before applying.",
       "pending": "{count, plural, one {# pending} other {# pending}}",
-      "generate": "Generate AI Draft",
+      "generate": "Generate with AI",
       "generating": "Generating...",
+      "generatingFor": "Generating rubric for {locale}",
       "applyAll": "Apply all",
-      "loadingHint": "Generating structured fields from the current prompt…"
+      "loadingHint": "Generating structured fields from the current prompt…",
+      "previewLabel": "Draft preview"
+    },
+    "translatePanel": {
+      "description": "Select locales that are not open yet. AI translates the full primary content block into each locale.",
+      "noLocalesAvailable": "All locales are already open as tabs.",
+      "localeLoading": "Translating…",
+      "translating": "Translating…",
+      "tabTranslating": "Translating {locale}…",
+      "applyAllForLocale": "Apply all for {locale}"
     },
     "aiSuggestion": {
       "eyebrow": "AI suggestion",
@@ -111,6 +149,7 @@
       "saving": "Saving..."
     },
     "chips": {
+      "locale": "Locale: {value}",
       "difficulty": "Difficulty: {value}",
       "category": "Category: {value}",
       "subcategory": "Type: {value}",
@@ -175,6 +214,7 @@
         "loadingFacets": "Loading filter options…",
         "facetsUnavailable": "Filter options could not be loaded.",
         "difficultyTitle": "Difficulty",
+        "localeTitle": "Language",
         "categoryTitle": "Category",
         "typeTitle": "Type",
         "roleTitle": "Role",
@@ -238,6 +278,7 @@
       },
       "card": {
         "deleted": "Deleted",
+        "resolvedLocaleBadge": "Shown as {locale}",
         "weightLabel": "weight {weight}",
         "conceptsMetric": "Concepts",
         "redFlagsMetric": "Red flags",
@@ -440,7 +481,14 @@
       "candidateNameLabel": "Candidate name",
       "candidateNamePlaceholder": "e.g. Jane Doe",
       "positionLabel": "Position",
-      "positionPlaceholder": "e.g. Senior Frontend Engineer"
+      "positionPlaceholder": "e.g. Senior Frontend Engineer",
+      "interviewLocaleLabel": "Interview language",
+      "interviewLocaleOption": "{locale}",
+      "missingTranslationWarningTitle": "{count, plural, one {# question lacks this translation} other {# questions lack this translation}}",
+      "missingTranslationWarningDescription": "Selected prompts are not available in {locale}. The interview may show fallback text for those questions.",
+      "feedbackLinkLabel": "Feedback link",
+      "generatingFeedbackLink": "Generating a fresh feedback link…",
+      "feedbackLinkNotReady": "Feedback link is not available yet."
     }
   }
 }

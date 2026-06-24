@@ -114,7 +114,6 @@ export function useSimilaritySearch({
     const textTokens = tokenize(value.questionText)
     return {
       conceptCount: (value.expectedConcepts || []).filter((item) => {
-        if (typeof item === 'string') return item.trim().length > 0
         return Boolean(item.label?.trim() || item.id?.trim())
       }).length,
       tagCount: (value.tags || []).filter((item) => item.trim()).length,

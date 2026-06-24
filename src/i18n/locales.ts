@@ -10,3 +10,10 @@ export const LOCALE_FORMATS: Record<Locale, string> = {
   ru: 'ru-RU',
   pl: 'pl-PL',
 }
+
+export function resolveSpeechSynthesisLocale(locale: Locale): string {
+  if (locale === 'be') {
+    return LOCALE_FORMATS.ru
+  }
+  return LOCALE_FORMATS[locale]
+}

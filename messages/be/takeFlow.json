@@ -90,6 +90,9 @@
     "liveTranscriptDraftSuffix": "(чарнавік)",
     "liveTranscriptPlaceholder": "Стэнаграма будзе з'яўляцца, пакуль вы будзеце гаварыць...",
     "questionProgress": "Пытанне {current} з {total}",
-    "beforeUnloadLeaveInterview": "Калі вы зараз перазагрузіце старонку або выйдзеце, інтэрв'ю будзе перапынена, і прагрэс можа быць страчаны. Вы ўпэўнены?"
+    "languageBadgeResolvedAs": "Паказана як {locale}",
+    "languageBadgeInterviewAs": "Мова інтэрв'ю {locale}",
+    "beforeUnloadLeaveInterview": "Калі вы зараз перазагрузіце старонку або выйдзеце, інтэрв'ю будзе перапынена, і прагрэс можа быць страчаны. Вы ўпэўнены?",
+    "languageBadgeFallbackFrom": "Тэкст пытання ўзяты з {locale}"
   }
 }

@@ -1,6 +1,8 @@
+import { LOCALES, type Locale } from '@/i18n/locales'
 import type {
   FetchQuestionFacetsParams,
   FetchQuestionsParams,
+  LocaleCode,
   PaginatedQuestions,
   QuestionDifficulty,
   QuestionFacetsResponse,
@@ -29,6 +31,7 @@ export type QuestionView = (typeof QUESTION_VIEWS)[number]
 
 export type QuestionsQueryState = {
   q: string
+  locale?: LocaleCode
   difficulty?: QuestionDifficulty
   category?: string
   subcategory?: string
@@ -44,6 +47,7 @@ export type QuestionsQueryState = {
 
 export const DEFAULT_QUESTIONS_QUERY: QuestionsQueryState = {
   q: '',
+  locale: undefined,
   difficulty: undefined,
   category: undefined,
   subcategory: undefined,
@@ -64,6 +68,10 @@ export function readQuestionsFromSearchParams(
   const next: QuestionsQueryState = { ...fallback }
   const q = params.get('q')
   if (q !== null) next.q = q.slice(0, MAX_QUESTIONS_Q_LENGTH)
+  const locale = params.get('locale')
+  if (LOCALES.includes(locale as Locale)) {
+    next.locale = locale as LocaleCode
+  }
   const difficulty = params.get('difficulty')
   if (difficulty === 'easy' || difficulty === 'medium' || difficulty === 'hard') {
     next.difficulty = difficulty
@@ -108,12 +116,13 @@ export function readQuestionsFromSearchParams(
 function buildQuestionFilterParams(
   state: Pick<
     QuestionsQueryState,
-    'difficulty' | 'category' | 'subcategory' | 'tags' | 'role' | 'status'
+    'locale' | 'difficulty' | 'category' | 'subcategory' | 'tags' | 'role' | 'status'
   >,
   debouncedQ: string,
 ): Omit<FetchQuestionsParams, 'sortBy' | 'sortOrder' | 'page' | 'limit'> {
   return {
     q: debouncedQ || undefined,
+    locale: state.locale,
     difficulty: state.difficulty,
     category: state.category,
     subcategory: state.subcategory,
@@ -150,7 +159,7 @@ export function buildQuestionsInfiniteParams(
 export function buildQuestionFacetsParams(
   state: Pick<
     QuestionsQueryState,
-    'q' | 'difficulty' | 'category' | 'subcategory' | 'tags' | 'role' | 'status'
+    'q' | 'locale' | 'difficulty' | 'category' | 'subcategory' | 'tags' | 'role' | 'status'
   >,
   debouncedQ: string,
 ): FetchQuestionFacetsParams {

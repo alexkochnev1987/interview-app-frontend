@@ -14,6 +14,7 @@ function mockQuestion(
     role: 'frontend intern',
     focus: 'fundamentals',
     outputLanguage: 'English',
+    primaryLocale: 'en' as const,
     category: 'soft_skills',
     subcategory: 'fundamentals',
     questionText,
@@ -39,6 +40,8 @@ function mockQuestion(
     updatedAt: now,
     deleted: false,
     usageCount: 0,
+    resolvedLocale: 'en' as const,
+    availableLocales: ['en'] as Array<'en' | 'be' | 'ru' | 'pl'>,
   }
 }
 
@@ -47,6 +50,7 @@ export const DASHBOARD_MOCK_INTERVIEWS: Interview[] = [
     id: 'mock-11',
     candidateName: 'Alice Johnson',
     position: 'Senior Frontend Engineer',
+    interviewLocale: 'en',
     questions: [
       mockQuestion(
         'mock-1-q1',
@@ -74,6 +78,7 @@ export const DASHBOARD_MOCK_INTERVIEWS: Interview[] = [
     id: 'mock-2',
     candidateName: 'Bob Smith',
     position: 'Backend Developer',
+    interviewLocale: 'en',
     questions: [
       mockQuestion(
         'mock-2-q1',
@@ -110,6 +115,7 @@ export const DASHBOARD_MOCK_INTERVIEWS: Interview[] = [
     id: 'mock-3',
     candidateName: 'Carol Lee',
     position: 'Full Stack Engineer',
+    interviewLocale: 'en',
     questions: [
       mockQuestion(
         'mock-3-q1',
@@ -139,6 +145,7 @@ export const DASHBOARD_MOCK_INTERVIEWS: Interview[] = [
     answers: [],
     status: 'completed',
     result: {
+      interviewLocale: 'en',
       overallScore: 82,
       summary: 'Strong candidate with good communication skills.',
       categoryScores: { technical: 85, communication: 80, problemSolving: 81 },

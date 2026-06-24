@@ -1,7 +1,9 @@
 import { useTranslations } from 'next-intl'
+import { resolveApiErrorMessage } from './api-error'
 
 export function useToastMessages() {
   const t = useTranslations('toast')
+  const tApiErrors = useTranslations('apiErrors')
 
   return {
     defaults: {
@@ -92,6 +94,14 @@ export function useToastMessages() {
     },
     deleteQuestion: {
       cannotDeleteTitle: t('deleteQuestion.cannotDeleteTitle'),
+    },
+    apiError: {
+      message(error: unknown) {
+        return resolveApiErrorMessage(error, {
+          has: tApiErrors.has,
+          t: tApiErrors,
+        })
+      },
     },
   }
 }

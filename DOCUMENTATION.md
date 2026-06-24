@@ -183,23 +183,26 @@ Do not use `useEffect` + module-level dedupe to fire toasts when `error` or `res
 
 **Toast sources (user actions):**
 
-- **Question create / save / delete / restore** — TanStack Query mutations in `src/components/questions/use-question-mutations.ts`. Success and error toasts run in hook `onSuccess` / `onError` (copy from `useToastMessages()`). Delete errors use `getDeleteQuestionErrorTitle` in `src/lib/api-error.ts` for “question in use” (409). UI components call `mutate` with `onSuccess` / `onError` callbacks for local state (navigation, form baseline, dialog close) only; they must not call `runMutation`, wrap the mutation in `try/catch`, or duplicate toasts.
+- **Question create** — `question-new-client.tsx` passes `saveToastOptions` into `QuestionEditor`; `useCreateQuestion` only invalidates the library. Success/error toasts run inside the editor via `runMutation`.
+- **Question delete / restore** — TanStack Query mutations in `src/components/questions/use-question-mutations.ts`. Success and error toasts run in hook `onSuccess` / `onError` (copy from `useToastMessages()`). Delete errors use `getDeleteQuestionErrorTitle` in `src/lib/api-error.ts` for “question in use” (409). UI components call `mutate` with `onSuccess` / `onError` callbacks for local state (navigation, form baseline, dialog close) only; they must not call `runMutation`, wrap the mutation in `try/catch`, or duplicate toasts.
+- **Question save (edit)** — `useUpdateQuestion` invalidates the library only; save success/error toasts and translation-refresh flows are owned by `question-editor.tsx` via `runMutation` so `translationsMode` and stale-translation refresh can run without duplicate toasts.
 - **Question bulk delete** — `useBulkDeleteQuestions` in `src/components/questions/use-question-mutations.ts` invalidates the library and owns toast feedback: `notifyBulkDeleteOutcome` on success (partial or full outcomes) and `notifyMutationError` with `getErrorMessage` on hard failure. `questions-library-client.tsx` calls `mutate` with `onSuccess` / `onError` only to clear selection, close the confirm dialog, and set `bulkResult`; it must not call `notifyBulkDeleteOutcome`, `notifyError`, or `runMutation`.
-- **Question AI draft** — `useDraftQuestion` in `src/components/questions/editor/use-draft-question.ts`. Inline error copy comes from `draftMutation.isError` and `getErrorMessage(draftMutation.error, …)` in `question-editor.tsx`; success clears/applies draft state via `mutate` `onSuccess` / `onError` callbacks. No `try/catch` around the draft API call in the editor.
+- **Question AI draft** — inline in `question-editor.tsx` via `draftQuestion` API; errors stay inline (`FEEDBACK_POLICY.draftQuestion`). No `useDraftQuestion` hook toast path on the multilingual editor.
 - **Interviews, team, take, and other non–React Query APIs** — still use `runMutation` in `src/lib/run-mutation.ts` from the click handler. Toast descriptions fall back to `getErrorMessage` from `api-error.ts` unless `runMutation` options override them. Do not rename `RunMutationOptions.getErrorMessage` (callback) when importing the shared helper — use an alias such as `getApiErrorMessage`.
 
-Do not remove remaining `Alert` usages to “finish” the migration unless the UX above is preserved another way. Field error state uses `FieldErrors` from `src/lib/clear-field-error.ts`; question editor validation lives in `src/lib/question-editor/validate-question-form.ts`. Copy lives in `src/lib/toast-messages.ts` for toasts; whitelisted Alerts may stay hardcoded or use `TOAST_MESSAGES` where shared.
+Do not remove remaining `Alert` usages to “finish” the migration unless the UX above is preserved another way. Field error state uses `FieldErrors` from `src/lib/clear-field-error.ts`; question editor validation lives in `src/lib/question-editor/validate-question-form.ts`. Toast copy is resolved through `src/lib/use-toast-messages.ts`; whitelisted Alerts may stay hardcoded where they represent persistent page state.
 
-### Candidate flow is intentionally English-only
+### Candidate flow locale policy
 
-Candidate-facing pages `/<locale>/take/[id]` and `/<locale>/feedback/[id]` are intentionally locked to English UI copy, regardless of the locale segment in the URL.
+Candidate-facing pages `/<locale>/take/[id]` and `/<locale>/feedback/[id]` use locale from the URL segment (`params.locale`) and are not English-locked.
 
 Policy:
-- Locale switching must not change candidate UI language on take/feedback pages.
-- The app header is hidden on candidate flow, so `LanguageSwitcher` is not shown there.
-- Question TTS in candidate flow is intentionally fixed to `en-US` (see `src/features/take/use-take-question-tts.ts`).
-- Internal routes set `<html lang>` from the active locale; candidate routes force `lang="en"` to match English-only UI (see `src/i18n/html-lang.ts`).
-- Page metadata (`title`, `description`) is localized per locale via `generateMetadata` in `src/app/[locale]/layout.tsx`.
+- UI locale for take/feedback follows the route locale and can be changed with `LanguageSwitcher` on take flow; take header badge reflects `resolvedLocale` fallback only.
+- API requests send `X-Locale` from a single helper: `useLocale()` on client and `params.locale` on server.
+- Question content supports localized payloads via `primaryLocale` + `translations`, and API may return `resolvedLocale` / `availableLocales` for fallback visibility.
+- Feedback payload (`generalFeedback`, `improvements`) is single-locale in v1 and returned in `interviewLocale`.
+- Candidate links should be generated and copied as `/{interviewLocale}/take/{id}?token=...`; feedback links as `/{interviewLocale}/feedback/{id}?token=...` when available.
+- `<html lang>` follows URL locale (see `src/i18n/html-lang.ts`), and page metadata remains localized via `generateMetadata` in `src/app/[locale]/layout.tsx`.
 
 ### Что запускается в Docker
 ```

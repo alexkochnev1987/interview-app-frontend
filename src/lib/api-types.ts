@@ -147,11 +147,37 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List questions (paginated, filterable, sortable) */
+        /**
+         * List questions (paginated, filterable, sortable)
+         * @description Filter by translation availability with `?locale=` (primaryLocale match or non-empty `translations[locale].questionText`); list items resolve rubric for that locale when set, otherwise for `X-Locale` (default `en`). Use `?primaryLocale=` for canonical locale only. Deprecated: `?outputLanguage=`. Pass `?includeTranslations=true` for the full map per item.
+         */
         get: operations["QuestionController_findAll"];
         put?: never;
-        /** Create question */
+        /**
+         * Create question
+         * @description Requires `primaryLocale` (en|be|ru|pl) and a full `translations[primaryLocale]` block (questionText, followUpQuestions, expectedConcepts, redFlags, sampleGoodAnswer). Metadata fields (role, category, tags, …) are stored flat on the question row.
+         */
         post: operations["QuestionController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/questions/ai/draft": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Generate AI question draft
+         * @description Generates a question draft in locale from body `locale` or X-Locale header. If `mode=translate`, translates the full primary content block from `question.primaryLocale` to body `locale` (requires both locales and the complete primary rubric; preserves concept/red-flag ids 1:1) and returns the content block only. If `mode=generate`, returns identity fields (externalId, role, focus, category, subcategory, difficulty, weight, minimumPassScore, tags) plus the full rubric content block in the target locale; seed metadata is context only and is not returned. Does not persist anything to the database.
+         */
+        post: operations["QuestionController_draftQuestion"];
         delete?: never;
         options?: never;
         head?: never;
@@ -167,7 +193,7 @@ export interface paths {
         };
         /**
          * Faceted counts for the picker sidebar
-         * @description Returns each filter facet (difficulty / category / subcategory / role / tags) with a per-value count. Counts respect every other filter on the request so the user sees what is still available before clicking.
+         * @description Returns each filter facet (difficulty / category / subcategory / role / tags) with a per-value count. Uses the same query filters as GET /questions (including ?locale=, ?primaryLocale=, ?q=, tags, status). Deprecated: ?outputLanguage= (use primaryLocale). The facet being counted is omitted from the filter so counts show remaining options.
          */
         get: operations["QuestionController_getFacets"];
         put?: never;
@@ -185,16 +211,26 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get question by id */
+        /**
+         * Get question by id
+         * @description Nested editor shape: `primaryLocale`, flat metadata, resolved rubric for `X-Locale`, and `translations` map (omit with `?includeTranslations=false`). Legacy rows with only `outputLanguage` and flat columns map to `primaryLocale` and hydrate the primary translation block on read. Non–super-admin callers receive 404 for soft-deleted questions.
+         */
         get: operations["QuestionController_findOne"];
-        put?: never;
+        /**
+         * Update question
+         * @description `primaryLocale` is immutable — changing it returns 400. Default `translationsMode=merge` upserts locale keys; `replace` requires `translations` and replaces the entire map (removed locales disappear). Patching `translations[primaryLocale]` or using `replace` requires the full five-field primary block. Metadata-only patches are allowed when stored content stays valid.
+         */
+        put: operations["QuestionController_update"];
         post?: never;
         /** Soft delete question */
         delete: operations["QuestionController_remove"];
         options?: never;
         head?: never;
-        /** Update question */
-        patch: operations["QuestionController_update"];
+        /**
+         * Update question
+         * @description `primaryLocale` is immutable — changing it returns 400. Default `translationsMode=merge` upserts locale keys; `replace` requires `translations` and replaces the entire map (removed locales disappear). Patching `translations[primaryLocale]` or using `replace` requires the full five-field primary block. Metadata-only patches are allowed when stored content stays valid.
+         */
+        patch: operations["QuestionController_patchUpdate"];
         trace?: never;
     };
     "/questions/similar": {
@@ -206,7 +242,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Find similar questions */
+        /**
+         * Find similar questions
+         * @description Embedding search; each match question is resolved for X-Locale. Match reasons use the same locale.
+         */
         post: operations["QuestionController_findSimilar"];
         delete?: never;
         options?: never;
@@ -223,7 +262,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Soft delete questions in bulk */
+        /**
+         * Soft delete questions in bulk
+         * @description Blocked items include questionText resolved for X-Locale.
+         */
         post: operations["QuestionController_bulkRemove"];
         delete?: never;
         options?: never;
@@ -248,6 +290,61 @@ export interface paths {
         patch: operations["QuestionController_restore"];
         trace?: never;
     };
+    "/ai/chat": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Candidate chat assistant */
+        post: operations["AiController_chat"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/greet": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Candidate greeting prompt */
+        post: operations["AiController_greet"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/question-draft": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Generate draft question with AI
+         * @deprecated
+         * @description Deprecated compatibility endpoint. Use POST /questions/ai/draft. Supports two scenarios: `translate` (full primary content block from `question.primaryLocale` to body `locale`; ids preserved 1:1; content-only response) and `generate` (identity + full rubric content block; seed metadata is context, not returned). When `mode` is omitted, locale mismatch with full primary content triggers translate mode automatically.
+         */
+        post: operations["AiController_draftQuestion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/interviews": {
         parameters: {
             query?: never;
@@ -255,10 +352,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List interviews */
+        /**
+         * List interviews
+         * @description Default: JSON array with full questions[] (legacy clients). Pass paginated=true for { items, total, page, limit } with lightweight questionsPreview. questions[]/questionsPreview are resolved in interviewLocale.
+         */
         get: operations["InterviewController_findAll"];
         put?: never;
-        /** Create interview */
+        /**
+         * Create interview
+         * @description Question snapshots in the response are resolved for interviewLocale. If some selected questions have no translation for interviewLocale, creation still succeeds and `localeWarnings` is returned.
+         */
         post: operations["InterviewController_create"];
         delete?: never;
         options?: never;
@@ -273,7 +376,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get interview by id */
+        /**
+         * Get interview by id
+         * @description questions[] resolved for interviewLocale (single-language interview content).
+         */
         get: operations["InterviewController_findOne"];
         put?: never;
         post?: never;
@@ -313,7 +419,10 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** Complete interview */
+        /**
+         * Complete interview
+         * @description Response questions[] resolved for interviewLocale.
+         */
         patch: operations["InterviewController_complete"];
         trace?: never;
     };
@@ -358,7 +467,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get interview results */
+        /**
+         * Get interview results
+         * @description Returns single-locale AI result content in interviewLocale (not X-Locale).
+         */
         get: operations["InterviewController_getResults"];
         put?: never;
         post?: never;
@@ -545,7 +657,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get candidate interview state */
+        /**
+         * Get candidate interview state
+         * @description Resolves currentQuestion using optional contentLocale (UI language), then interviewLocale, primaryLocale, and any available translation. X-Locale is ignored on take. Includes resolvedLocale and optional fallbackFromLocale.
+         */
         get: operations["TakeController_getInterview"];
         put?: never;
         post?: never;
@@ -606,57 +721,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/ai/chat": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Candidate chat assistant */
-        post: operations["AiController_chat"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/ai/greet": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Candidate greeting prompt */
-        post: operations["AiController_greet"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/ai/question-draft": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Generate draft question with AI */
-        post: operations["AiController_draftQuestion"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/feedback/{id}": {
         parameters: {
             query?: never;
@@ -664,7 +728,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get interview feedback using a share link */
+        /**
+         * Get interview feedback using a share link
+         * @description Returns AI feedback in the interview single locale (interviewLocale). generalFeedback, improvements and per-question summaries are single-locale in v1.
+         */
         get: operations["FeedbackController_getFeedback"];
         put?: never;
         post?: never;
@@ -728,13 +795,24 @@ export interface components {
             /** @example true */
             ok: boolean;
         };
+        /** @enum {string} */
+        ApiErrorCode: "BAD_REQUEST" | "VALIDATION_ERROR" | "INVALID_LOCALE" | "REGISTRATION_FAILED" | "UPLOAD_FAILED" | "UPLOAD_NOT_ALLOWED" | "UNAUTHORIZED" | "INVALID_CREDENTIALS" | "AUTHENTICATION_REQUIRED" | "CANDIDATE_SESSION_REQUIRED" | "INVALID_CANDIDATE_SESSION" | "INTERVIEW_TOKEN_REQUIRED" | "INVALID_INTERVIEW_TOKEN" | "FORBIDDEN" | "INSUFFICIENT_PERMISSIONS" | "ACCESS_DENIED" | "NOT_FOUND" | "QUESTION_NOT_FOUND" | "INTERVIEW_NOT_FOUND" | "USER_NOT_FOUND" | "FEEDBACK_NOT_FOUND" | "CONFLICT" | "QUESTION_IN_USE" | "VALIDATION_RUNNING" | "QUESTION_DUPLICATE" | "SERVICE_UNAVAILABLE" | "AI_PROVIDER_NOT_CONFIGURED" | "EMBEDDING_PROVIDER_NOT_CONFIGURED" | "INTERNAL_SERVER_ERROR";
         ApiErrorResponseDto: {
             /** @example 400 */
             statusCode: number;
-            /** @example Bad Request */
-            error: string;
+            code: components["schemas"]["ApiErrorCode"];
             /** @example Validation failed */
-            message: string | string[];
+            message: string;
+            /**
+             * @example {
+             *       "errors": [
+             *         "email must be an email"
+             *       ]
+             *     }
+             */
+            params?: {
+                [key: string]: unknown;
+            };
             /** @example /questions/invalid-id */
             path?: string;
         };
@@ -754,12 +832,33 @@ export interface components {
             /** @enum {string} */
             severity: "low" | "medium" | "high";
         };
+        QuestionTranslationDto: {
+            questionText: string;
+            /** @description Optional for non-primary locales. Required for primaryLocale. */
+            followUpQuestions?: string[];
+            /** @description Optional for non-primary locales. Required for primaryLocale. */
+            expectedConcepts?: components["schemas"]["QuestionExpectedConceptDto"][];
+            /** @description Optional for non-primary locales. Required for primaryLocale. */
+            redFlags?: components["schemas"]["QuestionRedFlagDto"][];
+            /** @description Optional for non-primary locales. Required for primaryLocale. */
+            sampleGoodAnswer?: string;
+        };
         QuestionResponseDto: {
             id: string;
+            /** @enum {string} */
+            primaryLocale?: "en" | "be" | "ru" | "pl";
             externalId?: string;
             role?: string;
             focus?: string;
-            outputLanguage: string;
+            /**
+             * @deprecated
+             * @description Legacy display label derived from primaryLocale. Deprecated: use primaryLocale (en|be|ru|pl). Legacy outputLanguage labels map to locale: en→English, be→Belarusian, ru→Russian, pl→Polish (aliases such as english/polish also accepted on input).
+             */
+            outputLanguage?: string;
+            /** @description Locale-keyed rubric blocks (`Record<locale, QuestionTranslationDto>`). Included by default on GET /questions/:id; on list GET when `?includeTranslations=true`; always on POST/PUT/PATCH responses. */
+            translations?: {
+                [key: string]: components["schemas"]["QuestionTranslationDto"];
+            };
             category?: string;
             subcategory?: string;
             questionText: string;
@@ -783,12 +882,130 @@ export interface components {
             /** @description Number of times this question has been used in an interview. */
             usageCount: number;
         };
+        ResolvedQuestionResponseDto: {
+            id: string;
+            /** @enum {string} */
+            primaryLocale?: "en" | "be" | "ru" | "pl";
+            externalId?: string;
+            role?: string;
+            focus?: string;
+            /**
+             * @deprecated
+             * @description Legacy display label derived from primaryLocale. Deprecated: use primaryLocale (en|be|ru|pl). Legacy outputLanguage labels map to locale: en→English, be→Belarusian, ru→Russian, pl→Polish (aliases such as english/polish also accepted on input).
+             */
+            outputLanguage?: string;
+            /** @description Locale-keyed rubric blocks (`Record<locale, QuestionTranslationDto>`). Included by default on GET /questions/:id; on list GET when `?includeTranslations=true`; always on POST/PUT/PATCH responses. */
+            translations?: {
+                [key: string]: components["schemas"]["QuestionTranslationDto"];
+            };
+            category?: string;
+            subcategory?: string;
+            questionText: string;
+            followUpQuestions: string[];
+            expectedConcepts: components["schemas"]["QuestionExpectedConceptDto"][];
+            redFlags: components["schemas"]["QuestionRedFlagDto"][];
+            /** @enum {string} */
+            difficulty: "easy" | "medium" | "hard";
+            weight: number;
+            sampleGoodAnswer?: string;
+            minimumPassScore: number;
+            tags: string[];
+            metadata: {
+                [key: string]: unknown;
+            };
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            deleted: boolean;
+            /** @description Number of times this question has been used in an interview. */
+            usageCount: number;
+            /** @enum {string} */
+            resolvedLocale: "en" | "be" | "ru" | "pl";
+            availableLocales: ("en" | "be" | "ru" | "pl")[];
+            /**
+             * @description Present when resolvedLocale differs from the requested X-Locale.
+             * @enum {string}
+             */
+            fallbackFromLocale?: "en" | "be" | "ru" | "pl";
+        };
         PaginatedQuestionsResponseDto: {
-            items: components["schemas"]["QuestionResponseDto"][];
+            items: components["schemas"]["ResolvedQuestionResponseDto"][];
             /** @description Total rows matching the filter, ignoring page/limit. */
             total: number;
             page: number;
             limit: number;
+        };
+        QuestionDraftGenerateResponseDto: {
+            externalId?: string;
+            role?: string;
+            focus?: string;
+            category?: string;
+            subcategory?: string;
+            questionText: string;
+            followUpQuestions: string[];
+            expectedConcepts: components["schemas"]["QuestionExpectedConceptDto"][];
+            redFlags: components["schemas"]["QuestionRedFlagDto"][];
+            /** @enum {string} */
+            difficulty: "easy" | "medium" | "hard";
+            weight: number;
+            sampleGoodAnswer: string;
+            minimumPassScore: number;
+            tags: string[];
+        };
+        QuestionDraftContentResponseDto: {
+            /** @enum {string} */
+            primaryLocale: "en" | "be" | "ru" | "pl";
+            questionText: string;
+            followUpQuestions: string[];
+            expectedConcepts: components["schemas"]["QuestionExpectedConceptDto"][];
+            redFlags: components["schemas"]["QuestionRedFlagDto"][];
+            sampleGoodAnswer: string;
+        };
+        QuestionDraftInputDto: {
+            /** @enum {string} */
+            primaryLocale?: "en" | "be" | "ru" | "pl";
+            translations?: {
+                [key: string]: components["schemas"]["QuestionTranslationDto"];
+            };
+            questionText?: string;
+            followUpQuestions?: string[];
+            expectedConcepts?: components["schemas"]["QuestionExpectedConceptDto"][];
+            redFlags?: components["schemas"]["QuestionRedFlagDto"][];
+            /**
+             * @deprecated
+             * @description Deprecated: use primaryLocale (en|be|ru|pl). Legacy outputLanguage labels map to locale: en→English, be→Belarusian, ru→Russian, pl→Polish (aliases such as english/polish also accepted on input).
+             */
+            outputLanguage?: string;
+            role?: string;
+            focus?: string;
+            category?: string;
+            subcategory?: string;
+            /** @enum {string} */
+            difficulty?: "easy" | "medium" | "hard";
+            weight?: number;
+            sampleGoodAnswer?: string;
+            minimumPassScore?: number;
+            tags?: string[];
+            metadata?: {
+                [key: string]: unknown;
+            };
+        };
+        DraftQuestionDto: {
+            /**
+             * @description Locale for generated draft text (`en`|`be`|`ru`|`pl`). Defaults to `en`. When omitted, uses `X-Locale` header (also defaults to `en`).
+             * @default en
+             * @example pl
+             * @enum {string}
+             */
+            locale: "en" | "be" | "ru" | "pl";
+            /**
+             * @description Optional explicit mode. `translate` translates the full primary content block from `question.primaryLocale` to body `locale` (one target locale per call); concept/red-flag ids are preserved 1:1; returns content block only. Requires body `locale`, `question.primaryLocale`, and the full primary rubric in the request. `generate` returns identity fields plus the primary locale rubric content block. If omitted, mode is auto-detected: locale mismatch + full primary content => translate, otherwise generate.
+             * @example translate
+             * @enum {string}
+             */
+            mode?: "translate" | "generate";
+            question?: components["schemas"]["QuestionDraftInputDto"];
         };
         FacetCountDto: {
             value: string;
@@ -808,20 +1025,26 @@ export interface components {
             tags: components["schemas"]["FacetCountDto"][];
         };
         CreateQuestionDto: {
+            /** @enum {string} */
+            primaryLocale: "en" | "be" | "ru" | "pl";
+            /** @description Locale-keyed rubric blocks. The primaryLocale entry must include all five fields: questionText, followUpQuestions, expectedConcepts, redFlags, sampleGoodAnswer. Additional locales require questionText only; rubric fields are optional. */
+            translations: {
+                [key: string]: components["schemas"]["QuestionTranslationDto"];
+            };
             externalId?: string;
             role?: string;
             focus?: string;
+            /**
+             * @deprecated
+             * @description Ignored when translations are provided. Deprecated: use primaryLocale (en|be|ru|pl). Legacy outputLanguage labels map to locale: en→English, be→Belarusian, ru→Russian, pl→Polish (aliases such as english/polish also accepted on input).
+             */
             outputLanguage?: string;
+            /** @description Flat question metadata — stored on the question row, not inside translations. */
             category?: string;
             subcategory?: string;
-            questionText: string;
-            followUpQuestions?: string[];
-            expectedConcepts?: (string | components["schemas"]["QuestionExpectedConceptDto"])[];
-            redFlags?: (string | components["schemas"]["QuestionRedFlagDto"])[];
             /** @enum {string} */
             difficulty?: "easy" | "medium" | "hard";
             weight?: number;
-            sampleGoodAnswer?: string;
             minimumPassScore?: number;
             tags?: string[];
             metadata?: {
@@ -842,7 +1065,7 @@ export interface components {
             excludeQuestionId?: string;
         };
         SimilarQuestionMatchDto: {
-            question: components["schemas"]["QuestionResponseDto"];
+            question: components["schemas"]["ResolvedQuestionResponseDto"];
             score: number;
             reasons: string[];
         };
@@ -850,19 +1073,47 @@ export interface components {
             matches: components["schemas"]["SimilarQuestionMatchDto"][];
         };
         UpdateQuestionDto: {
+            /**
+             * @deprecated
+             * @description Ignored on update — primaryLocale is immutable after creation. Update the primary locale block via `translations[primaryLocale]` instead.
+             * @enum {string}
+             */
+            primaryLocale?: "en" | "be" | "ru" | "pl";
+            /**
+             * @description How to apply `translations`. Default `merge` upserts each locale key. Set to `replace` to replace the entire stored map (requires `translations`).
+             * @default merge
+             * @enum {string}
+             */
+            translationsMode: "merge" | "replace";
+            /** @description Locale blocks to merge or replace. primaryLocale must remain a full block; non-primary locales require questionText only and may omit rubric fields. */
+            translations?: {
+                [key: string]: components["schemas"]["QuestionTranslationDto"];
+            };
             externalId?: string;
             role?: string;
             focus?: string;
+            /**
+             * @deprecated
+             * @description Ignored when primaryLocale or translations are set. Deprecated: use primaryLocale (en|be|ru|pl). Legacy outputLanguage labels map to locale: en→English, be→Belarusian, ru→Russian, pl→Polish (aliases such as english/polish also accepted on input).
+             */
             outputLanguage?: string;
             category?: string;
             subcategory?: string;
+            /**
+             * @deprecated
+             * @description Updates the primary locale block when translations are omitted (legacy partial update).
+             */
             questionText?: string;
+            /** @deprecated */
             followUpQuestions?: string[];
-            expectedConcepts?: (string | components["schemas"]["QuestionExpectedConceptDto"])[];
-            redFlags?: (string | components["schemas"]["QuestionRedFlagDto"])[];
+            /** @deprecated */
+            expectedConcepts?: string[];
+            /** @deprecated */
+            redFlags?: string[];
             /** @enum {string} */
             difficulty?: "easy" | "medium" | "hard";
             weight?: number;
+            /** @deprecated */
             sampleGoodAnswer?: string;
             minimumPassScore?: number;
             tags?: string[];
@@ -887,10 +1138,36 @@ export interface components {
             deleted: string[];
             blocked: components["schemas"]["BulkDeleteBlockedItemDto"][];
         };
+        ChatHistoryItemDto: {
+            /** @enum {string} */
+            role: "system" | "assistant" | "candidate";
+            content: string;
+        };
+        ChatDto: {
+            question: string;
+            position: string;
+            candidateName: string;
+            history: components["schemas"]["ChatHistoryItemDto"][];
+            message: string;
+        };
+        AiTextResponseDto: {
+            response: string;
+        };
+        GreetDto: {
+            candidateName: string;
+            position: string;
+            totalQuestions: number;
+        };
         CreateInterviewDto: {
             candidateName: string;
             candidateEmail?: string;
             position: string;
+            /**
+             * @description Locale for interview UI and feedback. Defaults to en when omitted.
+             * @default en
+             * @enum {string}
+             */
+            interviewLocale: "en" | "be" | "ru" | "pl";
             questionIds: string[];
         };
         MediaArtifactDto: {
@@ -1010,8 +1287,15 @@ export interface components {
             decisionHint?: "pass" | "review" | "fail";
         };
         InterviewResultResponseDto: {
+            /**
+             * @description Interview language used for AI evaluation and summary text.
+             * @enum {string}
+             */
+            interviewLocale: "en" | "be" | "ru" | "pl";
             overallScore: number;
             summary: string;
+            /** @description Improvement notes in interviewLocale (same language as general summary). */
+            improvements?: string;
             categoryScores: {
                 [key: string]: number;
             };
@@ -1039,12 +1323,24 @@ export interface components {
             lastUpdatedAt: string;
             errorMessage?: string;
         };
-        InterviewWithCandidateLinkResponseDto: {
+        InterviewLocaleWarningDto: {
+            questionId: string;
+            availableLocales: ("en" | "be" | "ru" | "pl")[];
+        };
+        CreateInterviewResultDto: {
             id: string;
             candidateName: string;
             candidateEmail?: string;
             position: string;
-            questions: components["schemas"]["QuestionResponseDto"][];
+            /** @enum {string} */
+            interviewLocale: "en" | "be" | "ru" | "pl";
+            /**
+             * @description Locale used for questions[] (always interviewLocale).
+             * @enum {string}
+             */
+            questionsDisplayLocale?: "en" | "be" | "ru" | "pl";
+            /** @description Resolved for interviewLocale on read (resolvedLocale, availableLocales). */
+            questions: components["schemas"]["ResolvedQuestionResponseDto"][];
             answers: components["schemas"]["AnswerDto"][];
             /** @enum {string} */
             status: "pending" | "in_progress" | "processing" | "completed" | "failed";
@@ -1055,13 +1351,22 @@ export interface components {
             updatedAt: string;
             workflow?: components["schemas"]["InterviewWorkflowDto"];
             candidateLink: string;
+            localeWarnings: components["schemas"]["InterviewLocaleWarningDto"][];
         };
         InterviewResponseDto: {
             id: string;
             candidateName: string;
             candidateEmail?: string;
             position: string;
-            questions: components["schemas"]["QuestionResponseDto"][];
+            /** @enum {string} */
+            interviewLocale: "en" | "be" | "ru" | "pl";
+            /**
+             * @description Locale used for questions[] (always interviewLocale).
+             * @enum {string}
+             */
+            questionsDisplayLocale?: "en" | "be" | "ru" | "pl";
+            /** @description Resolved for interviewLocale on read (resolvedLocale, availableLocales). */
+            questions: components["schemas"]["ResolvedQuestionResponseDto"][];
             answers: components["schemas"]["AnswerDto"][];
             /** @enum {string} */
             status: "pending" | "in_progress" | "processing" | "completed" | "failed";
@@ -1071,6 +1376,42 @@ export interface components {
             /** Format: date-time */
             updatedAt: string;
             workflow?: components["schemas"]["InterviewWorkflowDto"];
+        };
+        InterviewQuestionPreviewDto: {
+            id: string;
+            questionText: string;
+            /** @enum {string} */
+            resolvedLocale: "en" | "be" | "ru" | "pl";
+        };
+        InterviewListItemResponseDto: {
+            id: string;
+            candidateName: string;
+            candidateEmail?: string;
+            position: string;
+            /** @enum {string} */
+            interviewLocale: "en" | "be" | "ru" | "pl";
+            /**
+             * @description Locale used for questionsPreview (always interviewLocale).
+             * @enum {string}
+             */
+            questionsDisplayLocale?: "en" | "be" | "ru" | "pl";
+            questionCount: number;
+            questionsPreview: components["schemas"]["InterviewQuestionPreviewDto"][];
+            answers: components["schemas"]["AnswerDto"][];
+            /** @enum {string} */
+            status: "pending" | "in_progress" | "processing" | "completed" | "failed";
+            result?: components["schemas"]["InterviewResultResponseDto"];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            workflow?: components["schemas"]["InterviewWorkflowDto"];
+        };
+        PaginatedInterviewListResponseDto: {
+            items: components["schemas"]["InterviewListItemResponseDto"][];
+            total: number;
+            page: number;
+            limit: number;
         };
         CandidateLinkResponseDto: {
             candidateLink: string;
@@ -1182,6 +1523,14 @@ export interface components {
         };
         CandidateQuestionViewDto: {
             text: string;
+            followUpQuestions: string[];
+            /** @enum {string} */
+            resolvedLocale: "en" | "be" | "ru" | "pl";
+            /**
+             * @description Present when resolvedLocale differs from the requested content locale (contentLocale query or interviewLocale).
+             * @enum {string}
+             */
+            fallbackFromLocale?: "en" | "be" | "ru" | "pl";
         };
         CurrentAnswerMetaDto: {
             /** @enum {string} */
@@ -1192,6 +1541,8 @@ export interface components {
         TakeInterviewResponseDto: {
             id: string;
             position: string;
+            /** @enum {string} */
+            interviewLocale: "en" | "be" | "ru" | "pl";
             candidateName: string;
             status: string;
             totalQuestions: number;
@@ -1286,51 +1637,20 @@ export interface components {
             sourceVersionNumber: number;
             reused: boolean;
         };
-        ChatHistoryItemDto: {
+        FeedbackQuestionResultDto: {
+            questionIndex: number;
+            questionId: string;
+            score?: number;
             /** @enum {string} */
-            role: "system" | "assistant" | "candidate";
-            content: string;
-        };
-        ChatDto: {
-            question: string;
-            position: string;
-            candidateName: string;
-            history: components["schemas"]["ChatHistoryItemDto"][];
-            message: string;
-        };
-        AiTextResponseDto: {
-            response: string;
-        };
-        GreetDto: {
-            candidateName: string;
-            position: string;
-            totalQuestions: number;
-        };
-        DraftQuestionDto: {
-            question?: components["schemas"]["CreateQuestionDto"];
-        };
-        QuestionDraftResponseDto: {
-            externalId?: string;
-            role?: string;
-            focus?: string;
-            outputLanguage: string;
-            category?: string;
-            subcategory?: string;
-            questionText: string;
-            followUpQuestions: string[];
-            expectedConcepts: components["schemas"]["QuestionExpectedConceptDto"][];
-            redFlags: components["schemas"]["QuestionRedFlagDto"][];
-            /** @enum {string} */
-            difficulty: "easy" | "medium" | "hard";
-            weight: number;
-            sampleGoodAnswer?: string;
-            minimumPassScore: number;
-            tags: string[];
-            metadata: {
-                [key: string]: unknown;
-            };
+            decisionHint?: "pass" | "review" | "fail";
+            summary?: string;
         };
         FeedbackResponseDto: {
+            /**
+             * @description Locale used for AI-generated feedback text (interview.interviewLocale). v1 is single-locale only — not multi-locale.
+             * @enum {string}
+             */
+            interviewLocale: "en" | "be" | "ru" | "pl";
             position: string;
             date: string;
             expiresAt: string;
@@ -1340,8 +1660,12 @@ export interface components {
             categoryScores?: {
                 [key: string]: number;
             };
+            /** @description Overall AI summary in interviewLocale (stored at completion). */
             generalFeedback?: string;
+            /** @description Improvement notes in interviewLocale (aggregated from weak answers). */
             improvements?: string;
+            /** @description Per-question feedback snippets in interviewLocale. */
+            questionResults?: components["schemas"]["FeedbackQuestionResultDto"][];
         };
         FeedbackLinkResponseDto: {
             url: string;
@@ -1360,7 +1684,10 @@ export interface operations {
     AuthController_login: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path?: never;
             cookie?: never;
         };
@@ -1397,7 +1724,10 @@ export interface operations {
     AuthController_register: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path?: never;
             cookie?: never;
         };
@@ -1420,7 +1750,10 @@ export interface operations {
     AuthController_googleLogin: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path?: never;
             cookie?: never;
         };
@@ -1438,7 +1771,10 @@ export interface operations {
     AuthController_googleCallback: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path?: never;
             cookie?: never;
         };
@@ -1456,7 +1792,10 @@ export interface operations {
     AuthController_logout: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path?: never;
             cookie?: never;
         };
@@ -1475,7 +1814,10 @@ export interface operations {
     AuthController_me: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path?: never;
             cookie?: never;
         };
@@ -1504,7 +1846,10 @@ export interface operations {
                 limit?: number;
                 offset?: number;
             };
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path?: never;
             cookie?: never;
         };
@@ -1531,7 +1876,10 @@ export interface operations {
     UserController_assignRole: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path: {
                 id: string;
             };
@@ -1573,15 +1921,28 @@ export interface operations {
                 /** @description ANY-match: rows whose tags array overlaps the given list. Send as ?tags=react,hooks or repeated. */
                 tags?: string[];
                 role?: string;
+                /** @description Filter by canonical question locale (primary_locale). */
+                primaryLocale?: "en" | "be" | "ru" | "pl";
+                /**
+                 * @deprecated
+                 * @description Deprecated: use primaryLocale (en|be|ru|pl). Legacy outputLanguage labels map to locale: en→English, be→Belarusian, ru→Russian, pl→Polish (aliases such as english/polish also accepted on input).
+                 */
                 outputLanguage?: string;
+                /** @description Filter: `primaryLocale === locale` OR non-empty `translations[locale].questionText`. When set, each list item resolves `questionText` and rubric for this locale (with primary fallback). When omitted, items follow `X-Locale` (default `en`). */
+                locale?: "en" | "be" | "ru" | "pl";
                 /** @description Non-super_admin callers are forced to "active" regardless of what they pass. */
                 status?: "active" | "inactive" | "all";
                 sortBy?: "createdAt" | "updatedAt" | "difficulty" | "questionText" | "popularity";
                 sortOrder?: "asc" | "desc";
+                /** @description When true, each list item includes the full translations map. Default false. */
+                includeTranslations?: boolean;
                 page?: number;
                 limit?: number;
             };
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path?: never;
             cookie?: never;
         };
@@ -1608,7 +1969,10 @@ export interface operations {
     QuestionController_create: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path?: never;
             cookie?: never;
         };
@@ -1623,7 +1987,58 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["QuestionResponseDto"];
+                    "application/json": components["schemas"]["ResolvedQuestionResponseDto"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    QuestionController_draftQuestion: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Used when body `locale` is omitted. Defaults to `en`. */
+                "X-Locale"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DraftQuestionDto"];
+            };
+        };
+        responses: {
+            /** @description mode=generate: identity + rubric (QuestionDraftGenerateResponseDto). mode=translate: content block only (QuestionDraftContentResponseDto). */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionDraftGenerateResponseDto"] | components["schemas"]["QuestionDraftContentResponseDto"];
                 };
             };
             400: {
@@ -1664,15 +2079,28 @@ export interface operations {
                 /** @description ANY-match: rows whose tags array overlaps the given list. Send as ?tags=react,hooks or repeated. */
                 tags?: string[];
                 role?: string;
+                /** @description Filter by canonical question locale (primary_locale). */
+                primaryLocale?: "en" | "be" | "ru" | "pl";
+                /**
+                 * @deprecated
+                 * @description Deprecated: use primaryLocale (en|be|ru|pl). Legacy outputLanguage labels map to locale: en→English, be→Belarusian, ru→Russian, pl→Polish (aliases such as english/polish also accepted on input).
+                 */
                 outputLanguage?: string;
+                /** @description Filter: `primaryLocale === locale` OR non-empty `translations[locale].questionText`. When set, each list item resolves `questionText` and rubric for this locale (with primary fallback). When omitted, items follow `X-Locale` (default `en`). */
+                locale?: "en" | "be" | "ru" | "pl";
                 /** @description Non-super_admin callers are forced to "active" regardless of what they pass. */
                 status?: "active" | "inactive" | "all";
                 sortBy?: "createdAt" | "updatedAt" | "difficulty" | "questionText" | "popularity";
                 sortOrder?: "asc" | "desc";
+                /** @description When true, each list item includes the full translations map. Default false. */
+                includeTranslations?: boolean;
                 page?: number;
                 limit?: number;
             };
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path?: never;
             cookie?: never;
         };
@@ -1698,8 +2126,14 @@ export interface operations {
     };
     QuestionController_findOne: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: {
+                /** @description When false, omit the translations map. Default true for GET /questions/:id. */
+                includeTranslations?: boolean;
+            };
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path: {
                 id: string;
             };
@@ -1712,7 +2146,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["QuestionResponseDto"];
+                    "application/json": components["schemas"]["ResolvedQuestionResponseDto"];
                 };
             };
             401: {
@@ -1733,10 +2167,73 @@ export interface operations {
             };
         };
     };
+    QuestionController_update: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateQuestionDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResolvedQuestionResponseDto"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
     QuestionController_remove: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path: {
                 id: string;
             };
@@ -1786,10 +2283,13 @@ export interface operations {
             };
         };
     };
-    QuestionController_update: {
+    QuestionController_patchUpdate: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path: {
                 id: string;
             };
@@ -1806,7 +2306,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["QuestionResponseDto"];
+                    "application/json": components["schemas"]["ResolvedQuestionResponseDto"];
                 };
             };
             400: {
@@ -1846,7 +2346,10 @@ export interface operations {
     QuestionController_findSimilar: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path?: never;
             cookie?: never;
         };
@@ -1885,7 +2388,10 @@ export interface operations {
     QuestionController_bulkRemove: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path?: never;
             cookie?: never;
         };
@@ -1931,8 +2437,14 @@ export interface operations {
     };
     QuestionController_restore: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: {
+                /** @description When false, omit the translations map. Default true for GET /questions/:id. */
+                includeTranslations?: boolean;
+            };
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path: {
                 id: string;
             };
@@ -1945,7 +2457,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["QuestionResponseDto"];
+                    "application/json": components["schemas"]["ResolvedQuestionResponseDto"];
                 };
             };
             401: {
@@ -1974,21 +2486,165 @@ export interface operations {
             };
         };
     };
-    InterviewController_findAll: {
+    AiController_chat: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChatDto"];
+            };
+        };
         responses: {
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["InterviewResponseDto"][];
+                    "application/json": components["schemas"]["AiTextResponseDto"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    AiController_greet: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GreetDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiTextResponseDto"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    AiController_draftQuestion: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Used when body `locale` is omitted. Defaults to `en`. */
+                "X-Locale"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DraftQuestionDto"];
+            };
+        };
+        responses: {
+            /** @description mode=generate: identity + rubric. mode=translate: content block only. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionDraftGenerateResponseDto"] | components["schemas"]["QuestionDraftContentResponseDto"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    InterviewController_findAll: {
+        parameters: {
+            query?: {
+                /** @description When true, response is { items, total, page, limit }. When false or omitted, returns a plain array (legacy clients). */
+                paginated?: boolean;
+                page?: number;
+                limit?: number;
+            };
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Array when paginated is false/omitted; paginated object when paginated=true */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterviewResponseDto"][] | components["schemas"]["PaginatedInterviewListResponseDto"];
                 };
             };
             401: {
@@ -2004,7 +2660,10 @@ export interface operations {
     InterviewController_create: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path?: never;
             cookie?: never;
         };
@@ -2019,7 +2678,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["InterviewWithCandidateLinkResponseDto"];
+                    "application/json": components["schemas"]["CreateInterviewResultDto"];
                 };
             };
             400: {
@@ -2051,7 +2710,10 @@ export interface operations {
     InterviewController_findOne: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path: {
                 id: string;
             };
@@ -2088,7 +2750,10 @@ export interface operations {
     InterviewController_generateCandidateLink: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path: {
                 id: string;
             };
@@ -2125,7 +2790,10 @@ export interface operations {
     InterviewController_complete: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path: {
                 id: string;
             };
@@ -2165,7 +2833,10 @@ export interface operations {
                 /** @description Re-evaluate answers whose latest validation already completed. Defaults to false; in-flight validations always return 409. */
                 force?: boolean;
             };
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path: {
                 id: string;
             };
@@ -2221,7 +2892,10 @@ export interface operations {
                 /** @description Re-evaluate the answer if its latest validation already completed. Defaults to false; in-flight validations always return 409. */
                 force?: boolean;
             };
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path: {
                 id: string;
                 questionIndex: number;
@@ -2283,7 +2957,10 @@ export interface operations {
     InterviewController_getResults: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path: {
                 id: string;
             };
@@ -2328,7 +3005,10 @@ export interface operations {
     UploadController_presign: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path?: never;
             cookie?: never;
         };
@@ -2367,7 +3047,10 @@ export interface operations {
     UploadController_complete: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path?: never;
             cookie?: never;
         };
@@ -2406,7 +3089,10 @@ export interface operations {
     UploadController_startMultipartUpload: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path?: never;
             cookie?: never;
         };
@@ -2445,7 +3131,10 @@ export interface operations {
     UploadController_presignMultipartPart: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path?: never;
             cookie?: never;
         };
@@ -2484,7 +3173,10 @@ export interface operations {
     UploadController_completeMultipartUpload: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path?: never;
             cookie?: never;
         };
@@ -2523,7 +3215,10 @@ export interface operations {
     UploadController_abortMultipartUpload: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path?: never;
             cookie?: never;
         };
@@ -2562,7 +3257,10 @@ export interface operations {
     RecruiterMediaController_presignManualUpload: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path: {
                 id: string;
                 questionIndex: number;
@@ -2612,7 +3310,10 @@ export interface operations {
     RecruiterMediaController_completeManualUpload: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path: {
                 id: string;
                 questionIndex: number;
@@ -2662,7 +3363,10 @@ export interface operations {
     RecruiterMediaController_getAnswerMedia: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path: {
                 id: string;
                 questionIndex: number;
@@ -2700,7 +3404,10 @@ export interface operations {
     HealthController_check: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path?: never;
             cookie?: never;
         };
@@ -2720,8 +3427,13 @@ export interface operations {
         parameters: {
             query?: {
                 token?: string;
+                /** @description Candidate UI language for currentQuestion. Omit to use interviewLocale. */
+                contentLocale?: "en" | "be" | "ru" | "pl";
             };
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path: {
                 id: string;
             };
@@ -2766,7 +3478,10 @@ export interface operations {
     TakeController_submitAnswer: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path: {
                 id: string;
             };
@@ -2815,7 +3530,10 @@ export interface operations {
     TakeController_saveAnswerProgress: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path: {
                 id: string;
             };
@@ -2864,7 +3582,10 @@ export interface operations {
     TakeController_startAnswerValidation: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path: {
                 id: string;
                 questionIndex: number;
@@ -2907,138 +3628,16 @@ export interface operations {
             };
         };
     };
-    AiController_chat: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ChatDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AiTextResponseDto"];
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponseDto"];
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponseDto"];
-                };
-            };
-        };
-    };
-    AiController_greet: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["GreetDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AiTextResponseDto"];
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponseDto"];
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponseDto"];
-                };
-            };
-        };
-    };
-    AiController_draftQuestion: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["DraftQuestionDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["QuestionDraftResponseDto"];
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponseDto"];
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponseDto"];
-                };
-            };
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponseDto"];
-                };
-            };
-        };
-    };
     FeedbackController_getFeedback: {
         parameters: {
             query: {
                 /** @description Access token from the share link */
                 token: string;
             };
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path: {
                 /** @description Interview ID */
                 id: string;
@@ -3068,7 +3667,10 @@ export interface operations {
     FeedbackLinkController_createLink: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path: {
                 /** @description Interview ID */
                 id: string;
@@ -3098,7 +3700,10 @@ export interface operations {
     FeedbackLinkController_revokeLink: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path: {
                 /** @description Interview ID */
                 id: string;

@@ -1,7 +1,7 @@
 'use client'
 
 import { BadgeCheck, ChartColumnBig, Clock3, Sparkles, Target } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
 import { HeroLead, HeroTitle } from '@/components/ui/hero-text'
@@ -14,6 +14,7 @@ import { Inline } from '@/components/ui/layout/inline'
 import { Section } from '@/components/ui/layout/section'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText } from '@/components/ui/text'
+import type { Locale } from '@/i18n/locales'
 import { type FeedbackResponse as Feedback } from '@/lib/api'
 import { formatInterviewDate } from '@/lib/interview-formatters'
 
@@ -41,6 +42,9 @@ type FeedbackViewProps = {
 
 export function FeedbackView({ feedback }: FeedbackViewProps) {
   const t = useTranslations('feedback')
+  const uiLocale = useLocale() as Locale
+  const interviewLocale = feedback.interviewLocale
+  const showLanguageMismatchBadge = interviewLocale !== uiLocale
 
   return (
     <PageShell>
@@ -71,6 +75,13 @@ export function FeedbackView({ feedback }: FeedbackViewProps) {
                 <StatusPill tone="neutral">
                   {t('reviewed', { date: formatInterviewDate(feedback.date) })}
                 </StatusPill>
+                {showLanguageMismatchBadge ? (
+                  <StatusPill tone="neutral_meta" casing="chip" size="compact">
+                    {t('languageBadgeInterviewAs', {
+                      locale: interviewLocale.toUpperCase(),
+                    })}
+                  </StatusPill>
+                ) : null}
               </Inline>
             </CardContent>
           </Card>

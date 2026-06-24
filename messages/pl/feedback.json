@@ -14,6 +14,7 @@
     "feedbackEyebrow": "Informacja zwrotna",
     "wentWellTitle": "Co poszło dobrze",
     "recommendationsEyebrow": "Zalecenia",
-    "improveTitle": "Co dalej poprawić"
+    "improveTitle": "Co dalej poprawić",
+    "languageBadgeInterviewAs": "Język rozmowy {locale}"
   }
 }

@@ -1,3 +1,4 @@
+export { TakeFlowChrome } from './take-flow-chrome';
 export { TakeCompleteScreen } from './recording/recording-complete-screen';
 export { TakeConsentScreen } from './consent/consent-screen';
 export { TakeLobbyScreen } from './lobby/lobby-screen';

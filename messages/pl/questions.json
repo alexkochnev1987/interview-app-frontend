@@ -4,7 +4,7 @@
       "externalId": "Identyfikator zewnętrzny",
       "role": "Rola",
       "focus": "Obszar",
-      "outputLanguage": "Język wyjściowy",
+      "primaryLocale": "Główna lokalizacja",
       "category": "Kategoria",
       "subcategory": "Podkategoria",
       "questionText": "Tekst pytania",
@@ -22,23 +22,50 @@
       "questionTextRequired": "Tekst pytania jest wymagany.",
       "metadataInvalidJson": "Metadane muszą mieć prawidłowy format JSON.",
       "metadataMustBeObject": "Metadane muszą być obiektem JSON (nie tablicą ani elementem pierwotnym).",
-      "englishOnlyField": "Pole „{field}” musi być w języku angielskim.",
-      "englishOnlyTitle": "Tylko angielski"
+      "metadataEnglishOnly": "Rola, kategoria, tagi i inne pola taksonomii muszą być po angielsku (znaki łacińskie).",
+      "primaryLocaleRequired": "Blok głównej lokalizacji jest wymagany.",
+      "primaryLocaleCannotBeRemoved": "Nie można usunąć języka głównego.",
+      "localeAlreadyAdded": "{locale} jest już dodany.",
+      "localeNotAdded": "{locale} nie został jeszcze dodany.",
+      "localeBlockIncomplete": "Blok {locale} jest niepełny. Uzupełnij: {fields}.",
+      "pendingAiDraft": "Zastosuj lub odrzuć wszystkie sugestie AI przed zapisem.",
+      "pendingTranslationDraft": "Zastosuj lub odrzuć wszystkie sugestie tłumaczenia przed zapisem."
     },
     "editor": {
       "previewEmpty": "Pusty",
       "moreInformation": "Więcej informacji",
       "aiQuestionTextRequired": "Tekst pytania jest wymagany przed wygenerowaniem AI.",
-      "aiQuestionTextEnglishOnly": "Przed generowaniem AI tekst pytania musi być w języku angielskim.",
-      "englishOnlyNoticeTitle": "Zasada treści: tylko angielski",
-      "englishOnlyNoticeDescription": "Wypełniaj wszystkie pola pytania po angielsku, niezależnie od bieżącej lokalizacji interfejsu.",
       "conceptDescriptionFallback": "W odpowiedzi należy uwzględnić {label}.",
       "headerEyebrow": "Ujednolicony edytor pytań",
       "headerLead": "Ukształtuj monit, zdefiniuj rubrykę i przechowuj sugestie wygenerowane przez sztuczną inteligencję widoczne jako wyraźne różnice, a nie niewidoczne mutacje w tle.",
       "metricDifficulty": "Trudność",
       "metricWeight": "Waga",
       "metricPendingAi": "Oczekujące różnice AI",
-      "selectDifficultyPlaceholder": "Wybierz poziom trudności"
+      "selectDifficultyPlaceholder": "Wybierz poziom trudności",
+      "primaryLocale": "Język główny",
+      "translateTo": "Przetłumacz na",
+      "translate": "Przetłumacz",
+      "applyAll": "Zastosuj wszystko",
+      "addLanguage": "Dodaj język",
+      "removeLanguage": "Usuń {locale}",
+      "emptyTabPlaceholder": "Brak tłumaczenia. Wpisz tekst tutaj lub przetłumacz z karty głównej.",
+      "primaryChanged": "Język główny został zmieniony",
+      "primaryChangedDescription": "Treść główna została zaktualizowana po zapisaniu tego tłumaczenia. Zaktualizuj tłumaczenie, aby odpowiadało bieżącej treści głównej.",
+      "updateTranslation": "Zaktualizuj tłumaczenie",
+      "updatingTranslation": "Aktualizowanie tłumaczenia…",
+      "tabsAriaLabel": "Języki treści",
+      "noLocalesToAdd": "Wszystkie języki dodane",
+      "primaryBadge": "Główny",
+      "setPrimary": "Ustaw {locale} jako język główny",
+      "localeTranslateErrorFallback": "Nie udało się wygenerować tłumaczenia.",
+      "removeLocaleConfirmTitle": "Usunąć {locale}?",
+      "removeLocaleConfirmDescription": "To tłumaczenie zostanie usunięte z edytora. Zapisz, aby zastosować zmianę na serwerze.",
+      "removeLocaleConfirmLabel": "Usuń język",
+      "removeLocaleCancelLabel": "Anuluj",
+      "refreshTranslationsTitle": "Treść główna została zmieniona",
+      "refreshTranslationsDescription": "Zaktualizować tłumaczenia dla {locales}?",
+      "refreshTranslationsConfirm": "Zaktualizuj tłumaczenia",
+      "refreshTranslationsCancel": "Nie teraz"
     },
     "sections": {
       "prompt": {
@@ -46,6 +73,7 @@
         "description": "Zapisz wyraźnie podstawowe pytanie, a następnie zapisz pytania uzupełniające, które osoby przeprowadzające rozmowę powinny mieć pod ręką.",
         "questionText": "Tekst pytania",
         "questionTextPlaceholder": "np. Co to jest zamknięcie w JavaScript?",
+        "questionTextLocalePlaceholder": "Tlumaczenie pytania na {locale}",
         "followUpQuestions": "Pytania uzupełniające",
         "followUpHint": "Użyj jednej linii na każdą sondę, aby osoba przeprowadzająca rozmowę mogła zachować rytm podczas sesji.",
         "followUpPlaceholder": "Jedno pytanie w każdym wierszu"
@@ -53,11 +81,11 @@
       "identity": {
         "title": "Pytanie o tożsamość",
         "description": "Zakotwicz zachętę w roli i taksonomii, których rekruterzy będą szukać później.",
+        "taxonomyEnglishHint": "Pola taksonomii (rola, kategoria, tagi itd.) są zapisywane po angielsku i nie są tłumaczone.",
         "externalIdTooltip": "Opcjonalny stabilny identyfikator importu.",
         "externalIdPlaceholder": "frontend_closure_v1",
         "rolePlaceholder": "stażysta frontendowy",
         "focusPlaceholder": "podstawy",
-        "outputLanguagePlaceholder": "angielski",
         "categoryPlaceholder": "JavaScript",
         "subcategoryPlaceholder": "zamknięcia"
       },
@@ -87,12 +115,22 @@
     },
     "aiDraft": {
       "title": "Projekt AI",
-      "description": "Pozwól sztucznej inteligencji zaproponować kategorię, dalsze sondy, oczekiwane koncepcje, sygnały ostrzegawcze i tagi na podstawie tekstu pytania. Każda zmiana pojawia się jako różnica, którą można sprawdzić, zanim cokolwiek zostanie zastosowane.",
+      "description": "Wygeneruj pytania uzupełniające, oczekiwane koncepcje, czerwone flagi i przykładową odpowiedź na podstawie głównego tekstu pytania. Każda sugestia pojawia się pod swoim polem do weryfikacji przed zastosowaniem.",
       "pending": "{count, plural, one {# wersja robocza} few {# wersje robocze} many {# wersji roboczych} other {# wersji roboczej}}",
-      "generate": "Wygeneruj wersję roboczą AI",
+      "generate": "Utwórz przez AI",
       "generating": "Generowanie...",
+      "generatingFor": "Generowanie rubric dla {locale}",
       "applyAll": "Zastosuj wszystko",
-      "loadingHint": "Generuję pola strukturalne z bieżącego monitu…"
+      "loadingHint": "Generuję pola strukturalne z bieżącego monitu…",
+      "previewLabel": "Podgląd szkicu"
+    },
+    "translatePanel": {
+      "description": "Wybierz lokalizacje, które nie są jeszcze otwarte jako karty. AI tłumaczy pełny blok treści głównej na każdą lokalizację.",
+      "noLocalesAvailable": "Wszystkie lokalizacje są już otwarte jako karty.",
+      "localeLoading": "Tłumaczenie…",
+      "translating": "Tłumaczenie…",
+      "tabTranslating": "Tłumaczenie {locale}…",
+      "applyAllForLocale": "Zastosuj wszystko dla {locale}"
     },
     "aiSuggestion": {
       "eyebrow": "Sugestia AI",
@@ -111,6 +149,7 @@
       "saving": "Oszczędność..."
     },
     "chips": {
+      "locale": "Język: {value}",
       "difficulty": "Trudność: {value}",
       "category": "Kategoria: {value}",
       "subcategory": "Typ: {value}",
@@ -175,6 +214,7 @@
         "loadingFacets": "Ładowanie opcji filtra…",
         "facetsUnavailable": "Nie można załadować opcji filtra.",
         "difficultyTitle": "Trudność",
+        "localeTitle": "Język",
         "categoryTitle": "Kategoria",
         "typeTitle": "Typ",
         "roleTitle": "Rola",
@@ -238,6 +278,7 @@
       },
       "card": {
         "deleted": "Usunięto",
+        "resolvedLocaleBadge": "Pokazano jako {locale}",
         "weightLabel": "waga {weight}",
         "conceptsMetric": "Koncepcje",
         "redFlagsMetric": "Czerwone flagi",
@@ -440,7 +481,14 @@
       "candidateNameLabel": "Imię kandydata",
       "candidateNamePlaceholder": "np. Jane Doe",
       "positionLabel": "Pozycja",
-      "positionPlaceholder": "np. Starszy Inżynier Frontendu"
+      "positionPlaceholder": "np. Starszy Inżynier Frontendu",
+      "interviewLocaleLabel": "Język rozmowy",
+      "interviewLocaleOption": "{locale}",
+      "missingTranslationWarningTitle": "{count, plural, one {# pytanie bez tego tłumaczenia} few {# pytania bez tego tłumaczenia} many {# pytań bez tego tłumaczenia} other {# pytań bez tego tłumaczenia}}",
+      "missingTranslationWarningDescription": "Wybrane pytania nie są dostępne w języku {locale}. W rozmowie może być pokazany tekst zastępczy.",
+      "feedbackLinkLabel": "Link do informacji zwrotnej",
+      "generatingFeedbackLink": "Generowanie nowego linku do informacji zwrotnej…",
+      "feedbackLinkNotReady": "Link do informacji zwrotnej nie jest dostępny jeszcze."
     }
   }
 }

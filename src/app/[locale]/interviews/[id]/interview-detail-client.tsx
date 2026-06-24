@@ -49,6 +49,7 @@ import { VideoFrame, VideoSurface } from "@/components/ui/video-frame";
 import {
   completeUploadAndFetchInterview,
   generateCandidateLink,
+  generateFeedbackLink,
   getInterview,
   getInterviewAnswerMedia,
   getPresignedUrl,
@@ -212,18 +213,74 @@ export default function InterviewDetailClient({
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "error">(
     "idle",
   );
+  const [feedbackLink, setFeedbackLink] = useState("");
+  const [feedbackLinkStatus, setFeedbackLinkStatus] = useState<
+    "idle" | "loading" | "ready" | "error"
+  >("idle");
+  const [feedbackLinkError, setFeedbackLinkError] = useState("");
+  const [feedbackCopyStatus, setFeedbackCopyStatus] = useState<
+    "idle" | "copied" | "error"
+  >("idle");
   const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const validationPollRef = useRef<number | null>(null);
   const requestedMediaRef = useRef<Map<number, string>>(new Map());
   const mediaFetchInterviewIdRef = useRef(id);
 
-  const buildCandidateUrl = useCallback((relativeLink: string) => {
-    if (typeof window === "undefined") {
-      return relativeLink;
-    }
+  const buildCandidateUrl = useCallback(
+    (relativeLink: string) => {
+      if (typeof window === "undefined") {
+        return relativeLink;
+      }
 
-    return new URL(relativeLink, window.location.origin).toString();
-  }, []);
+      const interviewLocale = interview?.interviewLocale;
+
+      try {
+        const url = new URL(relativeLink, window.location.origin);
+        const token = url.searchParams.get("token");
+        if (!token) {
+          return url.toString();
+        }
+
+        // Always prioritize interviewLocale from API (not current UI locale).
+        if (!interviewLocale) {
+          return url.toString();
+        }
+
+        return `${url.origin}/${interviewLocale}/take/${encodeURIComponent(id)}?token=${encodeURIComponent(token)}`;
+      } catch {
+        return relativeLink;
+      }
+    },
+    [id, interview?.interviewLocale],
+  );
+
+  const buildFeedbackUrl = useCallback(
+    (relativeLink: string) => {
+      if (typeof window === "undefined") {
+        return relativeLink;
+      }
+
+      const interviewLocale = interview?.interviewLocale;
+
+      try {
+        const url = new URL(relativeLink, window.location.origin);
+        const token = url.searchParams.get("token");
+        if (!token) {
+          return url.toString();
+        }
+
+        // Always prioritize interviewLocale from API (not current UI locale).
+        if (!interviewLocale) {
+          return url.toString();
+        }
+
+        return `${url.origin}/${interviewLocale}/feedback/${encodeURIComponent(id)}?token=${encodeURIComponent(token)}`;
+      } catch {
+        return relativeLink;
+      }
+    },
+    [id, interview?.interviewLocale],
+  );
 
   const loadCandidateLink = useCallback(
     async (mode: "initial" | "refresh" = "refresh") => {
@@ -251,12 +308,72 @@ export default function InterviewDetailClient({
         );
       }
     },
-    [buildCandidateUrl, id, toastMessages.interview.refreshLinkError, toastMessages.interview.refreshLinkSuccess],
+    [
+      buildCandidateUrl,
+      id,
+      toastMessages.interview.refreshLinkError,
+      toastMessages.interview.refreshLinkSuccess,
+    ],
   );
 
   useEffect(() => {
     void loadCandidateLink("initial");
   }, [loadCandidateLink]);
+
+  const loadFeedbackLink = useCallback(
+    async (mode: "initial" | "refresh" = "refresh") => {
+      try {
+        setFeedbackLinkStatus("loading");
+        setFeedbackLinkError("");
+        const data = await runMutation(() => generateFeedbackLink(id), {
+          showSuccessToast: mode === "refresh",
+          showErrorToast: mode === "refresh",
+          successMessage: toastMessages.interview.refreshLinkSuccess,
+          errorMessage: toastMessages.interview.refreshLinkError,
+        });
+
+        setFeedbackLink(buildFeedbackUrl(data.url));
+        setFeedbackLinkStatus("ready");
+
+        if (mode === "refresh") {
+          setFeedbackCopyStatus("idle");
+        }
+      } catch (err) {
+        setFeedbackLink("");
+        setFeedbackLinkStatus("error");
+        setFeedbackLinkError(
+          err instanceof Error ? err.message : toastMessages.interview.refreshLinkError,
+        );
+      }
+    },
+    [
+      buildFeedbackUrl,
+      id,
+      toastMessages.interview.refreshLinkError,
+      toastMessages.interview.refreshLinkSuccess,
+    ],
+  );
+
+  useEffect(() => {
+    if (interview?.status !== "completed") {
+      return;
+    }
+
+    void loadFeedbackLink("initial");
+  }, [interview?.status, loadFeedbackLink]);
+
+  async function handleCopyFeedbackLink() {
+    if (!feedbackLink) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(feedbackLink);
+      setFeedbackCopyStatus("copied");
+    } catch {
+      setFeedbackCopyStatus("error");
+    }
+  }
 
   function setFileInputRef(index: number, element: HTMLInputElement | null) {
     fileInputRefs.current[index] = element;
@@ -519,6 +636,7 @@ export default function InterviewDetailClient({
   const canValidate =
     allAnswered && !hasActiveValidation && interview.status !== "completed";
   const candidateLinkPreview = formatCandidateLinkPreview(candidateLink);
+  const feedbackLinkPreview = formatCandidateLinkPreview(feedbackLink);
 
   return (
     <PageShell>
@@ -651,6 +769,64 @@ export default function InterviewDetailClient({
                   <BodyText size="xs" title={candidateLink}>
                     {t("linkPreviewHelp")}
                   </BodyText>
+                ) : null}
+                {interview.status === "completed" ? (
+                  <>
+                    <Inline
+                      gap={3}
+                      align="center"
+                      justify="between"
+                      wrap="wrap"
+                    >
+                      <BodyText as="span" size="sm-tight" tone="foreground">
+                        {t("feedbackLinkLabel")}
+                      </BodyText>
+                      <Inline gap={2} wrap="wrap">
+                        <Button
+                          type="button"
+                          variant="outline-pill"
+                          shape="pill"
+                          size="sm"
+                          onClick={() => void loadFeedbackLink("refresh")}
+                          disabled={feedbackLinkStatus === "loading"}
+                        >
+                          {feedbackLinkStatus === "loading"
+                            ? t("generating")
+                            : t("refreshLink")}
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="gradient"
+                          shape="pill"
+                          size="sm"
+                          onClick={handleCopyFeedbackLink}
+                          disabled={
+                            feedbackLinkStatus !== "ready" || !feedbackLink
+                          }
+                        >
+                          <Copy className="size-4" />
+                          {feedbackCopyStatus === "copied"
+                            ? t("copied")
+                            : feedbackCopyStatus === "error"
+                              ? t("copyFailed")
+                              : t("copyLink")}
+                        </Button>
+                      </Inline>
+                    </Inline>
+
+                    <BodyText size="sm">
+                      {feedbackLinkStatus === "loading"
+                        ? t("generatingFeedbackLink")
+                        : feedbackLinkStatus === "error"
+                          ? feedbackLinkError
+                          : feedbackLinkPreview || t("feedbackLinkNotReady")}
+                    </BodyText>
+                    {feedbackLinkStatus === "ready" && feedbackLink ? (
+                      <BodyText size="xs" title={feedbackLink}>
+                        {t("linkPreviewHelp")}
+                      </BodyText>
+                    ) : null}
+                  </>
                 ) : null}
               </Stack>
             </SurfaceTile>

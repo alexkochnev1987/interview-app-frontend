@@ -1,36 +1,34 @@
 'use client'
 
-import { useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { QuestionEditor , type QuestionSubmitCallbacks} from '@/components/questions/editor/question-editor'
+
+import { QuestionEditor } from '@/components/questions/editor/question-editor'
 import { useCreateQuestion } from '@/components/questions/use-question-mutations'
 import { useRouter } from '@/i18n/navigation'
-import { routes } from '@/i18n/routes'
 import { type QuestionInput } from '@/lib/api'
-import { questionToEditorInput } from '@/lib/question-editor/parsers'
+import { useToastMessages } from '@/lib/use-toast-messages'
 
 export function QuestionNewClient() {
   const t = useTranslations('questions.newPage')
   const router = useRouter()
-  const { mutate: createQuestion, isPending: submitting } = useCreateQuestion()
-  const [ isNavigating , setIsNavigating ] = useState(false)
+  const toastMessages = useToastMessages()
+  const { mutateAsync: createQuestion } = useCreateQuestion()
 
-  function handleSubmit(value: QuestionInput , {onSuccess}: QuestionSubmitCallbacks) {
-    createQuestion(value, {
-      onSuccess: (question) => {
-        setIsNavigating(true)
-        onSuccess(questionToEditorInput(question))
-        router.push(routes.questions.detail(question.id))
-      },
-    })
+  async function handleSubmit(value: QuestionInput) {
+    const question = await createQuestion(value)
+    router.push(`/questions/${question.id}`)
+    return question
   }
 
   return (
     <QuestionEditor
       title={t('title')}
       submitLabel={t('submit')}
-      submitting={ submitting || isNavigating }
-      onSubmit={ handleSubmit }
+      onSubmit={handleSubmit}
+      saveToastOptions={{
+        successMessage: toastMessages.question.createSuccess,
+        errorMessage: toastMessages.question.createError,
+      }}
     />
   )
 }

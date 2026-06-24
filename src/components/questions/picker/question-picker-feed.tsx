@@ -27,7 +27,7 @@ export type QuestionPickerFeedProps = {
   debouncedQ: string
   filterState: Pick<
     QuestionsQueryState,
-    'difficulty' | 'category' | 'subcategory' | 'role' | 'tags' | 'status'
+    'locale' | 'difficulty' | 'category' | 'subcategory' | 'role' | 'tags' | 'status'
   >
   onReset: () => void
   tone?: StateCardTone

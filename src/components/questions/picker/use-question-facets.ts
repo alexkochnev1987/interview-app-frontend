@@ -26,6 +26,7 @@ export type UseQuestionFacetsResult = {
 type FilterSnapshot = Pick<
   QuestionsQueryState,
   | 'q'
+  | 'locale'
   | 'difficulty'
   | 'category'
   | 'subcategory'

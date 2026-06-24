@@ -6,10 +6,7 @@ import { useTranslations } from 'next-intl'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { DeletedQuestionBanner } from '@/components/questions/detail/deleted-question-banner'
 import { QuestionDangerZone } from '@/components/questions/detail/question-danger-zone'
-import {
-  QuestionEditor,
-  type QuestionSubmitCallbacks,
-} from '@/components/questions/editor/question-editor'
+import { QuestionEditor } from '@/components/questions/editor/question-editor'
 import {
   useDeleteQuestion,
   useRestoreQuestion,
@@ -17,7 +14,11 @@ import {
 } from '@/components/questions/use-question-mutations'
 import { useRouter } from '@/i18n/navigation'
 import { routes } from '@/i18n/routes'
-import { type Question, type QuestionInput } from '@/lib/api'
+import {
+  type Question,
+  type QuestionInput,
+  type UpdateQuestionInput,
+} from '@/lib/api'
 import { questionToEditorInput } from '@/lib/question-editor/parsers'
 
 type QuestionEditClientProps = {
@@ -35,47 +36,48 @@ export function QuestionEditClient({
 }: QuestionEditClientProps) {
   const t = useTranslations('questions.editPage')
   const router = useRouter()
-  const { mutate: updateQuestion, isPending: submitting } = useUpdateQuestion()
+  const { mutateAsync: updateQuestion } = useUpdateQuestion()
   const { mutate: deleteQuestion, isPending: deleting } = useDeleteQuestion()
   const { mutate: restoreQuestion, isPending: restoring } = useRestoreQuestion()
   const [question, setQuestion] = useState(initialQuestion)
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [restoreOpen, setRestoreOpen] = useState(false)
 
-  function handleSubmit(value: QuestionInput, { onSuccess }: QuestionSubmitCallbacks) {
-    updateQuestion(
-      { id, value },
-      {
-        onSuccess: (updated) => {
-          setQuestion(updated)
-          router.refresh()
-          onSuccess(questionToEditorInput(updated))
-        },
-      },
-    )
+  async function handleSubmit(
+    value: QuestionInput,
+    options?: { translationsMode?: UpdateQuestionInput['translationsMode'] },
+  ) {
+    const payload: UpdateQuestionInput = {
+      ...value,
+      translationsMode: options?.translationsMode,
+    }
+    const updated = await updateQuestion({ id, value: payload })
+    setQuestion(updated)
+    router.refresh()
+    return updated
   }
 
   function performRestore() {
     if (restoring) return
 
     restoreQuestion(id, {
-      onSuccess: (restored)=>{
+      onSuccess: (restored) => {
         setQuestion(restored)
         setRestoreOpen(false)
         router.refresh()
-      }
+      },
     })
   }
 
   function performDelete() {
     if (deleting) return
 
-    deleteQuestion(id,{
-      onSuccess:()=>{
+    deleteQuestion(id, {
+      onSuccess: () => {
         setConfirmOpen(false)
         router.push(routes.questions.list)
         router.refresh()
-      }
+      },
     })
   }
 
@@ -94,7 +96,6 @@ export function QuestionEditClient({
         initialValue={questionToEditorInput(question)}
         submitLabel={t('submit')}
         onSubmit={handleSubmit}
-        submitting={submitting}
       />
       {!question.deleted && canDelete ? (
         <QuestionDangerZone

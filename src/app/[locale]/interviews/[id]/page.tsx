@@ -58,6 +58,7 @@ export default async function InterviewDetailPage({
       (await requestServer<Interview>(
         `/interviews/${encodedId}`,
         auth.ctx,
+        { withLocaleHeader: false },
       )) ?? null
 
     if (interview) {
@@ -69,6 +70,7 @@ export default async function InterviewDetailPage({
             (await requestServer<InterviewResult>(
               `/interviews/${encodedId}/results`,
               auth.ctx,
+              { withLocaleHeader: false },
             )) ?? interview.result ?? null
         } catch {
           results = interview.result ?? null

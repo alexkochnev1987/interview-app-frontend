@@ -36,6 +36,7 @@ import {
   useTakeQuestionTts,
   type QuestionSpeechSynthCapture,
 } from './use-take-question-tts';
+import type { Locale } from '@/i18n/locales';
 
 type PendingVersionAction = 'submit' | 'rerecord' | null;
 
@@ -49,6 +50,7 @@ interface UseTakeOrchestratorParams {
   id: string;
   candidateToken: string;
   initialInterview?: TakeInterviewData;
+  contentLocale: Locale;
   takeMessage: TakeMessageGetter;
 }
 
@@ -75,6 +77,7 @@ export function useTakeOrchestrator({
   id,
   candidateToken,
   initialInterview,
+  contentLocale,
   takeMessage,
 }: UseTakeOrchestratorParams) {
   const {
@@ -248,8 +251,16 @@ export function useTakeOrchestrator({
     id,
     candidateToken,
     skipInitialLoad: Boolean(initialInterview),
+    contentLocale,
     onData: (data, mode) => {
       setError('');
+      if (mode === 'locale') {
+        setInterview((previous) =>
+          previous ? { ...previous, currentQuestion: data.currentQuestion } : data,
+        );
+        return;
+      }
+
       setInterview(data);
       if (data.completed) {
         releaseAllCaptures();
@@ -264,6 +275,16 @@ export function useTakeOrchestrator({
     },
     takeMessage,
   });
+
+  const prevContentLocaleRef = useRef<Locale | null>(null);
+  useEffect(() => {
+    const previousLocale = prevContentLocaleRef.current;
+    prevContentLocaleRef.current = contentLocale;
+
+    if (previousLocale !== null && previousLocale !== contentLocale) {
+      void loadInterview('locale', undefined, contentLocale);
+    }
+  }, [contentLocale, loadInterview]);
 
   const {
     restartFullInterviewCapture,
@@ -681,5 +702,6 @@ export function useTakeOrchestrator({
     formatTime,
     interviewerPresence,
     progressValue: interview ? progressValueForStage({ interview, stage }) : 0,
+    loadInterview,
   };
 }

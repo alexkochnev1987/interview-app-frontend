@@ -1,15 +1,15 @@
 import type { MutableRefObject } from 'react';
 import { useEffect, useRef, useState } from 'react';
+import { useLocale } from 'next-intl';
 
 import type { TakeStage } from '@/components/take/types';
+import { resolveSpeechSynthesisLocale, type Locale } from '@/i18n/locales';
 import type { TakeInterviewData } from '@/lib/api';
 
 const QUESTION_SPEAK_MS_PER_CHAR = 100;
 const QUESTION_SPEAK_WATCHDOG_SLACK_MS = 15_000;
 const QUESTION_SPEAK_WATCHDOG_MIN_MS = 10_000;
 const QUESTION_SPEAK_WATCHDOG_MAX_MS = 25 * 60 * 1000;
-const CANDIDATE_FLOW_TTS_LOCALE = 'en-US';
-
 export type InterviewerPresence = 'speaking' | 'listening';
 
 export type QuestionSpeechSynthCapture = Readonly<{
@@ -25,6 +25,7 @@ function cancelBrowserSpeechSynth() {
 
 function speakQuestion(
   text: string,
+  speechLocale: string,
   onEnd: () => void,
   speechCapture?: QuestionSpeechSynthCapture | null,
 ) {
@@ -50,8 +51,7 @@ function speakQuestion(
   }
 
   const utterance = new SpeechSynthesisUtterance(text);
-  // Candidate flow is intentionally English-only, including spoken prompts.
-  utterance.lang = CANDIDATE_FLOW_TTS_LOCALE;
+  utterance.lang = speechLocale;
   utterance.rate = 0.95;
   utterance.pitch = 1;
 
@@ -71,10 +71,29 @@ export function useTakeQuestionTts(
   stage: TakeStage,
   speechCapture?: QuestionSpeechSynthCapture | null,
 ): readonly [InterviewerPresence, MutableRefObject<boolean>] {
+  const uiLocale = useLocale() as Locale;
+  const speechLocale = resolveSpeechSynthesisLocale(uiLocale);
   const [speakingActive, setSpeakingActive] = useState(false);
   const recordingAllowedRef = useRef(true);
+  const uiLocaleRef = useRef(uiLocale);
+  const localeSwitchPendingRef = useRef(false);
+  const questionSnapshotRef = useRef(interview?.currentQuestion);
 
   const takeAudioStage = stage === 'interview' || stage === 'recording';
+
+  useEffect(() => {
+    if (uiLocaleRef.current !== uiLocale) {
+      uiLocaleRef.current = uiLocale;
+      localeSwitchPendingRef.current = true;
+    }
+  }, [uiLocale]);
+
+  useEffect(() => {
+    if (interview?.currentQuestion !== questionSnapshotRef.current) {
+      questionSnapshotRef.current = interview?.currentQuestion;
+      localeSwitchPendingRef.current = false;
+    }
+  }, [interview?.currentQuestion]);
 
   useEffect(() => {
     if (!takeAudioStage) {
@@ -83,6 +102,17 @@ export function useTakeQuestionTts(
       recordingAllowedRef.current = true;
       queueMicrotask(() => setSpeakingActive(false));
       return;
+    }
+
+    if (localeSwitchPendingRef.current) {
+      cancelBrowserSpeechSynth();
+      speechCapture?.discardOutboundSynthGuards();
+      recordingAllowedRef.current = false;
+      queueMicrotask(() => setSpeakingActive(false));
+      return () => {
+        cancelBrowserSpeechSynth();
+        speechCapture?.discardOutboundSynthGuards();
+      };
     }
 
     const text = interview?.currentQuestion?.text?.trim();
@@ -124,7 +154,7 @@ export function useTakeQuestionTts(
       release();
     }, watchdogMs);
 
-    speakQuestion(text, release, speechCapture ?? null);
+    speakQuestion(text, speechLocale, release, speechCapture ?? null);
 
     return () => {
       cancelBrowserSpeechSynth();
@@ -133,6 +163,7 @@ export function useTakeQuestionTts(
     };
   }, [
     takeAudioStage,
+    uiLocale,
     interview?.id,
     interview?.currentQuestion?.text,
     interview?.currentQuestionIndex,

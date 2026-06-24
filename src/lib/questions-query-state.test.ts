@@ -13,6 +13,7 @@ describe('questions-query-state', () => {
   it('reads filters and pagination from search params', () => {
     const params = new URLSearchParams({
       q: 'react',
+      locale: 'pl',
       difficulty: 'hard',
       category: 'frontend',
       tags: 'hooks',
@@ -27,6 +28,7 @@ describe('questions-query-state', () => {
 
     expect(readQuestionsFromSearchParams(params)).toMatchObject({
       q: 'react',
+      locale: 'pl',
       difficulty: 'hard',
       category: 'frontend',
       tags: ['hooks', 'typescript'],
@@ -42,6 +44,7 @@ describe('questions-query-state', () => {
   it('truncates q and ignores invalid enum values', () => {
     const params = new URLSearchParams({
       q: 'x'.repeat(250),
+      locale: 'de',
       difficulty: 'expert',
       page: '0',
       limit: '500',
@@ -49,6 +52,7 @@ describe('questions-query-state', () => {
 
     const state = readQuestionsFromSearchParams(params)
     expect(state.q).toHaveLength(200)
+    expect(state.locale).toBeUndefined()
     expect(state.difficulty).toBeUndefined()
     expect(state.page).toBe(1)
     expect(state.limit).toBe(DEFAULT_QUESTIONS_QUERY.limit)
@@ -58,6 +62,7 @@ describe('questions-query-state', () => {
     const state = {
       ...DEFAULT_QUESTIONS_QUERY,
       q: 'ignored',
+      locale: 'pl' as const,
       difficulty: 'easy' as const,
       tags: ['a'],
       page: 3,
@@ -66,6 +71,7 @@ describe('questions-query-state', () => {
 
     expect(buildQuestionsFetchParams(state, 'debounced')).toEqual({
       q: 'debounced',
+      locale: 'pl',
       difficulty: 'easy',
       category: undefined,
       subcategory: undefined,
@@ -79,6 +85,7 @@ describe('questions-query-state', () => {
     })
     expect(buildQuestionFacetsParams(state, 'debounced')).toEqual({
       q: 'debounced',
+      locale: 'pl',
       difficulty: 'easy',
       category: undefined,
       subcategory: undefined,

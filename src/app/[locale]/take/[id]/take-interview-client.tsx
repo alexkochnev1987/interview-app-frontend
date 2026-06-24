@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback } from 'react'
+import { useCallback, type ReactNode } from 'react'
 import { AlertCircle } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
@@ -8,6 +8,7 @@ import { PageContent, PageMainLayout } from '@/components/layout/page-shell'
 import {
   TakeCompleteScreen,
   TakeConsentScreen,
+  TakeFlowChrome,
   TakeLobbyScreen,
   TakeRecordingScreen,
 } from '@/components/take'
@@ -18,8 +19,13 @@ import {
   type TakeMessageKey,
   type TakeMessageValues,
   useTakeInterviewBeforeUnload,
+  useTakeLocaleSwitch,
   useTakeOrchestrator,
 } from '@/features/take'
+import {
+  TakeFlowLocaleProvider,
+  useTakeFlowLocale,
+} from '@/features/take/take-flow-locale-provider'
 import type { TakeInterviewData } from '@/lib/api'
 
 type TakeInterviewClientProps = {
@@ -33,6 +39,23 @@ export function TakeInterviewClient({
   candidateToken = '',
   initialInterview,
 }: TakeInterviewClientProps) {
+  return (
+    <TakeFlowLocaleProvider>
+      <TakeInterviewClientInner
+        id={id}
+        candidateToken={candidateToken}
+        initialInterview={initialInterview}
+      />
+    </TakeFlowLocaleProvider>
+  )
+}
+
+function TakeInterviewClientInner({
+  id,
+  candidateToken = '',
+  initialInterview,
+}: TakeInterviewClientProps) {
+  const { locale: contentLocale } = useTakeFlowLocale()
   const t = useTranslations('toast.pageGate.take')
   const tCommon = useTranslations('common')
   const tTake = useTranslations('takeFlow')
@@ -93,9 +116,45 @@ export function TakeInterviewClient({
     permissionTone,
     formatTime,
     interviewerPresence,
-  } = useTakeOrchestrator({ id, candidateToken, initialInterview, takeMessage })
+  } = useTakeOrchestrator({
+    id,
+    candidateToken,
+    initialInterview,
+    contentLocale,
+    takeMessage,
+  })
+
+  const {
+    locale,
+    switchLocale,
+    languageOptions,
+    languageAriaLabel,
+  } = useTakeLocaleSwitch()
 
   useTakeInterviewBeforeUnload(stage, takeMessage('beforeUnloadLeaveInterview'))
+
+  const withLocaleSwitcher = useCallback(
+    (content: ReactNode) => (
+      <TakeFlowChrome
+        currentLocale={locale}
+        languageAriaLabel={languageAriaLabel}
+        languageOptions={languageOptions}
+        onSelectLocale={switchLocale}
+        interviewLocale={interview?.interviewLocale}
+        fallbackFromLocale={interview?.currentQuestion?.fallbackFromLocale}
+      >
+        {content}
+      </TakeFlowChrome>
+    ),
+    [
+      locale,
+      languageAriaLabel,
+      languageOptions,
+      switchLocale,
+      interview?.interviewLocale,
+      interview?.currentQuestion?.fallbackFromLocale,
+    ],
+  )
 
   if (error && !interview) {
     return (
@@ -124,13 +183,13 @@ export function TakeInterviewClient({
   }
 
   if (stage === 'complete') {
-    return (
-      <TakeCompleteScreen candidateName={interview.candidateName} position={interview.position} />
+    return withLocaleSwitcher(
+      <TakeCompleteScreen candidateName={interview.candidateName} position={interview.position} />,
     )
   }
 
   if (stage === 'consent') {
-    return (
+    return withLocaleSwitcher(
       <TakeConsentScreen
         interview={interview}
         consent={consent}
@@ -140,12 +199,12 @@ export function TakeInterviewClient({
         onConsentChange={setConsent}
         onContinueToLobby={proceedToLobby}
         onRetrySessionSync={retrySessionSync}
-      />
+      />,
     )
   }
 
   if (stage === 'lobby') {
-    return (
+    return withLocaleSwitcher(
       <TakeLobbyScreen
         cameraStatus={cameraStatus}
         screenStatus={screenStatus}
@@ -162,11 +221,11 @@ export function TakeInterviewClient({
         onToggleCamera={() => void toggleLobbyCamera()}
         onScreenShare={() => void attachLobbyScreenShare()}
         onJoin={startInterviewFromLobby}
-      />
+      />,
     )
   }
 
-  return (
+  return withLocaleSwitcher(
     <TakeRecordingScreen
       interview={interview}
       currentVersionNumber={currentVersionNumber}
@@ -192,6 +251,6 @@ export function TakeInterviewClient({
       onReconnect={restartFullInterviewCapture}
       onRerecord={() => requestVersionAction('rerecord')}
       onSubmit={() => requestVersionAction('submit')}
-    />
+    />,
   )
 }

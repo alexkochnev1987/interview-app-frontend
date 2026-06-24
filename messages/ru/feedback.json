@@ -14,6 +14,7 @@
     "feedbackEyebrow": "Обратная связь",
     "wentWellTitle": "Что прошло хорошо",
     "recommendationsEyebrow": "Рекомендации",
-    "improveTitle": "Что улучшить дальше"
+    "improveTitle": "Что улучшить дальше",
+    "languageBadgeInterviewAs": "Язык интервью {locale}"
   }
 }

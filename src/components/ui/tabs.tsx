@@ -1,0 +1,114 @@
+'use client'
+
+import * as React from 'react'
+import { cva } from 'class-variance-authority'
+
+import { Badge } from '@/components/ui/badge'
+import { cn } from '@/lib/utils'
+
+export type TabItem = {
+  id: string
+  label: string
+  badge?: string
+  disabled?: boolean
+}
+
+const tabsListVariants = cva(
+  'inline-flex flex-wrap items-center gap-1 rounded-full border border-border bg-surface-glass-soft p-0.5',
+)
+
+const tabTriggerVariants = cva(
+  'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50',
+  {
+    variants: {
+      active: {
+        true: 'bg-secondary text-secondary-foreground shadow-sm',
+        false: 'text-muted-foreground hover:bg-muted hover:text-foreground',
+      },
+    },
+    defaultVariants: {
+      active: false,
+    },
+  },
+)
+
+export type TabsProps = Omit<React.ComponentProps<'div'>, 'onChange'> & {
+  items: TabItem[]
+  activeId: string
+  onChange: (id: string) => void
+  ariaLabel?: string
+  disabled?: boolean
+}
+
+export function Tabs({
+  items,
+  activeId,
+  onChange,
+  ariaLabel = 'Tabs',
+  disabled = false,
+  className,
+  ...props
+}: TabsProps) {
+  return (
+    <div
+      role="tablist"
+      aria-label={ariaLabel}
+      aria-orientation="horizontal"
+      data-slot="tabs"
+      className={cn(tabsListVariants(), className)}
+      {...props}
+    >
+      {items.map((item) => {
+        const isActive = item.id === activeId
+        const isDisabled = disabled || item.disabled
+
+        return (
+          <button
+            key={item.id}
+            type="button"
+            role="tab"
+            id={`tab-${item.id}`}
+            aria-selected={isActive}
+            aria-controls={`tabpanel-${item.id}`}
+            tabIndex={isActive ? 0 : -1}
+            disabled={isDisabled}
+            data-slot="tabs-trigger"
+            data-state={isActive ? 'active' : 'inactive'}
+            className={cn(tabTriggerVariants({ active: isActive }))}
+            onClick={() => onChange(item.id)}
+          >
+            <span>{item.label}</span>
+            {item.badge ? (
+              <Badge variant="capsLabelPrimary" size="capsLabelSm">
+                {item.badge}
+              </Badge>
+            ) : null}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+export type TabPanelProps = {
+  id: string
+  activeId: string
+  children: React.ReactNode
+  className?: string
+}
+
+export function TabPanel({ id, activeId, children, className }: TabPanelProps) {
+  if (id !== activeId) return null
+
+  return (
+    <div
+      role="tabpanel"
+      id={`tabpanel-${id}`}
+      aria-labelledby={`tab-${id}`}
+      data-slot="tabs-panel"
+      className={className}
+    >
+      {children}
+    </div>
+  )
+}

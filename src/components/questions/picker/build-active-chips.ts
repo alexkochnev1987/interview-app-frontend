@@ -7,6 +7,7 @@ type ChipBuilderOptions = {
 }
 
 export type ActiveFilterChipDescriptor =
+  | { kind: 'locale'; value: string }
   | { kind: 'difficulty'; value: string }
   | { kind: 'category'; value: string }
   | { kind: 'subcategory'; value: string }
@@ -19,6 +20,7 @@ export function buildActiveFilterChips(
   setters: Pick<
     UseQuestionsQueryResult,
     | 'setDifficulty'
+    | 'setLocale'
     | 'setCategory'
     | 'setSubcategory'
     | 'setRole'
@@ -29,6 +31,13 @@ export function buildActiveFilterChips(
   getChipLabel: (descriptor: ActiveFilterChipDescriptor) => string,
 ): ActiveFilterChip[] {
   const chips: ActiveFilterChip[] = []
+  if (state.locale) {
+    chips.push({
+      key: `locale:${state.locale}`,
+      label: getChipLabel({ kind: 'locale', value: state.locale }),
+      onRemove: () => setters.setLocale(undefined),
+    })
+  }
   if (state.difficulty) {
     chips.push({
       key: `difficulty:${state.difficulty}`,
