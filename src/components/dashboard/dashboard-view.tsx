@@ -44,9 +44,10 @@ import {
 
 type DashboardViewProps = {
   interviews: Interview[]
+  isDemo: boolean
 }
 
-export function DashboardView({ interviews }: DashboardViewProps) {
+export function DashboardView({ interviews, isDemo }: DashboardViewProps) {
   const t = useTranslations('dashboard')
   const labels = useSharedLabels()
   const formatters = useInterviewFormatters()
@@ -83,12 +84,14 @@ export function DashboardView({ interviews }: DashboardViewProps) {
                 </Stack>
 
                 <Inline gap={3} wrap="wrap">
-                  <Button asChild variant="gradient">
-                    <Link href="/interviews/new">
-                      {t('hero.newInterview')}
-                      <ArrowRight className="size-4" />
-                    </Link>
-                  </Button>
+                  {!isDemo ? (
+                    <Button asChild variant="gradient">
+                      <Link href="/interviews/new">
+                        {t('hero.newInterview')}
+                        <ArrowRight className="size-4" />
+                      </Link>
+                    </Button>
+                  ) : null}
                   <Button asChild variant="outline-pill" shape="pill" effects="blur">
                     <Link href={routes.questions.list}>{t('hero.questionBank')}</Link>
                   </Button>
@@ -168,9 +171,11 @@ export function DashboardView({ interviews }: DashboardViewProps) {
             title={t('empty.title')}
             description={t('empty.description')}
             action={
-              <Button asChild variant="gradient">
-                <Link href="/interviews/new">{t('empty.action')}</Link>
-              </Button>
+              !isDemo ? (
+                <Button asChild variant="gradient">
+                  <Link href="/interviews/new">{t('empty.action')}</Link>
+                </Button>
+              ) : null
             }
           />
         ) : (
@@ -180,9 +185,11 @@ export function DashboardView({ interviews }: DashboardViewProps) {
                 <EyebrowLabel size="lg">{t('recent.eyebrow')}</EyebrowLabel>
                 <SectionHeading>{t('recent.title')}</SectionHeading>
               </Stack>
-              <Button asChild variant="outline-pill" shape="pill" effects="blur">
-                <Link href={routes.questions.new}>{t('recent.createQuestion')}</Link>
-              </Button>
+              {!isDemo ? (
+                <Button asChild variant="outline-pill" shape="pill" effects="blur">
+                  <Link href={routes.questions.new}>{t('recent.createQuestion')}</Link>
+                </Button>
+              ) : null}
             </Inline>
 
             <Grid columns="cards-2-3" gap={4}>

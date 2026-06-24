@@ -38,6 +38,11 @@ export function useCandidateLink({
 
   const loadCandidateLink = useCallback(
     async (mode: 'initial' | 'refresh' = 'refresh') => {
+      // Demo users lack interviews:assign, so the call would always 403; skip it
+      // even if a UI guard is bypassed.
+      if (isDemo) {
+        return
+      }
       try {
         setCandidateLinkStatus('loading')
         setCandidateLinkError('')
@@ -65,6 +70,7 @@ export function useCandidateLink({
     [
       buildCandidateUrl,
       id,
+      isDemo,
       toastMessages.interview.refreshLinkError,
       toastMessages.interview.refreshLinkSuccess,
     ],

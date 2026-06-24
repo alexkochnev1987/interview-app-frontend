@@ -14,7 +14,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Inline } from '@/components/ui/layout/inline'
 import type { TeamMember } from '@/lib/api'
-import { useIsDemo } from '@/lib/auth-context'
 
 import {
   type TeamRowActionId,
@@ -65,7 +64,6 @@ export function TeamMemberRowActions({
   onChangeRole,
 }: TeamMemberRowActionsProps) {
   const t = useTranslations('team.actions')
-  const isDemo = useIsDemo()
 
   return (
     <DropdownMenu modal={false}>
@@ -84,9 +82,12 @@ export function TeamMemberRowActions({
         {ROW_ACTIONS.filter(({ id }) =>
           isTeamRowActionVisible(id, actorId, member),
         ).map(({ id, labelKey, Icon, tone }) => {
-          const enabled =
-            !isDemo &&
-            isTeamRowActionEnabled(id, actorId, actorRole, member)
+          const enabled = isTeamRowActionEnabled(
+            id,
+            actorId,
+            actorRole,
+            member,
+          )
           return (
             <DropdownMenuItem
               key={id}
