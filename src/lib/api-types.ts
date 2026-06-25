@@ -378,7 +378,7 @@ export interface paths {
         };
         /**
          * Get interview by id
-         * @description questions[] resolved for interviewLocale (single-language interview content).
+         * @description questions[] resolved for interviewLocale.
          */
         get: operations["InterviewController_findOne"];
         put?: never;
@@ -920,11 +920,14 @@ export interface components {
             deleted: boolean;
             /** @description Number of times this question has been used in an interview. */
             usageCount: number;
-            /** @enum {string} */
+            /**
+             * @description Locale of returned questionText and rubric fields.
+             * @enum {string}
+             */
             resolvedLocale: "en" | "be" | "ru" | "pl";
             availableLocales: ("en" | "be" | "ru" | "pl")[];
             /**
-             * @description Present when resolvedLocale differs from the requested X-Locale.
+             * @description Requested X-Locale (or ?locale= on list). Omitted when resolvedLocale matches. Also set when rubric fields partially fall back to primaryLocale while questionText matches the request.
              * @enum {string}
              */
             fallbackFromLocale?: "en" | "be" | "ru" | "pl";
@@ -1524,10 +1527,13 @@ export interface components {
         CandidateQuestionViewDto: {
             text: string;
             followUpQuestions: string[];
-            /** @enum {string} */
+            /**
+             * @description Locale of returned text and followUpQuestions. Resolved via contentLocale → interviewLocale → primaryLocale → any available translation.
+             * @enum {string}
+             */
             resolvedLocale: "en" | "be" | "ru" | "pl";
             /**
-             * @description Present when resolvedLocale differs from the requested content locale (contentLocale query or interviewLocale).
+             * @description Locale the candidate asked for: contentLocale query param, or interviewLocale when contentLocale is omitted. Omitted when resolvedLocale equals that requested locale.
              * @enum {string}
              */
             fallbackFromLocale?: "en" | "be" | "ru" | "pl";

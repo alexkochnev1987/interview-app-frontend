@@ -92,7 +92,6 @@
     "questionProgress": "Question {current} of {total}",
     "languageBadgeResolvedAs": "Resolved as {locale}",
     "languageBadgeInterviewAs": "Interview language {locale}",
-    "beforeUnloadLeaveInterview": "If you reload or leave now, you will exit this interview and may lose your progress. Are you sure?",
-    "languageBadgeFallbackFrom": "Question text fallback from {locale}"
+    "beforeUnloadLeaveInterview": "If you reload or leave now, you will exit this interview and may lose your progress. Are you sure?"
   }
 }

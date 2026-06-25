@@ -6,6 +6,7 @@ import {
   coerceLocaleTranslation,
   hasLocaleDraftContent,
   localeDraftFromInput,
+  normalizeLocaleDraft,
   type LocaleQuestionDraft,
 } from '@/lib/question-editor/parsers'
 
@@ -17,13 +18,7 @@ export type PrimaryContentSnapshot = Pick<
 export function primaryContentSnapshotFromDraft(
   draft?: Partial<LocaleQuestionDraft>,
 ): PrimaryContentSnapshot {
-  return {
-    questionText: draft?.questionText ?? '',
-    followUpQuestions: draft?.followUpQuestions ?? [],
-    expectedConcepts: draft?.expectedConcepts ?? [],
-    redFlags: draft?.redFlags ?? [],
-    sampleGoodAnswer: draft?.sampleGoodAnswer ?? '',
-  }
+  return normalizeLocaleDraft(draft)
 }
 
 export function primaryContentSnapshotFromQuestion(

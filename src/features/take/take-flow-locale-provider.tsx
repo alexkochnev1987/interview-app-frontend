@@ -118,7 +118,6 @@ function prefetchTakeFlowLocaleMessages() {
 type TakeFlowLocaleContextValue = {
   locale: Locale
   switchLocale: (nextLocale: Locale) => void
-  isLocaleReady: boolean
 }
 
 const TakeFlowLocaleContext = createContext<TakeFlowLocaleContextValue | null>(null)
@@ -148,7 +147,6 @@ function TakeFlowLocaleProviderInner({ children }: TakeFlowLocaleProviderProps) 
 
   const [locale, setLocale] = useState<Locale>(parentLocale)
   const [messages, setMessages] = useState(parentMessages)
-  const [isLocaleReady, setIsLocaleReady] = useState(true)
 
   useEffect(() => {
     const seeded = pickTakeFlowMessages(parentMessages as TakeFlowMessages)
@@ -186,14 +184,9 @@ function TakeFlowLocaleProviderInner({ children }: TakeFlowLocaleProviderProps) 
         return
       }
 
-      setIsLocaleReady(false)
-      void loadTakeFlowLocaleMessages(nextLocale)
-        .then((nextMessages) => {
-          applyLocaleSwitch(nextLocale, nextMessages)
-        })
-        .finally(() => {
-          setIsLocaleReady(true)
-        })
+      void loadTakeFlowLocaleMessages(nextLocale).then((nextMessages) => {
+        applyLocaleSwitch(nextLocale, nextMessages)
+      })
     },
     [applyLocaleSwitch, locale],
   )
@@ -202,9 +195,8 @@ function TakeFlowLocaleProviderInner({ children }: TakeFlowLocaleProviderProps) 
     () => ({
       locale,
       switchLocale,
-      isLocaleReady,
     }),
-    [locale, switchLocale, isLocaleReady],
+    [locale, switchLocale],
   )
 
   return (

@@ -356,7 +356,7 @@ function translationFromLocaleDraft(draft: LocaleQuestionDraft): TranslationValu
   }
 }
 
-function fullLocaleDraft(
+function normalizeLocaleDraft(
   partial?: Partial<LocaleQuestionDraft>,
 ): LocaleQuestionDraft {
   return {
@@ -368,8 +368,10 @@ function fullLocaleDraft(
   }
 }
 
+export { normalizeLocaleDraft }
+
 export function localeDraftFromInput(value: QuestionInput): LocaleQuestionDraft {
-  return fullLocaleDraft({
+  return normalizeLocaleDraft({
     questionText: value.questionText ?? '',
     followUpQuestions: value.followUpQuestions ?? [],
     expectedConcepts: value.expectedConcepts ?? [],
@@ -518,7 +520,7 @@ export function buildEditorStateForSave(args: {
   return {
     primaryLocale: args.primaryLocale,
     metadata: metadataBlockFromValue(args.value),
-    primary: fullLocaleDraft(primaryDraft),
+    primary: normalizeLocaleDraft(primaryDraft),
     translations,
     addedLocales: args.addedLocales,
   }
@@ -544,7 +546,7 @@ export function questionToEditorState(question: Question): QuestionEditorState {
   const primaryLocale = resolvePrimaryLocale(question.primaryLocale, question.outputLanguage)
   const primaryFromTranslation = coerceLocaleTranslation(question.translations?.[primaryLocale])
   const resolvedFlatContent = contentFromResolvedQuestion(question)
-  const primary = fullLocaleDraft(
+  const primary = normalizeLocaleDraft(
     hasLocaleDraftContent(primaryFromTranslation)
       ? primaryFromTranslation
       : resolvedFlatContent,
@@ -617,13 +619,13 @@ export function resolveEditorLocaleDraft(
 ): LocaleQuestionDraft {
   const fromRequestedLocale = coerceLocaleTranslation(input.translations?.[locale])
   if (hasLocaleDraftContent(fromRequestedLocale)) {
-    return fullLocaleDraft(fromRequestedLocale)
+    return normalizeLocaleDraft(fromRequestedLocale)
   }
 
   if (locale !== primaryLocale) {
     const fromPrimary = coerceLocaleTranslation(input.translations?.[primaryLocale])
     if (hasLocaleDraftContent(fromPrimary)) {
-      return fullLocaleDraft(fromPrimary)
+      return normalizeLocaleDraft(fromPrimary)
     }
   }
 

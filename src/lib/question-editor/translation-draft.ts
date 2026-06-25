@@ -5,6 +5,7 @@ import { TRANSLATE_DRAFT_FIELD_KEYS, type TranslateDraftFieldKey } from '@/lib/q
 import {
   areEqual,
   hasLocaleDraftContent,
+  normalizeLocaleDraft,
   type LocaleQuestionDraft,
 } from '@/lib/question-editor/parsers'
 
@@ -22,13 +23,7 @@ type DraftContentSource = {
 }
 
 export function draftToLocaleDraft(draft: DraftContentSource): LocaleQuestionDraft {
-  return {
-    questionText: draft.questionText ?? '',
-    followUpQuestions: draft.followUpQuestions ?? [],
-    expectedConcepts: draft.expectedConcepts ?? [],
-    redFlags: draft.redFlags ?? [],
-    sampleGoodAnswer: draft.sampleGoodAnswer ?? '',
-  }
+  return normalizeLocaleDraft(draft)
 }
 
 export function getQuestionDraftFieldValue(
