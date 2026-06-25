@@ -39,6 +39,7 @@ import { useRouter } from '@/i18n/navigation'
 import { useQuestionChipLabels } from '@/i18n/use-question-chip-labels'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
 import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
+import { useIsDemo } from '@/lib/auth-context'
 import { createInterview, type Question } from '@/lib/api'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
 import { buildQuestionsInfiniteParams } from '@/lib/questions-query-state'
@@ -55,6 +56,7 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
   const getChipLabel = useQuestionChipLabels()
   const sharedLabels = useSharedLabels()
   const toastMessages = useToastMessages()
+  const isDemo = useIsDemo()
   const [candidateName, setCandidateName] = useState('')
   const [position, setPosition] = useState('')
   const [selectedById, setSelectedById] = useState<Map<string, Question>>(new Map())
@@ -205,7 +207,7 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
                       onChange={(event) => setCandidateName(event.target.value)}
                       placeholder={t('candidateNamePlaceholder')}
                       autoComplete="name"
-                      disabled={submitting}
+                      disabled={submitting || isDemo}
                     />
                   </IconAffix>
                 </FormField>
@@ -218,7 +220,7 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
                       value={position}
                       onChange={(event) => setPosition(event.target.value)}
                       placeholder={t('positionPlaceholder')}
-                      disabled={submitting}
+                      disabled={submitting || isDemo}
                     />
                   </IconAffix>
                 </FormField>
@@ -331,6 +333,7 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
                     onSortChange={query.setSort}
                     page={query.state.page}
                     loading={query.loading}
+                    disabled={isDemo}
                   />
                 )}
                 renderCards={() => (
@@ -342,7 +345,7 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
                         <Checkbox
                           checked={selected}
                           onCheckedChange={() => toggleQuestion(question)}
-                          disabled={submitting}
+                          disabled={submitting || isDemo}
                           align="top"
                         />
 
