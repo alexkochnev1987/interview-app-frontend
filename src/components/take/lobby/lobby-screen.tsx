@@ -8,7 +8,6 @@ import { useTranslations } from 'next-intl';
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge';
 import type { StatusTone } from '@/components/ui/status-pill';
 import { SurfaceCard } from '@/components/ui/surface-card';
-import { PageMainViewport } from '@/components/layout/page-shell';
 import {
   LobbyPrepFloatingControls,
   LobbyPreviewFrame,
@@ -82,9 +81,8 @@ export function TakeLobbyScreen({
   }
 
   return (
-    <PageMainViewport>
-      <SurfaceCard tone="glassFloat" grow="fill" size="lg">
-        <CardContent layout="fill-column" spacing="xl">
+    <SurfaceCard tone="glassFloat" grow="fill" size="lg">
+      <CardContent layout="fill-column" spacing="xl">
           <EyebrowBadge icon={<Video size={14} />}>{tTake('lobbyEyebrow')}</EyebrowBadge>
           <Grid columns="lobby-shell" gap={10} grow="fill">
             <Stack gap={5} width="full" height="full">
@@ -146,7 +144,6 @@ export function TakeLobbyScreen({
             </Stack>
           </Grid>
         </CardContent>
-      </SurfaceCard>
-    </PageMainViewport>
+    </SurfaceCard>
   );
 }

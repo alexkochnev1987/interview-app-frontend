@@ -2,7 +2,6 @@ import { CheckCircle2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { SurfaceCard } from '@/components/ui/surface-card';
-import { PageMain } from '@/components/layout/page-shell';
 import { CardContent } from '@/components/ui/card';
 import { Heading } from '@/components/ui/heading';
 import { IconBox } from '@/components/ui/icon-box';
@@ -17,9 +16,8 @@ interface TakeCompleteScreenProps {
 export function TakeCompleteScreen({ candidateName, position }: TakeCompleteScreenProps) {
   const tTake = useTranslations('takeFlow');
   return (
-    <PageMain>
-      <SurfaceCard tone="glassFloat" size="lg">
-        <CardContent layout="stack-center" spacing="xl">
+    <SurfaceCard tone="glassFloat" size="lg">
+      <CardContent layout="stack-center" spacing="xl">
           <Stack gap={6} align="center" width="full">
             <IconBox centered>
               <CheckCircle2 size={32} />
@@ -34,7 +32,6 @@ export function TakeCompleteScreen({ candidateName, position }: TakeCompleteScre
             </Stack>
           </Stack>
         </CardContent>
-      </SurfaceCard>
-    </PageMain>
+    </SurfaceCard>
   );
 }

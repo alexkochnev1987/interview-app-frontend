@@ -4,14 +4,15 @@ import { useCallback, type ReactNode } from 'react'
 import { AlertCircle } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
-import { PageContent, PageMainLayout } from '@/components/layout/page-shell'
+import { PageContent, PageMainLayout, PageMainViewport } from '@/components/layout/page-shell'
 import {
   TakeCompleteScreen,
   TakeConsentScreen,
-  TakeFlowChrome,
   TakeLobbyScreen,
   TakeRecordingScreen,
 } from '@/components/take'
+import { TakeLocaleBar } from '@/components/ui/take'
+import { Stack } from '@/components/ui/layout'
 import { Icon } from '@/components/ui/icon'
 import { EmptyStateCard, LoadingStateCard } from '@/components/ui/state-card'
 import {
@@ -133,26 +134,29 @@ function TakeInterviewClientInner({
 
   useTakeInterviewBeforeUnload(stage, takeMessage('beforeUnloadLeaveInterview'))
 
-  const withLocaleSwitcher = useCallback(
+  const wrapTakeStage = useCallback(
     (content: ReactNode) => (
-      <TakeFlowChrome
-        currentLocale={locale}
-        languageAriaLabel={languageAriaLabel}
-        languageOptions={languageOptions}
-        onSelectLocale={switchLocale}
-        interviewLocale={interview?.interviewLocale}
-        fallbackFromLocale={interview?.currentQuestion?.fallbackFromLocale}
-      >
-        {content}
-      </TakeFlowChrome>
+      <PageMainViewport spacing="take">
+        <Stack gap={4} grow="fill" width="full">
+          <TakeLocaleBar
+            ariaLabel={languageAriaLabel}
+            currentLocale={locale}
+            options={languageOptions}
+            onSelectLocale={switchLocale}
+            interviewLocale={interview?.interviewLocale}
+            resolvedLocale={interview?.currentQuestion?.resolvedLocale}
+          />
+          {content}
+        </Stack>
+      </PageMainViewport>
     ),
     [
-      locale,
       languageAriaLabel,
+      locale,
       languageOptions,
       switchLocale,
       interview?.interviewLocale,
-      interview?.currentQuestion?.fallbackFromLocale,
+      interview?.currentQuestion?.resolvedLocale,
     ],
   )
 
@@ -183,13 +187,16 @@ function TakeInterviewClientInner({
   }
 
   if (stage === 'complete') {
-    return withLocaleSwitcher(
-      <TakeCompleteScreen candidateName={interview.candidateName} position={interview.position} />,
+    return wrapTakeStage(
+      <TakeCompleteScreen
+        candidateName={interview.candidateName}
+        position={interview.position}
+      />,
     )
   }
 
   if (stage === 'consent') {
-    return withLocaleSwitcher(
+    return wrapTakeStage(
       <TakeConsentScreen
         interview={interview}
         consent={consent}
@@ -204,7 +211,7 @@ function TakeInterviewClientInner({
   }
 
   if (stage === 'lobby') {
-    return withLocaleSwitcher(
+    return wrapTakeStage(
       <TakeLobbyScreen
         cameraStatus={cameraStatus}
         screenStatus={screenStatus}
@@ -225,7 +232,7 @@ function TakeInterviewClientInner({
     )
   }
 
-  return withLocaleSwitcher(
+  return wrapTakeStage(
     <TakeRecordingScreen
       interview={interview}
       currentVersionNumber={currentVersionNumber}

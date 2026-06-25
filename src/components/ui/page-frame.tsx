@@ -5,6 +5,7 @@ const pageFrameVariants = cva("", {
   variants: {
     spacing: {
       page: "py-10 md:py-12",
+      take: "py-4 md:py-6",
       compact: "py-12",
     },
     stretch: {
