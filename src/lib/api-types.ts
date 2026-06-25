@@ -772,6 +772,15 @@ export interface components {
             /** @enum {string} */
             severity: "low" | "medium" | "high";
         };
+        QuestionDeleteBlockingInterviewDto: {
+            id: string;
+            candidateName: string;
+            /**
+             * @description Staff app path to open the blocking interview.
+             * @example /interviews/550e8400-e29b-41d4-a716-446655440000
+             */
+            href: string;
+        };
         QuestionResponseDto: {
             id: string;
             externalId?: string;
@@ -800,6 +809,8 @@ export interface components {
             deleted: boolean;
             /** @description True when deletion is scheduled because the question is still used by active interviews. */
             pendingDeletion: boolean;
+            /** @description Present when pendingDeletion is true — active interviews still using this question. */
+            blockingInterviews?: components["schemas"]["QuestionDeleteBlockingInterviewDto"][];
             /** @description Number of times this question has been used in an interview. */
             usageCount: number;
         };
@@ -889,15 +900,6 @@ export interface components {
             metadata?: {
                 [key: string]: unknown;
             };
-        };
-        QuestionDeleteBlockingInterviewDto: {
-            id: string;
-            candidateName: string;
-            /**
-             * @description Staff app path to open the blocking interview.
-             * @example /interviews/550e8400-e29b-41d4-a716-446655440000
-             */
-            href: string;
         };
         DeleteQuestionResponseDto: {
             id: string;
@@ -1080,7 +1082,7 @@ export interface components {
             questions: components["schemas"]["QuestionResponseDto"][];
             answers: components["schemas"]["AnswerDto"][];
             /** @enum {string} */
-            status: "pending" | "in_progress" | "processing" | "completed" | "failed" | "canceled";
+            status: "pending" | "in_progress" | "processing" | "completed" | "failed";
             result?: components["schemas"]["InterviewResultResponseDto"];
             /** Format: date-time */
             createdAt: string;
@@ -1097,7 +1099,7 @@ export interface components {
             questions: components["schemas"]["QuestionResponseDto"][];
             answers: components["schemas"]["AnswerDto"][];
             /** @enum {string} */
-            status: "pending" | "in_progress" | "processing" | "completed" | "failed" | "canceled";
+            status: "pending" | "in_progress" | "processing" | "completed" | "failed";
             result?: components["schemas"]["InterviewResultResponseDto"];
             /** Format: date-time */
             createdAt: string;
@@ -1107,6 +1109,11 @@ export interface components {
         };
         CandidateLinkResponseDto: {
             candidateLink: string;
+        };
+        InterviewCancelResponseDto: {
+            id: string;
+            /** @example true */
+            canceled: boolean;
         };
         UpdateInterviewDto: {
             candidateName?: string;
@@ -2230,7 +2237,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["InterviewResponseDto"];
+                    "application/json": components["schemas"]["InterviewCancelResponseDto"];
                 };
             };
             401: {

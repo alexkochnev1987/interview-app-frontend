@@ -17,7 +17,9 @@ describe('interview-management', () => {
     expect(isPendingInterview(interviewFixture({ status: 'in_progress' }))).toBe(
       false,
     )
-    expect(isPendingInterview(interviewFixture({ status: 'canceled' }))).toBe(false)
+    expect(isPendingInterview(interviewFixture({ status: 'completed' }))).toBe(
+      false,
+    )
   })
 
   it('detects interviews with uploaded answers', () => {
@@ -64,6 +66,8 @@ describe('interview-management', () => {
       false,
     )
     expect(canManageInterview(interviewFixture({ status: 'failed' }))).toBe(false)
-    expect(canManageInterview(interviewFixture({ status: 'canceled' }))).toBe(false)
+    expect(canManageInterview(interviewFixture({ status: 'completed' }))).toBe(
+      false,
+    )
   })
 })

@@ -21,7 +21,10 @@ import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { Input } from '@/components/ui/input'
 import { updateInterview, type Interview } from '@/lib/api'
-import { isInterviewEditDirty } from '@/lib/interview-edit-dirty'
+import {
+  getSelectedQuestionIdsInEditOrder,
+  isInterviewEditDirty,
+} from '@/lib/interview-edit-dirty'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
 import { runMutation } from '@/lib/run-mutation'
 import { useToastMessages } from '@/lib/use-toast-messages'
@@ -97,7 +100,10 @@ export function InterviewEditPanel({
           updateInterview(interview.id, {
             candidateName: candidateName.trim(),
             position: position.trim(),
-            questionIds: Array.from(selectedById.keys()),
+            questionIds: getSelectedQuestionIdsInEditOrder(
+                interview.questions,
+                selectedById,
+            ),
           }),
         {
           successMessage: toastMessages.interview.updateSuccess,

@@ -60,6 +60,10 @@ export function QuestionEditClient({
     Extract<DeleteQuestionResult, { scheduled: true }> | null
   >(null)
 
+  const blockingInterviews = scheduledDelete?.blockingInterviews
+      ?? question.blockingInterviews
+      ?? []
+
   function handleSubmit(value: QuestionInput, { onSuccess }: QuestionSubmitCallbacks) {
     updateQuestion(
       { id, value },
@@ -99,7 +103,11 @@ export function QuestionEditClient({
         notifyInfo(toastMessages.deleteQuestion.scheduledTitle, {
           description: toastMessages.deleteQuestion.scheduledIntro,
         })
-        setQuestion((prev) => ({ ...prev, pendingDeletion: true }))
+        setQuestion((prev) => ({
+          ...prev,
+          pendingDeletion: true,
+          blockingInterviews: result.blockingInterviews,
+        }))
         return
       }
       notifySuccess(toastMessages.question.deleteSuccess)
@@ -119,7 +127,7 @@ export function QuestionEditClient({
       {!question.deleted && (question.pendingDeletion || scheduledDelete) ? (
           <QuestionDeleteScheduledAlert
             intro={toastMessages.deleteQuestion.scheduledIntro}
-            blockingInterviews={scheduledDelete?.blockingInterviews ?? []}
+            blockingInterviews={blockingInterviews}
           />
       ) : null}
       <QuestionEditor

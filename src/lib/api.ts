@@ -53,6 +53,7 @@ type ValidateAllAnswersResponse = Schemas['StartAllAnswerValidationsResponseDto'
 export type StartAnswerValidationResult = Schemas['StartAnswerValidationResultDto'];
 export type InterviewAnswerMediaResponse = Schemas['InterviewAnswerMediaResponseDto'];
 export type CandidateLinkResponse = Schemas['CandidateLinkResponseDto'];
+export type InterviewCancelResponse = Schemas['InterviewCancelResponseDto'];
 
 export type CreateInterviewPayload = Schemas['CreateInterviewDto'];
 
@@ -310,7 +311,7 @@ export async function updateInterview(
   }));
 }
 
-export async function cancelInterview(id: string): Promise<Interview> {
+export async function cancelInterview(id: string): Promise<InterviewCancelResponse> {
   return handle(client.PATCH('/interviews/{id}/cancel', {
     params: { path: { id } },
   }));

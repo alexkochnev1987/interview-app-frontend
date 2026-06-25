@@ -115,8 +115,6 @@ export function deriveReviewStatus(interview: Interview): ReviewStatus {
       return 'scoring'
     case 'completed':
       return interview.result ? 'ready' : 'scoring'
-    case 'canceled':
-      return 'canceled'
     default:
       return assertNever(interview.status)
   }

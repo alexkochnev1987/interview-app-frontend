@@ -165,9 +165,8 @@ async function handleRequest(req, res) {
     }
 
     if (method === 'PATCH' && action === 'cancel') {
-      const updated = { ...current, status: 'canceled' }
-      interviews = interviews.map((item) => (item.id === id ? updated : item))
-      json(res, 200, updated)
+      interviews = interviews.filter((item) => item.id !== id)
+      json(res, 200, { id, canceled: true })
       return
     }
 
