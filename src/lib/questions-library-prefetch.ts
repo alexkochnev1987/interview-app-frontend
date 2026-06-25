@@ -18,6 +18,7 @@ import {
   emptyPaginatedQuestions,
   EMPTY_QUESTION_FACETS,
   resolveQuestionsQueryState,
+  type QuestionFetchOptions,
   type QuestionsQueryState,
 } from '@/lib/questions-query-state'
 import { type ServerRequestContext, requestServer } from '@/lib/server-fetch'
@@ -54,12 +55,13 @@ async function hydrateQuestionsPicker(
   ctx: ServerRequestContext,
   queryState: QuestionsQueryState,
   options: { prefetchList: boolean; prefetchInfinite: boolean },
+  fetchOptions?: QuestionFetchOptions,
 ): Promise<QuestionsLibraryPrefetch> {
   const queryClient = getQueryClient()
   const debouncedQ = queryState.q
-  const fetchParams = buildQuestionsFetchParams(queryState, debouncedQ)
-  const facetsParams = buildQuestionFacetsParams(queryState, debouncedQ)
-  const infiniteParams = buildQuestionsInfiniteParams(queryState, debouncedQ)
+  const fetchParams = buildQuestionsFetchParams(queryState, debouncedQ, fetchOptions)
+  const facetsParams = buildQuestionFacetsParams(queryState, debouncedQ, fetchOptions)
+  const infiniteParams = buildQuestionsInfiniteParams(queryState, debouncedQ, fetchOptions)
 
   const prefetches: Promise<unknown>[] = [
     queryClient.prefetchQuery({
@@ -117,8 +119,10 @@ export async function prefetchInterviewCreatePicker(
     lockStatus: 'active',
   })
 
-  return hydrateQuestionsPicker(ctx, queryState, {
-    prefetchList: true,
-    prefetchInfinite: true,
-  })
+  return hydrateQuestionsPicker(
+    ctx,
+    queryState,
+    { prefetchList: true, prefetchInfinite: true },
+    { eligibleForInterview: true },
+  )
 }

@@ -1,8 +1,11 @@
 import createClient from 'openapi-fetch';
 import { paths, components } from './api-types';
-import { ApiError, QuestionInUseError } from './api-error';
+import { ApiError } from './api-error';
 
-export { ApiError, QuestionInUseError };
+export { ApiError } from './api-error';
+
+export type UpdateInterviewPayload = Schemas['UpdateInterviewDto'];
+export type InterviewStatus = Interview['status'];
 
 const client = createClient<paths>({
   baseUrl: '/api',
@@ -50,6 +53,7 @@ type ValidateAllAnswersResponse = Schemas['StartAllAnswerValidationsResponseDto'
 export type StartAnswerValidationResult = Schemas['StartAnswerValidationResultDto'];
 export type InterviewAnswerMediaResponse = Schemas['InterviewAnswerMediaResponseDto'];
 export type CandidateLinkResponse = Schemas['CandidateLinkResponseDto'];
+export type InterviewCancelResponse = Schemas['InterviewCancelResponseDto'];
 
 export type CreateInterviewPayload = Schemas['CreateInterviewDto'];
 
@@ -196,26 +200,25 @@ export async function updateQuestion(
   }));
 }
 
+export type QuestionDeleteBlockingInterview =
+  Schemas['QuestionDeleteBlockingInterviewDto'];
+
+export type DeleteQuestionResult =
+  | { id: string; deleted: true }
+  | {
+      id: string;
+      scheduled: true;
+      blockingInterviews: QuestionDeleteBlockingInterview[];
+    };
 
 export async function deleteQuestion(
   id: string,
-): Promise<{ id: string; deleted: true }> {
+): Promise<DeleteQuestionResult> {
   const { data, error, response } = await client.DELETE('/questions/{id}', {
     params: { path: { id } }
   });
   const status = response.status;
   const path = `/questions/${id}`;
-
-  if (status === 409) {
-    let message = 'Question is used by an active interview.';
-    if (error && typeof error === 'object' && error !== null && 'message' in error) {
-      const maybeMessage = (error as { message?: unknown }).message;
-      if (typeof maybeMessage === 'string') {
-        message = maybeMessage;
-      }
-    }
-    throw new QuestionInUseError(message);
-  }
 
   if (error) {
     throw new ApiError(status, messageFromError(error, status), path);
@@ -223,6 +226,14 @@ export async function deleteQuestion(
 
   if (!data) {
     throw new ApiError(status, 'API error: Empty response body', path);
+  }
+
+  if (data.scheduled === true) {
+    return {
+      id: data.id,
+      scheduled: true,
+      blockingInterviews: data.blockingInterviews ?? [],
+    };
   }
 
   if (data.deleted !== true) {
@@ -290,6 +301,21 @@ export async function getInterviews(): Promise<Interview[]> {
   return handle(client.GET('/interviews'));
 }
 
+export async function updateInterview(
+  id: string,
+  data: UpdateInterviewPayload,
+): Promise<Interview> {
+  return handle(client.PATCH('/interviews/{id}', {
+    params: { path: { id } },
+    body: data,
+  }));
+}
+
+export async function cancelInterview(id: string): Promise<InterviewCancelResponse> {
+  return handle(client.PATCH('/interviews/{id}/cancel', {
+    params: { path: { id } },
+  }));
+}
 
 export async function generateCandidateLink(
   id: string,

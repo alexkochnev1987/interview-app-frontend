@@ -280,7 +280,8 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        /** Update pending interview */
+        patch: operations["InterviewController_update"];
         trace?: never;
     };
     "/interviews/{id}/candidate-link": {
@@ -298,6 +299,23 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/interviews/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Cancel pending interview */
+        patch: operations["InterviewController_cancel"];
         trace?: never;
     };
     "/interviews/{id}/complete": {
@@ -754,6 +772,15 @@ export interface components {
             /** @enum {string} */
             severity: "low" | "medium" | "high";
         };
+        QuestionDeleteBlockingInterviewDto: {
+            id: string;
+            candidateName: string;
+            /**
+             * @description Staff app path to open the blocking interview.
+             * @example /interviews/550e8400-e29b-41d4-a716-446655440000
+             */
+            href: string;
+        };
         QuestionResponseDto: {
             id: string;
             externalId?: string;
@@ -780,6 +807,10 @@ export interface components {
             /** Format: date-time */
             updatedAt: string;
             deleted: boolean;
+            /** @description True when deletion is scheduled because the question is still used by active interviews. */
+            pendingDeletion: boolean;
+            /** @description Present when pendingDeletion is true — active interviews still using this question. */
+            blockingInterviews?: components["schemas"]["QuestionDeleteBlockingInterviewDto"][];
             /** @description Number of times this question has been used in an interview. */
             usageCount: number;
         };
@@ -873,19 +904,23 @@ export interface components {
         DeleteQuestionResponseDto: {
             id: string;
             /** @example true */
-            deleted: boolean;
+            deleted?: boolean;
+            /** @example true */
+            scheduled?: boolean;
+            blockingInterviews?: components["schemas"]["QuestionDeleteBlockingInterviewDto"][];
         };
         BulkDeleteQuestionsDto: {
             ids: string[];
         };
-        BulkDeleteBlockedItemDto: {
+        BulkDeleteScheduledItemDto: {
             id: string;
             questionText: string;
             reason: string;
+            blockingInterviews: components["schemas"]["QuestionDeleteBlockingInterviewDto"][];
         };
         BulkDeleteQuestionsResponseDto: {
             deleted: string[];
-            blocked: components["schemas"]["BulkDeleteBlockedItemDto"][];
+            scheduled: components["schemas"]["BulkDeleteScheduledItemDto"][];
         };
         CreateInterviewDto: {
             candidateName: string;
@@ -1074,6 +1109,17 @@ export interface components {
         };
         CandidateLinkResponseDto: {
             candidateLink: string;
+        };
+        InterviewCancelResponseDto: {
+            id: string;
+            /** @example true */
+            canceled: boolean;
+        };
+        UpdateInterviewDto: {
+            candidateName?: string;
+            candidateEmail?: string;
+            position?: string;
+            questionIds?: string[];
         };
         StartAnswerValidationResultDto: {
             /** @enum {string} */
@@ -1575,11 +1621,13 @@ export interface operations {
                 role?: string;
                 outputLanguage?: string;
                 /** @description Non-super_admin callers are forced to "active" regardless of what they pass. */
-                status?: "active" | "inactive" | "all";
+                status?: "active" | "inactive" | "all" | "scheduled";
                 sortBy?: "createdAt" | "updatedAt" | "difficulty" | "questionText" | "popularity";
                 sortOrder?: "asc" | "desc";
                 page?: number;
                 limit?: number;
+                /** @description When true, only interview-eligible (active) questions are returned */
+                eligibleForInterview?: boolean;
             };
             header?: never;
             path?: never;
@@ -1666,11 +1714,13 @@ export interface operations {
                 role?: string;
                 outputLanguage?: string;
                 /** @description Non-super_admin callers are forced to "active" regardless of what they pass. */
-                status?: "active" | "inactive" | "all";
+                status?: "active" | "inactive" | "all" | "scheduled";
                 sortBy?: "createdAt" | "updatedAt" | "difficulty" | "questionText" | "popularity";
                 sortOrder?: "asc" | "desc";
                 page?: number;
                 limit?: number;
+                /** @description When true, only interview-eligible (active) questions are returned */
+                eligibleForInterview?: boolean;
             };
             header?: never;
             path?: never;
@@ -1769,14 +1819,6 @@ export interface operations {
                 };
             };
             404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponseDto"];
-                };
-            };
-            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -2085,6 +2127,63 @@ export interface operations {
             };
         };
     };
+    InterviewController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateInterviewDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterviewResponseDto"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
     InterviewController_generateCandidateLink: {
         parameters: {
             query?: never;
@@ -2113,6 +2212,51 @@ export interface operations {
                 };
             };
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    InterviewController_cancel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterviewCancelResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

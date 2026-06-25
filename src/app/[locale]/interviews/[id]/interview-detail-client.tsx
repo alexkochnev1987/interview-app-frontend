@@ -15,7 +15,6 @@ import {
   Upload,
   Workflow,
 } from "lucide-react";
-
 import { EyebrowBadge } from "@/components/ui/eyebrow-badge";
 import { EyebrowLabel } from "@/components/ui/eyebrow-label";
 import { HeroLead, HeroTitle } from "@/components/ui/hero-text";
@@ -65,6 +64,12 @@ import {
 import { useSharedLabels } from "@/i18n/use-shared-labels";
 import { runMutation } from "@/lib/run-mutation";
 import { useToastMessages } from "@/lib/use-toast-messages";
+import { InterviewDetailCancelDialog } from '@/components/interviews/detail/interview-detail-cancel-dialog'
+import { InterviewDetailEditSection } from '@/components/interviews/detail/interview-detail-edit-section'
+import { InterviewDetailHeaderActions } from '@/components/interviews/detail/interview-detail-header-actions'
+import { useInterviewDetailManagement } from '@/components/interviews/detail/use-interview-detail-management'
+import { interviewStatusTone } from '@/lib/interview-status-ui'
+import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
 
 type UploadStatus = "idle" | "uploading" | "uploaded" | "error";
 
@@ -84,6 +89,7 @@ interface InterviewDetailClientProps {
   id: string;
   initialInterview: Interview;
   initialResults: InterviewResult | null;
+  editPickerPrefetch?: QuestionsLibraryPrefetch | null;
 }
 
 function formatAnswerDuration(seconds: number | undefined, emptyLabel: string) {
@@ -162,15 +168,29 @@ function formatCandidateLinkPreview(candidateLink: string) {
   }
 }
 
+function buildUploadStates(interview: Interview): QuestionUploadState[] {
+  return (interview.questions ?? []).map((_, qi) => {
+    const hasAnswer = (interview.answers ?? []).some(
+      (answer) => answer.questionIndex === qi,
+    );
+    return { status: hasAnswer ? "uploaded" : "idle" } as QuestionUploadState;
+  });
+}
+
 export default function InterviewDetailClient({
   id,
   initialInterview,
   initialResults,
+  editPickerPrefetch = null,
 }: InterviewDetailClientProps) {
   const t = useTranslations("questions.common");
   const tDetail = useTranslations("interviews.detail");
   const sharedLabels = useSharedLabels();
   const toastMessages = useToastMessages();
+
+  const [uploadStates, setUploadStates] = useState<QuestionUploadState[]>(() =>
+      buildUploadStates(initialInterview),
+  );
 
   function validationStatusLabel(status?: string) {
     if (!status) {
@@ -191,16 +211,7 @@ export default function InterviewDetailClient({
   const [results, setResults] = useState<InterviewResult | null>(initialResults);
   const [loading] = useState(false);
   const [validating, setValidating] = useState(false);
-  const [uploadStates, setUploadStates] = useState<QuestionUploadState[]>(
-    initialInterview.questions.map((_, qi) => {
-      const hasAnswer = initialInterview.answers.some(
-        (answer) => answer.questionIndex === qi,
-      );
-      return {
-        status: hasAnswer ? "uploaded" : "idle",
-      } as QuestionUploadState;
-    }),
-  );
+
   const [mediaByQuestion, setMediaByQuestion] = useState<
     Record<number, AnswerMediaState>
   >({});
@@ -212,10 +223,30 @@ export default function InterviewDetailClient({
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "error">(
     "idle",
   );
+
   const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const validationPollRef = useRef<number | null>(null);
   const requestedMediaRef = useRef<Map<number, string>>(new Map());
   const mediaFetchInterviewIdRef = useRef(id);
+
+  const {
+    isEditing,
+    startEditing,
+    exitEditing,
+    handleEditSaved,
+    cancelConfirmOpen,
+    setCancelConfirmOpen,
+    canceling,
+    handleCancelInterview,
+  } = useInterviewDetailManagement({
+    interviewId: id,
+    onInterviewUpdated: (updated) => {
+      setInterview(updated)
+      setUploadStates(buildUploadStates(updated))
+      setMediaByQuestion({})
+      requestedMediaRef.current.clear()
+    },
+  })
 
   const buildCandidateUrl = useCallback((relativeLink: string) => {
     if (typeof window === "undefined") {
@@ -547,7 +578,7 @@ export default function InterviewDetailClient({
                 </Inline>
 
                 <Inline gap={3} align="center" wrap="wrap">
-                  <StatusPill tone={interview.status}>
+                  <StatusPill tone={interviewStatusTone(interview.status)}>
                     {sharedLabels.interviewStatus(interview.status)}
                   </StatusPill>
                   <StatusPill tone="neutral">
@@ -556,20 +587,17 @@ export default function InterviewDetailClient({
                 </Inline>
               </Stack>
 
-              <Inline gap={3} wrap="wrap">
-                {interview.status !== "completed" ? (
-                  <Button
-                    type="button"
-                    variant="gradient"
-                    onClick={handleValidate}
-                    disabled={!canValidate || validating || hasActiveValidation}
-                  >
-                    {validating || hasActiveValidation
-                      ? t("validating")
-                      : t("validate")}
-                  </Button>
-                ) : null}
-              </Inline>
+              <InterviewDetailHeaderActions
+                interview={interview}
+                isEditing={isEditing}
+                canceling={canceling}
+                onStartEditing={startEditing}
+                onOpenCancelConfirm={() => setCancelConfirmOpen(true)}
+                onValidate={() => void handleValidate()}
+                canValidate={canValidate}
+                validating={validating}
+                hasActiveValidation={hasActiveValidation}
+              />
             </Inline>
 
             <Grid columns="metrics-3" gap={4}>
@@ -592,6 +620,7 @@ export default function InterviewDetailClient({
           </CardContent>
         </Card>
 
+        {!isEditing ? (
         <Card variant="tinted">
           <CardHeader spacing="sm">
             <EyebrowBadge icon={<Sparkles className="size-3.5" />} tone="muted">
@@ -725,8 +754,18 @@ export default function InterviewDetailClient({
             ) : null}
           </CardContent>
         </Card>
+        ) : null}
       </Grid>
 
+      {isEditing ? (
+        <InterviewDetailEditSection
+          interview={interview}
+          editPickerPrefetch={editPickerPrefetch}
+          onSaved={handleEditSaved}
+          onExitEdit={exitEditing}
+        />
+      ) : (
+      <>
       <Section gap={4}>
         <Inline gap={4} align="end" justify="between" wrap="wrap">
           <Stack gap={2}>
@@ -1224,6 +1263,18 @@ export default function InterviewDetailClient({
           </Grid>
         </Section>
       ) : null}
+      </>
+      )}
+
+      <InterviewDetailCancelDialog
+        open={cancelConfirmOpen}
+        loading={canceling}
+        onConfirm={() => void handleCancelInterview()}
+        onCancel={() => {
+          if (!canceling) setCancelConfirmOpen(false)
+        }}
+      />
+
     </PageShell>
   );
 }

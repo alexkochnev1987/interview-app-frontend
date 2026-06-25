@@ -25,7 +25,11 @@
       "validationStartSuccess": "Проверка запущена",
       "validationStartError": "Не удалось запустить проверку интервью",
       "uploadSuccess": "Загрузка завершена для вопроса {questionNumber}",
-      "uploadError": "Загрузка не удалась для вопроса {questionNumber}"
+      "uploadError": "Загрузка не удалась для вопроса {questionNumber}",
+      "updateSuccess": "Интервью обновлено",
+      "updateError": "Не удалось обновить интервью",
+      "cancelSuccess": "Интервью отменено",
+      "cancelError": "Не удалось отменить интервью"
     },
     "take": {
       "submitSuccess": "Ответ отправлен",
@@ -33,12 +37,12 @@
     },
     "bulkDelete": {
       "failedTitle": "Массовое удаление не удалось",
-      "partialTitle": "Удалено: {deletedCount}, заблокировано: {blockedCount}",
+      "partialTitle": "Удалено: {deletedCount}, запланировано: {scheduledCount}",
       "successTitle": "{count, plural, one {Удалён # вопрос} few {Удалено # вопроса} many {Удалено # вопросов} other {Удалено # вопросов}}",
       "successDescription": "Библиотека обновлена.",
       "noopTitle": "Вопросы не удалены",
       "noopDescription": "Выбранные вопросы не были удалены.",
-      "blockedIntro": "Эти вопросы используются в активных интервью и не были удалены:"
+      "scheduledIntro": "Эти вопросы всё ещё используются в активных интервью. Удаление произойдёт после их завершения:"
     },
     "questionFeed": {
       "unavailableTitle": "Лента вопросов недоступна"
@@ -127,7 +131,8 @@
       "queuedLabel": "Повторная оценка поставлена в очередь"
     },
     "deleteQuestion": {
-      "cannotDeleteTitle": "Нельзя удалить"
+      "scheduledTitle": "Удаление запланировано",
+      "scheduledIntro": "Этот вопрос всё ещё используется в активных интервью. Он будет удалён после их завершения:"
     },
     "team": {
       "updateSuccess": "Роль обновлена",

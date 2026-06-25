@@ -27,6 +27,11 @@
     --danger-soft: 0 100% 97%;
     --danger-soft-border: 0 86% 86%;
     --danger-soft-foreground: 0 70% 32%;
+    --blocked-soft: 214 100% 97%;
+    --blocked-soft-border: 214 90% 84%;
+    --blocked-soft-foreground: 214 72% 28%;
+    --scheduled-soft: 211 55% 93%;
+    --scheduled-soft-foreground: 210 45% 38%;
     --warning-soft: 48 100% 96%;
     --warning-soft-border: 38 92% 80%;
     --warning-soft-foreground: 32 81% 25%;
@@ -72,6 +77,8 @@
     --danger-soft: 0 50% 14%;
     --danger-soft-border: 0 50% 28%;
     --danger-soft-foreground: 0 80% 88%;
+    --scheduled-soft: 214 35% 16%;
+    --scheduled-soft-foreground: 204 80% 88%;
     --warning-soft: 36 38% 14%;
     --warning-soft-border: 36 38% 28%;
     --warning-soft-foreground: 38 90% 80%;

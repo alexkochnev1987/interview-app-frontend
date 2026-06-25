@@ -38,6 +38,7 @@ function mockQuestion(
     createdAt: now,
     updatedAt: now,
     deleted: false,
+    pendingDeletion: false,
     usageCount: 0,
   }
 }

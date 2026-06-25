@@ -1,12 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  ApiError,
-  QuestionInUseError,
-  getDeleteQuestionErrorTitle,
-  getErrorMessage,
-  isConflictError,
-} from '@/lib/api-error'
+import { ApiError, getErrorMessage } from '@/lib/api-error'
 
 describe('getErrorMessage', () => {
   it('returns empty string for null and non-Error values', () => {
@@ -25,29 +19,10 @@ describe('getErrorMessage', () => {
   })
 })
 
-describe('getDeleteQuestionErrorTitle', () => {
-  it('uses in-use title for conflict errors', () => {
-    expect(
-      getDeleteQuestionErrorTitle(
-        new QuestionInUseError('Question is in use'),
-        'Delete failed',
-        'Cannot delete',
-      ),
-    ).toBe('Cannot delete')
-  })
-
-  it('uses default title for other errors', () => {
-    expect(
-      getDeleteQuestionErrorTitle(new Error('Server error'), 'Delete failed', 'Cannot delete'),
-    ).toBe('Delete failed')
-  })
-})
-
-describe('isConflictError', () => {
-  it('detects QuestionInUseError and ApiError 409', () => {
-    expect(isConflictError(new QuestionInUseError('in use'))).toBe(true)
-    expect(isConflictError(new ApiError(409, 'Conflict'))).toBe(true)
-    expect(isConflictError(new ApiError(500, 'Server error'))).toBe(false)
-    expect(isConflictError(new Error('other'))).toBe(false)
+describe('ApiError', () => {
+  it('exposes status and path', () => {
+    const error = new ApiError(404, 'Not found', '/questions/q1')
+    expect(error.status).toBe(404)
+    expect(error.path).toBe('/questions/q1')
   })
 })
