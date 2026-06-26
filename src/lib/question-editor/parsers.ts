@@ -15,7 +15,7 @@ export { CONTENT_FIELD_KEYS, METADATA_FIELD_KEYS } from '@/lib/question-editor/f
 
 type CreateQuestionPayload = components['schemas']['CreateQuestionDto']
 type UpdateQuestionPayload = components['schemas']['UpdateQuestionDto']
-type TranslationValue = NonNullable<QuestionInput['translations']>[string]
+type TranslationValue = components['schemas']['QuestionTranslationDto']
 
 const OUTPUT_LANGUAGE_ALIASES: Record<string, Locale> = {
   en: 'en',

@@ -218,7 +218,7 @@ export interface paths {
         get: operations["QuestionController_findOne"];
         /**
          * Update question
-         * @description `primaryLocale` is immutable — changing it returns 400. Default `translationsMode=merge` upserts locale keys; `replace` requires `translations` and replaces the entire map (removed locales disappear). Patching `translations[primaryLocale]` or using `replace` requires the full five-field primary block. Metadata-only patches are allowed when stored content stays valid.
+         * @description `PUT` and `PATCH` are equivalent: both merge the body (default `translationsMode=merge`). Use `translationsMode=replace` with a full `translations` map for a full locale-map replace. `primaryLocale` is immutable — changing it returns 400. Patching `translations[primaryLocale]` or using `replace` requires the full five-field primary block (enforced in the service). Metadata-only patches are allowed when stored content stays valid.
          */
         put: operations["QuestionController_update"];
         post?: never;
@@ -228,7 +228,7 @@ export interface paths {
         head?: never;
         /**
          * Update question
-         * @description `primaryLocale` is immutable — changing it returns 400. Default `translationsMode=merge` upserts locale keys; `replace` requires `translations` and replaces the entire map (removed locales disappear). Patching `translations[primaryLocale]` or using `replace` requires the full five-field primary block. Metadata-only patches are allowed when stored content stays valid.
+         * @description `PUT` and `PATCH` are equivalent: both merge the body (default `translationsMode=merge`). Use `translationsMode=replace` with a full `translations` map for a full locale-map replace. `primaryLocale` is immutable — changing it returns 400. Patching `translations[primaryLocale]` or using `replace` requires the full five-field primary block (enforced in the service). Metadata-only patches are allowed when stored content stays valid.
          */
         patch: operations["QuestionController_patchUpdate"];
         trace?: never;
@@ -1027,13 +1027,17 @@ export interface components {
             /** @description Tag value + count, given all OTHER current filters (tag overlap is not applied). */
             tags: components["schemas"]["FacetCountDto"][];
         };
+        QuestionTranslationsMapDto: {
+            en?: components["schemas"]["QuestionTranslationDto"];
+            be?: components["schemas"]["QuestionTranslationDto"];
+            ru?: components["schemas"]["QuestionTranslationDto"];
+            pl?: components["schemas"]["QuestionTranslationDto"];
+        };
         CreateQuestionDto: {
             /** @enum {string} */
             primaryLocale: "en" | "be" | "ru" | "pl";
             /** @description Locale-keyed rubric blocks. The primaryLocale entry must include all five fields: questionText, followUpQuestions, expectedConcepts, redFlags, sampleGoodAnswer. Additional locales require questionText only; rubric fields are optional. */
-            translations: {
-                [key: string]: components["schemas"]["QuestionTranslationDto"];
-            };
+            translations: components["schemas"]["QuestionTranslationsMapDto"];
             externalId?: string;
             role?: string;
             focus?: string;
@@ -1089,9 +1093,7 @@ export interface components {
              */
             translationsMode: "merge" | "replace";
             /** @description Locale blocks to merge or replace. primaryLocale must remain a full block; non-primary locales require questionText only and may omit rubric fields. */
-            translations?: {
-                [key: string]: components["schemas"]["QuestionTranslationDto"];
-            };
+            translations?: components["schemas"]["QuestionTranslationsMapDto"];
             externalId?: string;
             role?: string;
             focus?: string;

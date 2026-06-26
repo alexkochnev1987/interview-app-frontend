@@ -34,14 +34,18 @@ export function useDirtyTracking({
     formatMetadata(initialValue?.metadata ?? {}),
   )
 
-  const dirtyFieldKeys = useMemo(
-    () =>
-      EDITABLE_FIELD_KEYS.filter((key) => {
-        if (key === 'metadata') return metadataText !== savedMetadataText
-        return !areEqual(value[key], savedValue[key])
-      }),
-    [value, savedValue, metadataText, savedMetadataText],
-  )
+  const dirtyFieldKeys = useMemo(() => {
+    const keys = EDITABLE_FIELD_KEYS.filter((key) => {
+      if (key === 'metadata') return metadataText !== savedMetadataText
+      return !areEqual(value[key], savedValue[key])
+    })
+
+    if (!areEqual(value.translations ?? {}, savedValue.translations ?? {})) {
+      keys.push('translations')
+    }
+
+    return keys
+  }, [value, savedValue, metadataText, savedMetadataText])
   const isDirty = dirtyFieldKeys.length > 0
 
   useEffect(() => {

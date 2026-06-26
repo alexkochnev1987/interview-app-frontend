@@ -1356,7 +1356,9 @@ export function QuestionEditor({
                 <QuestionEditorSaveBar
                   isDirty={isDirty}
                   dirtyFieldLabels={dirtyFieldKeys.map((key) =>
-                    editorLabels.fieldLabel(key),
+                    key === 'translations'
+                      ? editorLabels.translate
+                      : editorLabels.fieldLabel(key),
                   )}
                   submitting={submitting}
                   submitLabel={submitLabel}
