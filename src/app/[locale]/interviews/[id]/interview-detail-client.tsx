@@ -5,12 +5,8 @@ import { useTranslations } from 'next-intl'
 
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { Grid } from '@/components/ui/layout/grid'
-import { Inline } from '@/components/ui/layout/inline'
-import { Button } from '@/components/ui/button'
-import { BodyText } from '@/components/ui/text'
 import type { Interview, InterviewResult } from '@/lib/api'
 import { formatCandidateLinkPreview } from '@/lib/interview-detail-format'
-import { canEditInterview, canManageInterview } from '@/lib/interview-management'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
 import { useToastMessages } from '@/lib/use-toast-messages'
 import { useAuth, useIsDemo } from '@/lib/auth-context'
@@ -42,8 +38,6 @@ export default function InterviewDetailClient({
   editPickerPrefetch,
 }: InterviewDetailClientProps) {
   const t = useTranslations('questions.common')
-  const tActions = useTranslations('interviews.actions')
-  const tEdit = useTranslations('interviews.edit')
   const toastMessages = useToastMessages()
   const { user } = useAuth()
   const isDemo = useIsDemo()
@@ -152,39 +146,8 @@ export default function InterviewDetailClient({
     allAnswered && !hasActiveValidation && interview.status !== 'completed'
   const candidateLinkPreview = formatCandidateLinkPreview(candidateLink)
 
-  // Demo accounts are read-only, so interview editing and cancellation are
-  // hidden for them; the rest of the detail view stays visible.
-  const canEdit = canEditInterview(interview)
-  const canManage = canManageInterview(interview)
-  const showManagementActions = !isDemo && !isEditing && (canEdit || canManage)
-
   return (
     <PageShell>
-      {showManagementActions ? (
-        <Inline gap={3} wrap="wrap" justify="end">
-          {canEdit ? (
-            <Button type="button" variant="outline" onClick={startEditing}>
-              {tActions('edit')}
-            </Button>
-          ) : null}
-          {canManage ? (
-            <Button
-              type="button"
-              variant="destructive"
-              onClick={() => setCancelConfirmOpen(true)}
-              disabled={canceling}
-            >
-              {canceling ? tActions('canceling') : tActions('cancelInterview')}
-            </Button>
-          ) : null}
-          {canManage && !canEdit ? (
-            <BodyText size="sm" tone="muted">
-              {tEdit('answersBlockEditNotice')}
-            </BodyText>
-          ) : null}
-        </Inline>
-      ) : null}
-
       <Grid as="section" columns="split-115-85" gap={6}>
         <InterviewSummaryCard
           interview={interview}
@@ -195,6 +158,10 @@ export default function InterviewDetailClient({
           validating={validating}
           hasActiveValidation={hasActiveValidation}
           onValidate={handleValidate}
+          isEditing={isEditing}
+          canceling={canceling}
+          onStartEditing={startEditing}
+          onOpenCancelConfirm={() => setCancelConfirmOpen(true)}
         />
 
         <CandidateAccessPanel

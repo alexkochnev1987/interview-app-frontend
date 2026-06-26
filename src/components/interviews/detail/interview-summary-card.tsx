@@ -14,12 +14,14 @@ import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { MetricPanel } from '@/components/ui/metric-panel'
 import { StatusPill } from '@/components/ui/status-pill'
+import { BodyText } from '@/components/ui/text'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
 import type { Interview, InterviewResult } from '@/lib/api'
 import {
   formatInterviewDate,
   getCandidateInitials,
 } from '@/lib/interview-formatters'
+import { canEditInterview, canManageInterview } from '@/lib/interview-management'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
 
 interface InterviewSummaryCardProps {
@@ -31,6 +33,10 @@ interface InterviewSummaryCardProps {
   validating: boolean
   hasActiveValidation: boolean
   onValidate: () => void
+  isEditing: boolean
+  canceling: boolean
+  onStartEditing: () => void
+  onOpenCancelConfirm: () => void
 }
 
 export function InterviewSummaryCard({
@@ -42,10 +48,19 @@ export function InterviewSummaryCard({
   validating,
   hasActiveValidation,
   onValidate,
+  isEditing,
+  canceling,
+  onStartEditing,
+  onOpenCancelConfirm,
 }: InterviewSummaryCardProps) {
   const t = useTranslations('questions.common')
   const tDetail = useTranslations('interviews.detail')
+  const tActions = useTranslations('interviews.actions')
+  const tEdit = useTranslations('interviews.edit')
   const sharedLabels = useSharedLabels()
+
+  const canEdit = canEditInterview(interview)
+  const canManage = canManageInterview(interview)
 
   return (
     <Card variant="floating" size="lg">
@@ -81,19 +96,50 @@ export function InterviewSummaryCard({
             </Inline>
           </Stack>
 
-          <Inline gap={3} wrap="wrap">
-            {interview.status !== 'completed' ? (
-              <DemoWriteGuard
-                disabled={!canValidate || validating || hasActiveValidation}
-              >
-                <Button type="button" variant="gradient" onClick={onValidate}>
-                  {validating || hasActiveValidation
-                    ? t('validating')
-                    : t('validate')}
-                </Button>
-              </DemoWriteGuard>
+          <Stack gap={2} align="end">
+            <Inline gap={3} wrap="wrap">
+              {canEdit && !isEditing ? (
+                <DemoWriteGuard>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={onStartEditing}
+                  >
+                    {tActions('edit')}
+                  </Button>
+                </DemoWriteGuard>
+              ) : null}
+              {canManage && !isEditing ? (
+                <DemoWriteGuard disabled={canceling}>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={onOpenCancelConfirm}
+                  >
+                    {canceling
+                      ? tActions('canceling')
+                      : tActions('cancelInterview')}
+                  </Button>
+                </DemoWriteGuard>
+              ) : null}
+              {interview.status !== 'completed' ? (
+                <DemoWriteGuard
+                  disabled={!canValidate || validating || hasActiveValidation}
+                >
+                  <Button type="button" variant="gradient" onClick={onValidate}>
+                    {validating || hasActiveValidation
+                      ? t('validating')
+                      : t('validate')}
+                  </Button>
+                </DemoWriteGuard>
+              ) : null}
+            </Inline>
+            {canManage && !canEdit && !isEditing ? (
+              <BodyText size="sm" tone="muted">
+                {tEdit('answersBlockEditNotice')}
+              </BodyText>
             ) : null}
-          </Inline>
+          </Stack>
         </Inline>
 
         <Grid columns="metrics-3" gap={4}>
