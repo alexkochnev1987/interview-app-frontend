@@ -38,6 +38,7 @@ export type TakeLanguageControlProps = {
   currentLocale: Locale
   options: LanguageOption[]
   onSelectLocale: (locale: Locale) => void
+  disabled?: boolean
 }
 
 export function TakeLanguageControl({
@@ -45,6 +46,7 @@ export function TakeLanguageControl({
   currentLocale,
   options,
   onSelectLocale,
+  disabled = false,
 }: TakeLanguageControlProps) {
   const activeLocaleCode = currentLocale.toUpperCase()
 
@@ -57,6 +59,7 @@ export function TakeLanguageControl({
           size="xs"
           shape="rounded"
           aria-label={ariaLabel}
+          disabled={disabled}
         >
           <Languages aria-hidden />
           {activeLocaleCode}

@@ -62,20 +62,18 @@ import {
 } from '@/lib/question-editor/field-keys'
 import {
   areEqual,
-  applyLocaleDraft,
   buildEditorStateForSave,
-  coerceLocaleTranslation,
+  composeEditorViewValue,
   editorStateToCreatePayload,
+  editorStateToQuestionInput,
   editorStateToUpdatePayload,
   formatMetadata,
-  hasLocaleDraftContent,
   type LocaleQuestionDraft,
-  localeDraftFromInput,
   normalizeInitialValue,
+  normalizeLocaleDraft,
   hasPersistedLocaleTranslation,
-  localeDraftsFromTranslations,
   pickInitialEditingLocale,
-  resolveEditorLocaleDraft,
+  seedLocaleDraftsFromQuestion,
 } from '@/lib/question-editor/parsers'
 import { FEEDBACK_POLICY } from '@/lib/feedback-policy'
 import { runMutation } from '@/lib/run-mutation'
@@ -133,7 +131,11 @@ export function QuestionEditor({
   const initialEditingLocale = questionId
     ? pickInitialEditingLocale(uiLocale, initialPrimaryLocale, normalizedInitialValue)
     : uiLocale
-  const initialLocaleDrafts = localeDraftsFromTranslations(normalizedInitialValue)
+  const initialLocaleDrafts = seedLocaleDraftsFromQuestion(
+    normalizedInitialValue,
+    initialPrimaryLocale,
+    [initialEditingLocale],
+  )
   const initialPersistedLocales = LOCALES.filter((locale) =>
     hasPersistedLocaleTranslation(normalizedInitialValue, locale),
   )
@@ -156,15 +158,8 @@ export function QuestionEditor({
     initialEditorPhase === 2
       ? initialVisibleLocales.filter((locale) => locale !== initialPrimaryLocale)
       : []
-  const [value, setValue] = useState<QuestionInput>(() =>
-    applyLocaleDraft(
-      normalizedInitialValue,
-      resolveEditorLocaleDraft(
-        normalizedInitialValue,
-        initialEditingLocale,
-        initialPrimaryLocale,
-      ),
-    ),
+  const [metadataValue, setMetadataValue] = useState<QuestionInput>(
+    () => normalizedInitialValue,
   )
   const [activeLocale, setActiveLocale] = useState<Locale>(initialEditingLocale)
   const [primaryLocale, setPrimaryLocale] = useState<Locale>(initialPrimaryLocale)
@@ -212,15 +207,35 @@ export function QuestionEditor({
   const [isRefreshingTranslations, setIsRefreshingTranslations] = useState(false)
   const [pendingTranslationsReplace, setPendingTranslationsReplace] = useState(false)
   const [aiError, setAiError] = useState<string | null>(null)
-  const fieldsDisabled = submitting || readOnly
+  const fieldsDisabled = submitting || readOnly || isBatchTranslating
+  const translateGenerationRef = useRef(0)
+
+  const viewValue = useMemo(
+    () => composeEditorViewValue(metadataValue, localeDrafts, activeLocale),
+    [metadataValue, localeDrafts, activeLocale],
+  )
+
+  const effectiveValue = useMemo(
+    () =>
+      editorStateToQuestionInput(
+        buildEditorStateForSave({
+          primaryLocale,
+          value: metadataValue,
+          visibleLocales,
+          localeDrafts,
+          addedLocales,
+        }),
+      ),
+    [metadataValue, localeDrafts, primaryLocale, visibleLocales, addedLocales],
+  )
 
   const { dirtyFieldKeys, isDirty, markSaved } = useDirtyTracking({
-    value,
+    value: effectiveValue,
     metadataText,
     initialValue,
   })
 
-  const similarity = useSimilaritySearch({ value, questionId })
+  const similarity = useSimilaritySearch({ value: effectiveValue, questionId })
   const skipHeaderLocaleSwitchRef = useRef(true)
 
   const translatableLocales = useMemo(
@@ -266,7 +281,10 @@ export function QuestionEditor({
     return locales.length > 0 ? locales : null
   }
 
-  async function batchTranslateLocales(targets: Locale[]): Promise<{
+  async function batchTranslateLocales(
+    targets: Locale[],
+    options: { source: QuestionInput; generation: number },
+  ): Promise<{
     translated: Array<{ locale: Locale; patch: LocaleQuestionDraft }>
     failed: Locale[]
   }> {
@@ -274,10 +292,17 @@ export function QuestionEditor({
     const failed: Locale[] = []
 
     for (const locale of targets) {
-      const result = await translateLocaleFromPrimary(locale, { autoApply: true })
+      if (options.generation !== translateGenerationRef.current) {
+        break
+      }
+      const result = await translateLocaleFromPrimary(locale, {
+        autoApply: true,
+        source: options.source,
+        generation: options.generation,
+      })
       if (result.success && result.patch) {
         translated.push({ locale, patch: result.patch })
-      } else {
+      } else if (!result.stale) {
         failed.push(locale)
       }
     }
@@ -285,17 +310,20 @@ export function QuestionEditor({
     return { translated, failed }
   }
 
-  function buildTranslateSource(): QuestionInput | null {
+  function buildTranslateSource(
+    drafts: Partial<Record<Locale, Partial<LocaleQuestionDraft>>> = localeDrafts,
+  ): QuestionInput | null {
+    const primaryDraft = normalizeLocaleDraft(drafts[primaryLocale])
     const source = buildAiDraftQuestionInput({
       value: {
-        ...value,
+        ...metadataValue,
         primaryLocale,
-        questionText: getPrimaryQuestionTextFromState(),
+        questionText: primaryDraft.questionText,
       },
       contentLocale: primaryLocale,
       localeDrafts: {
-        ...localeDrafts,
-        [primaryLocale]: resolveLocaleDraftByLocale(primaryLocale),
+        ...drafts,
+        [primaryLocale]: primaryDraft,
       },
     })
 
@@ -308,10 +336,16 @@ export function QuestionEditor({
 
   async function translateLocaleFromPrimary(
     locale: Locale,
-    options?: { autoApply?: boolean },
-  ): Promise<{ success: boolean; patch?: LocaleQuestionDraft }> {
-    const source = buildTranslateSource()
+    options?: {
+      autoApply?: boolean
+      source?: QuestionInput
+      generation?: number
+    },
+  ): Promise<{ success: boolean; patch?: LocaleQuestionDraft; stale?: boolean }> {
+    const source = options?.source ?? buildTranslateSource()
     if (!source) return { success: false }
+
+    const generation = options?.generation ?? translateGenerationRef.current
 
     setLocaleTranslationStatus((current) => ({ ...current, [locale]: 'loading' }))
     setLocaleTranslationErrors((current) => {
@@ -326,6 +360,10 @@ export function QuestionEditor({
         question: source,
         targetLocale: locale,
       })
+      if (generation !== translateGenerationRef.current) {
+        setLocaleTranslationStatus((current) => ({ ...current, [locale]: 'idle' }))
+        return { success: false, stale: true }
+      }
       if (!draft.questionText?.trim()) {
         throw new Error(editorLabels.localeTabs.translateErrorFallback)
       }
@@ -348,6 +386,10 @@ export function QuestionEditor({
       setLocaleTranslationStatus((current) => ({ ...current, [locale]: 'idle' }))
       return { success: true }
     } catch (error) {
+      if (generation !== translateGenerationRef.current) {
+        setLocaleTranslationStatus((current) => ({ ...current, [locale]: 'idle' }))
+        return { success: false, stale: true }
+      }
       setLocaleTranslationStatus((current) => ({ ...current, [locale]: 'error' }))
       setLocaleTranslationErrors((current) => ({
         ...current,
@@ -384,23 +426,43 @@ export function QuestionEditor({
     }
   }
 
+  function getLocaleDraft(locale: Locale): LocaleQuestionDraft {
+    return normalizeLocaleDraft(localeDrafts[locale])
+  }
+
+  function updateLocaleDraft(locale: Locale, patch: Partial<LocaleQuestionDraft>) {
+    setLocaleDrafts((current) => ({
+      ...current,
+      [locale]: mergeLocaleDraft(current[locale], patch),
+    }))
+  }
+
+  function buildDraftsForSave(
+    translationPatches?: Array<{ locale: Locale; patch: LocaleQuestionDraft }>,
+  ): Partial<Record<Locale, LocaleQuestionDraft>> {
+    const drafts: Partial<Record<Locale, LocaleQuestionDraft>> = {}
+    for (const locale of visibleLocales) {
+      drafts[locale] = getLocaleDraft(locale)
+    }
+    for (const { locale, patch } of translationPatches ?? []) {
+      drafts[locale] = mergeLocaleDraft(drafts[locale], patch)
+    }
+    return drafts
+  }
+
   function commitTranslatedLocales(
     translations: Array<{ locale: Locale; patch: LocaleQuestionDraft }>,
     activateLocale?: Locale,
   ) {
     if (translations.length === 0) return
 
-    const currentDraft = resolveActiveLocaleDraftFromState()
     const localesToAdd = translations.map(({ locale }) => locale)
 
     setAddedLocales((current) =>
       Array.from(new Set([...current, ...localesToAdd])),
     )
     setLocaleDrafts((current) => {
-      const next = {
-        ...current,
-        [activeLocale]: currentDraft,
-      }
+      const next = { ...current }
       for (const { locale, patch } of translations) {
         next[locale] = mergeLocaleDraft(current[locale], patch)
       }
@@ -409,13 +471,11 @@ export function QuestionEditor({
 
     if (!activateLocale) return
 
-    const activePatch = translations.find(({ locale }) => locale === activateLocale)?.patch
-    if (!activePatch) return
-
-    setValue((current) => applyLocaleDraft(current, activePatch))
-    setActiveLocale(activateLocale)
-    setLocaleValidationError(null)
-    setAiError(null)
+    if (translations.some(({ locale }) => locale === activateLocale)) {
+      setActiveLocale(activateLocale)
+      setLocaleValidationError(null)
+      setAiError(null)
+    }
   }
 
   async function handleBatchTranslate() {
@@ -424,32 +484,27 @@ export function QuestionEditor({
     }
 
     const targets = translateTargetLocales.filter((locale) => locale !== primaryLocale)
-    if (targets.length === 0 || !buildTranslateSource()) return
+    const source = buildTranslateSource()
+    if (targets.length === 0 || !source) return
 
+    const generation = ++translateGenerationRef.current
     setIsBatchTranslating(true)
-    const { translated } = await batchTranslateLocales(targets)
-    setIsBatchTranslating(false)
+    try {
+      const { translated } = await batchTranslateLocales(targets, { source, generation })
+      if (translated.length === 0) return
 
-    if (translated.length === 0) return
-
-    const lastTranslatedLocale = translated[translated.length - 1].locale
-    commitTranslatedLocales(translated, lastTranslatedLocale)
-    setTranslateTargetLocales((current) =>
-      current.filter((locale) => !translated.some((item) => item.locale === locale)),
-    )
+      const lastTranslatedLocale = translated[translated.length - 1].locale
+      commitTranslatedLocales(translated, lastTranslatedLocale)
+      setTranslateTargetLocales((current) =>
+        current.filter((locale) => !translated.some((item) => item.locale === locale)),
+      )
+    } finally {
+      setIsBatchTranslating(false)
+    }
   }
 
   function getLocaleDraftForTranslation(locale: Locale): Partial<LocaleQuestionDraft> {
-    if (locale === activeLocale) {
-      if (locale === primaryLocale) {
-        return localeDraftFromInput(value)
-      }
-      return {
-        ...(localeDrafts[locale] ?? {}),
-        questionText: value.questionText ?? '',
-      }
-    }
-    return localeDrafts[locale] ?? resolveEditorLocaleDraft(value, locale, primaryLocale)
+    return getLocaleDraft(locale)
   }
 
   function getPendingTranslationFieldsForLocale(locale: Locale): TranslateDraftFieldKey[] {
@@ -519,22 +574,7 @@ export function QuestionEditor({
     locale: Locale,
     patch: Partial<LocaleQuestionDraft>,
   ) {
-    setLocaleDrafts((current) => ({
-      ...current,
-      [locale]: {
-        ...(current[locale] ?? {
-          questionText: '',
-          followUpQuestions: [],
-          expectedConcepts: [],
-          redFlags: [],
-          sampleGoodAnswer: '',
-        }),
-        ...patch,
-      },
-    }))
-    if (activeLocale === locale) {
-      setValue((current) => ({ ...current, ...patch }))
-    }
+    updateLocaleDraft(locale, patch)
   }
 
   function isPrimaryDraftField(field: DraftFieldKey): field is PrimaryDraftFieldKey {
@@ -542,10 +582,7 @@ export function QuestionEditor({
   }
 
   function getPrimaryQuestionTextFromState(): string {
-    if (activeLocale === primaryLocale) {
-      return value.questionText ?? ''
-    }
-    return localeDrafts[primaryLocale]?.questionText ?? ''
+    return getLocaleDraft(primaryLocale).questionText
   }
 
   function setPrimaryDraftField(
@@ -576,50 +613,8 @@ export function QuestionEditor({
     }
   }
 
-  function resolvePrimaryDraft(): LocaleQuestionDraft {
-    const activePrimaryDraft =
-      activeLocale === primaryLocale
-        ? localeDraftFromInput(value)
-        : {
-            questionText: '',
-            followUpQuestions: [],
-            expectedConcepts: [],
-            redFlags: [],
-            sampleGoodAnswer: '',
-          }
-    const storedPrimaryDraft = localeDrafts[primaryLocale] ?? {}
-
-    return {
-      questionText: getPrimaryQuestionTextFromState(),
-      followUpQuestions:
-        storedPrimaryDraft.followUpQuestions ?? activePrimaryDraft.followUpQuestions,
-      expectedConcepts:
-        storedPrimaryDraft.expectedConcepts ?? activePrimaryDraft.expectedConcepts,
-      redFlags: storedPrimaryDraft.redFlags ?? activePrimaryDraft.redFlags,
-      sampleGoodAnswer:
-        storedPrimaryDraft.sampleGoodAnswer ?? activePrimaryDraft.sampleGoodAnswer,
-    }
-  }
-
-  function resolveActiveLocaleDraftFromState(): LocaleQuestionDraft {
-    return localeDraftFromInput(value)
-  }
-
   function getLocaleContentDraft(locale: Locale): LocaleQuestionDraft {
-    if (locale === activeLocale) {
-      return localeDraftFromInput(value)
-    }
-    const stored = localeDrafts[locale]
-    if (stored) {
-      return {
-        questionText: stored.questionText ?? '',
-        followUpQuestions: stored.followUpQuestions ?? [],
-        expectedConcepts: stored.expectedConcepts ?? [],
-        redFlags: stored.redFlags ?? [],
-        sampleGoodAnswer: stored.sampleGoodAnswer ?? '',
-      }
-    }
-    return resolveEditorLocaleDraft(value, locale, primaryLocale)
+    return getLocaleDraft(locale)
   }
 
   function updateLocaleContentDraft(
@@ -631,9 +626,9 @@ export function QuestionEditor({
       clearFieldError('questionText', setFieldErrors)
     }
     setLocaleValidationError(null)
+    updateLocaleDraft(locale, patch)
 
     if (locale === primaryLocale) {
-      applyPatchToPrimaryDraft(patch)
       for (const field of GENERATE_DRAFT_FIELD_KEYS) {
         if (field in patch) {
           dismissDraftField(field)
@@ -642,7 +637,6 @@ export function QuestionEditor({
       return
     }
 
-    applyTranslationPatchToLocale(locale, patch)
     for (const field of TRANSLATE_DRAFT_FIELD_KEYS) {
       if (field in patch) {
         dismissTranslationDraftField(locale, field)
@@ -650,36 +644,11 @@ export function QuestionEditor({
     }
   }
 
-  function applyPatchToPrimaryDraft(patch: Partial<LocaleQuestionDraft>) {
-    setLocaleDrafts((current) => {
-      const currentPrimaryDraft =
-        current[primaryLocale] ?? {
-          questionText: '',
-          followUpQuestions: [],
-          expectedConcepts: [],
-          redFlags: [],
-          sampleGoodAnswer: '',
-        }
-      return {
-        ...current,
-        [primaryLocale]: {
-          ...currentPrimaryDraft,
-          ...patch,
-        },
-      }
-    })
-    if (activeLocale === primaryLocale) {
-      setValue((current) => ({ ...current, ...patch }))
-    }
-  }
-
-
   function getAiCurrentFieldValue(field: DraftFieldKey): QuestionInput[DraftFieldKey] {
     if (isPrimaryDraftField(field)) {
-      const primaryDraft = resolvePrimaryDraft()
-      return primaryDraft[field] as QuestionInput[DraftFieldKey]
+      return getLocaleDraft(primaryLocale)[field] as QuestionInput[DraftFieldKey]
     }
-    return value[field]
+    return metadataValue[field]
   }
 
   function handlePrimaryLocaleChange(_nextLocale: Locale) {
@@ -696,15 +665,6 @@ export function QuestionEditor({
       return
     }
     if (nextLocale === activeLocale) return
-    const currentDraft = resolveActiveLocaleDraftFromState()
-    const nextDraft =
-      localeDrafts[nextLocale] ??
-      resolveEditorLocaleDraft(value, nextLocale, primaryLocale)
-    setLocaleDrafts((current) => ({
-      ...current,
-      [activeLocale]: currentDraft,
-    }))
-    setValue((current) => applyLocaleDraft(current, nextDraft))
     setActiveLocale(nextLocale)
     setLocaleValidationError(null)
     setAiError(null)
@@ -728,33 +688,18 @@ export function QuestionEditor({
   }
 
   function performRemoveLocale(locale: Locale) {
-    const currentDraft = resolveActiveLocaleDraftFromState()
     const fallbackLocale = activeLocale === locale ? primaryLocale : activeLocale
-    const fallbackDraft =
-      fallbackLocale === activeLocale
-        ? currentDraft
-        : localeDrafts[fallbackLocale] ??
-          resolveEditorLocaleDraft(value, fallbackLocale, primaryLocale)
 
     setLocaleDrafts((current) => {
-      const next = {
-        ...current,
-        [activeLocale]: currentDraft,
-      }
+      const next = { ...current }
       delete next[locale]
       return next
     })
     setAddedLocales((current) => current.filter((item) => item !== locale))
-    setValue((current) => {
+    setMetadataValue((current) => {
       const nextTranslations = { ...(current.translations ?? {}) }
       delete nextTranslations[locale]
-      return applyLocaleDraft(
-        {
-          ...current,
-          translations: nextTranslations,
-        },
-        fallbackDraft,
-      )
+      return { ...current, translations: nextTranslations }
     })
     if (activeLocale === locale) {
       setActiveLocale(fallbackLocale)
@@ -799,7 +744,7 @@ export function QuestionEditor({
     if (!visibleLocales.includes(uiLocale)) {
       return
     }
-    if (questionId && !hasPersistedLocaleTranslation(value, uiLocale)) {
+    if (questionId && !hasPersistedLocaleTranslation(metadataValue, uiLocale)) {
       return
     }
     const timeoutId = window.setTimeout(() => {
@@ -815,24 +760,6 @@ export function QuestionEditor({
     setDismissedDraftFields((current) =>
       current.includes(field) ? current : [...current, field],
     )
-  }
-
-  function resolveLocaleDraftByLocale(locale: Locale): LocaleQuestionDraft {
-    if (locale === activeLocale) {
-      return localeDraftFromInput(value)
-    }
-    const fallbackDraft = resolveEditorLocaleDraft(value, locale, primaryLocale)
-    const draft = localeDrafts[locale]
-    if (!draft) {
-      return fallbackDraft
-    }
-    return {
-      questionText: draft.questionText ?? fallbackDraft.questionText,
-      followUpQuestions: draft.followUpQuestions ?? fallbackDraft.followUpQuestions,
-      expectedConcepts: draft.expectedConcepts ?? fallbackDraft.expectedConcepts,
-      redFlags: draft.redFlags ?? fallbackDraft.redFlags,
-      sampleGoodAnswer: draft.sampleGoodAnswer ?? fallbackDraft.sampleGoodAnswer,
-    }
   }
 
   function getLocaleQuestionText(locale: Locale): string {
@@ -960,7 +887,21 @@ export function QuestionEditor({
       clearFieldError('questionText', setFieldErrors)
     }
     setLocaleValidationError(null)
-    setValue((current) => ({ ...current, ...patch }))
+    const contentPatch: Partial<LocaleQuestionDraft> = {}
+    const metadataPatch: Partial<QuestionInput> = {}
+    for (const [key, fieldValue] of Object.entries(patch)) {
+      if (PRIMARY_DRAFT_FIELDS.includes(key as PrimaryDraftFieldKey)) {
+        ;(contentPatch as Record<string, unknown>)[key] = fieldValue
+      } else {
+        ;(metadataPatch as Record<string, unknown>)[key] = fieldValue
+      }
+    }
+    if (Object.keys(contentPatch).length > 0) {
+      updateLocaleDraft(primaryLocale, contentPatch)
+    }
+    if (Object.keys(metadataPatch).length > 0) {
+      setMetadataValue((current) => ({ ...current, ...metadataPatch }))
+    }
     for (const field of GENERATE_DRAFT_FIELD_KEYS) {
       if (field in patch) {
         dismissDraftField(field)
@@ -993,14 +934,14 @@ export function QuestionEditor({
     try {
       const aiQuestion = buildAiDraftQuestionInput({
         value: {
-          ...value,
+          ...metadataValue,
           primaryLocale,
           questionText: primaryQuestionText,
         },
         contentLocale: primaryLocale,
         localeDrafts: {
           ...localeDrafts,
-          [primaryLocale]: resolveLocaleDraftByLocale(primaryLocale),
+          [primaryLocale]: getLocaleDraft(primaryLocale),
         },
       })
       const draft = await draftQuestion({
@@ -1071,10 +1012,10 @@ export function QuestionEditor({
       }
     }
     if (Object.keys(basePatch).length > 0) {
-      setValue((current) => ({ ...current, ...basePatch }))
+      setMetadataValue((current) => ({ ...current, ...basePatch }))
     }
     if (Object.keys(primaryPatch).length > 0) {
-      applyPatchToPrimaryDraft(primaryPatch)
+      updateLocaleDraft(primaryLocale, primaryPatch)
     }
     setAiDraft(null)
     setAiError(null)
@@ -1085,11 +1026,11 @@ export function QuestionEditor({
     if (!aiDraft || readOnly) return
     const nextValue = getAiDraftFieldValue(field)
     if (isPrimaryDraftField(field)) {
-      applyPatchToPrimaryDraft({ [field]: nextValue } as Partial<LocaleQuestionDraft>)
+      updateLocaleDraft(primaryLocale, { [field]: nextValue } as Partial<LocaleQuestionDraft>)
       dismissDraftField(field)
       return
     }
-    update({ [field]: nextValue } as Partial<QuestionInput>)
+    setMetadataValue((current) => ({ ...current, [field]: nextValue }))
   }
 
   function keepCurrentField(field: DraftFieldKey) {
@@ -1129,7 +1070,7 @@ export function QuestionEditor({
   ): Promise<QuestionInput | null> {
     setSubmitting(true)
     try {
-      const persisted = normalizeInitialValue(
+      return normalizeInitialValue(
         await runMutation(() => onSubmit(payload, { translationsMode }), {
           showSuccessToast: options?.showSuccessToast ?? (saveToastOptions?.enabled ?? true),
           successMessage: saveToastOptions?.successMessage ?? toastMessages.question.saveSuccess,
@@ -1140,8 +1081,6 @@ export function QuestionEditor({
             toastMessages.question.saveError,
         }),
       )
-      applyPersistedQuestionState(persisted)
-      return persisted
     } catch {
       return null
     } finally {
@@ -1164,13 +1103,10 @@ export function QuestionEditor({
     const nextActiveLocale = [nextPrimaryLocale, ...nextAddedLocales].includes(activeLocale)
       ? activeLocale
       : nextPrimaryLocale
-    setValue(
-      applyLocaleDraft(
-        persisted,
-        coerceLocaleTranslation(persisted.translations?.[nextActiveLocale]),
-      ),
+    setMetadataValue(persisted)
+    setLocaleDrafts(
+      seedLocaleDraftsFromQuestion(persisted, nextPrimaryLocale, [nextActiveLocale]),
     )
-    setLocaleDrafts(localeDraftsFromTranslations(persisted))
     setPrimaryLocale(nextPrimaryLocale)
     setPersistedLocales(nextPersistedLocales)
     setAddedLocales(nextAddedLocales)
@@ -1192,9 +1128,16 @@ export function QuestionEditor({
   async function confirmRefreshTranslations() {
     if (!refreshTranslationLocales?.length || !questionId) return
 
+    const source = buildTranslateSource()
+    if (!source) return
+
+    const generation = ++translateGenerationRef.current
     setIsRefreshingTranslations(true)
     try {
-      const { translated, failed } = await batchTranslateLocales(refreshTranslationLocales)
+      const { translated, failed } = await batchTranslateLocales(refreshTranslationLocales, {
+        source,
+        generation,
+      })
 
       if (failed.length > 0) {
         notifyError(editorLabels.localeTabs.translateErrorFallback, {
@@ -1206,27 +1149,14 @@ export function QuestionEditor({
         return
       }
 
+      const draftsForSave = buildDraftsForSave(translated)
       commitTranslatedLocales(translated)
-
-      const currentDraft = resolveActiveLocaleDraftFromState()
-      const primaryDraftForSave = resolvePrimaryDraft()
-      const updatedDrafts = {
-        ...localeDrafts,
-        [activeLocale]: currentDraft,
-        [primaryLocale]: {
-          ...primaryDraftForSave,
-          questionText: getLocaleQuestionText(primaryLocale),
-        },
-      }
-      for (const { locale, patch } of translated) {
-        updatedDrafts[locale] = mergeLocaleDraft(updatedDrafts[locale], patch)
-      }
 
       const editorState = buildEditorStateForSave({
         primaryLocale,
-        value,
+        value: metadataValue,
         visibleLocales,
-        localeDrafts: updatedDrafts,
+        localeDrafts: draftsForSave,
         addedLocales,
       })
       const followUpPayload = editorStateToUpdatePayload(editorState) as QuestionInput
@@ -1234,6 +1164,7 @@ export function QuestionEditor({
         showSuccessToast: false,
       })
       if (persisted) {
+        applyPersistedQuestionState(persisted)
         setRefreshTranslationLocales(null)
       }
     } finally {
@@ -1270,16 +1201,9 @@ export function QuestionEditor({
     }
 
     const contentLocale = activeLocale
-    const currentDraft = resolveActiveLocaleDraftFromState()
-    const primaryDraftForSave = resolvePrimaryDraft()
-    const draftsForSave = {
-      ...localeDrafts,
-      [contentLocale]: currentDraft,
-      [primaryLocale]: {
-        ...primaryDraftForSave,
-        questionText: getLocaleQuestionText(primaryLocale),
-      },
-    }
+    const draftsForSave = buildDraftsForSave()
+    const currentDraft = draftsForSave[contentLocale] ?? getLocaleDraft(contentLocale)
+    const primaryDraftForSave = draftsForSave[primaryLocale] ?? getLocaleDraft(primaryLocale)
 
     const localeError = validateLocaleBlocks({
       primaryLocale,
@@ -1300,7 +1224,7 @@ export function QuestionEditor({
     }
 
     const metadataEnglishError = validateMetadataEnglishOnly(
-      { ...value, metadata },
+      { ...metadataValue, metadata },
       editorLabels.validation,
     )
     if (metadataEnglishError) {
@@ -1310,7 +1234,7 @@ export function QuestionEditor({
 
     const editorState = buildEditorStateForSave({
       primaryLocale,
-      value: { ...value, metadata },
+      value: { ...metadataValue, metadata },
       visibleLocales: editorPhase === 1 ? [primaryLocale] : visibleLocales,
       localeDrafts: draftsForSave,
       addedLocales:
@@ -1324,8 +1248,9 @@ export function QuestionEditor({
     const payload: QuestionInput = questionId
       ? (editorStateToUpdatePayload(editorState, { translationsMode }) as QuestionInput)
       : (editorStateToCreatePayload(editorState) as QuestionInput)
+    const preSaveSnapshot = savedPrimarySnapshot
     const primaryContentChanged = !arePrimarySnapshotsEqual(
-      savedPrimarySnapshot,
+      preSaveSnapshot,
       primaryContentSnapshotFromDraft(primaryDraftForSave),
     )
 
@@ -1336,6 +1261,8 @@ export function QuestionEditor({
     if (!persisted) {
       return
     }
+
+    applyPersistedQuestionState(persisted)
 
     const nextPrimaryLocale = (persisted.primaryLocale ?? primaryLocale) as Locale
     const unlockedPhase2 =
@@ -1352,7 +1279,7 @@ export function QuestionEditor({
     }
   }
 
-  const primaryContentComplete = isPrimaryContentComplete(resolvePrimaryDraft())
+  const primaryContentComplete = isPrimaryContentComplete(getLocaleDraft(primaryLocale))
   const hasPendingAiDraft = pendingDraftFields.length > 0
   const hasPendingTranslationDraft = countPendingTranslationFields() > 0
   const canSubmit =
@@ -1366,8 +1293,8 @@ export function QuestionEditor({
     <PageShell spacing="tight">
       <QuestionEditorHeader
         title={title}
-        difficulty={value.difficulty}
-        weight={value.weight || 1}
+        difficulty={viewValue.difficulty}
+        weight={viewValue.weight || 1}
         pendingDraftCount={readOnly ? 0 : pendingDraftFields.length}
       />
 
@@ -1391,7 +1318,7 @@ export function QuestionEditor({
                 tabsAriaLabel={editorLabels.localeTabs.tabsAriaLabel}
                 onSelectLocale={switchLocale}
                 onRemoveLocale={requestRemoveLocale}
-                value={value}
+                value={viewValue}
                 metadataText={metadataText}
                 submitting={fieldsDisabled}
                 primaryLocaleDisabled

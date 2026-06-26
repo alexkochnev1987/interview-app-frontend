@@ -661,6 +661,37 @@ export function localeDraftsFromTranslations(
   ) as Partial<Record<Locale, Partial<LocaleQuestionDraft> | undefined>>
 }
 
+/** Seeds per-locale drafts from persisted translations and top-level primary content. */
+export function seedLocaleDraftsFromQuestion(
+  input: QuestionInput,
+  primaryLocale: Locale,
+  extraLocales: Locale[] = [],
+): Partial<Record<Locale, Partial<LocaleQuestionDraft> | undefined>> {
+  const drafts: Partial<Record<Locale, Partial<LocaleQuestionDraft> | undefined>> = {
+    ...localeDraftsFromTranslations(input),
+  }
+  drafts[primaryLocale] = normalizeLocaleDraft(
+    resolveEditorLocaleDraft(input, primaryLocale, primaryLocale),
+  )
+  for (const locale of extraLocales) {
+    if (locale === primaryLocale) continue
+    drafts[locale] = normalizeLocaleDraft(
+      resolveEditorLocaleDraft(input, locale, primaryLocale),
+    )
+  }
+  return drafts
+}
+
+/** Merges metadata with the active locale draft for form display. */
+export function composeEditorViewValue(
+  metadata: QuestionInput,
+  localeDrafts: Partial<Record<Locale, Partial<LocaleQuestionDraft> | undefined>>,
+  activeLocale: Locale,
+): QuestionInput {
+  const activeDraft = normalizeLocaleDraft(localeDrafts[activeLocale])
+  return applyLocaleDraft(metadata, activeDraft)
+}
+
 export function pickInitialEditingLocale(
   uiLocale: Locale,
   primaryLocale: Locale,

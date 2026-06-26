@@ -28,6 +28,7 @@ import {
   useTakeFlowLocale,
 } from '@/features/take/take-flow-locale-provider'
 import type { TakeInterviewData } from '@/lib/api'
+import type { Locale } from '@/i18n/locales'
 
 type TakeInterviewClientProps = {
   id: string
@@ -108,6 +109,7 @@ function TakeInterviewClientInner({
     lobbyCameraOn,
     lobbyJoinReady,
     recording,
+    localeSwitchDisabled,
     startInterviewFromLobby,
     recordingStartBusy,
     capturePipelineReady,
@@ -132,6 +134,16 @@ function TakeInterviewClientInner({
     languageAriaLabel,
   } = useTakeLocaleSwitch()
 
+  const handleSelectLocale = useCallback(
+    (nextLocale: Locale) => {
+      if (localeSwitchDisabled) {
+        return;
+      }
+      switchLocale(nextLocale);
+    },
+    [localeSwitchDisabled, switchLocale],
+  );
+
   useTakeInterviewBeforeUnload(stage, takeMessage('beforeUnloadLeaveInterview'))
 
   const wrapTakeStage = useCallback(
@@ -142,9 +154,10 @@ function TakeInterviewClientInner({
             ariaLabel={languageAriaLabel}
             currentLocale={locale}
             options={languageOptions}
-            onSelectLocale={switchLocale}
+            onSelectLocale={handleSelectLocale}
             interviewLocale={interview?.interviewLocale}
             resolvedLocale={interview?.currentQuestion?.resolvedLocale}
+            disabled={localeSwitchDisabled}
           />
           {content}
         </Stack>
@@ -154,9 +167,10 @@ function TakeInterviewClientInner({
       languageAriaLabel,
       locale,
       languageOptions,
-      switchLocale,
+      handleSelectLocale,
       interview?.interviewLocale,
       interview?.currentQuestion?.resolvedLocale,
+      localeSwitchDisabled,
     ],
   )
 

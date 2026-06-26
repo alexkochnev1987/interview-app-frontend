@@ -2,6 +2,7 @@ import createClient from 'openapi-fetch';
 import { paths, components } from './api-types';
 import { ApiError, QuestionInUseError } from './api-error';
 import { extractApiErrorFields, extractApiErrorFieldsFromBody } from './api-error-fields';
+import { normalizeInterviewsResponse } from './interviews-response';
 import { buildApiLocaleHeaders, resolveApiLocale } from './api-locale';
 import {
   buildGenerateDraftRequestPayload,
@@ -493,7 +494,7 @@ export async function getInterview(id: string): Promise<Interview> {
 
 export async function getInterviews(): Promise<Interview[]> {
   const data = await handle(client.GET('/interviews'));
-  return (Array.isArray(data) ? data : data.items) as Interview[];
+  return normalizeInterviewsResponse<Interview>(data, 'client:/interviews');
 }
 
 
@@ -596,6 +597,7 @@ export async function getTakeInterview(
   id: string,
   token?: string,
   contentLocale?: Locale,
+  init?: { signal?: AbortSignal },
 ): Promise<TakeInterviewData> {
   return handle(client.GET('/take/{id}', {
     headers: buildClientBaseHeaders(),
@@ -606,6 +608,7 @@ export async function getTakeInterview(
         ...(contentLocale ? { contentLocale } : {}),
       },
     },
+    signal: init?.signal,
   }));
 }
 

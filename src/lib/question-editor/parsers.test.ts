@@ -3,8 +3,11 @@ import { describe, expect, it } from 'vitest'
 import type { Question } from '@/lib/api'
 import {
   editorStateToUpdatePayload,
+  localeDraftsFromTranslations,
+  questionToEditorInput,
   questionToEditorState,
   resolvePrimaryLocale,
+  seedLocaleDraftsFromQuestion,
 } from '@/lib/question-editor/parsers'
 
 function buildMultilingualQuestion(): Question {
@@ -131,5 +134,16 @@ describe('question-editor parsers round-trip', () => {
     const state = questionToEditorState(buildLegacyEnglishQuestion())
     expect(state.primaryLocale).toBe('en')
     expect(state.primary.expectedConcepts.map((item) => item.id)).toEqual(['concept-scope'])
+  })
+
+  it('seeds primary locale draft from top-level content when translations omit primary', () => {
+    const input = questionToEditorInput(buildLegacyEnglishQuestion())
+    delete input.translations?.en
+
+    expect(localeDraftsFromTranslations(input).en?.questionText).toBeUndefined()
+
+    const seeded = seedLocaleDraftsFromQuestion(input, 'en')
+    expect(seeded.en?.questionText).toBe('Explain closures')
+    expect(seeded.en?.followUpQuestions).toEqual(['Give an example'])
   })
 })

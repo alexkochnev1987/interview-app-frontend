@@ -17,6 +17,10 @@ interface UseTakeInterviewLoaderParams {
   takeMessage: TakeMessageGetter;
 }
 
+function isAbortError(error: unknown): boolean {
+  return error instanceof DOMException && error.name === 'AbortError';
+}
+
 export function useTakeInterviewLoader({
   id,
   candidateToken,
@@ -33,6 +37,8 @@ export function useTakeInterviewLoader({
   const onErrorRef = useRef(onError);
   const onCleanupRef = useRef(onCleanup);
   const takeMessageRef = useRef(takeMessage);
+  const loadGenerationRef = useRef(0);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const loadInterview = useCallback(
     async (
@@ -40,12 +46,39 @@ export function useTakeInterviewLoader({
       tokenOverride?: string,
       localeOverride?: Locale,
     ) => {
+      const effectiveToken = tokenOverride ?? candidateTokenRef.current;
+      const effectiveContentLocale = localeOverride ?? contentLocaleRef.current;
+      const generation = ++loadGenerationRef.current;
+
+      abortControllerRef.current?.abort();
+      const abortController = new AbortController();
+      abortControllerRef.current = abortController;
+
       try {
-        const effectiveToken = tokenOverride ?? candidateTokenRef.current;
-        const effectiveContentLocale = localeOverride ?? contentLocaleRef.current;
-        const data = await getTakeInterview(id, effectiveToken, effectiveContentLocale);
+        const data = await getTakeInterview(
+          id,
+          effectiveToken,
+          effectiveContentLocale,
+          { signal: abortController.signal },
+        );
+
+        if (generation !== loadGenerationRef.current) {
+          return;
+        }
+
+        const latestLocale = localeOverride ?? contentLocaleRef.current;
+        if (effectiveContentLocale !== latestLocale) {
+          return;
+        }
+
         onDataRef.current(data, mode, tokenOverride);
       } catch (err) {
+        if (abortController.signal.aborted || isAbortError(err)) {
+          return;
+        }
+        if (generation !== loadGenerationRef.current) {
+          return;
+        }
         onErrorRef.current(
           err instanceof Error ? err.message : takeMessageRef.current('takeLoadFailed'),
         );
@@ -74,6 +107,7 @@ export function useTakeInterviewLoader({
     }
 
     return () => {
+      abortControllerRef.current?.abort();
       onCleanupRef.current();
     };
   }, [id, skipInitialLoad]);

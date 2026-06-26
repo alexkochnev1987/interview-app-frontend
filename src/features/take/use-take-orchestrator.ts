@@ -177,6 +177,36 @@ export function useTakeOrchestrator({
   >(async () => undefined);
   const requestVersionActionRef = useRef<(action: PendingVersionAction) => void>(() => undefined);
   const autoStartedQuestionKeyRef = useRef('');
+  const recordingRef = useRef(recording);
+  const uploadingRef = useRef(uploading);
+  const recordingStartBusyRef = useRef(recordingStartBusy);
+  const stageRef = useRef(stage);
+
+  useEffect(() => {
+    recordingRef.current = recording;
+  }, [recording]);
+
+  useEffect(() => {
+    uploadingRef.current = uploading;
+  }, [uploading]);
+
+  useEffect(() => {
+    recordingStartBusyRef.current = recordingStartBusy;
+  }, [recordingStartBusy]);
+
+  useEffect(() => {
+    stageRef.current = stage;
+  }, [stage]);
+
+  function isLocaleQuestionMutationBlocked(): boolean {
+    return (
+      recordingRef.current ||
+      uploadingRef.current ||
+      recordingStartBusyRef.current ||
+      stageRef.current === 'recording' ||
+      stageRef.current === 'transition'
+    );
+  }
 
   function attachCameraPreview(stream: MediaStream) {
     cameraStreamRef.current = stream;
@@ -255,6 +285,9 @@ export function useTakeOrchestrator({
     onData: (data, mode) => {
       setError('');
       if (mode === 'locale') {
+        if (isLocaleQuestionMutationBlocked()) {
+          return;
+        }
         setInterview((previous) =>
           previous ? { ...previous, currentQuestion: data.currentQuestion } : data,
         );
@@ -282,6 +315,9 @@ export function useTakeOrchestrator({
     prevContentLocaleRef.current = contentLocale;
 
     if (previousLocale !== null && previousLocale !== contentLocale) {
+      if (isLocaleQuestionMutationBlocked()) {
+        return;
+      }
       void loadInterview('locale', undefined, contentLocale);
     }
   }, [contentLocale, loadInterview]);
@@ -657,10 +693,18 @@ export function useTakeOrchestrator({
     takeMessage,
   ]);
 
+  const localeSwitchDisabled =
+    recording ||
+    uploading ||
+    recordingStartBusy ||
+    stage === 'recording' ||
+    stage === 'transition';
+
   return {
     stage,
     interview,
     error,
+    localeSwitchDisabled,
     candidateSessionReady,
     sessionSyncError,
     retrySessionSync,

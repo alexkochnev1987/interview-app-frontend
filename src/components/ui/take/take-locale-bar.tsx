@@ -24,6 +24,7 @@ export type TakeLocaleBarProps = {
   onSelectLocale: (locale: Locale) => void
   interviewLocale?: Locale
   resolvedLocale?: Locale
+  disabled?: boolean
 }
 
 export function TakeLocaleBar({
@@ -33,6 +34,7 @@ export function TakeLocaleBar({
   onSelectLocale,
   interviewLocale,
   resolvedLocale,
+  disabled = false,
 }: TakeLocaleBarProps) {
   const tTake = useTranslations('takeFlow')
   const showInterviewBadge =
@@ -47,6 +49,7 @@ export function TakeLocaleBar({
         currentLocale={currentLocale}
         options={options}
         onSelectLocale={onSelectLocale}
+        disabled={disabled}
       />
       {showInterviewBadge ? (
         <StatusPill tone="neutral_meta" casing="chip" size="compact">

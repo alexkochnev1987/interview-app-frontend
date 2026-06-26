@@ -40,6 +40,10 @@ export type TabsProps = Omit<React.ComponentProps<'div'>, 'onChange'> & {
   disabled?: boolean
 }
 
+function isTabItemEnabled(item: TabItem, listDisabled: boolean): boolean {
+  return !listDisabled && !item.disabled
+}
+
 export function Tabs({
   items,
   activeId,
@@ -49,6 +53,59 @@ export function Tabs({
   className,
   ...props
 }: TabsProps) {
+  const tabRefs = React.useRef(new Map<string, HTMLButtonElement>())
+
+  const enabledItems = React.useMemo(
+    () => items.filter((item) => isTabItemEnabled(item, disabled)),
+    [items, disabled],
+  )
+
+  function focusTab(id: string) {
+    requestAnimationFrame(() => {
+      tabRefs.current.get(id)?.focus()
+    })
+  }
+
+  function activateTab(id: string) {
+    if (!enabledItems.some((item) => item.id === id)) {
+      return
+    }
+    onChange(id)
+    focusTab(id)
+  }
+
+  function handleTabListKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+    if (enabledItems.length === 0) {
+      return
+    }
+
+    const currentIndex = enabledItems.findIndex((item) => item.id === activeId)
+    const resolvedIndex = currentIndex === -1 ? 0 : currentIndex
+    let nextIndex = resolvedIndex
+
+    switch (event.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+        nextIndex = (resolvedIndex + 1) % enabledItems.length
+        break
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        nextIndex = (resolvedIndex - 1 + enabledItems.length) % enabledItems.length
+        break
+      case 'Home':
+        nextIndex = 0
+        break
+      case 'End':
+        nextIndex = enabledItems.length - 1
+        break
+      default:
+        return
+    }
+
+    event.preventDefault()
+    activateTab(enabledItems[nextIndex].id)
+  }
+
   return (
     <div
       role="tablist"
@@ -56,6 +113,7 @@ export function Tabs({
       aria-orientation="horizontal"
       data-slot="tabs"
       className={cn(tabsListVariants(), className)}
+      onKeyDown={handleTabListKeyDown}
       {...props}
     >
       {items.map((item) => {
@@ -65,6 +123,13 @@ export function Tabs({
         return (
           <button
             key={item.id}
+            ref={(node) => {
+              if (node) {
+                tabRefs.current.set(item.id, node)
+              } else {
+                tabRefs.current.delete(item.id)
+              }
+            }}
             type="button"
             role="tab"
             id={`tab-${item.id}`}
