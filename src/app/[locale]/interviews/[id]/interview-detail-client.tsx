@@ -5,8 +5,13 @@ import { useTranslations } from 'next-intl'
 
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { Grid } from '@/components/ui/layout/grid'
+import { Inline } from '@/components/ui/layout/inline'
+import { Button } from '@/components/ui/button'
+import { BodyText } from '@/components/ui/text'
 import type { Interview, InterviewResult } from '@/lib/api'
 import { formatCandidateLinkPreview } from '@/lib/interview-detail-format'
+import { canEditInterview, canManageInterview } from '@/lib/interview-management'
+import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
 import { useToastMessages } from '@/lib/use-toast-messages'
 import { useAuth, useIsDemo } from '@/lib/auth-context'
 import { DemoTakeExperience } from '@/components/take/demo/demo-take-experience'
@@ -14,6 +19,9 @@ import { CandidateAccessPanel } from '@/components/interviews/detail/candidate-a
 import { InterviewSummaryCard } from '@/components/interviews/detail/interview-summary-card'
 import { AnswerPacketList } from '@/components/interviews/detail/answer-packet-list'
 import { InterviewScorecard } from '@/components/interviews/detail/interview-scorecard'
+import { InterviewDetailCancelDialog } from '@/components/interviews/detail/interview-detail-cancel-dialog'
+import { InterviewDetailEditSection } from '@/components/interviews/detail/interview-detail-edit-section'
+import { useInterviewDetailManagement } from '@/components/interviews/detail/use-interview-detail-management'
 
 import { useCandidateLink } from './use-candidate-link'
 import { useInterviewValidation } from './use-interview-validation'
@@ -24,14 +32,18 @@ interface InterviewDetailClientProps {
   id: string
   initialInterview: Interview
   initialResults: InterviewResult | null
+  editPickerPrefetch: QuestionsLibraryPrefetch | null
 }
 
 export default function InterviewDetailClient({
   id,
   initialInterview,
   initialResults,
+  editPickerPrefetch,
 }: InterviewDetailClientProps) {
   const t = useTranslations('questions.common')
+  const tActions = useTranslations('interviews.actions')
+  const tEdit = useTranslations('interviews.edit')
   const toastMessages = useToastMessages()
   const { user } = useAuth()
   const isDemo = useIsDemo()
@@ -71,6 +83,22 @@ export default function InterviewDetailClient({
     id,
     interview,
     failedLoadMediaLabel: t('failedLoadMedia'),
+  })
+
+  const {
+    isEditing,
+    startEditing,
+    exitEditing,
+    handleEditSaved,
+    cancelConfirmOpen,
+    setCancelConfirmOpen,
+    canceling,
+    handleCancelInterview,
+  } = useInterviewDetailManagement({
+    interviewId: id,
+    onInterviewUpdated: (updated) => {
+      setInterview(updated)
+    },
   })
 
   if (!interview) {
@@ -124,8 +152,39 @@ export default function InterviewDetailClient({
     allAnswered && !hasActiveValidation && interview.status !== 'completed'
   const candidateLinkPreview = formatCandidateLinkPreview(candidateLink)
 
+  // Demo accounts are read-only, so interview editing and cancellation are
+  // hidden for them; the rest of the detail view stays visible.
+  const canEdit = canEditInterview(interview)
+  const canManage = canManageInterview(interview)
+  const showManagementActions = !isDemo && !isEditing && (canEdit || canManage)
+
   return (
     <PageShell>
+      {showManagementActions ? (
+        <Inline gap={3} wrap="wrap" justify="end">
+          {canEdit ? (
+            <Button type="button" variant="outline" onClick={startEditing}>
+              {tActions('edit')}
+            </Button>
+          ) : null}
+          {canManage ? (
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={() => setCancelConfirmOpen(true)}
+              disabled={canceling}
+            >
+              {canceling ? tActions('canceling') : tActions('cancelInterview')}
+            </Button>
+          ) : null}
+          {canManage && !canEdit ? (
+            <BodyText size="sm" tone="muted">
+              {tEdit('answersBlockEditNotice')}
+            </BodyText>
+          ) : null}
+        </Inline>
+      ) : null}
+
       <Grid as="section" columns="split-115-85" gap={6}>
         <InterviewSummaryCard
           interview={interview}
@@ -158,18 +217,36 @@ export default function InterviewDetailClient({
         />
       </Grid>
 
-      <AnswerPacketList
-        interview={interview}
-        answersByIndex={answersByIndex}
-        uploadStates={uploadStates}
-        mediaByQuestion={mediaByQuestion}
-        isTerminal={isTerminal}
-        hasActiveValidation={hasActiveValidation}
-        validating={validating}
-        onUpload={handleUpload}
-      />
+      {isEditing ? (
+        <InterviewDetailEditSection
+          interview={interview}
+          editPickerPrefetch={editPickerPrefetch}
+          onSaved={handleEditSaved}
+          onExitEdit={exitEditing}
+        />
+      ) : (
+        <AnswerPacketList
+          interview={interview}
+          answersByIndex={answersByIndex}
+          uploadStates={uploadStates}
+          mediaByQuestion={mediaByQuestion}
+          isTerminal={isTerminal}
+          hasActiveValidation={hasActiveValidation}
+          validating={validating}
+          onUpload={handleUpload}
+        />
+      )}
 
       {results ? <InterviewScorecard results={results} /> : null}
+
+      <InterviewDetailCancelDialog
+        open={cancelConfirmOpen}
+        loading={canceling}
+        onConfirm={() => void handleCancelInterview()}
+        onCancel={() => {
+          if (!canceling) setCancelConfirmOpen(false)
+        }}
+      />
     </PageShell>
   )
 }

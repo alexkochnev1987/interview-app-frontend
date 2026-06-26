@@ -1,4 +1,4 @@
-export { ApiError, QuestionInUseError } from './api-error';
+export { ApiError } from './api-error';
 
 export type {
   QuestionDifficulty,
@@ -27,6 +27,9 @@ export type {
   Answer,
   InterviewResult,
   Interview,
+  InterviewStatus,
+  UpdateInterviewPayload,
+  InterviewCancelResponse,
   StartAnswerValidationResult,
   InterviewAnswerMediaResponse,
   CandidateLinkResponse,
@@ -43,6 +46,8 @@ export type {
   FacetCount,
   BulkDeleteResult,
   SimilarQuestionMatch,
+  QuestionDeleteBlockingInterview,
+  DeleteQuestionResult,
 } from './api/types';
 
 export { updateUserRole, login, demoLogin, logout } from './api/auth';
@@ -63,6 +68,8 @@ export {
   createInterview,
   getInterview,
   getInterviews,
+  updateInterview,
+  cancelInterview,
   generateCandidateLink,
   getPresignedUrl,
   completeUploadAndFetchInterview,

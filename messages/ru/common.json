@@ -57,7 +57,8 @@
         "in_progress": "В процессе",
         "processing": "Обрабатывается",
         "completed": "Завершено",
-        "failed": "Ошибка"
+        "failed": "Ошибка",
+        "canceled": "Отменено"
       },
       "reviewStatus": {
         "ready": "Готово к просмотру",
@@ -65,7 +66,8 @@
         "ready_to_score": "Готово к оценке ИИ",
         "in_progress": "Кандидат проходит интервью",
         "pending": "Ожидает кандидата",
-        "failed": "Ошибка"
+        "failed": "Ошибка",
+        "canceled": "Отменено"
       },
       "decision": {
         "proceed": "Продолжить",

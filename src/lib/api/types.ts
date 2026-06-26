@@ -33,11 +33,14 @@ export type Answer = Schemas['AnswerDto'];
 
 export type InterviewResult = Schemas['InterviewResultResponseDto'];
 export type Interview = Schemas['InterviewResponseDto'];
+export type InterviewStatus = Interview['status'];
+export type UpdateInterviewPayload = Schemas['UpdateInterviewDto'];
 
 export type ValidateAllAnswersResponse = Schemas['StartAllAnswerValidationsResponseDto'];
 export type StartAnswerValidationResult = Schemas['StartAnswerValidationResultDto'];
 export type InterviewAnswerMediaResponse = Schemas['InterviewAnswerMediaResponseDto'];
 export type CandidateLinkResponse = Schemas['CandidateLinkResponseDto'];
+export type InterviewCancelResponse = Schemas['InterviewCancelResponseDto'];
 
 export type CreateInterviewPayload = Schemas['CreateInterviewDto'];
 
@@ -64,3 +67,14 @@ export type FacetCount = Schemas['FacetCountDto'];
 export type BulkDeleteResult = Schemas['BulkDeleteQuestionsResponseDto'];
 
 export type SimilarQuestionMatch = Schemas['SimilarQuestionMatchDto'];
+
+export type QuestionDeleteBlockingInterview =
+  Schemas['QuestionDeleteBlockingInterviewDto'];
+
+export type DeleteQuestionResult =
+  | { id: string; deleted: true }
+  | {
+      id: string;
+      scheduled: true;
+      blockingInterviews: QuestionDeleteBlockingInterview[];
+    };

@@ -57,7 +57,8 @@
         "in_progress": "In progress",
         "processing": "Processing",
         "completed": "Completed",
-        "failed": "Failed"
+        "failed": "Failed",
+        "canceled": "Canceled"
       },
       "reviewStatus": {
         "ready": "Ready for review",
@@ -65,7 +66,8 @@
         "ready_to_score": "Ready for AI review",
         "in_progress": "Candidate in progress",
         "pending": "Awaiting candidate",
-        "failed": "Failed"
+        "failed": "Failed",
+        "canceled": "Canceled"
       },
       "decision": {
         "proceed": "Proceed",

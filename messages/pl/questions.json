@@ -117,7 +117,8 @@
       "role": "Rola: {value}",
       "tag": "#{tag}",
       "statusDeletedOnly": "Tylko usunięte",
-      "statusActiveDeleted": "Aktywne i usunięte"
+      "statusActiveDeleted": "Aktywne i usunięte",
+      "scheduledOnly": "Zaplanowane do usunięcia"
     },
     "picker": {
       "toolbar": {
@@ -171,7 +172,6 @@
         "noValues": "Brak wartości pasujących do bieżących filtrów.",
         "showAll": "Pokaż wszystkie ({count})",
         "showFewer": "Pokaż mniej",
-        "statusActiveDeleted": "Aktywne + usunięte",
         "loadingFacets": "Ładowanie opcji filtra…",
         "facetsUnavailable": "Nie można załadować opcji filtra.",
         "difficultyTitle": "Trudność",
@@ -185,7 +185,9 @@
         "statusTitle": "Status",
         "activeOnly": "Tylko aktywne",
         "includeDeleted": "Uwzględnij usunięte",
-        "deletedOnly": "Tylko usunięte"
+        "deletedOnly": "Tylko usunięte",
+        "scheduledOnly": "Zaplanowane do usunięcia",
+        "allStatuses": "Wszystkie statusy"
       },
       "refetch": {
         "title": "Nie można odświeżyć strony {page}",
@@ -232,7 +234,7 @@
         "hideFiltersSidebar": "Ukryj panel filtrów",
         "showFiltersSidebar": "Pokaż panel filtrów",
         "bulkDeleteTitle": "Usunąć wybrane pytania?",
-        "bulkDeleteDescription": "Wybrane pytania zostaną ukryte w bibliotece i nowych wywiadach. Wcześniejsze wywiady zachowują migawkę. Pytania używane podczas aktywnych rozmów kwalifikacyjnych zostaną pominięte.",
+        "bulkDeleteDescription": "Wybrane pytania zostaną ukryte w bibliotece i nie będą dostępne w nowych rozmowach kwalifikacyjnych. Poprzednie rozmowy zachowają swoją migawkę. Pytania używane w aktywnych rozmowach zostaną zaplanowane do usunięcia.",
         "cancel": "Anulować",
         "confirmBulkDelete": "Usuwać"
       },
@@ -243,7 +245,8 @@
         "redFlagsMetric": "Czerwone flagi",
         "expectedConcepts": "Oczekiwane koncepcje",
         "redFlagSignals": "Sygnały czerwonej flagi",
-        "notSpecified": "Nie określono"
+        "notSpecified": "Nie określono",
+        "scheduled": "Zaplanowane"
       },
       "table": {
         "selectAll": "Zaznacz wszystko",
@@ -254,6 +257,7 @@
         "updated": "Zaktualizowano",
         "open": "Otwarte",
         "deleted": "Usunięto",
+        "scheduled": "Zaplanowane",
         "selectAllVisible": "Zaznacz wszystkie widoczne",
         "selectQuestion": "Zaznacz pytanie",
         "category": "Kategoria",
@@ -274,7 +278,7 @@
         "endOfList": "Koniec listy"
       },
       "bulkAlerts": {
-        "blockedHeading": "Pominięte (w użyciu)",
+        "scheduledHeading": "Zaplanowane do usunięcia",
         "deletedHeading": "Usunięto"
       }
     },
@@ -311,7 +315,7 @@
       "restoring": "Przywracam...",
       "restore": "Przywrócić",
       "deleteTitle": "Usunąć to pytanie?",
-      "deleteDescription": "Będzie ukryte przed biblioteką i nowymi wywiadami. Wcześniejsze wywiady zachowują migawkę. Aktywne rozmowy kwalifikacyjne blokują usunięcie.",
+      "deleteDescription": "Pytanie zostanie ukryte w bibliotece i nie będzie dostępne w nowych rozmowach kwalifikacyjnych. Poprzednie rozmowy zachowają swoją migawkę. Jeśli jest nadal używane w aktywnych rozmowach, usunięcie zostanie zaplanowane do momentu ich zakończenia.",
       "restoreTitle": "Przywrócić to pytanie?",
       "restoreDescription": "Będzie ponownie widoczny w bibliotece i dostępny do nowych wywiadów.",
       "cancel": "Anulować",
@@ -320,7 +324,7 @@
     },
     "dangerZone": {
       "title": "Strefa niebezpieczeństwa",
-      "description": "Usunięcie powoduje ukrycie tego pytania w bibliotece i przed nowymi wywiadami. Wcześniejsze wywiady zachowują migawkę. Aktywne rozmowy kwalifikacyjne blokują usunięcie.",
+      "description": "Usunięcie ukrywa to pytanie przed nowymi rozmowami kwalifikacyjnymi. Poprzednie rozmowy zachowają swoją migawkę. Aktywne rozmowy planują usunięcie zamiast je blokować.",
       "delete": "Usuń pytanie",
       "deleting": "Usuwanie..."
     },

@@ -43,6 +43,7 @@ export function useDeleteQuestionToastMessages() {
   const t = useTranslations('toast')
 
   return {
-    cannotDeleteTitle: t('deleteQuestion.cannotDeleteTitle'),
+    scheduledTitle: t('deleteQuestion.scheduledTitle'),
+    scheduledIntro: t('deleteQuestion.scheduledIntro'),
   }
 }

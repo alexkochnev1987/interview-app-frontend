@@ -12,7 +12,7 @@ export type ActiveFilterChipDescriptor =
   | { kind: 'subcategory'; value: string }
   | { kind: 'role'; value: string }
   | { kind: 'tag'; value: string }
-  | { kind: 'status'; value: 'inactive' | 'all' }
+  | { kind: 'status'; value: 'inactive' | 'all' | 'active' | 'scheduled'}
 
 export function buildActiveFilterChips(
   state: QuestionsQueryState,
@@ -69,7 +69,8 @@ export function buildActiveFilterChips(
       key: `status:${state.status}`,
       label: getChipLabel({
         kind: 'status',
-        value: state.status === 'inactive' ? 'inactive' : 'all',
+        value: state.status === 'inactive' ? 'inactive'
+            : state.status === 'scheduled' ? 'scheduled' : 'all',
       }),
       onRemove: () => setters.setStatus('active'),
     })

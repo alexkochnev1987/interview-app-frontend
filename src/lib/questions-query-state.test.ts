@@ -105,4 +105,16 @@ describe('questions-query-state', () => {
     expect(params.get('q')).toBe('node')
     expect(params.getAll('tags')).toEqual(['api', 'auth'])
   })
+
+  it('adds eligibleForInterview when requested', () => {
+    const state = DEFAULT_QUESTIONS_QUERY
+
+    expect(
+        buildQuestionsFetchParams(state, '', { eligibleForInterview: true }),
+    ).toMatchObject({ eligibleForInterview: true, status: 'active' })
+
+    expect(
+        buildQuestionFacetsParams(state, '', { eligibleForInterview: true }),
+    ).toMatchObject({ eligibleForInterview: true })
+  })
 })

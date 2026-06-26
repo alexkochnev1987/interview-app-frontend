@@ -9,6 +9,7 @@ import {
 import {
   buildQuestionFacetsParams,
   EMPTY_QUESTION_FACETS,
+  type QuestionFetchOptions,
   type QuestionsQueryState,
 } from '@/lib/questions-query-state'
 import { questionFacetsQueryKey } from './query-keys'
@@ -37,11 +38,12 @@ type FilterSnapshot = Pick<
 export function useQuestionFacets(
   snapshot: FilterSnapshot,
   debouncedQ: string,
+  options?: QuestionFetchOptions,
 ): UseQuestionFacetsResult {
   const toastMessages = useToastMessages()
   const params = useMemo(
-    () => buildQuestionFacetsParams(snapshot, debouncedQ),
-    [snapshot, debouncedQ],
+    () => buildQuestionFacetsParams(snapshot, debouncedQ, options),
+    [snapshot, debouncedQ, options],
   )
 
   const query = useQuery({

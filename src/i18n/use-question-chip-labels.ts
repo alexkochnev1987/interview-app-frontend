@@ -24,7 +24,9 @@ export function useQuestionChipLabels() {
         case 'status':
           return descriptor.value === 'inactive'
             ? t('statusDeletedOnly')
-            : t('statusActiveDeleted')
+              : descriptor.value == 'scheduled'
+                  ? t('scheduledOnly')
+                    : t('statusActiveDeleted')
         default:
           return ''
       }

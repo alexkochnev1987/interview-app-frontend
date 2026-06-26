@@ -99,6 +99,8 @@ const tableRowVariants = cva('transition-colors', {
       default: '',
       selected: 'bg-primary/5',
       deleted: 'opacity-60',
+      scheduled:
+        'bg-scheduled-soft text-scheduled-soft-foreground [&_.text-muted-foreground]:text-scheduled-soft-foreground/75 [&_.text-foreground]:text-scheduled-soft-foreground',
     },
   },
   defaultVariants: {

@@ -57,7 +57,8 @@
         "in_progress": "W toku",
         "processing": "Przetwarzanie",
         "completed": "Zakończone",
-        "failed": "Nieudane"
+        "failed": "Nieudane",
+        "canceled": "Anulowane"
       },
       "reviewStatus": {
         "ready": "Gotowe do przeglądu",
@@ -65,7 +66,8 @@
         "ready_to_score": "Gotowe do oceny AI",
         "in_progress": "Kandydat jest w trakcie",
         "pending": "Oczekuje na kandydata",
-        "failed": "Nieudane"
+        "failed": "Nieudane",
+        "canceled": "Anulowane"
       },
       "decision": {
         "proceed": "Kontynuować",

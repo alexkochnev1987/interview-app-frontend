@@ -22,6 +22,7 @@ export function questionFixture(
     createdAt: ISO,
     updatedAt: ISO,
     deleted: false,
+    pendingDeletion: false,
     usageCount: 0,
     ...partial,
   }
