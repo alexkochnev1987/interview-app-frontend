@@ -11,10 +11,12 @@ import { Icon } from '@/components/ui/icon'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { Link } from '@/i18n/navigation'
+import { useIsDemo } from '@/lib/auth-context'
 
 export function AssessmentsListHeader() {
   const t = useTranslations('assessments.list')
   const tNav = useTranslations('nav')
+  const isDemo = useIsDemo()
 
   return (
     <Card variant="floating" size="lg">
@@ -26,14 +28,16 @@ export function AssessmentsListHeader() {
           <HeroTitle>{t('title')}</HeroTitle>
           <HeroLead width="prose">{t('lead')}</HeroLead>
         </Stack>
-        <Inline>
-          <Button asChild variant="gradient" size="hero">
-            <Link href="/interviews/new">
-              <Icon size="lg"><Plus /></Icon>
-              {tNav('newInterview')}
-            </Link>
-          </Button>
-        </Inline>
+        {!isDemo ? (
+          <Inline>
+            <Button asChild variant="gradient" size="hero">
+              <Link href="/interviews/new">
+                <Icon size="lg"><Plus /></Icon>
+                {tNav('newInterview')}
+              </Link>
+            </Button>
+          </Inline>
+        ) : null}
       </CardContent>
     </Card>
   )

@@ -12,6 +12,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { PageShell } from '@/components/ui/layout/page-shell'
+import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 
 interface QuestionDangerZoneProps {
   deleting: boolean
@@ -32,20 +33,21 @@ export function QuestionDangerZone({
           <CardDescription>{t('description')}</CardDescription>
         </CardHeader>
         <CardContent spacing="md">
-          <Button
-            type="button"
-            variant="destructive"
-            shape="pill"
-            disabled={deleting}
-            onClick={onRequestDelete}
-          >
-            {deleting ? (
-              <LoaderCircle className="size-4 animate-spin" />
-            ) : (
-              <Trash2 className="size-4" />
-            )}
-            {deleting ? t('deleting') : t('delete')}
-          </Button>
+          <DemoWriteGuard disabled={deleting}>
+            <Button
+              type="button"
+              variant="destructive"
+              shape="pill"
+              onClick={onRequestDelete}
+            >
+              {deleting ? (
+                <LoaderCircle className="size-4 animate-spin" />
+              ) : (
+                <Trash2 className="size-4" />
+              )}
+              {deleting ? t('deleting') : t('delete')}
+            </Button>
+          </DemoWriteGuard>
         </CardContent>
       </Card>
     </PageShell>

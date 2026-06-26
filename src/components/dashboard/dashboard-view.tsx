@@ -9,7 +9,6 @@ import {
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
 import { EyebrowLabel } from '@/components/ui/eyebrow-label'
 import { HeroLead, HeroTitle } from '@/components/ui/hero-text'
@@ -45,10 +44,10 @@ import {
 
 type DashboardViewProps = {
   interviews: Interview[]
-  demoMode?: boolean
+  isDemo: boolean
 }
 
-export function DashboardView({ interviews, demoMode = false }: DashboardViewProps) {
+export function DashboardView({ interviews, isDemo }: DashboardViewProps) {
   const t = useTranslations('dashboard')
   const labels = useSharedLabels()
   const formatters = useInterviewFormatters()
@@ -66,17 +65,6 @@ export function DashboardView({ interviews, demoMode = false }: DashboardViewPro
   return (
     <PageShell>
       <Stack gap={6}>
-        {demoMode ? (
-          <Alert variant="warning">
-            <AlertTitle>{t('demoMode.title')}</AlertTitle>
-            <AlertDescription>
-              {t('demoMode.description')}{' '}
-              <Link href="/login">{t('demoMode.signInAction')}</Link>{' '}
-              {t('demoMode.signInSuffix')}
-            </AlertDescription>
-          </Alert>
-        ) : null}
-
         <Grid as="section" columns="split-13-7" gap={6}>
           <Card variant="floating" size="lg" effects="blur-strong">
             <CardContent layout="fill-column" spacing="2xl">
@@ -96,12 +84,14 @@ export function DashboardView({ interviews, demoMode = false }: DashboardViewPro
                 </Stack>
 
                 <Inline gap={3} wrap="wrap">
-                  <Button asChild variant="gradient">
-                    <Link href="/interviews/new">
-                      {t('hero.newInterview')}
-                      <ArrowRight className="size-4" />
-                    </Link>
-                  </Button>
+                  {!isDemo ? (
+                    <Button asChild variant="gradient">
+                      <Link href="/interviews/new">
+                        {t('hero.newInterview')}
+                        <ArrowRight className="size-4" />
+                      </Link>
+                    </Button>
+                  ) : null}
                   <Button asChild variant="outline-pill" shape="pill" effects="blur">
                     <Link href={routes.questions.list}>{t('hero.questionBank')}</Link>
                   </Button>
@@ -165,15 +155,11 @@ export function DashboardView({ interviews, demoMode = false }: DashboardViewPro
                     </BodyText>
                     <StatusPill tone="neutral">
                       <Clock3 className="size-3" />
-                      {demoMode ? t('metrics.lastSync.demo') : t('metrics.lastSync.live')}
+                      {t('metrics.lastSync.live')}
                     </StatusPill>
                   </Inline>
                 }
-                description={
-                  demoMode
-                    ? t('metrics.lastSync.demoDescription')
-                    : t('metrics.lastSync.liveDescription')
-                }
+                description={t('metrics.lastSync.liveDescription')}
               />
             </CardContent>
           </Card>
@@ -185,9 +171,11 @@ export function DashboardView({ interviews, demoMode = false }: DashboardViewPro
             title={t('empty.title')}
             description={t('empty.description')}
             action={
-              <Button asChild variant="gradient">
-                <Link href="/interviews/new">{t('empty.action')}</Link>
-              </Button>
+              !isDemo ? (
+                <Button asChild variant="gradient">
+                  <Link href="/interviews/new">{t('empty.action')}</Link>
+                </Button>
+              ) : null
             }
           />
         ) : (
@@ -197,9 +185,11 @@ export function DashboardView({ interviews, demoMode = false }: DashboardViewPro
                 <EyebrowLabel size="lg">{t('recent.eyebrow')}</EyebrowLabel>
                 <SectionHeading>{t('recent.title')}</SectionHeading>
               </Stack>
-              <Button asChild variant="outline-pill" shape="pill" effects="blur">
-                <Link href={routes.questions.new}>{t('recent.createQuestion')}</Link>
-              </Button>
+              {!isDemo ? (
+                <Button asChild variant="outline-pill" shape="pill" effects="blur">
+                  <Link href={routes.questions.new}>{t('recent.createQuestion')}</Link>
+                </Button>
+              ) : null}
             </Inline>
 
             <Grid columns="cards-2-3" gap={4}>

@@ -1,12 +1,5 @@
 {
   "dashboard": {
-    "demoMode": {
-      "title": "Demo mode",
-      "description": "Sample interviews only — no live backend.",
-      "signInPrefix": "",
-      "signInAction": "Sign in",
-      "signInSuffix": "for your workspace dashboard."
-    },
     "hero": {
       "eyebrow": "Recruiter Dashboard",
       "title": "Run your interview pipeline from one editorial command surface.",
@@ -33,9 +26,7 @@
       },
       "lastSync": {
         "label": "Last sync",
-        "demo": "Demo",
         "live": "Live",
-        "demoDescription": "Showing sample interviews for demonstration.",
         "liveDescription": "Updated against the live backend just now."
       }
     },

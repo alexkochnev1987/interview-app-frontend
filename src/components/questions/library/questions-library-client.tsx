@@ -34,6 +34,7 @@ import { useRouter } from '@/i18n/navigation'
 import { routes } from '@/i18n/routes'
 import { useQuestionChipLabels } from '@/i18n/use-question-chip-labels'
 import { type BulkDeleteResult, type Question } from '@/lib/api'
+import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
 import { buildQuestionsInfiniteParams } from '@/lib/questions-query-state'
 
@@ -254,28 +255,29 @@ export function QuestionsLibraryClient({
         }
         bulkActions={
           isSuperAdmin ? (
-            <Button
-              type="button"
-              variant="destructive"
-              shape="pill"
-              size="xl"
-              disabled={selectedCount === 0 || bulkDeleting}
-              onClick={() => {
-                setBulkResult(null)
-                setBulkConfirmOpen(true)
-              }}
-            >
-              {bulkDeleting ? (
-                <Icon size="md" spinning><LoaderCircle /></Icon>
-              ) : (
-                <Icon size="md"><Trash2 /></Icon>
-              )}
-              {bulkDeleting
-                ? t('deleting')
-                : selectedCount > 0
-                  ? t('bulkDeleteWithCount', { count: selectedCount })
-                  : t('bulkDelete')}
-            </Button>
+            <DemoWriteGuard disabled={selectedCount === 0 || bulkDeleting}>
+              <Button
+                type="button"
+                variant="destructive"
+                shape="pill"
+                size="xl"
+                onClick={() => {
+                  setBulkResult(null)
+                  setBulkConfirmOpen(true)
+                }}
+              >
+                {bulkDeleting ? (
+                  <Icon size="md" spinning><LoaderCircle /></Icon>
+                ) : (
+                  <Icon size="md"><Trash2 /></Icon>
+                )}
+                {bulkDeleting
+                  ? t('deleting')
+                  : selectedCount > 0
+                    ? t('bulkDeleteWithCount', { count: selectedCount })
+                    : t('bulkDelete')}
+              </Button>
+            </DemoWriteGuard>
           ) : null
         }
       />

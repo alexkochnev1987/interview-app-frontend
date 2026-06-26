@@ -23,6 +23,7 @@ const meFixture = (role: string): MeResponse => ({
   email: 'admin@interview-app.com',
   name: 'Admin',
   role,
+  demo: false,
   createdAt: '2026-01-01T00:00:00.000Z',
 })
 

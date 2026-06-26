@@ -19,6 +19,8 @@ import { Grid } from '@/components/ui/layout/grid'
 import { Stack } from '@/components/ui/layout/stack'
 import { Input } from '@/components/ui/input'
 import { useRouter } from '@/i18n/navigation'
+import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
+import { useIsDemo } from '@/lib/auth-context'
 import { createInterview } from '@/lib/api'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
 import { runMutation } from '@/lib/run-mutation'
@@ -32,6 +34,7 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
   const t = useTranslations('questions.common')
   const router = useRouter()
   const toastMessages = useToastMessages()
+  const isDemo = useIsDemo()
   const [candidateName, setCandidateName] = useState('')
   const [position, setPosition] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -110,7 +113,7 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
                       onChange={(event) => setCandidateName(event.target.value)}
                       placeholder={t('candidateNamePlaceholder')}
                       autoComplete="name"
-                      disabled={submitting}
+                      disabled={submitting || isDemo}
                     />
                   </IconAffix>
                 </FormField>
@@ -123,29 +126,30 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
                       value={position}
                       onChange={(event) => setPosition(event.target.value)}
                       placeholder={t('positionPlaceholder')}
-                      disabled={submitting}
+                      disabled={submitting || isDemo}
                     />
                   </IconAffix>
                 </FormField>
 
-                <Button
-                  type="submit"
-                  variant="gradient"
-                  width="full"
-                  disabled={submitting || selectedCount === 0}
-                >
-                  {submitting
-                    ? toastMessages.pageGate.interview.creatingLabel
-                    : t(
-                        selectedCount > 0
-                          ? 'createInterviewCtaWithCount'
-                          : 'createInterviewCta',
-                        { count: selectedCount },
-                      )}
-                  <Icon size="md">
-                    <ArrowRight />
-                  </Icon>
-                </Button>
+                <DemoWriteGuard width="full" disabled={submitting || selectedCount === 0}>
+                  <Button
+                    type="submit"
+                    variant="gradient"
+                    width="full"
+                  >
+                    {submitting
+                      ? toastMessages.pageGate.interview.creatingLabel
+                      : t(
+                          selectedCount > 0
+                            ? 'createInterviewCtaWithCount'
+                            : 'createInterviewCta',
+                          { count: selectedCount },
+                        )}
+                    <Icon size="md">
+                      <ArrowRight />
+                    </Icon>
+                  </Button>
+                </DemoWriteGuard>
               </CardContent>
             </Card>
 
@@ -156,7 +160,7 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
             picker={picker}
             title={t('selectionTitle')}
             description={t('selectionDescription')}
-            disabled={submitting}
+            disabled={submitting || isDemo}
           />
         </Grid>
       </form>

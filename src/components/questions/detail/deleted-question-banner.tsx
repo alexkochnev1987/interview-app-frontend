@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText } from '@/components/ui/text'
+import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 
 interface DeletedQuestionBannerProps {
   restoring: boolean
@@ -33,20 +34,21 @@ export function DeletedQuestionBanner({
               {tBanner('description')}
             </BodyText>
           </Stack>
-          <Button
-            type="button"
-            variant="destructive"
-            shape="pill"
-            disabled={restoring}
-            onClick={onRestore}
-          >
-            {restoring ? (
-              <LoaderCircle className="size-4 animate-spin" />
-            ) : (
-              <RotateCcw className="size-4" />
-            )}
-            {restoring ? tEdit('restoring') : tBanner('restore')}
-          </Button>
+          <DemoWriteGuard disabled={restoring}>
+            <Button
+              type="button"
+              variant="destructive"
+              shape="pill"
+              onClick={onRestore}
+            >
+              {restoring ? (
+                <LoaderCircle className="size-4 animate-spin" />
+              ) : (
+                <RotateCcw className="size-4" />
+              )}
+              {restoring ? tEdit('restoring') : tBanner('restore')}
+            </Button>
+          </DemoWriteGuard>
         </CardContent>
       </Card>
     </PageShell>

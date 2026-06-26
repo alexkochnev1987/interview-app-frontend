@@ -4,7 +4,6 @@ const BLOCKED_PATH_PREFIXES = [
   '/login',
   '/take',
   '/feedback',
-  '/demo',
   '/api',
   '/_next',
 ] as const
