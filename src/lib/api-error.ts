@@ -59,14 +59,6 @@ export function getErrorMessage(err: unknown, fallback = ''): string {
   return fallback
 }
 
-export function getDeleteQuestionErrorTitle(
-  err: unknown,
-  defaultTitle: string,
-  inUseTitle: string,
-): string {
-  return isConflictError(err) ? inUseTitle : defaultTitle
-}
-
 export function isApiError(err: unknown): err is ApiError {
   return err instanceof ApiError
 }

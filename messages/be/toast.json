@@ -25,7 +25,11 @@
       "validationStartSuccess": "Праверка запушчана",
       "validationStartError": "Не ўдалося запусціць праверку інтэрв’ю",
       "uploadSuccess": "Загрузка завершана для пытання {questionNumber}",
-      "uploadError": "Загрузка не ўдалася для пытання {questionNumber}"
+      "uploadError": "Загрузка не ўдалася для пытання {questionNumber}",
+      "updateSuccess": "Інтэрв'ю абноўлена",
+      "updateError": "Не ўдалося абнавіць інтэрв'ю",
+      "cancelSuccess": "Інтэрв'ю адменена",
+      "cancelError": "Не ўдалося адмяніць інтэрв'ю"
     },
     "take": {
       "submitSuccess": "Адказ адпраўлены",
@@ -33,12 +37,12 @@
     },
     "bulkDelete": {
       "failedTitle": "Масавае выдаленне не ўдалося",
-      "partialTitle": "Выдалена: {deletedCount}, заблакіравана: {blockedCount}",
+      "partialTitle": "Выдалена: {deletedCount}, запланавана: {scheduledCount}",
       "successTitle": "{count, plural, one {Выдалена # пытанне} few {Выдалена # пытанні} many {Выдалена # пытанняў} other {Выдалена # пытання}}",
       "successDescription": "Бібліятэка абноўлена.",
       "noopTitle": "Пытанні не выдалены",
       "noopDescription": "Выбраныя пытанні не былі выдалены.",
-      "blockedIntro": "Гэтыя пытанні выкарыстоўваюцца ў актыўных інтэрв’ю і не былі выдалены:"
+      "scheduledIntro": "Гэтыя пытанні яшчэ выкарыстоўваюцца ў актыўных інтэрв’ю. Выдаленне адбудзецца пасля іх завяршэння:"
     },
     "questionFeed": {
       "unavailableTitle": "Стужка пытанняў недаступна"
@@ -127,7 +131,8 @@
       "queuedLabel": "Паўторная ацэнка пастаўлена ў чаргу"
     },
     "deleteQuestion": {
-      "cannotDeleteTitle": "Нельга выдаліць"
+      "scheduledTitle": "Выдаленне запланавана",
+      "scheduledIntro": "Гэтае пытанне яшчэ выкарыстоўваецца ў актыўных інтэрв’ю. Яно будзе выдалена пасля іх завяршэння:"
     },
     "team": {
       "updateSuccess": "Роля абноўлена",

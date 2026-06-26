@@ -25,6 +25,8 @@ const cardVariants = cva(
           "border border-warning-soft-border bg-warning-soft shadow-soft",
         "danger-soft":
           "border border-danger-soft-border bg-danger-soft text-danger-soft-foreground shadow-soft [&_[data-slot=card-title]]:text-danger-soft-foreground [&_[data-slot=card-description]]:text-danger-soft-foreground/80",
+        "scheduled-soft":
+          "border border-scheduled-soft-foreground bg-scheduled-soft text-scheduled-soft-foreground shadow-soft [&_[data-slot=card-title]]:text-scheduled-soft-foreground [&_[data-slot=card-description]]:text-scheduled-soft-foreground/80 [&_.text-muted-foreground]:text-scheduled-soft-foreground/75",
         ghost: "bg-transparent",
       },
       size: {
@@ -52,6 +54,7 @@ const cardVariants = cva(
         default: "",
         selected: "ring-2 ring-destructive/70",
         deleted: "opacity-80",
+        scheduled: "",
       },
       height: {
         auto: "",

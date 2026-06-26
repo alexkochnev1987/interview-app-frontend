@@ -108,6 +108,8 @@ export type Question = Omit<
   availableLocales?: Schemas['ResolvedQuestionResponseDto']['availableLocales'];
   expectedConcepts: QuestionExpectedConcept[];
   redFlags: QuestionRedFlag[];
+  pendingDeletion?: Schemas['QuestionResponseDto']['pendingDeletion'];
+  blockingInterviews?: Schemas['QuestionResponseDto']['blockingInterviews'];
 };
 export type PaginatedQuestions = Schemas['PaginatedQuestionsResponseDto'];
 export type QuestionFacetsResponse = Schemas['QuestionFacetsResponseDto'];
@@ -127,12 +129,15 @@ export type Answer = Schemas['AnswerDto'];
 
 export type InterviewResult = Schemas['InterviewResultResponseDto'];
 export type Interview = Schemas['InterviewResponseDto'];
+export type UpdateInterviewPayload = Schemas['UpdateInterviewDto'];
+export type InterviewStatus = Interview['status'];
 
 type ValidateAllAnswersResponse = Schemas['StartAllAnswerValidationsResponseDto'];
 export type StartAnswerValidationResult = Schemas['StartAnswerValidationResultDto'];
 export type InterviewAnswerMediaResponse = Schemas['InterviewAnswerMediaResponseDto'];
 export type CandidateLinkResponse = Schemas['CandidateLinkResponseDto'];
 export type FeedbackLinkResponse = Schemas['FeedbackLinkResponseDto'];
+export type InterviewCancelResponse = Schemas['InterviewCancelResponseDto'];
 
 export type CreateInterviewPayload = Schemas['CreateInterviewDto'];
 
@@ -365,27 +370,26 @@ export async function updateQuestion(
   }));
 }
 
+export type QuestionDeleteBlockingInterview =
+  Schemas['QuestionDeleteBlockingInterviewDto'];
+
+export type DeleteQuestionResult =
+  | { id: string; deleted: true }
+  | {
+      id: string;
+      scheduled: true;
+      blockingInterviews: QuestionDeleteBlockingInterview[];
+    };
 
 export async function deleteQuestion(
   id: string,
-): Promise<{ id: string; deleted: true }> {
+): Promise<DeleteQuestionResult> {
   const { data, error, response } = await client.DELETE('/questions/{id}', {
     ...LOCALIZED_HEADERS,
     params: { path: { id } }
   });
   const status = response.status;
   const path = `/questions/${id}`;
-
-  if (status === 409) {
-    let message = 'Question is used by an active interview.';
-    if (error && typeof error === 'object' && error !== null && 'message' in error) {
-      const maybeMessage = (error as { message?: unknown }).message;
-      if (typeof maybeMessage === 'string') {
-        message = maybeMessage;
-      }
-    }
-    throw new QuestionInUseError(message);
-  }
 
   if (error) {
     const { code, params } = extractApiErrorFields(error);
@@ -394,6 +398,14 @@ export async function deleteQuestion(
 
   if (!data) {
     throw new ApiError(status, 'API error: Empty response body', path);
+  }
+
+  if (data.scheduled === true) {
+    return {
+      id: data.id,
+      scheduled: true,
+      blockingInterviews: data.blockingInterviews ?? [],
+    };
   }
 
   if (data.deleted !== true) {
@@ -497,6 +509,21 @@ export async function getInterviews(): Promise<Interview[]> {
   return normalizeInterviewsResponse<Interview>(data, 'client:/interviews');
 }
 
+export async function updateInterview(
+  id: string,
+  data: UpdateInterviewPayload,
+): Promise<Interview> {
+  return handle(client.PATCH('/interviews/{id}', {
+    params: { path: { id } },
+    body: data,
+  }));
+}
+
+export async function cancelInterview(id: string): Promise<InterviewCancelResponse> {
+  return handle(client.PATCH('/interviews/{id}/cancel', {
+    params: { path: { id } },
+  }));
+}
 
 export async function generateCandidateLink(
   id: string,

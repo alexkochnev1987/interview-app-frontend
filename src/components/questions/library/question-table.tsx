@@ -248,9 +248,11 @@ export function QuestionTable({
             const selected = selectedIds.has(question.id)
             const rowState = question.deleted
               ? 'deleted'
-              : selected
-                ? 'selected'
-                : 'default'
+              : question.pendingDeletion
+                    ? 'scheduled'
+                    : selected
+                        ? 'selected'
+                        : 'default'
             const updatedAtFormatted = formatInterviewDate(question.updatedAt)
             return (
               <TableRow
@@ -275,6 +277,9 @@ export function QuestionTable({
                       <StatusPill tone="failed" size="compact">
                         {t('deleted')}
                       </StatusPill>
+                    ) : null}
+                    {question.pendingDeletion && !question.deleted ? (
+                        <StatusPill tone="scheduled">{t('scheduled')}</StatusPill>
                     ) : null}
                     <BodyText
                       size="sm"

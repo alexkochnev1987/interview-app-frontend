@@ -156,7 +156,8 @@
       "role": "Role: {value}",
       "tag": "#{tag}",
       "statusDeletedOnly": "Deleted only",
-      "statusActiveDeleted": "Active and deleted"
+      "statusActiveDeleted": "Active and deleted",
+      "scheduledOnly": "Scheduled for deletion"
     },
     "picker": {
       "toolbar": {
@@ -210,7 +211,6 @@
         "noValues": "No values match the current filters.",
         "showAll": "Show all {count}",
         "showFewer": "Show fewer",
-        "statusActiveDeleted": "Active + deleted",
         "loadingFacets": "Loading filter options…",
         "facetsUnavailable": "Filter options could not be loaded.",
         "difficultyTitle": "Difficulty",
@@ -225,7 +225,9 @@
         "statusTitle": "Status",
         "activeOnly": "Active only",
         "includeDeleted": "Include deleted",
-        "deletedOnly": "Deleted only"
+        "deletedOnly": "Deleted only",
+        "scheduledOnly": "Scheduled for deletion only",
+        "allStatuses": "All"
       },
       "refetch": {
         "title": "Could not refresh page {page}",
@@ -272,7 +274,7 @@
         "hideFiltersSidebar": "Hide filters sidebar",
         "showFiltersSidebar": "Show filters sidebar",
         "bulkDeleteTitle": "Delete selected questions?",
-        "bulkDeleteDescription": "Selected questions will be hidden from the library and from new interviews. Past interviews keep their snapshot. Questions used by active interviews will be skipped.",
+        "bulkDeleteDescription": "Selected questions will be hidden from the library and from new interviews. Past interviews keep their snapshot. Questions used by active interviews will be scheduled for deletion.",
         "cancel": "Cancel",
         "confirmBulkDelete": "Delete"
       },
@@ -284,7 +286,8 @@
         "redFlagsMetric": "Red flags",
         "expectedConcepts": "Expected concepts",
         "redFlagSignals": "Red flag signals",
-        "notSpecified": "Not specified"
+        "notSpecified": "Not specified",
+        "scheduled": "Scheduled"
       },
       "table": {
         "selectAll": "Select all",
@@ -295,6 +298,7 @@
         "updated": "Updated",
         "open": "Open",
         "deleted": "Deleted",
+        "scheduled": "Scheduled",
         "selectAllVisible": "Select all visible",
         "selectQuestion": "Select question",
         "category": "Category",
@@ -315,7 +319,7 @@
         "endOfList": "End of list"
       },
       "bulkAlerts": {
-        "blockedHeading": "Skipped (in use)",
+        "scheduledHeading": "Scheduled for deletion",
         "deletedHeading": "Deleted"
       }
     },
@@ -352,7 +356,7 @@
       "restoring": "Restoring...",
       "restore": "Restore",
       "deleteTitle": "Delete this question?",
-      "deleteDescription": "It will be hidden from the library and from new interviews. Past interviews keep their snapshot. Active interviews block deletion.",
+      "deleteDescription": "It will be hidden from the library and from new interviews. Past interviews keep their snapshot. If it is still used by active interviews, deletion will be scheduled until they finish.",
       "restoreTitle": "Restore this question?",
       "restoreDescription": "It will become visible in the library again and available for new interviews.",
       "cancel": "Cancel",
@@ -361,7 +365,7 @@
     },
     "dangerZone": {
       "title": "Danger zone",
-      "description": "Deleting hides this question from the library and from new interviews. Past interviews keep their snapshot. Active interviews block deletion.",
+      "description": "Deleting hides this question from new interviews. Past interviews keep their snapshot. Active interviews schedule deletion instead of blocking it.",
       "delete": "Delete question",
       "deleting": "Deleting..."
     },

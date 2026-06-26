@@ -57,7 +57,8 @@
         "in_progress": "У працэсе",
         "processing": "Апрацоўваецца",
         "completed": "Завершана",
-        "failed": "Памылка"
+        "failed": "Памылка",
+        "canceled": "Скасавана"
       },
       "reviewStatus": {
         "ready": "Гатова да прагляду",
@@ -65,7 +66,8 @@
         "ready_to_score": "Гатова да ацэнкі ШІ",
         "in_progress": "Кандыдат праходзіць інтэрв’ю",
         "pending": "Чакае кандыдата",
-        "failed": "Памылка"
+        "failed": "Памылка",
+        "canceled": "Скасавана"
       },
       "decision": {
         "proceed": "Працягнуць",

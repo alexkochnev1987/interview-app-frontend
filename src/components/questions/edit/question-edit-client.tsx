@@ -6,26 +6,37 @@ import { useTranslations } from 'next-intl'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { DeletedQuestionBanner } from '@/components/questions/detail/deleted-question-banner'
 import { QuestionDangerZone } from '@/components/questions/detail/question-danger-zone'
+import { QuestionDeleteScheduledAlert } from '@/components/questions/detail/question-delete-scheduled-alert'
 import { QuestionEditor } from '@/components/questions/editor/question-editor'
 import {
   useDeleteQuestion,
   useRestoreQuestion,
   useUpdateQuestion,
 } from '@/components/questions/use-question-mutations'
+import { Stack } from '@/components/ui/layout/stack'
 import { useRouter } from '@/i18n/navigation'
-import { routes } from '@/i18n/routes'
 import {
+  type DeleteQuestionResult,
   type Question,
   type QuestionInput,
   type UpdateQuestionInput,
 } from '@/lib/api'
 import { questionToEditorInput } from '@/lib/question-editor/parsers'
+import { runMutation } from '@/lib/run-mutation'
+import { notifyInfo, notifySuccess } from '@/lib/toast'
+import { useToastMessages } from '@/lib/use-toast-messages'
 
 type QuestionEditClientProps = {
   id: string
   initialQuestion: Question
   canUpdate: boolean
   canDelete: boolean
+}
+
+function isDeleteScheduled(
+  result: DeleteQuestionResult,
+): result is Extract<DeleteQuestionResult, { scheduled: true }> {
+  return 'scheduled' in result && result.scheduled === true
 }
 
 export function QuestionEditClient({
@@ -36,12 +47,20 @@ export function QuestionEditClient({
 }: QuestionEditClientProps) {
   const t = useTranslations('questions.editPage')
   const router = useRouter()
+  const toastMessages = useToastMessages()
   const { mutateAsync: updateQuestion } = useUpdateQuestion()
-  const { mutate: deleteQuestion, isPending: deleting } = useDeleteQuestion()
-  const { mutate: restoreQuestion, isPending: restoring } = useRestoreQuestion()
+  const { mutateAsync: deleteQuestion, isPending: deleting } = useDeleteQuestion()
+  const { mutateAsync: restoreQuestion, isPending: restoring } = useRestoreQuestion()
   const [question, setQuestion] = useState(initialQuestion)
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [restoreOpen, setRestoreOpen] = useState(false)
+  const [scheduledDelete, setScheduledDelete] = useState<
+    Extract<DeleteQuestionResult, { scheduled: true }> | null
+  >(null)
+
+  const blockingInterviews = scheduledDelete?.blockingInterviews
+      ?? question.blockingInterviews
+      ?? []
 
   async function handleSubmit(
     value: QuestionInput,
@@ -57,28 +76,43 @@ export function QuestionEditClient({
     return updated
   }
 
-  function performRestore() {
+  async function performRestore() {
     if (restoring) return
-
-    restoreQuestion(id, {
-      onSuccess: (restored) => {
-        setQuestion(restored)
-        setRestoreOpen(false)
-        router.refresh()
-      },
-    })
+    try {
+      const restored = await runMutation(() => restoreQuestion(id), {
+        successMessage: toastMessages.question.restoreSuccess,
+        errorMessage: toastMessages.question.restoreError,
+      })
+      setQuestion(restored)
+      setRestoreOpen(false)
+      router.refresh()
+    } catch {}
   }
 
-  function performDelete() {
+  async function performDelete() {
     if (deleting) return
-
-    deleteQuestion(id, {
-      onSuccess: () => {
-        setConfirmOpen(false)
-        router.push(routes.questions.list)
-        router.refresh()
-      },
-    })
+    try {
+      const result = await runMutation(() => deleteQuestion(id), {
+        showSuccessToast: false,
+        errorMessage: toastMessages.question.deleteError,
+      })
+      setConfirmOpen(false)
+      if (isDeleteScheduled(result)) {
+        setScheduledDelete(result)
+        notifyInfo(toastMessages.deleteQuestion.scheduledTitle, {
+          description: toastMessages.deleteQuestion.scheduledIntro,
+        })
+        setQuestion((prev) => ({
+          ...prev,
+          pendingDeletion: true,
+          blockingInterviews: result.blockingInterviews,
+        }))
+        return
+      }
+      notifySuccess(toastMessages.question.deleteSuccess)
+      router.push('/questions')
+      router.refresh()
+    } catch {}
   }
 
   return (
@@ -89,6 +123,12 @@ export function QuestionEditClient({
           onRestore={() => setRestoreOpen(true)}
         />
       ) : null}
+      {!question.deleted && (question.pendingDeletion || scheduledDelete) ? (
+          <QuestionDeleteScheduledAlert
+            intro={toastMessages.deleteQuestion.scheduledIntro}
+            blockingInterviews={blockingInterviews}
+          />
+      ) : null}
       <QuestionEditor
         questionId={id}
         title={canUpdate ? t('title') : t('viewTitle')}
@@ -98,10 +138,12 @@ export function QuestionEditClient({
         onSubmit={handleSubmit}
       />
       {!question.deleted && canDelete ? (
-        <QuestionDangerZone
-          deleting={deleting}
-          onRequestDelete={() => setConfirmOpen(true)}
-        />
+        <Stack gap={4}>
+          <QuestionDangerZone
+            deleting={deleting}
+            onRequestDelete={() => setConfirmOpen(true)}
+          />
+        </Stack>
       ) : null}
       <ConfirmDialog
         open={confirmOpen}

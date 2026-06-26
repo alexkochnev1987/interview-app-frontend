@@ -12,6 +12,9 @@ import {
   redirectIfUnauthorizedError,
 } from '@/lib/auth-gate'
 import { canConfigureInterview } from '@/lib/auth-roles'
+import { canEditInterview } from '@/lib/interview-management'
+import { prefetchInterviewCreatePicker } from '@/lib/questions-library-prefetch'
+import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
 import { isForbiddenError, requestServer } from '@/lib/server-fetch'
 
 interface InterviewDetailPageProps {
@@ -102,11 +105,21 @@ export default async function InterviewDetailPage({
     )
   }
 
+  let editPickerPrefetch: QuestionsLibraryPrefetch | null = null
+  if (canEditInterview(interview)) {
+    try {
+      editPickerPrefetch = await prefetchInterviewCreatePicker(auth.ctx)
+    } catch {
+      editPickerPrefetch = null
+    }
+  }
+
   return (
     <InterviewDetailClient
       id={id}
       initialInterview={interview}
       initialResults={results}
+      editPickerPrefetch={editPickerPrefetch}
     />
   )
 }

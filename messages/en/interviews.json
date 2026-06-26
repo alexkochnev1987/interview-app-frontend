@@ -16,6 +16,29 @@
         "completed": "Completed",
         "failed": "Failed"
       }
+    },
+    "actions": {
+      "edit": "Edit interview",
+      "saveChanges": "Save changes",
+      "saving": "Saving...",
+      "cancelInterview": "Cancel interview",
+      "canceling": "Canceling...",
+      "cancelTitle": "Cancel this interview?",
+      "cancelDescription": "The candidate link will stop working. This cannot be undone.",
+      "confirmCancel": "Cancel interview",
+      "dismiss": "Keep interview",
+      "discardEdit": "Discard changes",
+      "keepEditing": "Keep editing"
+    },
+    "edit": {
+      "title": "Edit interview",
+      "candidateName": "Candidate name",
+      "candidateEmail": "Candidate email",
+      "position": "Position",
+      "questionsTitle": "Questions",
+      "answersBlockEditNotice": "Editing is disabled after answers have been uploaded, because answers are tied to question order.",
+      "discardTitle": "Discard unsaved changes?",
+      "discardDescription": "Your edits to this interview will be lost."
     }
   }
 }

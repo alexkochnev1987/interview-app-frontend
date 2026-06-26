@@ -72,6 +72,7 @@ type UseQuestionsQueryOptions = {
   syncUrl?: boolean
   lockStatus?: QuestionStatusFilter
   disableFetchInCardsView?: boolean
+  eligibleForInterview?: boolean
 }
 
 export type UseQuestionsQueryResult = {
@@ -128,6 +129,7 @@ export function useQuestionsQuery(
     syncUrl,
     lockStatus,
     disableFetchInCardsView,
+    eligibleForInterview
   } = options
   const [capturedInitial] = useState<Partial<QuestionsQueryState> | undefined>(initial)
   const router = useRouter()
@@ -192,8 +194,8 @@ export function useQuestionsQuery(
   }, [state, pathname, router, syncUrl, capturedInitial, lockStatus, searchParams])
 
   const fetchParams = useMemo(
-    () => buildQuestionsFetchParams(state, debouncedQ),
-    [state, debouncedQ],
+    () => buildQuestionsFetchParams(state, debouncedQ, { eligibleForInterview }),
+    [state, debouncedQ, eligibleForInterview],
   )
 
   const query = useQuery({

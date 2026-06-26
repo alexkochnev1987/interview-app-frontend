@@ -9,7 +9,7 @@ export const BULK_DELETE_TOAST_IDS = {
 } as const
 
 type BulkDeleteToastMessages = {
-  partialTitle: (deletedCount: number, blockedCount: number) => string
+  partialTitle: (deletedCount: number, scheduledCount: number) => string
   noopTitle: string
   noopDescription: string
   successTitle: (count: number) => string
@@ -20,11 +20,11 @@ export function notifyBulkDeleteOutcome(
   result: BulkDeleteResult,
   messages: BulkDeleteToastMessages,
 ) {
-  if (result.blocked.length > 0) {
+  if (result.scheduled.length > 0) {
     notifyInfo(
       messages.partialTitle(
         result.deleted.length,
-        result.blocked.length,
+        result.scheduled.length,
       ),
       { id: BULK_DELETE_TOAST_IDS.partial },
     )
