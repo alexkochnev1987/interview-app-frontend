@@ -64,6 +64,8 @@ import {
   getCandidateInitials,
 } from "@/lib/interview-formatters";
 import { useSharedLabels } from "@/i18n/use-shared-labels";
+import { localizedPath } from "@/i18n/pathname";
+import type { Locale } from "@/i18n/locales";
 import { runMutation } from "@/lib/run-mutation";
 import { useToastMessages } from "@/lib/use-toast-messages";
 
@@ -226,6 +228,20 @@ export default function InterviewDetailClient({
   const requestedMediaRef = useRef<Map<number, string>>(new Map());
   const mediaFetchInterviewIdRef = useRef(id);
 
+  const buildLocalizedInterviewPath = useCallback(
+    (
+      route: "take" | "feedback",
+      interviewLocale: Locale,
+      interviewId: string,
+      token: string,
+    ) =>
+      localizedPath(
+        `/${route}/${encodeURIComponent(interviewId)}?token=${encodeURIComponent(token)}`,
+        interviewLocale,
+      ),
+    [],
+  );
+
   const buildCandidateUrl = useCallback(
     (relativeLink: string) => {
       if (typeof window === "undefined") {
@@ -246,12 +262,17 @@ export default function InterviewDetailClient({
           return url.toString();
         }
 
-        return `${url.origin}/${interviewLocale}/take/${encodeURIComponent(id)}?token=${encodeURIComponent(token)}`;
+        return `${window.location.origin}${buildLocalizedInterviewPath(
+          "take",
+          interviewLocale,
+          id,
+          token,
+        )}`;
       } catch {
         return relativeLink;
       }
     },
-    [id, interview?.interviewLocale],
+    [buildLocalizedInterviewPath, id, interview?.interviewLocale],
   );
 
   const buildFeedbackUrl = useCallback(
@@ -274,12 +295,17 @@ export default function InterviewDetailClient({
           return url.toString();
         }
 
-        return `${url.origin}/${interviewLocale}/feedback/${encodeURIComponent(id)}?token=${encodeURIComponent(token)}`;
+        return `${window.location.origin}${buildLocalizedInterviewPath(
+          "feedback",
+          interviewLocale,
+          id,
+          token,
+        )}`;
       } catch {
         return relativeLink;
       }
     },
-    [id, interview?.interviewLocale],
+    [buildLocalizedInterviewPath, id, interview?.interviewLocale],
   );
 
   const loadCandidateLink = useCallback(

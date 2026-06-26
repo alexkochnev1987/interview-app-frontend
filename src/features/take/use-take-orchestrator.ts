@@ -698,7 +698,8 @@ export function useTakeOrchestrator({
     uploading ||
     recordingStartBusy ||
     stage === 'recording' ||
-    stage === 'transition';
+    stage === 'transition' ||
+    interviewerPresence === 'speaking';
 
   return {
     stage,

@@ -1,12 +1,11 @@
 'use client'
 
 import { WandSparkles } from 'lucide-react'
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { type ReactNode } from 'react'
 import { useTranslations } from 'next-intl'
 
 import { Grid } from '@/components/ui/layout/grid'
 import { Stack } from '@/components/ui/layout/stack'
-import { Textarea } from '@/components/ui/textarea'
 import {
   type QuestionExpectedConcept,
   type QuestionInput,
@@ -21,6 +20,7 @@ import {
 } from '@/lib/question-editor/parsers'
 import { type DraftFieldKey } from '@/lib/question-editor/field-keys'
 import { useQuestionEditorLabels } from '@/i18n/use-question-editor-labels'
+import { RawListTextarea } from './editor-raw-list-textarea'
 import { EditorSectionCard } from './editor-section-card'
 import { QuestionEditorField } from './question-editor-field'
 
@@ -41,56 +41,6 @@ function coerceRedFlags(
     typeof item === 'string'
       ? { id: item, label: item, severity: 'medium' }
       : item,
-  )
-}
-
-type ListItem = QuestionExpectedConcept | QuestionRedFlag
-
-interface RawListTextareaProps<T extends ListItem> {
-  id: string
-  parsedValue: T[]
-  format: (items: T[]) => string
-  parse: (text: string) => T[]
-  onParsedChange: (next: T[]) => void
-  placeholder: string
-  disabled: boolean
-}
-
-function RawListTextarea<T extends ListItem>({
-  id,
-  parsedValue,
-  format,
-  parse,
-  onParsedChange,
-  placeholder,
-  disabled,
-}: RawListTextareaProps<T>) {
-  const [text, setText] = useState(() => format(parsedValue))
-  const lastSyncedRef = useRef(parsedValue)
-
-  useEffect(() => {
-    if (parsedValue === lastSyncedRef.current) return
-    lastSyncedRef.current = parsedValue
-    setText(format(parsedValue))
-  }, [parsedValue, format])
-
-  function handleChange(nextText: string) {
-    setText(nextText)
-    const parsed = parse(nextText)
-    lastSyncedRef.current = parsed
-    onParsedChange(parsed)
-  }
-
-  return (
-    <Textarea
-      id={id}
-      size="xs"
-      tone="code"
-      value={text}
-      onChange={(event) => handleChange(event.target.value)}
-      placeholder={placeholder}
-      disabled={disabled}
-    />
   )
 }
 

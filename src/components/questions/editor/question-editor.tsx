@@ -205,7 +205,6 @@ export function QuestionEditor({
     null,
   )
   const [isRefreshingTranslations, setIsRefreshingTranslations] = useState(false)
-  const [pendingTranslationsReplace, setPendingTranslationsReplace] = useState(false)
   const [aiError, setAiError] = useState<string | null>(null)
   const fieldsDisabled = submitting || readOnly || isBatchTranslating
   const translateGenerationRef = useRef(0)
@@ -732,7 +731,6 @@ export function QuestionEditor({
   function confirmRemoveLocale() {
     if (!localePendingRemoval) return
     performRemoveLocale(localePendingRemoval)
-    setPendingTranslationsReplace(true)
     setLocalePendingRemoval(null)
   }
 
@@ -1112,7 +1110,6 @@ export function QuestionEditor({
     setAddedLocales(nextAddedLocales)
     setActiveLocale(nextActiveLocale)
     setMetadataText(normalizedMetadataText)
-    setPendingTranslationsReplace(false)
     if (editorPhase === 1 && shouldUnlockPhase2AfterSave(persisted, nextPrimaryLocale)) {
       setEditorPhase(2)
     }
@@ -1243,8 +1240,7 @@ export function QuestionEditor({
     const removedPersistedLocale = persistedLocales.some(
       (locale) => !visibleLocales.includes(locale),
     )
-    const translationsMode =
-      removedPersistedLocale || pendingTranslationsReplace ? 'replace' : undefined
+    const translationsMode = removedPersistedLocale ? 'replace' : undefined
     const payload: QuestionInput = questionId
       ? (editorStateToUpdatePayload(editorState, { translationsMode }) as QuestionInput)
       : (editorStateToCreatePayload(editorState) as QuestionInput)

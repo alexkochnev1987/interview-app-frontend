@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react'
@@ -147,6 +148,7 @@ function TakeFlowLocaleProviderInner({ children }: TakeFlowLocaleProviderProps) 
 
   const [locale, setLocale] = useState<Locale>(parentLocale)
   const [messages, setMessages] = useState(parentMessages)
+  const localeSwitchGenerationRef = useRef(0)
 
   useEffect(() => {
     const seeded = pickTakeFlowMessages(parentMessages as TakeFlowMessages)
@@ -178,13 +180,21 @@ function TakeFlowLocaleProviderInner({ children }: TakeFlowLocaleProviderProps) 
         return
       }
 
+      const generation = ++localeSwitchGenerationRef.current
+
       const cachedMessages = takeFlowMessagesCache.get(nextLocale)
       if (cachedMessages && isCompleteTakeFlowMessages(cachedMessages)) {
+        if (generation !== localeSwitchGenerationRef.current) {
+          return
+        }
         applyLocaleSwitch(nextLocale, cachedMessages)
         return
       }
 
       void loadTakeFlowLocaleMessages(nextLocale).then((nextMessages) => {
+        if (generation !== localeSwitchGenerationRef.current) {
+          return
+        }
         applyLocaleSwitch(nextLocale, nextMessages)
       })
     },
