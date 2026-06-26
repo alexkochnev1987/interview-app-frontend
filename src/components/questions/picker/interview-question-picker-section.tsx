@@ -159,6 +159,7 @@ export function InterviewQuestionPickerMain({
               onSortChange={query.setSort}
               page={query.state.page}
               loading={query.loading}
+              disabled={disabled}
             />
           )}
           renderCards={() => (
