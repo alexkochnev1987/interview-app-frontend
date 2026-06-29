@@ -62,57 +62,79 @@ export function InterviewSummaryCard({
   const canEdit = canEditInterview(interview)
   const canManage = canManageInterview(interview)
 
+  const editButton =
+    canEdit && !isEditing ? (
+      <DemoWriteGuard>
+        <Button type="button" variant="outline" onClick={onStartEditing}>
+          {tActions('edit')}
+        </Button>
+      </DemoWriteGuard>
+    ) : null
+
+  const cancelButton =
+    canManage && !isEditing ? (
+      <DemoWriteGuard disabled={canceling}>
+        <Button type="button" variant="destructive" onClick={onOpenCancelConfirm}>
+          {canceling ? tActions('canceling') : tActions('cancelInterview')}
+        </Button>
+      </DemoWriteGuard>
+    ) : null
+
+  const validateButton =
+    interview.status !== 'completed' ? (
+      <DemoWriteGuard disabled={!canValidate || validating || hasActiveValidation}>
+        <Button type="button" variant="gradient" onClick={onValidate}>
+          {validating || hasActiveValidation ? t('validating') : t('validate')}
+        </Button>
+      </DemoWriteGuard>
+    ) : null
+
+  const managementNotice =
+    canManage && !canEdit && !isEditing ? (
+      <BodyText size="sm" tone="muted">
+        {tEdit('answersBlockEditNotice')}
+      </BodyText>
+    ) : null
+
+  const hasManagementActions = Boolean(editButton || cancelButton)
+
+  const backLink = (
+    <UnstyledLink href="/">
+      <EyebrowBadge tone="default" icon={<ArrowLeft className="size-3.5" />}>
+        {tDetail('backToDashboard')}
+      </EyebrowBadge>
+    </UnstyledLink>
+  )
+
   return (
     <Card variant="floating" size="lg">
       <CardContent spacing="2xl">
         <Stack gap={4} width="full">
-          <Inline gap={4} align="start" justify="between" wrap="nowrap" width="full">
-            <UnstyledLink href="/">
-              <EyebrowBadge
-                tone="default"
-                icon={<ArrowLeft className="size-3.5" />}
-              >
-                {tDetail('backToDashboard')}
-              </EyebrowBadge>
-            </UnstyledLink>
+          <Stack gap={3} width="full" visibility="below-sm">
+            <Inline gap={3} align="center" justify="between" wrap="nowrap" width="full">
+              {backLink}
+              {validateButton}
+            </Inline>
+            {hasManagementActions ? (
+              <Inline gap={3} wrap="wrap" justify="end" width="full">
+                {editButton}
+                {cancelButton}
+              </Inline>
+            ) : null}
+            {managementNotice}
+          </Stack>
 
-            <Stack gap={2} align="end" placeSelf="start">
-                <Inline gap={3} wrap="wrap">
-                  {canEdit && !isEditing ? (
-                      <DemoWriteGuard>
-                        <Button type="button" variant="outline" onClick={onStartEditing}>
-                          {tActions('edit')}
-                        </Button>
-                      </DemoWriteGuard>
-                  ) : null}
-                  {canManage && !isEditing ? (
-                      <DemoWriteGuard disabled={canceling}>
-                        <Button
-                            type="button"
-                            variant="destructive"
-                            onClick={onOpenCancelConfirm}
-                        >
-                          {canceling ? tActions('canceling') : tActions('cancelInterview')}
-                        </Button>
-                      </DemoWriteGuard>
-                  ) : null}
-                  {interview.status !== 'completed' ? (
-                      <DemoWriteGuard
-                          disabled={!canValidate || validating || hasActiveValidation}
-                      >
-                        <Button type="button" variant="gradient" onClick={onValidate}>
-                          {validating || hasActiveValidation ? t('validating') : t('validate')}
-                        </Button>
-                      </DemoWriteGuard>
-                  ) : null}
-                </Inline>
-                {canManage && !canEdit && !isEditing ? (
-                    <BodyText size="sm" tone="muted">
-                      {tEdit('answersBlockEditNotice')}
-                    </BodyText>
-                ) : null}
+          <Grid columns="page-header-actions" gap={3} visibility="sm-up">
+            {backLink}
+            <Stack gap={2} align="end">
+              <Inline gap={3} wrap="wrap" justify="end">
+                {editButton}
+                {cancelButton}
+                {validateButton}
+              </Inline>
+              {managementNotice}
             </Stack>
-          </Inline>
+          </Grid>
 
           <Inline gap={4} align="center">
             <IconBadge tone="primary" size="lg" textSize="lg">
