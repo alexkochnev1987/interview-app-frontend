@@ -65,8 +65,8 @@ export function InterviewSummaryCard({
   return (
     <Card variant="floating" size="lg">
       <CardContent spacing="2xl">
-        <Inline gap={4} align="start" justify="between" wrap="wrap">
-          <Stack gap={4}>
+        <Stack gap={4} width="full">
+          <Inline gap={4} align="start" justify="between" wrap="nowrap" width="full">
             <UnstyledLink href="/">
               <EyebrowBadge
                 tone="default"
@@ -76,71 +76,63 @@ export function InterviewSummaryCard({
               </EyebrowBadge>
             </UnstyledLink>
 
-            <Inline gap={4} align="center">
-              <IconBadge tone="primary" size="lg" textSize="lg">
-                {getCandidateInitials(interview.candidateName)}
-              </IconBadge>
-              <Stack gap={1.5}>
-                <HeroTitle>{interview.candidateName}</HeroTitle>
-                <HeroLead>{interview.position}</HeroLead>
-              </Stack>
-            </Inline>
+            <Stack gap={2} align="end" placeSelf="start">
+                <Inline gap={3} wrap="wrap">
+                  {canEdit && !isEditing ? (
+                      <DemoWriteGuard>
+                        <Button type="button" variant="outline" onClick={onStartEditing}>
+                          {tActions('edit')}
+                        </Button>
+                      </DemoWriteGuard>
+                  ) : null}
+                  {canManage && !isEditing ? (
+                      <DemoWriteGuard disabled={canceling}>
+                        <Button
+                            type="button"
+                            variant="destructive"
+                            onClick={onOpenCancelConfirm}
+                        >
+                          {canceling ? tActions('canceling') : tActions('cancelInterview')}
+                        </Button>
+                      </DemoWriteGuard>
+                  ) : null}
+                  {interview.status !== 'completed' ? (
+                      <DemoWriteGuard
+                          disabled={!canValidate || validating || hasActiveValidation}
+                      >
+                        <Button type="button" variant="gradient" onClick={onValidate}>
+                          {validating || hasActiveValidation ? t('validating') : t('validate')}
+                        </Button>
+                      </DemoWriteGuard>
+                  ) : null}
+                </Inline>
+                {canManage && !canEdit && !isEditing ? (
+                    <BodyText size="sm" tone="muted">
+                      {tEdit('answersBlockEditNotice')}
+                    </BodyText>
+                ) : null}
+            </Stack>
+          </Inline>
 
-            <Inline gap={3} align="center" wrap="wrap">
-              <StatusPill tone={interview.status}>
-                {sharedLabels.interviewStatus(interview.status)}
-              </StatusPill>
-              <StatusPill tone="neutral">
-                {t('createdPrefix')} {formatInterviewDate(interview.createdAt)}
-              </StatusPill>
-            </Inline>
-          </Stack>
+          <Inline gap={4} align="center">
+            <IconBadge tone="primary" size="lg" textSize="lg">
+              {getCandidateInitials(interview.candidateName)}
+            </IconBadge>
+            <Stack gap={1.5}>
+              <HeroTitle>{interview.candidateName}</HeroTitle>
+              <HeroLead>{interview.position}</HeroLead>
+            </Stack>
+          </Inline>
 
-          <Stack gap={2} align="end">
-            <Inline gap={3} wrap="wrap">
-              {canEdit && !isEditing ? (
-                <DemoWriteGuard>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={onStartEditing}
-                  >
-                    {tActions('edit')}
-                  </Button>
-                </DemoWriteGuard>
-              ) : null}
-              {canManage && !isEditing ? (
-                <DemoWriteGuard disabled={canceling}>
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    onClick={onOpenCancelConfirm}
-                  >
-                    {canceling
-                      ? tActions('canceling')
-                      : tActions('cancelInterview')}
-                  </Button>
-                </DemoWriteGuard>
-              ) : null}
-              {interview.status !== 'completed' ? (
-                <DemoWriteGuard
-                  disabled={!canValidate || validating || hasActiveValidation}
-                >
-                  <Button type="button" variant="gradient" onClick={onValidate}>
-                    {validating || hasActiveValidation
-                      ? t('validating')
-                      : t('validate')}
-                  </Button>
-                </DemoWriteGuard>
-              ) : null}
-            </Inline>
-            {canManage && !canEdit && !isEditing ? (
-              <BodyText size="sm" tone="muted">
-                {tEdit('answersBlockEditNotice')}
-              </BodyText>
-            ) : null}
-          </Stack>
-        </Inline>
+          <Inline gap={3} align="center" wrap="wrap">
+            <StatusPill tone={interview.status}>
+              {sharedLabels.interviewStatus(interview.status)}
+            </StatusPill>
+            <StatusPill tone="neutral">
+              {t('createdPrefix')} {formatInterviewDate(interview.createdAt)}
+            </StatusPill>
+          </Inline>
+        </Stack>
 
         <Grid columns="metrics-3" gap={4}>
           <MetricPanel
