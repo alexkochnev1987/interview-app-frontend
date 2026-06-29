@@ -47,6 +47,8 @@ const gridVariants = cva('grid', {
       'metrics-5': 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5',
       'pagination-footer':
         'grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center [&>*:first-child]:min-w-0 [&>*:last-child]:justify-self-center sm:[&>*:last-child]:justify-self-end',
+      'page-header-actions':
+        'grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start [&>*:first-child]:min-w-0 [&>*:last-child]:justify-self-end',
       'consent-shell':
         'grid-cols-1 content-start lg:grid-cols-[1.1fr_0.9fr]',
       'lobby-shell': cn(
@@ -59,12 +61,18 @@ const gridVariants = cva('grid', {
       stretch: 'items-stretch',
       center: 'items-center',
     },
+    visibility: {
+      always: '',
+      'below-sm': 'sm:hidden',
+      'sm-up': 'hidden sm:grid',
+    },
   },
   defaultVariants: {
     grow: 'none',
     gap: 4,
     columns: 1,
     align: 'stretch',
+    visibility: 'always',
   },
 })
 
@@ -80,13 +88,14 @@ export function Grid({
   gap,
   columns,
   align,
+  visibility,
   ...props
 }: GridProps) {
   const Comp = (as ?? 'div') as React.ElementType
 
   return (
     <Comp
-      className={cn(gridVariants({ grow, gap, columns, align }), className)}
+      className={cn(gridVariants({ grow, gap, columns, align, visibility }), className)}
       {...props}
     />
   )

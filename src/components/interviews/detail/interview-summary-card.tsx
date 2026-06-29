@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
 import { HeroLead, HeroTitle } from '@/components/ui/hero-text'
+import { Icon } from '@/components/ui/icon'
 import { IconBadge } from '@/components/ui/icon-badge'
 import { Grid } from '@/components/ui/layout/grid'
 import { Inline } from '@/components/ui/layout/inline'
@@ -62,85 +63,106 @@ export function InterviewSummaryCard({
   const canEdit = canEditInterview(interview)
   const canManage = canManageInterview(interview)
 
+  const editButton =
+    canEdit && !isEditing ? (
+      <DemoWriteGuard>
+        <Button type="button" variant="outline" onClick={onStartEditing}>
+          {tActions('edit')}
+        </Button>
+      </DemoWriteGuard>
+    ) : null
+
+  const cancelButton =
+    canManage && !isEditing ? (
+      <DemoWriteGuard disabled={canceling}>
+        <Button type="button" variant="destructive" onClick={onOpenCancelConfirm}>
+          {canceling ? tActions('canceling') : tActions('cancelInterview')}
+        </Button>
+      </DemoWriteGuard>
+    ) : null
+
+  const validateButton =
+    interview.status !== 'completed' ? (
+      <DemoWriteGuard disabled={!canValidate || validating || hasActiveValidation}>
+        <Button type="button" variant="gradient" onClick={onValidate}>
+          {validating || hasActiveValidation ? t('validating') : t('validate')}
+        </Button>
+      </DemoWriteGuard>
+    ) : null
+
+  const managementNotice =
+    canManage && !canEdit && !isEditing ? (
+      <BodyText size="sm" tone="muted">
+        {tEdit('answersBlockEditNotice')}
+      </BodyText>
+    ) : null
+
+  const hasManagementActions = Boolean(editButton || cancelButton)
+
+  const backLink = (
+    <UnstyledLink href="/">
+      <EyebrowBadge
+        tone="default"
+        icon={
+          <Icon size="sm">
+            <ArrowLeft />
+          </Icon>
+        }
+      >
+        {tDetail('backToDashboard')}
+      </EyebrowBadge>
+    </UnstyledLink>
+  )
+
   return (
     <Card variant="floating" size="lg">
       <CardContent spacing="2xl">
-        <Inline gap={4} align="start" justify="between" wrap="wrap">
-          <Stack gap={4}>
-            <UnstyledLink href="/">
-              <EyebrowBadge
-                tone="default"
-                icon={<ArrowLeft className="size-3.5" />}
-              >
-                {tDetail('backToDashboard')}
-              </EyebrowBadge>
-            </UnstyledLink>
-
-            <Inline gap={4} align="center">
-              <IconBadge tone="primary" size="lg" textSize="lg">
-                {getCandidateInitials(interview.candidateName)}
-              </IconBadge>
-              <Stack gap={1.5}>
-                <HeroTitle>{interview.candidateName}</HeroTitle>
-                <HeroLead>{interview.position}</HeroLead>
-              </Stack>
+        <Stack gap={4} width="full">
+          <Stack gap={3} width="full" visibility="below-sm">
+            <Inline gap={3} align="center" justify="between" wrap="nowrap" width="full">
+              {backLink}
+              {validateButton}
             </Inline>
-
-            <Inline gap={3} align="center" wrap="wrap">
-              <StatusPill tone={interview.status}>
-                {sharedLabels.interviewStatus(interview.status)}
-              </StatusPill>
-              <StatusPill tone="neutral">
-                {t('createdPrefix')} {formatInterviewDate(interview.createdAt)}
-              </StatusPill>
-            </Inline>
-          </Stack>
-
-          <Stack gap={2} align="end">
-            <Inline gap={3} wrap="wrap">
-              {canEdit && !isEditing ? (
-                <DemoWriteGuard>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={onStartEditing}
-                  >
-                    {tActions('edit')}
-                  </Button>
-                </DemoWriteGuard>
-              ) : null}
-              {canManage && !isEditing ? (
-                <DemoWriteGuard disabled={canceling}>
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    onClick={onOpenCancelConfirm}
-                  >
-                    {canceling
-                      ? tActions('canceling')
-                      : tActions('cancelInterview')}
-                  </Button>
-                </DemoWriteGuard>
-              ) : null}
-              {interview.status !== 'completed' ? (
-                <DemoWriteGuard
-                  disabled={!canValidate || validating || hasActiveValidation}
-                >
-                  <Button type="button" variant="gradient" onClick={onValidate}>
-                    {validating || hasActiveValidation
-                      ? t('validating')
-                      : t('validate')}
-                  </Button>
-                </DemoWriteGuard>
-              ) : null}
-            </Inline>
-            {canManage && !canEdit && !isEditing ? (
-              <BodyText size="sm" tone="muted">
-                {tEdit('answersBlockEditNotice')}
-              </BodyText>
+            {hasManagementActions ? (
+              <Inline gap={3} wrap="wrap" justify="end" width="full">
+                {editButton}
+                {cancelButton}
+              </Inline>
             ) : null}
+            {managementNotice}
           </Stack>
-        </Inline>
+
+          <Grid columns="page-header-actions" gap={3} visibility="sm-up">
+            {backLink}
+            <Stack gap={2} align="end">
+              <Inline gap={3} wrap="wrap" justify="end">
+                {editButton}
+                {cancelButton}
+                {validateButton}
+              </Inline>
+              {managementNotice}
+            </Stack>
+          </Grid>
+
+          <Inline gap={4} align="center">
+            <IconBadge tone="primary" size="lg" textSize="lg">
+              {getCandidateInitials(interview.candidateName)}
+            </IconBadge>
+            <Stack gap={1.5}>
+              <HeroTitle>{interview.candidateName}</HeroTitle>
+              <HeroLead>{interview.position}</HeroLead>
+            </Stack>
+          </Inline>
+
+          <Inline gap={3} align="center" wrap="wrap">
+            <StatusPill tone={interview.status}>
+              {sharedLabels.interviewStatus(interview.status)}
+            </StatusPill>
+            <StatusPill tone="neutral">
+              {t('createdPrefix')} {formatInterviewDate(interview.createdAt)}
+            </StatusPill>
+          </Inline>
+        </Stack>
 
         <Grid columns="metrics-3" gap={4}>
           <MetricPanel
