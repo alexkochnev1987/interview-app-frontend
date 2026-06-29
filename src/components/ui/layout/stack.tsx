@@ -57,6 +57,11 @@ const stackVariants = cva('flex flex-col', {
       center: 'self-center',
       stretch: 'self-stretch',
     },
+    visibility: {
+      always: '',
+      'below-sm': 'sm:hidden',
+      'sm-up': 'hidden sm:flex',
+    },
   },
   defaultVariants: {
     gap: 4,
@@ -67,6 +72,7 @@ const stackVariants = cva('flex flex-col', {
     height: 'auto',
     overflow: 'none',
     placeSelf: 'auto',
+    visibility: 'always',
   },
 })
 
@@ -86,6 +92,7 @@ export function Stack({
   height,
   overflow,
   placeSelf,
+  visibility,
   ...props
 }: StackProps) {
   const Comp = (as ?? 'div') as React.ElementType
@@ -102,6 +109,7 @@ export function Stack({
           height,
           overflow,
           placeSelf,
+          visibility,
         }),
         className,
       )}
