@@ -79,7 +79,7 @@ export function useTakeQuestionTts(
   const localeSwitchPendingRef = useRef(false);
   const questionSnapshotRef = useRef(interview?.currentQuestion);
 
-  const takeAudioStage = stage === 'interview' || stage === 'recording';
+  const shouldSpeakQuestion = stage === 'interview';
 
   useEffect(() => {
     if (uiLocaleRef.current !== uiLocale) {
@@ -96,7 +96,7 @@ export function useTakeQuestionTts(
   }, [interview?.currentQuestion]);
 
   useEffect(() => {
-    if (!takeAudioStage) {
+    if (!shouldSpeakQuestion) {
       cancelBrowserSpeechSynth();
       speechCapture?.discardOutboundSynthGuards();
       recordingAllowedRef.current = true;
@@ -162,8 +162,9 @@ export function useTakeQuestionTts(
       release();
     };
   }, [
-    takeAudioStage,
+    shouldSpeakQuestion,
     uiLocale,
+    speechLocale,
     interview?.id,
     interview?.currentQuestion?.text,
     interview?.currentQuestionIndex,
@@ -172,7 +173,7 @@ export function useTakeQuestionTts(
   ]);
 
   const presence: InterviewerPresence =
-    takeAudioStage && speakingActive ? 'speaking' : 'listening';
+    shouldSpeakQuestion && speakingActive ? 'speaking' : 'listening';
 
   return [presence, recordingAllowedRef] as const;
 }
