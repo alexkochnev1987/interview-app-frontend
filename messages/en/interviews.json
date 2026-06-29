@@ -9,6 +9,7 @@
     },
     "detail": {
       "backToDashboard": "Back to dashboard",
+      "demoTryCandidateExperience": "Try the candidate experience",
       "validationStatus": {
         "idle": "Idle",
         "queued": "Queued",

@@ -9,6 +9,7 @@
     },
     "detail": {
       "backToDashboard": "Powrót do deski rozdzielczej",
+      "demoTryCandidateExperience": "Wypróbuj jako kandydat",
       "validationStatus": {
         "idle": "Bezczynny",
         "queued": "W kolejce",

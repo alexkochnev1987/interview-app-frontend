@@ -348,6 +348,10 @@ export async function login(data: LoginPayload): Promise<AuthUserResponseDto> {
   }));
 }
 
+export async function demoLogin(): Promise<AuthUserResponseDto> {
+  return handle(client.POST('/auth/demo', LOCALIZED_HEADERS));
+}
+
 export async function logout(): Promise<LogoutResponse> {
   return handle(client.POST('/auth/logout', LOCALIZED_HEADERS));
 }

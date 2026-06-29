@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input'
 import { Stack } from '@/components/ui/layout/stack'
 import { useRouter } from '@/i18n/navigation'
 import { stripLocalePrefix } from '@/i18n/pathname'
-import { login } from '@/lib/api'
+import { demoLogin, login } from '@/lib/api'
 import { ApiError } from '@/lib/api-error'
 import { useAuth } from '@/lib/auth-context'
 import { safeRedirectPath } from '@/lib/safe-redirect-path'
@@ -30,17 +30,20 @@ export function LoginForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [pendingAction, setPendingAction] = useState<'login' | 'demo' | null>(null)
+  const pending = pendingAction !== null
 
   const redirectPath = stripLocalePrefix(safeRedirectPath(searchParams.get('from')))
 
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault()
+  async function runAuth(
+    action: 'login' | 'demo',
+    authCall: () => Promise<Awaited<ReturnType<typeof login>>>,
+  ) {
     setError('')
-    setLoading(true)
+    setPendingAction(action)
 
     try {
-      const sessionUser = await login({ email, password })
+      const sessionUser = await authCall()
       establishSession(sessionUser)
       router.push(redirectPath)
       router.refresh()
@@ -53,8 +56,17 @@ export function LoginForm() {
         toastMessages.apiError.message(err) ?? toastMessages.pageGate.login.failedFallback,
       )
     } finally {
-      setLoading(false)
+      setPendingAction(null)
     }
+  }
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault()
+    await runAuth('login', () => login({ email, password }))
+  }
+
+  async function handleDemo() {
+    await runAuth('demo', () => demoLogin())
   }
 
   return (
@@ -105,10 +117,10 @@ export function LoginForm() {
               variant="gradient"
               size="xl"
               width="full"
-              disabled={loading}
+              disabled={pending}
               data-testid="login-submit"
             >
-              {loading
+              {pendingAction === 'login'
                 ? toastMessages.pageGate.login.signingInLabel
                 : toastMessages.pageGate.login.signInLabel}
             </Button>
@@ -119,6 +131,20 @@ export function LoginForm() {
               <Link href="/api/auth/google" prefetch={false}>
                 {t('google')}
               </Link>
+            </Button>
+
+            <Button
+              type="button"
+              variant="ghost"
+              size="xl"
+              width="full"
+              onClick={handleDemo}
+              disabled={pending}
+              data-testid="login-demo"
+            >
+              {pendingAction === 'demo'
+                ? toastMessages.pageGate.login.signingInLabel
+                : t('demo')}
             </Button>
           </Stack>
         </form>

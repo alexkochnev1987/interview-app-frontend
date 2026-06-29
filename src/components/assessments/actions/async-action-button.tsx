@@ -11,6 +11,7 @@ import { RefreshCw } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
+import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { ApiError } from '@/lib/api'
 import { notifyError, notifyInfo } from '@/lib/toast'
 
@@ -46,12 +47,6 @@ interface AsyncActionButtonProps {
   onSuccess?: () => void
 }
 
-/**
- * A button for a one-shot async backend action with built-in phase handling
- * (idle -> submitting -> submitted -> idle), 409 "already running" handling,
- * and unmount safety. It is intentionally domain-agnostic; callers supply all
- * labels and toast copy.
- */
 export function AsyncActionButton({
   onRun,
   idleLabel,
@@ -91,8 +86,7 @@ export function AsyncActionButton({
         })
       }
       setPhase('submitted')
-      // An informational result means nothing was enqueued, so do not signal
-      // "work started" and kick live polling for a no-op.
+      // An informational result means nothing was enqueued, so don't kick live polling for a no-op.
       if (!result) onSuccess?.()
     } catch (err) {
       if (!mountedRef.current) return
@@ -122,20 +116,21 @@ export function AsyncActionButton({
   }, [phase])
 
   return (
-    <Button
-      type="button"
-      variant={variant}
-      size={size}
-      shape="pill"
-      onClick={handleClick}
-      disabled={disabled || phase !== 'idle'}
-    >
-      <Icon size={iconSize}>{icon}</Icon>
-      {phase === 'submitting'
-        ? startingLabel
-        : phase === 'submitted'
-          ? submittedLabel
-          : idleLabel}
-    </Button>
+    <DemoWriteGuard disabled={disabled || phase !== 'idle'}>
+      <Button
+        type="button"
+        variant={variant}
+        size={size}
+        shape="pill"
+        onClick={handleClick}
+      >
+        <Icon size={iconSize}>{icon}</Icon>
+        {phase === 'submitting'
+          ? startingLabel
+          : phase === 'submitted'
+            ? submittedLabel
+            : idleLabel}
+      </Button>
+    </DemoWriteGuard>
   )
 }

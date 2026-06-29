@@ -21,6 +21,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/demo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sign in to the read-only demo account */
+        post: operations["AuthController_demo"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/register": {
         parameters: {
             query?: never;
@@ -798,6 +815,11 @@ export interface components {
             role: string;
             /** @example org_123 */
             organizationId?: string;
+            /**
+             * @description Read-only demo account.
+             * @example false
+             */
+            demo: boolean;
             /**
              * Format: date-time
              * @example 2026-05-05T12:00:00.000Z
@@ -1768,6 +1790,39 @@ export interface operations {
             };
             /** @description Too many login attempts */
             429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AuthController_demo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuthUserResponseDto"];
+                };
+            };
+            /** @description Too many demo sign-in attempts */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Demo access is not available */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };

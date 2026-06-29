@@ -51,6 +51,8 @@ export type QuestionTableProps = {
   onSortChange: (sortBy: QuestionSortField, sortOrder: QuestionSortOrder) => void
   page: number
   loading: boolean
+  /** Browse-only: keep rows readable but block selection (e.g. demo accounts). */
+  disabled?: boolean
 }
 
 function nextSort(
@@ -140,6 +142,7 @@ export function QuestionTable({
   onSortChange,
   page,
   loading,
+  disabled = false,
 }: QuestionTableProps) {
   const t = useTranslations('questions.library.table')
   const tCard = useTranslations('questions.library.card')
@@ -186,6 +189,7 @@ export function QuestionTable({
               <TableHead width="tight">
                 <Checkbox
                   size="sm"
+                  disabled={disabled}
                   checked={
                     allVisibleSelected
                       ? true
@@ -257,14 +261,15 @@ export function QuestionTable({
             return (
               <TableRow
                 key={question.id}
-                interactive
+                interactive={disabled ? 'none' : true}
                 state={rowState}
-                onClick={() => onRowClick(question)}
+                onClick={disabled ? undefined : () => onRowClick(question)}
               >
                 {selectable ? (
                   <TableCell width="tight" onClick={stopRowClick}>
                     <Checkbox
                       size="sm"
+                      disabled={disabled}
                       checked={selected}
                       onCheckedChange={() => onToggleSelected(question)}
                       aria-label={t('selectQuestion')}

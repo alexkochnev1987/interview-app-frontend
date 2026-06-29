@@ -9,6 +9,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText, SectionHeading } from '@/components/ui/text'
+import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 
 interface QuestionEditorSaveBarProps {
   isDirty: boolean
@@ -50,15 +51,17 @@ export function QuestionEditorSaveBar({
               : t('descriptionClean')}
           </BodyText>
         </Stack>
-        <Button
-          type="submit"
-          variant="gradient"
-          size="xl"
-          disabled={submitting || !canSubmit}
-        >
-          <Save className="size-4" />
-          {submitting ? t('saving') : submitLabel}
-        </Button>
+        <DemoWriteGuard disabled={submitting || !canSubmit}>
+          <Button
+            type="submit"
+            variant="gradient"
+            size="xl"
+            disabled={submitting || !canSubmit}
+          >
+            <Save className="size-4" />
+            {submitting ? t('saving') : submitLabel}
+          </Button>
+        </DemoWriteGuard>
       </CardContent>
     </Card>
   )

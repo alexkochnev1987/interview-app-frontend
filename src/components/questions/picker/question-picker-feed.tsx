@@ -10,6 +10,7 @@ import { EmptyStateCard, LoadingStateCard } from '@/components/ui/state-card'
 import { Link } from '@/i18n/navigation'
 import { routes } from '@/i18n/routes'
 import type { Question } from '@/lib/api'
+import { useIsDemo } from '@/lib/auth-context'
 import type { QuestionView, QuestionsQueryState } from '@/lib/questions-query-state'
 import { useToastMessages } from '@/lib/use-toast-messages'
 
@@ -55,6 +56,7 @@ export function QuestionPickerFeed({
 }: QuestionPickerFeedProps) {
   const t = useTranslations('questions.picker.feed')
   const toastMessages = useToastMessages()
+  const isDemo = useIsDemo()
   const copyPath = copyVariant === 'library' ? 'library' : 'interview'
   const allEmpty = isQuestionsBankFullyEmpty({
     items,
@@ -103,9 +105,11 @@ export function QuestionPickerFeed({
         }
         action={
           allEmpty ? (
-            <Button asChild variant="gradient">
-              <Link href={routes.questions.new}>{t(`${copyPath}.createCta`)}</Link>
-            </Button>
+            isDemo ? null : (
+              <Button asChild variant="gradient">
+                <Link href={routes.questions.new}>{t(`${copyPath}.createCta`)}</Link>
+              </Button>
+            )
           ) : (
             <Button type="button" variant="outline-pill" shape="pill" onClick={onReset}>
               {t('resetFilters')}
