@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
 import { HeroLead, HeroTitle } from '@/components/ui/hero-text'
+import { Icon } from '@/components/ui/icon'
 import { IconBadge } from '@/components/ui/icon-badge'
 import { Grid } from '@/components/ui/layout/grid'
 import { Inline } from '@/components/ui/layout/inline'
@@ -100,7 +101,14 @@ export function InterviewSummaryCard({
 
   const backLink = (
     <UnstyledLink href="/">
-      <EyebrowBadge tone="default" icon={<ArrowLeft className="size-3.5" />}>
+      <EyebrowBadge
+        tone="default"
+        icon={
+          <Icon size="sm">
+            <ArrowLeft />
+          </Icon>
+        }
+      >
         {tDetail('backToDashboard')}
       </EyebrowBadge>
     </UnstyledLink>
