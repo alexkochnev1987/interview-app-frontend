@@ -24,7 +24,7 @@
       "saving": "Zapisywanie...",
       "cancelInterview": "Anuluj wywiad",
       "canceling": "Anulowanie...",
-      "cancelTitle": "Anulować to wywiad?",
+      "cancelTitle": "Anulować ten wywiad?",
       "cancelDescription": "Link dla kandydata przestanie działać. Tej operacji nie można cofnąć.",
       "confirmCancel": "Anuluj wywiad",
       "dismiss": "Pozostaw wywiad",
@@ -32,14 +32,14 @@
       "keepEditing": "Kontynuuj edycję"
     },
     "edit": {
-      "title": "Edycja wywiad",
+      "title": "Edycja wywiadu",
       "candidateName": "Imię i nazwisko kandydata",
       "candidateEmail": "Email kandydata",
       "position": "Stanowisko",
       "questionsTitle": "Pytania",
       "answersBlockEditNotice": "Edycja jest wyłączona po przesłaniu odpowiedzi, ponieważ odpowiedzi są powiązane z kolejnością pytań.",
       "discardTitle": "Odrzucić niezapisane zmiany?",
-      "discardDescription": "Twoje zmiany w tym wywiad zostaną utracone."
+      "discardDescription": "Twoje zmiany w tym wywiadzie zostaną utracone."
     }
   }
 }
