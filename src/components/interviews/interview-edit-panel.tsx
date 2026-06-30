@@ -13,6 +13,7 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { FormField } from '@/components/ui/form-field'
 import { IconAffix } from '@/components/ui/icon-affix'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -162,14 +163,16 @@ export function InterviewEditPanel({
               </FormField>
 
               <Inline gap={2} wrap="wrap">
-                <Button
-                  type="button"
-                  variant="gradient"
-                  disabled={submitting || selectedCount === 0}
-                  onClick={() => void handleSave()}
-                >
-                  {submitting ? tActions('saving') : tActions('saveChanges')}
-                </Button>
+                <DemoWriteGuard disabled={submitting || selectedCount === 0}>
+                  <Button
+                    type="button"
+                    variant="gradient"
+                    disabled={submitting || selectedCount === 0}
+                    onClick={() => void handleSave()}
+                  >
+                    {submitting ? tActions('saving') : tActions('saveChanges')}
+                  </Button>
+                </DemoWriteGuard>
                 <Button
                   type="button"
                   variant="outline"
