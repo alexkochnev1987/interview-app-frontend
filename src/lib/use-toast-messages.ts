@@ -1,6 +1,7 @@
 import { useBulkDeleteToastMessages } from './toast-messages/use-bulk-delete-toast-messages'
 import { useDefaultsToastMessages } from './toast-messages/use-defaults-toast-messages'
 import { useInterviewToastMessages } from './toast-messages/use-interview-toast-messages'
+import { useInterviewsLibraryToastMessages } from './toast-messages/use-interviews-library-toast-messages'
 import { usePageGateToastMessages } from './toast-messages/use-page-gate-toast-messages'
 import {
   useDeleteQuestionToastMessages,
@@ -19,6 +20,7 @@ export {
   useDefaultsToastMessages,
   useDeleteQuestionToastMessages,
   useInterviewToastMessages,
+  useInterviewsLibraryToastMessages,
   usePageGateToastMessages,
   useQuestionFacetsToastMessages,
   useQuestionFeedToastMessages,
@@ -35,6 +37,7 @@ export function useToastMessages() {
     defaults: useDefaultsToastMessages(),
     question: useQuestionToastMessages(),
     questions: useQuestionsToastMessages(),
+    interviewsLibrary: useInterviewsLibraryToastMessages(),
     interview: useInterviewToastMessages(),
     take: useTakeToastMessages(),
     bulkDelete: useBulkDeleteToastMessages(),

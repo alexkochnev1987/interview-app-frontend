@@ -5,7 +5,7 @@ import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallbac
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import type { Locale } from '@/i18n/locales'
 import { routes } from '@/i18n/routes'
-import { type Interview } from '@/lib/api'
+import { type InterviewListItem, type PaginatedInterviews } from '@/lib/api'
 import { canAccessDashboard } from '@/lib/auth-roles'
 import {
   loadAuthGate,
@@ -46,12 +46,16 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
     )
   }
 
-  let interviews: Interview[] = []
+  let interviews: InterviewListItem[] = []
   let error: string | null = null
 
   try {
-    interviews =
-      (await requestServer<Interview[]>('/interviews', auth.ctx)) ?? []
+    const response =
+        (await requestServer<PaginatedInterviews>('/interviews', auth.ctx, {
+          query: { limit: 20, sortBy: 'updatedAt', sortOrder: 'desc' },
+        })) ?? { items: [], total: 0, page: 1, limit: 20 }
+
+    interviews = response.items
   } catch (err) {
     redirectIfUnauthorizedError(err, '/', locale)
     if (isForbiddenError(err)) {

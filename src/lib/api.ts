@@ -48,6 +48,15 @@ export type {
   SimilarQuestionMatch,
   QuestionDeleteBlockingInterview,
   DeleteQuestionResult,
+  InterviewListItem,
+  PaginatedInterviews,
+  InterviewFacetsResponse,
+  InterviewFacetCount,
+  FetchInterviewsParams,
+  InterviewSortField,
+  InterviewSortOrder,
+  InterviewStatusFilter,
+  FetchInterviewFacetsParams,
 } from './api/types';
 
 export { updateUserRole, login, demoLogin, logout } from './api/auth';
@@ -67,7 +76,9 @@ export {
 export {
   createInterview,
   getInterview,
-  getInterviews,
+  fetchInterviews,
+  fetchInterviewFacets,
+  emptyPaginatedInterviews,
   updateInterview,
   cancelInterview,
   generateCandidateLink,

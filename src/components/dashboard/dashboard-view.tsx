@@ -37,13 +37,13 @@ import { Link } from '@/i18n/navigation'
 import { routes } from '@/i18n/routes'
 import { useInterviewFormatters } from '@/i18n/use-interview-formatters'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
-import type { Interview } from '@/lib/api'
+import type { InterviewListItem } from '@/lib/api'
 import {
   getCandidateInitials,
 } from '@/lib/interview-formatters'
 
 type DashboardViewProps = {
-  interviews: Interview[]
+  interviews: InterviewListItem[]
   isDemo: boolean
 }
 
@@ -58,7 +58,7 @@ export function DashboardView({ interviews, isDemo }: DashboardViewProps) {
     (interview) => interview.status === 'completed',
   ).length
   const questionVolume = interviews.reduce(
-    (sum, interview) => sum + interview.questions.length,
+    (sum, interview) => sum + interview.questionCount,
     0,
   )
 
@@ -218,17 +218,13 @@ export function DashboardView({ interviews, isDemo }: DashboardViewProps) {
                           <MetricPanel
                             tone="elevated"
                             label={t('recent.questions')}
-                            value={interview.questions.length}
+                            value={interview.questionCount}
                             valueSize="md"
                           />
                           <MetricPanel
                             tone="elevated"
                             label={t('recent.uploaded')}
-                            value={
-                              interview.answers.filter(
-                                (answer) => answer.status === 'submitted',
-                              ).length
-                            }
+                            value={interview.submittedAnswerCount}
                             valueSize="md"
                           />
                         </Grid>

@@ -272,11 +272,31 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List interviews */
+        /** List interviews (paginated, filterable, sortable) */
         get: operations["InterviewController_findAll"];
         put?: never;
         /** Create interview */
         post: operations["InterviewController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/interviews/facets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Faceted counts for the interview list sidebar
+         * @description Returns position and status counts. Counts respect every other filter on the request (q, and the other facet) so the UI shows what is still available before clicking.
+         */
+        get: operations["InterviewController_getFacets"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1112,6 +1132,44 @@ export interface components {
             updatedAt: string;
             workflow?: components["schemas"]["InterviewWorkflowDto"];
             candidateLink: string;
+        };
+        InterviewListItemDto: {
+            id: string;
+            candidateName: string;
+            candidateEmail?: string;
+            position: string;
+            /** @enum {string} */
+            status: "pending" | "in_progress" | "processing" | "completed" | "failed";
+            /** @description Total questions in this interview. */
+            questionCount: number;
+            /** @description Number of submitted answers. */
+            submittedAnswerCount: number;
+            /** @description Present when a result has been computed. */
+            overallScore?: number;
+            /** @enum {string} */
+            decision?: "proceed" | "review" | "reject";
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        PaginatedInterviewsResponseDto: {
+            items: components["schemas"]["InterviewListItemDto"][];
+            /** @description Total rows matching the filter, ignoring page/limit. */
+            total: number;
+            page: number;
+            limit: number;
+        };
+        InterviewFacetCountDto: {
+            value: string;
+            /** @description Number of interviews with this value, given all OTHER current filters. */
+            count: number;
+        };
+        InterviewFacetsResponseDto: {
+            /** @description Position value + count, given all OTHER current filters (position itself is not applied). */
+            positions: components["schemas"]["InterviewFacetCountDto"][];
+            /** @description Status value + count, given all OTHER current filters (status itself is not applied). */
+            statuses: components["schemas"]["InterviewFacetCountDto"][];
         };
         InterviewResponseDto: {
             id: string;
@@ -2073,7 +2131,17 @@ export interface operations {
     };
     InterviewController_findAll: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Search by candidates name */
+                q?: string;
+                /** @description Filter by position (exact match) */
+                position?: string;
+                status?: "pending" | "in_progress" | "processing" | "completed" | "failed";
+                sortBy?: "candidateName" | "createdAt" | "updatedAt";
+                sortOrder?: "asc" | "desc";
+                page?: number;
+                limit?: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -2085,7 +2153,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["InterviewResponseDto"][];
+                    "application/json": components["schemas"]["PaginatedInterviewsResponseDto"];
                 };
             };
             401: {
@@ -2136,6 +2204,43 @@ export interface operations {
                 };
             };
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    InterviewController_getFacets: {
+        parameters: {
+            query?: {
+                /** @description Search by candidates name */
+                q?: string;
+                /** @description Filter by position (exact match) */
+                position?: string;
+                status?: "pending" | "in_progress" | "processing" | "completed" | "failed";
+                sortBy?: "candidateName" | "createdAt" | "updatedAt";
+                sortOrder?: "asc" | "desc";
+                page?: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterviewFacetsResponseDto"];
+                };
+            };
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };

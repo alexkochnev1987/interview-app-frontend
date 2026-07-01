@@ -14,9 +14,5 @@ export function useInterviewToastMessages() {
       t('interview.uploadSuccess', { questionNumber }),
     uploadError: (questionNumber: number) =>
       t('interview.uploadError', { questionNumber }),
-    updateSuccess: t('interview.updateSuccess'),
-    updateError: t('interview.updateError'),
-    cancelSuccess: t('interview.cancelSuccess'),
-    cancelError: t('interview.cancelError'),
   }
 }

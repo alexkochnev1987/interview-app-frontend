@@ -15,19 +15,19 @@ import { Icon } from '@/components/ui/icon'
 import { CardGrid } from '@/components/ui/layout/card-grid'
 import { Stack } from '@/components/ui/layout/stack'
 import { EmptyStateCard } from '@/components/ui/state-card'
-import { getInterviews, type Interview } from '@/lib/api'
+import { fetchInterviews, type InterviewListItem } from '@/lib/api'
 import {
-  deriveReviewStatus,
-  hasScoringInProgress,
-  selectHrVisibleAssessments,
+  deriveReviewStatusFromListItem,
+  hasScoringInProgressListItems,
+  selectHrVisibleListItems,
 } from '@/lib/assessment-status'
 import { useLivePolling } from '@/lib/use-live-polling'
 
 interface AssessmentsListClientProps {
-  interviews: Interview[]
+  interviews: InterviewListItem[]
 }
 
-function matchesQuery(interview: Interview, normalizedQuery: string): boolean {
+function matchesQuery(interview: InterviewListItem, normalizedQuery: string): boolean {
   if (!normalizedQuery) return true
   const haystack = `${interview.candidateName} ${interview.position}`.toLowerCase()
   return haystack.includes(normalizedQuery)
@@ -41,14 +41,18 @@ export function AssessmentsListClient({
   const [status, setStatus] = useState<StatusFilter>('all')
   const deferredQuery = useDeferredValue(query)
 
-  const fetcher = useCallback(
-    async () => selectHrVisibleAssessments(await getInterviews()),
-    [],
-  )
+  const fetcher = useCallback(async () => {
+    const page = await fetchInterviews({
+      limit: 100,
+      sortBy: 'updatedAt',
+      sortOrder: 'desc',
+    })
+    return selectHrVisibleListItems(page.items)
+  }, [])
   const { data: interviews, refresh, kick, paused } = useLivePolling(
     initialInterviews,
     fetcher,
-    hasScoringInProgress,
+    hasScoringInProgressListItems,
   )
 
   const onEvaluationStarted = useCallback(() => {
@@ -59,7 +63,7 @@ export function AssessmentsListClient({
   const filtered = useMemo(() => {
     const normalizedQuery = deferredQuery.trim().toLowerCase()
     return interviews.filter((interview) => {
-      if (status !== 'all' && deriveReviewStatus(interview) !== status) {
+      if (status !== 'all' && deriveReviewStatusFromListItem(interview) !== status) {
         return false
       }
       return matchesQuery(interview, normalizedQuery)

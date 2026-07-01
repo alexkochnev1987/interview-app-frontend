@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 type PlaceholderLoadingFlags = {
   isPending: boolean
@@ -16,4 +16,19 @@ export function useVoidCallback(callback: () => Promise<unknown>): () => void {
   return useCallback(() => {
     void callback()
   }, [callback])
+}
+
+export function useDebouncedSearchValue(value: string, delayMs: number): string {
+  const [debounced, setDebounced] = useState(value)
+
+  useEffect(() => {
+    if (value === '') {
+      setDebounced('')
+      return
+    }
+    const handle = window.setTimeout(() => setDebounced(value), delayMs)
+    return () => window.clearTimeout(handle)
+  }, [value, delayMs])
+
+  return debounced
 }

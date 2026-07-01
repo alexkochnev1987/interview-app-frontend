@@ -5,12 +5,12 @@ export function useBulkDeleteToastMessages() {
 
   return {
     failedTitle: t('bulkDelete.failedTitle'),
-    partialTitle: (deletedCount: number, scheduledCount: number) =>
-      t('bulkDelete.partialTitle', { deletedCount, scheduledCount }),
+    partialTitle: (deletedCount: number, blockedCount: number) =>
+      t('bulkDelete.partialTitle', { deletedCount, blockedCount }),
     successTitle: (count: number) => t('bulkDelete.successTitle', { count }),
     successDescription: t('bulkDelete.successDescription'),
     noopTitle: t('bulkDelete.noopTitle'),
     noopDescription: t('bulkDelete.noopDescription'),
-    scheduledIntro: t('bulkDelete.scheduledIntro'),
+    blockedIntro: t('bulkDelete.blockedIntro'),
   }
 }

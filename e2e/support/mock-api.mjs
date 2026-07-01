@@ -10,17 +10,6 @@ import {
 
 const PORT = Number(process.env.E2E_MOCK_API_PORT ?? process.env.PORT ?? 3000)
 
-const DEMO_SESSION_TOKEN = 'e2e-demo-session'
-const DEMO_USER = {
-  id: 'demo-e2e',
-  email: 'demo@interview-app.com',
-  name: 'Demo HR',
-  role: 'hr',
-  demo: true,
-  createdAt: '2026-01-01T00:00:00.000Z',
-}
-const DEMO_PERMISSIONS = ['questions:read', 'interviews:read_own']
-
 /** @type {ReturnType<typeof createInitialInterviews>} */
 let interviews = createInitialInterviews()
 
@@ -36,12 +25,7 @@ function readSession(req) {
 }
 
 function isAuthed(req) {
-  const session = readSession(req)
-  return session === E2E_SESSION_TOKEN || session === DEMO_SESSION_TOKEN
-}
-
-function isDemoSession(req) {
-  return readSession(req) === DEMO_SESSION_TOKEN
+  return readSession(req) === E2E_SESSION_TOKEN
 }
 
 async function readJsonBody(req) {
@@ -119,13 +103,6 @@ async function handleRequest(req, res) {
     return
   }
 
-  if (method === 'POST' && pathname === '/auth/demo') {
-    json(res, 200, DEMO_USER, {
-      'Set-Cookie': `session=${DEMO_SESSION_TOKEN}; Path=/; HttpOnly; SameSite=Lax`,
-    })
-    return
-  }
-
   if (method === 'POST' && pathname === '/auth/logout') {
     json(res, 200, { ok: true }, {
       'Set-Cookie': 'session=; Path=/; HttpOnly; Max-Age=0; SameSite=Lax',
@@ -136,10 +113,6 @@ async function handleRequest(req, res) {
   if (method === 'GET' && pathname === '/auth/me') {
     if (!isAuthed(req)) {
       json(res, 401, { message: 'Unauthorized', statusCode: 401 })
-      return
-    }
-    if (isDemoSession(req)) {
-      json(res, 200, { ...DEMO_USER, permissions: DEMO_PERMISSIONS })
       return
     }
     json(res, 200, authUser())

@@ -31,6 +31,9 @@
       "cancelSuccess": "Інтэрв'ю адменена",
       "cancelError": "Не ўдалося адмяніць інтэрв'ю"
     },
+    "interviewsLibrary": {
+      "loadFailedFallback": "Не ўдалося загрузіць інтэрв'ю."
+    },
     "take": {
       "submitSuccess": "Адказ адпраўлены",
       "submitError": "Не ўдалося адправіць адказ"
@@ -78,6 +81,12 @@
         "unavailableTitle": "Ацэнка недаступна",
         "loadDetailFallback": "Не ўдалося загрузіць ацэнку.",
         "notFoundFallback": "Запытаную ацэнку не ўдалося загрузіць."
+      },
+      "interviews": {
+        "libraryForbiddenTitle": "У вас няма доступу да інтэрв'ю",
+        "libraryForbiddenDescription": "Бібліятэка інтэрв'ю даступная толькі карыстальнікам з ролямі HR, адміністратар і суперадміністратар. Калі вы лічыце, што гэта памылка, звярніцеся да ўладальніка рабочай прасторы.",
+        "libraryUnavailableTitle": "Інтэрв'ю зараз недаступныя",
+        "libraryLoadFailedFallback": "Не ўдалося загрузіць інтэрв'ю."
       },
       "interview": {
         "forbiddenTitle": "У вас няма доступу да гэтага інтэрв’ю",

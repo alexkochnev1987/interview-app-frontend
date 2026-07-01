@@ -1,8 +1,7 @@
-import { client, handle, Schemas } from './client';
-import { ApiError } from '../api-error';
+import { client, handle, extractMessage, Schemas } from './client';
+import { ApiError, QuestionInUseError } from '../api-error';
 import type {
   BulkDeleteResult,
-  DeleteQuestionResult,
   FetchQuestionFacetsParams,
   FetchQuestionsParams,
   PaginatedQuestions,
@@ -56,21 +55,21 @@ export async function updateQuestion(
 
 export async function deleteQuestion(
   id: string,
-): Promise<DeleteQuestionResult> {
+): Promise<{ id: string; deleted: true }> {
   const path = `/questions/${id}`;
   const data = await handle(
     client.DELETE('/questions/{id}', {
       params: { path: { id } },
     }),
+    {
+      onStatus: (status, error) =>
+        status === 409
+          ? new QuestionInUseError(
+              extractMessage(error, 'Question is used by an active interview.'),
+            )
+          : undefined,
+    },
   );
-
-  if (data.scheduled === true) {
-    return {
-      id: data.id,
-      scheduled: true,
-      blockingInterviews: data.blockingInterviews ?? [],
-    };
-  }
 
   if (data.deleted !== true) {
     throw new ApiError(200, 'API error: delete response did not confirm deletion.', path);

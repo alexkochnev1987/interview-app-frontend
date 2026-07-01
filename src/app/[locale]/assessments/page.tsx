@@ -6,8 +6,8 @@ import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallbac
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import type { Locale } from '@/i18n/locales'
-import { type Interview } from '@/lib/api'
-import { selectHrVisibleAssessments } from '@/lib/assessment-status'
+import { type InterviewListItem, type PaginatedInterviews } from '@/lib/api'
+import { selectHrVisibleListItems } from '@/lib/assessment-status'
 import {
   loadAuthGate,
   redirectIfUnauthenticated,
@@ -50,12 +50,16 @@ export default async function AssessmentsPage({
     )
   }
 
-  let interviews: Interview[] = []
+  let interviews: InterviewListItem[] = []
   let error: string | null = null
 
   try {
-    interviews =
-      (await requestServer<Interview[]>('/interviews', auth.ctx)) ?? []
+    const response =
+        (await requestServer<PaginatedInterviews>('/interviews', auth.ctx, {
+          query: { limit: 100, sortBy: 'updatedAt', sortOrder: 'desc' },
+        })) ?? { items: [], total: 0, page: 1, limit: 100 }
+
+    interviews = response.items
   } catch (err) {
     redirectIfUnauthorizedError(err, '/assessments', locale)
     if (isForbiddenError(err)) {
@@ -83,7 +87,7 @@ export default async function AssessmentsPage({
     )
   }
 
-  const sorted = selectHrVisibleAssessments(interviews)
+  const sorted = selectHrVisibleListItems(interviews)
 
   return (
     <PageShell>

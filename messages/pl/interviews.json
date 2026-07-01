@@ -9,14 +9,109 @@
     },
     "detail": {
       "backToDashboard": "Powrót do deski rozdzielczej",
-      "demoTryCandidateExperience": "Wypróbuj jako kandydat",
       "validationStatus": {
         "idle": "Bezczynny",
         "queued": "W kolejce",
         "processing": "Przetwarzanie",
         "completed": "Zakończony",
         "failed": "Przegrany"
+      },
+      "demoTryCandidateExperience": "Wypróbuj jako kandydat"
+    },
+    "library": {
+      "header": {
+        "eyebrow": "...",
+        "title": "Interviews",
+        "lead": "...",
+        "newInterview": "Nowe interview",
+        "overviewEyebrow": "Przegląd",
+        "healthTitle": "Pipeline",
+        "healthDescription": "...",
+        "totalInterviews": "Łącznie",
+        "visibleNow": "Wyświetlane"
+      },
+      "card": {
+        "progress": "Odpowiedzi",
+        "score": "Wynik",
+        "updatedAt": "Data aktualizacji",
+        "createdAt": "Data utworzenia"
+      },
+      "table": {
+        "candidate": "Kandydat",
+        "position": "Stanowisko",
+        "status": "Status",
+        "progress": "Postęp",
+        "score": "Wynik",
+        "updated": "Zaktualizowano",
+        "created": "Utworzono"
+      },
+      "toolbar": {
+        "searchPlaceholder": "Szukaj według imienia i nazwiska kandydata",
+        "resultCount": "{count} interview",
+        "removeChipAria": "Usuń {label}",
+        "sortLabel": "Sortowanie"
+      },
+      "sort": {
+        "updatedAt_desc": "Ostatnio zaktualizowane",
+        "updatedAt_asc": "Najdawniej zaktualizowane",
+        "createdAt_desc": "Ostatnio utworzone",
+        "createdAt_asc": "Najdawniej utworzone",
+        "candidateName_asc": "Kandydat A–Z",
+        "candidateName_desc": "Kandydat Z–A"
+      },
+      "facet": {
+        "filtersTitle": "Filtry",
+        "activeFilters": "{count} aktywnych",
+        "resetTitle": "Resetuj filtry",
+        "reset": "Resetuj",
+        "resetAll": "Resetuj filtry",
+        "resetAllWithCount": "Resetuj ({count})",
+        "positionTitle": "Stanowisko",
+        "statusTitle": "Status",
+        "retry": "Spróbuj ponownie",
+        "unavailable": "Filtry są niedostępne",
+        "loading": "Ładowanie…",
+        "noValues": "Brak pasujących wartości",
+        "showAll": "Pokaż wszystkie ({count})",
+        "showFewer": "Pokaż mniej"
+      },
+      "viewToggle": {
+        "viewModeAria": "Tryb widoku",
+        "cards": "Karty",
+        "table": "Tabela",
+        "switchToCards": "Przełącz na karty",
+        "switchToTable": "Przełącz na tabelę"
+      },
+      "empty": {
+        "title": "Brak interview",
+        "filteredTitle": "Brak wyników",
+        "description": "...",
+        "filteredDescription": "...",
+        "createCta": "Nowe interview"
+      },
+      "client": {
+        "hideFiltersSidebar": "Ukryj panel filtrów",
+        "showFiltersSidebar": "Pokaż panel filtrów"
+      },
+      "infinite": {
+        "loadMore": "Załaduj więcej",
+        "loadingMore": "Ładowanie…",
+        "showing": "Wyświetlono {loaded} z {total}",
+        "allLoaded": "Załadowano wszystkie {count} interview",
+        "loadErrorTitle": "Nie udało się załadować kolejnych wyników"
+      },
+      "feed": {
+        "loading": "Ładowanie interview…",
+        "retry": "Spróbuj ponownie",
+        "resetFilters": "Resetuj filtry"
+      },
+      "refetch": {
+        "genericTitle": "Nie udało się odświeżyć strony"
       }
+    },
+    "chips": {
+      "position": "Stanowisko: {value}",
+      "status": "Status: {value}"
     },
     "actions": {
       "edit": "Edytuj wywiad",

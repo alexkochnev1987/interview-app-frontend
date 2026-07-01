@@ -9,14 +9,109 @@
     },
     "detail": {
       "backToDashboard": "Назад да прыборнай панэлі",
-      "demoTryCandidateExperience": "Паспрабаваць вопыт кандыдата",
       "validationStatus": {
         "idle": "Бяздзейны",
         "queued": "У чарзе",
         "processing": "Апрацоўка",
         "completed": "Завершана",
         "failed": "Не атрымалася"
+      },
+      "demoTryCandidateExperience": "Паспрабаваць вопыт кандыдата"
+    },
+    "library": {
+      "header": {
+        "eyebrow": "...",
+        "title": "Інтэрв'ю",
+        "lead": "...",
+        "newInterview": "Новае інтэрв'ю",
+        "overviewEyebrow": "Агляд",
+        "healthTitle": "Варонка",
+        "healthDescription": "...",
+        "totalInterviews": "Усяго",
+        "visibleNow": "Паказана"
+      },
+      "card": {
+        "progress": "Адказы",
+        "score": "Ацэнка",
+        "updatedAt": "Дата абнаўлення",
+        "createdAt": "Дата стварэння"
+      },
+      "table": {
+        "candidate": "Кандыдат",
+        "position": "Пасада",
+        "status": "Статус",
+        "progress": "Прагрэс",
+        "score": "Ацэнка",
+        "updated": "Абноўлена",
+        "created": "Створана"
+      },
+      "toolbar": {
+        "searchPlaceholder": "Пошук па імені кандыдата",
+        "resultCount": "{count} інтэрв'ю",
+        "removeChipAria": "Выдаліць {label}",
+        "sortLabel": "Сартаванне"
+      },
+      "sort": {
+        "updatedAt_desc": "Спачатку нядаўна абноўленыя",
+        "updatedAt_asc": "Спачатку даўно абноўленыя",
+        "createdAt_desc": "Спачатку нядаўна створаныя",
+        "createdAt_asc": "Спачатку даўно створаныя",
+        "candidateName_asc": "Кандыдат А–Я",
+        "candidateName_desc": "Кандыдат Я–А"
+      },
+      "facet": {
+        "filtersTitle": "Фільтры",
+        "activeFilters": "{count} актыўных",
+        "resetTitle": "Скінуць фільтры",
+        "reset": "Скінуць",
+        "resetAll": "Скінуць фільтры",
+        "resetAllWithCount": "Скінуць ({count})",
+        "positionTitle": "Пасада",
+        "statusTitle": "Статус",
+        "retry": "Паўтарыць",
+        "unavailable": "Фільтры недаступныя",
+        "loading": "Загрузка…",
+        "noValues": "Няма адпаведных значэнняў",
+        "showAll": "Паказаць усе ({count})",
+        "showFewer": "Паказаць менш"
+      },
+      "viewToggle": {
+        "viewModeAria": "Рэжым прагляду",
+        "cards": "Карткі",
+        "table": "Табліца",
+        "switchToCards": "Пераключыцца на карткі",
+        "switchToTable": "Пераключыцца на табліцу"
+      },
+      "empty": {
+        "title": "Пакуль няма інтэрв'ю",
+        "filteredTitle": "Нічога не знойдзена",
+        "description": "...",
+        "filteredDescription": "...",
+        "createCta": "Новае інтэрв'ю"
+      },
+      "client": {
+        "hideFiltersSidebar": "Схаваць панэль фільтраў",
+        "showFiltersSidebar": "Паказаць панэль фільтраў"
+      },
+      "infinite": {
+        "loadMore": "Загрузіць яшчэ",
+        "loadingMore": "Загрузка…",
+        "showing": "Паказана {loaded} з {total}",
+        "allLoaded": "Загружаны ўсе {count} інтэрв'ю",
+        "loadErrorTitle": "Не ўдалося загрузіць дадатковыя даныя"
+      },
+      "feed": {
+        "loading": "Загрузка інтэрв'ю…",
+        "retry": "Паўтарыць",
+        "resetFilters": "Скінуць фільтры"
+      },
+      "refetch": {
+        "genericTitle": "Не ўдалося абнавіць старонку"
       }
+    },
+    "chips": {
+      "position": "Пасада: {value}",
+      "status": "Статус: {value}"
     },
     "actions": {
       "edit": "Рэдагаваць інтэрв'ю",

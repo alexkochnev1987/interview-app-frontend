@@ -33,14 +33,11 @@ export type Answer = Schemas['AnswerDto'];
 
 export type InterviewResult = Schemas['InterviewResultResponseDto'];
 export type Interview = Schemas['InterviewResponseDto'];
-export type InterviewStatus = Interview['status'];
-export type UpdateInterviewPayload = Schemas['UpdateInterviewDto'];
 
 export type ValidateAllAnswersResponse = Schemas['StartAllAnswerValidationsResponseDto'];
 export type StartAnswerValidationResult = Schemas['StartAnswerValidationResultDto'];
 export type InterviewAnswerMediaResponse = Schemas['InterviewAnswerMediaResponseDto'];
 export type CandidateLinkResponse = Schemas['CandidateLinkResponseDto'];
-export type InterviewCancelResponse = Schemas['InterviewCancelResponseDto'];
 
 export type CreateInterviewPayload = Schemas['CreateInterviewDto'];
 
@@ -56,6 +53,22 @@ export type SubmitTakeAnswerPayload = Schemas['SubmitAnswerDto'];
 
 export type CaptureTarget = 'camera' | 'screen';
 
+export type InterviewListItem = Schemas['InterviewListItemDto'];
+export type PaginatedInterviews = Schemas['PaginatedInterviewsResponseDto'];
+export type InterviewFacetsResponse = Schemas['InterviewFacetsResponseDto'];
+export type InterviewFacetCount = Schemas['InterviewFacetCountDto'];
+
+export type FetchInterviewsParams = NonNullable<
+  paths['/interviews']['get']['parameters']['query']
+>;
+export type InterviewSortField = NonNullable<FetchInterviewsParams['sortBy']>;
+export type InterviewSortOrder = NonNullable<FetchInterviewsParams['sortOrder']>;
+export type InterviewStatusFilter = NonNullable<FetchInterviewsParams['status']>;
+
+export type FetchInterviewFacetsParams = NonNullable<
+  paths['/interviews/facets']['get']['parameters']['query']
+>;
+
 export type TeamMember = Schemas['AuthUserResponseDto'];
 
 export type FetchQuestionFacetsParams = NonNullable<
@@ -67,14 +80,3 @@ export type FacetCount = Schemas['FacetCountDto'];
 export type BulkDeleteResult = Schemas['BulkDeleteQuestionsResponseDto'];
 
 export type SimilarQuestionMatch = Schemas['SimilarQuestionMatchDto'];
-
-export type QuestionDeleteBlockingInterview =
-  Schemas['QuestionDeleteBlockingInterviewDto'];
-
-export type DeleteQuestionResult =
-  | { id: string; deleted: true }
-  | {
-      id: string;
-      scheduled: true;
-      blockingInterviews: QuestionDeleteBlockingInterview[];
-    };
