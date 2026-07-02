@@ -25,7 +25,8 @@
       "passwordLabel": "Hasło",
       "passwordPlaceholder": "Hasło",
       "or": "Lub",
-      "google": "Zaloguj przez Google"
+      "google": "Zaloguj przez Google",
+      "demo": "Wypróbuj demo"
     }
   }
 }

@@ -16,7 +16,7 @@ import {
   updateQuestion,
   type QuestionInput,
 } from '@/lib/api'
-import { getDeleteQuestionErrorTitle, getErrorMessage } from '@/lib/api-error'
+import { getErrorMessage } from '@/lib/api-error'
 import { notifyError, notifySuccess } from '@/lib/toast'
 import { useToastMessages } from '@/lib/use-toast-messages'
 import {
@@ -65,8 +65,10 @@ function useQuestionMutationResources() {
 
 type BuildQuestionMutationOptionsConfig<TData, TVariables> = {
   mutationFn:(variables:TVariables)=> Promise<TData>
-  successMessage: string
+  successMessage?: string
   errorTitle: QuestionMutationErrorTitle
+  notifyOnSuccess?: boolean
+  notifyOnError?: boolean
 }
 
 export function buildQuestionMutationOptions<TData, TVariables>(
@@ -83,9 +85,13 @@ export function buildQuestionMutationOptions<TData, TVariables>(
     mutationFn: config.mutationFn,
     onSuccess: ()=>{
       invalidateQuestions()
-      notifyMutationSuccess(config.successMessage)
+      if (config.notifyOnSuccess !== false && config.successMessage) {
+        notifyMutationSuccess(config.successMessage)
+      }
     },
     onError: (error: unknown) => {
+      if (config.notifyOnError === false) return
+
       const title =
         typeof config.errorTitle === 'function'
           ? config.errorTitle(error)
@@ -129,12 +135,9 @@ export function useDeleteQuestion() {
   return useMutation(
       buildQuestionMutationOptions(resources,{
         mutationFn: deleteQuestion,
-        successMessage:resources.toastMessages.question.deleteSuccess,
-        errorTitle:(error)=> getDeleteQuestionErrorTitle(
-            error,
-            resources.toastMessages.question.deleteError,
-            resources.toastMessages.deleteQuestion.cannotDeleteTitle,
-        )
+        errorTitle: resources.toastMessages.question.deleteError,
+        notifyOnSuccess: false,
+        notifyOnError: false,
       })
   )
 }
@@ -146,8 +149,9 @@ export function useRestoreQuestion() {
   return useMutation(
       buildQuestionMutationOptions( resources , {
         mutationFn:restoreQuestion,
-        successMessage: resources.toastMessages.question.restoreSuccess,
         errorTitle: resources.toastMessages.question.restoreError,
+        notifyOnSuccess: false,
+        notifyOnError: false,
       })
   )
 }

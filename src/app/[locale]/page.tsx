@@ -77,5 +77,5 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
     )
   }
 
-  return <DashboardView interviews={interviews} />
+  return <DashboardView interviews={interviews} isDemo={auth.me.demo} />
 }

@@ -56,6 +56,13 @@ If the app needs a new composition pattern, add or extend a layout primitive in 
 
 See `DOCUMENTATION.md` → **Alert vs toast**. Persistent or actionable page state → `Alert`. User actions → toast in the handler after `await` / `runMutation`, not `useEffect` on state. Passive load errors → inline / EmptyState (+ Retry); no duplicate toast.
 
+## Demo read-only gating
+
+Demo accounts are read-only. Gate write affordances by where the control lives:
+- Primary nav or entry affordances that lead to a write-only screen (for example "New question", "New interview") are hidden when demo. Use the conditional-hide pattern.
+- In-place write controls on a browsable screen (save, delete, validate, upload, apply role) wrap their Button in `DemoWriteGuard`. The guard disables the Button for demo users and shows the read-only hint on hover.
+- Never disable a control for demo without the hint. Pass the control's own disabled reasons to `DemoWriteGuard` through its `disabled` prop instead of combining them with `isDemo` by hand.
+
 ## Non-Goals
 - Do not rewrite untouched files.
 - Do not restyle screens unless the current task already requires editing that screen.

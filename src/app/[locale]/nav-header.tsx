@@ -9,7 +9,7 @@ import { LOCALES, type Locale } from '@/i18n/locales'
 import { usePathname } from '@/i18n/navigation'
 import { routes } from '@/i18n/routes'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
-import { useAuth } from '@/lib/auth-context'
+import { useAuth, useIsDemo } from '@/lib/auth-context'
 import {
   canAccessDashboard,
   canConfigureInterview,
@@ -42,6 +42,7 @@ import { UnstyledLink } from '@/components/ui/unstyled-link'
 
 export function NavHeader() {
   const { user, logout } = useAuth()
+  const isDemo = useIsDemo()
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const locale = useLocale() as Locale
@@ -70,7 +71,7 @@ export function NavHeader() {
     ...(canReviewAssessments(user?.role)
       ? [{ href: '/assessments', label: tNav('assessments'), icon: ClipboardList }]
       : []),
-    ...(canConfigureInterview(user?.role)
+    ...(canConfigureInterview(user?.role) && !isDemo
       ? [{ href: '/interviews/new', label: tNav('newInterview'), icon: Plus }]
       : []),
     ...(canManageTeam(user?.role)

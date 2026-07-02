@@ -9,6 +9,7 @@
     },
     "detail": {
       "backToDashboard": "Назад да прыборнай панэлі",
+      "demoTryCandidateExperience": "Паспрабаваць вопыт кандыдата",
       "validationStatus": {
         "idle": "Бяздзейны",
         "queued": "У чарзе",
@@ -16,6 +17,29 @@
         "completed": "Завершана",
         "failed": "Не атрымалася"
       }
+    },
+    "actions": {
+      "edit": "Рэдагаваць інтэрв'ю",
+      "saveChanges": "Захаваць змены",
+      "saving": "Захаванне...",
+      "cancelInterview": "Адмяніць інтэрв'ю",
+      "canceling": "Адмена...",
+      "cancelTitle": "Адмяніць гэта інтэрв'ю?",
+      "cancelDescription": "Спасылка для кандыдата перастане працаваць. Гэта дзеянне немагчыма адмяніць.",
+      "confirmCancel": "Адмяніць інтэрв'ю",
+      "dismiss": "Не адмяняць",
+      "discardEdit": "Скасаваць змены",
+      "keepEditing": "Працягнуць рэдагаванне"
+    },
+    "edit": {
+      "title": "Рэдагаванне інтэрв'ю",
+      "candidateName": "Імя кандыдата",
+      "candidateEmail": "Email кандыдата",
+      "position": "Пасада",
+      "questionsTitle": "Пытанні",
+      "answersBlockEditNotice": "Рэдагаванне адключана пасля загрузкі адказаў, бо адказы прывязаны да парадку пытанняў.",
+      "discardTitle": "Адмяніць незахаваныя змены?",
+      "discardDescription": "Вашы змены ў гэтым інтэрв'ю будуць страчаны."
     }
   }
 }

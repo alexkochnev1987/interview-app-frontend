@@ -19,6 +19,7 @@ import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { Link } from '@/i18n/navigation'
 import { routes } from '@/i18n/routes'
+import { useIsDemo } from '@/lib/auth-context'
 
 interface QuestionsLibraryHeaderProps {
   loading: boolean
@@ -32,6 +33,7 @@ export function QuestionsLibraryHeader({
   visibleCount,
 }: QuestionsLibraryHeaderProps) {
   const t = useTranslations('questions.library.header')
+  const isDemo = useIsDemo()
 
   return (
     <HeroGrid
@@ -45,14 +47,16 @@ export function QuestionsLibraryHeader({
               <HeroTitle>{t('title')}</HeroTitle>
               <HeroLead width="prose">{t('lead')}</HeroLead>
             </Stack>
-            <Inline>
-              <Button asChild variant="gradient" size="hero" shape="pill">
-                <Link href={routes.questions.new}>
-                  <Plus className="size-5" />
-                  {t('newQuestion')}
-                </Link>
-              </Button>
-            </Inline>
+            {!isDemo ? (
+              <Inline>
+                <Button asChild variant="gradient" size="hero" shape="pill">
+                  <Link href={routes.questions.new}>
+                    <Plus className="size-5" />
+                    {t('newQuestion')}
+                  </Link>
+                </Button>
+              </Inline>
+            ) : null}
           </CardContent>
         </Card>
       }

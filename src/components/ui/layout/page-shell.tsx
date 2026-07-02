@@ -15,6 +15,7 @@ const pageShellVariants = cva('container flex flex-col', {
       default: 'py-10 md:py-12',
       top: 'pt-6',
       bottom: 'pb-12',
+      compact: 'py-6',
       none: '',
     },
     align: {

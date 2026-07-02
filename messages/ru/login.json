@@ -25,7 +25,8 @@
       "passwordLabel": "Пароль",
       "passwordPlaceholder": "Пароль",
       "or": "Или",
-      "google": "Войти через Google"
+      "google": "Войти через Google",
+      "demo": "Попробовать демо"
     }
   }
 }

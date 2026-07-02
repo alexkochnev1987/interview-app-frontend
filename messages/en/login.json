@@ -25,7 +25,8 @@
       "passwordLabel": "Password",
       "passwordPlaceholder": "Password",
       "or": "Or",
-      "google": "Sign in with Google"
+      "google": "Sign in with Google",
+      "demo": "Try the demo"
     }
   }
 }

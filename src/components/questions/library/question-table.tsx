@@ -50,6 +50,8 @@ export type QuestionTableProps = {
   onSortChange: (sortBy: QuestionSortField, sortOrder: QuestionSortOrder) => void
   page: number
   loading: boolean
+  /** Browse-only: keep rows readable but block selection (e.g. demo accounts). */
+  disabled?: boolean
 }
 
 function nextSort(
@@ -138,6 +140,7 @@ export function QuestionTable({
   onSortChange,
   page,
   loading,
+  disabled = false,
 }: QuestionTableProps) {
   const t = useTranslations('questions.library.table')
   const tFields = useTranslations('questions.fields')
@@ -183,6 +186,7 @@ export function QuestionTable({
               <TableHead width="tight">
                 <Checkbox
                   size="sm"
+                  disabled={disabled}
                   checked={
                     allVisibleSelected
                       ? true
@@ -245,21 +249,24 @@ export function QuestionTable({
             const selected = selectedIds.has(question.id)
             const rowState = question.deleted
               ? 'deleted'
-              : selected
-                ? 'selected'
-                : 'default'
+              : question.pendingDeletion
+                    ? 'scheduled'
+                    : selected
+                        ? 'selected'
+                        : 'default'
             const updatedAtFormatted = formatInterviewDate(question.updatedAt)
             return (
               <TableRow
                 key={question.id}
-                interactive
+                interactive={disabled ? 'none' : true}
                 state={rowState}
-                onClick={() => onRowClick(question)}
+                onClick={disabled ? undefined : () => onRowClick(question)}
               >
                 {selectable ? (
                   <TableCell width="tight" onClick={stopRowClick}>
                     <Checkbox
                       size="sm"
+                      disabled={disabled}
                       checked={selected}
                       onCheckedChange={() => onToggleSelected(question)}
                       aria-label={t('selectQuestion')}
@@ -272,6 +279,9 @@ export function QuestionTable({
                       <StatusPill tone="failed" size="compact">
                         {t('deleted')}
                       </StatusPill>
+                    ) : null}
+                    {question.pendingDeletion && !question.deleted ? (
+                        <StatusPill tone="scheduled">{t('scheduled')}</StatusPill>
                     ) : null}
                     <BodyText
                       size="sm"

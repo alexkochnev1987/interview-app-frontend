@@ -1,6 +1,6 @@
 'use client'
 
-import { BulletList } from '@/components/ui/bullet-list'
+import { QuestionDeleteBlockingInterviews } from '@/components/questions/detail/question-delete-blocking-interviews'
 import { Card, CardContent } from '@/components/ui/card'
 import { Stack } from '@/components/ui/layout/stack'
 import { SurfaceTile } from '@/components/ui/surface-tile'
@@ -16,7 +16,7 @@ interface BulkDeleteResultAlertsProps {
 export function BulkDeleteResultAlerts({ result }: BulkDeleteResultAlertsProps) {
   const toastMessages = useToastMessages()
 
-  if (!result || result.blocked.length === 0) {
+  if (!result || result.scheduled.length === 0) {
     return null
   }
 
@@ -24,21 +24,20 @@ export function BulkDeleteResultAlerts({ result }: BulkDeleteResultAlertsProps) 
     <Card variant="warning" size="sm">
       <CardContent spacing="md">
         <Stack gap={2}>
-          <BodyText size="sm">{toastMessages.bulkDelete.blockedIntro}</BodyText>
+          <BodyText size="sm">{toastMessages.bulkDelete.scheduledIntro}</BodyText>
           <SurfaceTile tone="soft" padding="md" rounded="lg" width="full">
-            <BulletList>
-              {result.blocked.map((item) => (
-                <li key={item.id}>
-                  <BodyText as="span" size="sm" weight="medium" tone="foreground">
+            <Stack gap={3}>
+              {result.scheduled.map((item) => (
+                <Stack key={item.id} gap={1}>
+                  <BodyText size="sm" weight="medium" tone="foreground">
                     {truncateText(item.questionText, 80)}
                   </BodyText>
-                  {' — '}
-                  <BodyText as="span" size="sm">
-                    {item.reason}
-                  </BodyText>
-                </li>
+                  <QuestionDeleteBlockingInterviews
+                    interviews={item.blockingInterviews}
+                  />
+                </Stack>
               ))}
-            </BulletList>
+            </Stack>
           </SurfaceTile>
         </Stack>
       </CardContent>
