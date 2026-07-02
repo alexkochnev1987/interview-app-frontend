@@ -62,6 +62,7 @@ export function TakeLobbyScreen({
   const tTake = useTranslations('takeFlow');
   const permissionGranted = cameraStatus === 'granted';
   const screenShareReady = screenStatus === 'granted' && screenSurface === 'monitor';
+  const showScreenShareHint = !screenShareReady;
   const joinLabel = setupBusy ? tTake('lobbyJoinBusy') : tTake('lobbyJoin');
 
   let previewOverlay: ReactNode = null;
@@ -114,6 +115,13 @@ export function TakeLobbyScreen({
                 <Text variant="bodyMutedSm">{tTake('lobbyDevicesHelp')}</Text>
               </Stack>
               <Stack gap={5}>
+                {showScreenShareHint ? (
+                  <Alert variant="warning">
+                    <AlertTitle>{tTake('lobbyScreenShareHintTitle')}</AlertTitle>
+                    <AlertDescription>{tTake('lobbyScreenShareHint')}</AlertDescription>
+                  </Alert>
+                ) : null}
+
                 <TakePermissionStatusList
                   cameraStatus={cameraStatus}
                   screenStatus={screenStatus}
