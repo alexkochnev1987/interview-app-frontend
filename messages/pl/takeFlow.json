@@ -20,6 +20,8 @@
     "lobbyJoin": "Rozpocznij rozmowę kwalifikacyjną",
     "lobbyJoinBusy": "Jedna chwila…",
     "lobbyDevicesHelp": "Aktualizacje stanu w miarę nawiązywania połączenia. W oknie dialogowym udostępniania systemowego wybierz opcję Cały ekran.",
+    "lobbyScreenShareHint": "Gdy otworzy się okno przeglądarki, wybierz „Cały ekran” (nie kartę przeglądarki ani okno aplikacji), inaczej nie uda się rozpocząć rozmowy kwalifikacyjnej.",
+    "lobbyScreenShareHintTitle": "Udostępnij cały ekran",
     "lobbyToolbarMic": "Mikrofon",
     "lobbyToolbarCamera": "Kamera",
     "lobbyToolbarScreen": "Udostępnianie całego ekranu",
