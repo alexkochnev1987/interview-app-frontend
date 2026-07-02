@@ -1,11 +1,9 @@
 import { AlertCircle } from 'lucide-react'
-import { NextIntlClientProvider } from 'next-intl'
 import { getTranslations } from 'next-intl/server'
 
 import { PageContent, PageMainLayout } from '@/components/layout/page-shell'
 import { Icon } from '@/components/ui/icon'
 import { EmptyStateCard } from '@/components/ui/state-card'
-import { loadLocaleMessages } from '@/i18n/load-messages'
 import type { Locale } from '@/i18n/locales'
 import { type TakeInterviewData } from '@/lib/api'
 import { getServerRequestContext, requestServer } from '@/lib/server-fetch'
@@ -21,20 +19,15 @@ export default async function TakeInterviewPage({
   params,
   searchParams,
 }: TakeInterviewPageProps) {
-  const { id } = await params
-  const t = await getTranslations({ locale: 'en', namespace: 'toast.pageGate.take' })
-  const englishMessages = await loadLocaleMessages('en')
+  const { id, locale } = await params
+  const t = await getTranslations({ locale, namespace: 'toast.pageGate.take' })
   const token = readSearchParamToken((await searchParams).token)
 
   if (token) {
-    return (
-      <NextIntlClientProvider locale="en" messages={englishMessages}>
-        <TakeInterviewClient id={id} candidateToken={token} />
-      </NextIntlClientProvider>
-    )
+    return <TakeInterviewClient id={id} candidateToken={token} />
   }
 
-  const ctx = await getServerRequestContext()
+  const ctx = await getServerRequestContext(locale)
   const encodedId = encodeURIComponent(id)
 
   let interview: TakeInterviewData | null = null
@@ -42,7 +35,10 @@ export default async function TakeInterviewPage({
 
   try {
     interview =
-      (await requestServer<TakeInterviewData>(`/take/${encodedId}`, ctx)) ?? null
+      (await requestServer<TakeInterviewData>(`/take/${encodedId}`, ctx, {
+        withLocaleHeader: false,
+        query: { contentLocale: locale },
+      })) ?? null
   } catch (err) {
     error =
       err instanceof Error
@@ -68,9 +64,5 @@ export default async function TakeInterviewPage({
     )
   }
 
-  return (
-    <NextIntlClientProvider locale="en" messages={englishMessages}>
-      <TakeInterviewClient id={id} initialInterview={interview} />
-    </NextIntlClientProvider>
-  )
+  return <TakeInterviewClient id={id} initialInterview={interview} />
 }

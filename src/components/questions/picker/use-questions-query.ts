@@ -15,6 +15,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { usePathname, useRouter } from '@/i18n/navigation'
 import {
   fetchQuestions,
+  type LocaleCode,
   type Question,
   type QuestionDifficulty,
   type QuestionSortField,
@@ -86,6 +87,7 @@ export type UseQuestionsQueryResult = {
   canReset: boolean
   setQ: Dispatch<SetStateAction<string>>
   setDifficulty: (value: QuestionDifficulty | undefined) => void
+  setLocale: (value: LocaleCode | undefined) => void
   setCategory: (value: string | undefined) => void
   setSubcategory: (value: string | undefined) => void
   setTags: (value: string[]) => void
@@ -102,6 +104,7 @@ function writeToSearchParams(state: QuestionsQueryState): URLSearchParams {
   const params = new URLSearchParams()
   if (state.q) params.set('q', state.q)
   if (state.difficulty) params.set('difficulty', state.difficulty)
+  if (state.locale) params.set('locale', state.locale)
   if (state.category) params.set('category', state.category)
   if (state.subcategory) params.set('subcategory', state.subcategory)
   state.tags.forEach((tag) => params.append('tags', tag))
@@ -243,6 +246,10 @@ export function useQuestionsQuery(
     (value: QuestionDifficulty | undefined) => resetToPageOne({ difficulty: value }),
     [resetToPageOne],
   )
+  const setLocale = useCallback(
+    (value: LocaleCode | undefined) => resetToPageOne({ locale: value }),
+    [resetToPageOne],
+  )
   const setCategory = useCallback(
     (value: string | undefined) => resetToPageOne({ category: value }),
     [resetToPageOne],
@@ -299,6 +306,7 @@ export function useQuestionsQuery(
     return (
       state.q !== base.q ||
       state.difficulty !== base.difficulty ||
+      state.locale !== base.locale ||
       state.category !== base.category ||
       state.subcategory !== base.subcategory ||
       state.role !== base.role ||
@@ -321,6 +329,7 @@ export function useQuestionsQuery(
     canReset,
     setQ,
     setDifficulty,
+    setLocale,
     setCategory,
     setSubcategory,
     setTags,

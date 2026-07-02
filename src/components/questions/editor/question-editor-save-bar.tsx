@@ -16,6 +16,7 @@ interface QuestionEditorSaveBarProps {
   dirtyFieldLabels: string[]
   submitting: boolean
   submitLabel: string
+  canSubmit: boolean
 }
 
 export function QuestionEditorSaveBar({
@@ -23,6 +24,7 @@ export function QuestionEditorSaveBar({
   dirtyFieldLabels,
   submitting,
   submitLabel,
+  canSubmit,
 }: QuestionEditorSaveBarProps) {
   const t = useTranslations('questions.saveBar')
   const fieldCount = dirtyFieldLabels.length
@@ -49,11 +51,12 @@ export function QuestionEditorSaveBar({
               : t('descriptionClean')}
           </BodyText>
         </Stack>
-        <DemoWriteGuard disabled={submitting || !isDirty}>
+        <DemoWriteGuard disabled={submitting || !canSubmit}>
           <Button
             type="submit"
             variant="gradient"
             size="xl"
+            disabled={submitting || !canSubmit}
           >
             <Save className="size-4" />
             {submitting ? t('saving') : submitLabel}

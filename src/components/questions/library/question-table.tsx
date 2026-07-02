@@ -40,6 +40,7 @@ type SortableField = Extract<
 
 export type QuestionTableProps = {
   items: Question[]
+  listLocale: string
   selectable: boolean
   selectedIds: Set<string>
   onToggleSelected: (question: Question) => void
@@ -130,6 +131,7 @@ function dashIfEmpty(value: string | undefined | null): ReactNode {
 
 export function QuestionTable({
   items,
+  listLocale,
   selectable,
   selectedIds,
   onToggleSelected,
@@ -143,6 +145,7 @@ export function QuestionTable({
   disabled = false,
 }: QuestionTableProps) {
   const t = useTranslations('questions.library.table')
+  const tCard = useTranslations('questions.library.card')
   const tFields = useTranslations('questions.fields')
   const sharedLabels = useSharedLabels()
   const sortLabel = useMemo(
@@ -292,6 +295,11 @@ export function QuestionTable({
                     >
                       {question.questionText}
                     </BodyText>
+                    {question.resolvedLocale && question.resolvedLocale !== listLocale ? (
+                      <StatusPill tone="neutral_meta" size="compact" casing="chip">
+                        {tCard('resolvedLocaleBadge', { locale: question.resolvedLocale.toUpperCase() })}
+                      </StatusPill>
+                    ) : null}
                   </Inline>
                 </TableCell>
                 <TableCell>

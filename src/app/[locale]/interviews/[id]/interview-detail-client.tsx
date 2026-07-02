@@ -53,7 +53,13 @@ export default function InterviewDetailClient({
     copyStatus,
     loadCandidateLink,
     handleCopyCandidateLink,
-  } = useCandidateLink({ id, isDemo, user, toastMessages })
+  } = useCandidateLink({
+    id,
+    interviewLocale: interview?.interviewLocale,
+    isDemo,
+    user,
+    toastMessages,
+  })
 
   const { validating, handleValidate } = useInterviewValidation({
     id,

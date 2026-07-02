@@ -47,4 +47,9 @@ async function loadLocaleMessagesUncached(locale: string): Promise<Messages> {
   })) as Messages
 }
 
-export const loadLocaleMessages = cache(loadLocaleMessagesUncached)
+const loadLocaleMessagesCached = cache(loadLocaleMessagesUncached)
+
+export const loadLocaleMessages =
+  process.env.NODE_ENV === 'development'
+    ? loadLocaleMessagesUncached
+    : loadLocaleMessagesCached

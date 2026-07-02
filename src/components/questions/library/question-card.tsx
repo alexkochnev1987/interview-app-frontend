@@ -26,6 +26,7 @@ import { truncateText } from '@/lib/text'
 
 interface QuestionCardProps {
   question: Question
+  listLocale: string
   selectable: boolean
   selected: boolean
   onToggleSelected: (id: string) => void
@@ -33,6 +34,7 @@ interface QuestionCardProps {
 
 function CardBody({
   question,
+  listLocale,
   selectable,
   selected,
 }: Omit<QuestionCardProps, 'onToggleSelected'>) {
@@ -71,6 +73,11 @@ function CardBody({
                 {question.category}
               </StatusPill>
             ) : null}
+            {question.resolvedLocale && question.resolvedLocale !== listLocale ? (
+              <StatusPill tone="neutral_meta" casing="chip">
+                {t('resolvedLocaleBadge', { locale: question.resolvedLocale.toUpperCase() })}
+              </StatusPill>
+            ) : null}
           </PillRow>
           <Stack gap={2}>
             <CardTitle size="list-clamp">
@@ -105,7 +112,7 @@ function CardBody({
                 {question.expectedConcepts.length > 0
                   ? question.expectedConcepts
                       .slice(0, 3)
-                      .map((item) => item.label)
+                      .map((item: { label: string }) => item.label)
                       .join(', ')
                   : t('notSpecified')}
               </BodyText>
@@ -116,7 +123,7 @@ function CardBody({
                 {question.redFlags.length > 0
                   ? question.redFlags
                       .slice(0, 2)
-                      .map((item) => item.label)
+                      .map((item: { label: string }) => item.label)
                       .join(', ')
                   : t('notSpecified')}
               </BodyText>
@@ -130,6 +137,7 @@ function CardBody({
 
 export function QuestionCard({
   question,
+  listLocale,
   selectable,
   selected,
   onToggleSelected,
@@ -137,7 +145,14 @@ export function QuestionCard({
   const t = useTranslations('questions.library.table')
 
   if (!selectable) {
-    return <CardBody question={question} selectable={false} selected={false} />
+    return (
+      <CardBody
+        question={question}
+        listLocale={listLocale}
+        selectable={false}
+        selected={false}
+      />
+    )
   }
   return (
     <SelectableOverlay
@@ -151,7 +166,7 @@ export function QuestionCard({
         />
       }
     >
-      <CardBody question={question} selectable selected={selected} />
+      <CardBody question={question} listLocale={listLocale} selectable selected={selected} />
     </SelectableOverlay>
   )
 }

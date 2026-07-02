@@ -3,6 +3,7 @@
 import { WandSparkles } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
+import { useQuestionEditorLabels } from '@/i18n/use-question-editor-labels'
 import { StatusPill } from '@/components/ui/status-pill'
 import { Button } from '@/components/ui/button'
 import {
@@ -35,6 +36,7 @@ export function AiDraftPanel({
   onApplyAll,
 }: AiDraftPanelProps) {
   const t = useTranslations('questions.aiDraft')
+  const labels = useQuestionEditorLabels()
 
   return (
     <Card variant="surface">
@@ -65,7 +67,7 @@ export function AiDraftPanel({
                 shape="pill"
                 onClick={onApplyAll}
               >
-                {t('applyAll')}
+                {labels.applyAll}
               </Button>
             ) : null}
             <Button

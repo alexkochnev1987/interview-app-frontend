@@ -18,6 +18,7 @@ import { StatusPill } from '@/components/ui/status-pill'
 import { BodyText } from '@/components/ui/text'
 import type {
   FacetCount,
+  LocaleCode,
   QuestionDifficulty,
   QuestionStatusFilter,
 } from '@/lib/api'
@@ -33,6 +34,7 @@ export type QuestionFacetSidebarProps = {
   roles: FacetCount[]
   tags: FacetCount[]
   selected: {
+    locale?: LocaleCode
     difficulty?: QuestionDifficulty
     category?: string
     subcategory?: string
@@ -41,6 +43,7 @@ export type QuestionFacetSidebarProps = {
     status: QuestionStatusFilter
   }
   onDifficultyChange: (value: QuestionDifficulty | undefined) => void
+  onLocaleChange: (value: LocaleCode | undefined) => void
   onCategoryChange: (value: string | undefined) => void
   onSubcategoryChange: (value: string | undefined) => void
   onRoleChange: (value: string | undefined) => void
@@ -62,6 +65,7 @@ export function QuestionFacetSidebar(props: QuestionFacetSidebarProps) {
     roles,
     tags,
     selected,
+    onLocaleChange,
     onDifficultyChange,
     onCategoryChange,
     onSubcategoryChange,
@@ -79,6 +83,7 @@ export function QuestionFacetSidebar(props: QuestionFacetSidebarProps) {
   const t = useTranslations('questions.picker.facet')
 
   const activeFilterCount =
+    (selected.locale ? 1 : 0) +
     (selected.difficulty ? 1 : 0) +
     (selected.category ? 1 : 0) +
     (selected.subcategory ? 1 : 0) +
@@ -150,7 +155,19 @@ export function QuestionFacetSidebar(props: QuestionFacetSidebarProps) {
               onChange={onStatusChange}
             />
           ) : null}
-
+          <ScalarFacetSection
+            title={t('localeTitle')}
+            values={[
+              { value: 'en', count: 0 },
+              { value: 'be', count: 0 },
+              { value: 'ru', count: 0 },
+              { value: 'pl', count: 0 },
+            ]}
+            selected={selected.locale}
+            onChange={(value) => onLocaleChange(value as LocaleCode | undefined)}
+            loading={false}
+            hideCounts
+          />
           <ScalarFacetSection
             title={t('difficultyTitle')}
             values={difficulties}
@@ -199,8 +216,9 @@ function ScalarFacetSection(props: {
   selected: string | undefined
   onChange: (value: string | undefined) => void
   loading: boolean
+  hideCounts?: boolean
 }) {
-  const { title, values, selected, onChange, loading } = props
+  const { title, values, selected, onChange, loading, hideCounts = false } = props
   const t = useTranslations('questions.picker.facet')
   const [expanded, setExpanded] = useState(false)
 
@@ -226,7 +244,7 @@ function ScalarFacetSection(props: {
               <FacetRowButton
                 key={item.value}
                 label={item.value}
-                trailing={item.count}
+                trailing={hideCounts ? undefined : item.count}
                 state={isSelected ? 'selected' : 'default'}
                 onClick={() => onChange(isSelected ? undefined : item.value)}
               />

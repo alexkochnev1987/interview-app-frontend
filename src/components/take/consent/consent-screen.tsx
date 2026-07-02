@@ -3,7 +3,6 @@ import { useTranslations } from 'next-intl';
 
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge';
 import { SurfaceCard } from '@/components/ui/surface-card';
-import { PageMainViewport } from '@/components/layout/page-shell';
 import { TakeCapabilityCards } from './consent-capability-cards';
 import { TakeConsentCheckboxBlock } from './consent-checkbox-block';
 import { Panel } from '@/components/ui/panel';
@@ -42,9 +41,8 @@ export function TakeConsentScreen({
 }: TakeConsentScreenProps) {
   const tTake = useTranslations('takeFlow');
   return (
-    <PageMainViewport>
-      <SurfaceCard tone="glassFloat" grow="fill" size="lg">
-        <CardContent layout="fill-column" spacing="xl">
+    <SurfaceCard tone="glassFloat" grow="fill" size="lg">
+      <CardContent layout="fill-column" spacing="xl">
           <EyebrowBadge icon={<ListVideo size={14} strokeWidth={2} />}>{tTake('consentEyebrow')}</EyebrowBadge>
           <Grid columns="consent-shell" gap={10} grow="fill">
             <Stack gap={5} height="full">
@@ -140,7 +138,6 @@ export function TakeConsentScreen({
             </Stack>
           </Grid>
         </CardContent>
-      </SurfaceCard>
-    </PageMainViewport>
+    </SurfaceCard>
   );
 }

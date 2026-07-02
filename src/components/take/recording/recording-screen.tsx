@@ -1,6 +1,5 @@
 import type { RefObject } from 'react';
 
-import { PageMainViewport } from '@/components/layout/page-shell';
 import {
   TakeRecordingHeroColumn,
   TakeRecordingSidebarColumn,
@@ -74,9 +73,8 @@ export function TakeRecordingScreen({
   );
 
   return (
-    <PageMainViewport>
-      <Stack gap={4} width="full" grow="fill" height="full">
-        <TakeRecordingHeader
+    <Stack gap={4} width="full" grow="fill" height="full">
+      <TakeRecordingHeader
           interview={interview}
           currentVersionNumber={currentVersionNumber}
           screenSurface={screenSurface}
@@ -117,8 +115,7 @@ export function TakeRecordingScreen({
             onRerecord={onRerecord}
             onSubmit={onSubmit}
           />
-        </Grid>
-      </Stack>
-    </PageMainViewport>
+      </Grid>
+    </Stack>
   );
 }

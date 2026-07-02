@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import { generateCandidateLink } from '@/lib/api'
+import { localizedPath } from '@/i18n/pathname'
+import type { Locale } from '@/i18n/locales'
 import { runMutation } from '@/lib/run-mutation'
 import type { useToastMessages } from '@/lib/use-toast-messages'
 
@@ -11,6 +13,7 @@ type CopyStatus = 'idle' | 'copied' | 'error'
 
 interface UseCandidateLinkParams {
   id: string
+  interviewLocale?: Locale
   isDemo: boolean
   user: unknown
   toastMessages: ReturnType<typeof useToastMessages>
@@ -18,6 +21,7 @@ interface UseCandidateLinkParams {
 
 export function useCandidateLink({
   id,
+  interviewLocale,
   isDemo,
   user,
   toastMessages,
@@ -28,18 +32,32 @@ export function useCandidateLink({
   const [candidateLinkError, setCandidateLinkError] = useState('')
   const [copyStatus, setCopyStatus] = useState<CopyStatus>('idle')
 
-  const buildCandidateUrl = useCallback((relativeLink: string) => {
-    if (typeof window === 'undefined') {
-      return relativeLink
-    }
+  const buildCandidateUrl = useCallback(
+    (relativeLink: string) => {
+      if (typeof window === 'undefined') {
+        return relativeLink
+      }
 
-    return new URL(relativeLink, window.location.origin).toString()
-  }, [])
+      try {
+        const url = new URL(relativeLink, window.location.origin)
+        const token = url.searchParams.get('token')
+        if (!token || !interviewLocale) {
+          return url.toString()
+        }
+
+        return `${window.location.origin}${localizedPath(
+          `/take/${encodeURIComponent(id)}?token=${encodeURIComponent(token)}`,
+          interviewLocale,
+        )}`
+      } catch {
+        return relativeLink
+      }
+    },
+    [id, interviewLocale],
+  )
 
   const loadCandidateLink = useCallback(
     async (mode: 'initial' | 'refresh' = 'refresh') => {
-      // Demo users lack interviews:assign, so the call would always 403; skip it
-      // even if a UI guard is bypassed.
       if (isDemo) {
         return
       }
@@ -77,15 +95,13 @@ export function useCandidateLink({
   )
 
   useEffect(() => {
-    // Wait for auth to resolve so we don't fire a guaranteed-403 during hydration.
     if (!user) {
       return
     }
-    // Demo users lack interviews:assign, so the call would always 403.
     if (isDemo) {
       return
     }
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial candidate-link load once auth/user resolves; mirrors original component behavior
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial candidate-link load once auth/user resolves
     void loadCandidateLink('initial')
   }, [loadCandidateLink, isDemo, user])
 

@@ -14,6 +14,10 @@ import {
   redirectIfUnauthorizedError,
 } from '@/lib/auth-gate'
 import { canReviewAssessments } from '@/lib/auth-roles'
+import {
+  normalizeInterviewsResponse,
+  type InterviewsListResponse,
+} from '@/lib/interviews-response'
 import { isForbiddenError, requestServer } from '@/lib/server-fetch'
 
 const ERROR_BACK_HREF = '/'
@@ -54,8 +58,8 @@ export default async function AssessmentsPage({
   let error: string | null = null
 
   try {
-    interviews =
-      (await requestServer<Interview[]>('/interviews', auth.ctx)) ?? []
+    const response = await requestServer<InterviewsListResponse<Interview>>('/interviews', auth.ctx)
+    interviews = normalizeInterviewsResponse<Interview>(response, 'assessments:/interviews')
   } catch (err) {
     redirectIfUnauthorizedError(err, '/assessments', locale)
     if (isForbiddenError(err)) {

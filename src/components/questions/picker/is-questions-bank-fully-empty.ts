@@ -2,7 +2,7 @@ import type { QuestionsQueryState } from '@/lib/questions-query-state'
 
 type FilterSlice = Pick<
   QuestionsQueryState,
-  'difficulty' | 'category' | 'subcategory' | 'role' | 'tags' | 'status'
+  'locale' | 'difficulty' | 'category' | 'subcategory' | 'role' | 'tags' | 'status'
 >
 
 export function isQuestionsBankFullyEmpty({
@@ -24,6 +24,7 @@ export function isQuestionsBankFullyEmpty({
     return false
   }
   if (
+    filterState.locale ||
     filterState.difficulty ||
     filterState.category ||
     filterState.subcategory ||

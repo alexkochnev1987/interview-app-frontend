@@ -26,3 +26,34 @@ describe('ApiError', () => {
     expect(error.path).toBe('/questions/q1')
   })
 })
+
+describe('ApiError', () => {
+  it('uses provided code and params without re-parsing body', () => {
+    const error = new ApiError(
+      400,
+      'Validation failed',
+      '/questions',
+      JSON.stringify({ code: 'OTHER_CODE', params: { field: 'ignored' } }),
+      'VALIDATION_ERROR',
+      { errors: ['questionText is required'] },
+    )
+
+    expect(error.code).toBe('VALIDATION_ERROR')
+    expect(error.params).toEqual({ errors: ['questionText is required'] })
+  })
+
+  it('parses body once when code and params are omitted', () => {
+    const error = new ApiError(
+      400,
+      'Validation failed',
+      '/questions',
+      JSON.stringify({
+        code: 'VALIDATION_ERROR',
+        params: { errors: ['questionText is required'] },
+      }),
+    )
+
+    expect(error.code).toBe('VALIDATION_ERROR')
+    expect(error.params).toEqual({ errors: ['questionText is required'] })
+  })
+})

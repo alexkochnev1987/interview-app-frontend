@@ -54,7 +54,9 @@ export default async function AssessmentDetailPage({
 
   try {
     interview =
-      (await requestServer<Interview>(`/interviews/${encodedId}`, auth.ctx)) ??
+      (await requestServer<Interview>(`/interviews/${encodedId}`, auth.ctx, {
+        withLocaleHeader: false,
+      })) ??
       null
   } catch (err) {
     redirectIfUnauthorizedError(err, returnPath, locale)
