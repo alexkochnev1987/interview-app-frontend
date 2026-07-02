@@ -24,6 +24,9 @@ export const TAKE_MESSAGES = {
   lobbyJoinBusy: 'One moment…',
   lobbyDevicesHelp:
     'Status updates as you connect. In the system share dialog, choose Entire screen.',
+  lobbyScreenShareHint:
+    'When the browser dialog opens, choose "Entire screen" (not a browser tab or app window), or you won\'t be able to start the interview.',
+  lobbyScreenShareHintTitle: 'Share your entire screen',
   lobbyToolbarMic: 'Microphone',
   lobbyToolbarCamera: 'Camera',
   lobbyToolbarScreen: 'Entire screen share',

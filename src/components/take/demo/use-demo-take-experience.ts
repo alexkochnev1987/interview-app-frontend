@@ -18,8 +18,6 @@ import {
 } from '@/features/take'
 import { permissionLabel, TAKE_RECORDING_LIMIT_SECONDS } from '@/features/take/utils'
 
-const AUTO_RECORD_DELAY_MS = 1200
-
 interface UseDemoTakeExperienceParams {
   candidateName: string
   position: string
@@ -83,53 +81,22 @@ export function useDemoTakeExperience({
   const [versionNumber, setVersionNumber] = useState(1)
   const [recording, setRecording] = useState(false)
   const [timeLeft, setTimeLeft] = useState(TAKE_RECORDING_LIMIT_SECONDS)
-  const [speaking, setSpeaking] = useState(false)
   const [setupError, setSetupError] = useState('')
 
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const screenVideoRef = useRef<HTMLVideoElement | null>(null)
   const cameraStreamRef = useRef<MediaStream | null>(null)
-  const autoRecordTimerRef = useRef<number | null>(null)
 
   const stopCamera = useCallback(() => {
     cameraStreamRef.current?.getTracks().forEach((track) => track.stop())
     cameraStreamRef.current = null
   }, [])
 
-  const cancelSpeech = useCallback(() => {
-    if (typeof window !== 'undefined' && window.speechSynthesis) {
-      window.speechSynthesis.cancel()
-    }
-  }, [])
-
-  const speakQuestion = useCallback(
-    (text: string) => {
-      if (typeof window === 'undefined' || !window.speechSynthesis) {
-        setSpeaking(false)
-        return
-      }
-      cancelSpeech()
-      const utterance = new SpeechSynthesisUtterance(text)
-      utterance.lang = 'en-US'
-      utterance.rate = 0.95
-      utterance.onend = () => setSpeaking(false)
-      utterance.onerror = () => setSpeaking(false)
-      setSpeaking(true)
-      window.speechSynthesis.speak(utterance)
-    },
-    [cancelSpeech],
-  )
-
-  // Release camera, speech, and pending timer on unmount.
   useEffect(() => {
     return () => {
       stopCamera()
-      cancelSpeech()
-      if (autoRecordTimerRef.current !== null) {
-        window.clearTimeout(autoRecordTimerRef.current)
-      }
     }
-  }, [stopCamera, cancelSpeech])
+  }, [stopCamera])
 
   useEffect(() => {
     if (stage !== 'recording' || !recording || timeLeft <= 0) {
@@ -163,23 +130,12 @@ export function useDemoTakeExperience({
     [position, interviewLocale, candidateName, totalQuestions, questionTexts, currentIndex, versionNumber],
   )
 
-  const beginQuestion = useCallback(
-    (index: number) => {
-      setVersionNumber(1)
-      setTimeLeft(TAKE_RECORDING_LIMIT_SECONDS)
-      setRecording(false)
-      setStage('interview')
-      speakQuestion(questionTexts[index] ?? '')
-      if (autoRecordTimerRef.current !== null) {
-        window.clearTimeout(autoRecordTimerRef.current)
-      }
-      autoRecordTimerRef.current = window.setTimeout(() => {
-        setStage('recording')
-        setRecording(true)
-      }, AUTO_RECORD_DELAY_MS)
-    },
-    [questionTexts, speakQuestion],
-  )
+  const beginQuestion = useCallback(() => {
+    setVersionNumber(1)
+    setTimeLeft(TAKE_RECORDING_LIMIT_SECONDS)
+    setStage('recording')
+    setRecording(true)
+  }, [])
 
   const prepareCamera = useCallback(async () => {
     setCameraStatus('pending')
@@ -218,7 +174,6 @@ export function useDemoTakeExperience({
   )
 
   const onSubmit = useCallback(() => {
-    cancelSpeech()
     setRecording(false)
     if (currentIndex >= totalQuestions - 1) {
       stopCamera()
@@ -227,8 +182,8 @@ export function useDemoTakeExperience({
     }
     const next = currentIndex + 1
     setCurrentIndex(next)
-    beginQuestion(next)
-  }, [cancelSpeech, currentIndex, totalQuestions, stopCamera, beginQuestion])
+    beginQuestion()
+  }, [currentIndex, totalQuestions, stopCamera, beginQuestion])
 
   const onRerecord = useCallback(() => {
     setVersionNumber((value) => value + 1)
@@ -261,7 +216,7 @@ export function useDemoTakeExperience({
     versionNumber,
     recording,
     timeLeft,
-    interviewerPresence: speaking ? 'speaking' : 'listening',
+    interviewerPresence: 'listening',
     progressValue,
     permissionLabel: (status: PermissionStatus) =>
       permissionLabel(status, takeMessage),
@@ -269,7 +224,7 @@ export function useDemoTakeExperience({
     onToggleMic: () => toggleTrack('audio'),
     onToggleCamera: () => toggleTrack('video'),
     onScreenShare: () => setScreenStatus('granted'),
-    onJoin: () => beginQuestion(0),
+    onJoin: () => beginQuestion(),
     onRerecord,
     onSubmit,
   }
