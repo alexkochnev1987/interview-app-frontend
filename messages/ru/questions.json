@@ -242,9 +242,8 @@
         "deleted": "Удалено",
         "weightLabel": "вес {weight}",
         "conceptsMetric": "Концепции",
-        "redFlagsMetric": "Красные флаги",
+        "popularityMetric": "Популярность",
         "expectedConcepts": "Ожидаемые концепции",
-        "redFlagSignals": "Сигналы красного флага",
         "notSpecified": "Не указан",
         "scheduled": "Запланировано"
       },

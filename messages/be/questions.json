@@ -242,9 +242,8 @@
         "deleted": "Выдалены",
         "weightLabel": "вага {weight}",
         "conceptsMetric": "Паняцці",
-        "redFlagsMetric": "Чырвоныя сцягі",
+        "popularityMetric": "Папулярнасць",
         "expectedConcepts": "Чаканыя паняцці",
-        "redFlagSignals": "Сігналы чырвонага сцяга",
         "notSpecified": "Не ўдакладняецца",
         "scheduled": "Запланавана"
       },

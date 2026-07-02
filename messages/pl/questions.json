@@ -242,9 +242,8 @@
         "deleted": "Usunięto",
         "weightLabel": "waga {weight}",
         "conceptsMetric": "Koncepcje",
-        "redFlagsMetric": "Czerwone flagi",
+        "popularityMetric": "Popularność",
         "expectedConcepts": "Oczekiwane koncepcje",
-        "redFlagSignals": "Sygnały czerwonej flagi",
         "notSpecified": "Nie określono",
         "scheduled": "Zaplanowane"
       },

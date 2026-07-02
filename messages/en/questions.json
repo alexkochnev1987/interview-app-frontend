@@ -242,9 +242,8 @@
         "deleted": "Deleted",
         "weightLabel": "weight {weight}",
         "conceptsMetric": "Concepts",
-        "redFlagsMetric": "Red flags",
+        "popularityMetric": "Popularity",
         "expectedConcepts": "Expected concepts",
-        "redFlagSignals": "Red flag signals",
         "notSpecified": "Not specified",
         "scheduled": "Scheduled"
       },
