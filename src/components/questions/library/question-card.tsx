@@ -1,5 +1,6 @@
 'use client'
 
+import { type ComponentProps } from 'react'
 import { useTranslations } from 'next-intl'
 
 import { EyebrowLabel } from '@/components/ui/eyebrow-label'
@@ -24,50 +25,54 @@ import { useSharedLabels } from '@/i18n/use-shared-labels'
 import { type Question } from '@/lib/api'
 import { truncateText } from '@/lib/text'
 
-type QuestionCardInteraction = 'navigate' | 'select'
+// navigate: click opens the detail page.
+// select:   click opens the detail page, checkbox toggles a delete selection.
+// pick:      click toggles the pick selection, no navigation.
+type QuestionCardMode = 'navigate' | 'select' | 'pick'
 
 interface QuestionCardProps {
   question: Question
-  selectable: boolean
-  selected: boolean
-  onToggleSelected: (id: string) => void
-  interaction?: QuestionCardInteraction
+  mode?: QuestionCardMode
+  selected?: boolean
+  onToggleSelected?: (id: string) => void
   disabled?: boolean
+}
+
+type CardVariant = ComponentProps<typeof Card>['variant']
+type CardState = ComponentProps<typeof Card>['state']
+
+function getCardAppearance(
+  question: Question,
+  mode: QuestionCardMode,
+  selected: boolean,
+): { variant: CardVariant; state: CardState } {
+  if (question.deleted) return { variant: 'danger-soft', state: 'deleted' }
+  if (question.pendingDeletion)
+    return { variant: 'scheduled-soft', state: 'scheduled' }
+  if (selected && mode === 'pick') return { variant: 'surface', state: 'picked' }
+  if (selected && mode === 'select')
+    return { variant: 'surface', state: 'selected' }
+  return { variant: 'surface', state: 'default' }
 }
 
 function CardSurface({
   question,
-  selectable,
-  selected,
-  selectionTone,
+  reserveCorner,
+  variant,
+  state,
 }: {
   question: Question
-  selectable: boolean
-  selected: boolean
-  selectionTone: 'delete' | 'pick'
+  reserveCorner: boolean
+  variant: CardVariant
+  state: CardState
 }) {
   const t = useTranslations('questions.library.card')
   const sharedLabels = useSharedLabels()
 
-  const state = question.deleted
-    ? 'deleted'
-    : question.pendingDeletion
-      ? 'scheduled'
-      : selected && selectable
-        ? selectionTone === 'pick'
-          ? 'picked'
-          : 'selected'
-        : 'default'
-
   return (
-    <Card
-      variant={question.deleted ? 'danger-soft' : question.pendingDeletion ? 'scheduled-soft' : 'surface'}
-      height="full"
-      interaction="hover"
-      state={state}
-    >
+    <Card variant={variant} height="full" interaction="hover" state={state}>
       <CardHeader spacing="md">
-        <PillRow reserveCorner={selectable}>
+        <PillRow reserveCorner={reserveCorner}>
           {question.deleted ? (
             <StatusPill tone="failed">{t('deleted')}</StatusPill>
           ) : null}
@@ -127,73 +132,62 @@ function CardSurface({
 
 export function QuestionCard({
   question,
-  selectable,
-  selected,
+  mode = 'navigate',
+  selected = false,
   onToggleSelected,
-  interaction = 'navigate',
   disabled = false,
 }: QuestionCardProps) {
   const t = useTranslations('questions.library.table')
 
-  if (interaction === 'select') {
+  const { variant, state } = getCardAppearance(question, mode, selected)
+  const isSelectable = mode === 'select' || mode === 'pick'
+
+  const surface = (
+    <CardSurface
+      question={question}
+      reserveCorner={isSelectable}
+      variant={variant}
+      state={state}
+    />
+  )
+
+  if (mode === 'navigate') {
+    return (
+      <UnstyledLink href={routes.questions.detail(question.id)}>
+        {surface}
+      </UnstyledLink>
+    )
+  }
+
+  const marker = (
+    <Checkbox
+      size="md"
+      surface="card"
+      checked={selected}
+      onCheckedChange={() => onToggleSelected?.(question.id)}
+      disabled={disabled}
+      aria-label={t('selectQuestion')}
+    />
+  )
+
+  if (mode === 'pick') {
     return (
       <SelectableOverlay
-        interactive
-        onClick={disabled ? undefined : () => onToggleSelected(question.id)}
-        marker={
-          <Checkbox
-            size="md"
-            surface="card"
-            checked={selected}
-            onCheckedChange={() => onToggleSelected(question.id)}
-            disabled={disabled}
-            aria-label={t('selectQuestion')}
-          />
-        }
+        interactive={!disabled}
+        onToggle={() => onToggleSelected?.(question.id)}
+        marker={marker}
       >
-        <CardSurface
-          question={question}
-          selectable
-          selected={selected}
-          selectionTone="pick"
-        />
+        {surface}
       </SelectableOverlay>
     )
   }
 
-  if (!selectable) {
-    return (
-      <UnstyledLink href={routes.questions.detail(question.id)}>
-        <CardSurface
-          question={question}
-          selectable={false}
-          selected={false}
-          selectionTone="delete"
-        />
-      </UnstyledLink>
-    )
-  }
-
   return (
-    <SelectableOverlay
-      marker={
-        <Checkbox
-          size="md"
-          surface="card"
-          checked={selected}
-          onCheckedChange={() => onToggleSelected(question.id)}
-          aria-label={t('selectQuestion')}
-        />
-      }
-    >
+    <SelectableOverlay marker={marker}>
       <UnstyledLink href={routes.questions.detail(question.id)}>
-        <CardSurface
-          question={question}
-          selectable
-          selected={selected}
-          selectionTone="delete"
-        />
+        {surface}
       </UnstyledLink>
     </SelectableOverlay>
   )
 }
+
