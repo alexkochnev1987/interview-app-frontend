@@ -7,28 +7,38 @@ import { useTranslations } from 'next-intl'
 import { Stack } from '@/components/ui/layout/stack'
 import { Textarea } from '@/components/ui/textarea'
 import { type QuestionInput } from '@/lib/api'
+import { type Locale } from '@/i18n/locales'
 import {
   joinStringList,
   parseStringList,
+  type LocaleQuestionDraft,
 } from '@/lib/question-editor/parsers'
 import { type DraftFieldKey } from '@/lib/question-editor/field-keys'
 import { EditorSectionCard } from './editor-section-card'
 import { QuestionEditorField } from './question-editor-field'
 
 interface EditorReferenceSectionProps {
+  locale: Locale
+  primaryLocale: Locale
+  contentDraft: LocaleQuestionDraft
   value: QuestionInput
   metadataText: string
   submitting: boolean
+  onContentUpdate: (patch: Partial<LocaleQuestionDraft>) => void
   onUpdate: (patch: Partial<QuestionInput>) => void
   onMetadataTextChange: (next: string) => void
-  renderAiSuggestion: (field: DraftFieldKey) => ReactNode
+  renderAiSuggestion?: (field: DraftFieldKey) => ReactNode
   metadataError?: string
 }
 
 export function EditorReferenceSection({
+  locale,
+  primaryLocale,
+  contentDraft,
   value,
   metadataText,
   submitting,
+  onContentUpdate,
   onUpdate,
   onMetadataTextChange,
   renderAiSuggestion,
@@ -36,6 +46,7 @@ export function EditorReferenceSection({
 }: EditorReferenceSectionProps) {
   const tFields = useTranslations('questions.fields')
   const t = useTranslations('questions.sections.reference')
+  const isPrimaryLocale = locale === primaryLocale
 
   return (
     <EditorSectionCard
@@ -46,20 +57,22 @@ export function EditorReferenceSection({
       <Stack gap={5}>
         <Stack gap={2}>
           <QuestionEditorField
-            htmlFor="sampleGoodAnswer"
+            htmlFor={`sampleGoodAnswer-${locale}`}
             label={t('sampleGoodAnswer')}
             hint={t('sampleGoodAnswerHint')}
           >
             <Textarea
-              id="sampleGoodAnswer"
+              id={`sampleGoodAnswer-${locale}`}
               size="md"
-              value={value.sampleGoodAnswer ?? ''}
-              onChange={(event) => onUpdate({ sampleGoodAnswer: event.target.value })}
+              value={contentDraft.sampleGoodAnswer ?? ''}
+              onChange={(event) =>
+                onContentUpdate({ sampleGoodAnswer: event.target.value })
+              }
               placeholder={t('sampleGoodAnswerPlaceholder')}
               disabled={submitting}
             />
           </QuestionEditorField>
-          {renderAiSuggestion('sampleGoodAnswer')}
+          {isPrimaryLocale ? renderAiSuggestion?.('sampleGoodAnswer') : null}
         </Stack>
 
         <Stack gap={2}>
@@ -77,7 +90,7 @@ export function EditorReferenceSection({
               disabled={submitting}
             />
           </QuestionEditorField>
-          {renderAiSuggestion('tags')}
+          {isPrimaryLocale ? renderAiSuggestion?.('tags') : null}
         </Stack>
 
         <QuestionEditorField

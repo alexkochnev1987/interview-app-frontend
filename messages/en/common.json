@@ -23,9 +23,15 @@
     "label": "Language",
     "locales": {
       "en": "English",
-      "be": "Беларуская",
-      "ru": "Русский",
-      "pl": "Polski"
+      "be": "Belarusian",
+      "ru": "Russian",
+      "pl": "Polish"
+    },
+    "inLocale": {
+      "en": "in English",
+      "be": "in Belarusian",
+      "ru": "in Russian",
+      "pl": "in Polish"
     }
   },
   "shared": {

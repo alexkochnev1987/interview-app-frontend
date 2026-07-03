@@ -48,7 +48,7 @@ export async function loadAuthGate(
   roleCheck: (role: string) => boolean,
   locale: Locale,
 ): Promise<AuthGate> {
-  const ctx = await getServerRequestContext()
+  const ctx = await getServerRequestContext(locale)
   const t = await getTranslations({ locale, namespace: 'common' })
 
   if (!ctx.cookieHeader) {

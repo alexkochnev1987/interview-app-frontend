@@ -32,6 +32,7 @@ type QuestionCardMode = 'navigate' | 'select' | 'pick'
 
 interface QuestionCardProps {
   question: Question
+  listLocale: string
   mode?: QuestionCardMode
   selected?: boolean
   onToggleSelected?: (id: string) => void
@@ -57,11 +58,13 @@ function getCardAppearance(
 
 function CardSurface({
   question,
+  listLocale,
   reserveCorner,
   variant,
   state,
 }: {
   question: Question
+  listLocale: string
   reserveCorner: boolean
   variant: CardVariant
   state: CardState
@@ -85,6 +88,13 @@ function CardSurface({
           {question.category ? (
             <StatusPill tone="neutral" casing="chip">
               {question.category}
+            </StatusPill>
+          ) : null}
+          {question.resolvedLocale && question.resolvedLocale !== listLocale ? (
+            <StatusPill tone="neutral_meta" casing="chip">
+              {t('resolvedLocaleBadge', {
+                locale: question.resolvedLocale.toUpperCase(),
+              })}
             </StatusPill>
           ) : null}
         </PillRow>
@@ -120,7 +130,7 @@ function CardSurface({
             {question.expectedConcepts.length > 0
               ? question.expectedConcepts
                   .slice(0, 3)
-                  .map((item) => item.label)
+                  .map((item: { label: string }) => item.label)
                   .join(', ')
               : t('notSpecified')}
           </BodyText>
@@ -132,6 +142,7 @@ function CardSurface({
 
 export function QuestionCard({
   question,
+  listLocale,
   mode = 'navigate',
   selected = false,
   onToggleSelected,
@@ -145,6 +156,7 @@ export function QuestionCard({
   const surface = (
     <CardSurface
       question={question}
+      listLocale={listLocale}
       reserveCorner={isSelectable}
       variant={variant}
       state={state}
@@ -190,4 +202,3 @@ export function QuestionCard({
     </SelectableOverlay>
   )
 }
-

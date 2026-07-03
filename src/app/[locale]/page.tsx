@@ -12,6 +12,10 @@ import {
   redirectIfUnauthenticated,
   redirectIfUnauthorizedError,
 } from '@/lib/auth-gate'
+import {
+  normalizeInterviewsResponse,
+  type InterviewsListResponse,
+} from '@/lib/interviews-response'
 import { isForbiddenError, requestServer } from '@/lib/server-fetch'
 
 const ERROR_SIGN_IN_HREF = '/login'
@@ -50,8 +54,8 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
   let error: string | null = null
 
   try {
-    interviews =
-      (await requestServer<Interview[]>('/interviews', auth.ctx)) ?? []
+    const response = await requestServer<InterviewsListResponse<Interview>>('/interviews', auth.ctx)
+    interviews = normalizeInterviewsResponse<Interview>(response, 'dashboard:/interviews')
   } catch (err) {
     redirectIfUnauthorizedError(err, '/', locale)
     if (isForbiddenError(err)) {

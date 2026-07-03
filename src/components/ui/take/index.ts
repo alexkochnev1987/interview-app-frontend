@@ -14,3 +14,4 @@ export {
 } from './recording-header-layout';
 
 export { RecordingStageHero } from './recording-stage-hero';
+export { TakeLocaleBar, type TakeLocaleBarProps } from './take-locale-bar';

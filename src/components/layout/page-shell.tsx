@@ -7,6 +7,12 @@ type ChildrenProps = {
   children: ReactNode
 }
 
+type PageMainViewportSpacing = 'page' | 'take'
+
+type PageMainViewportProps = ChildrenProps & {
+  spacing?: PageMainViewportSpacing
+}
+
 export function PageMain({ children }: ChildrenProps) {
   return (
     <PageFrame as="main" spacing="page">
@@ -17,9 +23,12 @@ export function PageMain({ children }: ChildrenProps) {
   )
 }
 
-export function PageMainViewport({ children }: ChildrenProps) {
+export function PageMainViewport({
+  children,
+  spacing = 'page',
+}: PageMainViewportProps) {
   return (
-    <PageFrame as="main" spacing="page" stretch="viewport">
+    <PageFrame as="main" spacing={spacing} stretch="viewport">
       <Container width="default" layout="viewportColumn">
         <Stack gap={8} grow="fill" width="full">
           {children}

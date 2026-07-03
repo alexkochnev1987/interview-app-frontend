@@ -4,7 +4,7 @@
       "externalId": "Внешний идентификатор",
       "role": "Роль",
       "focus": "Фокус",
-      "outputLanguage": "Язык вывода",
+      "primaryLocale": "Основная локаль",
       "category": "Категория",
       "subcategory": "Подкатегория",
       "questionText": "Текст вопроса",
@@ -22,23 +22,50 @@
       "questionTextRequired": "Текст вопроса обязателен.",
       "metadataInvalidJson": "Метаданные должны быть действительными в формате JSON.",
       "metadataMustBeObject": "Метаданные должны быть объектом JSON (а не массивом или примитивом).",
-      "englishOnlyField": "Поле «{field}» должно быть на английском языке.",
-      "englishOnlyTitle": "Только английский"
+      "metadataEnglishOnly": "Роль, категория, теги и другие поля таксономии должны быть на английском (латиница).",
+      "primaryLocaleRequired": "Блок основной локали обязателен.",
+      "primaryLocaleCannotBeRemoved": "Основной язык нельзя удалить.",
+      "localeAlreadyAdded": "{locale} уже добавлен.",
+      "localeNotAdded": "{locale} еще не добавлен.",
+      "localeBlockIncomplete": "Блок {locale} неполный. Заполните: {fields}.",
+      "pendingAiDraft": "Примените или отклоните все AI-предложения перед сохранением.",
+      "pendingTranslationDraft": "Примените или отклоните все предложения перевода перед сохранением."
     },
     "editor": {
       "previewEmpty": "Пустой",
       "moreInformation": "Больше информации",
       "aiQuestionTextRequired": "Текст вопроса необходим перед созданием ИИ.",
-      "aiQuestionTextEnglishOnly": "Перед генерацией ИИ текст вопроса должен быть на английском языке.",
-      "englishOnlyNoticeTitle": "Политика контента: только английский",
-      "englishOnlyNoticeDescription": "Заполняйте все поля вопроса на английском вне зависимости от текущей локали интерфейса.",
       "conceptDescriptionFallback": "{label} должно быть указано в ответе.",
       "headerEyebrow": "Единый редактор вопросов",
       "headerLead": "Формируйте подсказку, определите критерии и сохраняйте черновые предложения, созданные ИИ, видимыми в виде явных различий, а не невидимых фоновых мутаций.",
       "metricDifficulty": "Сложность",
       "metricWeight": "Масса",
       "metricPendingAi": "Ожидаемые различия ИИ",
-      "selectDifficultyPlaceholder": "Выберите сложность"
+      "selectDifficultyPlaceholder": "Выберите сложность",
+      "primaryLocale": "Основной язык",
+      "translateTo": "Перевести на",
+      "translate": "Перевести",
+      "applyAll": "Применить всё",
+      "addLanguage": "Добавить язык",
+      "removeLanguage": "Удалить {locale}",
+      "emptyTabPlaceholder": "Перевода пока нет. Введите текст или переведите с основной вкладки.",
+      "primaryChanged": "Основной язык изменился",
+      "primaryChangedDescription": "Основной контент был обновлён после сохранения этого перевода. Обновите перевод, чтобы он соответствовал текущему основному тексту.",
+      "updateTranslation": "Обновить перевод",
+      "updatingTranslation": "Обновление перевода…",
+      "tabsAriaLabel": "Языки контента",
+      "noLocalesToAdd": "Все языки добавлены",
+      "primaryBadge": "Основной",
+      "setPrimary": "Сделать {locale} основным языком",
+      "localeTranslateErrorFallback": "Не удалось сгенерировать перевод.",
+      "removeLocaleConfirmTitle": "Удалить {locale}?",
+      "removeLocaleConfirmDescription": "Этот перевод будет удалён из редактора. Сохраните, чтобы применить изменение на сервере.",
+      "removeLocaleConfirmLabel": "Удалить язык",
+      "removeLocaleCancelLabel": "Отмена",
+      "refreshTranslationsTitle": "Основной контент изменился",
+      "refreshTranslationsDescription": "Обновить переводы для {locales}?",
+      "refreshTranslationsConfirm": "Обновить переводы",
+      "refreshTranslationsCancel": "Не сейчас"
     },
     "sections": {
       "prompt": {
@@ -46,6 +73,7 @@
         "description": "Четко напишите основной вопрос, а затем запишите последующие вопросы, которые интервьюеры должны держать наготове.",
         "questionText": "Текст вопроса",
         "questionTextPlaceholder": "например Что такое замыкание в JavaScript?",
+        "questionTextLocalePlaceholder": "Перевод вопроса на {locale}",
         "followUpQuestions": "Дополнительные вопросы",
         "followUpHint": "Используйте одну строку для каждого зонда, чтобы интервьюер мог сохранять ритм во время сеанса.",
         "followUpPlaceholder": "Один вопрос в строке"
@@ -53,11 +81,11 @@
       "identity": {
         "title": "Личность вопроса",
         "description": "Привяжите подсказку к роли и таксономии, которые рекрутеры будут искать позже.",
+        "taxonomyEnglishHint": "Поля таксономии (роль, категория, теги и т. д.) хранятся на английском и не переводятся.",
         "externalIdTooltip": "Необязательный стабильный идентификатор для импорта.",
         "externalIdPlaceholder": "frontend_closure_v1",
         "rolePlaceholder": "стажер по интерфейсу",
         "focusPlaceholder": "основы",
-        "outputLanguagePlaceholder": "Английский",
         "categoryPlaceholder": "javascript",
         "subcategoryPlaceholder": "закрытия"
       },
@@ -87,12 +115,22 @@
     },
     "aiDraft": {
       "title": "ИИ-драфт",
-      "description": "Позвольте ИИ предлагать категории, последующие проверки, ожидаемые понятия, красные флажки и теги на основе текста вашего вопроса. Каждое изменение отображается в виде проверяемой разницы, прежде чем что-либо будет применено.",
+      "description": "Сгенерируйте follow-up, ожидаемые концепты, red flags и образец ответа из текста основного вопроса. Каждое предложение появляется под своим полем для проверки перед применением.",
       "pending": "{count, plural, one {# черновик} few {# черновика} many {# черновиков} other {# черновика}}",
-      "generate": "Создать проект ИИ",
+      "generate": "Создать через AI",
       "generating": "Создание...",
+      "generatingFor": "Генерация rubric для {locale}",
       "applyAll": "Применить все",
-      "loadingHint": "Генерация структурированных полей из текущего приглашения…"
+      "loadingHint": "Генерация структурированных полей из текущего приглашения…",
+      "previewLabel": "Предпросмотр черновика"
+    },
+    "translatePanel": {
+      "description": "Выберите локали, которые ещё не открыты как вкладки. AI переводит полный блок основного контента в каждую локаль.",
+      "noLocalesAvailable": "Все локали уже открыты как вкладки.",
+      "localeLoading": "Перевод…",
+      "translating": "Перевод…",
+      "tabTranslating": "Перевод {locale}…",
+      "applyAllForLocale": "Применить всё для {locale}"
     },
     "aiSuggestion": {
       "eyebrow": "предложение ИИ",
@@ -111,6 +149,7 @@
       "saving": "Сохранение..."
     },
     "chips": {
+      "locale": "Локаль: {value}",
       "difficulty": "Сложность: {value}",
       "category": "Категория: {value}",
       "subcategory": "Тип: {value}",
@@ -175,6 +214,7 @@
         "loadingFacets": "Загрузка параметров фильтра…",
         "facetsUnavailable": "Не удалось загрузить параметры фильтра.",
         "difficultyTitle": "Сложность",
+        "localeTitle": "Язык",
         "categoryTitle": "Категория",
         "typeTitle": "Тип",
         "roleTitle": "Роль",
@@ -240,6 +280,7 @@
       },
       "card": {
         "deleted": "Удалено",
+        "resolvedLocaleBadge": "Показано как {locale}",
         "weightLabel": "вес {weight}",
         "conceptsMetric": "Концепции",
         "popularityMetric": "Популярность",
@@ -440,7 +481,14 @@
       "candidateNameLabel": "Имя кандидата",
       "candidateNamePlaceholder": "например Джейн Доу",
       "positionLabel": "Позиция",
-      "positionPlaceholder": "например Старший фронтенд-инженер"
+      "positionPlaceholder": "например Старший фронтенд-инженер",
+      "interviewLocaleLabel": "Язык интервью",
+      "interviewLocaleOption": "{locale}",
+      "missingTranslationWarningTitle": "{count, plural, one {# вопрос без этого перевода} few {# вопроса без этого перевода} many {# вопросов без этого перевода} other {# вопросов без этого перевода}}",
+      "missingTranslationWarningDescription": "Выбранные вопросы недоступны на {locale}. В интервью для них может отображаться текст с fallback.",
+      "feedbackLinkLabel": "Ссылка на обратную связь",
+      "generatingFeedbackLink": "Генерация новой ссылки на обратную связь…",
+      "feedbackLinkNotReady": "Ссылка на обратную связь пока недоступна."
     }
   }
 }

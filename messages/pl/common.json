@@ -22,10 +22,16 @@
   "languageSwitcher": {
     "label": "Język",
     "locales": {
-      "en": "English",
-      "be": "Беларуская",
-      "ru": "Русский",
+      "en": "Angielski",
+      "be": "Białoruski",
+      "ru": "Rosyjski",
       "pl": "Polski"
+    },
+    "inLocale": {
+      "en": "po angielsku",
+      "be": "po białorusku",
+      "ru": "po rosyjsku",
+      "pl": "po polsku"
     }
   },
   "shared": {

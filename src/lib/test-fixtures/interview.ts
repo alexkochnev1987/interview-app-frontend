@@ -32,6 +32,7 @@ export function interviewResultFixture(
   partial: Partial<InterviewResult> = {},
 ): InterviewResult {
   return {
+    interviewLocale: 'en',
     overallScore: 75,
     summary: 'Evaluation summary',
     categoryScores: {
@@ -62,6 +63,7 @@ export function interviewFixture(partial: Partial<Interview> = {}): Interview {
     id: 'iv-1',
     candidateName: 'Test Candidate',
     position: 'Engineer',
+    interviewLocale: 'en',
     questions: [],
     answers: [],
     status: 'pending',

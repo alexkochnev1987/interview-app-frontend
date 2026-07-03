@@ -47,6 +47,7 @@ export function InterviewQuestionPickerAside({
         roles={facets.roles}
         tags={facets.tags}
         selected={{
+          locale: query.state.locale,
           difficulty: query.state.difficulty,
           category: query.state.category,
           subcategory: query.state.subcategory,
@@ -54,6 +55,7 @@ export function InterviewQuestionPickerAside({
           tags: query.state.tags,
           status: query.state.status,
         }}
+        onLocaleChange={query.setLocale}
         onDifficultyChange={query.setDifficulty}
         onCategoryChange={query.setCategory}
         onSubcategoryChange={query.setSubcategory}
@@ -158,6 +160,7 @@ export function InterviewQuestionPickerMain({
         renderTable={() => (
           <QuestionTable
             items={query.items}
+            listLocale={query.state.locale ?? 'en'}
             selectable
             selectedIds={selectedIds}
             onToggleSelected={toggleQuestion}
@@ -177,6 +180,7 @@ export function InterviewQuestionPickerMain({
               <QuestionCard
                 key={question.id}
                 question={question}
+                listLocale={query.state.locale ?? 'en'}
                 mode="pick"
                 selected={selectedById.has(question.id)}
                 onToggleSelected={() => toggleQuestion(question)}

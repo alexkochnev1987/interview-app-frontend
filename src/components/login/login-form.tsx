@@ -16,6 +16,7 @@ import { Stack } from '@/components/ui/layout/stack'
 import { useRouter } from '@/i18n/navigation'
 import { stripLocalePrefix } from '@/i18n/pathname'
 import { demoLogin, login } from '@/lib/api'
+import { ApiError } from '@/lib/api-error'
 import { useAuth } from '@/lib/auth-context'
 import { safeRedirectPath } from '@/lib/safe-redirect-path'
 import { useToastMessages } from '@/lib/use-toast-messages'
@@ -47,7 +48,13 @@ export function LoginForm() {
       router.push(redirectPath)
       router.refresh()
     } catch (err) {
-      setError(err instanceof Error ? err.message : toastMessages.pageGate.login.failedFallback)
+      if (err instanceof ApiError && err.code === 'VALIDATION_ERROR') {
+        setError(toastMessages.pageGate.login.failedFallback)
+        return
+      }
+      setError(
+        toastMessages.apiError.message(err) ?? toastMessages.pageGate.login.failedFallback,
+      )
     } finally {
       setPendingAction(null)
     }

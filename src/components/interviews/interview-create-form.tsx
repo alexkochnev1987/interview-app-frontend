@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, type FormEvent } from 'react'
+import { useMemo, useState, type FormEvent } from 'react'
 import { ArrowRight, BriefcaseBusiness, UserRound } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import {
   InterviewQuestionPickerAside,
@@ -18,10 +18,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Grid } from '@/components/ui/layout/grid'
 import { Stack } from '@/components/ui/layout/stack'
 import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { useRouter } from '@/i18n/navigation'
+import { LOCALES, type Locale } from '@/i18n/locales'
 import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { useIsDemo } from '@/lib/auth-context'
-import { createInterview } from '@/lib/api'
+import { createInterview, type Question } from '@/lib/api'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
 import { runMutation } from '@/lib/run-mutation'
 import { useToastMessages } from '@/lib/use-toast-messages'
@@ -30,13 +38,26 @@ type InterviewCreateFormProps = {
   initialPrefetch: QuestionsLibraryPrefetch
 }
 
+function questionSupportsInterviewLocale(question: Question, locale: Locale): boolean {
+  const translatedQuestionText = question.translations?.[locale]?.questionText?.trim()
+  if (translatedQuestionText) {
+    return true
+  }
+
+  const available = question.availableLocales
+  if (!available || available.length === 0) return false
+  return available.includes(locale)
+}
+
 export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProps) {
   const t = useTranslations('questions.common')
+  const uiLocale = useLocale() as Locale
   const router = useRouter()
   const toastMessages = useToastMessages()
   const isDemo = useIsDemo()
   const [candidateName, setCandidateName] = useState('')
   const [position, setPosition] = useState('')
+  const [interviewLocale, setInterviewLocale] = useState<Locale>(uiLocale)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -45,6 +66,14 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
     serverHydrated: true,
   })
   const { selectedCount, selectedById } = picker
+
+  const questionsMissingInterviewLocale = useMemo(
+    () =>
+      Array.from(selectedById.values()).filter(
+        (question) => !questionSupportsInterviewLocale(question, interviewLocale),
+      ),
+    [selectedById, interviewLocale],
+  )
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
@@ -71,11 +100,14 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
           createInterview({
             candidateName: candidateName.trim(),
             position: position.trim(),
+            interviewLocale,
             questionIds: Array.from(selectedById.keys()),
           }),
         {
           successMessage: toastMessages.interview.createSuccess,
           errorMessage: toastMessages.interview.createError,
+          getErrorMessage: (error) =>
+            toastMessages.apiError.message(error) ?? toastMessages.interview.createError,
         },
       )
       router.push(`/interviews/${interview.id}`)
@@ -131,11 +163,53 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
                   </IconAffix>
                 </FormField>
 
+                <FormField htmlFor="interviewLocale" label={t('interviewLocaleLabel')}>
+                  <Select
+                    value={interviewLocale}
+                    onValueChange={(value) => setInterviewLocale(value as Locale)}
+                    disabled={submitting || isDemo}
+                  >
+                    <SelectTrigger
+                      id="interviewLocale"
+                      variant="surface"
+                      size="md"
+                      shape="rounded"
+                      width="full"
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {LOCALES.map((code) => (
+                        <SelectItem key={code} value={code}>
+                          {t('interviewLocaleOption', { locale: code.toUpperCase() })}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormField>
+
+                {questionsMissingInterviewLocale.length > 0 ? (
+                  <Alert variant="warning">
+                    <AlertTitle>
+                      {t('missingTranslationWarningTitle', {
+                        count: questionsMissingInterviewLocale.length,
+                      })}
+                    </AlertTitle>
+                    <AlertDescription>
+                      {t('missingTranslationWarningDescription', {
+                        locale: interviewLocale.toUpperCase(),
+                        count: questionsMissingInterviewLocale.length,
+                      })}
+                    </AlertDescription>
+                  </Alert>
+                ) : null}
+
                 <DemoWriteGuard width="full" disabled={submitting || selectedCount === 0}>
                   <Button
                     type="submit"
                     variant="gradient"
                     width="full"
+                    disabled={submitting || selectedCount === 0}
                   >
                     {submitting
                       ? toastMessages.pageGate.interview.creatingLabel

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { LoaderCircle, PanelLeftClose, PanelLeftOpen, Trash2 } from 'lucide-react'
+import { useLocale } from 'next-intl'
 
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { CardGrid } from '@/components/ui/layout/card-grid'
@@ -48,6 +49,7 @@ export function QuestionsLibraryClient({
   isSuperAdmin,
   initialPrefetch,
 }: QuestionsLibraryClientProps) {
+  const uiLocale = useLocale()
   const router = useRouter()
   const t = useTranslations('questions.library.client')
   const tToolbar = useTranslations('questions.picker.toolbar')
@@ -62,6 +64,7 @@ export function QuestionsLibraryClient({
     lockStatus: isSuperAdmin ? undefined : 'active',
     disableFetchInCardsView: true,
   })
+  const listLocale = query.state.locale ?? uiLocale
   const isCardsView = query.state.view === 'cards'
   const cardsInfiniteParams = useMemo(
     () => buildQuestionsInfiniteParams(query.state, query.debouncedQ),
@@ -101,6 +104,7 @@ export function QuestionsLibraryClient({
   const activeChips = buildActiveFilterChips(
     query.state,
     {
+      setLocale: query.setLocale,
       setDifficulty: query.setDifficulty,
       setCategory: query.setCategory,
       setSubcategory: query.setSubcategory,
@@ -201,6 +205,7 @@ export function QuestionsLibraryClient({
       roles={facets.roles}
       tags={facets.tags}
       selected={{
+        locale: query.state.locale,
         difficulty: query.state.difficulty,
         category: query.state.category,
         subcategory: query.state.subcategory,
@@ -209,6 +214,7 @@ export function QuestionsLibraryClient({
         status: query.state.status,
       }}
       onDifficultyChange={query.setDifficulty}
+      onLocaleChange={query.setLocale}
       onCategoryChange={query.setCategory}
       onSubcategoryChange={query.setSubcategory}
       onRoleChange={query.setRole}
@@ -306,6 +312,7 @@ export function QuestionsLibraryClient({
         renderTable={() => (
           <QuestionTable
             items={query.items}
+            listLocale={listLocale}
             selectable={isSuperAdmin}
             selectedIds={selectedIds}
             onToggleSelected={toggleSelected}
@@ -325,6 +332,7 @@ export function QuestionsLibraryClient({
                 <QuestionCard
                   key={question.id}
                   question={question}
+                  listLocale={listLocale}
                   mode={isSuperAdmin ? 'select' : 'navigate'}
                   selected={selectedIds.has(question.id)}
                   onToggleSelected={() => toggleSelected(question)}
