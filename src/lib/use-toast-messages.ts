@@ -1,3 +1,4 @@
+import { useApiErrorToastMessages } from './toast-messages/use-api-error-toast-messages'
 import { useBulkDeleteToastMessages } from './toast-messages/use-bulk-delete-toast-messages'
 import { useDefaultsToastMessages } from './toast-messages/use-defaults-toast-messages'
 import { useInterviewToastMessages } from './toast-messages/use-interview-toast-messages'
@@ -15,6 +16,7 @@ import { useTakeToastMessages } from './toast-messages/use-take-toast-messages'
 import { useTeamToastMessages } from './toast-messages/use-team-toast-messages'
 
 export {
+  useApiErrorToastMessages,
   useBulkDeleteToastMessages,
   useDefaultsToastMessages,
   useDeleteQuestionToastMessages,
@@ -45,5 +47,6 @@ export function useToastMessages() {
     team: useTeamToastMessages(),
     rerun: useRerunToastMessages(),
     deleteQuestion: useDeleteQuestionToastMessages(),
+    apiError: useApiErrorToastMessages(),
   }
 }

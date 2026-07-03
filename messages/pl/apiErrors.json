@@ -1,0 +1,9 @@
+{
+  "AUTH_UNAUTHORIZED": "Zaloguj się, aby kontynuować.",
+  "AUTH_FORBIDDEN": "Nie masz dostępu do tego zasobu.",
+  "COMMON_NOT_FOUND": "Żądany zasób nie został znaleziony.",
+  "COMMON_VALIDATION_FAILED": "Część pól jest nieprawidłowa. Sprawdź dane wejściowe.",
+  "QUESTION_IN_USE": "To pytanie jest używane w aktywnych interview i nie może zostać usunięte.",
+  "INTERVIEW_VALIDATION_RUNNING": "Walidacja interview już trwa.",
+  "UPLOAD_FAILED": "Upload nie powiódł się. Spróbuj ponownie."
+}

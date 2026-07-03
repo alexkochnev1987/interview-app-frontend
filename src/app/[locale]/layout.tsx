@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { hasLocale, NextIntlClientProvider } from 'next-intl'
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server'
-import { headers } from 'next/headers'
 import { notFound } from 'next/navigation'
 
 import { AppBody } from '@/components/ui/app-shell'
@@ -51,8 +50,7 @@ export default async function LocaleLayout({
   setRequestLocale(locale)
   const messages = await getMessages()
   const session = await getServerSessionSnapshot()
-  const pathname = (await headers()).get('x-pathname') ?? '/'
-  const htmlLang = resolveHtmlLang(locale as Locale, pathname)
+  const htmlLang = resolveHtmlLang(locale as Locale)
 
   return (
     <html lang={htmlLang}>

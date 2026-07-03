@@ -35,20 +35,23 @@ type LanguageOption = {
   label: string
 }
 
-interface LanguageSwitcherProps {
+type LanguageSwitcherProps = {
   ariaLabel: string
   currentLocale: Locale
-  href: string
   options: LanguageOption[]
   side?: 'top' | 'right' | 'bottom' | 'left'
   align?: 'start' | 'center' | 'end'
   onOpenChange?: (open: boolean) => void
-}
+} & (
+  | { href: string; onSelectLocale?: never }
+  | { href?: never; onSelectLocale: (locale: Locale) => void }
+)
 
 export function LanguageSwitcher({
   ariaLabel,
   currentLocale,
   href,
+  onSelectLocale,
   options,
   side,
   align = 'end',
@@ -70,6 +73,25 @@ export function LanguageSwitcher({
       <DropdownMenuContent side={side} align={align} className="w-max !min-w-0">
         {options.map(({ locale, label }) => {
           const active = locale === currentLocale
+
+          if (onSelectLocale) {
+            return (
+              <DropdownMenuItem
+                key={locale}
+                aria-current={active ? 'true' : undefined}
+                className={cn(languageSwitcherItemVariants({ active }))}
+                onClick={() => onSelectLocale(locale)}
+              >
+                <span>{label}</span>
+                <Check
+                  className={cn(
+                    'size-4 text-primary',
+                    active ? 'opacity-100' : 'opacity-0',
+                  )}
+                />
+              </DropdownMenuItem>
+            )
+          }
 
           return (
             <DropdownMenuItem key={locale} asChild>

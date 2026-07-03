@@ -4,7 +4,7 @@
       "externalId": "Знешні ідэнтыфікатар",
       "role": "Роля",
       "focus": "Фокус",
-      "outputLanguage": "Мова вываду",
+      "primaryLocale": "Асноўная лакаль",
       "category": "Катэгорыя",
       "subcategory": "Падкатэгорыя",
       "questionText": "Тэкст пытання",
@@ -22,23 +22,50 @@
       "questionTextRequired": "Тэкст пытання абавязковы.",
       "metadataInvalidJson": "Метададзеныя павінны быць сапраўднымі ў фармаце JSON.",
       "metadataMustBeObject": "Метададзеныя павінны быць аб'ектам JSON (а не масівам або прымітывам).",
-      "englishOnlyField": "Поле «{field}» павінна быць на англійскай мове.",
-      "englishOnlyTitle": "Толькі англійская"
+      "metadataEnglishOnly": "Роля, катэгорыя, тэгі і іншыя палі таксанаміі павінны быць на англійскай (лацініца).",
+      "primaryLocaleRequired": "Блок асноўнай лакалі абавязковы.",
+      "primaryLocaleCannotBeRemoved": "Асноўную лакаль нельга выдаліць.",
+      "localeAlreadyAdded": "{locale} ужо дададзена.",
+      "localeNotAdded": "{locale} яшчэ не дададзена.",
+      "localeBlockIncomplete": "Блок {locale} няпоўны. Запоўніце: {fields}.",
+      "pendingAiDraft": "Ужыце або адхіліце ўсе AI-прапановы перад захаваннем.",
+      "pendingTranslationDraft": "Ужыце або адхіліце ўсе прапановы перакладу перад захаваннем."
     },
     "editor": {
       "previewEmpty": "Пусты",
       "moreInformation": "Больш інфармацыі",
       "aiQuestionTextRequired": "Перад стварэннем штучнага інтэлекту патрабуецца тэкст пытання.",
-      "aiQuestionTextEnglishOnly": "Перад генерацыяй штучнага інтэлекту тэкст пытання павінен быць на англійскай мове.",
-      "englishOnlyNoticeTitle": "Палітыка кантэнту: толькі англійская",
-      "englishOnlyNoticeDescription": "Запаўняйце ўсе палі пытання на англійскай, незалежна ад бягучай лакалі інтэрфейсу.",
       "conceptDescriptionFallback": "{label} павінна быць ахоплена ў адказе.",
       "headerEyebrow": "Адзіны рэдактар ​​пытанняў",
       "headerLead": "Сфармуйце падказку, вызначыце рубрыку і захавайце згенераваныя штучным інтэлектам чарнавікі бачнымі як відавочныя адрозненні замест нябачных фонавых мутацый.",
       "metricDifficulty": "Цяжкасць",
       "metricWeight": "Вага",
       "metricPendingAi": "Чакаюцца адрозненні AI",
-      "selectDifficultyPlaceholder": "Выберыце складанасць"
+      "selectDifficultyPlaceholder": "Выберыце складанасць",
+      "primaryLocale": "Асноўная мова",
+      "translateTo": "Перакласці на",
+      "translate": "Перакласці",
+      "applyAll": "Ужыць усе",
+      "addLanguage": "Дадаць мову",
+      "removeLanguage": "Выдаліць {locale}",
+      "emptyTabPlaceholder": "Перакладу пакуль няма. Увядзіце тэкст або перакладзіце з асноўнай укладкі.",
+      "primaryChanged": "Асноўная мова змянілася",
+      "primaryChangedDescription": "Асноўны кантэнт быў абноўлены пасля захавання гэтага перакладу. Абновіце пераклад, каб ён адпавядаў бягучаму асноўнаму тэксту.",
+      "updateTranslation": "Абнавіць пераклад",
+      "updatingTranslation": "Абнаўленне перакладу…",
+      "tabsAriaLabel": "Мовы кантэнту",
+      "noLocalesToAdd": "Усе мовы дададзены",
+      "primaryBadge": "Асноўная",
+      "setPrimary": "Зрабіць {locale} асноўнай мовай",
+      "localeTranslateErrorFallback": "Не ўдалося згенераваць пераклад.",
+      "removeLocaleConfirmTitle": "Выдаліць {locale}?",
+      "removeLocaleConfirmDescription": "Гэты пераклад будзе выдалены з рэдактара. Захавайце, каб прымяніць змену на серверы.",
+      "removeLocaleConfirmLabel": "Выдаліць мову",
+      "removeLocaleCancelLabel": "Скасаваць",
+      "refreshTranslationsTitle": "Асноўны кантэнт змяніўся",
+      "refreshTranslationsDescription": "Абнавіць пераклады для {locales}?",
+      "refreshTranslationsConfirm": "Абнавіць пераклады",
+      "refreshTranslationsCancel": "Не зараз"
     },
     "sections": {
       "prompt": {
@@ -46,6 +73,7 @@
         "description": "Выразна напішыце асноўнае пытанне, а затым зафіксуйце наступныя запыты, якія інтэрв'юеры павінны трымаць напагатове.",
         "questionText": "Тэкст пытання",
         "questionTextPlaceholder": "напр. Што такое замыканне ў JavaScript?",
+        "questionTextLocalePlaceholder": "Пераклад пытання на {locale}",
         "followUpQuestions": "Дадатковыя пытанні",
         "followUpHint": "Выкарыстоўвайце адзін радок на зонд, каб інтэрв'юер мог захоўваць кадэнцыю падчас сеансу.",
         "followUpPlaceholder": "Адно пытанне ў радку"
@@ -53,11 +81,11 @@
       "identity": {
         "title": "Пытанне ідэнтычнасці",
         "description": "Прывяжыце падказку да ролі і таксанаміі, якія, як вы чакаеце, вярбоўшчыкі будуць шукаць пазней.",
+        "taxonomyEnglishHint": "Палі таксанаміі (роля, катэгорыя, тэгі і г.д.) захоўваюцца на англійскай і не перакладаюцца.",
         "externalIdTooltip": "Неабавязковы стабільны ідэнтыфікатар для імпарту.",
         "externalIdPlaceholder": "frontend_closure_v1",
         "rolePlaceholder": "інтэрфейс міжнар",
         "focusPlaceholder": "асновы",
-        "outputLanguagePlaceholder": "англійская",
         "categoryPlaceholder": "javascript",
         "subcategoryPlaceholder": "закрыцці"
       },
@@ -87,12 +115,22 @@
     },
     "aiDraft": {
       "title": "Чарнавік AI",
-      "description": "Дазвольце штучнаму інтэлекту прапанаваць катэгорыі, наступныя даследаванні, чаканыя канцэпцыі, чырвоныя сцягі і тэгі на аснове тэксту вашага пытання. Кожная змена паказваецца як розніца, якую можна праглядаць, перш чым што-небудзь прымяніць.",
+      "description": "Стварыце follow-up, чаканыя канцэпцыі, red flags і ўзор адказу з тэксту асноўнага пытання. Кожная прапанова з'яўляецца пад сваім полем для праверкі перад ужываннем.",
       "pending": "{count, plural, one {# чарнавік} few {# чарнавікі} many {# чарнавікоў} other {# чарнавіка}}",
-      "generate": "Стварыце чарнавік AI",
+      "generate": "Стварыць праз AI",
       "generating": "Ідзе стварэнне...",
+      "generatingFor": "Генерацыя rubric для {locale}",
       "applyAll": "Ужыць усе",
-      "loadingHint": "Стварэнне структураваных палёў з бягучага запыту…"
+      "loadingHint": "Стварэнне структураваных палёў з бягучага запыту…",
+      "previewLabel": "Папярэдні прагляд чарнавіка"
+    },
+    "translatePanel": {
+      "description": "Выберыце лакалі, якія яшчэ не адкрыты як укладкі. AI перакладае поўны блок асноўнага кантэнту на кожную лакаль.",
+      "noLocalesAvailable": "Усе лакалі ўжо адкрыты як укладкі.",
+      "localeLoading": "Пераклад…",
+      "translating": "Пераклад…",
+      "tabTranslating": "Пераклад {locale}…",
+      "applyAllForLocale": "Ужыць усё для {locale}"
     },
     "aiSuggestion": {
       "eyebrow": "Прапанова AI",
@@ -111,6 +149,7 @@
       "saving": "Захаванне..."
     },
     "chips": {
+      "locale": "Лакаль: {value}",
       "difficulty": "Складанасць: {value}",
       "category": "Катэгорыя: {value}",
       "subcategory": "Тып: {value}",
@@ -175,6 +214,7 @@
         "loadingFacets": "Загрузка параметраў фільтра…",
         "facetsUnavailable": "Не ўдалося загрузіць параметры фільтра.",
         "difficultyTitle": "Цяжкасць",
+        "localeTitle": "Мова",
         "categoryTitle": "Катэгорыя",
         "typeTitle": "Тып",
         "roleTitle": "Роля",
@@ -240,6 +280,7 @@
       },
       "card": {
         "deleted": "Выдалены",
+        "resolvedLocaleBadge": "Паказана як {locale}",
         "weightLabel": "вага {weight}",
         "conceptsMetric": "Паняцці",
         "redFlagsMetric": "Чырвоныя сцягі",
@@ -444,7 +485,14 @@
       "candidateNameLabel": "Імя кандыдата",
       "candidateNamePlaceholder": "напр. Джэйн Доу",
       "positionLabel": "Пазіцыя",
-      "positionPlaceholder": "напр. Старэйшы інтэрфейсны інжынер"
+      "positionPlaceholder": "напр. Старэйшы інтэрфейсны інжынер",
+      "interviewLocaleLabel": "Мова інтэрв'ю",
+      "interviewLocaleOption": "{locale}",
+      "missingTranslationWarningTitle": "{count, plural, one {# пытанне без гэтага перакладу} few {# пытанні без гэтага перакладу} many {# пытанняў без гэтага перакладу} other {# пытання без гэтага перакладу}}",
+      "missingTranslationWarningDescription": "Абраныя пытанні не даступныя на {locale}. У інтэрв'ю для іх можа адображацца тэкст з fallback.",
+      "feedbackLinkLabel": "Спасылка на зваротную сувязь",
+      "generatingFeedbackLink": "Генерацыя новай спасылкі на зваротную сувязь…",
+      "feedbackLinkNotReady": "Спасылка на зваротную сувязь пакуль недаступная."
     }
   }
 }

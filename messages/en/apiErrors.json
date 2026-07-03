@@ -1,0 +1,9 @@
+{
+  "AUTH_UNAUTHORIZED": "You need to sign in to continue.",
+  "AUTH_FORBIDDEN": "You don't have access to this resource.",
+  "COMMON_NOT_FOUND": "Requested resource was not found.",
+  "COMMON_VALIDATION_FAILED": "Some fields are invalid. Please review your input.",
+  "QUESTION_IN_USE": "This question is used by active interviews and cannot be deleted.",
+  "INTERVIEW_VALIDATION_RUNNING": "Interview validation is already running.",
+  "UPLOAD_FAILED": "Upload failed. Please try again."
+}

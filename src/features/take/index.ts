@@ -11,6 +11,8 @@ export * from './use-take-begin-recording';
 export * from './use-take-interview-before-unload';
 export * from './use-take-candidate-session';
 export * from './use-take-interview-loader';
+export * from './take-flow-locale-provider';
+export * from './use-take-locale-switch';
 export * from './use-take-orchestrator';
 export * from './use-take-permissions';
 export * from './use-take-recording-controls';

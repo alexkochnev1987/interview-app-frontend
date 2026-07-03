@@ -9,9 +9,6 @@ export function isCandidateFlowPath(pathnameWithoutLocale: string): boolean {
   )
 }
 
-export function resolveHtmlLang(
-  locale: Locale,
-  pathnameWithoutLocale: string,
-): string {
-  return isCandidateFlowPath(pathnameWithoutLocale) ? 'en' : locale
+export function resolveHtmlLang(locale: Locale): string {
+  return locale
 }

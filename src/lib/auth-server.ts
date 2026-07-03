@@ -1,6 +1,7 @@
 import { cache } from 'react';
 
 import type { AuthUserResponseDto } from '@/lib/api';
+import { DEFAULT_LOCALE } from '@/i18n/locales';
 
 import { getServerRequestContext, requestServer } from './server-fetch';
 
@@ -12,6 +13,7 @@ export const fetchCachedServerAuthMe = cache(
     return requestServer<AuthUserResponseDto>('/auth/me', {
       cookieHeader,
       origin,
+      locale: DEFAULT_LOCALE,
     });
   },
 );
