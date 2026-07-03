@@ -6,11 +6,18 @@ import { InfiniteCardsLoader } from '@/components/questions/library/infinite-car
 import { QuestionCard } from '@/components/questions/library/question-card'
 import { QuestionTable } from '@/components/questions/library/question-table'
 import { StatusPill } from '@/components/ui/status-pill'
-import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { CardGrid } from '@/components/ui/layout/card-grid'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { Pagination } from '@/components/ui/pagination'
+import { SearchInput } from '@/components/ui/search-input'
 
 import { QuestionFacetSidebar } from './question-facet-sidebar'
 import { QuestionPickerFeed } from './question-picker-feed'
@@ -83,6 +90,7 @@ export function InterviewQuestionPickerMain({
   disabled = false,
 }: InterviewQuestionPickerMainProps) {
   const t = useTranslations('questions.common')
+  const tToolbar = useTranslations('questions.picker.toolbar')
 
   const {
     query,
@@ -111,11 +119,16 @@ export function InterviewQuestionPickerMain({
             </StatusPill>
           </Inline>
         </CardHeader>
+        <CardContent>
+          <SearchInput
+            value={query.state.q}
+            onChange={(event) => query.setQ(event.target.value)}
+            placeholder={tToolbar('searchPlaceholder')}
+          />
+        </CardContent>
       </Card>
 
       <QuestionPickerToolbar
-        q={query.state.q}
-        onQChange={query.setQ}
         sortBy={query.state.sortBy}
         sortOrder={query.state.sortOrder}
         onSortChange={query.setSort}
@@ -164,8 +177,7 @@ export function InterviewQuestionPickerMain({
               <QuestionCard
                 key={question.id}
                 question={question}
-                interaction="select"
-                selectable
+                mode="pick"
                 selected={selectedById.has(question.id)}
                 onToggleSelected={() => toggleQuestion(question)}
                 disabled={disabled}

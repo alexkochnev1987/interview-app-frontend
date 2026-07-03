@@ -29,6 +29,7 @@ import { useBulkDeleteQuestions } from '@/components/questions/use-question-muta
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { Pagination } from '@/components/ui/pagination'
+import { SearchInput } from '@/components/ui/search-input'
 import { useTranslations } from 'next-intl'
 import { useRouter } from '@/i18n/navigation'
 import { routes } from '@/i18n/routes'
@@ -49,6 +50,7 @@ export function QuestionsLibraryClient({
 }: QuestionsLibraryClientProps) {
   const router = useRouter()
   const t = useTranslations('questions.library.client')
+  const tToolbar = useTranslations('questions.picker.toolbar')
   const getChipLabel = useQuestionChipLabels()
   const { mutate: bulkDeleteQuestions, isPending: bulkDeleting } =
     useBulkDeleteQuestions()
@@ -223,9 +225,12 @@ export function QuestionsLibraryClient({
 
   const mainContent = (
     <Stack gap={4}>
+      <SearchInput
+        value={query.state.q}
+        onChange={(event) => query.setQ(event.target.value)}
+        placeholder={tToolbar('searchPlaceholder')}
+      />
       <QuestionPickerToolbar
-        q={query.state.q}
-        onQChange={query.setQ}
         sortBy={query.state.sortBy}
         sortOrder={query.state.sortOrder}
         onSortChange={query.setSort}
@@ -320,7 +325,7 @@ export function QuestionsLibraryClient({
                 <QuestionCard
                   key={question.id}
                   question={question}
-                  selectable={isSuperAdmin}
+                  mode={isSuperAdmin ? 'select' : 'navigate'}
                   selected={selectedIds.has(question.id)}
                   onToggleSelected={() => toggleSelected(question)}
                 />
