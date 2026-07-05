@@ -1,5 +1,6 @@
 'use client'
 
+import type { ComponentProps } from 'react'
 import { useTranslations } from 'next-intl'
 
 import { InfiniteCardsLoader } from '@/components/questions/library/infinite-cards-loader'
@@ -83,7 +84,7 @@ type InterviewQuestionPickerMainProps = {
   title: string
   description: string
   disabled?: boolean
-} & Pick<React.ComponentProps<typeof Card>, 'data-tour'>
+} & Pick<ComponentProps<typeof Card>, 'data-tour'>
 
 export function InterviewQuestionPickerMain({
   picker,
