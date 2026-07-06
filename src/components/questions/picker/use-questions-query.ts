@@ -26,6 +26,7 @@ import {
   buildQuestionsFetchParams,
   DEFAULT_QUESTIONS_LIMIT,
   DEFAULT_QUESTIONS_QUERY,
+  QUESTIONS_SEARCH_DEBOUNCE_MS,
   readQuestionsFromSearchParams,
   type QuestionView,
   type QuestionsQueryState,
@@ -37,7 +38,6 @@ import { splitListQueryErrors } from './split-questions-query-errors'
 import {getErrorMessage} from '@/lib/api-error';
 import { useToastMessages } from '@/lib/use-toast-messages'
 
-const SEARCH_DEBOUNCE_MS = 300
 const VIEW_STORAGE_KEY = 'questions:view'
 
 function withLockedDefaults(
@@ -78,6 +78,7 @@ type UseQuestionsQueryOptions = {
 export type UseQuestionsQueryResult = {
   state: QuestionsQueryState
   debouncedQ: string
+  isSearchPending: boolean
   items: Question[]
   total: number
   totalPages: number
@@ -166,13 +167,26 @@ export function useQuestionsQuery(
 
   useEffect(() => {
     if (state.q === debouncedQ) return
-    const handle = window.setTimeout(() => setDebouncedQ(state.q), SEARCH_DEBOUNCE_MS)
+    const handle = window.setTimeout(
+      () => setDebouncedQ(state.q),
+      QUESTIONS_SEARCH_DEBOUNCE_MS,
+    )
     return () => window.clearTimeout(handle)
   }, [state.q, debouncedQ])
 
+  const isSearchPending = state.q !== debouncedQ
+
+  const stateUrl = useMemo(
+    () =>
+      writeToSearchParams({
+        ...state,
+        q: debouncedQ,
+      }).toString(),
+    [state, debouncedQ],
+  )
+
   useEffect(() => {
     if (!syncUrl) return
-    const stateUrl = writeToSearchParams(state).toString()
     const currentUrl = searchParams ? searchParams.toString() : ''
     if (stateUrl === currentUrl) {
       lastWrittenUrlRef.current = currentUrl
@@ -191,7 +205,7 @@ export function useQuestionsQuery(
     const url = stateUrl.length > 0 ? `${pathname}?${stateUrl}` : pathname
     lastWrittenUrlRef.current = stateUrl
     router.replace(url, { scroll: false })
-  }, [state, pathname, router, syncUrl, capturedInitial, lockStatus, searchParams])
+  }, [stateUrl, pathname, router, syncUrl, capturedInitial, lockStatus, searchParams])
 
   const fetchParams = useMemo(
     () => buildQuestionsFetchParams(state, debouncedQ, { eligibleForInterview }),
@@ -320,6 +334,7 @@ export function useQuestionsQuery(
   return {
     state,
     debouncedQ,
+    isSearchPending,
     items,
     total,
     totalPages,

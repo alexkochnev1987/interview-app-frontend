@@ -66,7 +66,12 @@ export function useInterviewQuestionPicker({
     serverHydrated,
   })
 
-  const view = pickQuestionsViewSource(isCardsView, query, infinite)
+  const view = pickQuestionsViewSource(
+    isCardsView,
+    query,
+    infinite,
+    query.isSearchPending,
+  )
   const facetsResult = useQuestionFacets(
     query.state,
     query.debouncedQ,
