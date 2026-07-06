@@ -76,28 +76,10 @@ export function QuestionsLibraryClient({
     serverHydrated: Boolean(initialPrefetch),
   })
 
-  const cardsScrollRootRef = useRef<HTMLDivElement>(null)
   const cardsFilterSignature = useMemo(
     () => JSON.stringify(cardsInfiniteParams),
     [cardsInfiniteParams],
   )
-  const prevCardsFilterSignatureRef = useRef<string | null>(null)
-  useEffect(() => {
-    if (!isCardsView) {
-      prevCardsFilterSignatureRef.current = null
-      return
-    }
-    if (prevCardsFilterSignatureRef.current === null) {
-      prevCardsFilterSignatureRef.current = cardsFilterSignature
-      return
-    }
-    if (prevCardsFilterSignatureRef.current === cardsFilterSignature) return
-    prevCardsFilterSignatureRef.current = cardsFilterSignature
-    cardsScrollRootRef.current?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-    })
-  }, [cardsFilterSignature, isCardsView])
   const facetsResult = useQuestionFacets(query.state, query.debouncedQ)
   const facets = facetsResult.facets
 
@@ -195,7 +177,12 @@ export function QuestionsLibraryClient({
   }
 
   const selectedCount = selectedIds.size
-  const view = pickQuestionsViewSource(isCardsView, query, infinite)
+  const view = pickQuestionsViewSource(
+    isCardsView,
+    query,
+    infinite,
+    query.isSearchPending,
+  )
 
   const sidebar = (
     <QuestionFacetSidebar
@@ -326,20 +313,18 @@ export function QuestionsLibraryClient({
           />
         )}
         renderCards={() => (
-          <div ref={cardsScrollRootRef}>
-            <CardGrid>
-              {view.items.map((question) => (
-                <QuestionCard
-                  key={question.id}
-                  question={question}
-                  listLocale={listLocale}
-                  mode={isSuperAdmin ? 'select' : 'navigate'}
-                  selected={selectedIds.has(question.id)}
-                  onToggleSelected={() => toggleSelected(question)}
-                />
-              ))}
-            </CardGrid>
-          </div>
+          <CardGrid>
+            {view.items.map((question) => (
+              <QuestionCard
+                key={question.id}
+                question={question}
+                listLocale={listLocale}
+                mode={isSuperAdmin ? 'select' : 'navigate'}
+                selected={selectedIds.has(question.id)}
+                onToggleSelected={() => toggleSelected(question)}
+              />
+            ))}
+          </CardGrid>
         )}
       />
 
