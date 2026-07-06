@@ -31,6 +31,9 @@
       "cancelSuccess": "Интервью отменено",
       "cancelError": "Не удалось отменить интервью"
     },
+    "interviewsLibrary": {
+      "loadFailedFallback": "Не удалось загрузить интервью."
+    },
     "take": {
       "submitSuccess": "Ответ отправлен",
       "submitError": "Не удалось отправить ответ"
@@ -78,6 +81,12 @@
         "unavailableTitle": "Оценка недоступна",
         "loadDetailFallback": "Не удалось загрузить оценку.",
         "notFoundFallback": "Запрошенную оценку не удалось загрузить."
+      },
+      "interviews": {
+        "libraryForbiddenTitle": "У вас нет доступа к интервью",
+        "libraryForbiddenDescription": "Библиотека интервью доступна только пользователям с ролями HR, администратор и суперадминистратор. Если вы считаете, что это ошибка, обратитесь к владельцу рабочего пространства.",
+        "libraryUnavailableTitle": "Интервью сейчас недоступны",
+        "libraryLoadFailedFallback": "Не удалось загрузить интервью."
       },
       "interview": {
         "forbiddenTitle": "У вас нет доступа к этому интервью",

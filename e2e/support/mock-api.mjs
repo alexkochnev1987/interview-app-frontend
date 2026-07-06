@@ -2,13 +2,16 @@ import { createServer } from 'node:http'
 
 import {
   authUser,
+  buildInterviewFacets,
   createInitialInterviews,
   E2E_SESSION_TOKEN,
+  EMPTY_INTERVIEW_FACETS,
+  EMPTY_QUESTION_FACETS,
   MOCK_QUESTIONS,
-  EMPTY_FACETS,
+  toInterviewListItem,
 } from './fixtures.mjs'
 
-const PORT = Number(process.env.E2E_MOCK_API_PORT ?? process.env.PORT ?? 3000)
+const PORT = Number(process.env.E2E_MOCK_API_PORT ?? process.env.PORT ?? 13000)
 
 const DEMO_SESSION_TOKEN = 'e2e-demo-session'
 const DEMO_USER = {
@@ -91,6 +94,41 @@ function filterQuestions(query) {
   return items
 }
 
+function filterInterviewListItems(query) {
+  let items = interviews.map(toInterviewListItem)
+
+  const q = query.get('q')?.trim()
+  if (q) {
+    items = items.filter((item) =>
+      item.candidateName.toLowerCase().includes(q.toLowerCase()),
+    )
+  }
+
+  const status = query.get('status')
+  if (status) {
+    items = items.filter((item) => item.status === status)
+  }
+
+  const position = query.get('position')
+  if (position) {
+    items = items.filter((item) => item.position === position)
+  }
+
+  const sortBy = query.get('sortBy') ?? 'updatedAt'
+  const sortOrder = query.get('sortOrder') === 'asc' ? 1 : -1
+  items.sort((left, right) => {
+    if (sortBy === 'candidateName') {
+      return left.candidateName.localeCompare(right.candidateName) * sortOrder
+    }
+    const leftValue = left[sortBy] ?? left.updatedAt
+    const rightValue = right[sortBy] ?? right.updatedAt
+    if (leftValue === rightValue) return 0
+    return leftValue > rightValue ? sortOrder : -sortOrder
+  })
+
+  return items
+}
+
 function findInterview(id) {
   return interviews.find((item) => item.id === id)
 }
@@ -157,12 +195,27 @@ async function handleRequest(req, res) {
   }
 
   if (method === 'GET' && pathname === '/questions/facets') {
-    json(res, 200, EMPTY_FACETS)
+    json(res, 200, EMPTY_QUESTION_FACETS)
+    return
+  }
+
+  if (method === 'GET' && pathname === '/interviews/facets') {
+    json(
+      res,
+      200,
+      interviews.length > 0
+        ? buildInterviewFacets(interviews.map(toInterviewListItem))
+        : EMPTY_INTERVIEW_FACETS,
+    )
     return
   }
 
   if (method === 'GET' && pathname === '/interviews') {
-    json(res, 200, interviews)
+    json(
+      res,
+      200,
+      paginate(filterInterviewListItems(url.searchParams), url.searchParams),
+    )
     return
   }
 
@@ -181,6 +234,16 @@ async function handleRequest(req, res) {
 
     if (method === 'GET' && !action) {
       json(res, 200, current)
+      return
+    }
+
+    if (method === 'GET' && action === 'results') {
+      json(res, 200, current.result ?? {
+        overallScore: 0,
+        summary: 'No results yet',
+        categoryScores: {},
+        completedAt: current.updatedAt,
+      })
       return
     }
 

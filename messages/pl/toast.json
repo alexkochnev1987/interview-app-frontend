@@ -31,6 +31,9 @@
       "cancelSuccess": "Interview zostało anulowane",
       "cancelError": "Nie udało się anulować interview"
     },
+    "interviewsLibrary": {
+      "loadFailedFallback": "Nie udało się załadować interview."
+    },
     "take": {
       "submitSuccess": "Odpowiedź wysłana",
       "submitError": "Nie udało się wysłać odpowiedzi"
@@ -78,6 +81,12 @@
         "unavailableTitle": "Ocena niedostępna",
         "loadDetailFallback": "Nie udało się załadować oceny.",
         "notFoundFallback": "Nie udało się załadować wybranej oceny."
+      },
+      "interviews": {
+        "libraryForbiddenTitle": "Nie masz dostępu do interview",
+        "libraryForbiddenDescription": "Biblioteka interview jest dostępna wyłącznie dla użytkowników z rolami HR, administrator i superadministrator. Jeśli uważasz, że to pomyłka, skontaktuj się z właścicielem obszaru roboczego.",
+        "libraryUnavailableTitle": "Interview są obecnie niedostępne",
+        "libraryLoadFailedFallback": "Nie udało się załadować interview."
       },
       "interview": {
         "forbiddenTitle": "Brak dostępu do tego interview",

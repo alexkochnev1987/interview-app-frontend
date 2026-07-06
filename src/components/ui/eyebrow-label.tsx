@@ -6,7 +6,6 @@ import { cn } from '@/lib/utils'
 const eyebrowLabelVariants = cva('uppercase', {
   variants: {
     size: {
-      xs: 'text-[0.6rem] tracking-eyebrow',
       sm: 'text-[0.68rem] tracking-eyebrow',
       md: 'text-[0.72rem] tracking-eyebrow-wide',
       lg: 'text-[0.72rem] tracking-eyebrow-widest',

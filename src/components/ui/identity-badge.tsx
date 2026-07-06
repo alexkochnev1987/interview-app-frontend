@@ -2,7 +2,6 @@ import { cva, type VariantProps } from 'class-variance-authority'
 
 import { EyebrowLabel } from '@/components/ui/eyebrow-label'
 import { Inline } from '@/components/ui/layout/inline'
-import { Stack } from '@/components/ui/layout/stack'
 import { BodyText } from '@/components/ui/text'
 import { cn } from '@/lib/utils'
 
@@ -33,34 +32,9 @@ function DotSeparator() {
 interface IdentityBadgeProps extends VariantProps<typeof nameVariants> {
   name: string
   role: string
-  layout?: 'inline' | 'stacked'
 }
 
-export function IdentityBadge({
-  name,
-  role,
-  nameMaxWidth,
-  layout = 'inline',
-}: IdentityBadgeProps) {
-  if (layout === 'stacked') {
-    return (
-      <Stack gap={1}>
-        <BodyText
-          as="span"
-          size="xs"
-          weight="semibold"
-          tone="foreground"
-          className={cn(nameVariants({ nameMaxWidth }))}
-        >
-          {name}
-        </BodyText>
-        <EyebrowLabel size="xs" weight="normal" className="w-fit leading-none">
-          {role}
-        </EyebrowLabel>
-      </Stack>
-    )
-  }
-
+export function IdentityBadge({ name, role, nameMaxWidth }: IdentityBadgeProps) {
   return (
     <Inline gap={2} align="baseline" justify="end" wrap="nowrap">
       <BodyText

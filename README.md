@@ -68,23 +68,23 @@ npm run test
 
 ### Frontend E2E (Playwright)
 
-E2E uses a **lightweight mock API** on `:3000` (no Postgres or real backend). It covers browser-level routing and auth gating; API contracts and persistence stay in backend integration tests.
+E2E uses a **lightweight mock API** on `:13000` (no Postgres or real backend). The test runner starts a dedicated frontend on `:13001` so it does not reuse your dev servers on `:3000`/`:3001`.
 
 Locally, tests use your installed **Google Chrome** — no browser download. CI installs Playwright Chromium via `npm run test:e2e:install`.
 
-If mock API (`:3000`) and frontend (`:3001`) are already running:
-
-```bash
-npm run test:e2e:fast
-```
-
-Otherwise (auto-starts mock API + frontend):
+Auto-starts mock API + frontend (recommended):
 
 ```bash
 npm run test:e2e
 ```
 
-If services are already up, Playwright reuses them. To skip auto-start: `E2E_SKIP_WEBSERVER=1 npm run test:e2e`.
+If mock API (`:13000`) and frontend (`:13001`) are already running with `BACKEND_URL=http://localhost:13000`:
+
+```bash
+npm run test:e2e:fast
+```
+
+To skip auto-start: `E2E_SKIP_WEBSERVER=1 npm run test:e2e`.
 
 ### Backend integration
 

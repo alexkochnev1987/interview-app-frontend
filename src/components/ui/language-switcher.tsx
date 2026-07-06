@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 const languageSwitcherTriggerVariants = cva(
-  'flex w-full items-center justify-between gap-1.5 rounded-full border border-border/60 bg-background/70 px-3 py-1.5 text-xs font-semibold text-foreground shadow-sm transition-colors hover:bg-surface-low-soft',
+  'inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-background/70 px-3 py-1.5 text-xs font-semibold text-foreground shadow-sm transition-colors hover:bg-surface-low-soft',
 )
 
 const languageSwitcherItemVariants = cva(
@@ -39,9 +39,6 @@ type LanguageSwitcherProps = {
   ariaLabel: string
   currentLocale: Locale
   options: LanguageOption[]
-  side?: 'top' | 'right' | 'bottom' | 'left'
-  align?: 'start' | 'center' | 'end'
-  onOpenChange?: (open: boolean) => void
 } & (
   | { href: string; onSelectLocale?: never }
   | { href?: never; onSelectLocale: (locale: Locale) => void }
@@ -53,24 +50,19 @@ export function LanguageSwitcher({
   href,
   onSelectLocale,
   options,
-  side,
-  align = 'end',
-  onOpenChange,
 }: LanguageSwitcherProps) {
-  const activeLabel =
-    options.find((option) => option.locale === currentLocale)?.label ??
-    currentLocale.toUpperCase()
+  const activeLocaleCode = currentLocale.toUpperCase()
 
   return (
-    <DropdownMenu onOpenChange={onOpenChange}>
+    <DropdownMenu>
       <DropdownMenuTrigger
         aria-label={ariaLabel}
         className={cn(languageSwitcherTriggerVariants())}
       >
-        <span className="truncate">{activeLabel}</span>
-        <ChevronDown className="size-3.5 shrink-0 text-muted-foreground" />
+        {activeLocaleCode}
+        <ChevronDown className="size-3.5 text-muted-foreground" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent side={side} align={align} className="w-max !min-w-0">
+      <DropdownMenuContent align="end" className="w-max !min-w-0">
         {options.map(({ locale, label }) => {
           const active = locale === currentLocale
 
