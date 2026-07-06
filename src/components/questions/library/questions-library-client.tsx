@@ -68,19 +68,7 @@ export function QuestionsLibraryClient({
   const isCardsView = query.state.view === 'cards'
   const cardsInfiniteParams = useMemo(
     () => buildQuestionsInfiniteParams(query.state, query.debouncedQ),
-    [
-      query.debouncedQ,
-      query.state.category,
-      query.state.difficulty,
-      query.state.limit,
-      query.state.locale,
-      query.state.role,
-      query.state.sortBy,
-      query.state.sortOrder,
-      query.state.status,
-      query.state.subcategory,
-      query.state.tags,
-    ],
+    [query.state, query.debouncedQ],
   )
   const infinite = useQuestionsInfinite({
     params: cardsInfiniteParams,

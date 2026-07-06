@@ -182,21 +182,7 @@ export function useQuestionsQuery(
         ...state,
         q: debouncedQ,
       }).toString(),
-    [
-      debouncedQ,
-      state.category,
-      state.difficulty,
-      state.limit,
-      state.locale,
-      state.page,
-      state.role,
-      state.sortBy,
-      state.sortOrder,
-      state.status,
-      state.subcategory,
-      state.tags,
-      state.view,
-    ],
+    [state, debouncedQ],
   )
 
   useEffect(() => {
@@ -223,21 +209,7 @@ export function useQuestionsQuery(
 
   const fetchParams = useMemo(
     () => buildQuestionsFetchParams(state, debouncedQ, { eligibleForInterview }),
-    [
-      debouncedQ,
-      eligibleForInterview,
-      state.category,
-      state.difficulty,
-      state.limit,
-      state.locale,
-      state.page,
-      state.role,
-      state.sortBy,
-      state.sortOrder,
-      state.status,
-      state.subcategory,
-      state.tags,
-    ],
+    [state, debouncedQ, eligibleForInterview],
   )
 
   const query = useQuery({
