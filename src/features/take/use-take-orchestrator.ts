@@ -199,7 +199,12 @@ export function useTakeOrchestrator({
   }, [stage]);
 
   function isLocaleQuestionMutationBlocked(): boolean {
-    return uploadingRef.current || stageRef.current === 'transition';
+    return (
+      uploadingRef.current ||
+      recordingRef.current ||
+      recordingStartBusyRef.current ||
+      stageRef.current === 'transition'
+    );
   }
 
   function attachCameraPreview(stream: MediaStream) {
@@ -688,7 +693,11 @@ export function useTakeOrchestrator({
   ]);
 
   const localeSwitchDisabled =
-    uploading || stage === 'transition' || interviewerPresence === 'speaking';
+    uploading ||
+    recording ||
+    recordingStartBusy ||
+    stage === 'transition' ||
+    interviewerPresence === 'speaking';
 
   return {
     stage,
