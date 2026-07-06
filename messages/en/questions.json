@@ -163,9 +163,7 @@
       "toolbar": {
         "searchPlaceholder": "Search by prompt, role, category, or tag",
         "resultCount": "{count, plural, one {# question} other {# questions}}",
-        "removeChipAria": "Remove {label}",
-        "pageSizeLabel": "Rows per page",
-        "pageSizeOption": "{count} per page"
+        "removeChipAria": "Remove {label}"
       },
       "sort": {
         "updatedAt_desc": "Recently updated",

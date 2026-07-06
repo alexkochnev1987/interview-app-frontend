@@ -28,7 +28,6 @@ import {
   DEFAULT_QUESTIONS_QUERY,
   QUESTIONS_SEARCH_DEBOUNCE_MS,
   readQuestionsFromSearchParams,
-  type QuestionPageLimit,
   type QuestionView,
   type QuestionsQueryState,
 } from '@/lib/questions-query-state'
@@ -97,7 +96,6 @@ export type UseQuestionsQueryResult = {
   setStatus: (value: QuestionStatusFilter) => void
   setSort: (sortBy: QuestionSortField, sortOrder: QuestionSortOrder) => void
   setPage: (value: number) => void
-  setLimit: (value: QuestionPageLimit) => void
   setView: (value: QuestionView) => void
   reset: () => void
   refetch: () => void
@@ -118,9 +116,7 @@ function writeToSearchParams(state: QuestionsQueryState): URLSearchParams {
   if (state.view === 'table' && state.page !== 1) {
     params.set('page', String(state.page))
   }
-  if (state.view === 'table' && state.limit !== DEFAULT_QUESTIONS_LIMIT) {
-    params.set('limit', String(state.limit))
-  }
+  if (state.limit !== DEFAULT_QUESTIONS_LIMIT) params.set('limit', String(state.limit))
   if (state.view !== 'cards') params.set('view', state.view)
   return params
 }
@@ -328,10 +324,6 @@ export function useQuestionsQuery(
     (value: number) => setState((prev) => ({ ...prev, page: Math.max(1, Math.floor(value)) })),
     [],
   )
-  const setLimit = useCallback(
-    (value: QuestionPageLimit) => resetToPageOne({ limit: value }),
-    [resetToPageOne],
-  )
   const setView = useCallback((value: QuestionView) => {
     setState((prev) => {
       if (prev.view === value) return prev
@@ -388,7 +380,6 @@ export function useQuestionsQuery(
     setStatus,
     setSort,
     setPage,
-    setLimit,
     setView,
     reset,
     refetch,

@@ -163,9 +163,7 @@
       "toolbar": {
         "searchPlaceholder": "Поиск по подсказке, роли, категории или тегу",
         "resultCount": "{count, plural, one {# вопрос} few {# вопроса} many {# вопросов} other {# вопроса}}",
-        "removeChipAria": "Удалить {label}",
-        "pageSizeLabel": "Строк на странице",
-        "pageSizeOption": "{count} на странице"
+        "removeChipAria": "Удалить {label}"
       },
       "sort": {
         "updatedAt_desc": "Недавно обновлено",

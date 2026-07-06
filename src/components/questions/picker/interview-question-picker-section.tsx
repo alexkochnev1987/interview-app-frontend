@@ -137,9 +137,6 @@ export function InterviewQuestionPickerMain({
         activeChips={activeChips}
         resultCount={view.total}
         loading={view.toolbarLoading}
-        limit={query.state.limit}
-        onLimitChange={query.setLimit}
-        pageSizeDisabled={isCardsView}
         viewToggle={
           <QuestionViewToggle
             view={query.state.view}
