@@ -242,6 +242,9 @@ export function QuestionsLibraryClient({
         activeChips={activeChips}
         resultCount={view.total}
         loading={view.toolbarLoading}
+        limit={query.state.limit}
+        onLimitChange={query.setLimit}
+        pageSizeDisabled={isCardsView}
         viewToggle={
           <Inline gap={2} align="center">
             <Button

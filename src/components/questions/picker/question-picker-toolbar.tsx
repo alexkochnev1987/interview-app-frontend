@@ -18,6 +18,9 @@ import type {
   QuestionSortField,
   QuestionSortOrder,
 } from '@/lib/api'
+import type { QuestionPageLimit } from '@/lib/questions-query-state'
+
+import { QuestionPageSizeSelect } from './question-page-size-select'
 
 const SORT_OPTIONS: Array<{ value: `${QuestionSortField}:${QuestionSortOrder}`; key: string }> = [
   { value: 'updatedAt:desc', key: 'updatedAt_desc' },
@@ -47,6 +50,9 @@ export type QuestionPickerToolbarProps = {
   loading: boolean
   bulkActions?: ReactNode
   viewToggle?: ReactNode
+  limit: number
+  onLimitChange: (limit: QuestionPageLimit) => void
+  pageSizeDisabled?: boolean
 }
 
 export function QuestionPickerToolbar(props: QuestionPickerToolbarProps) {
@@ -59,6 +65,9 @@ export function QuestionPickerToolbar(props: QuestionPickerToolbarProps) {
     loading,
     bulkActions,
     viewToggle,
+    limit,
+    onLimitChange,
+    pageSizeDisabled,
   } = props
 
   const sortValue = `${sortBy}:${sortOrder}` as `${QuestionSortField}:${QuestionSortOrder}`
@@ -92,6 +101,11 @@ export function QuestionPickerToolbar(props: QuestionPickerToolbarProps) {
 
       <Inline gap={2} align="center" wrap="wrap">
         {viewToggle}
+        <QuestionPageSizeSelect
+          limit={limit}
+          onLimitChange={onLimitChange}
+          disabled={pageSizeDisabled}
+        />
         <Select
           value={sortValue}
           onValueChange={(value) => {
