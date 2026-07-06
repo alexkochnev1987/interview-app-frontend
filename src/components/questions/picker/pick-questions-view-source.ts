@@ -19,22 +19,25 @@ export function pickQuestionsViewSource(
   isCardsView: boolean,
   query: QuerySlice,
   infinite: UseQuestionsInfiniteResult,
+  isSearchPending = false,
 ): QuestionsViewSource {
   if (isCardsView) {
+    const loading = isSearchPending ? false : infinite.isInitialLoading
     return {
       items: infinite.items,
       total: infinite.total,
-      loading: infinite.isInitialLoading,
-      toolbarLoading: infinite.isInitialLoading || infinite.isFetching,
+      loading,
+      toolbarLoading: loading,
       error: infinite.blockingError,
       retry: infinite.refetch,
     }
   }
+  const loading = isSearchPending ? false : query.loading
   return {
     items: query.items,
     total: query.total,
-    loading: query.loading,
-    toolbarLoading: query.loading,
+    loading,
+    toolbarLoading: loading,
     error: query.blockingError,
     retry: query.refetch,
   }

@@ -68,7 +68,19 @@ export function QuestionsLibraryClient({
   const isCardsView = query.state.view === 'cards'
   const cardsInfiniteParams = useMemo(
     () => buildQuestionsInfiniteParams(query.state, query.debouncedQ),
-    [query.state, query.debouncedQ],
+    [
+      query.debouncedQ,
+      query.state.category,
+      query.state.difficulty,
+      query.state.limit,
+      query.state.locale,
+      query.state.role,
+      query.state.sortBy,
+      query.state.sortOrder,
+      query.state.status,
+      query.state.subcategory,
+      query.state.tags,
+    ],
   )
   const infinite = useQuestionsInfinite({
     params: cardsInfiniteParams,
@@ -76,28 +88,10 @@ export function QuestionsLibraryClient({
     serverHydrated: Boolean(initialPrefetch),
   })
 
-  const cardsScrollRootRef = useRef<HTMLDivElement>(null)
   const cardsFilterSignature = useMemo(
     () => JSON.stringify(cardsInfiniteParams),
     [cardsInfiniteParams],
   )
-  const prevCardsFilterSignatureRef = useRef<string | null>(null)
-  useEffect(() => {
-    if (!isCardsView) {
-      prevCardsFilterSignatureRef.current = null
-      return
-    }
-    if (prevCardsFilterSignatureRef.current === null) {
-      prevCardsFilterSignatureRef.current = cardsFilterSignature
-      return
-    }
-    if (prevCardsFilterSignatureRef.current === cardsFilterSignature) return
-    prevCardsFilterSignatureRef.current = cardsFilterSignature
-    cardsScrollRootRef.current?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-    })
-  }, [cardsFilterSignature, isCardsView])
   const facetsResult = useQuestionFacets(query.state, query.debouncedQ)
   const facets = facetsResult.facets
 
@@ -195,7 +189,12 @@ export function QuestionsLibraryClient({
   }
 
   const selectedCount = selectedIds.size
-  const view = pickQuestionsViewSource(isCardsView, query, infinite)
+  const view = pickQuestionsViewSource(
+    isCardsView,
+    query,
+    infinite,
+    query.isSearchPending,
+  )
 
   const sidebar = (
     <QuestionFacetSidebar
@@ -326,20 +325,18 @@ export function QuestionsLibraryClient({
           />
         )}
         renderCards={() => (
-          <div ref={cardsScrollRootRef}>
-            <CardGrid>
-              {view.items.map((question) => (
-                <QuestionCard
-                  key={question.id}
-                  question={question}
-                  listLocale={listLocale}
-                  mode={isSuperAdmin ? 'select' : 'navigate'}
-                  selected={selectedIds.has(question.id)}
-                  onToggleSelected={() => toggleSelected(question)}
-                />
-              ))}
-            </CardGrid>
-          </div>
+          <CardGrid>
+            {view.items.map((question) => (
+              <QuestionCard
+                key={question.id}
+                question={question}
+                listLocale={listLocale}
+                mode={isSuperAdmin ? 'select' : 'navigate'}
+                selected={selectedIds.has(question.id)}
+                onToggleSelected={() => toggleSelected(question)}
+              />
+            ))}
+          </CardGrid>
         )}
       />
 
