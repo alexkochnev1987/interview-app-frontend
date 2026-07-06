@@ -11,10 +11,10 @@ import {
   createQuestion,
   deleteQuestion,
   deleteQuestionsBulk,
-  draftQuestion,
   restoreQuestion,
   updateQuestion,
   type QuestionInput,
+  type UpdateQuestionInput,
 } from '@/lib/api'
 import { getErrorMessage } from '@/lib/api-error'
 import { notifyError, notifySuccess } from '@/lib/toast'
@@ -23,8 +23,6 @@ import {
   BULK_DELETE_TOAST_IDS,
   notifyBulkDeleteOutcome,
 } from '@/lib/notify-bulk-delete'
-import { FEEDBACK_POLICY } from '@/lib/feedback-policy'
-import {deriveInlineAsyncStatus} from "./editor/async-status";
 
 type QuestionMutationErrorTitle = string | ((error: unknown) => string)
 
@@ -103,29 +101,26 @@ export function buildQuestionMutationOptions<TData, TVariables>(
 }
 
 export function useCreateQuestion() {
+  const invalidateQuestions = useInvalidateQuestions()
 
-  const resources= useQuestionMutationResources()
-
-  return useMutation(
-      buildQuestionMutationOptions(resources, {
-        mutationFn:createQuestion,
-        successMessage:resources.toastMessages.question.createSuccess,
-        errorTitle:resources.toastMessages.question.createError
-      })
-  )
+  return useMutation({
+    mutationFn: (value: QuestionInput) => createQuestion(value),
+    onSuccess: invalidateQuestions,
+  })
 }
 
 export function useUpdateQuestion() {
   const resources = useQuestionMutationResources()
 
-  return useMutation(
-      buildQuestionMutationOptions(resources,{
-        mutationFn: ({ id, value }: { id: string; value: QuestionInput }) =>
-          updateQuestion(id, value),
-        successMessage:resources.toastMessages.question.saveSuccess,
-        errorTitle:resources.toastMessages.question.saveError
-      })
-  )
+  const { invalidateQuestions } = resources
+
+  return useMutation({
+    mutationFn: ({ id, value }: { id: string; value: UpdateQuestionInput }) =>
+      updateQuestion(id, value),
+    onSuccess: () => {
+      invalidateQuestions()
+    },
+  })
 }
 
 export function useDeleteQuestion() {
@@ -179,24 +174,4 @@ export function useBulkDeleteQuestions() {
   const resources = useQuestionMutationResources()
 
   return useMutation(buildBulkDeleteMutationOptions(resources))
-}
-
-/** Draft errors stay inline in QuestionEditor; this hook doesn't toast. */
-export function useDraftQuestion() {
-  const mutation = useMutation({
-    mutationFn: (value: QuestionInput) => draftQuestion(value)
-  })
-
-  const status = deriveInlineAsyncStatus(mutation)
-
-  const error = mutation.isError ? getErrorMessage(
-      mutation.error,
-      FEEDBACK_POLICY.draftQuestion.inlineErrorFallback
-  ) : null
-
-  return {
-    ...mutation,
-    status,
-    error,
-  }
 }

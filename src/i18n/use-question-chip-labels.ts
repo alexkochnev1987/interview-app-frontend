@@ -11,6 +11,8 @@ export function useQuestionChipLabels() {
   return useCallback(
     (descriptor: ActiveFilterChipDescriptor) => {
       switch (descriptor.kind) {
+        case 'locale':
+          return t('locale', { value: descriptor.value.toUpperCase() })
         case 'difficulty':
           return t('difficulty', { value: sharedLabels.difficulty(descriptor.value) })
         case 'category':

@@ -1,17 +1,28 @@
 'use client'
 
 import { WandSparkles } from 'lucide-react'
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { type ReactNode } from 'react'
 import { useTranslations } from 'next-intl'
 
 import { Grid } from '@/components/ui/layout/grid'
 import { Stack } from '@/components/ui/layout/stack'
-import { Textarea } from '@/components/ui/textarea'
 import {
   type QuestionExpectedConcept,
   type QuestionInput,
   type QuestionRedFlag,
 } from '@/lib/api'
+import { type Locale } from '@/i18n/locales'
+import {
+  formatExpectedConcepts,
+  formatRedFlags,
+  parseExpectedConcepts,
+  parseRedFlags,
+} from '@/lib/question-editor/parsers'
+import { type DraftFieldKey } from '@/lib/question-editor/field-keys'
+import { useQuestionEditorLabels } from '@/i18n/use-question-editor-labels'
+import { RawListTextarea } from './editor-raw-list-textarea'
+import { EditorSectionCard } from './editor-section-card'
+import { QuestionEditorField } from './question-editor-field'
 
 function coerceExpectedConcepts(
   items: (string | QuestionExpectedConcept)[] | undefined,
@@ -32,25 +43,17 @@ function coerceRedFlags(
       : item,
   )
 }
-import {
-  formatExpectedConcepts,
-  formatRedFlags,
-  parseExpectedConcepts,
-  parseRedFlags,
-} from '@/lib/question-editor/parsers'
-import { type DraftFieldKey } from '@/lib/question-editor/field-keys'
-import { useQuestionEditorLabels } from '@/i18n/use-question-editor-labels'
-import { EditorSectionCard } from './editor-section-card'
-import { QuestionEditorField } from './question-editor-field'
 
 interface EditorRubricSectionProps {
+  locale: Locale
   value: QuestionInput
   submitting: boolean
   onUpdate: (patch: Partial<QuestionInput>) => void
-  renderAiSuggestion: (field: DraftFieldKey) => ReactNode
+  renderAiSuggestion?: (field: DraftFieldKey) => ReactNode
 }
 
 export function EditorRubricSection({
+  locale,
   value,
   submitting,
   onUpdate,
@@ -68,12 +71,12 @@ export function EditorRubricSection({
       <Grid columns="editor-2" gap={6}>
         <Stack gap={2}>
           <QuestionEditorField
-            htmlFor="expectedConcepts"
+            htmlFor={`expectedConcepts-${locale}`}
             label={t('expectedConcepts')}
             hint={t('expectedConceptsHint')}
           >
             <RawListTextarea
-              id="expectedConcepts"
+              id={`expectedConcepts-${locale}`}
               parsedValue={coerceExpectedConcepts(value.expectedConcepts)}
               format={formatExpectedConcepts}
               parse={(text) => parseExpectedConcepts(text, labels.conceptDescriptionFallback)}
@@ -82,17 +85,17 @@ export function EditorRubricSection({
               disabled={submitting}
             />
           </QuestionEditorField>
-          {renderAiSuggestion('expectedConcepts')}
+          {renderAiSuggestion?.('expectedConcepts')}
         </Stack>
 
         <Stack gap={2}>
           <QuestionEditorField
-            htmlFor="redFlags"
+            htmlFor={`redFlags-${locale}`}
             label={t('redFlags')}
             hint={t('redFlagsHint')}
           >
             <RawListTextarea
-              id="redFlags"
+              id={`redFlags-${locale}`}
               parsedValue={coerceRedFlags(value.redFlags)}
               format={formatRedFlags}
               parse={parseRedFlags}
@@ -101,59 +104,9 @@ export function EditorRubricSection({
               disabled={submitting}
             />
           </QuestionEditorField>
-          {renderAiSuggestion('redFlags')}
+          {renderAiSuggestion?.('redFlags')}
         </Stack>
       </Grid>
     </EditorSectionCard>
-  )
-}
-
-type ListItem = QuestionExpectedConcept | QuestionRedFlag
-
-interface RawListTextareaProps<T extends ListItem> {
-  id: string
-  parsedValue: T[]
-  format: (items: T[]) => string
-  parse: (text: string) => T[]
-  onParsedChange: (next: T[]) => void
-  placeholder: string
-  disabled: boolean
-}
-
-function RawListTextarea<T extends ListItem>({
-  id,
-  parsedValue,
-  format,
-  parse,
-  onParsedChange,
-  placeholder,
-  disabled,
-}: RawListTextareaProps<T>) {
-  const [text, setText] = useState(() => format(parsedValue))
-  const lastSyncedRef = useRef(parsedValue)
-
-  useEffect(() => {
-    if (parsedValue === lastSyncedRef.current) return
-    lastSyncedRef.current = parsedValue
-    setText(format(parsedValue))
-  }, [parsedValue, format])
-
-  function handleChange(nextText: string) {
-    setText(nextText)
-    const parsed = parse(nextText)
-    lastSyncedRef.current = parsed
-    onParsedChange(parsed)
-  }
-
-  return (
-    <Textarea
-      id={id}
-      size="xs"
-      tone="code"
-      value={text}
-      onChange={(event) => handleChange(event.target.value)}
-      placeholder={placeholder}
-      disabled={disabled}
-    />
   )
 }

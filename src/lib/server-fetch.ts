@@ -2,6 +2,8 @@ import { cookies, headers } from 'next/headers'
 import { cache } from 'react'
 
 import { ApiError } from './api-error'
+import { extractApiErrorFieldsFromBody } from './api-error-fields'
+import { resolveApiLocale } from './api-locale'
 
 export { isForbiddenError } from './api-error'
 
@@ -29,14 +31,19 @@ function resolveRequestOrigin(headerStore: Headers): string {
 export interface ServerRequestContext {
   cookieHeader: string
   origin: string
+  locale: string
 }
 
 export const getServerRequestContext = cache(
-  async (): Promise<ServerRequestContext> => {
+  async (locale?: string): Promise<ServerRequestContext> => {
     const headerStore = await headers()
     const rawCookieHeader = headerStore.get('cookie')
     const cookieHeader = rawCookieHeader ?? (await buildCookieHeaderFallback())
-    return { cookieHeader, origin: resolveRequestOrigin(headerStore) }
+    return {
+      cookieHeader,
+      origin: resolveRequestOrigin(headerStore),
+      locale: resolveApiLocale(locale),
+    }
   },
 )
 
@@ -83,7 +90,8 @@ const SERVER_REQUEST_TIMEOUT_MS = 15_000
 async function parseServerResponse<T>(res: Response, path: string): Promise<T | undefined> {
   if (!res.ok) {
     const body = await res.text()
-    throw new ApiError(res.status, safeErrorMessage(res.status, body), path, body)
+    const { code, params } = extractApiErrorFieldsFromBody(body)
+    throw new ApiError(res.status, safeErrorMessage(res.status, body), path, body, code, params)
   }
 
   const body = await res.text()
@@ -107,14 +115,27 @@ async function parseServerResponse<T>(res: Response, path: string): Promise<T | 
 export async function requestServer<T>(
   path: string,
   ctx: ServerRequestContext,
-  options?: { method?: 'GET' | 'POST'; query?: Record<string, unknown> },
+  options?: {
+    method?: 'GET' | 'POST'
+    query?: Record<string, unknown>
+    locale?: string
+    withLocaleHeader?: boolean
+  },
 ): Promise<T | undefined> {
+  const locale = resolveApiLocale(options?.locale ?? ctx.locale)
+  const withLocaleHeader = options?.withLocaleHeader ?? true
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+    cookie: ctx.cookieHeader,
+  }
+
+  if (withLocaleHeader) {
+    headers['X-Locale'] = locale
+  }
+
   const res = await fetch(buildServerApiUrl(path, ctx.origin, options?.query), {
     method: options?.method ?? 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      cookie: ctx.cookieHeader,
-    },
+    headers,
     cache: 'no-store',
     signal: AbortSignal.timeout(SERVER_REQUEST_TIMEOUT_MS),
   })

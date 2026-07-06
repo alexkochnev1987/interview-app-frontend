@@ -36,6 +36,7 @@ import {
   useTakeQuestionTts,
   type QuestionSpeechSynthCapture,
 } from './use-take-question-tts';
+import type { Locale } from '@/i18n/locales';
 
 type PendingVersionAction = 'submit' | 'rerecord' | null;
 
@@ -49,6 +50,7 @@ interface UseTakeOrchestratorParams {
   id: string;
   candidateToken: string;
   initialInterview?: TakeInterviewData;
+  contentLocale: Locale;
   takeMessage: TakeMessageGetter;
 }
 
@@ -75,6 +77,7 @@ export function useTakeOrchestrator({
   id,
   candidateToken,
   initialInterview,
+  contentLocale,
   takeMessage,
 }: UseTakeOrchestratorParams) {
   const {
@@ -174,6 +177,35 @@ export function useTakeOrchestrator({
   >(async () => undefined);
   const requestVersionActionRef = useRef<(action: PendingVersionAction) => void>(() => undefined);
   const autoStartedQuestionKeyRef = useRef('');
+  const recordingRef = useRef(recording);
+  const uploadingRef = useRef(uploading);
+  const recordingStartBusyRef = useRef(recordingStartBusy);
+  const stageRef = useRef(stage);
+
+  useEffect(() => {
+    recordingRef.current = recording;
+  }, [recording]);
+
+  useEffect(() => {
+    uploadingRef.current = uploading;
+  }, [uploading]);
+
+  useEffect(() => {
+    recordingStartBusyRef.current = recordingStartBusy;
+  }, [recordingStartBusy]);
+
+  useEffect(() => {
+    stageRef.current = stage;
+  }, [stage]);
+
+  function isLocaleQuestionMutationBlocked(): boolean {
+    return (
+      uploadingRef.current ||
+      recordingRef.current ||
+      recordingStartBusyRef.current ||
+      stageRef.current === 'transition'
+    );
+  }
 
   function attachCameraPreview(stream: MediaStream) {
     cameraStreamRef.current = stream;
@@ -248,8 +280,19 @@ export function useTakeOrchestrator({
     id,
     candidateToken,
     skipInitialLoad: Boolean(initialInterview),
+    contentLocale,
     onData: (data, mode) => {
       setError('');
+      if (mode === 'locale') {
+        if (isLocaleQuestionMutationBlocked()) {
+          return;
+        }
+        setInterview((previous) =>
+          previous ? { ...previous, currentQuestion: data.currentQuestion } : data,
+        );
+        return;
+      }
+
       setInterview(data);
       if (data.completed) {
         releaseAllCaptures();
@@ -264,6 +307,19 @@ export function useTakeOrchestrator({
     },
     takeMessage,
   });
+
+  const prevContentLocaleRef = useRef<Locale | null>(null);
+  useEffect(() => {
+    const previousLocale = prevContentLocaleRef.current;
+    prevContentLocaleRef.current = contentLocale;
+
+    if (previousLocale !== null && previousLocale !== contentLocale) {
+      if (isLocaleQuestionMutationBlocked()) {
+        return;
+      }
+      void loadInterview('locale', undefined, contentLocale);
+    }
+  }, [contentLocale, loadInterview]);
 
   const {
     restartFullInterviewCapture,
@@ -636,10 +692,18 @@ export function useTakeOrchestrator({
     takeMessage,
   ]);
 
+  const localeSwitchDisabled =
+    uploading ||
+    recording ||
+    recordingStartBusy ||
+    stage === 'transition' ||
+    interviewerPresence === 'speaking';
+
   return {
     stage,
     interview,
     error,
+    localeSwitchDisabled,
     candidateSessionReady,
     sessionSyncError,
     retrySessionSync,
@@ -681,5 +745,6 @@ export function useTakeOrchestrator({
     formatTime,
     interviewerPresence,
     progressValue: interview ? progressValueForStage({ interview, stage }) : 0,
+    loadInterview,
   };
 }

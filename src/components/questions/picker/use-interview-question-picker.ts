@@ -77,6 +77,7 @@ export function useInterviewQuestionPicker({
   const activeChips = buildActiveFilterChips(
     query.state,
     {
+      setLocale: query.setLocale,
       setDifficulty: query.setDifficulty,
       setCategory: query.setCategory,
       setSubcategory: query.setSubcategory,

@@ -149,7 +149,7 @@ function RecordingAiInterviewerSessionLayout({
       align="stretch"
       className={cn(
         'relative overflow-hidden bg-white',
-        'min-h-[min(52vh,26rem)] md:min-h-[min(360px,48vh)] xl:min-h-0',
+        'min-h-0 lg:min-h-[min(360px,48vh)]',
       )}
     >
       <RecordingHiddenCaptureVideo videoRef={screenVideoRef} />

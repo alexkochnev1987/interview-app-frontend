@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import type {
   InterviewDataView,
@@ -10,6 +10,7 @@ import type {
 } from '@/components/take/types'
 import type { InterviewerPresence } from '@/features/take/use-take-question-tts'
 import type { TakeInterviewData } from '@/lib/api'
+import type { Locale } from '@/i18n/locales'
 import {
   TAKE_MESSAGES,
   type TakeMessageKey,
@@ -56,6 +57,7 @@ export function useDemoTakeExperience({
   questionTexts,
 }: UseDemoTakeExperienceParams): DemoTakeExperience {
   const tTake = useTranslations('takeFlow')
+  const interviewLocale = useLocale() as Locale
   const takeMessage = useCallback(
     (key: TakeMessageKey, values?: TakeMessageValues) =>
       tTake.has(key)
@@ -108,10 +110,15 @@ export function useDemoTakeExperience({
     () => ({
       id: 'demo-take',
       position,
+      interviewLocale,
       candidateName,
       status: 'in_progress',
       totalQuestions,
-      currentQuestion: { text: questionTexts[currentIndex] ?? '' },
+      currentQuestion: {
+        text: questionTexts[currentIndex] ?? '',
+        followUpQuestions: [],
+        resolvedLocale: interviewLocale,
+      },
       currentQuestionIndex: currentIndex,
       currentAnswerMeta: {
         status: 'recording',
@@ -120,7 +127,7 @@ export function useDemoTakeExperience({
       },
       completed: false,
     }),
-    [position, candidateName, totalQuestions, questionTexts, currentIndex, versionNumber],
+    [position, interviewLocale, candidateName, totalQuestions, questionTexts, currentIndex, versionNumber],
   )
 
   const beginQuestion = useCallback(() => {

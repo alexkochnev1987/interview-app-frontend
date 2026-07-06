@@ -60,6 +60,7 @@ export default async function EditQuestionPage({ params }: EditQuestionPageProps
       (await requestServer<Question>(
         `/questions/${encodeURIComponent(id)}`,
         auth.ctx,
+        { query: { includeTranslations: true } },
       )) ?? null
   } catch (err) {
     redirectIfUnauthorizedError(err, returnPath, locale)
