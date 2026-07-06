@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import { useSearchParams } from 'next/navigation'
 import {
+  BriefcaseBusiness,
   ClipboardList,
   LayoutDashboard,
   LibraryBig,
@@ -78,6 +79,9 @@ export function SideNav() {
       : []),
     ...(canReviewAssessments(user?.role)
       ? [{ href: '/assessments', label: tNav('assessments'), icon: ClipboardList }]
+      : []),
+    ...(canConfigureInterview(user?.role)
+      ? [{ href: routes.interviews.list, label: tNav('interviews'), icon: BriefcaseBusiness }]
       : []),
     ...(canConfigureInterview(user?.role) && !isDemo
       ? [{ href: '/interviews/new', label: tNav('newInterview'), icon: Plus }]
