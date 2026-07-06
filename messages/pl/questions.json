@@ -163,7 +163,9 @@
       "toolbar": {
         "searchPlaceholder": "Szukaj według podpowiedzi, roli, kategorii lub tagu",
         "resultCount": "{count, plural, one {# pytanie} few {# pytania} many {# pytań} other {# pytania}}",
-        "removeChipAria": "Usuń {label}"
+        "removeChipAria": "Usuń {label}",
+        "pageSizeLabel": "Wierszy na stronę",
+        "pageSizeOption": "{count} na stronę"
       },
       "sort": {
         "updatedAt_desc": "Niedawno zaktualizowany",

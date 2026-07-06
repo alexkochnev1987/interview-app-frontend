@@ -163,7 +163,9 @@
       "toolbar": {
         "searchPlaceholder": "Пошук па запыце, ролі, катэгорыі або тэгу",
         "resultCount": "{count, plural, one {# пытанне} few {# пытанні} many {# пытанняў} other {# пытання}}",
-        "removeChipAria": "Выдаліць {label}"
+        "removeChipAria": "Выдаліць {label}",
+        "pageSizeLabel": "Радкоў на старонку",
+        "pageSizeOption": "{count} на старонку"
       },
       "sort": {
         "updatedAt_desc": "Нядаўна абноўлены",
