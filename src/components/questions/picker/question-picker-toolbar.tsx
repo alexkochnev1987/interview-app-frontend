@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { Inline } from '@/components/ui/layout/inline'
+import { Stack } from '@/components/ui/layout/stack'
 import {
   Select,
   SelectContent,
@@ -75,31 +76,8 @@ export function QuestionPickerToolbar(props: QuestionPickerToolbarProps) {
   const tSort = useTranslations('questions.picker.sort')
 
   return (
-    <Inline gap={3} align="center" justify="between" wrap="wrap">
-      <Inline gap={2} align="center" wrap="wrap">
-        <StatusPill tone="neutral">
-          {loading ? '…' : tToolbar('resultCount', { count: resultCount })}
-        </StatusPill>
-        {activeChips.map((chip) => (
-          <StatusPill key={chip.key} tone="neutral" casing="chip">
-            <Inline gap={1} align="center">
-              <span>{chip.label}</span>
-              <Button
-                type="button"
-                variant="ghost"
-                shape="pill"
-                size="icon-xxs"
-                aria-label={tToolbar('removeChipAria', { label: chip.label })}
-                onClick={chip.onRemove}
-              >
-                <X className="size-3" />
-              </Button>
-            </Inline>
-          </StatusPill>
-        ))}
-      </Inline>
-
-      <Inline gap={2} align="center" wrap="wrap">
+    <Stack gap={3}>
+      <Inline gap={2} align="center" justify="end" wrap="wrap">
         {viewToggle}
         <QuestionPageSizeSelect
           limit={limit}
@@ -129,6 +107,29 @@ export function QuestionPickerToolbar(props: QuestionPickerToolbarProps) {
         </Select>
         {bulkActions}
       </Inline>
-    </Inline>
+
+      <Inline gap={2} align="center" wrap="wrap">
+        <StatusPill tone="neutral">
+          {loading ? '…' : tToolbar('resultCount', { count: resultCount })}
+        </StatusPill>
+        {activeChips.map((chip) => (
+          <StatusPill key={chip.key} tone="neutral" casing="chip">
+            <Inline gap={1} align="center">
+              <span>{chip.label}</span>
+              <Button
+                type="button"
+                variant="ghost"
+                shape="pill"
+                size="icon-xxs"
+                aria-label={tToolbar('removeChipAria', { label: chip.label })}
+                onClick={chip.onRemove}
+              >
+                <X className="size-3" />
+              </Button>
+            </Inline>
+          </StatusPill>
+        ))}
+      </Inline>
+    </Stack>
   )
 }
