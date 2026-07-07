@@ -8,5 +8,9 @@ export const routes = {
     list: '/interviews',
     new: '/interviews/new',
     detail: (id: string) => `/interviews/${encodeURIComponent(id)}`,
-  }
+  },
+  assessments: {
+    list: '/assessments',
+    detail: (id: string) => `/assessments/${encodeURIComponent(id)}`,
+  },
 } as const

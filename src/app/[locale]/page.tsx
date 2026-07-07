@@ -9,6 +9,7 @@ import { routes } from '@/i18n/routes'
 import {
   type InterviewFacetsResponse,
   type PaginatedInterviews,
+  emptyPaginatedInterviews,
 } from '@/lib/api'
 import { canAccessDashboard } from '@/lib/auth-roles'
 import {
@@ -17,6 +18,10 @@ import {
   redirectIfUnauthorizedError,
 } from '@/lib/auth-gate'
 import { computeDashboardMetrics } from '@/lib/dashboard-metrics'
+import {
+  ASSESSMENTS_INTERVIEW_PAGE_SIZE,
+  fetchAllInterviewPages,
+} from '@/lib/fetch-all-interviews'
 import { prefetchInterviewsLibrary } from '@/lib/interviews-library-prefetch'
 import {
   EMPTY_INTERVIEW_FACETS,
@@ -26,7 +31,6 @@ import { isForbiddenError, requestServer } from '@/lib/server-fetch'
 
 const ERROR_SIGN_IN_HREF = '/login'
 const ERROR_ESCAPE_HREF = routes.questions.list
-const METRICS_INTERVIEW_SAMPLE_LIMIT = 100
 
 interface DashboardPageProps {
   params: Promise<{ locale: Locale }>
@@ -73,16 +77,22 @@ export default async function DashboardPage({
       requestServer<InterviewFacetsResponse>('/interviews/facets', auth.ctx).then(
         (response) => response ?? EMPTY_INTERVIEW_FACETS,
       ),
-      requestServer<PaginatedInterviews>('/interviews', auth.ctx, {
-        query: {
-          limit: METRICS_INTERVIEW_SAMPLE_LIMIT,
+      fetchAllInterviewPages(
+        (params) =>
+          requestServer<PaginatedInterviews>('/interviews', auth.ctx, {
+            query: params,
+          }).then(
+            (response) =>
+              response ??
+              emptyPaginatedInterviews(
+                params.limit ?? ASSESSMENTS_INTERVIEW_PAGE_SIZE,
+              ),
+          ),
+        {
+          limit: ASSESSMENTS_INTERVIEW_PAGE_SIZE,
           sortBy: 'updatedAt',
           sortOrder: 'desc',
         },
-      }).then(
-        (response) =>
-          response?.items ??
-          [],
       ),
     ])
   } catch (err) {

@@ -18,6 +18,7 @@ import { StatusPill } from '@/components/ui/status-pill'
 import { BodyText } from '@/components/ui/text'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
 import { Link } from '@/i18n/navigation'
+import { routes } from '@/i18n/routes'
 import type { Interview, InterviewResult } from '@/lib/api'
 import {
   formatInterviewDate,
@@ -94,7 +95,7 @@ export function InterviewSummaryCard({
 
   const visitAssessmentButton = isHrVisibleAssessment(interview) ? (
     <Button asChild variant="outline">
-      <Link href={`/assessments/${interview.id}`}>
+      <Link href={routes.assessments.detail(interview.id)}>
         {tActions('visitAssessment')}
         <ArrowRight className="size-4" />
       </Link>

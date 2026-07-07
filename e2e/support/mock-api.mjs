@@ -200,11 +200,12 @@ async function handleRequest(req, res) {
   }
 
   if (method === 'GET' && pathname === '/interviews/facets') {
+    const filtered = filterInterviewListItems(url.searchParams)
     json(
       res,
       200,
-      interviews.length > 0
-        ? buildInterviewFacets(interviews.map(toInterviewListItem))
+      filtered.length > 0
+        ? buildInterviewFacets(filtered)
         : EMPTY_INTERVIEW_FACETS,
     )
     return
