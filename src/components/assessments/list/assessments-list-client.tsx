@@ -21,6 +21,10 @@ import {
   hasScoringInProgressListItems,
   selectHrVisibleListItems,
 } from '@/lib/assessment-status'
+import {
+  ASSESSMENTS_INTERVIEW_PAGE_SIZE,
+  fetchAllInterviewPages,
+} from '@/lib/fetch-all-interviews'
 import { useLivePolling } from '@/lib/use-live-polling'
 
 interface AssessmentsListClientProps {
@@ -42,12 +46,12 @@ export function AssessmentsListClient({
   const deferredQuery = useDeferredValue(query)
 
   const fetcher = useCallback(async () => {
-    const page = await fetchInterviews({
-      limit: 100,
+    const items = await fetchAllInterviewPages(fetchInterviews, {
+      limit: ASSESSMENTS_INTERVIEW_PAGE_SIZE,
       sortBy: 'updatedAt',
       sortOrder: 'desc',
     })
-    return selectHrVisibleListItems(page.items)
+    return selectHrVisibleListItems(items)
   }, [])
   const { data: interviews, refresh, kick, paused } = useLivePolling(
     initialInterviews,

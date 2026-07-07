@@ -6,8 +6,12 @@ import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallbac
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import type { Locale } from '@/i18n/locales'
-import { type InterviewListItem, type PaginatedInterviews } from '@/lib/api'
+import { type InterviewListItem, type PaginatedInterviews, emptyPaginatedInterviews } from '@/lib/api'
 import { selectHrVisibleListItems } from '@/lib/assessment-status'
+import {
+  ASSESSMENTS_INTERVIEW_PAGE_SIZE,
+  fetchAllInterviewPages,
+} from '@/lib/fetch-all-interviews'
 import {
   loadAuthGate,
   redirectIfUnauthenticated,
@@ -54,12 +58,23 @@ export default async function AssessmentsPage({
   let error: string | null = null
 
   try {
-    const response =
-        (await requestServer<PaginatedInterviews>('/interviews', auth.ctx, {
-          query: { limit: 100, sortBy: 'updatedAt', sortOrder: 'desc' },
-        })) ?? { items: [], total: 0, page: 1, limit: 100 }
+    const items = await fetchAllInterviewPages(
+      (params) =>
+        requestServer<PaginatedInterviews>('/interviews', auth.ctx, {
+          query: params,
+        }).then(
+          (response) =>
+            response ??
+            emptyPaginatedInterviews(params.limit ?? ASSESSMENTS_INTERVIEW_PAGE_SIZE),
+        ),
+      {
+        limit: ASSESSMENTS_INTERVIEW_PAGE_SIZE,
+        sortBy: 'updatedAt',
+        sortOrder: 'desc',
+      },
+    )
 
-    interviews = response.items
+    interviews = items
   } catch (err) {
     redirectIfUnauthorizedError(err, '/assessments', locale)
     if (isForbiddenError(err)) {
