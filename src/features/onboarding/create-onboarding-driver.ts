@@ -7,7 +7,7 @@ import '@/components/ui/onboarding/onboarding-tour.css';
 export type CreateOnboardingDriverParams = {
   steps: DriveStep[];
   labels: OnboardingTourLabels;
-  onComplete: () => void;
+  isComplete: () => boolean;
   onSkip: () => void;
 };
 
@@ -15,8 +15,6 @@ export async function createOnboardingDriver(
   params: CreateOnboardingDriverParams,
 ): Promise<Driver> {
   const { driver } = await import('driver.js');
-
-  let skipped = false;
 
   const instance = driver({
     steps: params.steps,
@@ -29,21 +27,19 @@ export async function createOnboardingDriver(
     doneBtnText: params.labels.done,
     popoverClass: 'onboarding-tour-popover',
     overlayOpacity: 0.45,
-    stagePadding: 5,
-    stageRadius: 12,
-    popoverOffset: 4,
+    stagePadding: 0,
+    stageRadius: 14,
+    popoverOffset: 16,
     allowClose: true,
     onCloseClick: () => {
-      skipped = true;
       instance.destroy();
     },
     onDestroyed: () => {
-      if (skipped) {
-        params.onSkip();
+      if (params.isComplete()) {
         return;
       }
 
-      params.onComplete();
+      params.onSkip();
     },
   });
 

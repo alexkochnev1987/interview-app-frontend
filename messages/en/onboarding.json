@@ -14,7 +14,7 @@
     "tour": {
       "next": "Next",
       "back": "Back",
-      "done": "Get started",
+      "done": "Complete",
       "replay": "Product tour"
     },
     "errors": {
@@ -57,9 +57,9 @@
         "title": "Select questions",
         "description": "Search your bank, choose prompts for this session, then create the interview to send the candidate link."
       },
-      "teamHeading": {
-        "title": "Team & permissions",
-        "description": "Manage who can create interviews, review assessments, and administer workspace access."
+      "teamActions": {
+        "title": "Team actions",
+        "description": "Use row actions to change roles and manage each teammate's access."
       }
     }
   }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Driver } from 'driver.js'
 import { useLocale, useTranslations } from 'next-intl'
 
@@ -51,7 +51,21 @@ export function useOnboardingTour({
   const pathnameRef = useRef(pathname)
   pathnameRef.current = pathname
   const driverRef = useRef<Driver | null>(null)
+  const completedRef = useRef(false)
   const [phase, setPhase] = useState<OnboardingPhase>('idle')
+
+  useEffect(() => {
+    if (phase !== 'welcome' && phase !== 'touring' && phase !== 'complete') {
+      return
+    }
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+    }
+  }, [phase])
 
   const prepareStep = useCallback(
     async (step: ResolvedOnboardingStep) =>
@@ -83,6 +97,7 @@ export function useOnboardingTour({
   const runTour = useCallback(
     async (options?: { skipWelcome?: boolean }) => {
       await stopTour()
+      completedRef.current = false
 
       const flow = getOnboardingFlow(flowId)
       const resolvedSteps = await resolveOnboardingSteps(flow, context, pathname)
@@ -104,14 +119,16 @@ export function useOnboardingTour({
         translateStep,
         labels,
         prepareStep,
+        onDone: () => {
+          completedRef.current = true
+          void onTourComplete?.()
+          setPhase('complete')
+        },
       })
       const driver = await createOnboardingDriver({
         steps: driverSteps,
         labels,
-        onComplete: () => {
-          void onTourComplete?.()
-          setPhase('complete')
-        },
+        isComplete: () => completedRef.current,
         onSkip: () => {
           void onTourSkip?.()
           setPhase('idle')

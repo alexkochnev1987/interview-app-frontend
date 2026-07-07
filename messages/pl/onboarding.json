@@ -14,7 +14,7 @@
     "tour": {
       "next": "Dalej",
       "back": "Wstecz",
-      "done": "Zacznij pracę",
+      "done": "Zakończ",
       "replay": "Tour produktu"
     },
     "errors": {
@@ -57,9 +57,9 @@
         "title": "Wybór pytań",
         "description": "Wyszukaj pytania w bazie, wybierz je do sesji i utwórz interview, aby wysłać link kandydatowi."
       },
-      "teamHeading": {
-        "title": "Zespół i uprawnienia",
-        "description": "Zarządzaj tym, kto może tworzyć interview, oceniać wyniki i administrować workspace."
+      "teamActions": {
+        "title": "Akcje zespołu",
+        "description": "Użyj akcji w wierszu, aby zmieniać role i zarządzać dostępem członków zespołu."
       }
     }
   }

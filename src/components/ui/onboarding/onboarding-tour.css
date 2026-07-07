@@ -9,6 +9,24 @@
   color: hsl(var(--foreground));
   box-shadow: var(--shadow-float);
   padding: 2.25rem 1.125rem 1rem;
+  animation: onboarding-popover-in 0.26s ease-out;
+}
+
+@keyframes onboarding-popover-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .onboarding-tour-popover.driver-popover {
+    animation: onboarding-popover-in 0.2s ease-out;
+  }
 }
 
 .onboarding-tour-popover .driver-popover-title {
@@ -41,15 +59,15 @@
   align-items: center;
   justify-content: space-between;
   margin-top: 1.25rem;
-  gap: 0.875rem 1.25rem;
+  gap: 0.875rem 2rem;
 }
 
 .onboarding-tour-popover .driver-popover-navigation-btns {
   display: flex;
-  flex-grow: 1;
+  flex-grow: 0;
   justify-content: flex-end;
   align-items: center;
-  gap: 1rem;
+  gap: 1.25rem;
   margin-left: auto;
 }
 
@@ -127,7 +145,45 @@
 }
 
 .onboarding-tour-popover .driver-popover-arrow {
-  border-color: hsl(var(--card) / 0.96);
+  border-width: 8px;
+}
+
+.onboarding-tour-popover .driver-popover-arrow-side-top {
+  border-top-color: hsl(var(--card) / 0.96);
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+  border-left-color: transparent;
+}
+
+.onboarding-tour-popover .driver-popover-arrow-side-bottom {
+  border-bottom-color: hsl(var(--card) / 0.96);
+  border-left-color: transparent;
+  border-top-color: transparent;
+  border-right-color: transparent;
+}
+
+.onboarding-tour-popover .driver-popover-arrow-side-left {
+  border-left-color: hsl(var(--card) / 0.96);
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+  border-top-color: transparent;
+}
+
+.onboarding-tour-popover .driver-popover-arrow-side-right {
+  border-right-color: hsl(var(--card) / 0.96);
+  border-left-color: transparent;
+  border-bottom-color: transparent;
+  border-top-color: transparent;
+}
+
+.onboarding-tour-popover .driver-popover-arrow-side-left.driver-popover-arrow-align-center,
+.onboarding-tour-popover .driver-popover-arrow-side-right.driver-popover-arrow-align-center {
+  margin-top: -8px;
+}
+
+.onboarding-tour-popover .driver-popover-arrow-side-top.driver-popover-arrow-align-center,
+.onboarding-tour-popover .driver-popover-arrow-side-bottom.driver-popover-arrow-align-center {
+  margin-left: -8px;
 }
 
 .driver-active .driver-active-element,

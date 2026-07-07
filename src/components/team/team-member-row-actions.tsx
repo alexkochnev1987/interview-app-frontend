@@ -55,6 +55,7 @@ interface TeamMemberRowActionsProps {
   actorId: string
   actorRole: TeamRowActorRole
   onChangeRole: () => void
+  tourTarget?: string
 }
 
 export function TeamMemberRowActions({
@@ -62,6 +63,7 @@ export function TeamMemberRowActions({
   actorId,
   actorRole,
   onChangeRole,
+  tourTarget,
 }: TeamMemberRowActionsProps) {
   const t = useTranslations('team.actions')
 
@@ -74,6 +76,7 @@ export function TeamMemberRowActions({
           size="icon-sm"
           aria-haspopup="menu"
           aria-label={t('menuAria', { name: member.name })}
+          data-tour={tourTarget}
         >
           <MoreVertical />
         </Button>

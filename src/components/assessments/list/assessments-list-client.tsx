@@ -94,8 +94,12 @@ export function AssessmentsListClient({
           />
         ) : (
           <CardGrid>
-            {filtered.map((interview) => (
-              <AssessmentCard key={interview.id} interview={interview} />
+            {filtered.map((interview, index) => (
+              <AssessmentCard
+                key={interview.id}
+                interview={interview}
+                tourTarget={index === 0 ? 'assessments-card' : undefined}
+              />
             ))}
           </CardGrid>
         )}

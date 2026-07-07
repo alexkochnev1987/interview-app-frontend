@@ -11,6 +11,7 @@ type BuildDriverStepsParams = {
   translateStep: OnboardingStepTranslator;
   labels: OnboardingTourLabels;
   prepareStep: (step: ResolvedOnboardingStep) => Promise<boolean>;
+  onDone: () => void;
 };
 
 export function buildDriverSteps({
@@ -18,6 +19,7 @@ export function buildDriverSteps({
   translateStep,
   labels,
   prepareStep,
+  onDone,
 }: BuildDriverStepsParams): DriveStep[] {
   return steps.map((step, index) => {
     const content = translateStep(step.contentKey);
@@ -37,6 +39,12 @@ export function buildDriverSteps({
         prevBtnText: labels.back,
         doneBtnText: labels.done,
         onNextClick: async (_element, _driveStep, { driver }) => {
+          if (isLast) {
+            onDone();
+            driver.destroy();
+            return;
+          }
+
           if (nextStep) {
             await prepareStep(nextStep);
           }

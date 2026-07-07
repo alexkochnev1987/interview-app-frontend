@@ -28,9 +28,10 @@ import { formatInterviewDate } from '@/lib/interview-formatters'
 
 interface AssessmentCardProps {
   interview: Interview
+  tourTarget?: string
 }
 
-export function AssessmentCard({ interview }: AssessmentCardProps) {
+export function AssessmentCard({ interview, tourTarget }: AssessmentCardProps) {
   const t = useTranslations('assessments.list')
   const sharedLabels = useSharedLabels()
   const reviewStatus = deriveReviewStatus(interview)
@@ -40,7 +41,7 @@ export function AssessmentCard({ interview }: AssessmentCardProps) {
   const isReadyToScore = reviewStatus === 'ready_to_score'
 
   return (
-    <Card variant="surface" height="full" interaction="hover">
+    <Card variant="surface" height="full" interaction="hover" data-tour={tourTarget}>
       {/* display="contents" keeps the header + metrics as direct layout children
           of the Card (no overlay, no stacking or hover conflict). The Start
           button stays a sibling and is never nested inside the anchor. */}
