@@ -7,7 +7,6 @@ import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
-import { SearchInput } from '@/components/ui/search-input'
 import {
   Select,
   SelectContent,
@@ -41,8 +40,6 @@ export type ActiveFilterChip = {
 }
 
 export type QuestionPickerToolbarProps = {
-  q: string
-  onQChange: (value: string) => void
   sortBy: QuestionSortField
   sortOrder: QuestionSortOrder
   onSortChange: (sortBy: QuestionSortField, sortOrder: QuestionSortOrder) => void
@@ -55,8 +52,6 @@ export type QuestionPickerToolbarProps = {
 
 export function QuestionPickerToolbar(props: QuestionPickerToolbarProps) {
   const {
-    q,
-    onQChange,
     sortBy,
     sortOrder,
     onSortChange,
@@ -73,61 +68,53 @@ export function QuestionPickerToolbar(props: QuestionPickerToolbarProps) {
 
   return (
     <Stack gap={3}>
-      <SearchInput
-        value={q}
-        onChange={(event) => onQChange(event.target.value)}
-        placeholder={tToolbar('searchPlaceholder')}
-      />
+      <Inline gap={2} align="center" justify="end" wrap="wrap">
+        {viewToggle}
+        <Select
+          value={sortValue}
+          onValueChange={(value) => {
+            const [nextSortBy, nextSortOrder] = value.split(':') as [
+              QuestionSortField,
+              QuestionSortOrder,
+            ]
+            onSortChange(nextSortBy, nextSortOrder)
+          }}
+        >
+          <SelectTrigger variant="surface" size="md" shape="pill" width="auto-wide">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {SORT_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {tSort(option.key)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {bulkActions}
+      </Inline>
 
-      <Inline gap={3} align="center" justify="between" wrap="wrap">
-        <Inline gap={2} align="center" wrap="wrap">
-          <StatusPill tone="neutral">
-            {loading ? '…' : tToolbar('resultCount', { count: resultCount })}
+      <Inline gap={2} align="center" wrap="wrap">
+        <StatusPill tone="neutral">
+          {loading ? '…' : tToolbar('resultCount', { count: resultCount })}
+        </StatusPill>
+        {activeChips.map((chip) => (
+          <StatusPill key={chip.key} tone="neutral" casing="chip">
+            <Inline gap={1} align="center">
+              <span>{chip.label}</span>
+              <Button
+                type="button"
+                variant="ghost"
+                shape="pill"
+                size="icon-xxs"
+                aria-label={tToolbar('removeChipAria', { label: chip.label })}
+                onClick={chip.onRemove}
+              >
+                <X className="size-3" />
+              </Button>
+            </Inline>
           </StatusPill>
-          {activeChips.map((chip) => (
-            <StatusPill key={chip.key} tone="neutral" casing="chip">
-              <Inline gap={1} align="center">
-                <span>{chip.label}</span>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  shape="pill"
-                  size="icon-xxs"
-                  aria-label={tToolbar('removeChipAria', { label: chip.label })}
-                  onClick={chip.onRemove}
-                >
-                  <X className="size-3" />
-                </Button>
-              </Inline>
-            </StatusPill>
-          ))}
-        </Inline>
-
-        <Inline gap={2} align="center" wrap="wrap">
-          {viewToggle}
-          <Select
-            value={sortValue}
-            onValueChange={(value) => {
-              const [nextSortBy, nextSortOrder] = value.split(':') as [
-                QuestionSortField,
-                QuestionSortOrder,
-              ]
-              onSortChange(nextSortBy, nextSortOrder)
-            }}
-          >
-            <SelectTrigger variant="surface" size="md" shape="pill" width="auto-wide">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {SORT_OPTIONS.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {tSort(option.key)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {bulkActions}
-        </Inline>
+        ))}
       </Inline>
     </Stack>
   )

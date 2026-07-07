@@ -12,6 +12,7 @@ import type {
 } from '@/lib/api'
 
 export const DEFAULT_QUESTIONS_LIMIT = 20
+export const QUESTIONS_SEARCH_DEBOUNCE_MS = 500
 const MAX_QUESTIONS_Q_LENGTH = 200
 
 export const EMPTY_QUESTION_FACETS: QuestionFacetsResponse = {

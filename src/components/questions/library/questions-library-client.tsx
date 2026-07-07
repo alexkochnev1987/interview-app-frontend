@@ -30,6 +30,7 @@ import { useBulkDeleteQuestions } from '@/components/questions/use-question-muta
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { Pagination } from '@/components/ui/pagination'
+import { SearchInput } from '@/components/ui/search-input'
 import { useTranslations } from 'next-intl'
 import { useRouter } from '@/i18n/navigation'
 import { routes } from '@/i18n/routes'
@@ -51,6 +52,7 @@ export function QuestionsLibraryClient({
   const uiLocale = useLocale()
   const router = useRouter()
   const t = useTranslations('questions.library.client')
+  const tToolbar = useTranslations('questions.picker.toolbar')
   const getChipLabel = useQuestionChipLabels()
   const { mutate: bulkDeleteQuestions, isPending: bulkDeleting } =
     useBulkDeleteQuestions()
@@ -74,28 +76,10 @@ export function QuestionsLibraryClient({
     serverHydrated: Boolean(initialPrefetch),
   })
 
-  const cardsScrollRootRef = useRef<HTMLDivElement>(null)
   const cardsFilterSignature = useMemo(
     () => JSON.stringify(cardsInfiniteParams),
     [cardsInfiniteParams],
   )
-  const prevCardsFilterSignatureRef = useRef<string | null>(null)
-  useEffect(() => {
-    if (!isCardsView) {
-      prevCardsFilterSignatureRef.current = null
-      return
-    }
-    if (prevCardsFilterSignatureRef.current === null) {
-      prevCardsFilterSignatureRef.current = cardsFilterSignature
-      return
-    }
-    if (prevCardsFilterSignatureRef.current === cardsFilterSignature) return
-    prevCardsFilterSignatureRef.current = cardsFilterSignature
-    cardsScrollRootRef.current?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-    })
-  }, [cardsFilterSignature, isCardsView])
   const facetsResult = useQuestionFacets(query.state, query.debouncedQ)
   const facets = facetsResult.facets
 
@@ -193,7 +177,12 @@ export function QuestionsLibraryClient({
   }
 
   const selectedCount = selectedIds.size
-  const view = pickQuestionsViewSource(isCardsView, query, infinite)
+  const view = pickQuestionsViewSource(
+    isCardsView,
+    query,
+    infinite,
+    query.isSearchPending,
+  )
 
   const sidebar = (
     <QuestionFacetSidebar
@@ -229,9 +218,12 @@ export function QuestionsLibraryClient({
 
   const mainContent = (
     <Stack gap={4}>
+      <SearchInput
+        value={query.state.q}
+        onChange={(event) => query.setQ(event.target.value)}
+        placeholder={tToolbar('searchPlaceholder')}
+      />
       <QuestionPickerToolbar
-        q={query.state.q}
-        onQChange={query.setQ}
         sortBy={query.state.sortBy}
         sortOrder={query.state.sortOrder}
         onSortChange={query.setSort}
@@ -321,20 +313,18 @@ export function QuestionsLibraryClient({
           />
         )}
         renderCards={() => (
-          <div ref={cardsScrollRootRef}>
-            <CardGrid>
-              {view.items.map((question) => (
-                <QuestionCard
-                  key={question.id}
-                  question={question}
-                  listLocale={listLocale}
-                  selectable={isSuperAdmin}
-                  selected={selectedIds.has(question.id)}
-                  onToggleSelected={() => toggleSelected(question)}
-                />
-              ))}
-            </CardGrid>
-          </div>
+          <CardGrid>
+            {view.items.map((question) => (
+              <QuestionCard
+                key={question.id}
+                question={question}
+                listLocale={listLocale}
+                mode={isSuperAdmin ? 'select' : 'navigate'}
+                selected={selectedIds.has(question.id)}
+                onToggleSelected={() => toggleSelected(question)}
+              />
+            ))}
+          </CardGrid>
         )}
       />
 

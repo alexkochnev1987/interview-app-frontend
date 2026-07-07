@@ -53,6 +53,7 @@ const cardVariants = cva(
       state: {
         default: "",
         selected: "ring-2 ring-destructive/70",
+        picked: "ring-2 ring-[hsl(var(--primary)/0.55)]",
         deleted: "opacity-80",
         scheduled: "",
       },

@@ -4,7 +4,7 @@ import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server
 import { notFound } from 'next/navigation'
 
 import { AppBody } from '@/components/ui/app-shell'
-import { AppShellRoot } from '@/components/ui/app-shell'
+import { AppMain, AppShellRoot } from '@/components/ui/app-shell'
 import { DemoModeBanner } from '@/components/demo/demo-mode-banner'
 import { Toaster } from '@/components/ui/toaster'
 import { TooltipProvider } from '@/components/ui/tooltip'
@@ -15,7 +15,7 @@ import { AuthProvider } from '@/lib/auth-context'
 import { getServerSessionSnapshot } from '@/lib/auth-server'
 import { AppQueryClientProvider } from '@/lib/query-client-provider'
 
-import { NavHeader } from './nav-header'
+import { SideNav } from './side-nav'
 
 export async function generateMetadata({
   params,
@@ -60,9 +60,11 @@ export default async function LocaleLayout({
             <AuthProvider initialUser={session.user}>
               <TooltipProvider>
                 <AppShellRoot>
-                  <NavHeader />
-                  <DemoModeBanner />
-                  {children}
+                  <SideNav />
+                  <AppMain>
+                    <DemoModeBanner />
+                    {children}
+                  </AppMain>
                 </AppShellRoot>
                 <Toaster />
               </TooltipProvider>

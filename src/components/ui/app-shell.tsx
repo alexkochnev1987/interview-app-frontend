@@ -23,7 +23,19 @@ export function AppShellRoot({
 }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn('relative min-h-screen overflow-x-clip', className)}
+      className={cn('relative flex min-h-screen overflow-x-clip', className)}
+      {...props}
+    />
+  )
+}
+
+export function AppMain({
+  className,
+  ...props
+}: HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div
+      className={cn('flex min-h-screen min-w-0 flex-1 flex-col', className)}
       {...props}
     />
   )
