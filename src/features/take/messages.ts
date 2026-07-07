@@ -112,6 +112,8 @@ export const TAKE_MESSAGES = {
   questionProgress: 'Question {current} of {total}',
   beforeUnloadLeaveInterview:
     'If you reload or leave now, you will exit this interview and may lose your progress. Are you sure?',
+  attemptsMetricLabel: 'Attempts:',
+  answerAttemptLimitReached: 'Recording attempt limit reached',
 } as const;
 
 export type TakeMessageKey = keyof typeof TAKE_MESSAGES;

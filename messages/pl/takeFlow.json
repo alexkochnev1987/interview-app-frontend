@@ -94,6 +94,8 @@
     "questionProgress": "Pytanie {current} z {total}",
     "languageBadgeResolvedAs": "Wyświetlane jako {locale}",
     "languageBadgeInterviewAs": "Język rozmowy {locale}",
-    "beforeUnloadLeaveInterview": "Jeśli załadujesz ponownie lub wyjdziesz teraz, opuścisz tę rozmowę kwalifikacyjną i możesz stracić swoje postępy. Czy jesteś pewien?"
+    "beforeUnloadLeaveInterview": "Jeśli załadujesz ponownie lub wyjdziesz teraz, opuścisz tę rozmowę kwalifikacyjną i możesz stracić swoje postępy. Czy jesteś pewien?",
+    "attemptsMetricLabel": "Próby:",
+    "answerAttemptLimitReached": "Osiągnięto limit prób nagrywania"
   }
 }
