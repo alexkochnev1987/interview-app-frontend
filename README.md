@@ -144,6 +144,25 @@ Product language policy (current stage):
 - Backend locale-aware AI/dynamic multilingual candidate content is out of scope for now.
 - Decision log, scope boundaries, and future backend requirements: `DOCUMENTATION.md` -> `Candidate flow is intentionally English-only`.
 
+## Deployments
+
+Public application URLs only (no secrets, infrastructure IPs, private hostnames, tokens, or environment values):
+
+| Environment | Frontend |
+|-------------|----------|
+| Dev | https://develop.d1z0clbcev0y8a.amplifyapp.com |
+| Prod | https://main.d2k50usvcss92k.amplifyapp.com |
+
+Amplify auto-deploys after push: `develop` → dev, `main` → prod. Demo login and ops detail: [DOCUMENTATION.md](DOCUMENTATION.md).
+
+## Branch workflow
+
+Protected branches: `develop` (integration) and `main` (production).
+
+1. Branch from `develop`, open a PR back into `develop`.
+2. PR must pass CI, receive approval (see `.github/CODEOWNERS`), and use verified commit signatures.
+3. Release to prod: merge `develop` into `main` via PR with the same protections.
+
 ---
 
 **Full documentation:** [DOCUMENTATION.md](DOCUMENTATION.md)
