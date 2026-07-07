@@ -5,9 +5,10 @@ import {
   ELIGIBLE_QUESTION_TEXT,
   SCHEDULED_QUESTION_TEXT,
 } from './support/fixtures.mjs'
-import { E2E_MOCK_API_URL } from './support/ports.mjs'
 
-const MOCK_API_BASE = E2E_MOCK_API_URL
+const MOCK_API_BASE =
+  process.env.BACKEND_URL ??
+  `http://localhost:${process.env.E2E_MOCK_API_PORT ?? '3000'}`
 
 test.describe('interview management', () => {
   test.beforeEach(async ({ request }) => {

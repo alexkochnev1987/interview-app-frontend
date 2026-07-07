@@ -22,10 +22,7 @@ jobs:
         run: git diff --exit-code -- src/lib/api-types.ts
       - run: npm run lint:ci
       - run: npm run test
-      - name: Build for E2E (API rewrites target the mock port)
-        run: npx next build --webpack
-        env:
-          BACKEND_URL: http://localhost:13000
+      - run: npx next build --webpack
       - name: Upload production build for E2E
         uses: actions/upload-artifact@v4
         with:
@@ -39,7 +36,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CI: true
-      BACKEND_URL: http://localhost:13000
+      BACKEND_URL: http://localhost:3000
+      E2E_BASE_URL: http://localhost:3001
       E2E_PREBUILT: '1'
     steps:
       - uses: actions/checkout@v4

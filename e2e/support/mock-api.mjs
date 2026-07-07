@@ -11,7 +11,7 @@ import {
   toInterviewListItem,
 } from './fixtures.mjs'
 
-const PORT = Number(process.env.E2E_MOCK_API_PORT ?? process.env.PORT ?? 13000)
+const PORT = Number(process.env.E2E_MOCK_API_PORT ?? process.env.PORT ?? 3000)
 
 const DEMO_SESSION_TOKEN = 'e2e-demo-session'
 const DEMO_USER = {
