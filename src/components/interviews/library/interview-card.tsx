@@ -79,7 +79,7 @@ export function InterviewCard({ interview }: InterviewCardProps) {
             />
           </Grid>
           <CardDescription>
-            {t('createdAt')} - {formatInterviewDate(interview.updatedAt)}
+            {t('createdAt')} - {formatInterviewDate(interview.createdAt)}
           </CardDescription>
           <CardDescription>
             {t('updatedAt')} - {formatInterviewDate(interview.updatedAt)}

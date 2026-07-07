@@ -192,6 +192,7 @@ export function useInterviewsQuery(
             const fromUrl = searchParams
                 ? readInterviewsFromSearchParams(searchParams, base)
                 : base
+            if (fromUrl.view === 'cards' && fromUrl.page !== 1) fromUrl.page = 1
             lastWrittenUrlRef.current = currentUrl
             setState(fromUrl)
             setDebouncedQ(fromUrl.q)
