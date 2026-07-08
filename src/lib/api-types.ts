@@ -157,6 +157,26 @@ export interface paths {
         patch: operations["UserController_assignRole"];
         trace?: never;
     };
+    "/users/demo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Provision the read-only demo account and demo content
+         * @description Idempotent admin-only setup for environments without direct database access. Refused on production unless ALLOW_DEMO_SEED=true is set, so it can never seed demo data into production by accident.
+         */
+        post: operations["UserController_provisionDemo"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/questions": {
         parameters: {
             query?: never;
@@ -172,7 +192,7 @@ export interface paths {
         put?: never;
         /**
          * Create question
-         * @description Requires `primaryLocale` (en|be|ru|pl) and a full `translations[primaryLocale]` block (questionText, followUpQuestions, expectedConcepts, redFlags, sampleGoodAnswer). Metadata fields (role, category, tags, …) are stored flat on the question row.
+         * @description Requires `primaryLocale` (en|be|ru|pl) and a full `translations[primaryLocale]` block (questionText, followUpQuestions, expectedConcepts, redFlags, sampleGoodAnswer). Response rubric is resolved for `primaryLocale` (not `X-Locale`). Metadata fields (role, category, tags, …) are stored flat on the question row.
          */
         post: operations["QuestionController_create"];
         delete?: never;
@@ -489,6 +509,26 @@ export interface paths {
         put?: never;
         /** Start validation for single answer */
         post: operations["InterviewController_validateAnswer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/interviews/{id}/mark-demo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Mark an interview as the demo interview
+         * @description Admin-only. Flips the interview to demo and reassigns it to the demo account, removes the fabricated placeholder demo interview and demotes any other completed demo interview so exactly the marked completed interview plus the seeded pending one remain. Re-running the demo provisioning afterwards will not recreate the placeholder. Refused on production unless ALLOW_DEMO_SEED=true is set.
+         */
+        post: operations["InterviewController_markDemo"];
         delete?: never;
         options?: never;
         head?: never;
@@ -836,7 +876,7 @@ export interface components {
             ok: boolean;
         };
         /** @enum {string} */
-        ApiErrorCode: "BAD_REQUEST" | "VALIDATION_ERROR" | "INVALID_LOCALE" | "REGISTRATION_FAILED" | "UPLOAD_FAILED" | "UPLOAD_NOT_ALLOWED" | "UNAUTHORIZED" | "INVALID_CREDENTIALS" | "AUTHENTICATION_REQUIRED" | "CANDIDATE_SESSION_REQUIRED" | "INVALID_CANDIDATE_SESSION" | "INTERVIEW_TOKEN_REQUIRED" | "INVALID_INTERVIEW_TOKEN" | "FORBIDDEN" | "INSUFFICIENT_PERMISSIONS" | "ACCESS_DENIED" | "NOT_FOUND" | "QUESTION_NOT_FOUND" | "INTERVIEW_NOT_FOUND" | "USER_NOT_FOUND" | "FEEDBACK_NOT_FOUND" | "CONFLICT" | "QUESTION_IN_USE" | "VALIDATION_RUNNING" | "QUESTION_DUPLICATE" | "SERVICE_UNAVAILABLE" | "AI_PROVIDER_NOT_CONFIGURED" | "EMBEDDING_PROVIDER_NOT_CONFIGURED" | "INTERNAL_SERVER_ERROR";
+        ApiErrorCode: "BAD_REQUEST" | "VALIDATION_ERROR" | "INVALID_LOCALE" | "REGISTRATION_FAILED" | "UPLOAD_FAILED" | "UPLOAD_NOT_ALLOWED" | "ANSWER_ATTEMPT_LIMIT_REACHED" | "UNAUTHORIZED" | "INVALID_CREDENTIALS" | "AUTHENTICATION_REQUIRED" | "CANDIDATE_SESSION_REQUIRED" | "INVALID_CANDIDATE_SESSION" | "INTERVIEW_TOKEN_REQUIRED" | "INVALID_INTERVIEW_TOKEN" | "FORBIDDEN" | "INSUFFICIENT_PERMISSIONS" | "ACCESS_DENIED" | "NOT_FOUND" | "QUESTION_NOT_FOUND" | "INTERVIEW_NOT_FOUND" | "USER_NOT_FOUND" | "FEEDBACK_NOT_FOUND" | "CONFLICT" | "QUESTION_IN_USE" | "VALIDATION_RUNNING" | "QUESTION_DUPLICATE" | "SERVICE_UNAVAILABLE" | "AI_PROVIDER_NOT_CONFIGURED" | "EMBEDDING_PROVIDER_NOT_CONFIGURED" | "INTERNAL_SERVER_ERROR";
         ApiErrorResponseDto: {
             /** @example 400 */
             statusCode: number;
@@ -859,6 +899,18 @@ export interface components {
         AssignRoleDto: {
             /** @enum {string} */
             role: "super_admin" | "admin" | "hr" | "candidate";
+        };
+        DemoProvisionCountsDto: {
+            /** @example 1 */
+            users: number;
+            /** @example 3 */
+            questions: number;
+            /** @example 1 */
+            interviews: number;
+        };
+        DemoProvisionResponseDto: {
+            user: components["schemas"]["AuthUserResponseDto"];
+            counts: components["schemas"]["DemoProvisionCountsDto"];
         };
         QuestionExpectedConceptDto: {
             id: string;
@@ -971,6 +1023,10 @@ export interface components {
             /** Format: date-time */
             updatedAt: string;
             deleted: boolean;
+            /** @description True when deletion is scheduled because the question is still used by active interviews. */
+            pendingDeletion: boolean;
+            /** @description Present when pendingDeletion is true — active interviews still using this question. */
+            blockingInterviews?: components["schemas"]["QuestionDeleteBlockingInterviewDto"][];
             /** @description Number of times this question has been used in an interview. */
             usageCount: number;
             /**
@@ -1018,12 +1074,16 @@ export interface components {
             redFlags: components["schemas"]["QuestionRedFlagDto"][];
             sampleGoodAnswer: string;
         };
+        QuestionTranslationsMapDto: {
+            en?: components["schemas"]["QuestionTranslationDto"];
+            be?: components["schemas"]["QuestionTranslationDto"];
+            ru?: components["schemas"]["QuestionTranslationDto"];
+            pl?: components["schemas"]["QuestionTranslationDto"];
+        };
         QuestionDraftInputDto: {
             /** @enum {string} */
             primaryLocale?: "en" | "be" | "ru" | "pl";
-            translations?: {
-                [key: string]: components["schemas"]["QuestionTranslationDto"];
-            };
+            translations?: components["schemas"]["QuestionTranslationsMapDto"];
             questionText?: string;
             followUpQuestions?: string[];
             expectedConcepts?: components["schemas"]["QuestionExpectedConceptDto"][];
@@ -1079,12 +1139,6 @@ export interface components {
             roles: components["schemas"]["FacetCountDto"][];
             /** @description Tag value + count, given all OTHER current filters (tag overlap is not applied). */
             tags: components["schemas"]["FacetCountDto"][];
-        };
-        QuestionTranslationsMapDto: {
-            en?: components["schemas"]["QuestionTranslationDto"];
-            be?: components["schemas"]["QuestionTranslationDto"];
-            ru?: components["schemas"]["QuestionTranslationDto"];
-            pl?: components["schemas"]["QuestionTranslationDto"];
         };
         CreateQuestionDto: {
             /** @enum {string} */
@@ -1506,12 +1560,22 @@ export interface components {
             skippedCount: number;
             answers: components["schemas"]["StartAnswerValidationResultDto"][];
         };
+        MarkInterviewDemoResponseDto: {
+            /** @example true */
+            ok: boolean;
+            /** @example 00000000-0000-4000-8000-0000000000a1 */
+            interviewId: string;
+            /** @example true */
+            placeholderRemoved: boolean;
+        };
         PresignRequestDto: {
             questionIndex: number;
             /** @enum {string} */
             contentType: "video/webm";
             /** @enum {string} */
             mediaType?: "camera" | "screen";
+            /** @description Answer attempt/version being recorded. Omit when starting the next attempt. */
+            versionNumber?: number;
         };
         PresignedUrlResponseDto: {
             uploadUrl: string;
@@ -1532,6 +1596,8 @@ export interface components {
             contentType: "video/webm";
             /** @enum {string} */
             mediaType?: "camera" | "screen";
+            /** @description Answer attempt/version being recorded. Omit when starting the next attempt. */
+            versionNumber?: number;
         };
         MultipartUploadSessionResponseDto: {
             mediaKey: string;
@@ -1588,6 +1654,8 @@ export interface components {
         HealthResponseDto: {
             /** @example ok */
             status: string;
+            /** @example Lightsail backend is serving the latest deploy. */
+            message: string;
             /**
              * Format: date-time
              * @example 2026-05-05T12:00:00.000Z
@@ -1800,7 +1868,10 @@ export interface operations {
     AuthController_demo: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path?: never;
             cookie?: never;
         };
@@ -2009,6 +2080,44 @@ export interface operations {
                 };
             };
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    UserController_provisionDemo: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DemoProvisionResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -2855,7 +2964,10 @@ export interface operations {
     InterviewController_update: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path: {
                 id: string;
             };
@@ -2952,7 +3064,10 @@ export interface operations {
     InterviewController_cancel: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path: {
                 id: string;
             };
@@ -3152,6 +3267,54 @@ export interface operations {
                 };
             };
             503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    InterviewController_markDemo: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MarkInterviewDemoResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

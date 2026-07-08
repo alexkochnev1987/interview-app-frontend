@@ -2,7 +2,9 @@ import { ArrowRight, RotateCcw } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { Button } from '@/components/ui/button';
-import { Stack } from '@/components/ui/layout';
+import { Inline, Stack } from '@/components/ui/layout';
+import { BodyText } from '@/components/ui/text';
+import { MAX_ANSWER_ATTEMPTS_PER_QUESTION } from '@/features/take';
 import type { TakeStage } from '@/components/take/types';
 import type { InterviewerPresence } from '@/features/take/use-take-question-tts';
 
@@ -14,6 +16,8 @@ interface TakeRecordingActionsProps {
   recording: boolean;
   recordingStartBusy: boolean;
   interviewerPresence: InterviewerPresence;
+  retakeDisabled: boolean;
+  displayedAttemptNumber: number;
   onReconnect: () => void;
   onRerecord: () => void;
   onSubmit: () => void;
@@ -28,6 +32,8 @@ export function TakeRecordingActions({
   recording,
   recordingStartBusy,
   interviewerPresence,
+  retakeDisabled,
+  displayedAttemptNumber,
   onReconnect,
   onRerecord,
   onSubmit,
@@ -40,6 +46,7 @@ export function TakeRecordingActions({
     stage !== 'transition' &&
     !recordingStartBusy &&
     interviewerPresence === 'listening';
+  const retakeEnabled = versionActionsEnabled && !retakeDisabled;
 
   return (
     <Stack align="stretch" gap={3} width="full">
@@ -56,17 +63,31 @@ export function TakeRecordingActions({
         </Button>
       ) : null}
 
+      <Inline align="center" gap={1}>
+        <BodyText as="span" size="xs" tone="muted" weight="medium">
+          {tTake('attemptsMetricLabel')}
+        </BodyText>
+        <BodyText as="span" size="xs" tone="foreground" weight="semibold">
+          {displayedAttemptNumber}/{MAX_ANSWER_ATTEMPTS_PER_QUESTION}
+        </BodyText>
+      </Inline>
+
       <Button
         type="button"
         variant="outline"
         size="xl"
         width="full"
         onClick={onRerecord}
-        disabled={!versionActionsEnabled}
+        disabled={!retakeEnabled}
       >
         <RotateCcw size={18} strokeWidth={2} aria-hidden />
         {tTake('rerecordAsNewVersion')}
       </Button>
+      {versionActionsEnabled && retakeDisabled ? (
+        <BodyText size="xs" tone="muted">
+          {tTake('retakeDisabledAtLimitHint')}
+        </BodyText>
+      ) : null}
       <Button
         type="button"
         variant="gradient"

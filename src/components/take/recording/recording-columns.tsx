@@ -63,6 +63,8 @@ interface TakeRecordingSidebarColumnProps {
   progressValue: number;
   submitError: string;
   recordingStartBusy: boolean;
+  retakeDisabled: boolean;
+  displayedAttemptNumber: number;
   isBrowserTranscriptSupported: boolean;
   finalTranscript: string;
   interimTranscript: string;
@@ -84,6 +86,8 @@ export function TakeRecordingSidebarColumn({
   progressValue,
   submitError,
   recordingStartBusy,
+  retakeDisabled,
+  displayedAttemptNumber,
   isBrowserTranscriptSupported,
   finalTranscript,
   interimTranscript,
@@ -143,6 +147,8 @@ export function TakeRecordingSidebarColumn({
               recording={recording}
               recordingStartBusy={recordingStartBusy}
               interviewerPresence={interviewerPresence}
+              retakeDisabled={retakeDisabled}
+              displayedAttemptNumber={displayedAttemptNumber}
               onReconnect={onReconnect}
               onRerecord={onRerecord}
               onSubmit={onSubmit}

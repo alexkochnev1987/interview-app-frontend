@@ -119,6 +119,8 @@ function TakeInterviewClientInner({
     permissionTone,
     formatTime,
     interviewerPresence,
+    displayedAttemptNumber,
+    retakeDisabled,
   } = useTakeOrchestrator({
     id,
     candidateToken,
@@ -269,6 +271,8 @@ function TakeInterviewClientInner({
       interviewerPresence={interviewerPresence}
       formatTime={formatTime}
       recordingStartBusy={recordingStartBusy}
+      retakeDisabled={retakeDisabled}
+      displayedAttemptNumber={displayedAttemptNumber}
       onReconnect={restartFullInterviewCapture}
       onRerecord={() => requestVersionAction('rerecord')}
       onSubmit={() => requestVersionAction('submit')}
