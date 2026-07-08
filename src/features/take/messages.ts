@@ -113,6 +113,7 @@ export const TAKE_MESSAGES = {
   beforeUnloadLeaveInterview:
     'If you reload or leave now, you will exit this interview and may lose your progress. Are you sure?',
   attemptsMetricLabel: 'Attempts:',
+  retakeDisabledAtLimitHint: 'Retake is available only for attempts 1 and 2.',
   answerAttemptLimitReached: 'Recording attempt limit reached',
 } as const;
 

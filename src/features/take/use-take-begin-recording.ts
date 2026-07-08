@@ -5,11 +5,9 @@ import type { CaptureTarget, MultipartUploadSession, MultipartUploadState } from
 import { buildMediaRecorderOptions, pickSupportedMediaRecorderMimeType, TAKE_RECORDING_LIMIT_SECONDS } from './utils';
 import {
   isAnswerAttemptLimitError,
-  MAX_ANSWER_ATTEMPTS_PER_QUESTION,
   shouldSendAnswerProgressDuringRecording,
 } from './attempt-limit';
 import type { TakeMessageGetter } from './messages';
-import { notifyError } from '@/lib/toast';
 
 type PendingVersionAction = 'submit' | 'rerecord' | null;
 
@@ -147,14 +145,12 @@ export function useTakeBeginRecording({
       await abortMultipartUploads();
       clearRecordingArtifacts();
       if (isAnswerAttemptLimitError(err)) {
-        notifyError(
-          takeMessage('answerAttemptLimitReached', { max: MAX_ANSWER_ATTEMPTS_PER_QUESTION }),
-          { description: err instanceof Error ? err.message : undefined },
+        setSetupError(takeMessage('answerAttemptLimitReached'));
+      } else {
+        setSetupError(
+          err instanceof Error ? err.message : takeMessage('uploadFailedFallback'),
         );
       }
-      const message =
-        err instanceof Error ? err.message : takeMessage('uploadFailedFallback');
-      setSetupError(message);
       autoStartedQuestionKeyRef.current = '';
       setStage('interview');
       return;

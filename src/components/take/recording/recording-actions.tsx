@@ -83,6 +83,11 @@ export function TakeRecordingActions({
         <RotateCcw size={18} strokeWidth={2} aria-hidden />
         {tTake('rerecordAsNewVersion')}
       </Button>
+      {versionActionsEnabled && retakeDisabled ? (
+        <BodyText size="xs" tone="muted">
+          {tTake('retakeDisabledAtLimitHint')}
+        </BodyText>
+      ) : null}
       <Button
         type="button"
         variant="gradient"

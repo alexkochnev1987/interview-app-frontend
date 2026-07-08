@@ -96,6 +96,7 @@
     "languageBadgeInterviewAs": "Язык интервью {locale}",
     "beforeUnloadLeaveInterview": "Если вы перезагрузите компьютер или выйдете сейчас, вы выйдете из этого интервью и можете потерять свой прогресс. Вы уверены?",
     "attemptsMetricLabel": "Попытки:",
+    "retakeDisabledAtLimitHint": "Retake доступен только для попыток 1 и 2.",
     "answerAttemptLimitReached": "Достигнут лимит попыток записи"
   }
 }

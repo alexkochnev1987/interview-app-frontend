@@ -53,7 +53,8 @@ export function getDisplayedAttemptNumber(
   if (recording) {
     return currentVersionNumber;
   }
-  return getUsedAttempts(meta);
+  const usedAttempts = getUsedAttempts(meta);
+  return usedAttempts > 0 ? usedAttempts : 1;
 }
 
 export function isAnswerAttemptLimitError(error: unknown): boolean {
