@@ -2,14 +2,19 @@
   "onboarding": {
     "welcome": {
       "title": "Witamy w AI Interview Architect",
-      "description": "Krótki przewodnik po kluczowym procesie — baza pytań, uruchamianie interview, ocena wyników i zarządzanie zespołem.",
+      "description": "Krótki, około minutowy tour dla zespołów rekrutacyjnych: baza pytań, tworzenie interview, linki dla kandydatów i ocena wyników. Możesz pominąć w dowolnym momencie.",
       "start": "Rozpocznij tour",
       "skip": "Pomiń na razie"
     },
     "complete": {
       "title": "Wszystko gotowe",
-      "description": "Utwórz pierwsze interview, gdy będziesz gotowy. Tour możesz powtórzyć w dowolnym momencie z poziomu „Tour produktu” w nagłówku.",
-      "action": "Zacznij pracę"
+      "description": "Możesz już przejść przez cały workflow. Tour możesz powtórzyć w dowolnym momencie z poziomu „Tour produktu”.",
+      "action": "Zakończ tour",
+      "recapTitle": "Czego się właśnie nauczyłeś",
+      "recapQuestions": "Tworzyć i wzbogacać pytania z AI Draft",
+      "recapInterviews": "Składać interview z bazy pytań",
+      "recapCandidates": "Udostępniać bezpieczne linki dla kandydatów",
+      "recapAssessments": "Przeglądać i oceniać interview z pomocą AI"
     },
     "tour": {
       "next": "Dalej",
@@ -22,44 +27,48 @@
     },
     "steps": {
       "dashboardHero": {
-        "title": "Twoje centrum dowodzenia",
-        "description": "Monitoruj aktywne interview, metryki pipeline’u i codzienne priorytety z jednego ekranu głównego."
-      },
-      "dashboardActions": {
-        "title": "Szybkie akcje",
-        "description": "Uruchom nowe interview lub otwórz bazę pytań bez opuszczania panelu."
+        "title": "Twoja baza główna",
+        "description": "Tutaj trafiasz po zalogowaniu. Znajdziesz tu ostatnie interview i szybkie akcje."
       },
       "questionsLibrary": {
-        "title": "Baza pytań",
-        "description": "Centralna biblioteka pytań — uporządkowana, przeszukiwalna i gotowa do każdej sesji."
+        "title": "Najpierw zbuduj bazę pytań",
+        "description": "Interview są składane z pytań, więc to naturalne miejsce startu."
+      },
+      "questionsText": {
+        "title": "Napisz treść pytania",
+        "description": "Zacznij od głównej treści pytania. Następnie użyj AI Draft, aby wygenerować follow-upy, rubric i przykładową dobrą odpowiedź."
+      },
+      "questionsAiDraft": {
+        "title": "Wygeneruj AI draft",
+        "description": "Kliknij Generate AI Draft, aby uzupełnić szczegóły pytania na podstawie promptu."
+      },
+      "questionsAiApply": {
+        "title": "Zastosuj draft",
+        "description": "Przejrzyj wygenerowane sugestie, a następnie kliknij Apply All, aby dodać je do pytania."
       },
       "questionsCreate": {
-        "title": "Utwórz pytanie",
-        "description": "Dodawaj pytania dopasowane do ról z poziomem trudności, kategorią i kryteriami oceny."
+        "title": "Zapisz pytanie",
+        "description": "Kliknij Create Question, aby zapisać pytanie z detalami wygenerowanymi przez AI."
       },
       "assessmentsIntro": {
         "title": "Przestrzeń oceny",
         "description": "Gdy kandydaci zakończą sesje, wracaj tutaj, aby oceniać odpowiedzi, wyniki i analizy AI."
       },
-      "assessmentsBrowse": {
-        "title": "Pipeline interview",
-        "description": "Przeglądaj aktywne i zakończone oceny. Otwórz kartę, aby zobaczyć transkrypcje, nagrania i wyniki."
+      "assessmentsEvaluation": {
+        "title": "Uruchom AI evaluation",
+        "description": "Ta karta jest gotowa do AI review. Kliknij Start AI evaluation, aby ocenić przesłane interview."
       },
-      "interviewIntro": {
-        "title": "Uruchom interview",
-        "description": "Skonfiguruj sesję kandydata w jednym miejscu — profil, wybór pytań i link dla kandydata."
+      "candidateLink": {
+        "title": "Udostępnij link kandydatowi",
+        "description": "Skopiuj ten link i wyślij go kandydatowi. Kandydat przechodzi interview przez take flow."
       },
       "interviewCandidate": {
         "title": "Profil kandydata",
-        "description": "Podaj imię i docelową rolę, aby każda sesja była wyraźnie oznaczona w pipeline’ie."
+        "description": "Podaj imię i docelową rolę, a następnie kliknij Create Interview. Po utworzeniu interview przejdziemy do linku kandydata."
       },
       "interviewPicker": {
-        "title": "Wybór pytań",
-        "description": "Wyszukaj pytania w bazie, wybierz je do sesji i utwórz interview, aby wysłać link kandydatowi."
-      },
-      "teamActions": {
-        "title": "Akcje zespołu",
-        "description": "Użyj akcji w wierszu, aby zmieniać role i zarządzać dostępem członków zespołu."
+        "title": "Wybierz co najmniej jedno pytanie",
+        "description": "Wyszukaj pytania w bazie i wybierz co najmniej jedno do tej sesji. Gdy tylko je zaznaczysz, przejdziemy do utworzenia interview."
       }
     }
   }

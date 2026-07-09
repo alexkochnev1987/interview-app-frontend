@@ -37,7 +37,8 @@ export async function resolveOnboardingSteps(
 
   for (const step of visibleSteps) {
     const isDeferred =
-      step.route != null && !isOnboardingRoute(pathname, step.route);
+      step.route != null &&
+      !isOnboardingRoute(pathname, step.route, step.routeMatch);
 
     if (isDeferred) {
       resolved.push(step);

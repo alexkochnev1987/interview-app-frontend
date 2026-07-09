@@ -39,7 +39,7 @@ export function AiDraftPanel({
   const labels = useQuestionEditorLabels()
 
   return (
-    <Card variant="surface">
+    <Card variant="surface" data-tour="ai-draft-panel">
       <CardHeader spacing="lg">
         <Stack gap={1.5}>
           <Inline gap={3} align="start" justify="between">
@@ -65,6 +65,7 @@ export function AiDraftPanel({
                 type="button"
                 variant="outline-pill"
                 shape="pill"
+                data-tour="ai-draft-apply-all"
                 onClick={onApplyAll}
               >
                 {labels.applyAll}
@@ -73,6 +74,7 @@ export function AiDraftPanel({
             <Button
               type="button"
               variant="gradient"
+              data-tour="ai-draft-generate"
               onClick={onGenerate}
               disabled={disabled}
               loading={loading}

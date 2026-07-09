@@ -16,6 +16,11 @@ import {
 import { prepareOnboardingStep } from '@/features/onboarding/prepare-onboarding-step'
 import { resolveOnboardingSteps } from '@/features/onboarding/resolve-onboarding-steps'
 import { getDriverProgressTemplate } from '@/features/onboarding/tour-progress-template'
+import {
+  clearStoredOnboardingStep,
+  getStoredOnboardingStep,
+  storeOnboardingStep,
+} from '@/features/onboarding/onboarding-progress'
 import { usePathname, useRouter } from '@/i18n/navigation'
 import type { Locale } from '@/i18n/locales'
 import type {
@@ -24,6 +29,7 @@ import type {
   OnboardingStepContent,
   ResolvedOnboardingStep,
 } from '@/features/onboarding/types'
+import type { OnboardingEventDetail } from '@/features/onboarding/onboarding-events'
 
 export type OnboardingPhase =
   | 'idle'
@@ -49,10 +55,13 @@ export function useOnboardingTour({
   const pathname = usePathname()
   const router = useRouter()
   const pathnameRef = useRef(pathname)
-  pathnameRef.current = pathname
   const driverRef = useRef<Driver | null>(null)
   const completedRef = useRef(false)
   const [phase, setPhase] = useState<OnboardingPhase>('idle')
+
+  useEffect(() => {
+    pathnameRef.current = pathname
+  }, [pathname])
 
   useEffect(() => {
     if (phase !== 'welcome' && phase !== 'touring' && phase !== 'complete') {
@@ -68,11 +77,12 @@ export function useOnboardingTour({
   }, [phase])
 
   const prepareStep = useCallback(
-    async (step: ResolvedOnboardingStep) =>
+    async (step: ResolvedOnboardingStep, detail?: OnboardingEventDetail) =>
       prepareOnboardingStep({
         step,
-        pathname: pathnameRef.current,
+        getPathname: () => pathnameRef.current,
         push: router.push,
+        routeOverride: detail?.nextRoute,
       }),
     [router],
   )
@@ -95,14 +105,22 @@ export function useOnboardingTour({
   }, [])
 
   const runTour = useCallback(
-    async (options?: { skipWelcome?: boolean }) => {
+    async (options?: { skipWelcome?: boolean; startStepId?: string | null }) => {
       await stopTour()
       completedRef.current = false
 
+      if (!options?.startStepId) {
+        clearStoredOnboardingStep()
+      }
+
       const flow = getOnboardingFlow(flowId)
       const resolvedSteps = await resolveOnboardingSteps(flow, context, pathname)
+      const startIndex = options?.startStepId
+        ? resolvedSteps.findIndex((step) => step.id === options.startStepId)
+        : 0
 
-      if (resolvedSteps.length === 0) {
+      if (resolvedSteps.length === 0 || startIndex < 0) {
+        clearStoredOnboardingStep()
         setPhase('idle')
         return false
       }
@@ -119,8 +137,12 @@ export function useOnboardingTour({
         translateStep,
         labels,
         prepareStep,
+        onStepActive: (step) => {
+          storeOnboardingStep(flowId, step.id)
+        },
         onDone: () => {
           completedRef.current = true
+          clearStoredOnboardingStep()
           void onTourComplete?.()
           setPhase('complete')
         },
@@ -130,6 +152,7 @@ export function useOnboardingTour({
         labels,
         isComplete: () => completedRef.current,
         onSkip: () => {
+          clearStoredOnboardingStep()
           void onTourSkip?.()
           setPhase('idle')
         },
@@ -138,10 +161,11 @@ export function useOnboardingTour({
       driverRef.current = driver
       setPhase('touring')
 
-      const firstStep = resolvedSteps[0]
+      const firstStep = resolvedSteps[startIndex]
+      storeOnboardingStep(flowId, firstStep.id)
       await prepareStep(firstStep)
 
-      driver.drive()
+      driver.drive(startIndex)
 
       if (options?.skipWelcome) {
         return true
@@ -152,6 +176,23 @@ export function useOnboardingTour({
     [context, flowId, locale, onTourComplete, onTourSkip, pathname, prepareStep, stopTour, t, translateStep],
   )
 
+  useEffect(() => {
+    if (phase !== 'idle') {
+      return
+    }
+
+    const storedStepId = getStoredOnboardingStep(flowId)
+    if (!storedStepId) {
+      return
+    }
+
+    const timer = window.setTimeout(() => {
+      void runTour({ skipWelcome: true, startStepId: storedStepId })
+    }, 0)
+
+    return () => window.clearTimeout(timer)
+  }, [flowId, phase, runTour])
+
   const startFromWelcome = useCallback(async () => {
     const started = await runTour()
     if (!started) {
@@ -160,11 +201,13 @@ export function useOnboardingTour({
   }, [runTour])
 
   const skipFromWelcome = useCallback(async () => {
+    clearStoredOnboardingStep()
     setPhase('idle')
     await onTourSkip?.()
   }, [onTourSkip])
 
   const replayTour = useCallback(async () => {
+    clearStoredOnboardingStep()
     await runTour({ skipWelcome: true })
   }, [runTour])
 

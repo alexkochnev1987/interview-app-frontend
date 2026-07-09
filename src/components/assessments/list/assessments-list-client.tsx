@@ -65,6 +65,12 @@ export function AssessmentsListClient({
       return matchesQuery(interview, normalizedQuery)
     })
   }, [interviews, status, deferredQuery])
+  const tourAssessmentId = useMemo(
+    () =>
+      filtered.find((interview) => deriveReviewStatus(interview) === 'ready_to_score')
+        ?.id,
+    [filtered],
+  )
 
   return (
     <EvaluationActionsProvider onEvaluationStarted={onEvaluationStarted}>
@@ -94,11 +100,11 @@ export function AssessmentsListClient({
           />
         ) : (
           <CardGrid>
-            {filtered.map((interview, index) => (
+            {filtered.map((interview) => (
               <AssessmentCard
                 key={interview.id}
                 interview={interview}
-                tourTarget={index === 0 ? 'assessments-card' : undefined}
+                tourTarget={interview.id === tourAssessmentId ? 'assessments-card' : undefined}
               />
             ))}
           </CardGrid>

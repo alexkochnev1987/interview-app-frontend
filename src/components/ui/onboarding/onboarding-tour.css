@@ -1,6 +1,7 @@
 @import 'driver.js/dist/driver.css';
 
 .onboarding-tour-popover.driver-popover {
+  width: min(24rem, calc(100vw - 2rem));
   min-width: min(22rem, calc(100vw - 2rem));
   max-width: min(24rem, calc(100vw - 2rem));
   border-radius: var(--radius);
@@ -9,23 +10,11 @@
   color: hsl(var(--foreground));
   box-shadow: var(--shadow-float);
   padding: 2.25rem 1.125rem 1rem;
-  animation: onboarding-popover-in 0.26s ease-out;
-}
-
-@keyframes onboarding-popover-in {
-  from {
-    opacity: 0;
-    transform: scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .onboarding-tour-popover.driver-popover {
-    animation: onboarding-popover-in 0.2s ease-out;
+  .driver-fade .driver-popover {
+    animation: none;
   }
 }
 
@@ -99,10 +88,7 @@
   transition: color var(--transition);
 }
 
-.onboarding-tour-popover .driver-popover-close-btn:hover,
-.onboarding-tour-popover .driver-popover-close-btn:focus,
-.onboarding-tour-popover .driver-popover-close-btn:focus-visible,
-.onboarding-tour-popover .driver-popover-close-btn:active {
+.onboarding-tour-popover .driver-popover-close-btn:is(:hover, :focus, :focus-visible, :active) {
   background: none;
   background-color: transparent;
   color: hsl(var(--foreground));
@@ -149,40 +135,32 @@
 }
 
 .onboarding-tour-popover .driver-popover-arrow-side-top {
-  border-top-color: hsl(var(--card) / 0.96);
-  border-right-color: transparent;
-  border-bottom-color: transparent;
-  border-left-color: transparent;
+  border-color: hsl(var(--card) / 0.96) transparent transparent transparent;
 }
 
 .onboarding-tour-popover .driver-popover-arrow-side-bottom {
-  border-bottom-color: hsl(var(--card) / 0.96);
-  border-left-color: transparent;
-  border-top-color: transparent;
-  border-right-color: transparent;
+  border-color: transparent transparent hsl(var(--card) / 0.96) transparent;
 }
 
 .onboarding-tour-popover .driver-popover-arrow-side-left {
-  border-left-color: hsl(var(--card) / 0.96);
-  border-right-color: transparent;
-  border-bottom-color: transparent;
-  border-top-color: transparent;
+  border-color: transparent transparent transparent hsl(var(--card) / 0.96);
 }
 
 .onboarding-tour-popover .driver-popover-arrow-side-right {
-  border-right-color: hsl(var(--card) / 0.96);
-  border-left-color: transparent;
-  border-bottom-color: transparent;
-  border-top-color: transparent;
+  border-color: transparent hsl(var(--card) / 0.96) transparent transparent;
 }
 
-.onboarding-tour-popover .driver-popover-arrow-side-left.driver-popover-arrow-align-center,
-.onboarding-tour-popover .driver-popover-arrow-side-right.driver-popover-arrow-align-center {
+.onboarding-tour-popover :is(
+  .driver-popover-arrow-side-left.driver-popover-arrow-align-center,
+  .driver-popover-arrow-side-right.driver-popover-arrow-align-center
+) {
   margin-top: -8px;
 }
 
-.onboarding-tour-popover .driver-popover-arrow-side-top.driver-popover-arrow-align-center,
-.onboarding-tour-popover .driver-popover-arrow-side-bottom.driver-popover-arrow-align-center {
+.onboarding-tour-popover :is(
+  .driver-popover-arrow-side-top.driver-popover-arrow-align-center,
+  .driver-popover-arrow-side-bottom.driver-popover-arrow-align-center
+) {
   margin-left: -8px;
 }
 
@@ -191,7 +169,6 @@
   filter: none !important;
 }
 
-/* Ring/shadow sit outside the layout box; hide them so the overlay cutout fits flush. */
 .driver-active .driver-active-element {
   position: relative;
   z-index: 10001;
@@ -208,9 +185,4 @@
     max-width: none;
     transform: none !important;
   }
-}
-
-/* Keep right-aligned nav steps inside the viewport. */
-.onboarding-tour-popover.driver-popover {
-  max-width: min(24rem, calc(100vw - 2rem));
 }

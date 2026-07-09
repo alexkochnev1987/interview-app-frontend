@@ -1,6 +1,5 @@
 import {
   canConfigureInterview,
-  canManageTeam,
   canReadQuestions,
   canReviewAssessments,
 } from '@/lib/auth-roles';
@@ -16,22 +15,14 @@ function evaluateVisibilityRule(
   context: OnboardingRuntimeContext,
 ): boolean {
   switch (rule.type) {
-    case 'anyRole':
-      return rule.roles.includes(context.role ?? '');
-    case 'permission':
-      return context.permissions?.includes(rule.permission) ?? false;
-    case 'featureFlag':
-      return context.featureFlags?.[rule.flag] === true;
-    case 'canManageTeam':
-      return canManageTeam(context.role);
+    case 'notDemo':
+      return context.isDemo !== true;
     case 'canReadQuestions':
       return canReadQuestions(context.role);
     case 'canReviewAssessments':
       return canReviewAssessments(context.role);
     case 'canConfigureInterview':
       return canConfigureInterview(context.role);
-    default:
-      return true;
   }
 }
 

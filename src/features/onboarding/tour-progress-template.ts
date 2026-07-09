@@ -1,9 +1,5 @@
 import type { Locale } from '@/i18n/locales'
 
-/**
- * Driver.js replaces {{current}} / {{total}} itself.
- * These templates must not go through next-intl — ICU parsing breaks on {{ }}.
- */
 const DRIVER_PROGRESS_TEMPLATES: Record<Locale, string> = {
   en: '{{current}} of {{total}}',
   be: '{{current}} з {{total}}',

@@ -8,11 +8,11 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 
-const overlayVariants = cva('fixed inset-0 bg-scrim/55 backdrop-blur-sm', {
+const overlayVariants = cva('fixed inset-0', {
   variants: {
     layer: {
-      default: 'z-50',
-      tour: 'z-[1000000001]',
+      default: 'z-50 bg-scrim/55',
+      tour: 'z-[1000000001] bg-black/45',
     },
   },
   defaultVariants: {
@@ -95,7 +95,10 @@ export function ModalShell({
               {accessibilityDescription}
             </DialogPrimitive.Description>
           ) : null}
-          <Card variant="floating" className="w-full">
+          <Card
+            variant={layer === 'tour' ? 'floatingSolid' : 'floating'}
+            className="w-full"
+          >
             {children}
           </Card>
         </DialogPrimitive.Content>

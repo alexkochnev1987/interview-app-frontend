@@ -77,13 +77,34 @@ export function SideNav() {
       ? [{ href: '/', label: tNav('dashboard'), icon: LayoutDashboard }]
       : []),
     ...(canReadQuestions(user?.role)
-      ? [{ href: routes.questions.list, label: tNav('questions'), icon: LibraryBig }]
+      ? [
+          {
+            href: routes.questions.list,
+            label: tNav('questions'),
+            icon: LibraryBig,
+            dataTour: 'questions-nav',
+          },
+        ]
       : []),
     ...(canReviewAssessments(user?.role)
-      ? [{ href: '/assessments', label: tNav('assessments'), icon: ClipboardList }]
+      ? [
+          {
+            href: '/assessments',
+            label: tNav('assessments'),
+            icon: ClipboardList,
+            dataTour: 'assessments-nav',
+          },
+        ]
       : []),
     ...(canConfigureInterview(user?.role) && !isDemo
-      ? [{ href: '/interviews/new', label: tNav('newInterview'), icon: Plus }]
+      ? [
+          {
+            href: '/interviews/new',
+            label: tNav('newInterview'),
+            icon: Plus,
+            dataTour: 'new-interview-nav',
+          },
+        ]
       : []),
     ...(canManageTeam(user?.role)
       ? [{ href: '/team', label: tNav('team'), icon: Users }]
@@ -138,13 +159,14 @@ export function SideNav() {
       }
       nav={
         user
-          ? links.map(({ href, label, icon: LinkIcon }) => (
+          ? links.map(({ href, label, icon: LinkIcon, dataTour }) => (
               <SideNavLink
                 key={href}
                 href={href}
                 label={label}
                 icon={<LinkIcon />}
                 active={isActive(href)}
+                dataTour={dataTour}
               />
             ))
           : null
@@ -161,13 +183,9 @@ export function SideNav() {
                   size="sm"
                   effects="blur"
                   width="full"
-                  aria-label={tOnboarding('tour.replay')}
-                  title={tOnboarding('tour.replay')}
                   onClick={() => void replayTour()}
                 >
-                  <BodyText as="span" size="sm-tight" tone="foreground" weight="semibold" aria-hidden>
-                    ?
-                  </BodyText>
+                  {tOnboarding('tour.replay')}
                 </Button>
               ) : null}
               {languageSwitcher}

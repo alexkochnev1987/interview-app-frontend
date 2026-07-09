@@ -83,7 +83,7 @@ export function CandidateAccessPanel({
         <CardDescription>{t('interviewLinkDescription')}</CardDescription>
       </CardHeader>
       <CardContent spacing="xl">
-        <SurfaceTile tone="glass" padding="lg">
+        <SurfaceTile tone="glass" padding="lg" data-tour="candidate-link">
           <Stack gap={3}>
             <Inline gap={3} align="center" justify="between" wrap="wrap">
               <BodyText as="span" size="sm-tight" tone="foreground">

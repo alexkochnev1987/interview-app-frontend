@@ -47,8 +47,9 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
   const runtimeContext = useMemo(
     () => ({
       role: user?.role,
+      isDemo: user?.demo === true,
     }),
-    [user?.role],
+    [user?.demo, user?.role],
   )
 
   const persistOnboarding = useCallback(

@@ -4,6 +4,8 @@ import type { OnboardingTourLabels } from '@/features/onboarding/types';
 
 import '@/components/ui/onboarding/onboarding-tour.css';
 
+export const DEFAULT_STAGE_RADIUS = 14;
+
 export type CreateOnboardingDriverParams = {
   steps: DriveStep[];
   labels: OnboardingTourLabels;
@@ -19,7 +21,7 @@ export async function createOnboardingDriver(
   const instance = driver({
     steps: params.steps,
     animate: true,
-    smoothScroll: true,
+    smoothScroll: false,
     showProgress: true,
     progressText: params.labels.progress,
     nextBtnText: params.labels.next,
@@ -28,9 +30,10 @@ export async function createOnboardingDriver(
     popoverClass: 'onboarding-tour-popover',
     overlayOpacity: 0.45,
     stagePadding: 0,
-    stageRadius: 14,
+    stageRadius: DEFAULT_STAGE_RADIUS,
     popoverOffset: 16,
     allowClose: true,
+    overlayClickBehavior: () => {},
     onCloseClick: () => {
       instance.destroy();
     },

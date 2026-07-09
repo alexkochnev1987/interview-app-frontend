@@ -7,6 +7,7 @@ interface QuestionEditorFieldProps {
   hint?: string
   labelTooltip?: ReactNode
   labelTooltipLabel?: string
+  dataTour?: string
   htmlFor: string
   label: string
   error?: string
@@ -17,6 +18,7 @@ export function QuestionEditorField({
   hint,
   labelTooltip,
   labelTooltipLabel,
+  dataTour,
   htmlFor,
   label,
   error,
@@ -28,6 +30,7 @@ export function QuestionEditorField({
       hint={hint}
       labelTooltip={labelTooltip}
       labelTooltipLabel={labelTooltipLabel}
+      dataTour={dataTour}
       error={error}
     >
       {children}

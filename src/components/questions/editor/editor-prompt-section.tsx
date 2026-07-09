@@ -62,6 +62,7 @@ export function EditorPromptSection({
           >
             <Textarea
               id={`questionText-${locale}`}
+              data-tour={isPrimaryLocale ? 'question-text' : undefined}
               size="xs"
               value={contentDraft.questionText}
               onChange={(event) =>

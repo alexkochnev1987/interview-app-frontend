@@ -2,14 +2,19 @@
   "onboarding": {
     "welcome": {
       "title": "Welcome to AI Interview Architect",
-      "description": "A guided tour of the core workflow—build your question bank, launch interviews, review assessments, and manage team access.",
+      "description": "A quick one-minute tour for hiring teams: build your question bank, create interviews, share candidate links, and review assessments. You can skip anytime.",
       "start": "Start tour",
       "skip": "Skip for now"
     },
     "complete": {
       "title": "You're all set",
-      "description": "Create your first interview when you're ready. Replay this tour anytime from Product tour in the header.",
-      "action": "Get started"
+      "description": "You're ready to run the workflow. You can replay this tour anytime from Product tour.",
+      "action": "Complete tour",
+      "recapTitle": "What you just learned",
+      "recapQuestions": "Build and enrich questions with AI Draft",
+      "recapInterviews": "Assemble interviews from your question bank",
+      "recapCandidates": "Share secure candidate links",
+      "recapAssessments": "Review and AI-score completed interviews"
     },
     "tour": {
       "next": "Next",
@@ -22,44 +27,48 @@
     },
     "steps": {
       "dashboardHero": {
-        "title": "Your command center",
-        "description": "Track active interviews, pipeline metrics, and daily priorities from a single home screen."
-      },
-      "dashboardActions": {
-        "title": "Quick actions",
-        "description": "Launch a new interview or open the question bank without leaving the dashboard."
+        "title": "Your home base",
+        "description": "This is where you land after logging in. Recent interviews and quick actions live here."
       },
       "questionsLibrary": {
-        "title": "Question bank",
-        "description": "Your centralized library of interview questions—organized, searchable, and ready for any session."
+        "title": "Build your question bank first",
+        "description": "Interviews are assembled from questions, so this is the natural place to start."
+      },
+      "questionsText": {
+        "title": "Write the question prompt",
+        "description": "Start with the main question text. Then use AI Draft to generate the follow-ups, rubric, and sample answer."
+      },
+      "questionsAiDraft": {
+        "title": "Generate an AI draft",
+        "description": "Click Generate AI Draft to fill in the supporting question details from your prompt."
+      },
+      "questionsAiApply": {
+        "title": "Apply the draft",
+        "description": "Review the generated suggestions, then click Apply All to add them to the question."
       },
       "questionsCreate": {
-        "title": "Create a question",
-        "description": "Add role-specific prompts with difficulty, category, and scoring criteria for consistent evaluations."
+        "title": "Save the question",
+        "description": "Click Create Question to save the question with the AI-generated details."
       },
       "assessmentsIntro": {
         "title": "Review workspace",
         "description": "When candidates finish their sessions, return here to evaluate responses, scores, and AI-generated insights."
       },
-      "assessmentsBrowse": {
-        "title": "Interview pipeline",
-        "description": "Browse active and completed assessments. Open any card to review transcripts, recordings, and results."
+      "assessmentsEvaluation": {
+        "title": "Start AI evaluation",
+        "description": "This card is ready for AI review. Click Start AI evaluation to score the submitted interview."
       },
-      "interviewIntro": {
-        "title": "Launch an interview",
-        "description": "Configure a candidate session in one place—profile details, question selection, and sharing the link."
+      "candidateLink": {
+        "title": "Share the candidate link",
+        "description": "Copy this link and send it to the candidate. They complete the interview through the take flow."
       },
       "interviewCandidate": {
         "title": "Candidate profile",
-        "description": "Enter the candidate's name and target role so each session is clearly labeled in your pipeline."
+        "description": "Enter the candidate's name and target role, then click Create Interview. We'll continue on the candidate link after it is created."
       },
       "interviewPicker": {
-        "title": "Select questions",
-        "description": "Search your bank, choose prompts for this session, then create the interview to send the candidate link."
-      },
-      "teamActions": {
-        "title": "Team actions",
-        "description": "Use row actions to change roles and manage each teammate's access."
+        "title": "Select at least one question",
+        "description": "Search your bank and pick at least one question for this session. As soon as you select one, we'll move on to creating the interview."
       }
     }
   }

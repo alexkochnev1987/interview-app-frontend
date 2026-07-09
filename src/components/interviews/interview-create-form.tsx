@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { ArrowRight, BriefcaseBusiness, UserRound } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 
@@ -33,6 +33,11 @@ import { createInterview, type Question } from '@/lib/api'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
 import { runMutation } from '@/lib/run-mutation'
 import { useToastMessages } from '@/lib/use-toast-messages'
+import {
+  emitOnboardingEvent,
+  ONBOARDING_EVENT_NAMES,
+} from '@/features/onboarding/onboarding-events'
+import { getStoredOnboardingCreatedQuestionId } from '@/features/onboarding/onboarding-progress'
 
 type InterviewCreateFormProps = {
   initialPrefetch: QuestionsLibraryPrefetch
@@ -66,6 +71,21 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
     serverHydrated: true,
   })
   const { selectedCount, selectedById } = picker
+
+  const highlightQuestionId = useMemo(
+    () => getStoredOnboardingCreatedQuestionId(),
+    [],
+  )
+
+  const selectionAnnouncedRef = useRef(false)
+  useEffect(() => {
+    if (selectedCount > 0 && !selectionAnnouncedRef.current) {
+      selectionAnnouncedRef.current = true
+      emitOnboardingEvent(ONBOARDING_EVENT_NAMES.questionSelected)
+    } else if (selectedCount === 0) {
+      selectionAnnouncedRef.current = false
+    }
+  }, [selectedCount])
 
   const questionsMissingInterviewLocale = useMemo(
     () =>
@@ -110,7 +130,14 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
             toastMessages.apiError.message(error) ?? toastMessages.interview.createError,
         },
       )
-      router.push(`/interviews/${interview.id}`)
+      const nextRoute = `/interviews/${interview.id}`
+      const handledByOnboarding = emitOnboardingEvent(ONBOARDING_EVENT_NAMES.interviewCreated, {
+        nextRoute,
+      })
+
+      if (!handledByOnboarding) {
+        router.push(nextRoute)
+      }
     } catch {
       return
     } finally {
@@ -236,7 +263,7 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
             title={t('selectionTitle')}
             description={t('selectionDescription')}
             disabled={submitting || isDemo}
-            data-tour="interview-picker"
+            highlightQuestionId={highlightQuestionId}
           />
         </Grid>
       </form>

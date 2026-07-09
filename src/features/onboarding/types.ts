@@ -1,27 +1,39 @@
+import type { OnboardingEventName } from '@/features/onboarding/onboarding-events';
+
 export type OnboardingFlowId =
-  | 'staff-first-login'
-  | 'admin-onboarding'
-  | 'feature-tour';
+  | 'staff-first-login';
 
 export type OnboardingMissingTargetBehavior = 'skip' | 'wait';
 
 export type OnboardingVisibilityRule =
-  | { type: 'anyRole'; roles: readonly string[] }
-  | { type: 'permission'; permission: string }
-  | { type: 'featureFlag'; flag: string }
-  | { type: 'canManageTeam' }
+  | { type: 'notDemo' }
   | { type: 'canReadQuestions' }
   | { type: 'canReviewAssessments' }
   | { type: 'canConfigureInterview' };
+
+export type OnboardingAdvanceConfig =
+  | { mode?: 'next' }
+  | {
+      mode: 'event';
+      eventName: OnboardingEventName;
+    };
 
 export type OnboardingStepConfig = {
   id: string;
   target: string;
   contentKey: string;
   route?: string;
+  routeMatch?: 'exact' | 'prefix';
+  advance?: OnboardingAdvanceConfig;
   visibility?: readonly OnboardingVisibilityRule[];
   missingTarget?: OnboardingMissingTargetBehavior;
   waitTimeoutMs?: number;
+  preservePageTop?: boolean;
+  preserveCurrentScroll?: boolean;
+  pageScrollTop?: number;
+  scrollIntoViewBlock?: ScrollLogicalPosition;
+  stageRadius?: number;
+  lockPopoverPlacement?: 'bottom-start' | 'bottom-end';
   popoverSide?: 'top' | 'right' | 'bottom' | 'left';
   popoverAlign?: 'start' | 'center' | 'end';
 };
@@ -33,8 +45,7 @@ export type OnboardingFlowConfig = {
 
 export type OnboardingRuntimeContext = {
   role: string | null | undefined;
-  permissions?: readonly string[];
-  featureFlags?: Readonly<Record<string, boolean>>;
+  isDemo?: boolean;
 };
 
 export type ResolvedOnboardingStep = OnboardingStepConfig;
