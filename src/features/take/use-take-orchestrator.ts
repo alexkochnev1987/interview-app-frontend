@@ -37,6 +37,12 @@ import {
   type QuestionSpeechSynthCapture,
 } from './use-take-question-tts';
 import type { Locale } from '@/i18n/locales';
+import {
+  canStartNewAttempt,
+  canRequestRetake,
+  getDisplayedAttemptNumber,
+  resolveInitialVersionNumber,
+} from './attempt-limit';
 
 type PendingVersionAction = 'submit' | 'rerecord' | null;
 
@@ -246,10 +252,37 @@ export function useTakeOrchestrator({
     syncVideoPreview(screenVideoRef.current, screenStreamRef.current);
   }, [stage, recording]);
 
+  const syncAnswerMetaFromProgress = useCallback(
+    (meta: {
+      versionCount: number;
+      selectedVersionNumber: number;
+      status?: 'recording' | 'submitted';
+    }) => {
+      setInterview((previous) => {
+        if (!previous) {
+          return previous;
+        }
+
+        return {
+          ...previous,
+          currentAnswerMeta: {
+            status: meta.status ?? previous.currentAnswerMeta?.status ?? 'recording',
+            versionCount: meta.versionCount,
+            selectedVersionNumber: meta.selectedVersionNumber,
+          },
+        };
+      });
+      setCurrentVersionNumber(meta.selectedVersionNumber);
+      currentVersionNumberRef.current = meta.selectedVersionNumber;
+    },
+    [],
+  );
+
   const {
     startMultipartUploadSession,
     flushAnswerProgress,
     enqueueProgressFlush,
+    waitForProgressFlush,
     scheduleProgressFlush,
     startProgressHeartbeat,
     queueBufferedUpload,
@@ -258,7 +291,7 @@ export function useTakeOrchestrator({
     abortMultipartUploads,
   } = useTakeAnswerPersistence({
     id,
-    interview,
+    onAnswerMetaUpdated: syncAnswerMetaFromProgress,
     currentVersionNumberRef,
     answerStartedAtRef,
     answerStoppedAtMsRef,
@@ -414,6 +447,7 @@ export function useTakeOrchestrator({
     setCurrentVersionNumber,
     setRetakeCount,
     enqueueProgressFlush,
+    waitForProgressFlush,
     queueBufferedUpload,
     completeMultipartUpload,
     abortMultipartUploads,
@@ -432,6 +466,7 @@ export function useTakeOrchestrator({
     clearRecordingArtifacts,
     invokeBeginRecording: (nextVersionNumber, currentQuestionIndex) =>
       beginRecordingRef.current(nextVersionNumber, currentQuestionIndex),
+    onAnswerMetaUpdated: syncAnswerMetaFromProgress,
     takeMessage,
   });
 
@@ -570,6 +605,7 @@ export function useTakeOrchestrator({
       requestSubmitAction();
       return;
     }
+
     setSubmitError('');
     baseRequestVersionAction(action);
   }
@@ -659,6 +695,9 @@ export function useTakeOrchestrator({
     if (!questionSpeechRecordingAllowedRef.current) {
       return;
     }
+    if (!canStartNewAttempt(interview.currentAnswerMeta)) {
+      return;
+    }
 
     const questionKey = `${interview.currentQuestionIndex}:${interview.currentAnswerMeta?.versionCount ?? 0}`;
     if (autoStartedQuestionKeyRef.current === questionKey) {
@@ -666,12 +705,15 @@ export function useTakeOrchestrator({
     }
 
     autoStartedQuestionKeyRef.current = questionKey;
-    const nextVersionNumber = (interview.currentAnswerMeta?.versionCount ?? 0) + 1;
+    const nextVersionNumber = resolveInitialVersionNumber(interview.currentAnswerMeta);
 
     setRecordingStartBusy(true);
     void (async () => {
       try {
-        await beginRecordingRef.current(nextVersionNumber, interview.currentQuestionIndex);
+        await beginRecordingRef.current(
+          nextVersionNumber,
+          interview.currentQuestionIndex,
+        );
       } finally {
         setRecordingStartBusy(false);
       }
@@ -698,6 +740,13 @@ export function useTakeOrchestrator({
     recordingStartBusy ||
     stage === 'transition' ||
     interviewerPresence === 'speaking';
+
+  const retakeDisabled = !canRequestRetake(currentVersionNumber);
+  const displayedAttemptNumber = getDisplayedAttemptNumber(
+    interview?.currentAnswerMeta,
+    currentVersionNumber,
+    recording,
+  );
 
   return {
     stage,
@@ -746,5 +795,7 @@ export function useTakeOrchestrator({
     interviewerPresence,
     progressValue: interview ? progressValueForStage({ interview, stage }) : 0,
     loadInterview,
+    displayedAttemptNumber,
+    retakeDisabled,
   };
 }

@@ -94,6 +94,9 @@
     "questionProgress": "Пытанне {current} з {total}",
     "languageBadgeResolvedAs": "Паказана як {locale}",
     "languageBadgeInterviewAs": "Мова інтэрв'ю {locale}",
-    "beforeUnloadLeaveInterview": "Калі вы зараз перазагрузіце старонку або выйдзеце, інтэрв'ю будзе перапынена, і прагрэс можа быць страчаны. Вы ўпэўнены?"
+    "beforeUnloadLeaveInterview": "Калі вы зараз перазагрузіце старонку або выйдзеце, інтэрв'ю будзе перапынена, і прагрэс можа быць страчаны. Вы ўпэўнены?",
+    "attemptsMetricLabel": "Спробы:",
+    "retakeDisabledAtLimitHint": "Паўтор даступны толькі для спроб 1 і 2.",
+    "answerAttemptLimitReached": "Дасягнуты ліміт спробаў запісу"
   }
 }

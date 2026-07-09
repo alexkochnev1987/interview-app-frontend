@@ -5,7 +5,16 @@ import type { TakeInterviewData } from '@/lib/api';
 import { submitTakeAnswer } from '@/lib/api';
 import type { TakeStage } from '@/components/take/types';
 import { runMutation } from '@/lib/run-mutation';
+import { notifyError } from '@/lib/toast';
 import { useToastMessages } from '@/lib/use-toast-messages';
+
+import {
+  MAX_ANSWER_ATTEMPTS_PER_QUESTION,
+  getUsedAttempts,
+  isAnswerAttemptLimitError,
+  canRequestRetake,
+  resolveNextVersionAfterSave,
+} from './attempt-limit';
 
 import {
   getMultipartSession,
@@ -34,6 +43,7 @@ export interface UseTakeVersionPersistenceParams {
   setCurrentVersionNumber: (value: number) => void;
   setRetakeCount: (value: number) => void;
   enqueueProgressFlush: (forceAllEvents: boolean) => Promise<void>;
+  waitForProgressFlush: () => Promise<void>;
   queueBufferedUpload: (target: 'camera' | 'screen', forceAll: boolean) => Promise<void>;
   completeMultipartUpload: (target: 'camera' | 'screen') => Promise<void>;
   abortMultipartUploads: () => Promise<void>;
@@ -49,7 +59,15 @@ export interface UseTakeVersionPersistenceParams {
   finalizeTranscriptForSubmit: () => Promise<TranscriptFinalizeSnapshot>;
   loadInterview: (mode?: 'initial' | 'resume', tokenOverride?: string) => Promise<void>;
   clearRecordingArtifacts: () => void;
-  invokeBeginRecording: (nextVersionNumber: number, currentQuestionIndex: number) => Promise<void>;
+  invokeBeginRecording: (
+    nextVersionNumber: number,
+    currentQuestionIndex: number,
+  ) => Promise<void>;
+  onAnswerMetaUpdated: (meta: {
+    versionCount: number;
+    selectedVersionNumber: number;
+    status?: 'recording' | 'submitted';
+  }) => void;
   takeMessage: TakeMessageGetter;
 }
 
@@ -63,6 +81,7 @@ export function useTakeVersionPersistence({
   setCurrentVersionNumber,
   setRetakeCount,
   enqueueProgressFlush,
+  waitForProgressFlush,
   queueBufferedUpload,
   completeMultipartUpload,
   abortMultipartUploads,
@@ -79,11 +98,33 @@ export function useTakeVersionPersistence({
   loadInterview,
   clearRecordingArtifacts,
   invokeBeginRecording,
+  onAnswerMetaUpdated,
   takeMessage,
 }: UseTakeVersionPersistenceParams) {
   const toastMessages = useToastMessages();
   const submitFallbackDetail = takeMessage('submitFallbackDetail');
   const persistInFlightRef = useRef(false);
+
+  const notifyAttemptLimitReached = useCallback(
+    (message?: string) => {
+      notifyError(
+        takeMessage('answerAttemptLimitReached', { max: MAX_ANSWER_ATTEMPTS_PER_QUESTION }),
+        { description: message },
+      );
+    },
+    [takeMessage],
+  );
+
+  const handleAttemptLimitApiError = useCallback(
+    (error: unknown): boolean => {
+      if (!isAnswerAttemptLimitError(error)) {
+        return false;
+      }
+      notifyAttemptLimitReached(error instanceof Error ? error.message : undefined);
+      return true;
+    },
+    [notifyAttemptLimitReached],
+  );
 
   const persistCurrentVersion = useCallback(
     async (action: VersionPersistKind) => {
@@ -94,7 +135,11 @@ export function useTakeVersionPersistence({
 
       try {
         setSubmitError('');
-        await enqueueProgressFlush(true);
+        if (action === 'submit') {
+          await waitForProgressFlush();
+        } else {
+          await enqueueProgressFlush(true);
+        }
         await Promise.all([queueBufferedUpload('camera', true), queueBufferedUpload('screen', true)]);
 
         const cameraUpload = getMultipartSession(multipartUploadsRef.current, 'camera');
@@ -108,27 +153,35 @@ export function useTakeVersionPersistence({
           throw new Error(takeMessage('shortRecordingSubmit'));
         }
 
-        const startNextRerecordVersion = async () => {
-          const nextVersionNumber = currentVersionNumberRef.current + 1;
+        const startNextRecording = async (nextVersionNumber: number) => {
           setCurrentVersionNumber(nextVersionNumber);
           currentVersionNumberRef.current = nextVersionNumber;
-          setRetakeCount(nextVersionNumber - 1);
+          setRetakeCount(Math.max(nextVersionNumber - 1, 0));
           await invokeBeginRecording(nextVersionNumber, interview.currentQuestionIndex);
         };
 
         const handleRerecord = async () => {
+          const savedVersionCount = getUsedAttempts(interview.currentAnswerMeta);
+          const currentVersion = currentVersionNumberRef.current;
+
+          if (!canRequestRetake(currentVersion)) {
+            notifyAttemptLimitReached();
+            setStage('interview');
+            return;
+          }
+
           if (!hasUploadedAllParts) {
             await abortMultipartUploads();
             clearRecordingArtifacts();
             pendingVersionActionRef.current = null;
-            await startNextRerecordVersion();
+            await startNextRecording(currentVersion);
             return;
           }
 
           await Promise.all([completeMultipartUpload('camera'), completeMultipartUpload('screen')]);
           await submitTakeAnswer(id, {
             questionIndex: cameraUpload.questionIndex,
-            versionNumber: currentVersionNumberRef.current,
+            versionNumber: currentVersion,
             submitAnswer: false,
             mediaKey: cameraUpload.mediaKey,
             screenMediaKey: screenUpload.mediaKey,
@@ -141,14 +194,34 @@ export function useTakeVersionPersistence({
             behaviorEvents: behaviorEventsRef.current,
           });
 
+          const savedVersion = currentVersion;
+          const usedAfterSave = Math.max(savedVersionCount, savedVersion);
+          onAnswerMetaUpdated({
+            versionCount: usedAfterSave,
+            selectedVersionNumber: savedVersion,
+            status: 'recording',
+          });
+
           clearRecordingArtifacts();
           pendingVersionActionRef.current = null;
-          await startNextRerecordVersion();
+
+          const nextVersionNumber = resolveNextVersionAfterSave(
+            savedVersion,
+            { versionCount: usedAfterSave },
+          );
+          if (nextVersionNumber === null) {
+            notifyAttemptLimitReached();
+            setStage('interview');
+            return;
+          }
+
+          await startNextRecording(nextVersionNumber);
         };
 
         const handleSubmit = async () => {
           await Promise.all([completeMultipartUpload('camera'), completeMultipartUpload('screen')]);
 
+          const versionNumber = currentVersionNumberRef.current;
           const transcriptSnapshot = await finalizeTranscriptForSubmit();
           const submittedAt = new Date().toISOString();
           const fallbackStartedAt = answerStoppedAtMsRef.current
@@ -157,7 +230,7 @@ export function useTakeVersionPersistence({
 
           await submitTakeAnswer(id, {
             questionIndex: cameraUpload.questionIndex,
-            versionNumber: currentVersionNumberRef.current,
+            versionNumber,
             submitAnswer: true,
             mediaKey: cameraUpload.mediaKey,
             screenMediaKey: screenUpload.mediaKey,
@@ -200,7 +273,11 @@ export function useTakeVersionPersistence({
               successMessage: toastMessages.take.submitSuccess,
               showSuccessToast: showSubmitSuccessToast,
               errorMessage: toastMessages.take.submitError,
-              getErrorMessage: () => submitFallbackDetail,
+              showErrorToast: false,
+              getErrorMessage: (error) =>
+                error instanceof Error && error.message.trim()
+                  ? error.message
+                  : submitFallbackDetail,
             },
           );
         } else {
@@ -208,15 +285,20 @@ export function useTakeVersionPersistence({
         }
       } catch (err) {
         await abortMultipartUploads();
-        if (action === 'submit') {
+        if (handleAttemptLimitApiError(err)) {
+          autoStartedQuestionKeyRef.current = '';
+          setStage('interview');
+        } else if (action === 'submit') {
           setSubmitError(
             err instanceof Error && err.message.trim() ? err.message : submitFallbackDetail,
           );
+          autoStartedQuestionKeyRef.current = '';
+          setStage('interview');
         } else {
           setSubmitError(err instanceof Error ? err.message : takeMessage('uploadFailedFallback'));
+          autoStartedQuestionKeyRef.current = '';
+          setStage('interview');
         }
-        autoStartedQuestionKeyRef.current = '';
-        setStage('interview');
       } finally {
         setVersionPersistKind(null);
         setUploading(false);
@@ -233,6 +315,7 @@ export function useTakeVersionPersistence({
       setCurrentVersionNumber,
       setRetakeCount,
       enqueueProgressFlush,
+      waitForProgressFlush,
       queueBufferedUpload,
       completeMultipartUpload,
       abortMultipartUploads,
@@ -249,6 +332,9 @@ export function useTakeVersionPersistence({
       loadInterview,
       clearRecordingArtifacts,
       invokeBeginRecording,
+      onAnswerMetaUpdated,
+      notifyAttemptLimitReached,
+      handleAttemptLimitApiError,
       toastMessages.take.submitError,
       toastMessages.take.submitSuccess,
       submitFallbackDetail,

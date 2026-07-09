@@ -90,6 +90,8 @@ export function DemoTakeExperience({
           interviewerPresence={demo.interviewerPresence}
           formatTime={formatTime}
           recordingStartBusy={false}
+          retakeDisabled={false}
+          displayedAttemptNumber={1}
           onReconnect={() => undefined}
           onRerecord={demo.onRerecord}
           onSubmit={demo.onSubmit}

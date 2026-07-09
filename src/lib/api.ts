@@ -148,6 +148,7 @@ export type MultipartUploadSessionResponse = Schemas['MultipartUploadSessionResp
 export type MultipartUploadPartResponse = Schemas['MultipartUploadPartResponseDto'];
 
 export type TakeProgressPayload = Schemas['SaveAnswerProgressDto'];
+export type TakeProgressResponse = Schemas['SaveTakeAnswerProgressResponseDto'];
 
 export type SubmitTakeAnswerPayload = Schemas['SubmitAnswerDto'];
 
@@ -660,23 +661,28 @@ export async function syncCandidateSession(id: string, token: string): Promise<v
 export async function startMultipartUpload(
   questionIndex: number,
   mediaType: CaptureTarget,
-  contentType: 'video/webm' = 'video/webm',
+  options?: {
+    contentType?: 'video/webm';
+    versionNumber?: number;
+  },
 ): Promise<MultipartUploadSessionResponse> {
+  const contentType = options?.contentType ?? 'video/webm';
   return handle(client.POST('/upload/multipart/start', {
     ...LOCALIZED_HEADERS,
     body: {
       questionIndex,
       contentType,
       mediaType,
-    }
+      ...(options?.versionNumber !== undefined ? { versionNumber: options.versionNumber } : {}),
+    } as Schemas['StartMultipartUploadDto'] & { versionNumber?: number },
   }));
 }
 
 export async function sendTakeAnswerProgress(
   id: string,
   payload: TakeProgressPayload,
-): Promise<void> {
-  await handle(client.POST('/take/{id}/answer/progress', {
+): Promise<TakeProgressResponse> {
+  return handle(client.POST('/take/{id}/answer/progress', {
     ...LOCALIZED_HEADERS,
     params: { path: { id } },
     body: payload
