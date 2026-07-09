@@ -18,6 +18,11 @@ export type OnboardingAdvanceConfig =
       eventName: OnboardingEventName;
     };
 
+export type OnboardingGateConfig = {
+  type: 'nonEmptyInput';
+  autoFocus?: boolean;
+};
+
 export type OnboardingStepConfig = {
   id: string;
   target: string;
@@ -25,6 +30,7 @@ export type OnboardingStepConfig = {
   route?: string;
   routeMatch?: 'exact' | 'prefix';
   advance?: OnboardingAdvanceConfig;
+  gate?: OnboardingGateConfig;
   visibility?: readonly OnboardingVisibilityRule[];
   missingTarget?: OnboardingMissingTargetBehavior;
   waitTimeoutMs?: number;

@@ -130,6 +130,17 @@
   filter: brightness(1.05);
 }
 
+.onboarding-tour-popover .driver-popover-next-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  pointer-events: none;
+  filter: none;
+}
+
+.onboarding-tour-popover .driver-popover-next-btn:disabled:hover {
+  filter: none;
+}
+
 .onboarding-tour-popover .driver-popover-arrow {
   border-width: 8px;
 }

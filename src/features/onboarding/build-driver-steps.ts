@@ -12,6 +12,30 @@ import {
 import { storeOnboardingCreatedQuestionId } from '@/features/onboarding/onboarding-progress';
 import { DEFAULT_STAGE_RADIUS } from '@/features/onboarding/create-onboarding-driver';
 
+function resolveInputElement(element: Element | undefined): HTMLInputElement | HTMLTextAreaElement | null {
+  if (
+    element instanceof HTMLInputElement
+    || element instanceof HTMLTextAreaElement
+  ) {
+    return element;
+  }
+
+  const nested = element?.querySelector('input, textarea');
+  if (
+    nested instanceof HTMLInputElement
+    || nested instanceof HTMLTextAreaElement
+  ) {
+    return nested;
+  }
+
+  return null;
+}
+
+function hasNonEmptyInputValue(element: Element | undefined): boolean {
+  const input = resolveInputElement(element);
+  return input ? input.value.trim().length > 0 : false;
+}
+
 type BuildDriverStepsParams = {
   steps: ResolvedOnboardingStep[];
   translateStep: OnboardingStepTranslator;
@@ -33,12 +57,14 @@ export function buildDriverSteps({
   onDone,
 }: BuildDriverStepsParams): DriveStep[] {
   let cleanupEventListener: (() => void) | null = null;
+  let gateSync: (() => void) | null = null;
   let isTransitioning = false;
   let transitionId = 0;
 
   const cleanupGatedStep = () => {
     cleanupEventListener?.();
     cleanupEventListener = null;
+    gateSync = null;
   };
 
   const settleStepLayout = (
@@ -245,6 +271,38 @@ export function buildDriverSteps({
     driver.setConfig({ ...config, stageRadius: nextRadius });
   };
 
+  const setNextDisabled = (driver: Driver, disabled: boolean) => {
+    const apply = () => {
+      const popover = driver.getState('popover') as
+        | {
+            nextButton?: HTMLButtonElement;
+          }
+        | undefined;
+
+      if (!popover?.nextButton) {
+        return;
+      }
+
+      popover.nextButton.disabled = disabled;
+      popover.nextButton.setAttribute('aria-disabled', String(disabled));
+    };
+
+    apply();
+    window.requestAnimationFrame(apply);
+  };
+
+  const focusTourInput = (input: HTMLInputElement | HTMLTextAreaElement) => {
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        if (!input.isConnected) {
+          return;
+        }
+
+        input.focus({ preventScroll: true });
+      });
+    });
+  };
+
   const setNavigationDisabled = (driver: Driver, disabled: boolean) => {
     const popover = driver.getState('popover') as
       | {
@@ -286,6 +344,33 @@ export function buildDriverSteps({
 
     if (driver.isActive()) {
       setNavigationDisabled(driver, false);
+      gateSync?.();
+    }
+  };
+
+  const setupNonEmptyInputGate = (
+    element: Element | undefined,
+    driver: Driver,
+    options?: { autoFocus?: boolean },
+  ) => {
+    const input = resolveInputElement(element);
+    if (!input) {
+      return;
+    }
+
+    const sync = () => {
+      setNextDisabled(driver, input.value.trim().length === 0);
+    };
+
+    sync();
+    gateSync = sync;
+    input.addEventListener('input', sync);
+    cleanupEventListener = () => {
+      input.removeEventListener('input', sync);
+    };
+
+    if (options?.autoFocus !== false) {
+      focusTourInput(input);
     }
   };
 
@@ -374,6 +459,7 @@ export function buildDriverSteps({
     const isLast = index === steps.length - 1;
     const previousStep = steps[index - 1];
     const isEventGatedStep = step.advance?.mode === 'event';
+    const hasNonEmptyInputGate = step.gate?.type === 'nonEmptyInput';
 
     return {
       element: step.target,
@@ -389,7 +475,25 @@ export function buildDriverSteps({
         nextBtnText: isLast ? labels.done : labels.next,
         prevBtnText: labels.back,
         doneBtnText: labels.done,
-        onNextClick: async (_element, _driveStep, { driver }) => {
+        onPopoverRender: hasNonEmptyInputGate
+          ? (popover, { driver }) => {
+              const activeElement = driver.getState('activeElement') as
+                | Element
+                | undefined;
+              const input = resolveInputElement(activeElement);
+              const isEmpty = !input || input.value.trim().length === 0;
+              popover.nextButton.disabled = isEmpty;
+              popover.nextButton.setAttribute('aria-disabled', String(isEmpty));
+            }
+          : undefined,
+        onNextClick: async (element, _driveStep, { driver }) => {
+          if (
+            step.gate?.type === 'nonEmptyInput'
+            && !hasNonEmptyInputValue(element)
+          ) {
+            return;
+          }
+
           await moveFromActiveStep(driver, 1);
         },
         onPrevClick: async (_element, _driveStep, { driver }) => {
@@ -403,6 +507,12 @@ export function buildDriverSteps({
         applyStageRadius(driver, step.stageRadius);
 
         settleStepLayout(element, driver, step);
+
+        if (step.gate?.type === 'nonEmptyInput') {
+          setupNonEmptyInputGate(element, driver, {
+            autoFocus: step.gate.autoFocus,
+          });
+        }
 
         if (step.advance?.mode !== 'event') {
           return;

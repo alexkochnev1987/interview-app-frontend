@@ -1746,6 +1746,8 @@ export interface components {
             mediaKey: string;
             uploadId: string;
             partNumber: number;
+            /** @description Answer attempt/version being recorded. Required for multipart re-upload of an existing attempt. */
+            versionNumber?: number;
         };
         MultipartUploadPartResponseDto: {
             mediaKey: string;
@@ -1757,6 +1759,8 @@ export interface components {
             questionIndex: number;
             mediaKey: string;
             uploadId: string;
+            /** @description Answer attempt/version being recorded. Required for multipart re-upload of an existing attempt. */
+            versionNumber?: number;
         };
         MultipartUploadCompleteResponseDto: {
             mediaKey: string;
@@ -1768,6 +1772,8 @@ export interface components {
             questionIndex: number;
             mediaKey: string;
             uploadId: string;
+            /** @description Answer attempt/version being recorded. Required for multipart re-upload of an existing attempt. */
+            versionNumber?: number;
         };
         MultipartUploadAbortResponseDto: {
             mediaKey: string;

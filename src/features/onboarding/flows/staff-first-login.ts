@@ -32,6 +32,7 @@ export const staffFirstLoginFlow: OnboardingFlowConfig = {
       target: '[data-tour="question-text"]',
       contentKey: 'questionsText',
       visibility: [{ type: 'canReadQuestions' }, { type: 'notDemo' }],
+      gate: { type: 'nonEmptyInput', autoFocus: true },
       ...pageTourStepDefaults,
       stageRadius: 24,
       popoverSide: 'top',
