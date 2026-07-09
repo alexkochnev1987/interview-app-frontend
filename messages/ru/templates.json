@@ -1,0 +1,61 @@
+{
+  "templates": {
+    "title": "Шаблоны интервью",
+    "description": "Многоразовые наборы вопросов, с которых можно начать новое интервью.",
+    "newButton": "Новый шаблон",
+    "toolbar": {
+      "searchPlaceholder": "Поиск шаблонов",
+      "sortLabel": "Сортировка",
+      "sortPopular": "Самые используемые",
+      "sortRecent": "Недавно обновлённые",
+      "sortName": "Название А–Я"
+    },
+    "empty": {
+      "title": "Шаблонов пока нет",
+      "description": "Создайте шаблон, чтобы повторно использовать набор вопросов в разных интервью.",
+      "cta": "Новый шаблон"
+    },
+    "list": {
+      "loading": "Загрузка шаблонов…",
+      "questionsLabel": "Вопросы",
+      "popularityLabel": "Использован",
+      "updatedLabel": "Обновлён",
+      "useButton": "Использовать шаблон",
+      "editButton": "Изменить",
+      "deleteButton": "Удалить",
+      "otherGroup": "Другое",
+      "groupCount": "{count, plural, one {# шаблон} few {# шаблона} many {# шаблонов} other {# шаблона}}",
+      "noResults": "Ни один шаблон не соответствует поиску."
+    },
+    "form": {
+      "createTitle": "Новый шаблон",
+      "editTitle": "Изменить шаблон",
+      "nameLabel": "Название",
+      "namePlaceholder": "напр. Основы фронтенда",
+      "descriptionLabel": "Описание",
+      "descriptionPlaceholder": "Необязательное краткое описание",
+      "positionLabel": "Позиция по умолчанию",
+      "positionPlaceholder": "Выберите существующую или введите новую",
+      "questionsTitle": "Вопросы",
+      "questionsDescription": "Выберите вопросы, которые входят в этот шаблон.",
+      "createButton": "Создать шаблон",
+      "saveButton": "Сохранить шаблон",
+      "cancelButton": "Отмена"
+    },
+    "prefill": {
+      "bannerTitle": "Заполнено из шаблона «{name}»",
+      "bannerDescription": "Вопросы и позиция уже заполнены. Добавьте кандидата и при необходимости измените что угодно перед созданием.",
+      "bannerLink": "Открыть шаблон"
+    },
+    "reuse": {
+      "duplicate": "Дублировать как новое интервью",
+      "saveAsTemplate": "Сохранить как шаблон"
+    },
+    "delete": {
+      "confirmTitle": "Удалить «{name}»?",
+      "confirmDescription": "Это удалит шаблон. Уже созданные из него интервью не затрагиваются.",
+      "confirmButton": "Удалить",
+      "cancelButton": "Отмена"
+    }
+  }
+}

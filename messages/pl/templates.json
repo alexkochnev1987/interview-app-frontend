@@ -1,0 +1,61 @@
+{
+  "templates": {
+    "title": "Szablony interview",
+    "description": "Zestawy pytań wielokrotnego użytku, od których możesz rozpocząć nowe interview.",
+    "newButton": "Nowy szablon",
+    "toolbar": {
+      "searchPlaceholder": "Szukaj szablonów",
+      "sortLabel": "Sortuj",
+      "sortPopular": "Najczęściej używane",
+      "sortRecent": "Ostatnio zaktualizowane",
+      "sortName": "Nazwa A–Z"
+    },
+    "empty": {
+      "title": "Brak szablonów",
+      "description": "Utwórz szablon, aby wykorzystać zestaw pytań w wielu interview.",
+      "cta": "Nowy szablon"
+    },
+    "list": {
+      "loading": "Ładowanie szablonów…",
+      "questionsLabel": "Pytania",
+      "popularityLabel": "Użyto",
+      "updatedLabel": "Zaktualizowano",
+      "useButton": "Użyj szablonu",
+      "editButton": "Edytuj",
+      "deleteButton": "Usuń",
+      "otherGroup": "Inne",
+      "groupCount": "{count, plural, one {# szablon} few {# szablony} many {# szablonów} other {# szablonu}}",
+      "noResults": "Żaden szablon nie pasuje do wyszukiwania."
+    },
+    "form": {
+      "createTitle": "Nowy szablon",
+      "editTitle": "Edytuj szablon",
+      "nameLabel": "Nazwa",
+      "namePlaceholder": "np. Podstawy frontendu",
+      "descriptionLabel": "Opis",
+      "descriptionPlaceholder": "Opcjonalne podsumowanie",
+      "positionLabel": "Domyślne stanowisko",
+      "positionPlaceholder": "Wybierz istniejące lub wpisz nowe",
+      "questionsTitle": "Pytania",
+      "questionsDescription": "Wybierz pytania, które zawiera ten szablon.",
+      "createButton": "Utwórz szablon",
+      "saveButton": "Zapisz szablon",
+      "cancelButton": "Anuluj"
+    },
+    "prefill": {
+      "bannerTitle": "Wypełniono z szablonu „{name}”",
+      "bannerDescription": "Pytania i stanowisko zostały wypełnione. Dodaj kandydata i dostosuj wszystko przed utworzeniem.",
+      "bannerLink": "Zobacz szablon"
+    },
+    "reuse": {
+      "duplicate": "Powiel jako nowe interview",
+      "saveAsTemplate": "Zapisz jako szablon"
+    },
+    "delete": {
+      "confirmTitle": "Usunąć „{name}”?",
+      "confirmDescription": "To usuwa szablon. Interview już utworzone na jego podstawie pozostają nienaruszone.",
+      "confirmButton": "Usuń",
+      "cancelButton": "Anuluj"
+    }
+  }
+}

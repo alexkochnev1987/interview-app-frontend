@@ -1,0 +1,61 @@
+{
+  "templates": {
+    "title": "Шаблоны інтэрв’ю",
+    "description": "Наборы пытанняў шматразовага выкарыстання, з якіх можна пачаць новае інтэрв’ю.",
+    "newButton": "Новы шаблон",
+    "toolbar": {
+      "searchPlaceholder": "Пошук шаблонаў",
+      "sortLabel": "Сартаванне",
+      "sortPopular": "Найбольш выкарыстоўваныя",
+      "sortRecent": "Нядаўна абноўленыя",
+      "sortName": "Назва А–Я"
+    },
+    "empty": {
+      "title": "Шаблонаў пакуль няма",
+      "description": "Стварыце шаблон, каб паўторна выкарыстоўваць набор пытанняў у розных інтэрв’ю.",
+      "cta": "Новы шаблон"
+    },
+    "list": {
+      "loading": "Загрузка шаблонаў…",
+      "questionsLabel": "Пытанні",
+      "popularityLabel": "Выкарыстаны",
+      "updatedLabel": "Абноўлены",
+      "useButton": "Выкарыстаць шаблон",
+      "editButton": "Рэдагаваць",
+      "deleteButton": "Выдаліць",
+      "otherGroup": "Іншае",
+      "groupCount": "{count, plural, one {# шаблон} few {# шаблоны} many {# шаблонаў} other {# шаблона}}",
+      "noResults": "Ніводзін шаблон не адпавядае пошуку."
+    },
+    "form": {
+      "createTitle": "Новы шаблон",
+      "editTitle": "Рэдагаваць шаблон",
+      "nameLabel": "Назва",
+      "namePlaceholder": "напр. Асновы фронтэнду",
+      "descriptionLabel": "Апісанне",
+      "descriptionPlaceholder": "Неабавязковае кароткае апісанне",
+      "positionLabel": "Пазіцыя па змаўчанні",
+      "positionPlaceholder": "Выберыце існуючую або ўвядзіце новую",
+      "questionsTitle": "Пытанні",
+      "questionsDescription": "Выберыце пытанні, якія ўключае гэты шаблон.",
+      "createButton": "Стварыць шаблон",
+      "saveButton": "Захаваць шаблон",
+      "cancelButton": "Скасаваць"
+    },
+    "prefill": {
+      "bannerTitle": "Запоўнена з шаблона «{name}»",
+      "bannerDescription": "Пытанні і пазіцыя ўжо запоўнены. Дадайце кандыдата і пры неабходнасці змяніце што заўгодна перад стварэннем.",
+      "bannerLink": "Адкрыць шаблон"
+    },
+    "reuse": {
+      "duplicate": "Дубліраваць як новае інтэрв’ю",
+      "saveAsTemplate": "Захаваць як шаблон"
+    },
+    "delete": {
+      "confirmTitle": "Выдаліць «{name}»?",
+      "confirmDescription": "Гэта выдаліць шаблон. Ужо створаныя з яго інтэрв’ю не закранаюцца.",
+      "confirmButton": "Выдаліць",
+      "cancelButton": "Скасаваць"
+    }
+  }
+}
