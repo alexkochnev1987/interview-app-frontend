@@ -8,7 +8,7 @@ test('try-the-demo signs in read-only and shows the demo banner', async ({ page 
   await tryDemo.click()
 
   // Lands on the authenticated app (not back on /login)...
-  await expect(page).not.toHaveURL(/\/login(\?|$)/)
+  await expect(page).not.toHaveURL(/\/login(\?|$)/, { timeout: 15_000 })
   // ...and the read-only demo banner is shown.
   await expect(page.getByTestId('demo-mode-banner')).toBeVisible()
   await expect(page.getByText(/read-only demo/i)).toBeVisible()

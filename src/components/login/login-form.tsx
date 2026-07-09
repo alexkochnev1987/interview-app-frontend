@@ -45,8 +45,7 @@ export function LoginForm() {
     try {
       const sessionUser = await authCall()
       establishSession(sessionUser)
-      router.push(redirectPath)
-      router.refresh()
+      router.replace(redirectPath)
     } catch (err) {
       if (err instanceof ApiError && err.code === 'VALIDATION_ERROR') {
         setError(toastMessages.pageGate.login.failedFallback)

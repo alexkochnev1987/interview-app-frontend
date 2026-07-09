@@ -29,6 +29,7 @@ export function setClientApiLocale(locale?: string | null): void {
 
 const client = createClient<paths>({
   baseUrl: '/api',
+  credentials: 'include',
 });
 
 function buildClientApiHeaders(headers?: HeadersInit): Headers {
@@ -47,6 +48,7 @@ function buildClientBaseHeaders(headers?: HeadersInit): Headers {
 
 function fetchClientApi(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
   return fetch(input, {
+    credentials: 'include',
     ...init,
     headers: buildClientApiHeaders(init?.headers),
   });

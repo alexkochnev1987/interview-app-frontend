@@ -16,6 +16,7 @@ export function authUser(overrides = {}) {
     name: 'E2E Admin',
     role: 'admin',
     organizationId: 'org-e2e',
+    demo: false,
     createdAt: ISO,
     ...overrides,
   }
@@ -127,6 +128,9 @@ export function buildInterviewFacets(items) {
   return {
     positions: [...positions.entries()].map(([value, count]) => ({ value, count })),
     statuses: [...statuses.entries()].map(([value, count]) => ({ value, count })),
-    totalQuestionCount: items.reduce((sum, item) => sum + item.questions.length, 0),
+    totalQuestionCount: items.reduce(
+      (sum, item) => sum + (item.questionCount ?? 0),
+      0,
+    ),
   }
 }
