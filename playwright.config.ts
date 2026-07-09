@@ -14,9 +14,9 @@ const browser = {
 
 const frontendServerCommand =
   process.env.E2E_PREBUILT === '1'
-    ? 'node .next/standalone/server.js'
+    ? 'node scripts/e2e-start-frontend.mjs'
     : process.env.CI
-      ? 'npm run build && node .next/standalone/server.js'
+      ? 'npm run build && node scripts/e2e-start-frontend.mjs'
       : 'npm run dev:server'
 
 export default defineConfig({
@@ -53,10 +53,11 @@ export default defineConfig({
           cwd: path.resolve(__dirname),
           env: {
             ...process.env,
+            NODE_ENV: 'production',
             BACKEND_URL: backendUrl,
             E2E_MOCK_API_PORT: mockApiPort,
             PORT: frontendPort,
-            HOSTNAME: '127.0.0.1',
+            HOSTNAME: '0.0.0.0',
           },
         },
       ],

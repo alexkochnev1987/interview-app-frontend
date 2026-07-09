@@ -22,7 +22,10 @@ jobs:
         run: git diff --exit-code -- src/lib/api-types.ts
       - run: npm run lint:ci
       - run: npm run test
-      - run: npx next build --webpack
+      - name: Production build for E2E
+        run: npx next build --webpack
+        env:
+          BACKEND_URL: http://127.0.0.1:3000
       - name: Upload production build for E2E
         uses: actions/upload-artifact@v6
         with:
