@@ -30,7 +30,6 @@ import { Textarea } from '@/components/ui/textarea'
 import { useRouter } from '@/i18n/navigation'
 import { routes } from '@/i18n/routes'
 import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
-import { useIsDemo } from '@/lib/auth-context'
 import { getTemplates, type Question, type Template } from '@/lib/api'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
 import { useLocale, useTranslations } from 'next-intl'
@@ -56,8 +55,11 @@ export function TemplateForm({
   const tGate = useTranslations('toast.pageGate.templates')
   const locale = useLocale()
   const router = useRouter()
-  const isDemo = useIsDemo()
   const isEdit = Boolean(template)
+  // On edit, a template whose stored questions have all been deleted resolves to
+  // an empty set; warn explicitly instead of only blocking submit with a generic error.
+  const templateQuestionsUnavailable =
+    isEdit && (template?.questions?.length ?? 0) === 0
 
   const [name, setName] = useState(template?.name ?? initialName ?? '')
   const [description, setDescription] = useState(template?.description ?? '')
@@ -120,6 +122,15 @@ export function TemplateForm({
 
   return (
     <>
+      {templateQuestionsUnavailable ? (
+        <Alert variant="warning">
+          <AlertTitle>{t('form.questionsUnavailableTitle')}</AlertTitle>
+          <AlertDescription>
+            {t('form.questionsUnavailableDescription')}
+          </AlertDescription>
+        </Alert>
+      ) : null}
+
       {error ? (
         <Alert variant="danger">
           <AlertTitle>
@@ -146,7 +157,7 @@ export function TemplateForm({
                     value={name}
                     onChange={(event) => setName(event.target.value)}
                     placeholder={t('form.namePlaceholder')}
-                    disabled={submitting || isDemo}
+                    disabled={submitting}
                   />
                 </FormField>
 
@@ -156,7 +167,7 @@ export function TemplateForm({
                     value={description}
                     onChange={(event) => setDescription(event.target.value)}
                     placeholder={t('form.descriptionPlaceholder')}
-                    disabled={submitting || isDemo}
+                    disabled={submitting}
                   />
                 </FormField>
 
@@ -166,7 +177,7 @@ export function TemplateForm({
                     value={position}
                     onChange={(event) => setPosition(event.target.value)}
                     placeholder={t('form.positionPlaceholder')}
-                    disabled={submitting || isDemo}
+                    disabled={submitting}
                     list="template-position-options"
                     autoComplete="off"
                   />
@@ -212,7 +223,7 @@ export function TemplateForm({
             picker={picker}
             title={t('form.questionsTitle')}
             description={t('form.questionsDescription')}
-            disabled={submitting || isDemo}
+            disabled={submitting}
           />
         </Grid>
       </form>

@@ -83,14 +83,23 @@ export default async function NewInterviewPage({
     )
   }
 
-  // Prefill from a template (?templateId=) or a past interview (?fromInterview=); a missing id falls back to blank, templateId wins.
-  const template = templateId
-    ? await fetchTemplate(auth.ctx, templateId).catch(() => undefined)
-    : undefined
-  const sourceInterview =
-    !template && fromInterview
-      ? await fetchInterview(auth.ctx, fromInterview).catch(() => undefined)
-      : undefined
+  // Prefill from a template (?templateId=) or a past interview (?fromInterview=);
+  // templateId wins. When an id is present but the source cannot be loaded
+  // (deleted or out of scope), surface a warning rather than a silent blank form.
+  let template
+  let templateMissing = false
+  if (templateId) {
+    template = await fetchTemplate(auth.ctx, templateId).catch(() => undefined)
+    templateMissing = !template
+  }
+  let sourceInterview
+  let sourceInterviewMissing = false
+  if (!template && fromInterview) {
+    sourceInterview = await fetchInterview(auth.ctx, fromInterview).catch(
+      () => undefined,
+    )
+    sourceInterviewMissing = !sourceInterview
+  }
   const prefillQuestions = template?.questions ?? sourceInterview?.questions
   const prefillPosition = template?.position ?? sourceInterview?.position
 
@@ -102,10 +111,22 @@ export default async function NewInterviewPage({
           <AlertTitle>{tPrefill('bannerTitle', { name: template.name })}</AlertTitle>
           <AlertDescription>
             {tPrefill('bannerDescription')}{' '}
-            <Link href={routes.templates.detail(template.id)} className="underline">
+            <Link href={routes.templates.detail(template.id)}>
               {tPrefill('bannerLink')}
             </Link>
           </AlertDescription>
+        </Alert>
+      ) : null}
+      {templateMissing ? (
+        <Alert variant="warning">
+          <AlertTitle>{tPrefill('unavailableTitle')}</AlertTitle>
+          <AlertDescription>{tPrefill('templateMissing')}</AlertDescription>
+        </Alert>
+      ) : null}
+      {sourceInterviewMissing ? (
+        <Alert variant="warning">
+          <AlertTitle>{tPrefill('unavailableTitle')}</AlertTitle>
+          <AlertDescription>{tPrefill('interviewMissing')}</AlertDescription>
         </Alert>
       ) : null}
       <QueryHydrationBoundary state={initialPrefetch.dehydratedState}>

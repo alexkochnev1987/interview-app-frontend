@@ -2,6 +2,7 @@ import { getTranslations } from 'next-intl/server'
 
 import { TemplateForm } from '@/components/templates/template-form'
 import { QueryHydrationBoundary } from '@/components/questions/query-hydration-boundary'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
@@ -31,6 +32,7 @@ export default async function NewTemplatePage({
   const t = await getTranslations({ locale, namespace: 'toast.pageGate.templates' })
   const tCommon = await getTranslations({ locale, namespace: 'common' })
   const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
+  const tPrefill = await getTranslations({ locale, namespace: 'templates.prefill' })
   const auth = await loadAuthGate(canConfigureInterview, locale)
   redirectIfUnauthenticated(auth, routes.templates.new, locale)
 
@@ -49,7 +51,7 @@ export default async function NewTemplatePage({
         title={t('unavailableTitle')}
         description={`${tCommon('sessionVerificationFailed')} ${auth.message}`}
         backHref={ERROR_BACK_HREF}
-        backLabel={tFallback('backToDashboard')}
+        backLabel={tFallback('backToTemplates')}
       />
     )
   }
@@ -64,18 +66,28 @@ export default async function NewTemplatePage({
         title={t('unavailableTitle')}
         description={message}
         backHref={ERROR_BACK_HREF}
-        backLabel={tFallback('backToDashboard')}
+        backLabel={tFallback('backToTemplates')}
       />
     )
   }
 
   // "Save as template" from a past interview: prefill questions + position.
-  const interview = fromInterview
-    ? await fetchInterview(auth.ctx, fromInterview).catch(() => undefined)
-    : undefined
+  // A present-but-unloadable source is surfaced rather than silently dropped.
+  let interview
+  let sourceInterviewMissing = false
+  if (fromInterview) {
+    interview = await fetchInterview(auth.ctx, fromInterview).catch(() => undefined)
+    sourceInterviewMissing = !interview
+  }
 
   return (
     <PageShell>
+      {sourceInterviewMissing ? (
+        <Alert variant="warning">
+          <AlertTitle>{tPrefill('unavailableTitle')}</AlertTitle>
+          <AlertDescription>{tPrefill('interviewMissing')}</AlertDescription>
+        </Alert>
+      ) : null}
       <QueryHydrationBoundary state={initialPrefetch.dehydratedState}>
         <TemplateForm
           initialPrefetch={initialPrefetch}

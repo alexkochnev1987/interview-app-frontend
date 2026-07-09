@@ -25,7 +25,9 @@
       "deleteButton": "Usuń",
       "otherGroup": "Inne",
       "groupCount": "{count, plural, one {# szablon} few {# szablony} many {# szablonów} other {# szablonu}}",
-      "noResults": "Żaden szablon nie pasuje do wyszukiwania."
+      "noResults": "Żaden szablon nie pasuje do wyszukiwania.",
+      "loadError": "Nie udało się odświeżyć listy szablonów.",
+      "retry": "Ponów"
     },
     "form": {
       "createTitle": "Nowy szablon",
@@ -38,6 +40,8 @@
       "positionPlaceholder": "Wybierz istniejące lub wpisz nowe",
       "questionsTitle": "Pytania",
       "questionsDescription": "Wybierz pytania, które zawiera ten szablon.",
+      "questionsUnavailableTitle": "Pytania szablonu niedostępne",
+      "questionsUnavailableDescription": "Pytania zapisane w tym szablonie nie są już dostępne. Dodaj co najmniej jedno pytanie przed zapisaniem.",
       "createButton": "Utwórz szablon",
       "saveButton": "Zapisz szablon",
       "cancelButton": "Anuluj"
@@ -45,7 +49,10 @@
     "prefill": {
       "bannerTitle": "Wypełniono z szablonu „{name}”",
       "bannerDescription": "Pytania i stanowisko zostały wypełnione. Dodaj kandydata i dostosuj wszystko przed utworzeniem.",
-      "bannerLink": "Zobacz szablon"
+      "bannerLink": "Zobacz szablon",
+      "unavailableTitle": "Wstępne wypełnienie niedostępne",
+      "templateMissing": "Nie udało się załadować tego szablonu, więc nic nie zostało wypełnione. Nadal możesz zbudować interview ręcznie.",
+      "interviewMissing": "Nie udało się załadować tego interview, więc nic nie zostało wypełnione. Nadal możesz zbudować je ręcznie."
     },
     "reuse": {
       "duplicate": "Powiel jako nowe interview",

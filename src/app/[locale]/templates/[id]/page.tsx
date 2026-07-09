@@ -41,7 +41,7 @@ export default async function EditTemplatePage({ params }: EditTemplatePageProps
         title={t('unavailableTitle')}
         description={`${tCommon('sessionVerificationFailed')} ${auth.message}`}
         backHref={ERROR_BACK_HREF}
-        backLabel={tFallback('backToDashboard')}
+        backLabel={tFallback('backToTemplates')}
       />
     )
   }
@@ -60,7 +60,7 @@ export default async function EditTemplatePage({ params }: EditTemplatePageProps
         title={t('unavailableTitle')}
         description={message}
         backHref={ERROR_BACK_HREF}
-        backLabel={tFallback('backToDashboard')}
+        backLabel={tFallback('backToTemplates')}
       />
     )
   }
@@ -71,7 +71,7 @@ export default async function EditTemplatePage({ params }: EditTemplatePageProps
         title={t('unavailableTitle')}
         description={t('notFoundFallback')}
         backHref={ERROR_BACK_HREF}
-        backLabel={tFallback('backToDashboard')}
+        backLabel={tFallback('backToTemplates')}
       />
     )
   }

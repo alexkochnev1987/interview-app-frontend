@@ -25,7 +25,9 @@
       "deleteButton": "Delete",
       "otherGroup": "Other",
       "groupCount": "{count, plural, one {# template} other {# templates}}",
-      "noResults": "No templates match your search."
+      "noResults": "No templates match your search.",
+      "loadError": "We couldn't refresh the template list.",
+      "retry": "Retry"
     },
     "form": {
       "createTitle": "New template",
@@ -38,6 +40,8 @@
       "positionPlaceholder": "Choose an existing one or type a new one",
       "questionsTitle": "Questions",
       "questionsDescription": "Pick the questions this template includes.",
+      "questionsUnavailableTitle": "Template questions unavailable",
+      "questionsUnavailableDescription": "The questions saved in this template are no longer available. Add at least one question before saving.",
       "createButton": "Create template",
       "saveButton": "Save template",
       "cancelButton": "Cancel"
@@ -45,7 +49,10 @@
     "prefill": {
       "bannerTitle": "Prefilled from template “{name}”",
       "bannerDescription": "Questions and position are prefilled. Add a candidate and tweak anything before creating.",
-      "bannerLink": "View template"
+      "bannerLink": "View template",
+      "unavailableTitle": "Prefill unavailable",
+      "templateMissing": "We couldn't load that template, so nothing was prefilled. You can still build the interview manually.",
+      "interviewMissing": "We couldn't load that interview, so nothing was prefilled. You can still build it manually."
     },
     "reuse": {
       "duplicate": "Duplicate as new interview",

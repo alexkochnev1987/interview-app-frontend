@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useFormatter, useLocale, useTranslations } from 'next-intl'
-import { ArrowRight, LayoutTemplate, Pencil, Plus, Trash2 } from 'lucide-react'
+import { ArrowRight, LayoutTemplate, Pencil, Plus, RefreshCw, Trash2 } from 'lucide-react'
 
 import { templatesListQueryKey } from '@/components/templates/query-keys'
 import { useDeleteTemplate } from '@/components/templates/use-template-mutations'
@@ -11,6 +11,7 @@ import { getTemplates, type Template } from '@/lib/api'
 import { routes } from '@/i18n/routes'
 import { useRouter } from '@/i18n/navigation'
 import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Button } from '@/components/ui/button'
 import {
@@ -107,7 +108,7 @@ export function TemplatesListClient() {
   const [search, setSearch] = useState('')
   const [sort, setSort] = useState<TemplateSort>('popular')
 
-  const { data: templates = [], isLoading } = useQuery({
+  const { data: templates = [], isLoading, isError, refetch } = useQuery({
     queryKey: templatesListQueryKey(locale),
     queryFn: getTemplates,
   })
@@ -140,13 +141,25 @@ export function TemplatesListClient() {
         </DemoWriteGuard>
       </Inline>
 
+      {isError ? (
+        <Alert variant="danger">
+          <AlertTitle>{t('list.loadError')}</AlertTitle>
+          <AlertDescription>
+            <Button variant="outline" onClick={() => refetch()}>
+              <Icon size="md"><RefreshCw /></Icon>
+              {t('list.retry')}
+            </Button>
+          </AlertDescription>
+        </Alert>
+      ) : null}
+
       {isLoading ? (
         <BodyText tone="muted">{t('list.loading')}</BodyText>
       ) : templates.length === 0 ? (
         <Card variant="surface">
           <CardHeader spacing="sm">
             <IconBadge tone="surface" size="md">
-              <LayoutTemplate className="size-5" />
+              <Icon size="lg"><LayoutTemplate /></Icon>
             </IconBadge>
             <CardTitle size="lg">{t('empty.title')}</CardTitle>
             <CardDescription>{t('empty.description')}</CardDescription>
