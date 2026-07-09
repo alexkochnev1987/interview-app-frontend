@@ -1,7 +1,12 @@
 import { type MutableRefObject } from 'react';
 
+import type { TakeProgressResponse } from '@/lib/api';
 import type { CaptureTarget, MultipartUploadSession, MultipartUploadState } from './runtime';
 import { buildMediaRecorderOptions, pickSupportedMediaRecorderMimeType, TAKE_RECORDING_LIMIT_SECONDS } from './utils';
+import {
+  isAnswerAttemptLimitError,
+  shouldSendAnswerProgressDuringRecording,
+} from './attempt-limit';
 import type { TakeMessageGetter } from './messages';
 
 type PendingVersionAction = 'submit' | 'rerecord' | null;
@@ -35,8 +40,9 @@ interface UseTakeBeginRecordingParams {
   startMultipartUploadSession: (
     questionIndex: number,
     mediaType: CaptureTarget,
+    options?: { versionNumber?: number },
   ) => Promise<MultipartUploadSession>;
-  flushAnswerProgress: (forceAllEvents: boolean) => Promise<void>;
+  flushAnswerProgress: (forceAllEvents: boolean) => Promise<TakeProgressResponse | undefined>;
   startProgressHeartbeat: () => void;
   abortMultipartUploads: () => Promise<void>;
   handleRecordedChunk: (target: CaptureTarget, blob: Blob) => void;
@@ -120,9 +126,10 @@ export function useTakeBeginRecording({
     stoppedRecordersRef.current = 0;
 
     try {
+      const uploadOptions = { versionNumber: nextVersionNumber };
       const [cameraUpload, screenUpload] = await Promise.all([
-        startMultipartUploadSession(currentQuestionIndex, 'camera'),
-        startMultipartUploadSession(currentQuestionIndex, 'screen'),
+        startMultipartUploadSession(currentQuestionIndex, 'camera', uploadOptions),
+        startMultipartUploadSession(currentQuestionIndex, 'screen', uploadOptions),
       ]);
 
       multipartUploadsRef.current = {
@@ -130,12 +137,20 @@ export function useTakeBeginRecording({
         screen: screenUpload,
       };
 
-      await flushAnswerProgress(true);
-      startProgressHeartbeat();
+      if (shouldSendAnswerProgressDuringRecording(nextVersionNumber)) {
+        await flushAnswerProgress(true);
+        startProgressHeartbeat();
+      }
     } catch (err) {
       await abortMultipartUploads();
       clearRecordingArtifacts();
-      setSetupError(err instanceof Error ? err.message : takeMessage('uploadFailedFallback'));
+      if (isAnswerAttemptLimitError(err)) {
+        setSetupError(takeMessage('answerAttemptLimitReached'));
+      } else {
+        setSetupError(
+          err instanceof Error ? err.message : takeMessage('uploadFailedFallback'),
+        );
+      }
       autoStartedQuestionKeyRef.current = '';
       setStage('interview');
       return;

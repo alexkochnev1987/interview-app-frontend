@@ -4828,6 +4828,7 @@
           "REGISTRATION_FAILED",
           "UPLOAD_FAILED",
           "UPLOAD_NOT_ALLOWED",
+          "ANSWER_ATTEMPT_LIMIT_REACHED",
           "UNAUTHORIZED",
           "INVALID_CREDENTIALS",
           "AUTHENTICATION_REQUIRED",
@@ -7138,6 +7139,10 @@
               "camera",
               "screen"
             ]
+          },
+          "versionNumber": {
+            "type": "number",
+            "description": "Answer attempt/version being recorded. Omit when starting the next attempt."
           }
         },
         "required": [
@@ -7209,6 +7214,10 @@
               "camera",
               "screen"
             ]
+          },
+          "versionNumber": {
+            "type": "number",
+            "description": "Answer attempt/version being recorded. Omit when starting the next attempt."
           }
         },
         "required": [

@@ -9,7 +9,7 @@ import {
   uploadMultipartPart,
   type MultipartUploadPartResponse,
   type ClientTranscriptPayload,
-  type TakeInterviewData,
+  type TakeProgressResponse,
 } from '@/lib/api';
 
 import {
@@ -29,10 +29,11 @@ import {
   startProgressHeartbeat as startProgressHeartbeatData,
 } from './progress';
 import { abortMultipartUploads as abortMultipartUploadsData, completeMultipartUpload as completeMultipartUploadData } from './uploads';
+import { shouldSendAnswerProgressDuringRecording } from './attempt-limit';
 
 interface UseTakeAnswerPersistenceParams {
   id: string;
-  interview: TakeInterviewData | null;
+  onAnswerMetaUpdated?: (meta: TakeProgressResponse) => void;
   currentVersionNumberRef: React.MutableRefObject<number>;
   answerStartedAtRef: React.MutableRefObject<string | null>;
   answerStoppedAtMsRef: React.MutableRefObject<number | null>;
@@ -58,7 +59,7 @@ interface UseTakeAnswerPersistenceParams {
 
 export function useTakeAnswerPersistence({
   id,
-  interview,
+  onAnswerMetaUpdated,
   currentVersionNumberRef,
   answerStartedAtRef,
   answerStoppedAtMsRef,
@@ -78,18 +79,30 @@ export function useTakeAnswerPersistence({
   const lastEventFlushQueuedAtMsRef = useRef(0);
 
   const startMultipartUploadSession = useCallback(
-    async (questionIndex: number, mediaType: CaptureTarget): Promise<MultipartUploadSession> => {
-      const session = await startMultipartUpload(questionIndex, mediaType);
+    async (
+      questionIndex: number,
+      mediaType: CaptureTarget,
+      options?: { versionNumber?: number },
+    ): Promise<MultipartUploadSession> => {
+      const session = await startMultipartUpload(questionIndex, mediaType, {
+        ...(options?.versionNumber !== undefined
+          ? { versionNumber: options.versionNumber }
+          : {}),
+      });
       return createMultipartUploadSession({ ...session, questionIndex });
     },
     [],
   );
 
   const flushAnswerProgress = useCallback(
-    async (forceAllEvents = false) => {
+    async (forceAllEvents = false): Promise<TakeProgressResponse | undefined> => {
       const cameraUpload = multipartUploadsRef.current.camera;
       if (!cameraUpload) {
-        return;
+        return undefined;
+      }
+
+      if (!shouldSendAnswerProgressDuringRecording(currentVersionNumberRef.current)) {
+        return undefined;
       }
 
       const screenUpload = multipartUploadsRef.current.screen;
@@ -100,7 +113,7 @@ export function useTakeAnswerPersistence({
       });
       const transcriptSnapshot = getBrowserTranscriptSnapshot();
 
-      await sendTakeAnswerProgress(
+      const progressResponse = await sendTakeAnswerProgress(
         id,
         buildProgressPayload({
           questionIndex: cameraUpload.questionIndex,
@@ -128,6 +141,9 @@ export function useTakeAnswerPersistence({
       );
 
       flushedBehaviorEventCountRef.current = behaviorEventsRef.current.length;
+      currentVersionNumberRef.current = progressResponse.selectedVersionNumber;
+      onAnswerMetaUpdated?.(progressResponse);
+      return progressResponse;
     },
     [
       multipartUploadsRef,
@@ -140,6 +156,7 @@ export function useTakeAnswerPersistence({
       answerStoppedAtMsRef,
       behaviorSignalsRef,
       getBrowserTranscriptSnapshot,
+      onAnswerMetaUpdated,
     ],
   );
 
@@ -147,10 +164,17 @@ export function useTakeAnswerPersistence({
     (forceAllEvents = false) =>
       enqueueProgressFlushData({
         progressRequestChainRef,
-        flushAnswerProgress: (forceAll) => flushAnswerProgress(forceAll),
+        flushAnswerProgress: async (forceAll) => {
+          await flushAnswerProgress(forceAll);
+        },
         forceAllEvents,
       }),
     [progressRequestChainRef, flushAnswerProgress],
+  );
+
+  const waitForProgressFlush = useCallback(
+    () => progressRequestChainRef.current.catch(() => undefined),
+    [progressRequestChainRef],
   );
 
   const scheduleProgressFlush = useCallback(
@@ -259,6 +283,7 @@ export function useTakeAnswerPersistence({
     startMultipartUploadSession,
     flushAnswerProgress,
     enqueueProgressFlush,
+    waitForProgressFlush,
     scheduleProgressFlush,
     startProgressHeartbeat,
     queueBufferedUpload,
