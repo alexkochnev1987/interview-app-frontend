@@ -17,6 +17,7 @@ export function authUser(overrides = {}) {
     role: 'admin',
     organizationId: 'org-e2e',
     createdAt: ISO,
+    onboardingCompletedAt: ISO,
     ...overrides,
   }
 }
