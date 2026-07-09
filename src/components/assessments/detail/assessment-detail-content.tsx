@@ -12,6 +12,7 @@ import { EvaluationStatusBanner } from '@/components/assessments/detail/evaluati
 import { OverallPanel } from '@/components/assessments/detail/overall-panel'
 import { QuestionSection } from '@/components/assessments/detail/question-section'
 import { LiveRefreshNotice } from '@/components/assessments/live-refresh-notice'
+import { InterviewReuseActions } from '@/components/templates/interview-reuse-actions'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Card, CardContent } from '@/components/ui/card'
 import { EyebrowLabel } from '@/components/ui/eyebrow-label'
@@ -68,7 +69,10 @@ export function AssessmentDetailContent({
 
   return (
     <EvaluationActionsProvider onEvaluationStarted={onEvaluationStarted}>
-      <DetailHeader interview={interview} />
+      <DetailHeader
+        interview={interview}
+        actions={<InterviewReuseActions interview={interview} />}
+      />
 
       {!isReadyToScore ? <EvaluationStatusBanner interview={interview} /> : null}
 

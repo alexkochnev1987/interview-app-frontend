@@ -105,6 +105,7 @@ export function InterviewQuestionPickerMain({
     selectedById,
     selectedCount,
     selectedIds,
+    selectedQuestions,
     toggleQuestion,
     toggleQuestionsBulk,
   } = picker
@@ -177,26 +178,47 @@ export function InterviewQuestionPickerMain({
               disabled={disabled}
             />
           )}
-          renderCards={() => (
-            <CardGrid>
-              {view.items.map((question) => (
-                <QuestionCard
-                  key={question.id}
-                  question={question}
-                  listLocale={query.state.locale ?? 'en'}
-                  mode="pick"
-                  selected={selectedById.has(question.id)}
-                  onToggleSelected={() => toggleQuestion(question)}
-                  disabled={disabled}
-                  tourTarget={
-                    highlightQuestionId === question.id
-                      ? 'interview-question'
-                      : undefined
-                  }
-                />
-              ))}
-            </CardGrid>
-          )}
+          renderCards={() => {
+            const rest = view.items.filter(
+              (question) => !selectedById.has(question.id),
+            )
+            return (
+              <CardGrid>
+                {selectedQuestions.map((question) => (
+                  <QuestionCard
+                    key={question.id}
+                    question={question}
+                    listLocale={query.state.locale ?? 'en'}
+                    mode="pick"
+                    selected
+                    onToggleSelected={() => toggleQuestion(question)}
+                    disabled={disabled}
+                    tourTarget={
+                      highlightQuestionId === question.id
+                        ? 'interview-question'
+                        : undefined
+                    }
+                  />
+                ))}
+                {rest.map((question) => (
+                  <QuestionCard
+                    key={question.id}
+                    question={question}
+                    listLocale={query.state.locale ?? 'en'}
+                    mode="pick"
+                    selected={false}
+                    onToggleSelected={() => toggleQuestion(question)}
+                    disabled={disabled}
+                    tourTarget={
+                      highlightQuestionId === question.id
+                        ? 'interview-question'
+                        : undefined
+                    }
+                  />
+                ))}
+              </CardGrid>
+            )
+          }}
         />
 
         {!isCardsView ? (

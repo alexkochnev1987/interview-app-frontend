@@ -1,5 +1,6 @@
 'use client'
 
+import { type ReactNode } from 'react'
 import { ArrowLeft, ClipboardList } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
@@ -27,6 +28,8 @@ import {
 
 interface DetailHeaderProps {
   interview: Interview
+  // Optional actions rendered in the card's bottom-right corner.
+  actions?: ReactNode
 }
 
 function findSubmittedAt(interview: Interview): string | null {
@@ -42,7 +45,7 @@ function findSubmittedAt(interview: Interview): string | null {
   return latest
 }
 
-export function DetailHeader({ interview }: DetailHeaderProps) {
+export function DetailHeader({ interview, actions }: DetailHeaderProps) {
   const t = useTranslations('assessments.detail')
   const sharedLabels = useSharedLabels()
   const reviewStatus = deriveReviewStatus(interview)
@@ -109,6 +112,8 @@ export function DetailHeader({ interview }: DetailHeaderProps) {
               },
             ]}
           />
+
+          {actions}
         </Stack>
       </CardContent>
     </Card>
