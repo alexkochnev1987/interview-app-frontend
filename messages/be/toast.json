@@ -119,6 +119,16 @@
       "take": {
         "unavailableTitle": "Інтэрв’ю недаступнае",
         "loadFailedFallback": "Не ўдалося загрузіць інтэрв’ю."
+      },
+      "templates": {
+        "forbiddenTitle": "У вас няма доступу да шаблонаў",
+        "forbiddenDescription": "Шаблоны інтэрв’ю даступныя толькі HR, адміністратарам і суперадміністратарам. Калі гэта памылка, звярніцеся да ўладальніка працоўнай прасторы.",
+        "unavailableTitle": "Шаблоны зараз недаступныя",
+        "loadFailedFallback": "Не ўдалося загрузіць шаблоны.",
+        "notFoundFallback": "Запытаны шаблон не ўдалося загрузіць.",
+        "nameRequired": "Укажыце назву шаблона.",
+        "questionsRequired": "Выберыце хаця б адно пытанне.",
+        "savingLabel": "Захаванне..."
       }
     },
     "rerun": {
@@ -138,6 +148,14 @@
       "updateSuccess": "Роля абноўлена",
       "updateError": "Не ўдалося абнавіць ролю",
       "updateSuccessDescription": "{name} цяпер {role}."
+    },
+    "template": {
+      "createSuccess": "Шаблон створаны",
+      "createError": "Не ўдалося стварыць шаблон",
+      "updateSuccess": "Шаблон абноўлены",
+      "updateError": "Не ўдалося абнавіць шаблон",
+      "deleteSuccess": "Шаблон выдалены",
+      "deleteError": "Не ўдалося выдаліць шаблон"
     }
   }
 }

@@ -119,6 +119,16 @@
       "take": {
         "unavailableTitle": "Интервью недоступно",
         "loadFailedFallback": "Не удалось загрузить интервью."
+      },
+      "templates": {
+        "forbiddenTitle": "У вас нет доступа к шаблонам",
+        "forbiddenDescription": "Шаблоны интервью доступны только HR, администраторам и суперадминистраторам. Если это ошибка, обратитесь к владельцу рабочей области.",
+        "unavailableTitle": "Шаблоны сейчас недоступны",
+        "loadFailedFallback": "Не удалось загрузить шаблоны.",
+        "notFoundFallback": "Запрошенный шаблон не удалось загрузить.",
+        "nameRequired": "Укажите название шаблона.",
+        "questionsRequired": "Выберите хотя бы один вопрос.",
+        "savingLabel": "Сохранение..."
       }
     },
     "rerun": {
@@ -138,6 +148,14 @@
       "updateSuccess": "Роль обновлена",
       "updateError": "Не удалось обновить роль",
       "updateSuccessDescription": "{name} теперь {role}."
+    },
+    "template": {
+      "createSuccess": "Шаблон создан",
+      "createError": "Не удалось создать шаблон",
+      "updateSuccess": "Шаблон обновлён",
+      "updateError": "Не удалось обновить шаблон",
+      "deleteSuccess": "Шаблон удалён",
+      "deleteError": "Не удалось удалить шаблон"
     }
   }
 }

@@ -28,6 +28,7 @@ import { Stack } from '@/components/ui/layout/stack'
 import { StatusPill } from '@/components/ui/status-pill'
 import { SurfaceTile } from '@/components/ui/surface-tile'
 import { BodyText } from '@/components/ui/text'
+import { InterviewReuseActions } from '@/components/templates/interview-reuse-actions'
 import type { Interview } from '@/lib/api'
 import { formatInterviewDateTime } from '@/lib/interview-formatters'
 import { formatWorkflowStage } from '@/lib/interview-detail-format'
@@ -82,7 +83,7 @@ export function CandidateAccessPanel({
         <CardTitle size="lg">{t('interviewLinkTitle')}</CardTitle>
         <CardDescription>{t('interviewLinkDescription')}</CardDescription>
       </CardHeader>
-      <CardContent spacing="xl">
+      <CardContent spacing="md">
         <SurfaceTile tone="glass" padding="lg">
           <Stack gap={3}>
             <Inline gap={3} align="center" justify="between" wrap="wrap">
@@ -218,6 +219,8 @@ export function CandidateAccessPanel({
             </Stack>
           </SurfaceTile>
         ) : null}
+
+        <InterviewReuseActions interview={interview} />
       </CardContent>
     </Card>
   )
