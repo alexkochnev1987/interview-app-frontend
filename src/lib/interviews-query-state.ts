@@ -12,7 +12,12 @@ export { emptyPaginatedInterviews } from '@/lib/api'
 export const DEFAULT_INTERVIEWS_LIMIT = 20
 /** Delay before search hits the API / URL; input stays instant. */
 export const INTERVIEWS_SEARCH_DEBOUNCE_MS = 500
-const MAX_INTERVIEWS_Q_LENGTH = 200
+/** Matches GET /interviews and GET /interviews/facets server validation. */
+export const MAX_INTERVIEWS_Q_LENGTH = 120
+
+export function clampInterviewsSearchQuery(value: string): string {
+  return value.slice(0, MAX_INTERVIEWS_Q_LENGTH)
+}
 
 export const INTERVIEW_PAGE_LIMIT_OPTIONS = [5, 10, 15, 20, 50] as const
 export type InterviewPageLimit = (typeof INTERVIEW_PAGE_LIMIT_OPTIONS)[number]
@@ -54,7 +59,7 @@ export function readInterviewsFromSearchParams(
   const next: InterviewsQueryState = { ...fallback }
 
   const q = params.get('q')
-  if (q !== null) next.q = q.slice(0, MAX_INTERVIEWS_Q_LENGTH)
+  if (q !== null) next.q = clampInterviewsSearchQuery(q)
 
   const position = params.get('position')
   if (position) next.position = position

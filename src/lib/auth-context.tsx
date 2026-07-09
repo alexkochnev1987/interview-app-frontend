@@ -27,8 +27,9 @@ export function AuthProvider({
   const [user, setUser] = useState<User | null>(initialUser);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- align client state with RSC session snapshot after router.refresh() / navigations
-    setUser(initialUser);
+    // Keep a client-established session when the first RSC refresh has not
+    // picked up the new cookie yet (common right after login/demo sign-in).
+    setUser((current) => initialUser ?? current);
   }, [initialUser]);
 
   const establishSession = (sessionUser: User) => {

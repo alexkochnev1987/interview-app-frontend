@@ -292,8 +292,8 @@ export function startMockApi() {
     void handleRequest(req, res)
   })
 
-  server.listen(PORT, () => {
-    console.log(`[e2e-mock-api] listening on http://localhost:${PORT}`)
+  server.listen(PORT, '127.0.0.1', () => {
+    console.log(`[e2e-mock-api] listening on http://127.0.0.1:${PORT}`)
   })
 
   return server

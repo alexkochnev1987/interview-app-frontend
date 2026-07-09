@@ -22,6 +22,7 @@ import {
 } from '@/lib/api'
 import {
     buildInterviewsFetchParams,
+    clampInterviewsSearchQuery,
     DEFAULT_INTERVIEWS_LIMIT,
     DEFAULT_INTERVIEWS_QUERY,
     INTERVIEWS_SEARCH_DEBOUNCE_MS,
@@ -252,7 +253,8 @@ export function useInterviewsQuery(
 
     const setQ = useCallback<Dispatch<SetStateAction<string>>>((value) => {
         setState((prev) => {
-            const next = typeof value === 'function' ? value(prev.q) : value
+            const raw = typeof value === 'function' ? value(prev.q) : value
+            const next = clampInterviewsSearchQuery(raw)
             if (next === prev.q) return prev
             return { ...prev, q: next, page: 1 }
         })

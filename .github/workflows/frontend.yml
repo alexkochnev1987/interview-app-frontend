@@ -36,8 +36,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CI: true
-      BACKEND_URL: http://localhost:3000
-      E2E_BASE_URL: http://localhost:3001
+      BACKEND_URL: http://127.0.0.1:3000
+      E2E_BASE_URL: http://127.0.0.1:3001
       E2E_PREBUILT: '1'
     steps:
       - uses: actions/checkout@v4

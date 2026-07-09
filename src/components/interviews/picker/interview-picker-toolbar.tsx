@@ -18,8 +18,11 @@ import {
 } from '@/components/ui/select'
 import { StatusPill } from '@/components/ui/status-pill'
 import type { InterviewSortField, InterviewSortOrder } from '@/lib/api'
+import {
+  MAX_INTERVIEWS_Q_LENGTH,
+  type InterviewPageLimit,
+} from '@/lib/interviews-query-state'
 import { InterviewPageSizeSelect } from './interview-page-size-select'
-import type { InterviewPageLimit } from '@/lib/interviews-query-state'
 
 const SORT_OPTIONS: Array<{
   value: `${InterviewSortField}:${InterviewSortOrder}`
@@ -78,6 +81,7 @@ export function InterviewPickerToolbar(props: InterviewPickerToolbarProps) {
     <Stack gap={3}>
       <SearchInput
         value={q}
+        maxLength={MAX_INTERVIEWS_Q_LENGTH}
         onChange={(event) => onQChange(event.target.value)}
         placeholder={tToolbar('searchPlaceholder')}
       />
