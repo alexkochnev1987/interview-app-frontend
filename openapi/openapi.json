@@ -60,7 +60,24 @@
       "post": {
         "operationId": "AuthController_demo",
         "summary": "Sign in to the read-only demo account",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "X-Locale",
+            "in": "header",
+            "required": false,
+            "description": "Response language for localized content. Defaults to `en` when omitted.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "be",
+                "ru",
+                "pl"
+              ],
+              "default": "en"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -433,6 +450,71 @@
         ]
       }
     },
+    "/users/demo": {
+      "post": {
+        "operationId": "UserController_provisionDemo",
+        "summary": "Provision the read-only demo account and demo content",
+        "description": "Idempotent admin-only setup for environments without direct database access. Refused on production unless ALLOW_DEMO_SEED=true is set, so it can never seed demo data into production by accident.",
+        "parameters": [
+          {
+            "name": "X-Locale",
+            "in": "header",
+            "required": false,
+            "description": "Response language for localized content. Defaults to `en` when omitted.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "be",
+                "ru",
+                "pl"
+              ],
+              "default": "en"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemoProvisionResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "users"
+        ],
+        "security": [
+          {
+            "sessionAuth": []
+          }
+        ]
+      }
+    },
     "/questions": {
       "get": {
         "operationId": "QuestionController_findAll",
@@ -674,7 +756,7 @@
       "post": {
         "operationId": "QuestionController_create",
         "summary": "Create question",
-        "description": "Requires `primaryLocale` (en|be|ru|pl) and a full `translations[primaryLocale]` block (questionText, followUpQuestions, expectedConcepts, redFlags, sampleGoodAnswer). Metadata fields (role, category, tags, …) are stored flat on the question row.",
+        "description": "Requires `primaryLocale` (en|be|ru|pl) and a full `translations[primaryLocale]` block (questionText, followUpQuestions, expectedConcepts, redFlags, sampleGoodAnswer). Response rubric is resolved for `primaryLocale` (not `X-Locale`). Metadata fields (role, category, tags, …) are stored flat on the question row.",
         "parameters": [
           {
             "name": "X-Locale",
@@ -2417,6 +2499,22 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "X-Locale",
+            "in": "header",
+            "required": false,
+            "description": "Response language for localized content. Defaults to `en` when omitted.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "be",
+                "ru",
+                "pl"
+              ],
+              "default": "en"
+            }
           }
         ],
         "requestBody": {
@@ -2574,6 +2672,22 @@
             "in": "path",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "X-Locale",
+            "in": "header",
+            "required": false,
+            "description": "Response language for localized content. Defaults to `en` when omitted.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "be",
+                "ru",
+                "pl"
+              ],
+              "default": "en"
             }
           }
         ],
@@ -2902,6 +3016,89 @@
             }
           },
           "503": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "interviews"
+        ],
+        "security": [
+          {
+            "sessionAuth": []
+          }
+        ]
+      }
+    },
+    "/interviews/{id}/mark-demo": {
+      "post": {
+        "operationId": "InterviewController_markDemo",
+        "summary": "Mark an interview as the demo interview",
+        "description": "Admin-only. Flips the interview to demo and reassigns it to the demo account, removes the fabricated placeholder demo interview and demotes any other completed demo interview so exactly the marked completed interview plus the seeded pending one remain. Re-running the demo provisioning afterwards will not recreate the placeholder. Refused on production unless ALLOW_DEMO_SEED=true is set.",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Locale",
+            "in": "header",
+            "required": false,
+            "description": "Response language for localized content. Defaults to `en` when omitted.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "be",
+                "ru",
+                "pl"
+              ],
+              "default": "en"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarkInterviewDemoResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
             "description": "",
             "content": {
               "application/json": {
@@ -4456,6 +4653,7 @@
           "REGISTRATION_FAILED",
           "UPLOAD_FAILED",
           "UPLOAD_NOT_ALLOWED",
+          "ANSWER_ATTEMPT_LIMIT_REACHED",
           "UNAUTHORIZED",
           "INVALID_CREDENTIALS",
           "AUTHENTICATION_REQUIRED",
@@ -4530,6 +4728,43 @@
         },
         "required": [
           "role"
+        ]
+      },
+      "DemoProvisionCountsDto": {
+        "type": "object",
+        "properties": {
+          "users": {
+            "type": "number",
+            "example": 1
+          },
+          "questions": {
+            "type": "number",
+            "example": 3
+          },
+          "interviews": {
+            "type": "number",
+            "example": 1
+          }
+        },
+        "required": [
+          "users",
+          "questions",
+          "interviews"
+        ]
+      },
+      "DemoProvisionResponseDto": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/AuthUserResponseDto"
+          },
+          "counts": {
+            "$ref": "#/components/schemas/DemoProvisionCountsDto"
+          }
+        },
+        "required": [
+          "user",
+          "counts"
         ]
       },
       "QuestionExpectedConceptDto": {
@@ -4872,6 +5107,17 @@
           "deleted": {
             "type": "boolean"
           },
+          "pendingDeletion": {
+            "type": "boolean",
+            "description": "True when deletion is scheduled because the question is still used by active interviews."
+          },
+          "blockingInterviews": {
+            "description": "Present when pendingDeletion is true — active interviews still using this question.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuestionDeleteBlockingInterviewDto"
+            }
+          },
           "usageCount": {
             "type": "number",
             "description": "Number of times this question has been used in an interview."
@@ -4923,6 +5169,7 @@
           "createdAt",
           "updatedAt",
           "deleted",
+          "pendingDeletion",
           "usageCount",
           "resolvedLocale",
           "availableLocales"
@@ -5076,6 +5323,23 @@
           "sampleGoodAnswer"
         ]
       },
+      "QuestionTranslationsMapDto": {
+        "type": "object",
+        "properties": {
+          "en": {
+            "$ref": "#/components/schemas/QuestionTranslationDto"
+          },
+          "be": {
+            "$ref": "#/components/schemas/QuestionTranslationDto"
+          },
+          "ru": {
+            "$ref": "#/components/schemas/QuestionTranslationDto"
+          },
+          "pl": {
+            "$ref": "#/components/schemas/QuestionTranslationDto"
+          }
+        }
+      },
       "QuestionDraftInputDto": {
         "type": "object",
         "properties": {
@@ -5089,10 +5353,7 @@
             ]
           },
           "translations": {
-            "type": "object",
-            "additionalProperties": {
-              "$ref": "#/components/schemas/QuestionTranslationDto"
-            }
+            "$ref": "#/components/schemas/QuestionTranslationsMapDto"
           },
           "questionText": {
             "type": "string"
@@ -5252,23 +5513,6 @@
           "roles",
           "tags"
         ]
-      },
-      "QuestionTranslationsMapDto": {
-        "type": "object",
-        "properties": {
-          "en": {
-            "$ref": "#/components/schemas/QuestionTranslationDto"
-          },
-          "be": {
-            "$ref": "#/components/schemas/QuestionTranslationDto"
-          },
-          "ru": {
-            "$ref": "#/components/schemas/QuestionTranslationDto"
-          },
-          "pl": {
-            "$ref": "#/components/schemas/QuestionTranslationDto"
-          }
-        }
       },
       "CreateQuestionDto": {
         "type": "object",
@@ -6687,6 +6931,28 @@
           "answers"
         ]
       },
+      "MarkInterviewDemoResponseDto": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "example": true
+          },
+          "interviewId": {
+            "type": "string",
+            "example": "00000000-0000-4000-8000-0000000000a1"
+          },
+          "placeholderRemoved": {
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "required": [
+          "ok",
+          "interviewId",
+          "placeholderRemoved"
+        ]
+      },
       "PresignRequestDto": {
         "type": "object",
         "properties": {
@@ -6705,6 +6971,10 @@
               "camera",
               "screen"
             ]
+          },
+          "versionNumber": {
+            "type": "number",
+            "description": "Answer attempt/version being recorded. Omit when starting the next attempt."
           }
         },
         "required": [
@@ -6776,6 +7046,10 @@
               "camera",
               "screen"
             ]
+          },
+          "versionNumber": {
+            "type": "number",
+            "description": "Answer attempt/version being recorded. Omit when starting the next attempt."
           }
         },
         "required": [
@@ -6978,6 +7252,10 @@
             "type": "string",
             "example": "ok"
           },
+          "message": {
+            "type": "string",
+            "example": "Lightsail backend is serving the latest deploy."
+          },
           "timestamp": {
             "format": "date-time",
             "type": "string",
@@ -6986,6 +7264,7 @@
         },
         "required": [
           "status",
+          "message",
           "timestamp"
         ]
       },

@@ -34,6 +34,8 @@ interface TakeRecordingScreenProps {
   interviewerPresence: InterviewerPresence;
   formatTime: (seconds: number) => string;
   recordingStartBusy: boolean;
+  retakeDisabled: boolean;
+  displayedAttemptNumber: number;
   onReconnect: () => void;
   onRerecord: () => void;
   onSubmit: () => void;
@@ -61,6 +63,8 @@ export function TakeRecordingScreen({
   interviewerPresence,
   formatTime,
   recordingStartBusy,
+  retakeDisabled,
+  displayedAttemptNumber,
   onReconnect,
   onRerecord,
   onSubmit,
@@ -102,6 +106,8 @@ export function TakeRecordingScreen({
             progressValue={progressValue}
             submitError={submitError}
             recordingStartBusy={recordingStartBusy}
+            retakeDisabled={retakeDisabled}
+            displayedAttemptNumber={displayedAttemptNumber}
             isBrowserTranscriptSupported={isBrowserTranscriptSupported}
             finalTranscript={finalTranscript}
             interimTranscript={interimTranscript}
