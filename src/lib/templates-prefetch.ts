@@ -1,7 +1,7 @@
 import { dehydrate, type DehydratedState } from '@tanstack/react-query'
 
 import { templatesListQueryKey } from '@/components/templates/query-keys'
-import type { Interview, Template } from '@/lib/api'
+import type { Interview, Template, TemplateSummary } from '@/lib/api'
 import { getQueryClient } from '@/lib/get-query-client'
 import { requestServer, type ServerRequestContext } from '@/lib/server-fetch'
 
@@ -12,7 +12,7 @@ export async function prefetchTemplatesList(
   await queryClient.prefetchQuery({
     queryKey: templatesListQueryKey(ctx.locale),
     queryFn: async () =>
-      (await requestServer<Template[]>('/templates', ctx)) ?? [],
+      (await requestServer<TemplateSummary[]>('/templates', ctx)) ?? [],
   })
   return dehydrate(queryClient)
 }

@@ -41,7 +41,7 @@
       "questionsTitle": "Questions",
       "questionsDescription": "Pick the questions this template includes.",
       "questionsUnavailableTitle": "Template questions unavailable",
-      "questionsUnavailableDescription": "The questions saved in this template are no longer available. Add at least one question before saving.",
+      "questionsUnavailableDescription": "Some questions saved in this template are no longer available and were dropped from the selection. Add at least one question before saving.",
       "createButton": "Create template",
       "saveButton": "Save template",
       "cancelButton": "Cancel"

@@ -56,10 +56,10 @@ export function TemplateForm({
   const locale = useLocale()
   const router = useRouter()
   const isEdit = Boolean(template)
-  // On edit, a template whose stored questions have all been deleted resolves to
-  // an empty set; warn explicitly instead of only blocking submit with a generic error.
+  // On edit, warn when any stored question no longer resolves (some or all gone),
+  // instead of silently dropping them or only blocking submit with a generic error.
   const templateQuestionsUnavailable =
-    isEdit && (template?.questions?.length ?? 0) === 0
+    isEdit && !!template && template.questionCount < template.storedQuestionCount
 
   const [name, setName] = useState(template?.name ?? initialName ?? '')
   const [description, setDescription] = useState(template?.description ?? '')

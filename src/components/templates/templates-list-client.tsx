@@ -7,7 +7,7 @@ import { ArrowRight, LayoutTemplate, Pencil, Plus, RefreshCw, Trash2 } from 'luc
 
 import { templatesListQueryKey } from '@/components/templates/query-keys'
 import { useDeleteTemplate } from '@/components/templates/use-template-mutations'
-import { getTemplates, type Template } from '@/lib/api'
+import { getTemplates, type TemplateSummary } from '@/lib/api'
 import { routes } from '@/i18n/routes'
 import { useRouter } from '@/i18n/navigation'
 import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
@@ -44,13 +44,15 @@ type TemplateSort = 'popular' | 'recent' | 'name'
 interface TemplateGroup {
   key: string
   header: string
-  templates: Template[]
+  templates: TemplateSummary[]
 }
 
-const updatedMs = (t: Template) => new Date(t.updatedAt).getTime()
+const updatedMs = (t: TemplateSummary) => new Date(t.updatedAt).getTime()
 
 // Comparator for templates within a group, driven by the active sort.
-function cardComparator(sort: TemplateSort): (a: Template, b: Template) => number {
+function cardComparator(
+  sort: TemplateSort,
+): (a: TemplateSummary, b: TemplateSummary) => number {
   if (sort === 'recent') {
     return (a, b) => updatedMs(b) - updatedMs(a) || a.name.localeCompare(b.name)
   }
@@ -60,7 +62,7 @@ function cardComparator(sort: TemplateSort): (a: Template, b: Template) => numbe
   return (a, b) => b.usageCount - a.usageCount || a.name.localeCompare(b.name)
 }
 
-function matchesSearch(template: Template, needle: string): boolean {
+function matchesSearch(template: TemplateSummary, needle: string): boolean {
   if (!needle) return true
   const hay = `${template.name} ${template.description ?? ''} ${template.position ?? ''}`
   return hay.toLowerCase().includes(needle)
@@ -68,7 +70,7 @@ function matchesSearch(template: Template, needle: string): boolean {
 
 // Group by position; group order follows the active sort, with "Other" always last.
 function groupByPosition(
-  templates: Template[],
+  templates: TemplateSummary[],
   otherLabel: string,
   sort: TemplateSort,
 ): TemplateGroup[] {
@@ -104,7 +106,7 @@ export function TemplatesListClient() {
   const locale = useLocale()
   const router = useRouter()
   const deleteTemplate = useDeleteTemplate()
-  const [pendingDelete, setPendingDelete] = useState<Template | null>(null)
+  const [pendingDelete, setPendingDelete] = useState<TemplateSummary | null>(null)
   const [search, setSearch] = useState('')
   const [sort, setSort] = useState<TemplateSort>('popular')
 

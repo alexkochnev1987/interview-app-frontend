@@ -762,11 +762,13 @@ export async function submitTakeAnswer(
 export type Template = Omit<Schemas['TemplateResponseDto'], 'questions'> & {
   questions: Question[];
 };
+// List item: summary fields only, no resolved questions (the list never reads them).
+export type TemplateSummary = Schemas['TemplateSummaryResponseDto'];
 export type CreateTemplatePayload = Schemas['CreateTemplateDto'];
 export type UpdateTemplatePayload = Schemas['UpdateTemplateDto'];
 export type DeleteTemplateResponse = Schemas['DeleteTemplateResponseDto'];
 
-export async function getTemplates(): Promise<Template[]> {
+export async function getTemplates(): Promise<TemplateSummary[]> {
   return handle(client.GET('/templates', {
     ...LOCALIZED_HEADERS,
   }));

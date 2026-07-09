@@ -41,7 +41,7 @@
       "questionsTitle": "Pytania",
       "questionsDescription": "Wybierz pytania, które zawiera ten szablon.",
       "questionsUnavailableTitle": "Pytania szablonu niedostępne",
-      "questionsUnavailableDescription": "Pytania zapisane w tym szablonie nie są już dostępne. Dodaj co najmniej jedno pytanie przed zapisaniem.",
+      "questionsUnavailableDescription": "Niektóre pytania zapisane w tym szablonie nie są już dostępne i zostały usunięte z wyboru. Dodaj co najmniej jedno pytanie przed zapisaniem.",
       "createButton": "Utwórz szablon",
       "saveButton": "Zapisz szablon",
       "cancelButton": "Anuluj"

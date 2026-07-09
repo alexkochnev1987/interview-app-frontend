@@ -1328,8 +1328,29 @@ export interface components {
             position?: string;
             /** @description Number of currently-resolvable questions (references that are deleted or pending deletion are excluded). */
             questionCount: number;
+            /** @description Number of ids stored on the template, including references that no longer resolve. When higher than questionCount, some saved questions are gone. */
+            storedQuestionCount: number;
             /** @description Live question rows resolved from the stored ids, in stored order, for the request locale. Seeds the interview question picker on edit and prefill. */
             questions: components["schemas"]["ResolvedQuestionResponseDto"][];
+            /** @description Id of the user who created the template (attribution only). */
+            createdById?: string;
+            demo: boolean;
+            /** @description Popularity: how many interviews have been created from this template. */
+            usageCount: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        TemplateSummaryResponseDto: {
+            id: string;
+            name: string;
+            description?: string;
+            position?: string;
+            /** @description Number of currently-resolvable questions (references that are deleted or pending deletion are excluded). */
+            questionCount: number;
+            /** @description Number of ids stored on the template, including references that no longer resolve. When higher than questionCount, some saved questions are gone. */
+            storedQuestionCount: number;
             /** @description Id of the user who created the template (attribution only). */
             createdById?: string;
             demo: boolean;
@@ -2938,7 +2959,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TemplateResponseDto"][];
+                    "application/json": components["schemas"]["TemplateSummaryResponseDto"][];
                 };
             };
             401: {
