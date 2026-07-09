@@ -29,13 +29,18 @@ import { useRouter } from '@/i18n/navigation'
 import { LOCALES, type Locale } from '@/i18n/locales'
 import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { useIsDemo } from '@/lib/auth-context'
-import { createInterview, type Question } from '@/lib/api'
+import { createInterview, recordTemplateUse, type Question } from '@/lib/api'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
 import { runMutation } from '@/lib/run-mutation'
 import { useToastMessages } from '@/lib/use-toast-messages'
 
 type InterviewCreateFormProps = {
   initialPrefetch: QuestionsLibraryPrefetch
+  // Optional prefill: seeds the question picker and position; candidate name stays empty.
+  initialSelected?: Question[]
+  initialPosition?: string
+  // Set when prefilled from a template; its id is recorded on create to bump popularity.
+  initialTemplateId?: string
 }
 
 function questionSupportsInterviewLocale(question: Question, locale: Locale): boolean {
@@ -49,19 +54,25 @@ function questionSupportsInterviewLocale(question: Question, locale: Locale): bo
   return available.includes(locale)
 }
 
-export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProps) {
+export function InterviewCreateForm({
+  initialPrefetch,
+  initialSelected,
+  initialPosition,
+  initialTemplateId,
+}: InterviewCreateFormProps) {
   const t = useTranslations('questions.common')
   const uiLocale = useLocale() as Locale
   const router = useRouter()
   const toastMessages = useToastMessages()
   const isDemo = useIsDemo()
   const [candidateName, setCandidateName] = useState('')
-  const [position, setPosition] = useState('')
+  const [position, setPosition] = useState(initialPosition ?? '')
   const [interviewLocale, setInterviewLocale] = useState<Locale>(uiLocale)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const picker = useInterviewQuestionPicker({
+    initialSelected: initialSelected ?? [],
     initialPrefetch,
     serverHydrated: true,
   })
@@ -110,6 +121,10 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
             toastMessages.apiError.message(error) ?? toastMessages.interview.createError,
         },
       )
+      // Fire-and-forget popularity bump; never block navigation on it.
+      if (initialTemplateId) {
+        void recordTemplateUse(initialTemplateId).catch(() => {})
+      }
       router.push(`/interviews/${interview.id}`)
     } catch {
       return
