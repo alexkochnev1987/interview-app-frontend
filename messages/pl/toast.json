@@ -128,6 +128,16 @@
       "take": {
         "unavailableTitle": "Interview niedostępne",
         "loadFailedFallback": "Nie udało się załadować interview."
+      },
+      "templates": {
+        "forbiddenTitle": "Brak dostępu do szablonów",
+        "forbiddenDescription": "Szablony interview są zarezerwowane dla HR, administratorów i superadministratorów. Jeśli to błąd, skontaktuj się z właścicielem workspace.",
+        "unavailableTitle": "Szablony są teraz niedostępne",
+        "loadFailedFallback": "Nie udało się załadować szablonów.",
+        "notFoundFallback": "Nie udało się załadować wybranego szablonu.",
+        "nameRequired": "Nazwa szablonu jest wymagana.",
+        "questionsRequired": "Wybierz co najmniej jedno pytanie.",
+        "savingLabel": "Zapisywanie..."
       }
     },
     "rerun": {
@@ -147,6 +157,14 @@
       "updateSuccess": "Rola zaktualizowana",
       "updateError": "Nie udało się zaktualizować roli",
       "updateSuccessDescription": "{name} ma teraz rolę {role}."
+    },
+    "template": {
+      "createSuccess": "Szablon utworzony",
+      "createError": "Nie udało się utworzyć szablonu",
+      "updateSuccess": "Szablon zaktualizowany",
+      "updateError": "Nie udało się zaktualizować szablonu",
+      "deleteSuccess": "Szablon usunięty",
+      "deleteError": "Nie udało się usunąć szablonu"
     }
   }
 }

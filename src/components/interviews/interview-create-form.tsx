@@ -36,6 +36,11 @@ import { useToastMessages } from '@/lib/use-toast-messages'
 
 type InterviewCreateFormProps = {
   initialPrefetch: QuestionsLibraryPrefetch
+  // Optional prefill: seeds the question picker and position; candidate name stays empty.
+  initialSelected?: Question[]
+  initialPosition?: string
+  // Set when prefilled from a template; its id is recorded on create to bump popularity.
+  initialTemplateId?: string
 }
 
 function questionSupportsInterviewLocale(question: Question, locale: Locale): boolean {
@@ -49,19 +54,25 @@ function questionSupportsInterviewLocale(question: Question, locale: Locale): bo
   return available.includes(locale)
 }
 
-export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProps) {
+export function InterviewCreateForm({
+  initialPrefetch,
+  initialSelected,
+  initialPosition,
+  initialTemplateId,
+}: InterviewCreateFormProps) {
   const t = useTranslations('questions.common')
   const uiLocale = useLocale() as Locale
   const router = useRouter()
   const toastMessages = useToastMessages()
   const isDemo = useIsDemo()
   const [candidateName, setCandidateName] = useState('')
-  const [position, setPosition] = useState('')
+  const [position, setPosition] = useState(initialPosition ?? '')
   const [interviewLocale, setInterviewLocale] = useState<Locale>(uiLocale)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const picker = useInterviewQuestionPicker({
+    initialSelected: initialSelected ?? [],
     initialPrefetch,
     serverHydrated: true,
   })
@@ -102,6 +113,8 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
             position: position.trim(),
             interviewLocale,
             questionIds: Array.from(selectedById.keys()),
+            // Popularity is bumped server-side in the same transaction when set.
+            templateId: initialTemplateId,
           }),
         {
           successMessage: toastMessages.interview.createSuccess,

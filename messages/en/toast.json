@@ -128,6 +128,16 @@
       "take": {
         "unavailableTitle": "Interview unavailable",
         "loadFailedFallback": "Failed to load interview."
+      },
+      "templates": {
+        "forbiddenTitle": "You don't have access to templates",
+        "forbiddenDescription": "Interview templates are reserved for HR, admin, and super-admin users. If you think this is a mistake, contact your workspace owner.",
+        "unavailableTitle": "Templates are unavailable right now",
+        "loadFailedFallback": "Failed to load templates.",
+        "notFoundFallback": "The requested template could not be loaded.",
+        "nameRequired": "Template name is required.",
+        "questionsRequired": "Select at least one question.",
+        "savingLabel": "Saving..."
       }
     },
     "rerun": {
@@ -147,6 +157,14 @@
       "updateSuccess": "Role updated",
       "updateError": "Could not update role",
       "updateSuccessDescription": "{name} is now {role}."
+    },
+    "template": {
+      "createSuccess": "Template created",
+      "createError": "Failed to create template",
+      "updateSuccess": "Template updated",
+      "updateError": "Failed to update template",
+      "deleteSuccess": "Template deleted",
+      "deleteError": "Failed to delete template"
     }
   }
 }

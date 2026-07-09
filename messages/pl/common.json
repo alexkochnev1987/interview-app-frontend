@@ -38,7 +38,8 @@
     "fallback": {
       "backToDashboard": "Wróć do panelu",
       "backToQuestionLibrary": "Wróć do bazy pytań",
-      "backToAssessments": "Wróć do ocen"
+      "backToAssessments": "Wróć do ocen",
+      "backToTemplates": "Wróć do szablonów"
     },
     "labels": {
       "roles": {

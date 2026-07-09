@@ -7,6 +7,7 @@ import {
   BriefcaseBusiness,
   ClipboardList,
   LayoutDashboard,
+  LayoutTemplate,
   LibraryBig,
   LogOut,
   Plus,
@@ -81,7 +82,11 @@ export function SideNav() {
       ? [{ href: '/assessments', label: tNav('assessments'), icon: ClipboardList }]
       : []),
     ...(canConfigureInterview(user?.role)
-      ? [{ href: routes.interviews.list, label: tNav('interviews'), icon: BriefcaseBusiness }]
+      ? [
+          { href: routes.interviews.list, label: tNav('interviews'), icon: BriefcaseBusiness },
+          // Templates are read-only for demo accounts, so this entry is not gated on !isDemo.
+          { href: routes.templates.list, label: tNav('templates'), icon: LayoutTemplate },
+        ]
       : []),
     ...(canConfigureInterview(user?.role) && !isDemo
       ? [{ href: '/interviews/new', label: tNav('newInterview'), icon: Plus }]
