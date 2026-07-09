@@ -804,14 +804,3 @@ export async function deleteTemplate(id: string): Promise<DeleteTemplateResponse
     params: { path: { id } },
   }));
 }
-
-// Records that an interview was created from a template (bumps its popularity).
-export type TemplateUsageResponse = Schemas['TemplateUsageResponseDto'];
-
-export async function recordTemplateUse(
-  id: string,
-): Promise<TemplateUsageResponse> {
-  return handle(client.POST('/templates/{id}/use', {
-    params: { path: { id } },
-  }));
-}

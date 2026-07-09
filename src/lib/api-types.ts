@@ -429,26 +429,6 @@ export interface paths {
         patch: operations["TemplateController_patchUpdate"];
         trace?: never;
     };
-    "/templates/{id}/use": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Record that an interview was created from this template
-         * @description Increments the template popularity (usage_count). Gated on interviews:create so only users who can create interviews (never demo accounts) affect it.
-         */
-        post: operations["TemplateController_recordUse"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/interviews": {
         parameters: {
             query?: never;
@@ -1373,11 +1353,6 @@ export interface components {
             position?: string;
             questionIds?: string[];
         };
-        TemplateUsageResponseDto: {
-            id: string;
-            /** @description Usage count after the increment. */
-            usageCount: number;
-        };
         DeleteTemplateResponseDto: {
             id: string;
             /** @enum {number} */
@@ -1393,6 +1368,8 @@ export interface components {
              * @enum {string}
              */
             interviewLocale: "en" | "be" | "ru" | "pl";
+            /** @description Template this interview was started from. When set, the template popularity (usage_count) is incremented in the same transaction, so usage is recorded server-side rather than by a separate client call. */
+            templateId?: string;
             questionIds: string[];
         };
         MediaArtifactDto: {
@@ -3220,54 +3197,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ApiErrorResponseDto"];
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponseDto"];
-                };
-            };
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponseDto"];
-                };
-            };
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponseDto"];
-                };
-            };
-        };
-    };
-    TemplateController_recordUse: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Response language for localized content. Defaults to `en` when omitted. */
-                "X-Locale"?: "en" | "be" | "ru" | "pl";
-            };
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TemplateUsageResponseDto"];
                 };
             };
             401: {

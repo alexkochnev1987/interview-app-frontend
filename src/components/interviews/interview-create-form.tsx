@@ -29,7 +29,7 @@ import { useRouter } from '@/i18n/navigation'
 import { LOCALES, type Locale } from '@/i18n/locales'
 import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { useIsDemo } from '@/lib/auth-context'
-import { createInterview, recordTemplateUse, type Question } from '@/lib/api'
+import { createInterview, type Question } from '@/lib/api'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
 import { runMutation } from '@/lib/run-mutation'
 import { useToastMessages } from '@/lib/use-toast-messages'
@@ -113,6 +113,8 @@ export function InterviewCreateForm({
             position: position.trim(),
             interviewLocale,
             questionIds: Array.from(selectedById.keys()),
+            // Popularity is bumped server-side in the same transaction when set.
+            templateId: initialTemplateId,
           }),
         {
           successMessage: toastMessages.interview.createSuccess,
@@ -121,10 +123,6 @@ export function InterviewCreateForm({
             toastMessages.apiError.message(error) ?? toastMessages.interview.createError,
         },
       )
-      // Fire-and-forget popularity bump; never block navigation on it.
-      if (initialTemplateId) {
-        void recordTemplateUse(initialTemplateId).catch(() => {})
-      }
       router.push(`/interviews/${interview.id}`)
     } catch {
       return
