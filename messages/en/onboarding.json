@@ -2,7 +2,13 @@
   "onboarding": {
     "welcome": {
       "title": "Welcome to AI Interview Architect",
-      "description": "A quick one-minute tour for hiring teams: build your question bank, create interviews, share candidate links, and review assessments. You can skip anytime.",
+      "description": "A guided walkthrough of the hiring workflow — from question bank to AI-scored assessments. You can skip anytime.",
+      "eyebrow": "Product tour",
+      "duration": "~1 minute",
+      "journeyQuestions": "Questions",
+      "journeyAi": "AI Draft",
+      "journeyInterviews": "Interviews",
+      "journeyAssessments": "AI review",
       "start": "Start tour",
       "skip": "Skip for now"
     },
@@ -51,8 +57,8 @@
         "description": "Click Create Question to save the question with the AI-generated details."
       },
       "assessmentsEvaluation": {
-        "title": "AI-evaluated interview",
-        "description": "This interview has been scored by AI. Open the card to review candidate answers, per-question scores, and detailed insights."
+        "title": "Start AI evaluation",
+        "description": "When every answer is submitted, click Start AI evaluation to score the interview and generate the scorecard."
       },
       "candidateLink": {
         "title": "Share the candidate link",

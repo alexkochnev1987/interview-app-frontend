@@ -22,6 +22,7 @@ import {
   selectHrVisibleAssessments,
 } from '@/lib/assessment-status'
 import { useOnboardingAssessmentsCardHighlight } from '@/features/onboarding/use-onboarding-tour-targets'
+import { isOnboardingStarterInterview } from '@/lib/onboarding-starter'
 import { useLivePolling } from '@/lib/use-live-polling'
 
 interface AssessmentsListClientProps {
@@ -32,6 +33,20 @@ function matchesQuery(interview: Interview, normalizedQuery: string): boolean {
   if (!normalizedQuery) return true
   const haystack = `${interview.candidateName} ${interview.position}`.toLowerCase()
   return haystack.includes(normalizedQuery)
+}
+
+function pickTourAssessment(interviews: Interview[]): Interview | undefined {
+  const real = interviews.filter(
+    (interview) => !isOnboardingStarterInterview(interview),
+  )
+
+  return (
+    real.find((interview) => deriveReviewStatus(interview) === 'ready_to_score')
+    ?? real.find((interview) => deriveReviewStatus(interview) === 'ready')
+    ?? real[0]
+    ?? interviews.find((interview) => isOnboardingStarterInterview(interview))
+    ?? interviews[0]
+  )
 }
 
 export function AssessmentsListClient({
@@ -66,7 +81,12 @@ export function AssessmentsListClient({
       return matchesQuery(interview, normalizedQuery)
     })
   }, [interviews, status, deferredQuery])
-  const tourHighlightId = useOnboardingAssessmentsCardHighlight(filtered[0]?.id)
+
+  const tourAssessment = useMemo(
+    () => pickTourAssessment(filtered),
+    [filtered],
+  )
+  const tourHighlightId = useOnboardingAssessmentsCardHighlight(tourAssessment?.id)
 
   return (
     <EvaluationActionsProvider onEvaluationStarted={onEvaluationStarted}>

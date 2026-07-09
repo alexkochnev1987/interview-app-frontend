@@ -25,6 +25,7 @@ import {
   reviewStatusTone,
 } from '@/lib/assessment-status'
 import { formatInterviewDate } from '@/lib/interview-formatters'
+import { isOnboardingStarterInterview } from '@/lib/onboarding-starter'
 
 interface AssessmentCardProps {
   interview: Interview
@@ -39,12 +40,10 @@ export function AssessmentCard({ interview, tourTarget }: AssessmentCardProps) {
   const overallScore = interview.result?.overallScore
   const decision = interview.result?.decision ?? null
   const isReadyToScore = reviewStatus === 'ready_to_score'
+  const isStarterSample = isOnboardingStarterInterview(interview)
 
   return (
     <Card variant="surface" height="full" interaction="hover" data-tour={tourTarget}>
-      {/* display="contents" keeps the header + metrics as direct layout children
-          of the Card (no overlay, no stacking or hover conflict). The Start
-          button stays a sibling and is never nested inside the anchor. */}
       <UnstyledLink
         href={`/assessments/${interview.id}`}
         display="contents"
@@ -52,6 +51,11 @@ export function AssessmentCard({ interview, tourTarget }: AssessmentCardProps) {
       >
         <CardHeader spacing="md">
           <PillRow>
+            {isStarterSample ? (
+              <StatusPill tone="neutral" casing="chip">
+                {t('sampleBadge')}
+              </StatusPill>
+            ) : null}
             <StatusPill tone={reviewStatusTone(reviewStatus)} casing="chip">
               {sharedLabels.reviewStatus(reviewStatus)}
             </StatusPill>

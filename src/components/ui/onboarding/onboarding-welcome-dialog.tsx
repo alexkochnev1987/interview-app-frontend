@@ -1,14 +1,17 @@
 'use client'
 
-import { Sparkles } from 'lucide-react'
+import { Sparkles, Timer } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { CardContent } from '@/components/ui/card'
+import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
 import { Icon } from '@/components/ui/icon'
 import { IconBadge } from '@/components/ui/icon-badge'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { ModalShell } from '@/components/ui/modal-shell'
+import { OnboardingWelcomeJourney } from '@/components/ui/onboarding/onboarding-welcome-journey'
 import { BodyText, SectionHeading } from '@/components/ui/text'
 
 type OnboardingWelcomeDialogProps = {
@@ -28,6 +31,8 @@ export function OnboardingWelcomeDialog({
   onStart,
   onSkip,
 }: OnboardingWelcomeDialogProps) {
+  const t = useTranslations('onboarding.welcome')
+
   return (
     <ModalShell
       size="md"
@@ -36,24 +41,51 @@ export function OnboardingWelcomeDialog({
       accessibilityDescription={description}
     >
       <CardContent spacing="2xl">
-        <Stack gap={6}>
-          <Stack gap={4}>
-            <IconBadge tone="gradient" size="md">
-              <Icon size="lg">
+        <Stack gap={8} align="center" width="full">
+          <Stack gap={4} align="center" width="full">
+            <IconBadge tone="gradient" size="xl" align="center">
+              <Icon size="xl">
                 <Sparkles />
               </Icon>
             </IconBadge>
-            <Stack gap={2}>
-              <SectionHeading size="md">{title}</SectionHeading>
-              <BodyText tone="muted">{description}</BodyText>
-            </Stack>
+
+            <Inline gap={2} wrap="wrap" justify="center" align="center">
+              <EyebrowBadge tone="primary" size="sm" casing="normal">
+                {t('eyebrow')}
+              </EyebrowBadge>
+              <EyebrowBadge tone="muted" size="sm" casing="normal">
+                <Icon size="xs">
+                  <Timer />
+                </Icon>
+                {t('duration')}
+              </EyebrowBadge>
+            </Inline>
+
+            <SectionHeading size="lg" className="text-center">
+              {title}
+            </SectionHeading>
           </Stack>
 
-          <Inline gap={3} wrap="wrap" justify="end">
-            <Button type="button" variant="ghost" onClick={onSkip}>
+          <OnboardingWelcomeJourney />
+
+          <BodyText tone="muted" size="sm" className="max-w-md text-center">
+            {description}
+          </BodyText>
+
+          <Inline
+            gap={3}
+            wrap="wrap"
+            justify="center"
+            align="center"
+            width="full"
+          >
+            <Button type="button" variant="outline" size="lg" onClick={onSkip}>
               {skipLabel}
             </Button>
-            <Button type="button" variant="gradient" onClick={onStart}>
+            <Button type="button" variant="gradient" size="xl" onClick={onStart}>
+              <Icon size="md">
+                <Sparkles />
+              </Icon>
               {startLabel}
             </Button>
           </Inline>

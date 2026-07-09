@@ -153,6 +153,7 @@ export const staffFirstLoginFlow: OnboardingFlowConfig = {
       contentKey: 'assessmentsEvaluation',
       visibility: [{ type: 'canReviewAssessments' }, { type: 'notDemo' }],
       ...pageTourStepDefaults,
+      missingTarget: 'skip',
       waitTimeoutMs: 8000,
       scrollIntoViewBlock: 'center',
       popoverSide: 'right',

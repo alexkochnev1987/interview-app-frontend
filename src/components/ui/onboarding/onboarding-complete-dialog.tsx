@@ -49,15 +49,15 @@ export function OnboardingCompleteDialog({
       <CardContent spacing="2xl">
         <Stack gap={6}>
           <Stack gap={4}>
-            <IconBadge tone="gradient" size="lg">
-              <Icon size="xl">
-                <CheckCircle2 />
-              </Icon>
-            </IconBadge>
-            <Stack gap={2}>
+            <Inline gap={3} align="center">
+              <IconBadge tone="gradient" size="md">
+                <Icon size="lg">
+                  <CheckCircle2 />
+                </Icon>
+              </IconBadge>
               <SectionHeading size="md">{title}</SectionHeading>
-              <BodyText tone="muted">{description}</BodyText>
-            </Stack>
+            </Inline>
+            <BodyText tone="muted">{description}</BodyText>
           </Stack>
 
           <SurfaceTile tone="soft" padding="lg" rounded="2xl">

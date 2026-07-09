@@ -11,12 +11,10 @@ export type OnboardingVisibilityRule =
   | { type: 'canReviewAssessments' }
   | { type: 'canConfigureInterview' };
 
-export type OnboardingAdvanceConfig =
-  | { mode?: 'next' }
-  | {
-      mode: 'event';
-      eventName: OnboardingEventName;
-    };
+export type OnboardingAdvanceConfig = {
+  mode: 'event';
+  eventName: OnboardingEventName;
+};
 
 export type OnboardingGateConfig = {
   type: 'nonEmptyInput';

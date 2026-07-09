@@ -167,10 +167,6 @@ export function useOnboardingTour({
 
       driver.drive(startIndex)
 
-      if (options?.skipWelcome) {
-        return true
-      }
-
       return true
     },
     [context, flowId, locale, onTourComplete, onTourSkip, pathname, prepareStep, stopTour, t, translateStep],

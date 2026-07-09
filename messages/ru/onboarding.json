@@ -2,7 +2,13 @@
   "onboarding": {
     "welcome": {
       "title": "Добро пожаловать в AI Interview Architect",
-      "description": "Короткий тур примерно на минуту для команд найма: банк вопросов, создание интервью, ссылки для кандидатов и оценка результатов. Можно пропустить в любой момент.",
+      "description": "Пошаговый обзор процесса найма — от банка вопросов до AI-оценки. Можно пропустить в любой момент.",
+      "eyebrow": "Тур по продукту",
+      "duration": "~1 минута",
+      "journeyQuestions": "Вопросы",
+      "journeyAi": "AI Draft",
+      "journeyInterviews": "Интервью",
+      "journeyAssessments": "AI-оценка",
       "start": "Начать тур",
       "skip": "Пропустить"
     },
@@ -51,8 +57,8 @@
         "description": "Нажмите Create Question, чтобы сохранить вопрос с AI-сгенерированными деталями."
       },
       "assessmentsEvaluation": {
-        "title": "AI-evaluated interview",
-        "description": "This interview has been scored by AI. Open the card to review candidate answers, per-question scores, and detailed insights."
+        "title": "Запустите AI-оценку",
+        "description": "Когда все ответы отправлены, нажмите Start AI evaluation, чтобы оценить интервью и сформировать карту результатов."
       },
       "candidateLink": {
         "title": "Поделиться ссылкой с кандидатом",

@@ -19,9 +19,9 @@ export function useOnboardingCreatedQuestionId(): string | null {
 }
 
 function readAssessmentsCardHighlight(
-  firstInterviewId: string | undefined,
+  interviewId: string | undefined,
 ): string | null {
-  if (!firstInterviewId) {
+  if (!interviewId) {
     return null
   }
 
@@ -29,15 +29,15 @@ function readAssessmentsCardHighlight(
   const isTourOnAssessments =
     stepId === 'candidate-link' || stepId === 'assessments-evaluation'
 
-  return isTourOnAssessments ? firstInterviewId : null
+  return isTourOnAssessments ? interviewId : null
 }
 
 export function useOnboardingAssessmentsCardHighlight(
-  firstInterviewId: string | undefined,
+  interviewId: string | undefined,
 ): string | null {
   const getSnapshot = useCallback(
-    () => readAssessmentsCardHighlight(firstInterviewId),
-    [firstInterviewId],
+    () => readAssessmentsCardHighlight(interviewId),
+    [interviewId],
   )
 
   return useSyncExternalStore(emptySubscribe, getSnapshot, () => null)

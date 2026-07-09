@@ -2,7 +2,13 @@
   "onboarding": {
     "welcome": {
       "title": "Witamy w AI Interview Architect",
-      "description": "Krótki, około minutowy tour dla zespołów rekrutacyjnych: baza pytań, tworzenie interview, linki dla kandydatów i ocena wyników. Możesz pominąć w dowolnym momencie.",
+      "description": "Przewodnik po procesie rekrutacji — od bazy pytań po ocenę AI. Możesz pominąć w dowolnym momencie.",
+      "eyebrow": "Tour produktu",
+      "duration": "~1 minuta",
+      "journeyQuestions": "Pytania",
+      "journeyAi": "AI Draft",
+      "journeyInterviews": "Interview",
+      "journeyAssessments": "Ocena AI",
       "start": "Rozpocznij tour",
       "skip": "Pomiń na razie"
     },
@@ -51,8 +57,8 @@
         "description": "Kliknij Create Question, aby zapisać pytanie z detalami wygenerowanymi przez AI."
       },
       "assessmentsEvaluation": {
-        "title": "Wywiad oceniony przez AI",
-        "description": "Ten wywiad został oceniony przez AI. Otwórz kartę, aby przejrzeć odpowiedzi kandydata, wyniki per pytanie i szczegółowe analizy."
+        "title": "Uruchom ocenę AI",
+        "description": "Gdy wszystkie odpowiedzi są przesłane, kliknij Start AI evaluation, aby ocenić rozmowę i wygenerować kartę wyników."
       },
       "candidateLink": {
         "title": "Udostępnij link kandydatowi",

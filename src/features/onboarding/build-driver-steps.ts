@@ -203,63 +203,6 @@ export function buildDriverSteps({
     });
   };
 
-  const lockPopoverAboveTarget = (
-    element: Element | undefined,
-    driver: Driver,
-    align: 'start' | 'end',
-  ) => {
-    if (!element) return;
-
-    window.requestAnimationFrame(() => {
-      const popover = driver.getState('popover') as
-        | { wrapper?: HTMLElement; arrow?: HTMLElement }
-        | undefined;
-      const wrapper = popover?.wrapper;
-      const arrow = popover?.arrow;
-      if (!wrapper) return;
-
-      const targetRect = element.getBoundingClientRect();
-      const wrapperRect = wrapper.getBoundingClientRect();
-      const viewportPadding = 16;
-      const gap = 14;
-      const preferredLeft =
-        align === 'end'
-          ? targetRect.right - wrapperRect.width
-          : targetRect.left;
-      const left = Math.min(
-        Math.max(preferredLeft, viewportPadding),
-        window.innerWidth - wrapperRect.width - viewportPadding,
-      );
-      const top = Math.max(
-        viewportPadding,
-        targetRect.top - wrapperRect.height - gap,
-      );
-
-      wrapper.style.left = `${left}px`;
-      wrapper.style.right = 'auto';
-      wrapper.style.top = `${top}px`;
-      wrapper.style.bottom = 'auto';
-
-      if (arrow) {
-        arrow.classList.remove(
-          'driver-popover-arrow-side-left',
-          'driver-popover-arrow-side-right',
-          'driver-popover-arrow-side-bottom',
-          'driver-popover-arrow-side-over',
-          'driver-popover-arrow-align-center',
-          'driver-popover-arrow-align-end',
-          'driver-popover-arrow-align-start',
-        );
-        arrow.classList.add(
-          'driver-popover-arrow-side-top',
-          align === 'end'
-            ? 'driver-popover-arrow-align-end'
-            : 'driver-popover-arrow-align-start',
-        );
-      }
-    });
-  };
-
   const applyStageRadius = (driver: Driver, radius?: number) => {
     const nextRadius = radius ?? DEFAULT_STAGE_RADIUS;
     const config = driver.getConfig();
