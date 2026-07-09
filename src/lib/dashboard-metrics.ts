@@ -1,4 +1,4 @@
-import type { InterviewFacetsResponse, InterviewListItem } from '@/lib/api'
+import type { InterviewFacetsResponse } from '@/lib/api'
 
 export type DashboardMetrics = {
   activeCount: number
@@ -9,7 +9,6 @@ export type DashboardMetrics = {
 
 export function computeDashboardMetrics(
   facets: InterviewFacetsResponse,
-  interviews: InterviewListItem[],
 ): DashboardMetrics {
   const statusCounts = Object.fromEntries(
     facets.statuses.map((entry) => [entry.value, entry.count]),
@@ -22,9 +21,6 @@ export function computeDashboardMetrics(
       (statusCounts.processing ?? 0),
     completedCount: statusCounts.completed ?? 0,
     totalCount: facets.statuses.reduce((sum, entry) => sum + entry.count, 0),
-    questionVolume: interviews.reduce(
-      (sum, interview) => sum + interview.questionCount,
-      0,
-    ),
+    questionVolume: facets.totalQuestionCount ?? 0,
   }
 }

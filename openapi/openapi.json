@@ -2324,6 +2324,7 @@
       "get": {
         "operationId": "InterviewController_findAll",
         "summary": "List interviews (paginated, filterable, sortable)",
+        "description": "Always returns { items, total, page, limit } with slim InterviewListItem rows. The legacy `paginated` query flag is accepted but ignored for backward compatibility. Plain-array responses from older clients are no longer supported on this endpoint.",
         "parameters": [
           {
             "name": "q",
@@ -2356,6 +2357,16 @@
                 "failed"
               ],
               "type": "string"
+            }
+          },
+          {
+            "name": "paginated",
+            "required": false,
+            "in": "query",
+            "deprecated": true,
+            "description": "Deprecated legacy flag from the pre-filter list API. Accepted for backward compatibility but ignored; this endpoint always returns a paginated { items, total, page, limit } envelope.",
+            "schema": {
+              "type": "boolean"
             }
           },
           {
@@ -2462,24 +2473,6 @@
         "description": "Returns position and status counts. Counts respect every other filter on the request (q, and the other facet) so the UI shows what is still available before clicking.",
         "parameters": [
           {
-            "name": "q",
-            "required": false,
-            "in": "query",
-            "description": "Search by candidates name",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "position",
-            "required": false,
-            "in": "query",
-            "description": "Filter by position (exact match)",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "status",
             "required": false,
             "in": "query",
@@ -2495,51 +2488,21 @@
             }
           },
           {
-            "name": "sortBy",
+            "name": "position",
             "required": false,
             "in": "query",
+            "description": "Filter by position (exact match)",
             "schema": {
-              "default": "updatedAt",
-              "enum": [
-                "candidateName",
-                "createdAt",
-                "updatedAt"
-              ],
               "type": "string"
             }
           },
           {
-            "name": "sortOrder",
+            "name": "q",
             "required": false,
             "in": "query",
+            "description": "Search by candidates name",
             "schema": {
-              "default": "desc",
-              "enum": [
-                "asc",
-                "desc"
-              ],
               "type": "string"
-            }
-          },
-          {
-            "name": "page",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "minimum": 1,
-              "default": 1,
-              "type": "number"
-            }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "minimum": 1,
-              "maximum": 100,
-              "default": 20,
-              "type": "number"
             }
           },
           {
@@ -7254,6 +7217,10 @@
           },
           "partNumber": {
             "type": "number"
+          },
+          "versionNumber": {
+            "type": "number",
+            "description": "Answer attempt/version being recorded. Required for multipart re-upload of an existing attempt."
           }
         },
         "required": [
@@ -7297,6 +7264,10 @@
           },
           "uploadId": {
             "type": "string"
+          },
+          "versionNumber": {
+            "type": "number",
+            "description": "Answer attempt/version being recorded. Required for multipart re-upload of an existing attempt."
           }
         },
         "required": [
@@ -7336,6 +7307,10 @@
           },
           "uploadId": {
             "type": "string"
+          },
+          "versionNumber": {
+            "type": "number",
+            "description": "Answer attempt/version being recorded. Required for multipart re-upload of an existing attempt."
           }
         },
         "required": [

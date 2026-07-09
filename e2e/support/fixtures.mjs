@@ -95,6 +95,7 @@ export const EMPTY_QUESTION_FACETS = {
 export const EMPTY_INTERVIEW_FACETS = {
   positions: [],
   statuses: [],
+  totalQuestionCount: 0,
 }
 
 export function toInterviewListItem(item) {
@@ -126,5 +127,6 @@ export function buildInterviewFacets(items) {
   return {
     positions: [...positions.entries()].map(([value, count]) => ({ value, count })),
     statuses: [...statuses.entries()].map(([value, count]) => ({ value, count })),
+    totalQuestionCount: items.reduce((sum, item) => sum + item.questions.length, 0),
   }
 }

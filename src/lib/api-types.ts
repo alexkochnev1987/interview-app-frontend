@@ -389,7 +389,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List interviews (paginated, filterable, sortable) */
+        /**
+         * List interviews (paginated, filterable, sortable)
+         * @description Always returns { items, total, page, limit } with slim InterviewListItem rows. The legacy `paginated` query flag is accepted but ignored for backward compatibility. Plain-array responses from older clients are no longer supported on this endpoint.
+         */
         get: operations["InterviewController_findAll"];
         put?: never;
         /**
@@ -1627,6 +1630,8 @@ export interface components {
             mediaKey: string;
             uploadId: string;
             partNumber: number;
+            /** @description Answer attempt/version being recorded. Required for multipart re-upload of an existing attempt. */
+            versionNumber?: number;
         };
         MultipartUploadPartResponseDto: {
             mediaKey: string;
@@ -1638,6 +1643,8 @@ export interface components {
             questionIndex: number;
             mediaKey: string;
             uploadId: string;
+            /** @description Answer attempt/version being recorded. Required for multipart re-upload of an existing attempt. */
+            versionNumber?: number;
         };
         MultipartUploadCompleteResponseDto: {
             mediaKey: string;
@@ -1649,6 +1656,8 @@ export interface components {
             questionIndex: number;
             mediaKey: string;
             uploadId: string;
+            /** @description Answer attempt/version being recorded. Required for multipart re-upload of an existing attempt. */
+            versionNumber?: number;
         };
         MultipartUploadAbortResponseDto: {
             mediaKey: string;
@@ -2862,6 +2871,11 @@ export interface operations {
                 /** @description Filter by position (exact match) */
                 position?: string;
                 status?: "pending" | "in_progress" | "processing" | "completed" | "failed";
+                /**
+                 * @deprecated
+                 * @description Deprecated legacy flag from the pre-filter list API. Accepted for backward compatibility but ignored; this endpoint always returns a paginated { items, total, page, limit } envelope.
+                 */
+                paginated?: boolean;
                 sortBy?: "candidateName" | "createdAt" | "updatedAt";
                 sortOrder?: "asc" | "desc";
                 page?: number;
@@ -2947,15 +2961,11 @@ export interface operations {
     InterviewController_getFacets: {
         parameters: {
             query?: {
-                /** @description Search by candidates name */
-                q?: string;
+                status?: "pending" | "in_progress" | "processing" | "completed" | "failed";
                 /** @description Filter by position (exact match) */
                 position?: string;
-                status?: "pending" | "in_progress" | "processing" | "completed" | "failed";
-                sortBy?: "candidateName" | "createdAt" | "updatedAt";
-                sortOrder?: "asc" | "desc";
-                page?: number;
-                limit?: number;
+                /** @description Search by candidates name */
+                q?: string;
             };
             header?: {
                 /** @description Response language for localized content. Defaults to `en` when omitted. */

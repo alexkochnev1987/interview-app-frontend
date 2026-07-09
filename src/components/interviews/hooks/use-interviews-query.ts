@@ -223,14 +223,16 @@ export function useInterviewsQuery(
         enabled: !disableFetchInCardsView || state.view !== 'cards',
     })
 
-    const total = query.data?.total ?? 0
+    const total = query.data?.total
     useEffect(() => {
+        if (query.data === undefined) return
+        const resolvedTotal = query.data.total
         // eslint-disable-next-line react-hooks/set-state-in-effect -- clamp page after fetch when filters reduce total below current page
         setState((prev) => {
-            const maxPage = Math.max(1, Math.ceil(total / prev.limit))
+            const maxPage = Math.max(1, Math.ceil(resolvedTotal / prev.limit))
             return prev.page > maxPage ? { ...prev, page: maxPage } : prev
         })
-    }, [total])
+    }, [query.data])
 
     const items = query.data?.items ?? []
     const loading = isPlaceholderLoading(query)
@@ -241,10 +243,12 @@ export function useInterviewsQuery(
         query.isPlaceholderData,
     )
 
-    const totalPages = useMemo(
-        () => Math.max(1, Math.ceil(total / state.limit)),
-        [total, state.limit],
-    )
+    const totalPages = useMemo(() => {
+        if (query.data === undefined) {
+            return Math.max(1, state.page)
+        }
+        return Math.max(1, Math.ceil(query.data.total / state.limit))
+    }, [query.data, state.limit, state.page])
 
     const setQ = useCallback<Dispatch<SetStateAction<string>>>((value) => {
         setState((prev) => {
@@ -318,7 +322,7 @@ export function useInterviewsQuery(
         debouncedQ,
         isSearchPending,
         items,
-        total,
+        total: total ?? 0,
         totalPages,
         loading,
         blockingError,
