@@ -157,6 +157,26 @@ export interface paths {
         patch: operations["UserController_assignRole"];
         trace?: never;
     };
+    "/users/demo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Provision the read-only demo account and demo content
+         * @description Idempotent admin-only setup for environments without direct database access. Refused on production unless ALLOW_DEMO_SEED=true is set, so it can never seed demo data into production by accident.
+         */
+        post: operations["UserController_provisionDemo"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/questions": {
         parameters: {
             query?: never;
@@ -172,7 +192,7 @@ export interface paths {
         put?: never;
         /**
          * Create question
-         * @description Requires `primaryLocale` (en|be|ru|pl) and a full `translations[primaryLocale]` block (questionText, followUpQuestions, expectedConcepts, redFlags, sampleGoodAnswer). Metadata fields (role, category, tags, …) are stored flat on the question row.
+         * @description Requires `primaryLocale` (en|be|ru|pl) and a full `translations[primaryLocale]` block (questionText, followUpQuestions, expectedConcepts, redFlags, sampleGoodAnswer). Response rubric is resolved for `primaryLocale` (not `X-Locale`). Metadata fields (role, category, tags, …) are stored flat on the question row.
          */
         post: operations["QuestionController_create"];
         delete?: never;
@@ -362,6 +382,73 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List interview templates
+         * @description Returns all templates in the caller demo scope, most-recently-updated first. Each template resolves its stored question ids to live questions for X-Locale; deleted/pending references are excluded from the count.
+         */
+        get: operations["TemplateController_findAll"];
+        put?: never;
+        /**
+         * Create an interview template
+         * @description Requires a name and at least one question id. questionIds are stored as live references (ordered), resolved to current questions on read.
+         */
+        post: operations["TemplateController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/templates/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get an interview template by id
+         * @description Resolves the stored question ids to live question rows for X-Locale so the response can seed the interview question picker.
+         */
+        get: operations["TemplateController_findOne"];
+        /** Update an interview template (PUT and PATCH are equivalent) */
+        put: operations["TemplateController_update"];
+        post?: never;
+        /** Delete an interview template */
+        delete: operations["TemplateController_remove"];
+        options?: never;
+        head?: never;
+        /** Update an interview template (PUT and PATCH are equivalent) */
+        patch: operations["TemplateController_patchUpdate"];
+        trace?: never;
+    };
+    "/templates/{id}/use": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Record that an interview was created from this template
+         * @description Increments the template popularity (usage_count). Gated on interviews:create so only users who can create interviews (never demo accounts) affect it.
+         */
+        post: operations["TemplateController_recordUse"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/interviews": {
         parameters: {
             query?: never;
@@ -489,6 +576,26 @@ export interface paths {
         put?: never;
         /** Start validation for single answer */
         post: operations["InterviewController_validateAnswer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/interviews/{id}/mark-demo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Mark an interview as the demo interview
+         * @description Admin-only. Flips the interview to demo and reassigns it to the demo account, removes the fabricated placeholder demo interview and demotes any other completed demo interview so exactly the marked completed interview plus the seeded pending one remain. Re-running the demo provisioning afterwards will not recreate the placeholder. Refused on production unless ALLOW_DEMO_SEED=true is set.
+         */
+        post: operations["InterviewController_markDemo"];
         delete?: never;
         options?: never;
         head?: never;
@@ -860,6 +967,18 @@ export interface components {
             /** @enum {string} */
             role: "super_admin" | "admin" | "hr" | "candidate";
         };
+        DemoProvisionCountsDto: {
+            /** @example 1 */
+            users: number;
+            /** @example 3 */
+            questions: number;
+            /** @example 1 */
+            interviews: number;
+        };
+        DemoProvisionResponseDto: {
+            user: components["schemas"]["AuthUserResponseDto"];
+            counts: components["schemas"]["DemoProvisionCountsDto"];
+        };
         QuestionExpectedConceptDto: {
             id: string;
             label: string;
@@ -971,6 +1090,10 @@ export interface components {
             /** Format: date-time */
             updatedAt: string;
             deleted: boolean;
+            /** @description True when deletion is scheduled because the question is still used by active interviews. */
+            pendingDeletion: boolean;
+            /** @description Present when pendingDeletion is true — active interviews still using this question. */
+            blockingInterviews?: components["schemas"]["QuestionDeleteBlockingInterviewDto"][];
             /** @description Number of times this question has been used in an interview. */
             usageCount: number;
             /**
@@ -1018,12 +1141,16 @@ export interface components {
             redFlags: components["schemas"]["QuestionRedFlagDto"][];
             sampleGoodAnswer: string;
         };
+        QuestionTranslationsMapDto: {
+            en?: components["schemas"]["QuestionTranslationDto"];
+            be?: components["schemas"]["QuestionTranslationDto"];
+            ru?: components["schemas"]["QuestionTranslationDto"];
+            pl?: components["schemas"]["QuestionTranslationDto"];
+        };
         QuestionDraftInputDto: {
             /** @enum {string} */
             primaryLocale?: "en" | "be" | "ru" | "pl";
-            translations?: {
-                [key: string]: components["schemas"]["QuestionTranslationDto"];
-            };
+            translations?: components["schemas"]["QuestionTranslationsMapDto"];
             questionText?: string;
             followUpQuestions?: string[];
             expectedConcepts?: components["schemas"]["QuestionExpectedConceptDto"][];
@@ -1079,12 +1206,6 @@ export interface components {
             roles: components["schemas"]["FacetCountDto"][];
             /** @description Tag value + count, given all OTHER current filters (tag overlap is not applied). */
             tags: components["schemas"]["FacetCountDto"][];
-        };
-        QuestionTranslationsMapDto: {
-            en?: components["schemas"]["QuestionTranslationDto"];
-            be?: components["schemas"]["QuestionTranslationDto"];
-            ru?: components["schemas"]["QuestionTranslationDto"];
-            pl?: components["schemas"]["QuestionTranslationDto"];
         };
         CreateQuestionDto: {
             /** @enum {string} */
@@ -1219,6 +1340,48 @@ export interface components {
             candidateName: string;
             position: string;
             totalQuestions: number;
+        };
+        TemplateResponseDto: {
+            id: string;
+            name: string;
+            description?: string;
+            position?: string;
+            /** @description Number of currently-resolvable questions (references that are deleted or pending deletion are excluded). */
+            questionCount: number;
+            /** @description Live question rows resolved from the stored ids, in stored order, for the request locale. Seeds the interview question picker on edit and prefill. */
+            questions: components["schemas"]["ResolvedQuestionResponseDto"][];
+            /** @description Id of the user who created the template (attribution only). */
+            createdById?: string;
+            demo: boolean;
+            /** @description Popularity: how many interviews have been created from this template. */
+            usageCount: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        CreateTemplateDto: {
+            name: string;
+            description?: string;
+            position?: string;
+            /** @description Ordered question ids. Stored as live references and resolved to current questions on read; at least one is required (empty templates are rejected). */
+            questionIds: string[];
+        };
+        UpdateTemplateDto: {
+            name?: string;
+            description?: string;
+            position?: string;
+            questionIds?: string[];
+        };
+        TemplateUsageResponseDto: {
+            id: string;
+            /** @description Usage count after the increment. */
+            usageCount: number;
+        };
+        DeleteTemplateResponseDto: {
+            id: string;
+            /** @enum {number} */
+            deleted: true;
         };
         CreateInterviewDto: {
             candidateName: string;
@@ -1506,6 +1669,14 @@ export interface components {
             skippedCount: number;
             answers: components["schemas"]["StartAnswerValidationResultDto"][];
         };
+        MarkInterviewDemoResponseDto: {
+            /** @example true */
+            ok: boolean;
+            /** @example 00000000-0000-4000-8000-0000000000a1 */
+            interviewId: string;
+            /** @example true */
+            placeholderRemoved: boolean;
+        };
         PresignRequestDto: {
             questionIndex: number;
             /** @enum {string} */
@@ -1588,6 +1759,8 @@ export interface components {
         HealthResponseDto: {
             /** @example ok */
             status: string;
+            /** @example Lightsail backend is serving the latest deploy. */
+            message: string;
             /**
              * Format: date-time
              * @example 2026-05-05T12:00:00.000Z
@@ -1800,7 +1973,10 @@ export interface operations {
     AuthController_demo: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path?: never;
             cookie?: never;
         };
@@ -2009,6 +2185,44 @@ export interface operations {
                 };
             };
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    UserController_provisionDemo: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DemoProvisionResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -2726,6 +2940,358 @@ export interface operations {
             };
         };
     };
+    TemplateController_findAll: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TemplateResponseDto"][];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    TemplateController_create: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateTemplateDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TemplateResponseDto"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    TemplateController_findOne: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TemplateResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    TemplateController_update: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateTemplateDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TemplateResponseDto"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    TemplateController_remove: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeleteTemplateResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    TemplateController_patchUpdate: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateTemplateDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TemplateResponseDto"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    TemplateController_recordUse: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TemplateUsageResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
     InterviewController_findAll: {
         parameters: {
             query?: {
@@ -2855,7 +3421,10 @@ export interface operations {
     InterviewController_update: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path: {
                 id: string;
             };
@@ -2952,7 +3521,10 @@ export interface operations {
     InterviewController_cancel: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
             path: {
                 id: string;
             };
@@ -3152,6 +3724,54 @@ export interface operations {
                 };
             };
             503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    InterviewController_markDemo: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MarkInterviewDemoResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

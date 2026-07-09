@@ -751,3 +751,61 @@ export async function submitTakeAnswer(
     body: payload
   }));
 }
+
+// Interview templates; questions are live-resolved for the request locale.
+export type Template = Omit<Schemas['TemplateResponseDto'], 'questions'> & {
+  questions: Question[];
+};
+export type CreateTemplatePayload = Schemas['CreateTemplateDto'];
+export type UpdateTemplatePayload = Schemas['UpdateTemplateDto'];
+export type DeleteTemplateResponse = Schemas['DeleteTemplateResponseDto'];
+
+export async function getTemplates(): Promise<Template[]> {
+  return handle(client.GET('/templates', {
+    ...LOCALIZED_HEADERS,
+  }));
+}
+
+export async function getTemplate(id: string): Promise<Template> {
+  return handle(client.GET('/templates/{id}', {
+    ...LOCALIZED_HEADERS,
+    params: { path: { id } },
+  }));
+}
+
+export async function createTemplate(
+  data: CreateTemplatePayload,
+): Promise<Template> {
+  return handle(client.POST('/templates', {
+    ...LOCALIZED_HEADERS,
+    body: data,
+  }));
+}
+
+export async function updateTemplate(
+  id: string,
+  data: UpdateTemplatePayload,
+): Promise<Template> {
+  return handle(client.PATCH('/templates/{id}', {
+    ...LOCALIZED_HEADERS,
+    params: { path: { id } },
+    body: data,
+  }));
+}
+
+export async function deleteTemplate(id: string): Promise<DeleteTemplateResponse> {
+  return handle(client.DELETE('/templates/{id}', {
+    params: { path: { id } },
+  }));
+}
+
+// Records that an interview was created from a template (bumps its popularity).
+export type TemplateUsageResponse = Schemas['TemplateUsageResponseDto'];
+
+export async function recordTemplateUse(
+  id: string,
+): Promise<TemplateUsageResponse> {
+  return handle(client.POST('/templates/{id}/use', {
+    params: { path: { id } },
+  }));
+}

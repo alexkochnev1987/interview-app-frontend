@@ -60,7 +60,24 @@
       "post": {
         "operationId": "AuthController_demo",
         "summary": "Sign in to the read-only demo account",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "X-Locale",
+            "in": "header",
+            "required": false,
+            "description": "Response language for localized content. Defaults to `en` when omitted.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "be",
+                "ru",
+                "pl"
+              ],
+              "default": "en"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -433,6 +450,71 @@
         ]
       }
     },
+    "/users/demo": {
+      "post": {
+        "operationId": "UserController_provisionDemo",
+        "summary": "Provision the read-only demo account and demo content",
+        "description": "Idempotent admin-only setup for environments without direct database access. Refused on production unless ALLOW_DEMO_SEED=true is set, so it can never seed demo data into production by accident.",
+        "parameters": [
+          {
+            "name": "X-Locale",
+            "in": "header",
+            "required": false,
+            "description": "Response language for localized content. Defaults to `en` when omitted.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "be",
+                "ru",
+                "pl"
+              ],
+              "default": "en"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemoProvisionResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "users"
+        ],
+        "security": [
+          {
+            "sessionAuth": []
+          }
+        ]
+      }
+    },
     "/questions": {
       "get": {
         "operationId": "QuestionController_findAll",
@@ -674,7 +756,7 @@
       "post": {
         "operationId": "QuestionController_create",
         "summary": "Create question",
-        "description": "Requires `primaryLocale` (en|be|ru|pl) and a full `translations[primaryLocale]` block (questionText, followUpQuestions, expectedConcepts, redFlags, sampleGoodAnswer). Metadata fields (role, category, tags, …) are stored flat on the question row.",
+        "description": "Requires `primaryLocale` (en|be|ru|pl) and a full `translations[primaryLocale]` block (questionText, followUpQuestions, expectedConcepts, redFlags, sampleGoodAnswer). Response rubric is resolved for `primaryLocale` (not `X-Locale`). Metadata fields (role, category, tags, …) are stored flat on the question row.",
         "parameters": [
           {
             "name": "X-Locale",
@@ -2155,6 +2237,603 @@
         ]
       }
     },
+    "/templates": {
+      "get": {
+        "operationId": "TemplateController_findAll",
+        "summary": "List interview templates",
+        "description": "Returns all templates in the caller demo scope, most-recently-updated first. Each template resolves its stored question ids to live questions for X-Locale; deleted/pending references are excluded from the count.",
+        "parameters": [
+          {
+            "name": "X-Locale",
+            "in": "header",
+            "required": false,
+            "description": "Response language for localized content. Defaults to `en` when omitted.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "be",
+                "ru",
+                "pl"
+              ],
+              "default": "en"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TemplateResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "templates"
+        ],
+        "security": [
+          {
+            "sessionAuth": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "TemplateController_create",
+        "summary": "Create an interview template",
+        "description": "Requires a name and at least one question id. questionIds are stored as live references (ordered), resolved to current questions on read.",
+        "parameters": [
+          {
+            "name": "X-Locale",
+            "in": "header",
+            "required": false,
+            "description": "Response language for localized content. Defaults to `en` when omitted.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "be",
+                "ru",
+                "pl"
+              ],
+              "default": "en"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTemplateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplateResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "templates"
+        ],
+        "security": [
+          {
+            "sessionAuth": []
+          }
+        ]
+      }
+    },
+    "/templates/{id}": {
+      "get": {
+        "operationId": "TemplateController_findOne",
+        "summary": "Get an interview template by id",
+        "description": "Resolves the stored question ids to live question rows for X-Locale so the response can seed the interview question picker.",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Locale",
+            "in": "header",
+            "required": false,
+            "description": "Response language for localized content. Defaults to `en` when omitted.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "be",
+                "ru",
+                "pl"
+              ],
+              "default": "en"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplateResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "templates"
+        ],
+        "security": [
+          {
+            "sessionAuth": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "TemplateController_update",
+        "summary": "Update an interview template (PUT and PATCH are equivalent)",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Locale",
+            "in": "header",
+            "required": false,
+            "description": "Response language for localized content. Defaults to `en` when omitted.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "be",
+                "ru",
+                "pl"
+              ],
+              "default": "en"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTemplateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplateResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "templates"
+        ],
+        "security": [
+          {
+            "sessionAuth": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "TemplateController_patchUpdate",
+        "summary": "Update an interview template (PUT and PATCH are equivalent)",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Locale",
+            "in": "header",
+            "required": false,
+            "description": "Response language for localized content. Defaults to `en` when omitted.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "be",
+                "ru",
+                "pl"
+              ],
+              "default": "en"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTemplateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplateResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "templates"
+        ],
+        "security": [
+          {
+            "sessionAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "TemplateController_remove",
+        "summary": "Delete an interview template",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Locale",
+            "in": "header",
+            "required": false,
+            "description": "Response language for localized content. Defaults to `en` when omitted.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "be",
+                "ru",
+                "pl"
+              ],
+              "default": "en"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteTemplateResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "templates"
+        ],
+        "security": [
+          {
+            "sessionAuth": []
+          }
+        ]
+      }
+    },
+    "/templates/{id}/use": {
+      "post": {
+        "operationId": "TemplateController_recordUse",
+        "summary": "Record that an interview was created from this template",
+        "description": "Increments the template popularity (usage_count). Gated on interviews:create so only users who can create interviews (never demo accounts) affect it.",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Locale",
+            "in": "header",
+            "required": false,
+            "description": "Response language for localized content. Defaults to `en` when omitted.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "be",
+                "ru",
+                "pl"
+              ],
+              "default": "en"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplateUsageResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "templates"
+        ],
+        "security": [
+          {
+            "sessionAuth": []
+          }
+        ]
+      }
+    },
     "/interviews": {
       "post": {
         "operationId": "InterviewController_create",
@@ -2417,6 +3096,22 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "X-Locale",
+            "in": "header",
+            "required": false,
+            "description": "Response language for localized content. Defaults to `en` when omitted.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "be",
+                "ru",
+                "pl"
+              ],
+              "default": "en"
+            }
           }
         ],
         "requestBody": {
@@ -2574,6 +3269,22 @@
             "in": "path",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "X-Locale",
+            "in": "header",
+            "required": false,
+            "description": "Response language for localized content. Defaults to `en` when omitted.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "be",
+                "ru",
+                "pl"
+              ],
+              "default": "en"
             }
           }
         ],
@@ -2902,6 +3613,89 @@
             }
           },
           "503": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "interviews"
+        ],
+        "security": [
+          {
+            "sessionAuth": []
+          }
+        ]
+      }
+    },
+    "/interviews/{id}/mark-demo": {
+      "post": {
+        "operationId": "InterviewController_markDemo",
+        "summary": "Mark an interview as the demo interview",
+        "description": "Admin-only. Flips the interview to demo and reassigns it to the demo account, removes the fabricated placeholder demo interview and demotes any other completed demo interview so exactly the marked completed interview plus the seeded pending one remain. Re-running the demo provisioning afterwards will not recreate the placeholder. Refused on production unless ALLOW_DEMO_SEED=true is set.",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Locale",
+            "in": "header",
+            "required": false,
+            "description": "Response language for localized content. Defaults to `en` when omitted.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "be",
+                "ru",
+                "pl"
+              ],
+              "default": "en"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarkInterviewDemoResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
             "description": "",
             "content": {
               "application/json": {
@@ -4532,6 +5326,43 @@
           "role"
         ]
       },
+      "DemoProvisionCountsDto": {
+        "type": "object",
+        "properties": {
+          "users": {
+            "type": "number",
+            "example": 1
+          },
+          "questions": {
+            "type": "number",
+            "example": 3
+          },
+          "interviews": {
+            "type": "number",
+            "example": 1
+          }
+        },
+        "required": [
+          "users",
+          "questions",
+          "interviews"
+        ]
+      },
+      "DemoProvisionResponseDto": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/AuthUserResponseDto"
+          },
+          "counts": {
+            "$ref": "#/components/schemas/DemoProvisionCountsDto"
+          }
+        },
+        "required": [
+          "user",
+          "counts"
+        ]
+      },
       "QuestionExpectedConceptDto": {
         "type": "object",
         "properties": {
@@ -4872,6 +5703,17 @@
           "deleted": {
             "type": "boolean"
           },
+          "pendingDeletion": {
+            "type": "boolean",
+            "description": "True when deletion is scheduled because the question is still used by active interviews."
+          },
+          "blockingInterviews": {
+            "description": "Present when pendingDeletion is true — active interviews still using this question.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuestionDeleteBlockingInterviewDto"
+            }
+          },
           "usageCount": {
             "type": "number",
             "description": "Number of times this question has been used in an interview."
@@ -4923,6 +5765,7 @@
           "createdAt",
           "updatedAt",
           "deleted",
+          "pendingDeletion",
           "usageCount",
           "resolvedLocale",
           "availableLocales"
@@ -5076,6 +5919,23 @@
           "sampleGoodAnswer"
         ]
       },
+      "QuestionTranslationsMapDto": {
+        "type": "object",
+        "properties": {
+          "en": {
+            "$ref": "#/components/schemas/QuestionTranslationDto"
+          },
+          "be": {
+            "$ref": "#/components/schemas/QuestionTranslationDto"
+          },
+          "ru": {
+            "$ref": "#/components/schemas/QuestionTranslationDto"
+          },
+          "pl": {
+            "$ref": "#/components/schemas/QuestionTranslationDto"
+          }
+        }
+      },
       "QuestionDraftInputDto": {
         "type": "object",
         "properties": {
@@ -5089,10 +5949,7 @@
             ]
           },
           "translations": {
-            "type": "object",
-            "additionalProperties": {
-              "$ref": "#/components/schemas/QuestionTranslationDto"
-            }
+            "$ref": "#/components/schemas/QuestionTranslationsMapDto"
           },
           "questionText": {
             "type": "string"
@@ -5252,23 +6109,6 @@
           "roles",
           "tags"
         ]
-      },
-      "QuestionTranslationsMapDto": {
-        "type": "object",
-        "properties": {
-          "en": {
-            "$ref": "#/components/schemas/QuestionTranslationDto"
-          },
-          "be": {
-            "$ref": "#/components/schemas/QuestionTranslationDto"
-          },
-          "ru": {
-            "$ref": "#/components/schemas/QuestionTranslationDto"
-          },
-          "pl": {
-            "$ref": "#/components/schemas/QuestionTranslationDto"
-          }
-        }
       },
       "CreateQuestionDto": {
         "type": "object",
@@ -5689,6 +6529,142 @@
           "candidateName",
           "position",
           "totalQuestions"
+        ]
+      },
+      "TemplateResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "position": {
+            "type": "string"
+          },
+          "questionCount": {
+            "type": "number",
+            "description": "Number of currently-resolvable questions (references that are deleted or pending deletion are excluded)."
+          },
+          "questions": {
+            "description": "Live question rows resolved from the stored ids, in stored order, for the request locale. Seeds the interview question picker on edit and prefill.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ResolvedQuestionResponseDto"
+            }
+          },
+          "createdById": {
+            "type": "string",
+            "description": "Id of the user who created the template (attribution only)."
+          },
+          "demo": {
+            "type": "boolean"
+          },
+          "usageCount": {
+            "type": "number",
+            "description": "Popularity: how many interviews have been created from this template."
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "questionCount",
+          "questions",
+          "demo",
+          "usageCount",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateTemplateDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "position": {
+            "type": "string"
+          },
+          "questionIds": {
+            "description": "Ordered question ids. Stored as live references and resolved to current questions on read; at least one is required (empty templates are rejected).",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "questionIds"
+        ]
+      },
+      "UpdateTemplateDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "position": {
+            "type": "string"
+          },
+          "questionIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "TemplateUsageResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "usageCount": {
+            "type": "number",
+            "description": "Usage count after the increment."
+          }
+        },
+        "required": [
+          "id",
+          "usageCount"
+        ]
+      },
+      "DeleteTemplateResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "deleted": {
+            "type": "number",
+            "enum": [
+              true
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "deleted"
         ]
       },
       "CreateInterviewDto": {
@@ -6687,6 +7663,28 @@
           "answers"
         ]
       },
+      "MarkInterviewDemoResponseDto": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "example": true
+          },
+          "interviewId": {
+            "type": "string",
+            "example": "00000000-0000-4000-8000-0000000000a1"
+          },
+          "placeholderRemoved": {
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "required": [
+          "ok",
+          "interviewId",
+          "placeholderRemoved"
+        ]
+      },
       "PresignRequestDto": {
         "type": "object",
         "properties": {
@@ -6978,6 +7976,10 @@
             "type": "string",
             "example": "ok"
           },
+          "message": {
+            "type": "string",
+            "example": "Lightsail backend is serving the latest deploy."
+          },
           "timestamp": {
             "format": "date-time",
             "type": "string",
@@ -6986,6 +7988,7 @@
         },
         "required": [
           "status",
+          "message",
           "timestamp"
         ]
       },
