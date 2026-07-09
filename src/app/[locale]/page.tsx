@@ -6,7 +6,11 @@ import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallbac
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import type { Locale } from '@/i18n/locales'
 import { routes } from '@/i18n/routes'
-import { type InterviewFacetsResponse } from '@/lib/api'
+import {
+  type InterviewFacetsResponse,
+  type PaginatedInterviews,
+  emptyPaginatedInterviews,
+} from '@/lib/api'
 import { canAccessDashboard } from '@/lib/auth-roles'
 import {
   loadAuthGate,
@@ -14,6 +18,10 @@ import {
   redirectIfUnauthorizedError,
 } from '@/lib/auth-gate'
 import { computeDashboardMetrics } from '@/lib/dashboard-metrics'
+import {
+  ASSESSMENTS_INTERVIEW_PAGE_SIZE,
+  fetchAllInterviewPages,
+} from '@/lib/fetch-all-interviews'
 import { prefetchInterviewsLibrary } from '@/lib/interviews-library-prefetch'
 import {
   EMPTY_INTERVIEW_FACETS,
@@ -60,13 +68,31 @@ export default async function DashboardPage({
   const urlParams = toInterviewsSearchParams(await searchParams)
   let initialPrefetch
   let facets: InterviewFacetsResponse = EMPTY_INTERVIEW_FACETS
+  let metricsInterviews: PaginatedInterviews['items'] = []
   let error: string | null = null
 
   try {
-    ;[initialPrefetch, facets] = await Promise.all([
+    ;[initialPrefetch, facets, metricsInterviews] = await Promise.all([
       prefetchInterviewsLibrary(auth.ctx, urlParams),
       requestServer<InterviewFacetsResponse>('/interviews/facets', auth.ctx).then(
         (response) => response ?? EMPTY_INTERVIEW_FACETS,
+      ),
+      fetchAllInterviewPages(
+        (params) =>
+          requestServer<PaginatedInterviews>('/interviews', auth.ctx, {
+            query: params,
+          }).then(
+            (response) =>
+              response ??
+              emptyPaginatedInterviews(
+                params.limit ?? ASSESSMENTS_INTERVIEW_PAGE_SIZE,
+              ),
+          ),
+        {
+          limit: ASSESSMENTS_INTERVIEW_PAGE_SIZE,
+          sortBy: 'updatedAt',
+          sortOrder: 'desc',
+        },
       ),
     ])
   } catch (err) {
@@ -94,7 +120,7 @@ export default async function DashboardPage({
     )
   }
 
-  const metrics = computeDashboardMetrics(facets)
+  const metrics = computeDashboardMetrics(facets, metricsInterviews)
 
   return (
     <QueryHydrationBoundary state={initialPrefetch.dehydratedState}>

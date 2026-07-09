@@ -45,7 +45,6 @@ export const DEFAULT_INTERVIEWS_QUERY: InterviewsQueryState = {
 export const EMPTY_INTERVIEW_FACETS: InterviewFacetsResponse = {
   positions: [],
   statuses: [],
-  totalQuestionCount: 0,
 }
 
 export function readInterviewsFromSearchParams(
