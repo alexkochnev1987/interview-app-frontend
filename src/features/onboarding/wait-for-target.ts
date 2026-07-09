@@ -18,7 +18,7 @@ function rectsAreStable(previous: DOMRect, next: DOMRect) {
   );
 }
 
-function waitForElementLayout(element: Element): Promise<void> {
+export function waitForElementLayout(element: Element): Promise<void> {
   if (typeof window === 'undefined') {
     return Promise.resolve();
   }

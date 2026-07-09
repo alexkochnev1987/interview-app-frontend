@@ -49,33 +49,6 @@ export function buildDriverSteps({
     scrollTopOverride?: number | null,
   ) => {
     window.requestAnimationFrame(() => {
-      let didScroll = false;
-
-      if (scrollTopOverride !== undefined && scrollTopOverride !== null) {
-        window.scrollTo({
-          top: scrollTopOverride,
-          left: 0,
-          behavior: 'instant',
-        });
-        didScroll = true;
-      } else if (step.preservePageTop) {
-        window.scrollTo({
-          top: step.pageScrollTop ?? 0,
-          left: 0,
-          behavior: 'instant',
-        });
-        didScroll = true;
-      }
-
-      if (step.scrollIntoViewBlock && element) {
-        element.scrollIntoView({
-          block: step.scrollIntoViewBlock,
-          inline: 'nearest',
-          behavior: 'instant',
-        });
-        didScroll = true;
-      }
-
       const applyLockedPlacement = () => {
         if (step.lockPopoverPlacement === 'bottom-start') {
           lockPopoverBelowTarget(element, driver, 'start');
@@ -84,16 +57,73 @@ export function buildDriverSteps({
         }
       };
 
-      if (didScroll) {
-        window.requestAnimationFrame(() => {
-          driver.refresh();
-          applyLockedPlacement();
+      const refresh = () => {
+        driver.refresh();
+        applyLockedPlacement();
+      };
+
+      if (scrollTopOverride !== undefined && scrollTopOverride !== null) {
+        window.scrollTo({
+          top: scrollTopOverride,
+          left: 0,
+          behavior: 'instant',
         });
+        window.requestAnimationFrame(refresh);
         return;
       }
 
-      applyLockedPlacement();
+      refresh();
     });
+  };
+
+  const waitForDriverSettle = async (
+    driver: Driver,
+    expectedIndex: number,
+  ): Promise<void> => {
+    for (let frame = 0; frame < 60; frame += 1) {
+      await new Promise<void>((resolve) => {
+        window.requestAnimationFrame(() => resolve());
+      });
+
+      if (!driver.isActive()) {
+        return;
+      }
+
+      if (driver.getActiveIndex() === expectedIndex) {
+        await new Promise<void>((resolve) => {
+          window.requestAnimationFrame(() => resolve());
+        });
+        await new Promise<void>((resolve) => {
+          window.requestAnimationFrame(() => resolve());
+        });
+        return;
+      }
+    }
+  };
+
+  const navigateToStepIndex = (
+    driver: Driver,
+    fromIndex: number,
+    targetIndex: number,
+  ) => {
+    if (fromIndex === targetIndex) {
+      driver.refresh();
+      return;
+    }
+
+    const delta = targetIndex - fromIndex;
+
+    if (delta === 1 && driver.hasNextStep()) {
+      driver.moveNext();
+      return;
+    }
+
+    if (delta === -1 && driver.hasPreviousStep()) {
+      driver.movePrevious();
+      return;
+    }
+
+    driver.drive(targetIndex);
   };
 
   const rememberScrollForStep = (
@@ -213,8 +243,14 @@ export function buildDriverSteps({
     }
   };
 
+  const completeTour = (driver: Driver) => {
+    onDone();
+    driver.destroy();
+  };
+
   const moveToPreparedStep = async (
     driver: Driver,
+    fromIndex: number,
     targetIndex: number,
     direction: 1 | -1,
     token: number,
@@ -237,11 +273,16 @@ export function buildDriverSteps({
     }
 
     if (!targetReady) {
+      if (direction === 1 && targetIndex === steps.length - 1) {
+        completeTour(driver)
+        return true
+      }
+
       return false
     }
 
-    onStepActive(candidateStep)
-    driver.drive(targetIndex)
+    navigateToStepIndex(driver, fromIndex, targetIndex)
+    await waitForDriverSettle(driver, targetIndex)
     return true
   }
 
@@ -256,9 +297,9 @@ export function buildDriverSteps({
     }
 
     try {
-      const activeIndex = driver.getActiveIndex();
+      const fromIndex = driver.getActiveIndex();
 
-      if (activeIndex === undefined) {
+      if (fromIndex === undefined) {
         return;
       }
 
@@ -266,15 +307,17 @@ export function buildDriverSteps({
         preservedScrollTop = null;
       }
 
-      if (direction === 1 && activeIndex >= steps.length - 1) {
-        onDone();
-        driver.destroy();
+      if (direction === 1 && fromIndex >= steps.length - 1) {
+        completeTour(driver);
         return;
       }
 
+      const targetIndex = fromIndex + direction;
+
       await moveToPreparedStep(
         driver,
-        activeIndex + direction,
+        fromIndex,
+        targetIndex,
         direction,
         token,
         detail,
@@ -342,17 +385,17 @@ export function buildDriverSteps({
             }
 
             try {
-              const activeIndex = driver.getActiveIndex() ?? index;
+              const fromIndex = driver.getActiveIndex() ?? index;
 
-              if (activeIndex >= steps.length - 1) {
-                onDone();
-                driver.destroy();
+              if (fromIndex >= steps.length - 1) {
+                completeTour(driver);
                 return;
               }
 
               await moveToPreparedStep(
                 driver,
-                activeIndex + 1,
+                fromIndex,
+                fromIndex + 1,
                 1,
                 token,
                 detail,

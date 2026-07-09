@@ -14,7 +14,7 @@ import { OnboardingWelcomeDialog } from '@/components/ui/onboarding/onboarding-w
 import { useOnboardingTour } from '@/features/onboarding/use-onboarding-tour'
 import { shouldOfferOnboarding } from '@/features/onboarding/onboarding-state'
 import { isCandidateFlowPath } from '@/i18n/html-lang'
-import { usePathname } from '@/i18n/navigation'
+import { usePathname, useRouter } from '@/i18n/navigation'
 import { useAuth } from '@/lib/auth-context'
 import { notifyError } from '@/lib/toast'
 import { useTranslations } from 'next-intl'
@@ -42,6 +42,7 @@ function isStaffAppPath(pathname: string): boolean {
 export function OnboardingProvider({ children }: { children: ReactNode }) {
   const { user, completeOnboarding } = useAuth()
   const pathname = usePathname()
+  const router = useRouter()
   const t = useTranslations('onboarding')
 
   const runtimeContext = useMemo(
@@ -116,7 +117,10 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
           title={completeCopy.title}
           description={completeCopy.description}
           actionLabel={completeCopy.actionLabel}
-          onAction={dismissComplete}
+          onAction={() => {
+            dismissComplete()
+            router.push('/')
+          }}
         />
       ) : null}
 

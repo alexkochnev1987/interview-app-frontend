@@ -5,10 +5,6 @@ import { useTranslations } from 'next-intl'
 
 import { AsyncActionButton } from '@/components/assessments/actions/async-action-button'
 import { useEvaluationStarted } from '@/components/assessments/actions/evaluation-actions-context'
-import {
-  emitOnboardingEvent,
-  ONBOARDING_EVENT_NAMES,
-} from '@/features/onboarding/onboarding-events'
 import { validateInterview } from '@/lib/api'
 import { useToastMessages } from '@/lib/use-toast-messages'
 
@@ -47,8 +43,6 @@ export function StartEvaluationButton({
       errorFallback={toastMessages.rerun.allFailedFallback}
       inProgressTitle={toastMessages.rerun.alreadyInProgressTitle}
       onRun={async () => {
-        emitOnboardingEvent(ONBOARDING_EVENT_NAMES.evaluationStarted)
-
         const res = await validateInterview(interviewId, { force: false })
         if (res.requestedCount === 0) {
           return {

@@ -50,13 +50,9 @@
         "title": "Zapisz pytanie",
         "description": "Kliknij Create Question, aby zapisać pytanie z detalami wygenerowanymi przez AI."
       },
-      "assessmentsIntro": {
-        "title": "Przestrzeń oceny",
-        "description": "Gdy kandydaci zakończą sesje, wracaj tutaj, aby oceniać odpowiedzi, wyniki i analizy AI."
-      },
       "assessmentsEvaluation": {
-        "title": "Uruchom AI evaluation",
-        "description": "Ta karta jest gotowa do AI review. Kliknij Start AI evaluation, aby ocenić przesłane interview."
+        "title": "Wywiad oceniony przez AI",
+        "description": "Ten wywiad został oceniony przez AI. Otwórz kartę, aby przejrzeć odpowiedzi kandydata, wyniki per pytanie i szczegółowe analizy."
       },
       "candidateLink": {
         "title": "Udostępnij link kandydatowi",

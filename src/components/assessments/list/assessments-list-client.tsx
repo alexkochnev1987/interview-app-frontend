@@ -21,6 +21,7 @@ import {
   hasScoringInProgress,
   selectHrVisibleAssessments,
 } from '@/lib/assessment-status'
+import { useOnboardingAssessmentsCardHighlight } from '@/features/onboarding/use-onboarding-tour-targets'
 import { useLivePolling } from '@/lib/use-live-polling'
 
 interface AssessmentsListClientProps {
@@ -65,16 +66,11 @@ export function AssessmentsListClient({
       return matchesQuery(interview, normalizedQuery)
     })
   }, [interviews, status, deferredQuery])
-  const tourAssessmentId = useMemo(
-    () =>
-      filtered.find((interview) => deriveReviewStatus(interview) === 'ready_to_score')
-        ?.id,
-    [filtered],
-  )
+  const tourHighlightId = useOnboardingAssessmentsCardHighlight(filtered[0]?.id)
 
   return (
     <EvaluationActionsProvider onEvaluationStarted={onEvaluationStarted}>
-      <Stack gap={6} data-tour="assessments-browse">
+      <Stack gap={6}>
         <AssessmentsListToolbar
           query={query}
           onQueryChange={setQuery}
@@ -104,7 +100,9 @@ export function AssessmentsListClient({
               <AssessmentCard
                 key={interview.id}
                 interview={interview}
-                tourTarget={interview.id === tourAssessmentId ? 'assessments-card' : undefined}
+                tourTarget={
+                  interview.id === tourHighlightId ? 'assessments-card' : undefined
+                }
               />
             ))}
           </CardGrid>

@@ -37,7 +37,7 @@ import {
   emitOnboardingEvent,
   ONBOARDING_EVENT_NAMES,
 } from '@/features/onboarding/onboarding-events'
-import { getStoredOnboardingCreatedQuestionId } from '@/features/onboarding/onboarding-progress'
+import { useOnboardingCreatedQuestionId } from '@/features/onboarding/use-onboarding-tour-targets'
 
 type InterviewCreateFormProps = {
   initialPrefetch: QuestionsLibraryPrefetch
@@ -72,10 +72,7 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
   })
   const { selectedCount, selectedById } = picker
 
-  const highlightQuestionId = useMemo(
-    () => getStoredOnboardingCreatedQuestionId(),
-    [],
-  )
+  const highlightQuestionId = useOnboardingCreatedQuestionId()
 
   const selectionAnnouncedRef = useRef(false)
   useEffect(() => {

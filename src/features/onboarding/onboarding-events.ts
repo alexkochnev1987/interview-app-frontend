@@ -4,7 +4,6 @@ export const ONBOARDING_EVENT_NAMES = {
   aiDraftApplied: 'onboarding:ai-draft-applied',
   questionSelected: 'onboarding:question-selected',
   interviewCreated: 'onboarding:interview-created',
-  evaluationStarted: 'onboarding:evaluation-started',
 } as const
 
 export type OnboardingEventName =

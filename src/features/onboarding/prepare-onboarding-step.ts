@@ -6,17 +6,55 @@ import {
   getStoredOnboardingStepRoute,
   storeOnboardingStepRoute,
 } from '@/features/onboarding/onboarding-progress'
-import { waitForTourTarget } from '@/features/onboarding/wait-for-target'
+import {
+  waitForElementLayout,
+  waitForTourTarget,
+} from '@/features/onboarding/wait-for-target'
 import type { OnboardingStepConfig } from '@/features/onboarding/types'
 
 type PrepareOnboardingStepParams = {
   step: Pick<
     OnboardingStepConfig,
-    'id' | 'route' | 'routeMatch' | 'target' | 'waitTimeoutMs'
+    | 'id'
+    | 'route'
+    | 'routeMatch'
+    | 'target'
+    | 'waitTimeoutMs'
+    | 'preservePageTop'
+    | 'pageScrollTop'
+    | 'scrollIntoViewBlock'
   >
   getPathname: () => string
   push: (href: string) => void
   routeOverride?: string
+}
+
+async function settleStepViewport(
+  step: Pick<
+    OnboardingStepConfig,
+    'preservePageTop' | 'pageScrollTop' | 'scrollIntoViewBlock'
+  >,
+  element: Element,
+) {
+  if (step.preservePageTop) {
+    window.scrollTo({
+      top: step.pageScrollTop ?? 0,
+      left: 0,
+      behavior: 'instant',
+    })
+  }
+
+  if (step.scrollIntoViewBlock) {
+    element.scrollIntoView({
+      block: step.scrollIntoViewBlock,
+      inline: 'nearest',
+      behavior: 'instant',
+    })
+  }
+
+  if (step.preservePageTop || step.scrollIntoViewBlock) {
+    await waitForElementLayout(element)
+  }
 }
 
 export async function prepareOnboardingStep({
@@ -53,5 +91,10 @@ export async function prepareOnboardingStep({
   }
 
   const element = await waitForTourTarget(step.target, timeoutMs)
-  return element != null
+  if (!element) {
+    return false
+  }
+
+  await settleStepViewport(step, element)
+  return true
 }

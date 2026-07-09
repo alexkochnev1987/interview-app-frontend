@@ -50,13 +50,9 @@
         "title": "Save the question",
         "description": "Click Create Question to save the question with the AI-generated details."
       },
-      "assessmentsIntro": {
-        "title": "Review workspace",
-        "description": "When candidates finish their sessions, return here to evaluate responses, scores, and AI-generated insights."
-      },
       "assessmentsEvaluation": {
-        "title": "Start AI evaluation",
-        "description": "This card is ready for AI review. Click Start AI evaluation to score the submitted interview."
+        "title": "AI-evaluated interview",
+        "description": "This interview has been scored by AI. Open the card to review candidate answers, per-question scores, and detailed insights."
       },
       "candidateLink": {
         "title": "Share the candidate link",

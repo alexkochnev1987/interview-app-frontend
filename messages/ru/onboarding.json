@@ -50,13 +50,9 @@
         "title": "Сохраните вопрос",
         "description": "Нажмите Create Question, чтобы сохранить вопрос с AI-сгенерированными деталями."
       },
-      "assessmentsIntro": {
-        "title": "Пространство обзора",
-        "description": "Когда кандидаты завершают сессии, возвращайтесь сюда для оценки ответов, баллов и AI-аналитики."
-      },
       "assessmentsEvaluation": {
-        "title": "Запустите AI evaluation",
-        "description": "Эта карточка готова к AI review. Нажмите Start AI evaluation, чтобы оценить отправленное интервью."
+        "title": "AI-evaluated interview",
+        "description": "This interview has been scored by AI. Open the card to review candidate answers, per-question scores, and detailed insights."
       },
       "candidateLink": {
         "title": "Поделиться ссылкой с кандидатом",
