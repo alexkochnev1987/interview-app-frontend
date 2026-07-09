@@ -33,7 +33,6 @@ export function buildDriverSteps({
   onDone,
 }: BuildDriverStepsParams): DriveStep[] {
   let cleanupEventListener: (() => void) | null = null;
-  let preservedScrollTop: number | null = null;
   let isTransitioning = false;
   let transitionId = 0;
 
@@ -46,7 +45,6 @@ export function buildDriverSteps({
     element: Element | undefined,
     driver: Driver,
     step: ResolvedOnboardingStep,
-    scrollTopOverride?: number | null,
   ) => {
     window.requestAnimationFrame(() => {
       const applyLockedPlacement = () => {
@@ -62,9 +60,9 @@ export function buildDriverSteps({
         applyLockedPlacement();
       };
 
-      if (scrollTopOverride !== undefined && scrollTopOverride !== null) {
+      if (step.preservePageTop) {
         window.scrollTo({
-          top: scrollTopOverride,
+          top: step.pageScrollTop ?? 0,
           left: 0,
           behavior: 'instant',
         });
@@ -126,15 +124,6 @@ export function buildDriverSteps({
     driver.drive(targetIndex);
   };
 
-  const rememberScrollForStep = (
-    step: ResolvedOnboardingStep | undefined,
-    direction: 1 | -1,
-  ) => {
-    if (direction === 1 && step?.preserveCurrentScroll) {
-      preservedScrollTop = window.scrollY;
-    }
-  };
-
   const lockPopoverBelowTarget = (
     element: Element | undefined,
     driver: Driver,
@@ -180,6 +169,63 @@ export function buildDriverSteps({
         );
         arrow.classList.add(
           'driver-popover-arrow-side-bottom',
+          align === 'end'
+            ? 'driver-popover-arrow-align-end'
+            : 'driver-popover-arrow-align-start',
+        );
+      }
+    });
+  };
+
+  const lockPopoverAboveTarget = (
+    element: Element | undefined,
+    driver: Driver,
+    align: 'start' | 'end',
+  ) => {
+    if (!element) return;
+
+    window.requestAnimationFrame(() => {
+      const popover = driver.getState('popover') as
+        | { wrapper?: HTMLElement; arrow?: HTMLElement }
+        | undefined;
+      const wrapper = popover?.wrapper;
+      const arrow = popover?.arrow;
+      if (!wrapper) return;
+
+      const targetRect = element.getBoundingClientRect();
+      const wrapperRect = wrapper.getBoundingClientRect();
+      const viewportPadding = 16;
+      const gap = 14;
+      const preferredLeft =
+        align === 'end'
+          ? targetRect.right - wrapperRect.width
+          : targetRect.left;
+      const left = Math.min(
+        Math.max(preferredLeft, viewportPadding),
+        window.innerWidth - wrapperRect.width - viewportPadding,
+      );
+      const top = Math.max(
+        viewportPadding,
+        targetRect.top - wrapperRect.height - gap,
+      );
+
+      wrapper.style.left = `${left}px`;
+      wrapper.style.right = 'auto';
+      wrapper.style.top = `${top}px`;
+      wrapper.style.bottom = 'auto';
+
+      if (arrow) {
+        arrow.classList.remove(
+          'driver-popover-arrow-side-left',
+          'driver-popover-arrow-side-right',
+          'driver-popover-arrow-side-bottom',
+          'driver-popover-arrow-side-over',
+          'driver-popover-arrow-align-center',
+          'driver-popover-arrow-align-end',
+          'driver-popover-arrow-align-start',
+        );
+        arrow.classList.add(
+          'driver-popover-arrow-side-top',
           align === 'end'
             ? 'driver-popover-arrow-align-end'
             : 'driver-popover-arrow-align-start',
@@ -265,7 +311,7 @@ export function buildDriverSteps({
     }
 
     const candidateStep = steps[targetIndex]
-    rememberScrollForStep(candidateStep, direction)
+
     const targetReady = await prepareStep(candidateStep, detail)
 
     if (!isCurrentNavigation(token)) {
@@ -301,10 +347,6 @@ export function buildDriverSteps({
 
       if (fromIndex === undefined) {
         return;
-      }
-
-      if (direction === -1) {
-        preservedScrollTop = null;
       }
 
       if (direction === 1 && fromIndex >= steps.length - 1) {
@@ -360,13 +402,7 @@ export function buildDriverSteps({
 
         applyStageRadius(driver, step.stageRadius);
 
-        let scrollTopOverride: number | null = null;
-        if (step.preserveCurrentScroll && preservedScrollTop !== null) {
-          scrollTopOverride = preservedScrollTop;
-          preservedScrollTop = null;
-        }
-
-        settleStepLayout(element, driver, step, scrollTopOverride);
+        settleStepLayout(element, driver, step);
 
         if (step.advance?.mode !== 'event') {
           return;

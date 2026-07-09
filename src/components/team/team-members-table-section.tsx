@@ -59,14 +59,13 @@ export function TeamMembersTableSection({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {members.map((member, index) => (
+        {members.map((member) => (
           <TeamMemberRow
             key={member.id}
             member={member}
             actorId={actorId}
             actorRole={actorRole}
             onChangeRole={() => onRequestChangeRole(member)}
-            tourTarget={index === 0 ? 'team-actions' : undefined}
           />
         ))}
       </TableBody>

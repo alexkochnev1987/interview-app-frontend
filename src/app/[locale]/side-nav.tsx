@@ -82,7 +82,6 @@ export function SideNav() {
             href: routes.questions.list,
             label: tNav('questions'),
             icon: LibraryBig,
-            dataTour: 'questions-nav',
           },
         ]
       : []),
@@ -92,7 +91,6 @@ export function SideNav() {
             href: '/assessments',
             label: tNav('assessments'),
             icon: ClipboardList,
-            dataTour: 'assessments-nav',
           },
         ]
       : []),
@@ -102,7 +100,6 @@ export function SideNav() {
             href: '/interviews/new',
             label: tNav('newInterview'),
             icon: Plus,
-            dataTour: 'new-interview-nav',
           },
         ]
       : []),
@@ -159,14 +156,13 @@ export function SideNav() {
       }
       nav={
         user
-          ? links.map(({ href, label, icon: LinkIcon, dataTour }) => (
+          ? links.map(({ href, label, icon: LinkIcon }) => (
               <SideNavLink
                 key={href}
                 href={href}
                 label={label}
                 icon={<LinkIcon />}
                 active={isActive(href)}
-                dataTour={dataTour}
               />
             ))
           : null

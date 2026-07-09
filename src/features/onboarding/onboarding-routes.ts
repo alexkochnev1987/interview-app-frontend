@@ -1,4 +1,4 @@
-export function normalizeOnboardingPath(pathname: string): string {
+function normalizeOnboardingPath(pathname: string): string {
   const path = pathname.split('?')[0] ?? '/'
   return path === '' ? '/' : path
 }

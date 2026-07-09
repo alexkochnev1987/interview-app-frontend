@@ -65,7 +65,6 @@ export function AiDraftPanel({
                 type="button"
                 variant="outline-pill"
                 shape="pill"
-                data-tour="ai-draft-apply-all"
                 onClick={onApplyAll}
               >
                 {labels.applyAll}
@@ -74,7 +73,6 @@ export function AiDraftPanel({
             <Button
               type="button"
               variant="gradient"
-              data-tour="ai-draft-generate"
               onClick={onGenerate}
               disabled={disabled}
               loading={loading}

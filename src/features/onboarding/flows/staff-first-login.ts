@@ -63,9 +63,11 @@ export const staffFirstLoginFlow: OnboardingFlowConfig = {
       },
       ...pageTourStepDefaults,
       waitTimeoutMs: 8000,
-      preserveCurrentScroll: true,
       popoverSide: 'left',
       popoverAlign: 'start',
+      mobile: {
+        scrollIntoViewBlock: 'start',
+      },
     },
     {
       id: 'questions-save',
@@ -96,6 +98,15 @@ export const staffFirstLoginFlow: OnboardingFlowConfig = {
       pageScrollTop: 190,
       popoverSide: 'top',
       popoverAlign: 'start',
+      mobile: {
+        preservePageTop: undefined,
+        pageScrollTop: undefined,
+        waitTimeoutMs: 8000,
+        scrollIntoViewBlock: 'center',
+        lockPopoverPlacement: 'bottom-start',
+        popoverSide: 'bottom',
+        popoverAlign: 'start',
+      },
     },
     {
       id: 'interview-candidate',
@@ -112,6 +123,14 @@ export const staffFirstLoginFlow: OnboardingFlowConfig = {
       pageScrollTop: 190,
       popoverSide: 'right',
       popoverAlign: 'start',
+      mobile: {
+        preservePageTop: undefined,
+        pageScrollTop: undefined,
+        scrollIntoViewBlock: 'start',
+        lockPopoverPlacement: 'bottom-start',
+        popoverSide: 'bottom',
+        popoverAlign: 'start',
+      },
     },
     {
       id: 'candidate-link',

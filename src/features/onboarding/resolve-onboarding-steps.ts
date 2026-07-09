@@ -1,8 +1,8 @@
 import { isOnboardingRoute } from '@/features/onboarding/onboarding-routes';
+import { applyOnboardingStepViewport } from '@/features/onboarding/onboarding-viewport';
 import { isOnboardingStepVisible } from '@/features/onboarding/evaluate-visibility';
 import {
   queryTourTarget,
-  waitForTourTarget,
 } from '@/features/onboarding/wait-for-target';
 import type {
   OnboardingFlowConfig,
@@ -14,13 +14,6 @@ import type {
 async function resolveStepTarget(
   step: OnboardingStepConfig,
 ): Promise<Element | null> {
-  const behavior = step.missingTarget ?? 'skip';
-  const timeoutMs = step.waitTimeoutMs ?? 2000;
-
-  if (behavior === 'wait') {
-    return waitForTourTarget(step.target, timeoutMs);
-  }
-
   return queryTourTarget(step.target);
 }
 
@@ -36,21 +29,24 @@ export async function resolveOnboardingSteps(
   const resolved: ResolvedOnboardingStep[] = [];
 
   for (const step of visibleSteps) {
+    const resolvedStep = applyOnboardingStepViewport(step);
     const isDeferred =
-      step.route != null &&
-      !isOnboardingRoute(pathname, step.route, step.routeMatch);
+      resolvedStep.route != null &&
+      !isOnboardingRoute(pathname, resolvedStep.route, resolvedStep.routeMatch);
 
     if (isDeferred) {
-      resolved.push(step);
+      resolved.push(resolvedStep);
       continue;
     }
 
-    const element = await resolveStepTarget(step);
-    if (!element) {
+    const element = await resolveStepTarget(resolvedStep);
+    const missingTargetBehavior = resolvedStep.missingTarget ?? 'wait';
+
+    if (!element && missingTargetBehavior === 'skip') {
       continue;
     }
 
-    resolved.push(step);
+    resolved.push(resolvedStep);
   }
 
   return resolved;

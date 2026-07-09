@@ -30,7 +30,7 @@ export function AssessmentsListHeader() {
         </Stack>
         {!isDemo ? (
           <Inline>
-            <Button asChild variant="gradient" size="hero" data-tour="assessments-create">
+            <Button asChild variant="gradient" size="hero">
               <Link href="/interviews/new">
                 <Icon size="lg"><Plus /></Icon>
                 {tNav('newInterview')}

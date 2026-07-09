@@ -83,7 +83,7 @@ export function DashboardView({ interviews, isDemo }: DashboardViewProps) {
                   </Stack>
                 </Stack>
 
-                <Inline gap={3} wrap="wrap" data-tour="dashboard-actions">
+                <Inline gap={3} wrap="wrap">
                   {!isDemo ? (
                     <Button asChild variant="gradient">
                       <Link href="/interviews/new">
@@ -98,7 +98,7 @@ export function DashboardView({ interviews, isDemo }: DashboardViewProps) {
                 </Inline>
               </Inline>
 
-              <Grid columns="metrics-3" gap={4} data-tour="dashboard-metrics">
+              <Grid columns="metrics-3" gap={4}>
                 <MetricPanel
                   icon={<CircleDashed />}
                   label={t('metrics.active.label')}
@@ -121,7 +121,7 @@ export function DashboardView({ interviews, isDemo }: DashboardViewProps) {
             </CardContent>
           </Card>
 
-          <Card variant="tinted" data-tour="dashboard-snapshot">
+          <Card variant="tinted">
             <CardHeader spacing="sm">
               <EyebrowBadge icon={<BriefcaseBusiness className="size-3.5" />} tone="muted">
                 {t('snapshot.eyebrow')}

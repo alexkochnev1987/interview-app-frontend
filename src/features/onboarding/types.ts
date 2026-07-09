@@ -29,13 +29,18 @@ export type OnboardingStepConfig = {
   missingTarget?: OnboardingMissingTargetBehavior;
   waitTimeoutMs?: number;
   preservePageTop?: boolean;
-  preserveCurrentScroll?: boolean;
   pageScrollTop?: number;
   scrollIntoViewBlock?: ScrollLogicalPosition;
   stageRadius?: number;
   lockPopoverPlacement?: 'bottom-start' | 'bottom-end';
   popoverSide?: 'top' | 'right' | 'bottom' | 'left';
   popoverAlign?: 'start' | 'center' | 'end';
+  mobile?: Partial<
+    Omit<
+      OnboardingStepConfig,
+      'id' | 'contentKey' | 'visibility' | 'advance' | 'route' | 'routeMatch' | 'mobile'
+    >
+  >;
 };
 
 export type OnboardingFlowConfig = {

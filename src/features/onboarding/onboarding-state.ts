@@ -1,7 +1,7 @@
 import type { AuthUserResponseDto } from '@/lib/api';
 import { canAccessDashboard } from '@/lib/auth-roles';
 
-export function isOnboardingPending(
+function isOnboardingPending(
   user: AuthUserResponseDto | null | undefined,
 ): boolean {
   if (!user) return false;

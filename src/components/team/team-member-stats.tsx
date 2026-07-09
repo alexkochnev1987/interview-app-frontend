@@ -14,7 +14,7 @@ interface TeamMemberStatsProps {
 
 export function TeamMemberStats({ statCards }: TeamMemberStatsProps) {
   return (
-    <Grid columns="metrics-5" gap={4} data-tour="team-stats">
+    <Grid columns="metrics-5" gap={4}>
       {statCards.map(({ label, value, annotation, tone, accent }) => (
         <Card
           key={label}

@@ -234,7 +234,6 @@ export function InterviewCreateForm({ initialPrefetch }: InterviewCreateFormProp
                     variant="gradient"
                     width="full"
                     disabled={submitting || selectedCount === 0}
-                    data-tour="interview-submit"
                   >
                     {submitting
                       ? toastMessages.pageGate.interview.creatingLabel

@@ -65,7 +65,7 @@ export function TeamMembersView({
       <TeamMemberStats statCards={statCards} />
 
       <Card variant="surface" flexChild="contain">
-        <CardContent spacing="sm" data-tour="team-filters">
+        <CardContent spacing="sm">
           <TeamMembersFilters
             roleFilter={roleFilter}
             onRoleFilterChange={onRoleFilterChange}
@@ -76,7 +76,7 @@ export function TeamMembersView({
 
         <Separator />
 
-        <Stack data-tour="team-table">
+        <Stack>
           <TeamMembersTableSection
             hasResults={hasResults}
             members={paginatedMembers}

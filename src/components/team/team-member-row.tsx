@@ -21,7 +21,6 @@ interface TeamMemberRowProps {
   actorId: string
   actorRole: TeamRowActorRole
   onChangeRole: () => void
-  tourTarget?: string
 }
 
 export function TeamMemberRow({
@@ -29,7 +28,6 @@ export function TeamMemberRow({
   actorId,
   actorRole,
   onChangeRole,
-  tourTarget,
 }: TeamMemberRowProps) {
   return (
     <TableRow>
@@ -60,7 +58,6 @@ export function TeamMemberRow({
           actorId={actorId}
           actorRole={actorRole}
           onChangeRole={onChangeRole}
-          tourTarget={tourTarget}
         />
       </TableCell>
     </TableRow>
