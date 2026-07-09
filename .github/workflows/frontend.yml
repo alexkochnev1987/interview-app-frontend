@@ -11,8 +11,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: '22'
       - run: npm ci
@@ -24,7 +24,7 @@ jobs:
       - run: npm run test
       - run: npx next build --webpack
       - name: Upload production build for E2E
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: next-build
           path: .next
@@ -40,13 +40,13 @@ jobs:
       E2E_BASE_URL: http://127.0.0.1:3001
       E2E_PREBUILT: '1'
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: '22'
       - run: npm ci
       - name: Download production build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: next-build
           path: .next
