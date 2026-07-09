@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from '@/i18n/navigation';
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useContext, useState, type ReactNode } from 'react';
 import { logout as apiLogout, type AuthUserResponseDto as User } from '@/lib/api';
 
 interface AuthContextType {
@@ -25,12 +25,14 @@ export function AuthProvider({
 }) {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(initialUser);
+  const [prevInitialUser, setPrevInitialUser] = useState(initialUser);
 
-  useEffect(() => {
+  if (initialUser !== prevInitialUser) {
+    setPrevInitialUser(initialUser);
     // Keep a client-established session when the first RSC refresh has not
     // picked up the new cookie yet (common right after login/demo sign-in).
     setUser((current) => initialUser ?? current);
-  }, [initialUser]);
+  }
 
   const establishSession = (sessionUser: User) => {
     setUser(sessionUser);

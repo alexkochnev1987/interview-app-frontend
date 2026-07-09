@@ -171,13 +171,7 @@ export function useInterviewsQuery(
             }).toString(),
         [
             debouncedQ,
-            state.limit,
-            state.page,
-            state.position,
-            state.sortBy,
-            state.sortOrder,
-            state.status,
-            state.view,
+            state,
         ],
     )
 
@@ -208,12 +202,7 @@ export function useInterviewsQuery(
         () => buildInterviewsFetchParams(state, debouncedQ),
         [
             debouncedQ,
-            state.limit,
-            state.page,
-            state.position,
-            state.sortBy,
-            state.sortOrder,
-            state.status,
+            state,
         ],
     )
 

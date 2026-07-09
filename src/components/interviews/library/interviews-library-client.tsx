@@ -64,10 +64,7 @@ export function InterviewsLibraryClient({
       ),
     [
       query.debouncedQ,
-      query.state.position,
-      query.state.sortBy,
-      query.state.sortOrder,
-      query.state.status,
+      query.state,
     ],
   )
 
