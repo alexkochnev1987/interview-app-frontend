@@ -20,13 +20,13 @@
     },
     "library": {
       "header": {
-        "eyebrow": "...",
+        "eyebrow": "Proces rekrutacyjny",
         "title": "Interviews",
-        "lead": "...",
+        "lead": "Przeglądaj wszystkie interview kandydatów, śledź postępy i otwieraj szczegóły bez opuszczania listy.",
         "newInterview": "Nowe interview",
         "overviewEyebrow": "Przegląd",
         "healthTitle": "Pipeline",
-        "healthDescription": "...",
+        "healthDescription": "Liczby odzwierciedlają filtry zastosowane w bieżącym widoku.",
         "totalInterviews": "Łącznie",
         "visibleNow": "Wyświetlane"
       },
@@ -87,8 +87,8 @@
       "empty": {
         "title": "Brak interview",
         "filteredTitle": "Brak wyników",
-        "description": "...",
-        "filteredDescription": "...",
+        "description": "Utwórz interview, aby rozpocząć zbieranie odpowiedzi kandydatów.",
+        "filteredDescription": "Spróbuj wyczyścić filtry lub zmienić wyszukiwane hasło.",
         "createCta": "Nowe interview"
       },
       "client": {

@@ -28,10 +28,16 @@ export function AuthProvider({
   const [prevInitialUser, setPrevInitialUser] = useState(initialUser);
 
   if (initialUser !== prevInitialUser) {
+    const previousSnapshot = prevInitialUser;
     setPrevInitialUser(initialUser);
-    // Keep a client-established session when the first RSC refresh has not
-    // picked up the new cookie yet (common right after login/demo sign-in).
-    setUser((current) => initialUser ?? current);
+    if (initialUser != null) {
+      setUser(initialUser);
+    } else if (previousSnapshot != null) {
+      // Server cleared the session (expired or signed out elsewhere).
+      setUser(null);
+    }
+    // When both snapshots are null, keep a client-established session until
+    // the first RSC refresh picks up the new cookie (post login/demo sign-in).
   }
 
   const establishSession = (sessionUser: User) => {

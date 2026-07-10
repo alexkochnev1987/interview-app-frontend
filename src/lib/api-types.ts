@@ -1633,6 +1633,8 @@ export interface components {
             positions: components["schemas"]["InterviewFacetCountDto"][];
             /** @description Status value + count, given all OTHER current filters (status itself is not applied). */
             statuses: components["schemas"]["InterviewFacetCountDto"][];
+            /** @description Sum of questionCount across interviews matching the current filters. */
+            totalQuestionCount?: number;
         };
         InterviewResponseDto: {
             id: string;

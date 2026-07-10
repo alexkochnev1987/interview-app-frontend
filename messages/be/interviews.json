@@ -20,13 +20,13 @@
     },
     "library": {
       "header": {
-        "eyebrow": "...",
+        "eyebrow": "Варонка інтэрв'ю",
         "title": "Інтэрв'ю",
-        "lead": "...",
+        "lead": "Праглядайце ўсе інтэрв'ю кандыдатаў, адсочвайце іх прагрэс і адкрывайце падрабязнасці, не пакідаючы спіс.",
         "newInterview": "Новае інтэрв'ю",
         "overviewEyebrow": "Агляд",
         "healthTitle": "Варонка",
-        "healthDescription": "...",
+        "healthDescription": "Колькасць адпавядае фільтрам, ужытым да бягучага прадстаўлення.",
         "totalInterviews": "Усяго",
         "visibleNow": "Паказана"
       },
@@ -87,8 +87,8 @@
       "empty": {
         "title": "Пакуль няма інтэрв'ю",
         "filteredTitle": "Нічога не знойдзена",
-        "description": "...",
-        "filteredDescription": "...",
+        "description": "Стварыце інтэрв'ю, каб пачаць збіраць адказы кандыдатаў.",
+        "filteredDescription": "Паспрабуйце скінуць фільтры або змяніць пошукавы запыт.",
         "createCta": "Новае інтэрв'ю"
       },
       "client": {

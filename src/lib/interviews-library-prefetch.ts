@@ -24,6 +24,7 @@ import { type ServerRequestContext, requestServer } from '@/lib/server-fetch'
 
 export type InterviewsLibraryPrefetch = {
   queryState: InterviewsQueryState
+  facets: InterviewFacetsResponse
   dehydratedState: DehydratedState
 }
 
@@ -93,8 +94,14 @@ async function hydrateInterviewsLibrary(
 
   await Promise.all(prefetches)
 
+  const facets =
+    queryClient.getQueryData<InterviewFacetsResponse>(
+      interviewFacetsQueryKey(facetsParams),
+    ) ?? EMPTY_INTERVIEW_FACETS
+
   return {
     queryState,
+    facets,
     dehydratedState: dehydrate(queryClient),
   }
 }
