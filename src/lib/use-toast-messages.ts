@@ -1,5 +1,6 @@
 import { useApiErrorToastMessages } from './toast-messages/use-api-error-toast-messages'
 import { useBulkDeleteToastMessages } from './toast-messages/use-bulk-delete-toast-messages'
+import { useCandidateFeedbackToastMessages } from './toast-messages/use-candidate-feedback-toast-messages'
 import { useDefaultsToastMessages } from './toast-messages/use-defaults-toast-messages'
 import { useInterviewToastMessages } from './toast-messages/use-interview-toast-messages'
 import { usePageGateToastMessages } from './toast-messages/use-page-gate-toast-messages'
@@ -18,6 +19,7 @@ import { useTeamToastMessages } from './toast-messages/use-team-toast-messages'
 export {
   useApiErrorToastMessages,
   useBulkDeleteToastMessages,
+  useCandidateFeedbackToastMessages,
   useDefaultsToastMessages,
   useDeleteQuestionToastMessages,
   useInterviewToastMessages,
@@ -40,6 +42,7 @@ export function useToastMessages() {
     interview: useInterviewToastMessages(),
     take: useTakeToastMessages(),
     bulkDelete: useBulkDeleteToastMessages(),
+    candidateFeedback: useCandidateFeedbackToastMessages(),
     questionFeed: useQuestionFeedToastMessages(),
     questionFacets: useQuestionFacetsToastMessages(),
     similarity: useSimilarityToastMessages(),

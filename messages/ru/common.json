@@ -38,7 +38,8 @@
     "fallback": {
       "backToDashboard": "Вернуться на панель",
       "backToQuestionLibrary": "Вернуться в банк вопросов",
-      "backToAssessments": "Вернуться к оценкам"
+      "backToAssessments": "Вернуться к оценкам",
+      "backToInterview": "Вернуться к интервью"
     },
     "labels": {
       "roles": {

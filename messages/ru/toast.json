@@ -31,6 +31,14 @@
       "cancelSuccess": "Интервью отменено",
       "cancelError": "Не удалось отменить интервью"
     },
+    "candidateFeedback": {
+      "acceptSuccess": "Предложение принято",
+      "acceptError": "Не удалось принять предложение",
+      "saveSuccess": "Обратная связь сохранена",
+      "saveError": "Не удалось сохранить обратную связь",
+      "generateStartSuccess": "Генерация запущена",
+      "generateStartError": "Не удалось запустить генерацию"
+    },
     "take": {
       "submitSuccess": "Ответ отправлен",
       "submitError": "Не удалось отправить ответ"
@@ -95,6 +103,13 @@
       "feedback": {
         "unavailableTitle": "Обратная связь недоступна",
         "loadFailedFallback": "Не удалось загрузить"
+      },
+      "candidateFeedback": {
+        "forbiddenTitle": "У вас нет доступа к обратной связи для кандидата",
+        "forbiddenDescription": "Редактирование обратной связи для кандидата доступно только пользователям HR, admin и super-admin. Если это ошибка, обратитесь к владельцу рабочего пространства.",
+        "unavailableTitle": "Обратная связь для кандидата недоступна",
+        "loadFailedFallback": "Не удалось загрузить обратную связь для кандидата.",
+        "notFoundFallback": "Запрошенное интервью не удалось загрузить."
       },
       "team": {
         "forbiddenTitle": "У вас нет доступа к управлению командой",

@@ -11,6 +11,8 @@ export interface LivePolling<T> {
   data: T
   /** One-shot fetch. Also re-arms the loop if it was paused. */
   refresh: () => Promise<void>
+  /** Apply authoritative data without a network round-trip. */
+  replaceData: (next: T) => void
   /**
    * Force the live loop to run for a short grace window even if the data does
    * not yet show an active state. Use right after triggering backend work
@@ -73,6 +75,12 @@ export function useLivePolling<T>(
     setKicking(true)
   }, [])
 
+  const replaceData = useCallback((next: T) => {
+    failuresRef.current = 0
+    setData(next)
+    setPaused(false)
+  }, [])
+
   // The kick window is self-clearing; once it lapses, `shouldPoll` alone decides
   // whether the loop keeps running.
   useEffect(() => {
@@ -110,5 +118,5 @@ export function useLivePolling<T>(
     }
   }, [active, refresh])
 
-  return { data, refresh, kick, paused }
+  return { data, refresh, replaceData, kick, paused }
 }

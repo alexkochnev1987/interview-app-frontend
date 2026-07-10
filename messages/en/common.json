@@ -38,7 +38,8 @@
     "fallback": {
       "backToDashboard": "Back to dashboard",
       "backToQuestionLibrary": "Back to question library",
-      "backToAssessments": "Back to assessments"
+      "backToAssessments": "Back to assessments",
+      "backToInterview": "Back to interview"
     },
     "labels": {
       "roles": {

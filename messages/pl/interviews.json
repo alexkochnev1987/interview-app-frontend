@@ -40,6 +40,46 @@
       "answersBlockEditNotice": "Edycja jest wyłączona po przesłaniu odpowiedzi, ponieważ odpowiedzi są powiązane z kolejnością pytań.",
       "discardTitle": "Odrzucić niezapisane zmiany?",
       "discardDescription": "Twoje zmiany w tym wywiadzie zostaną utracone."
+    },
+    "candidateFeedback": {
+      "backToInterview": "Wróć do wywiadu",
+      "eyebrow": "Informacja zwrotna dla kandydata",
+      "title": "Przeglądaj i edytuj informację zwrotną dla kandydata",
+      "shellLead": "To miejsce jest oddzielone od oceny i wyników. Wygenerowane sugestie i ręczne edycje pojawią się tutaj.",
+      "emptyTitle": "Brak informacji zwrotnej dla kandydata",
+      "emptyDescription": "Wygeneruj informację zwrotną AI dla całego wywiadu lub zacznij od pojedynczych pytań poniżej.",
+      "generateAll": "Wygeneruj AI dla całego wywiadu",
+      "generateOverall": "Wygeneruj ogólną informację zwrotną AI",
+      "generateQuestion": "Wygeneruj AI dla tego pytania",
+      "overallBlockTitle": "Ogólna informacja zwrotna",
+      "questionBlocksTitle": "Informacja zwrotna dla pytań",
+      "questionBlockTitle": "Pytanie {index}",
+      "recommendationLabel": "Rekomendacje",
+      "improvementLabel": "Co można poprawić",
+      "noTextYet": "Brak tekstu",
+      "notGeneratedHint": "Informacja zwrotna AI dla tego bloku nie została jeszcze wygenerowana.",
+      "generatingHint": "Informacja zwrotna AI dla tego bloku jest generowana.",
+      "failedTitle": "Generowanie nie powiodło się",
+      "failedDescription": "Nie udało się wygenerować tego bloku. Spróbuj wygenerować go ponownie.",
+      "retry": "Spróbuj ponownie",
+      "suggestionLead": "Przejrzyj poniższą sugestię AI. Zaakceptuj ją, aby zablokować tekst dla informacji zwrotnej dla kandydata.",
+      "acceptSuggestion": "Zaakceptuj sugestię",
+      "saveChanges": "Zapisz zmiany",
+      "noQuestionsTitle": "Brak pytań wywiadu",
+      "noQuestionsDescription": "Ten wywiad nie ma pytań, więc nie ma informacji zwrotnej dla pytań do edycji.",
+      "blockState": {
+        "not_generated": "Nie wygenerowano",
+        "generating": "Generowanie",
+        "generated": "Wygenerowano",
+        "accepted": "Zaakceptowano",
+        "edited": "Edytowano",
+        "failed": "Błąd"
+      },
+      "liveRefresh": {
+        "title": "Wstrzymano bieżące aktualizacje",
+        "description": "Zatrzymaliśmy odpytywanie statusu generowania po powtarzających się błędach lub limicie czasu.",
+        "refresh": "Odśwież teraz"
+      }
     }
   }
 }

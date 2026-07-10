@@ -9,6 +9,11 @@ import {
   buildTranslateDraftRequestPayload,
 } from './question-editor/ai-draft-request';
 import { LOCALES, type Locale } from '@/i18n/locales';
+import {
+  createEmptyCandidateFeedback,
+  type CandidateFeedbackResponse,
+  type UpdateCandidateFeedbackPayload,
+} from './candidate-feedback';
 
 export { ApiError, QuestionInUseError } from './api-error';
 export { resolveApiLocale } from './api-locale';
@@ -546,6 +551,119 @@ export async function generateFeedbackLink(
     ...LOCALIZED_HEADERS,
     params: { path: { id } }
   }));
+}
+
+export type {
+  CandidateFeedbackBlockState,
+  CandidateFeedbackEditableState,
+  CandidateFeedbackQuestionBlock,
+  CandidateFeedbackResponse,
+  UpdateCandidateFeedbackOverallPayload,
+  UpdateCandidateFeedbackPayload,
+  UpdateCandidateFeedbackQuestionPayload,
+} from './candidate-feedback';
+export {
+  buildQuestionBlocksView,
+  candidateFeedbackPath,
+  canGenerateQuestionBlock,
+  createEmptyCandidateFeedback,
+  isCandidateFeedbackEmpty,
+  isCandidateFeedbackGenerating,
+  isOverallBlockGenerationBusy,
+  isQuestionBlockGenerationBusy,
+} from './candidate-feedback';
+
+export async function getCandidateFeedback(
+  id: string,
+): Promise<CandidateFeedbackResponse> {
+  const path = `/interviews/${encodeURIComponent(id)}/candidate-feedback`;
+  const res = await fetchClientApi(`/api${path}`, {
+    method: 'GET',
+    credentials: 'include',
+  });
+
+  if (!res.ok) {
+    const body = await res.text();
+    const { code, params } = extractApiErrorFieldsFromBody(body);
+    throw new ApiError(res.status, messageFromBody(body, res.status), path, body, code, params);
+  }
+
+  const body = await res.text();
+  if (!body) {
+    return createEmptyCandidateFeedback(id);
+  }
+
+  return JSON.parse(body) as CandidateFeedbackResponse;
+}
+
+export async function updateCandidateFeedback(
+  id: string,
+  payload: UpdateCandidateFeedbackPayload,
+): Promise<CandidateFeedbackResponse> {
+  const path = `/interviews/${encodeURIComponent(id)}/candidate-feedback`;
+  const res = await fetchClientApi(`/api${path}`, {
+    method: 'PATCH',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const body = await res.text();
+    const { code, params } = extractApiErrorFieldsFromBody(body);
+    throw new ApiError(res.status, messageFromBody(body, res.status), path, body, code, params);
+  }
+
+  const body = await res.text();
+  if (!body) {
+    return getCandidateFeedback(id);
+  }
+
+  return JSON.parse(body) as CandidateFeedbackResponse;
+}
+
+async function parseCandidateFeedbackPostResponse(
+  interviewId: string,
+  path: string,
+  res: Response,
+): Promise<CandidateFeedbackResponse> {
+  if (!res.ok) {
+    const body = await res.text();
+    const { code, params } = extractApiErrorFieldsFromBody(body);
+    throw new ApiError(res.status, messageFromBody(body, res.status), path, body, code, params);
+  }
+
+  const body = await res.text();
+  if (!body) {
+    return getCandidateFeedback(interviewId);
+  }
+
+  return JSON.parse(body) as CandidateFeedbackResponse;
+}
+
+export async function generateCandidateFeedbackQuestion(
+  interviewId: string,
+  questionIndex: number,
+): Promise<CandidateFeedbackResponse> {
+  const path = `/interviews/${encodeURIComponent(interviewId)}/candidate-feedback/questions/${encodeURIComponent(String(questionIndex))}/generate`;
+  const res = await fetchClientApi(`/api${path}`, {
+    method: 'POST',
+    credentials: 'include',
+  });
+
+  return parseCandidateFeedbackPostResponse(interviewId, path, res);
+}
+
+export async function generateCandidateFeedbackAll(
+  interviewId: string,
+): Promise<CandidateFeedbackResponse> {
+  const path = `/interviews/${encodeURIComponent(interviewId)}/candidate-feedback/generate?scope=all`;
+  const res = await fetchClientApi(`/api${path}`, {
+    method: 'POST',
+    credentials: 'include',
+  });
+
+  return parseCandidateFeedbackPostResponse(interviewId, path, res);
 }
 
 
