@@ -9,6 +9,7 @@
     },
     "detail": {
       "backToDashboard": "Back to dashboard",
+      "candidateFeedback": "Candidate feedback",
       "demoTryCandidateExperience": "Try the candidate experience",
       "validationStatus": {
         "idle": "Idle",
@@ -51,6 +52,7 @@
       "generateAll": "Generate AI for entire interview",
       "generateOverall": "Generate overall AI feedback",
       "generateQuestion": "Generate AI for this question",
+      "regenerateQuestion": "Regenerate AI for this question",
       "overallBlockTitle": "Overall feedback",
       "questionBlocksTitle": "Per-question feedback",
       "questionBlockTitle": "Question {index}",
@@ -62,8 +64,6 @@
       "failedTitle": "Generation failed",
       "failedDescription": "This block could not be generated. Try generating it again.",
       "retry": "Retry",
-      "suggestionLead": "Review the AI suggestion below. Accept it to lock the text for candidate-facing feedback.",
-      "acceptSuggestion": "Accept suggestion",
       "saveChanges": "Save changes",
       "noQuestionsTitle": "No interview questions",
       "noQuestionsDescription": "This interview has no questions, so there is no per-question feedback to edit.",

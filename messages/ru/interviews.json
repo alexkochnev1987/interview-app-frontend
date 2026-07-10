@@ -9,6 +9,7 @@
     },
     "detail": {
       "backToDashboard": "Вернуться к панели управления",
+      "candidateFeedback": "Обратная связь кандидату",
       "demoTryCandidateExperience": "Попробовать как кандидат",
       "validationStatus": {
         "idle": "Праздный",
@@ -51,6 +52,7 @@
       "generateAll": "Сгенерировать AI для всего интервью",
       "generateOverall": "Сгенерировать общую AI-обратную связь",
       "generateQuestion": "Сгенерировать AI для этого вопроса",
+      "regenerateQuestion": "Перегенерировать AI для этого вопроса",
       "overallBlockTitle": "Общая обратная связь",
       "questionBlocksTitle": "Обратная связь по вопросам",
       "questionBlockTitle": "Вопрос {index}",
@@ -62,8 +64,6 @@
       "failedTitle": "Генерация не удалась",
       "failedDescription": "Этот блок не удалось сгенерировать. Попробуйте сгенерировать его снова.",
       "retry": "Повторить",
-      "suggestionLead": "Просмотрите предложение AI ниже. Примите его, чтобы зафиксировать текст для обратной связи кандидату.",
-      "acceptSuggestion": "Принять предложение",
       "saveChanges": "Сохранить изменения",
       "noQuestionsTitle": "Нет вопросов интервью",
       "noQuestionsDescription": "В этом интервью нет вопросов, поэтому нет обратной связи по вопросам для редактирования.",

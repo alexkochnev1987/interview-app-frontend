@@ -11,15 +11,19 @@ import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 
 interface CandidateFeedbackFailedBlockProps {
+  errorMessage?: string | null
   retrying: boolean
   retryDisabled: boolean
   onRetry: () => Promise<void>
+  showRetry?: boolean
 }
 
 export function CandidateFeedbackFailedBlock({
+  errorMessage,
   retrying,
   retryDisabled,
   onRetry,
+  showRetry = true,
 }: CandidateFeedbackFailedBlockProps) {
   const t = useTranslations('interviews.candidateFeedback')
 
@@ -27,24 +31,28 @@ export function CandidateFeedbackFailedBlock({
     <Stack gap={4}>
       <Alert variant="danger">
         <AlertTitle>{t('failedTitle')}</AlertTitle>
-        <AlertDescription>{t('failedDescription')}</AlertDescription>
+        <AlertDescription>
+          {errorMessage?.trim() ? errorMessage : t('failedDescription')}
+        </AlertDescription>
       </Alert>
-      <Inline gap={2} wrap="wrap">
-        <DemoWriteGuard disabled={retrying || retryDisabled}>
-          <Button
-            type="button"
-            variant="outline-pill"
-            shape="pill"
-            loading={retrying}
-            onClick={() => void onRetry()}
-          >
-            <Icon size="sm">
-              <RefreshCw />
-            </Icon>
-            {t('retry')}
-          </Button>
-        </DemoWriteGuard>
-      </Inline>
+      {showRetry ? (
+        <Inline gap={2} wrap="wrap">
+          <DemoWriteGuard disabled={retrying || retryDisabled}>
+            <Button
+              type="button"
+              variant="outline-pill"
+              shape="pill"
+              loading={retrying}
+              onClick={() => void onRetry()}
+            >
+              <Icon size="sm">
+                <RefreshCw />
+              </Icon>
+              {t('retry')}
+            </Button>
+          </DemoWriteGuard>
+        </Inline>
+      ) : null}
     </Stack>
   )
 }

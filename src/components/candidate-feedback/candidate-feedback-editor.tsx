@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { MessageSquareText, Sparkles } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
@@ -60,12 +60,21 @@ export function CandidateFeedbackEditor({
     useCandidateFeedbackData(interview.id, initialFeedback)
   const [savingTarget, setSavingTarget] = useState<SavingTarget>(null)
   const [generatingTarget, setGeneratingTarget] = useState<GeneratingTarget>(null)
+  const [generateAllActive, setGenerateAllActive] = useState(false)
 
   const questionCount = interview.questions.length
+  const interviewLocale = interview.interviewLocale ?? feedback.interviewLocale
   const questionBlocks = buildQuestionBlocksView(questionCount, feedback)
   const isEmpty = isCandidateFeedbackEmpty(questionCount, feedback)
-  const generateAllBusy =
-    generatingTarget !== null || isCandidateFeedbackGenerating(feedback)
+  const feedbackGenerating = isCandidateFeedbackGenerating(feedback)
+  const generateAllBusy = generatingTarget !== null || feedbackGenerating
+  const generateAllLoading = generatingTarget === 'all' || generateAllActive
+
+  useEffect(() => {
+    if (!feedbackGenerating) {
+      setGenerateAllActive(false)
+    }
+  }, [feedbackGenerating])
 
   async function applyPatchUpdate(
     mutation: () => Promise<CandidateFeedbackResponse>,
@@ -104,10 +113,16 @@ export function CandidateFeedbackEditor({
     mutation: () => Promise<CandidateFeedbackResponse>,
     toast: FeedbackMutationToast,
   ) {
+    if (target === 'all') {
+      setGenerateAllActive(true)
+    }
     setGeneratingTarget(target)
     try {
       await runMutation(() => applyGenerationUpdate(mutation), toast)
     } catch {
+      if (target === 'all') {
+        setGenerateAllActive(false)
+      }
       /* toast handled by runMutation */
     } finally {
       setGeneratingTarget(null)
@@ -117,7 +132,7 @@ export function CandidateFeedbackEditor({
   function handleGenerateAll() {
     return runGenerateMutation(
       'all',
-      () => generateCandidateFeedbackAll(interview.id),
+      () => generateCandidateFeedbackAll(interview.id, interviewLocale),
       {
         successMessage: toastMessages.generateStartSuccess,
         errorMessage: toastMessages.generateStartError,
@@ -128,7 +143,7 @@ export function CandidateFeedbackEditor({
   function handleGenerateQuestion(questionIndex: number) {
     return runGenerateMutation(
       `question-${questionIndex}`,
-      () => generateCandidateFeedbackQuestion(interview.id, questionIndex),
+      () => generateCandidateFeedbackQuestion(interview.id, questionIndex, interviewLocale),
       {
         successMessage: toastMessages.generateStartSuccess,
         errorMessage: toastMessages.generateStartError,
@@ -136,16 +151,24 @@ export function CandidateFeedbackEditor({
     )
   }
 
-  function handleAcceptOverall() {
+  function handleUseAiOverall(payload: {
+    recommendationText: string
+    improvementText: string
+  }) {
     return runPatchMutation(
       'overall',
       () =>
-        updateCandidateFeedback(interview.id, {
-          overall: {
-            text: feedback.overallText ?? '',
-            state: 'accepted',
+        updateCandidateFeedback(
+          interview.id,
+          {
+            overall: {
+              recommendationText: payload.recommendationText,
+              improvementText: payload.improvementText,
+              state: 'accepted',
+            },
           },
-        }),
+          interviewLocale,
+        ),
       {
         successMessage: toastMessages.acceptSuccess,
         errorMessage: toastMessages.acceptError,
@@ -153,13 +176,24 @@ export function CandidateFeedbackEditor({
     )
   }
 
-  function handleSaveOverall(text: string) {
+  function handleSaveOverall(payload: {
+    recommendationText: string
+    improvementText: string
+  }) {
     return runPatchMutation(
       'overall',
       () =>
-        updateCandidateFeedback(interview.id, {
-          overall: { text, state: 'edited' },
-        }),
+        updateCandidateFeedback(
+          interview.id,
+          {
+            overall: {
+              recommendationText: payload.recommendationText,
+              improvementText: payload.improvementText,
+              state: 'edited',
+            },
+          },
+          interviewLocale,
+        ),
       {
         successMessage: toastMessages.saveSuccess,
         errorMessage: toastMessages.saveError,
@@ -167,25 +201,27 @@ export function CandidateFeedbackEditor({
     )
   }
 
-  function handleAcceptQuestion(questionIndex: number) {
-    const block = questionBlocks.find(
-      (item) => item.questionIndex === questionIndex,
-    )
-    if (!block) return Promise.resolve()
-
+  function handleUseAiQuestion(
+    questionIndex: number,
+    payload: { recommendationText: string; improvementText: string },
+  ) {
     return runPatchMutation(
       `question-${questionIndex}`,
       () =>
-        updateCandidateFeedback(interview.id, {
-          questions: [
-            {
-              questionIndex,
-              recommendationText: block.recommendationText ?? '',
-              improvementText: block.improvementText ?? '',
-              state: 'accepted',
-            },
-          ],
-        }),
+        updateCandidateFeedback(
+          interview.id,
+          {
+            questions: [
+              {
+                questionIndex,
+                recommendationText: payload.recommendationText,
+                improvementText: payload.improvementText,
+                state: 'accepted',
+              },
+            ],
+          },
+          interviewLocale,
+        ),
       {
         successMessage: toastMessages.acceptSuccess,
         errorMessage: toastMessages.acceptError,
@@ -200,16 +236,20 @@ export function CandidateFeedbackEditor({
     return runPatchMutation(
       `question-${questionIndex}`,
       () =>
-        updateCandidateFeedback(interview.id, {
-          questions: [
-            {
-              questionIndex,
-              recommendationText: payload.recommendationText,
-              improvementText: payload.improvementText,
-              state: 'edited',
-            },
-          ],
-        }),
+        updateCandidateFeedback(
+          interview.id,
+          {
+            questions: [
+              {
+                questionIndex,
+                recommendationText: payload.recommendationText,
+                improvementText: payload.improvementText,
+                state: 'edited',
+              },
+            ],
+          },
+          interviewLocale,
+        ),
       {
         successMessage: toastMessages.saveSuccess,
         errorMessage: toastMessages.saveError,
@@ -246,7 +286,7 @@ export function CandidateFeedbackEditor({
                 type="button"
                 variant="gradient"
                 shape="pill"
-                loading={generatingTarget === 'all'}
+                loading={generateAllLoading}
                 onClick={() => void handleGenerateAll()}
               >
                 <Icon size="sm">
@@ -258,16 +298,15 @@ export function CandidateFeedbackEditor({
           </Inline>
 
           <CandidateFeedbackOverallBlock
-            state={feedback.overallState}
-            text={feedback.overallText}
+            block={feedback.overall}
             saving={savingTarget === 'overall'}
-            retrying={generatingTarget === 'all'}
+            retrying={generateAllLoading}
             retryDisabled={isOverallBlockGenerationBusy(
-              feedback.overallState,
+              feedback.overall.state,
               generatingTarget,
             )}
             onRetry={handleGenerateAll}
-            onAccept={handleAcceptOverall}
+            onUseAi={handleUseAiOverall}
             onSave={handleSaveOverall}
           />
 
@@ -282,13 +321,16 @@ export function CandidateFeedbackEditor({
                   generating={
                     generatingTarget === `question-${block.questionIndex}`
                   }
+                  generateAllActive={generateAllActive}
                   generationDisabled={isQuestionBlockGenerationBusy(
                     block.state,
                     block.questionIndex,
                     generatingTarget,
                   )}
                   onGenerate={() => handleGenerateQuestion(block.questionIndex)}
-                  onAccept={() => handleAcceptQuestion(block.questionIndex)}
+                  onUseAi={(payload) =>
+                    handleUseAiQuestion(block.questionIndex, payload)
+                  }
                   onSave={(payload) =>
                     handleSaveQuestion(block.questionIndex, payload)
                   }

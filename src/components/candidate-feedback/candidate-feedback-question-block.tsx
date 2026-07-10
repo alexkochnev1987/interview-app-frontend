@@ -1,30 +1,33 @@
 'use client'
 
-import { Sparkles } from 'lucide-react'
-import { useEffect, useId, useState } from 'react'
 import { useTranslations } from 'next-intl'
 
-import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
+import { CandidateFeedbackBlockFields } from '@/components/candidate-feedback/candidate-feedback-block-fields'
 import { CandidateFeedbackBlockStatePill } from '@/components/candidate-feedback/candidate-feedback-block-state-pill'
 import { CandidateFeedbackFailedBlock } from '@/components/candidate-feedback/candidate-feedback-failed-block'
-import { Button } from '@/components/ui/button'
+import { CandidateFeedbackGenerateButton } from '@/components/candidate-feedback/candidate-feedback-generate-button'
+import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { Card, CardContent } from '@/components/ui/card'
-import { FormField } from '@/components/ui/form-field'
-import { Icon } from '@/components/ui/icon'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
-import { LoadingStateCard } from '@/components/ui/state-card'
-import { Textarea } from '@/components/ui/textarea'
 import { BodyText, SectionHeading } from '@/components/ui/text'
-import { type CandidateFeedbackQuestionBlock } from '@/lib/candidate-feedback'
+import {
+  getQuestionGenerateLabelKey,
+  shouldShowQuestionGenerateButton,
+  type CandidateFeedbackQuestionBlock,
+} from '@/lib/candidate-feedback'
 
 interface CandidateFeedbackQuestionBlockEditorProps {
   block: CandidateFeedbackQuestionBlock
   saving: boolean
   generating: boolean
+  generateAllActive: boolean
   generationDisabled: boolean
   onGenerate: () => Promise<void>
-  onAccept: () => Promise<void>
+  onUseAi: (payload: {
+    recommendationText: string
+    improvementText: string
+  }) => Promise<void>
   onSave: (payload: {
     recommendationText: string
     improvementText: string
@@ -35,25 +38,18 @@ export function CandidateFeedbackQuestionBlockEditor({
   block,
   saving,
   generating,
+  generateAllActive,
   generationDisabled,
   onGenerate,
-  onAccept,
+  onUseAi,
   onSave,
 }: CandidateFeedbackQuestionBlockEditorProps) {
   const t = useTranslations('interviews.candidateFeedback')
-  const recommendationId = useId()
-  const improvementId = useId()
-  const [recommendationText, setRecommendationText] = useState(
-    block.recommendationText ?? '',
-  )
-  const [improvementText, setImprovementText] = useState(
-    block.improvementText ?? '',
-  )
-
-  useEffect(() => {
-    setRecommendationText(block.recommendationText ?? '')
-    setImprovementText(block.improvementText ?? '')
-  }, [block.improvementText, block.recommendationText, block.state])
+  const showGenerateButton = shouldShowQuestionGenerateButton(block.state)
+  const isGenerating =
+    generating ||
+    (block.state === 'generating' && !generateAllActive)
+  const generateLabelKey = getQuestionGenerateLabelKey(block.state)
 
   return (
     <Card variant="surface" size="lg">
@@ -67,114 +63,38 @@ export function CandidateFeedbackQuestionBlockEditor({
           </Inline>
 
           {block.state === 'not_generated' ? (
-            <Stack gap={4}>
-              <BodyText tone="muted">{t('notGeneratedHint')}</BodyText>
-              <Inline gap={2} wrap="wrap">
-                <DemoWriteGuard disabled={generating || generationDisabled}>
-                  <Button
-                    type="button"
-                    variant="outline-pill"
-                    shape="pill"
-                    loading={generating}
-                    onClick={() => void onGenerate()}
-                  >
-                    <Icon size="sm">
-                      <Sparkles />
-                    </Icon>
-                    {t('generateQuestion')}
-                  </Button>
-                </DemoWriteGuard>
-              </Inline>
-            </Stack>
+            <BodyText tone="muted">{t('notGeneratedHint')}</BodyText>
           ) : null}
 
           {block.state === 'failed' ? (
             <CandidateFeedbackFailedBlock
-              retrying={generating}
+              errorMessage={block.errorMessage}
+              retrying={isGenerating}
               retryDisabled={generationDisabled}
               onRetry={onGenerate}
+              showRetry={false}
             />
           ) : null}
 
-          {block.state === 'generating' ? (
-            <LoadingStateCard label={t('generatingHint')} tone="ghost" />
+          {showGenerateButton ? (
+            <Inline gap={2} wrap="wrap">
+              <DemoWriteGuard disabled={generationDisabled}>
+                <CandidateFeedbackGenerateButton
+                  label={t(generateLabelKey)}
+                  loading={isGenerating}
+                  disabled={generationDisabled}
+                  onClick={() => void onGenerate()}
+                />
+              </DemoWriteGuard>
+            </Inline>
           ) : null}
 
-          {block.state === 'generated' ? (
-            <Stack gap={4}>
-              <BodyText tone="muted">{t('suggestionLead')}</BodyText>
-              <Stack gap={2}>
-                <BodyText tone="muted">{t('recommendationLabel')}</BodyText>
-                <BodyText>
-                  {block.recommendationText?.trim()
-                    ? block.recommendationText
-                    : t('noTextYet')}
-                </BodyText>
-              </Stack>
-              <Stack gap={2}>
-                <BodyText tone="muted">{t('improvementLabel')}</BodyText>
-                <BodyText>
-                  {block.improvementText?.trim()
-                    ? block.improvementText
-                    : t('noTextYet')}
-                </BodyText>
-              </Stack>
-              <Inline gap={2} wrap="wrap">
-                <DemoWriteGuard disabled={saving}>
-                  <Button
-                    type="button"
-                    variant="gradient"
-                    shape="pill"
-                    loading={saving}
-                    onClick={() => void onAccept()}
-                  >
-                    {t('acceptSuggestion')}
-                  </Button>
-                </DemoWriteGuard>
-              </Inline>
-            </Stack>
-          ) : null}
-
-          {block.state === 'accepted' || block.state === 'edited' ? (
-            <Stack gap={4}>
-              <FormField htmlFor={recommendationId} label={t('recommendationLabel')}>
-                <Textarea
-                  id={recommendationId}
-                  value={recommendationText}
-                  onChange={(event) => setRecommendationText(event.target.value)}
-                  disabled={saving}
-                  size="sm"
-                />
-              </FormField>
-              <FormField htmlFor={improvementId} label={t('improvementLabel')}>
-                <Textarea
-                  id={improvementId}
-                  value={improvementText}
-                  onChange={(event) => setImprovementText(event.target.value)}
-                  disabled={saving}
-                  size="sm"
-                />
-              </FormField>
-              <Inline gap={2} wrap="wrap">
-                <DemoWriteGuard disabled={saving}>
-                  <Button
-                    type="button"
-                    variant="gradient"
-                    shape="pill"
-                    loading={saving}
-                    onClick={() =>
-                      void onSave({
-                        recommendationText,
-                        improvementText,
-                      })
-                    }
-                  >
-                    {t('saveChanges')}
-                  </Button>
-                </DemoWriteGuard>
-              </Inline>
-            </Stack>
-          ) : null}
+          <CandidateFeedbackBlockFields
+            block={block}
+            saving={saving}
+            onSave={onSave}
+            onUseAi={onUseAi}
+          />
         </Stack>
       </CardContent>
     </Card>

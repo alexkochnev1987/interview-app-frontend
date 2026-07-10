@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, MessageSquareText } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
@@ -17,6 +17,8 @@ import { MetricPanel } from '@/components/ui/metric-panel'
 import { StatusPill } from '@/components/ui/status-pill'
 import { BodyText } from '@/components/ui/text'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
+import { Link } from '@/i18n/navigation'
+import { routes } from '@/i18n/routes'
 import type { Interview, InterviewResult } from '@/lib/api'
 import {
   formatInterviewDate,
@@ -90,6 +92,18 @@ export function InterviewSummaryCard({
       </DemoWriteGuard>
     ) : null
 
+  const candidateFeedbackButton =
+    interview.status === 'completed' ? (
+      <Button type="button" variant="outline-pill" shape="pill" asChild>
+        <Link href={routes.interviews.candidateFeedback(interview.id)}>
+          <Icon size="sm">
+            <MessageSquareText />
+          </Icon>
+          {tDetail('candidateFeedback')}
+        </Link>
+      </Button>
+    ) : null
+
   const managementNotice =
     canManage && !canEdit && !isEditing ? (
       <BodyText size="sm" tone="muted">
@@ -97,7 +111,9 @@ export function InterviewSummaryCard({
       </BodyText>
     ) : null
 
-  const hasManagementActions = Boolean(editButton || cancelButton)
+  const hasManagementActions = Boolean(
+    editButton || cancelButton || candidateFeedbackButton,
+  )
 
   const backLink = (
     <UnstyledLink href="/">
@@ -125,6 +141,7 @@ export function InterviewSummaryCard({
             </Inline>
             {hasManagementActions ? (
               <Inline gap={3} wrap="wrap" justify="end" width="full">
+                {candidateFeedbackButton}
                 {editButton}
                 {cancelButton}
               </Inline>
@@ -136,6 +153,7 @@ export function InterviewSummaryCard({
             {backLink}
             <Stack gap={2} align="end">
               <Inline gap={3} wrap="wrap" justify="end">
+                {candidateFeedbackButton}
                 {editButton}
                 {cancelButton}
                 {validateButton}

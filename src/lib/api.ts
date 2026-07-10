@@ -11,6 +11,10 @@ import {
 import { LOCALES, type Locale } from '@/i18n/locales';
 import {
   createEmptyCandidateFeedback,
+  mapCandidateFeedbackFromApi,
+  parseCandidateFeedbackBody,
+  unwrapCandidateFeedbackPayload,
+  type ApiCandidateFeedbackDto,
   type CandidateFeedbackResponse,
   type UpdateCandidateFeedbackPayload,
 } from './candidate-feedback';
@@ -554,6 +558,8 @@ export async function generateFeedbackLink(
 }
 
 export type {
+  ApiCandidateFeedbackDto,
+  CandidateFeedbackBlock,
   CandidateFeedbackBlockState,
   CandidateFeedbackEditableState,
   CandidateFeedbackQuestionBlock,
@@ -571,10 +577,13 @@ export {
   isCandidateFeedbackGenerating,
   isOverallBlockGenerationBusy,
   isQuestionBlockGenerationBusy,
+  mapCandidateFeedbackFromApi,
+  parseCandidateFeedbackBody,
 } from './candidate-feedback';
 
 export async function getCandidateFeedback(
   id: string,
+  interviewLocale: Locale,
 ): Promise<CandidateFeedbackResponse> {
   const path = `/interviews/${encodeURIComponent(id)}/candidate-feedback`;
   const res = await fetchClientApi(`/api${path}`, {
@@ -589,16 +598,13 @@ export async function getCandidateFeedback(
   }
 
   const body = await res.text();
-  if (!body) {
-    return createEmptyCandidateFeedback(id);
-  }
-
-  return JSON.parse(body) as CandidateFeedbackResponse;
+  return parseCandidateFeedbackBody(body, id, interviewLocale);
 }
 
 export async function updateCandidateFeedback(
   id: string,
   payload: UpdateCandidateFeedbackPayload,
+  interviewLocale: Locale,
 ): Promise<CandidateFeedbackResponse> {
   const path = `/interviews/${encodeURIComponent(id)}/candidate-feedback`;
   const res = await fetchClientApi(`/api${path}`, {
@@ -616,14 +622,15 @@ export async function updateCandidateFeedback(
 
   const body = await res.text();
   if (!body) {
-    return getCandidateFeedback(id);
+    return getCandidateFeedback(id, interviewLocale);
   }
 
-  return JSON.parse(body) as CandidateFeedbackResponse;
+  return parseCandidateFeedbackBody(body, id, interviewLocale);
 }
 
 async function parseCandidateFeedbackPostResponse(
   interviewId: string,
+  interviewLocale: Locale,
   path: string,
   res: Response,
 ): Promise<CandidateFeedbackResponse> {
@@ -635,15 +642,24 @@ async function parseCandidateFeedbackPostResponse(
 
   const body = await res.text();
   if (!body) {
-    return getCandidateFeedback(interviewId);
+    return getCandidateFeedback(interviewId, interviewLocale);
   }
 
-  return JSON.parse(body) as CandidateFeedbackResponse;
+  const parsed = JSON.parse(body) as unknown
+  const dto = unwrapCandidateFeedbackPayload(parsed)
+  return mapCandidateFeedbackFromApi(
+    {
+      ...dto,
+      interviewId: dto.interviewId ?? interviewId,
+    },
+    interviewLocale,
+  )
 }
 
 export async function generateCandidateFeedbackQuestion(
   interviewId: string,
   questionIndex: number,
+  interviewLocale: Locale,
 ): Promise<CandidateFeedbackResponse> {
   const path = `/interviews/${encodeURIComponent(interviewId)}/candidate-feedback/questions/${encodeURIComponent(String(questionIndex))}/generate`;
   const res = await fetchClientApi(`/api${path}`, {
@@ -651,11 +667,18 @@ export async function generateCandidateFeedbackQuestion(
     credentials: 'include',
   });
 
-  return parseCandidateFeedbackPostResponse(interviewId, path, res);
+  if (!res.ok) {
+    const body = await res.text();
+    const { code, params } = extractApiErrorFieldsFromBody(body);
+    throw new ApiError(res.status, messageFromBody(body, res.status), path, body, code, params);
+  }
+
+  return getCandidateFeedback(interviewId, interviewLocale);
 }
 
 export async function generateCandidateFeedbackAll(
   interviewId: string,
+  interviewLocale: Locale,
 ): Promise<CandidateFeedbackResponse> {
   const path = `/interviews/${encodeURIComponent(interviewId)}/candidate-feedback/generate?scope=all`;
   const res = await fetchClientApi(`/api${path}`, {
@@ -663,7 +686,12 @@ export async function generateCandidateFeedbackAll(
     credentials: 'include',
   });
 
-  return parseCandidateFeedbackPostResponse(interviewId, path, res);
+  return parseCandidateFeedbackPostResponse(
+    interviewId,
+    interviewLocale,
+    path,
+    res,
+  );
 }
 
 

@@ -9,6 +9,7 @@
     },
     "detail": {
       "backToDashboard": "Powrót do deski rozdzielczej",
+      "candidateFeedback": "Informacja zwrotna dla kandydata",
       "demoTryCandidateExperience": "Wypróbuj jako kandydat",
       "validationStatus": {
         "idle": "Bezczynny",
@@ -51,6 +52,7 @@
       "generateAll": "Wygeneruj AI dla całego wywiadu",
       "generateOverall": "Wygeneruj ogólną informację zwrotną AI",
       "generateQuestion": "Wygeneruj AI dla tego pytania",
+      "regenerateQuestion": "Wygeneruj ponownie AI dla tego pytania",
       "overallBlockTitle": "Ogólna informacja zwrotna",
       "questionBlocksTitle": "Informacja zwrotna dla pytań",
       "questionBlockTitle": "Pytanie {index}",
@@ -62,8 +64,6 @@
       "failedTitle": "Generowanie nie powiodło się",
       "failedDescription": "Nie udało się wygenerować tego bloku. Spróbuj wygenerować go ponownie.",
       "retry": "Spróbuj ponownie",
-      "suggestionLead": "Przejrzyj poniższą sugestię AI. Zaakceptuj ją, aby zablokować tekst dla informacji zwrotnej dla kandydata.",
-      "acceptSuggestion": "Zaakceptuj sugestię",
       "saveChanges": "Zapisz zmiany",
       "noQuestionsTitle": "Brak pytań wywiadu",
       "noQuestionsDescription": "Ten wywiad nie ma pytań, więc nie ma informacji zwrotnej dla pytań do edycji.",

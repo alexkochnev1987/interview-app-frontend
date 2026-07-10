@@ -11,9 +11,10 @@ export function useCandidateFeedbackData(
   interviewId: string,
   initialFeedback: CandidateFeedbackResponse,
 ) {
+  const interviewLocale = initialFeedback.interviewLocale
   const fetcher = useCallback(
-    () => getCandidateFeedback(interviewId),
-    [interviewId],
+    () => getCandidateFeedback(interviewId, interviewLocale),
+    [interviewId, interviewLocale],
   )
 
   const { data, refresh, replaceData, kick, paused } = useLivePolling(

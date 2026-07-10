@@ -16,6 +16,8 @@ import { canConfigureInterview } from '@/lib/auth-roles'
 import {
   candidateFeedbackPath,
   createEmptyCandidateFeedback,
+  mapCandidateFeedbackFromApi,
+  type ApiCandidateFeedbackDto,
   type CandidateFeedbackResponse,
 } from '@/lib/candidate-feedback'
 import { isForbiddenError, requestServer } from '@/lib/server-fetch'
@@ -70,7 +72,7 @@ export default async function CandidateFeedbackPage({
     requestServer<Interview>(`/interviews/${encodedId}`, auth.ctx, {
       withLocaleHeader: false,
     }),
-    requestServer<CandidateFeedbackResponse>(
+    requestServer<ApiCandidateFeedbackDto>(
       `/interviews/${encodedId}/candidate-feedback`,
       auth.ctx,
       { withLocaleHeader: false },
@@ -101,6 +103,8 @@ export default async function CandidateFeedbackPage({
   }
 
   if (!notFound && !error && interview) {
+    const interviewLocale = interview.interviewLocale ?? locale
+
     if (feedbackResult.status === 'rejected') {
       const err = feedbackResult.reason
       redirectIfUnauthorizedError(err, returnPath, locale)
@@ -113,23 +117,23 @@ export default async function CandidateFeedbackPage({
         )
       }
       if (isApiError(err) && err.status === 404) {
-        feedback = createEmptyCandidateFeedback(
-          interview.id,
-          interview.interviewLocale ?? locale,
-        )
+        feedback = createEmptyCandidateFeedback(interview.id, interviewLocale)
       } else {
         error =
           err instanceof Error
             ? err.message
             : t('loadFailedFallback')
       }
+    } else if (feedbackResult.value) {
+      feedback = mapCandidateFeedbackFromApi(
+        {
+          ...feedbackResult.value,
+          interviewId: feedbackResult.value.interviewId ?? interview.id,
+        },
+        interviewLocale,
+      )
     } else {
-      feedback =
-        feedbackResult.value ??
-        createEmptyCandidateFeedback(
-          interview.id,
-          interview.interviewLocale ?? locale,
-        )
+      feedback = createEmptyCandidateFeedback(interview.id, interviewLocale)
     }
   }
 

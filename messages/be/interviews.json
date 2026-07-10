@@ -9,6 +9,7 @@
     },
     "detail": {
       "backToDashboard": "Назад да прыборнай панэлі",
+      "candidateFeedback": "Зваротная сувязь кандыдату",
       "demoTryCandidateExperience": "Паспрабаваць вопыт кандыдата",
       "validationStatus": {
         "idle": "Бяздзейны",
@@ -51,6 +52,7 @@
       "generateAll": "Згенераваць AI для ўсяго інтэрв'ю",
       "generateOverall": "Згенераваць агульную AI-зваротную сувязь",
       "generateQuestion": "Згенераваць AI для гэтага пытання",
+      "regenerateQuestion": "Паўторна згенераваць AI для гэтага пытання",
       "overallBlockTitle": "Агульная зваротная сувязь",
       "questionBlocksTitle": "Зваротная сувязь па пытаннях",
       "questionBlockTitle": "Пытанне {index}",
@@ -62,8 +64,6 @@
       "failedTitle": "Генерацыя не ўдалася",
       "failedDescription": "Гэты блок не ўдалося згенераваць. Паспрабуйце згенераваць яго зноў.",
       "retry": "Паўтарыць",
-      "suggestionLead": "Праглядзіце прапанову AI ніжэй. Прыміце яе, каб зафіксаваць тэкст для зваротнай сувязі кандыдату.",
-      "acceptSuggestion": "Прыняць прапанову",
       "saveChanges": "Захаваць змены",
       "noQuestionsTitle": "Няма пытанняў інтэрв'ю",
       "noQuestionsDescription": "У гэтым інтэрв'ю няма пытанняў, таму няма зваротнай сувязі па пытаннях для рэдагавання.",
