@@ -29,7 +29,9 @@
       "updateSuccess": "Интервью обновлено",
       "updateError": "Не удалось обновить интервью",
       "cancelSuccess": "Интервью отменено",
-      "cancelError": "Не удалось отменить интервью"
+      "cancelError": "Не удалось отменить интервью",
+      "deleteSuccess": "Интервью успешно удалено",
+      "deleteError": "Не удалось удалить интервью"
     },
     "interviewsLibrary": {
       "loadFailedFallback": "Не удалось загрузить интервью."
