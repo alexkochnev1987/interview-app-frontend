@@ -462,7 +462,7 @@ export interface paths {
         };
         /**
          * Faceted counts for the interview list sidebar
-         * @description Returns position and status counts. Counts respect every other filter on the request (q, and the other facet) so the UI shows what is still available before clicking.
+         * @description Returns total question volume plus position and status counts. Facet counts respect every other filter on the request (q, and the other facet) so the UI shows what is still available before clicking. totalQuestionCount sums questions across interviews matching all current filters.
          */
         get: operations["InterviewController_getFacets"];
         put?: never;
@@ -1629,12 +1629,12 @@ export interface components {
             count: number;
         };
         InterviewFacetsResponseDto: {
+            /** @description Sum of question counts across interviews matching all current filters. */
+            totalQuestionCount: number;
             /** @description Position value + count, given all OTHER current filters (position itself is not applied). */
             positions: components["schemas"]["InterviewFacetCountDto"][];
             /** @description Status value + count, given all OTHER current filters (status itself is not applied). */
             statuses: components["schemas"]["InterviewFacetCountDto"][];
-            /** @description Sum of questionCount across interviews matching the current filters. */
-            totalQuestionCount?: number;
         };
         InterviewResponseDto: {
             id: string;
