@@ -487,7 +487,7 @@ export interface paths {
         get: operations["InterviewController_findOne"];
         put?: never;
         post?: never;
-        /** Delete completed interview */
+        /** Delete completed or failed interview */
         delete: operations["InterviewController_deleteCompleted"];
         options?: never;
         head?: never;

@@ -17,3 +17,8 @@ export function canEditInterview(interview: Interview): boolean {
 export function canManageInterview(interview: Interview): boolean {
   return isPendingInterview(interview)
 }
+
+/** Completed or failed interviews can be permanently deleted. */
+export function canDeleteInterview(interview: Interview): boolean {
+  return interview.status === 'completed' || interview.status === 'failed'
+}
