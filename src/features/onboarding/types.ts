@@ -14,6 +14,7 @@ export type OnboardingVisibilityRule =
 export type OnboardingAdvanceConfig = {
   mode: 'event';
   eventName: OnboardingEventName;
+  allowNextOnLastEventStep?: boolean;
 };
 
 export type OnboardingGateConfig = {

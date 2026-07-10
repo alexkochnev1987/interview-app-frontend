@@ -73,8 +73,6 @@ export function OnboardingWelcomeDialog({
           </BodyText>
 
           <Inline
-            gap={3}
-            wrap="wrap"
             justify="center"
             align="center"
             width="full"
@@ -82,7 +80,7 @@ export function OnboardingWelcomeDialog({
             <Button type="button" variant="outline" size="lg" onClick={onSkip}>
               {skipLabel}
             </Button>
-            <Button type="button" variant="gradient" size="xl" onClick={onStart}>
+            <Button type="button" variant="gradient" size="lg" onClick={onStart}>
               <Icon size="md">
                 <Sparkles />
               </Icon>

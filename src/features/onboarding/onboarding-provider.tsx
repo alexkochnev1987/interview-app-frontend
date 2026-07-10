@@ -66,7 +66,6 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
 
   const tour = useOnboardingTour({
     context: runtimeContext,
-    onTourComplete: () => persistOnboarding('completed'),
     onTourSkip: () => persistOnboarding('skipped'),
   })
 
@@ -118,6 +117,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
           description={completeCopy.description}
           actionLabel={completeCopy.actionLabel}
           onAction={() => {
+            void persistOnboarding('completed')
             dismissComplete()
             router.push('/')
           }}

@@ -64,7 +64,7 @@ export function useOnboardingTour({
   }, [pathname])
 
   useEffect(() => {
-    if (phase !== 'welcome' && phase !== 'touring' && phase !== 'complete') {
+    if (phase !== 'touring') {
       return
     }
 

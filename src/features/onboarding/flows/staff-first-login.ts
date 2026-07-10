@@ -152,6 +152,11 @@ export const staffFirstLoginFlow: OnboardingFlowConfig = {
       target: '[data-tour="assessments-card"]',
       contentKey: 'assessmentsEvaluation',
       visibility: [{ type: 'canReviewAssessments' }, { type: 'notDemo' }],
+      advance: {
+        mode: 'event',
+        eventName: ONBOARDING_EVENT_NAMES.evaluationStarted,
+        allowNextOnLastEventStep: true,
+      },
       ...pageTourStepDefaults,
       missingTarget: 'skip',
       waitTimeoutMs: 8000,

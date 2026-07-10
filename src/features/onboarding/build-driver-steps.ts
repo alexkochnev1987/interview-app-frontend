@@ -403,6 +403,10 @@ export function buildDriverSteps({
     const previousStep = steps[index - 1];
     const isEventGatedStep = step.advance?.mode === 'event';
     const hasNonEmptyInputGate = step.gate?.type === 'nonEmptyInput';
+    const lastEventWithNext =
+      isEventGatedStep
+      && isLast
+      && step.advance?.allowNextOnLastEventStep === true;
 
     return {
       element: step.target,
@@ -413,9 +417,13 @@ export function buildDriverSteps({
         align: step.popoverAlign ?? 'start',
         showProgress: true,
         showButtons: isEventGatedStep
-          ? (previousStep ? ['previous', 'close'] : ['close'])
+          ? (lastEventWithNext
+              ? ['previous', 'next', 'close']
+              : (previousStep ? ['previous', 'close'] : ['close']))
           : ['next', 'previous', 'close'],
-        nextBtnText: isLast ? labels.done : labels.next,
+        nextBtnText: lastEventWithNext
+          ? labels.next
+          : (isLast ? labels.done : labels.next),
         prevBtnText: labels.back,
         doneBtnText: labels.done,
         onPopoverRender: hasNonEmptyInputGate
@@ -426,7 +434,10 @@ export function buildDriverSteps({
               const input = resolveInputElement(activeElement);
               const isEmpty = !input || input.value.trim().length === 0;
               popover.nextButton.disabled = isEmpty;
-              popover.nextButton.setAttribute('aria-disabled', String(isEmpty));
+              popover.nextButton.setAttribute(
+                'aria-disabled',
+                String(isEmpty),
+              );
             }
           : undefined,
         onNextClick: async (element, _driveStep, { driver }) => {
