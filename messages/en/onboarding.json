@@ -15,6 +15,7 @@
     "complete": {
       "title": "You're all set",
       "description": "You're ready to run the workflow. You can replay this tour anytime from Product tour.",
+      "eyebrow": "Tour complete",
       "action": "Complete tour",
       "recapTitle": "What you just learned",
       "recapQuestions": "Build and enrich questions with AI Draft",

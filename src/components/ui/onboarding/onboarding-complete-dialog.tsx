@@ -1,18 +1,18 @@
 'use client'
 
-import { CheckCircle2, FileText, ListChecks, Send, Sparkles } from 'lucide-react'
-import { useTranslations } from 'next-intl'
-import type { ComponentType } from 'react'
+import { CheckCircle2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { CardContent } from '@/components/ui/card'
+import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
 import { Icon } from '@/components/ui/icon'
 import { IconBadge } from '@/components/ui/icon-badge'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { ModalShell } from '@/components/ui/modal-shell'
-import { SurfaceTile } from '@/components/ui/surface-tile'
-import { BodyText, SectionHeading, Text } from '@/components/ui/text'
+import { OnboardingCompleteJourney } from '@/components/ui/onboarding/onboarding-complete-journey'
+import { BodyText, SectionHeading } from '@/components/ui/text'
+import { useTranslations } from 'next-intl'
 
 type OnboardingCompleteDialogProps = {
   title: string
@@ -20,16 +20,6 @@ type OnboardingCompleteDialogProps = {
   actionLabel: string
   onAction: () => void
 }
-
-const recapItems: ReadonlyArray<{
-  key: string
-  icon: ComponentType<{ className?: string }>
-}> = [
-  { key: 'recapQuestions', icon: FileText },
-  { key: 'recapInterviews', icon: ListChecks },
-  { key: 'recapCandidates', icon: Send },
-  { key: 'recapAssessments', icon: Sparkles },
-]
 
 export function OnboardingCompleteDialog({
   title,
@@ -47,43 +37,31 @@ export function OnboardingCompleteDialog({
       accessibilityDescription={description}
     >
       <CardContent spacing="2xl">
-        <Stack gap={6}>
-          <Stack gap={4}>
-            <Inline gap={3} align="center">
-              <IconBadge tone="gradient" size="md">
-                <Icon size="lg">
-                  <CheckCircle2 />
-                </Icon>
-              </IconBadge>
-              <SectionHeading size="md">{title}</SectionHeading>
-            </Inline>
-            <BodyText tone="muted">{description}</BodyText>
+        <Stack gap={8} align="center" width="full">
+          <Stack gap={4} align="center" width="full">
+            <IconBadge tone="gradient" size="xl" align="center">
+              <Icon size="xl">
+                <CheckCircle2 />
+              </Icon>
+            </IconBadge>
+
+            <EyebrowBadge tone="primary" size="sm" casing="normal">
+              {t('eyebrow')}
+            </EyebrowBadge>
+
+            <SectionHeading size="lg" className="text-center">
+              {title}
+            </SectionHeading>
           </Stack>
 
-          <SurfaceTile tone="soft" padding="lg" rounded="2xl">
-            <Stack gap={4}>
-              <Text as="span" variant="eyebrowLabel">
-                {t('recapTitle')}
-              </Text>
-              <Stack gap={3}>
-                {recapItems.map(({ key, icon: RecapIcon }) => (
-                  <Inline key={key} gap={3} align="center">
-                    <IconBadge tone="surface" size="sm" shape="circle">
-                      <Icon size="md">
-                        <RecapIcon />
-                      </Icon>
-                    </IconBadge>
-                    <BodyText tone="foreground" size="sm" weight="medium">
-                      {t(key)}
-                    </BodyText>
-                  </Inline>
-                ))}
-              </Stack>
-            </Stack>
-          </SurfaceTile>
+          <OnboardingCompleteJourney />
 
-          <Inline justify="end">
-            <Button type="button" variant="gradient" onClick={onAction}>
+          <BodyText tone="muted" size="sm" className="max-w-md text-center">
+            {description}
+          </BodyText>
+
+          <Inline justify="center" align="center" width="full">
+            <Button type="button" variant="gradient" size="lg" onClick={onAction}>
               {actionLabel}
             </Button>
           </Inline>

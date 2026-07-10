@@ -97,7 +97,7 @@ export function ModalShell({
           ) : null}
           <Card
             variant={layer === 'tour' ? 'floatingSolid' : 'floating'}
-            className="w-full"
+            className={cn('w-full', layer === 'tour' && 'shadow-none')}
           >
             {children}
           </Card>

@@ -15,6 +15,7 @@
     "complete": {
       "title": "Wszystko gotowe",
       "description": "Możesz już przejść przez cały workflow. Tour możesz powtórzyć w dowolnym momencie z poziomu „Tour produktu”.",
+      "eyebrow": "Tour ukończony",
       "action": "Zakończ tour",
       "recapTitle": "Czego się właśnie nauczyłeś",
       "recapQuestions": "Tworzyć i wzbogacać pytania z AI Draft",
