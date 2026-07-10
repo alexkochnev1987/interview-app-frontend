@@ -17,26 +17,26 @@ import { PillRow } from '@/components/ui/pill-row'
 import { StatusPill } from '@/components/ui/status-pill'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
-import { type Interview } from '@/lib/api'
+import { type InterviewListItem } from '@/lib/api'
 import {
   decisionTone,
-  deriveReviewStatus,
-  getCompletionDate,
+  deriveReviewStatusFromListItem,
+  getCompletionDateFromListItem,
   reviewStatusTone,
 } from '@/lib/assessment-status'
 import { formatInterviewDate } from '@/lib/interview-formatters'
 
 interface AssessmentCardProps {
-  interview: Interview
+  interview: InterviewListItem
 }
 
 export function AssessmentCard({ interview }: AssessmentCardProps) {
   const t = useTranslations('assessments.list')
   const sharedLabels = useSharedLabels()
-  const reviewStatus = deriveReviewStatus(interview)
-  const completion = getCompletionDate(interview)
-  const overallScore = interview.result?.overallScore
-  const decision = interview.result?.decision ?? null
+  const reviewStatus = deriveReviewStatusFromListItem(interview)
+  const completion = getCompletionDateFromListItem(interview)
+  const overallScore = interview.overallScore
+  const decision = interview.decision ?? null
   const isReadyToScore = reviewStatus === 'ready_to_score'
 
   return (

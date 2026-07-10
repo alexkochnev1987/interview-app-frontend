@@ -9,14 +9,111 @@
     },
     "detail": {
       "backToDashboard": "Back to dashboard",
-      "demoTryCandidateExperience": "Try the candidate experience",
       "validationStatus": {
         "idle": "Idle",
         "queued": "Queued",
         "processing": "Processing",
         "completed": "Completed",
         "failed": "Failed"
+      },
+      "demoTryCandidateExperience": "Try the candidate experience"
+    },
+    "library": {
+      "header": {
+        "eyebrow": "Interview pipeline",
+        "title": "Interviews",
+        "lead": "Browse every candidate interview, track progress, and open details without leaving the list.",
+        "newInterview": "New interview",
+        "overviewEyebrow": "Overview",
+        "healthTitle": "Pipeline",
+        "healthDescription": "Counts reflect the filters currently applied to this view.",
+        "totalInterviews": "Total",
+        "visibleNow": "Showing"
+      },
+      "card": {
+        "progress": "Answers",
+        "score": "Score",
+        "updatedAt": "Updated at",
+        "createdAt": "Created at"
+      },
+      "table": {
+        "candidate": "Candidate",
+        "position": "Position",
+        "status": "Status",
+        "progress": "Progress",
+        "score": "Score",
+        "updated": "Updated",
+        "created": "Created"
+      },
+      "toolbar": {
+        "searchPlaceholder": "Search by candidate name",
+        "resultCount": "{count} interviews",
+        "removeChipAria": "Remove {label}",
+        "sortLabel": "Sort",
+        "pageSizeLabel": "Rows per page",
+        "pageSizeOption": "{count} per page"
+      },
+      "sort": {
+        "updatedAt_desc": "Recently updated",
+        "updatedAt_asc": "Oldest updated",
+        "createdAt_desc": "Recently created",
+        "createdAt_asc": "Oldest created",
+        "candidateName_asc": "Candidate A–Z",
+        "candidateName_desc": "Candidate Z–A"
+      },
+      "facet": {
+        "filtersTitle": "Filters",
+        "activeFilters": "{count} active",
+        "resetTitle": "Reset filters",
+        "reset": "Reset",
+        "resetAll": "Reset filters",
+        "resetAllWithCount": "Reset ({count})",
+        "positionTitle": "Position",
+        "statusTitle": "Status",
+        "retry": "Retry",
+        "unavailable": "Filters unavailable",
+        "loading": "Loading…",
+        "noValues": "No matching values",
+        "showAll": "Show all ({count})",
+        "showFewer": "Show fewer"
+      },
+      "viewToggle": {
+        "viewModeAria": "View mode",
+        "cards": "Cards",
+        "table": "Table",
+        "switchToCards": "Switch to cards",
+        "switchToTable": "Switch to table"
+      },
+      "empty": {
+        "title": "No interviews yet",
+        "filteredTitle": "No matches",
+        "description": "Create an interview to start collecting candidate responses.",
+        "filteredDescription": "Try clearing filters or changing your search.",
+        "createCta": "New interview"
+      },
+      "client": {
+        "hideFiltersSidebar": "Hide filters sidebar",
+        "showFiltersSidebar": "Show filters sidebar"
+      },
+      "infinite": {
+        "loadMore": "Load more",
+        "loadingMore": "Loading…",
+        "showing": "Showing {loaded} of {total}",
+        "allLoaded": "All {count} interviews loaded",
+        "loadErrorTitle": "Could not load more"
+      },
+      "feed": {
+        "loading": "Loading interviews…",
+        "retry": "Retry",
+        "resetFilters": "Reset filters"
+      },
+      "refetch": {
+        "genericTitle": "Could not refresh this page"
       }
+    },
+    "chips": {
+      "position": "Position: {value}",
+      "status": "Status: {value}"
     },
     "actions": {
       "edit": "Edit interview",
@@ -29,7 +126,8 @@
       "confirmCancel": "Cancel interview",
       "dismiss": "Keep interview",
       "discardEdit": "Discard changes",
-      "keepEditing": "Keep editing"
+      "keepEditing": "Keep editing",
+      "visitAssessment": "Visit assessment"
     },
     "edit": {
       "title": "Edit interview",

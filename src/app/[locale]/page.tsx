@@ -1,31 +1,34 @@
 import { getTranslations } from 'next-intl/server'
 
 import { DashboardView } from '@/components/dashboard/dashboard-view'
+import { QueryHydrationBoundary } from '@/components/questions/query-hydration-boundary'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import type { Locale } from '@/i18n/locales'
 import { routes } from '@/i18n/routes'
-import { type Interview } from '@/lib/api'
 import { canAccessDashboard } from '@/lib/auth-roles'
 import {
   loadAuthGate,
   redirectIfUnauthenticated,
   redirectIfUnauthorizedError,
 } from '@/lib/auth-gate'
-import {
-  normalizeInterviewsResponse,
-  type InterviewsListResponse,
-} from '@/lib/interviews-response'
-import { isForbiddenError, requestServer } from '@/lib/server-fetch'
+import { computeDashboardMetrics } from '@/lib/dashboard-metrics'
+import { prefetchInterviewsLibrary } from '@/lib/interviews-library-prefetch'
+import { toInterviewsSearchParams } from '@/lib/interviews-query-state'
+import { isForbiddenError } from '@/lib/server-fetch'
 
 const ERROR_SIGN_IN_HREF = '/login'
 const ERROR_ESCAPE_HREF = routes.questions.list
 
 interface DashboardPageProps {
   params: Promise<{ locale: Locale }>
+  searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
-export default async function DashboardPage({ params }: DashboardPageProps) {
+export default async function DashboardPage({
+  params,
+  searchParams,
+}: DashboardPageProps) {
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'toast.pageGate.dashboard' })
   const tCommon = await getTranslations({ locale, namespace: 'common' })
@@ -50,12 +53,12 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
     )
   }
 
-  let interviews: Interview[] = []
+  const urlParams = toInterviewsSearchParams(await searchParams)
+  let initialPrefetch
   let error: string | null = null
 
   try {
-    const response = await requestServer<InterviewsListResponse<Interview>>('/interviews', auth.ctx)
-    interviews = normalizeInterviewsResponse<Interview>(response, 'dashboard:/interviews')
+    initialPrefetch = await prefetchInterviewsLibrary(auth.ctx, urlParams)
   } catch (err) {
     redirectIfUnauthorizedError(err, '/', locale)
     if (isForbiddenError(err)) {
@@ -70,16 +73,26 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
       err instanceof Error ? err.message : t('loadFailedFallback')
   }
 
-  if (error) {
+  if (error || !initialPrefetch) {
     return (
       <FlashErrorPageFallback
         title={t('loadFailedTitle')}
-        description={error}
+        description={error ?? t('loadFailedFallback')}
         backHref={ERROR_ESCAPE_HREF}
         backLabel={t('questionBankActionLabel')}
       />
     )
   }
 
-  return <DashboardView interviews={interviews} isDemo={auth.me.demo} />
+  const metrics = computeDashboardMetrics(initialPrefetch.facets)
+
+  return (
+    <QueryHydrationBoundary state={initialPrefetch.dehydratedState}>
+      <DashboardView
+        metrics={metrics}
+        isDemo={auth.me.demo}
+        initialPrefetch={initialPrefetch}
+      />
+    </QueryHydrationBoundary>
+  )
 }

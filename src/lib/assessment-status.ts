@@ -1,6 +1,7 @@
 import type {
   Answer,
   Interview,
+  InterviewListItem,
   InterviewBehaviorRisk,
   InterviewDecision,
   InterviewResult,
@@ -262,6 +263,70 @@ export function selectHrVisibleAssessments(
   return interviews
     .filter(isHrVisibleAssessment)
     .sort(compareAssessmentsByCompletion)
+}
+
+/** Approximate review status from list DTO until assessments loads full Interview. */
+export function deriveReviewStatusFromListItem(
+  item: InterviewListItem,
+): ReviewStatus {
+  switch (item.status) {
+    case 'failed':
+      return 'failed'
+    case 'pending':
+      return 'pending'
+    case 'in_progress':
+      if (
+        item.questionCount > 0 &&
+        item.submittedAnswerCount === item.questionCount
+      ) {
+        return 'ready_to_score'
+      }
+      return 'in_progress'
+    case 'processing':
+      if (item.overallScore !== undefined) return 'ready'
+      return 'scoring'
+    case 'completed':
+      return item.overallScore !== undefined ? 'ready' : 'scoring'
+    default:
+      return assertNever(item.status)
+  }
+}
+
+export function getCompletionDateFromListItem(
+  item: InterviewListItem,
+): string | null {
+  if (item.status === 'completed') return item.updatedAt
+  return null
+}
+
+export function isHrVisibleListItem(item: InterviewListItem): boolean {
+  return HR_VISIBLE_REVIEW_STATUSES.has(deriveReviewStatusFromListItem(item))
+}
+
+export function hasScoringInProgressListItems(
+  items: InterviewListItem[],
+): boolean {
+  return items.some(
+    (item) => deriveReviewStatusFromListItem(item) === 'scoring',
+  )
+}
+
+export function selectHrVisibleListItems(
+  items: InterviewListItem[],
+): InterviewListItem[] {
+  return items
+    .filter(isHrVisibleListItem)
+    .sort((a, b) => {
+      const ca = getCompletionDateFromListItem(a)
+      const cb = getCompletionDateFromListItem(b)
+
+      if (ca && !cb) return -1
+      if (!ca && cb) return 1
+
+      const da = ca ?? a.updatedAt
+      const db = cb ?? b.updatedAt
+      return new Date(db).getTime() - new Date(da).getTime()
+    })
 }
 
 const PLACEHOLDER_RESULT_SUMMARY = 'Simulated evaluation result'

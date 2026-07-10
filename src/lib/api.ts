@@ -29,6 +29,7 @@ export function setClientApiLocale(locale?: string | null): void {
 
 const client = createClient<paths>({
   baseUrl: '/api',
+  credentials: 'include',
 });
 
 function buildClientApiHeaders(headers?: HeadersInit): Headers {
@@ -47,6 +48,7 @@ function buildClientBaseHeaders(headers?: HeadersInit): Headers {
 
 function fetchClientApi(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
   return fetch(input, {
+    credentials: 'include',
     ...init,
     headers: buildClientApiHeaders(init?.headers),
   });
@@ -138,6 +140,20 @@ export type InterviewAnswerMediaResponse = Schemas['InterviewAnswerMediaResponse
 export type CandidateLinkResponse = Schemas['CandidateLinkResponseDto'];
 export type FeedbackLinkResponse = Schemas['FeedbackLinkResponseDto'];
 export type InterviewCancelResponse = Schemas['InterviewCancelResponseDto'];
+
+export type InterviewListItem = Schemas['InterviewListItemDto'];
+export type PaginatedInterviews = Schemas['PaginatedInterviewsResponseDto'];
+export type InterviewFacetsResponse = Schemas['InterviewFacetsResponseDto'];
+export type InterviewFacetCount = Schemas['InterviewFacetCountDto'];
+export type FetchInterviewsParams = NonNullable<
+  paths['/interviews']['get']['parameters']['query']
+>;
+export type InterviewSortField = NonNullable<FetchInterviewsParams['sortBy']>;
+export type InterviewSortOrder = NonNullable<FetchInterviewsParams['sortOrder']>;
+export type InterviewStatusFilter = NonNullable<FetchInterviewsParams['status']>;
+export type FetchInterviewFacetsParams = NonNullable<
+  paths['/interviews/facets']['get']['parameters']['query']
+>;
 
 export type CreateInterviewPayload = Schemas['CreateInterviewDto'];
 
@@ -512,6 +528,36 @@ export async function getInterview(id: string): Promise<Interview> {
 export async function getInterviews(): Promise<Interview[]> {
   const data = await handle(client.GET('/interviews'));
   return normalizeInterviewsResponse<Interview>(data, 'client:/interviews');
+}
+
+export async function fetchInterviews(
+  params?: FetchInterviewsParams,
+  init?: { signal?: AbortSignal },
+): Promise<PaginatedInterviews> {
+  return handle(
+    client.GET('/interviews', {
+      ...LOCALIZED_HEADERS,
+      params: { query: params ?? {} },
+      signal: init?.signal,
+    }),
+  );
+}
+
+export async function fetchInterviewFacets(
+  params?: FetchInterviewFacetsParams,
+  init?: { signal?: AbortSignal },
+): Promise<InterviewFacetsResponse> {
+  return handle(
+    client.GET('/interviews/facets', {
+      ...LOCALIZED_HEADERS,
+      params: { query: params ?? {} },
+      signal: init?.signal,
+    }),
+  );
+}
+
+export function emptyPaginatedInterviews(limit = 20): PaginatedInterviews {
+  return { items: [], total: 0, page: 1, limit };
 }
 
 export async function updateInterview(
