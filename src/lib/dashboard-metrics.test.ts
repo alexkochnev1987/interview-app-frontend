@@ -25,9 +25,10 @@ describe('computeDashboardMetrics', () => {
     })
   })
 
-  it('defaults question volume to zero when facets omit the aggregate', () => {
+  it('defaults question volume to zero when facets report no questions', () => {
     expect(
       computeDashboardMetrics({
+        totalQuestionCount: 0,
         positions: [],
         statuses: [],
       }),
