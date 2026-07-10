@@ -14,6 +14,7 @@ import { useRerunToastMessages } from './toast-messages/use-rerun-toast-messages
 import { useSimilarityToastMessages } from './toast-messages/use-similarity-toast-messages'
 import { useTakeToastMessages } from './toast-messages/use-take-toast-messages'
 import { useTeamToastMessages } from './toast-messages/use-team-toast-messages'
+import { useTemplateToastMessages } from './toast-messages/use-template-toast-messages'
 
 export {
   useApiErrorToastMessages,
@@ -30,6 +31,7 @@ export {
   useSimilarityToastMessages,
   useTakeToastMessages,
   useTeamToastMessages,
+  useTemplateToastMessages,
 }
 
 export function useToastMessages() {
@@ -45,6 +47,7 @@ export function useToastMessages() {
     similarity: useSimilarityToastMessages(),
     pageGate: usePageGateToastMessages(),
     team: useTeamToastMessages(),
+    template: useTemplateToastMessages(),
     rerun: useRerunToastMessages(),
     deleteQuestion: useDeleteQuestionToastMessages(),
     apiError: useApiErrorToastMessages(),
