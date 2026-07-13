@@ -1,6 +1,6 @@
 'use client'
 
-import { useId, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 
 import { AiSuggestionRow } from '@/components/questions/editor/ai-suggestion-row'
@@ -81,12 +81,8 @@ export function CandidateFeedbackBlockFields({
   const improvementId = useId()
   const persistedSourceKey = getPersistedSourceKey(block)
   const generatedSnapshotKey = getGeneratedSnapshotKey(block)
-  const [syncedPersistedKey, setSyncedPersistedKey] = useState<string | null>(
-    null,
-  )
-  const [syncedGeneratedKey, setSyncedGeneratedKey] = useState<string | null>(
-    null,
-  )
+  const lastPersistedSourceKeyRef = useRef<string | null>(null)
+  const lastGeneratedSnapshotKeyRef = useRef<string | null>(null)
   const [recommendationText, setRecommendationText] = useState(() =>
     getInitialDraftText(block, 'recommendation'),
   )
@@ -96,27 +92,25 @@ export function CandidateFeedbackBlockFields({
   const [dismissedRecommendation, setDismissedRecommendation] = useState(false)
   const [dismissedImprovement, setDismissedImprovement] = useState(false)
 
-  if (persistedSourceKey && persistedSourceKey !== syncedPersistedKey) {
-    setSyncedPersistedKey(persistedSourceKey)
+  useEffect(() => {
+    if (persistedSourceKey === lastPersistedSourceKeyRef.current) return
+    lastPersistedSourceKeyRef.current = persistedSourceKey
+    if (!persistedSourceKey) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- sync draft fields when accepted/edited block changes from server
     setRecommendationText(block.recommendationText ?? '')
     setImprovementText(block.improvementText ?? '')
-  }
+  }, [persistedSourceKey, block.recommendationText, block.improvementText])
 
-  if (!persistedSourceKey && syncedPersistedKey !== null) {
-    setSyncedPersistedKey(null)
-  }
-
-  if (generatedSnapshotKey && generatedSnapshotKey !== syncedGeneratedKey) {
-    setSyncedGeneratedKey(generatedSnapshotKey)
+  useEffect(() => {
+    if (generatedSnapshotKey === lastGeneratedSnapshotKeyRef.current) return
+    lastGeneratedSnapshotKeyRef.current = generatedSnapshotKey
+    if (!generatedSnapshotKey) return
     setDismissedRecommendation(false)
     setDismissedImprovement(false)
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reset working copy when a new AI snapshot arrives
     setRecommendationText('')
     setImprovementText('')
-  }
-
-  if (!generatedSnapshotKey && syncedGeneratedKey !== null) {
-    setSyncedGeneratedKey(null)
-  }
+  }, [generatedSnapshotKey])
 
   const showRecommendationSuggestion =
     block.state === 'generated' &&

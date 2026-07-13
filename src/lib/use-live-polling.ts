@@ -42,9 +42,13 @@ export function useLivePolling<T>(
   const [kicking, setKicking] = useState(false)
   const inFlightRef = useRef(false)
   const failuresRef = useRef(0)
+  // Bumped on replaceData and on authoritative initial resync so an in-flight
+  // poll cannot overwrite a newer local mutation response.
+  const dataVersionRef = useRef(0)
   const [visible, setVisible] = useState(true)
   if (syncedFrom !== initial) {
     setSyncedFrom(initial)
+    dataVersionRef.current += 1
     setData(initial)
     // Fresh authoritative data clears any prior pause/kick state so a lingering
     // "paused" notice does not survive a navigation or router refresh. The
@@ -56,8 +60,10 @@ export function useLivePolling<T>(
   const refresh = useCallback(async () => {
     if (inFlightRef.current) return
     inFlightRef.current = true
+    const versionAtStart = dataVersionRef.current
     try {
       const next = await fetcher()
+      if (versionAtStart !== dataVersionRef.current) return
       failuresRef.current = 0
       setData(next)
       setPaused(false)
@@ -76,6 +82,7 @@ export function useLivePolling<T>(
   }, [])
 
   const replaceData = useCallback((next: T) => {
+    dataVersionRef.current += 1
     failuresRef.current = 0
     setData(next)
     setPaused(false)

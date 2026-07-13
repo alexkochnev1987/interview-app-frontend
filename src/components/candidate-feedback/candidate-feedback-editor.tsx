@@ -40,7 +40,6 @@ import {
   parseCandidateFeedbackErrorMessage,
 } from '@/lib/candidate-feedback'
 import { runMutation } from '@/lib/run-mutation'
-import { notifySuccess } from '@/lib/toast'
 import { useCandidateFeedbackToastMessages } from '@/lib/toast-messages/use-candidate-feedback-toast-messages'
 
 interface CandidateFeedbackEditorProps {
@@ -132,12 +131,8 @@ export function CandidateFeedbackEditor({
     toast: FeedbackMutationToast,
   ) {
     setGeneratingTarget(target)
-    notifySuccess(toast.successMessage)
     try {
-      await runMutation(() => applyGenerationUpdate(mutation), {
-        ...toast,
-        showSuccessToast: false,
-      })
+      await runMutation(() => applyGenerationUpdate(mutation), toast)
     } catch {
       /* toast handled by runMutation */
     } finally {

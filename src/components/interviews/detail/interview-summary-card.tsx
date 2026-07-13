@@ -95,7 +95,7 @@ export function InterviewSummaryCard({
 
   const candidateFeedbackButton =
     interview.status === 'completed' ? (
-      <Button type="button" variant="outline-pill" shape="pill" asChild>
+      <Button type="button" variant="gradient" shape="pill" asChild>
         <Link href={routes.interviews.candidateFeedback(interview.id)}>
           <Icon size="sm">
             <MessageSquareText />
