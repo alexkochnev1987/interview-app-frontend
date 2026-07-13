@@ -51,6 +51,12 @@ async function fetchFacetsPage(
   )
 }
 
+export async function fetchUnfilteredInterviewFacets(
+  ctx: ServerRequestContext,
+): Promise<InterviewFacetsResponse> {
+  return fetchFacetsPage({}, ctx)
+}
+
 async function hydrateInterviewsLibrary(
   ctx: ServerRequestContext,
   queryState: InterviewsQueryState,
