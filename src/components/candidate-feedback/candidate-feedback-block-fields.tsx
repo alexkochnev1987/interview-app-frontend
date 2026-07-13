@@ -28,6 +28,22 @@ interface CandidateFeedbackBlockFieldsProps {
   }) => Promise<void>
 }
 
+function getInitialDraftText(
+  block: Pick<
+    CandidateFeedbackBlock,
+    'recommendationText' | 'improvementText' | 'state'
+  >,
+  field: 'recommendation' | 'improvement',
+): string {
+  if (block.state !== 'accepted' && block.state !== 'edited') {
+    return ''
+  }
+
+  return field === 'recommendation'
+    ? (block.recommendationText ?? '')
+    : (block.improvementText ?? '')
+}
+
 function getPersistedSourceKey(
   block: Pick<
     CandidateFeedbackBlock,
@@ -71,11 +87,11 @@ export function CandidateFeedbackBlockFields({
   const [syncedGeneratedKey, setSyncedGeneratedKey] = useState<string | null>(
     null,
   )
-  const [recommendationText, setRecommendationText] = useState(
-    block.recommendationText ?? '',
+  const [recommendationText, setRecommendationText] = useState(() =>
+    getInitialDraftText(block, 'recommendation'),
   )
-  const [improvementText, setImprovementText] = useState(
-    block.improvementText ?? '',
+  const [improvementText, setImprovementText] = useState(() =>
+    getInitialDraftText(block, 'improvement'),
   )
   const [dismissedRecommendation, setDismissedRecommendation] = useState(false)
   const [dismissedImprovement, setDismissedImprovement] = useState(false)
@@ -94,6 +110,8 @@ export function CandidateFeedbackBlockFields({
     setSyncedGeneratedKey(generatedSnapshotKey)
     setDismissedRecommendation(false)
     setDismissedImprovement(false)
+    setRecommendationText('')
+    setImprovementText('')
   }
 
   if (!generatedSnapshotKey && syncedGeneratedKey !== null) {
