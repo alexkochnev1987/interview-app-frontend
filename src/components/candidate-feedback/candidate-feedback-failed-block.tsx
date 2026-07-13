@@ -16,6 +16,7 @@ interface CandidateFeedbackFailedBlockProps {
   retryDisabled: boolean
   onRetry: () => Promise<void>
   showRetry?: boolean
+  showAlert?: boolean
 }
 
 export function CandidateFeedbackFailedBlock({
@@ -24,17 +25,24 @@ export function CandidateFeedbackFailedBlock({
   retryDisabled,
   onRetry,
   showRetry = true,
+  showAlert = true,
 }: CandidateFeedbackFailedBlockProps) {
   const t = useTranslations('interviews.candidateFeedback')
 
+  if (!showAlert && !showRetry) {
+    return null
+  }
+
   return (
     <Stack gap={4}>
-      <Alert variant="danger">
-        <AlertTitle>{t('failedTitle')}</AlertTitle>
-        <AlertDescription>
-          {errorMessage?.trim() ? errorMessage : t('failedDescription')}
-        </AlertDescription>
-      </Alert>
+      {showAlert ? (
+        <Alert variant="danger">
+          <AlertTitle>{t('failedTitle')}</AlertTitle>
+          <AlertDescription>
+            {errorMessage?.trim() ? errorMessage : t('failedDescription')}
+          </AlertDescription>
+        </Alert>
+      ) : null}
       {showRetry ? (
         <Inline gap={2} wrap="wrap">
           <DemoWriteGuard disabled={retrying || retryDisabled}>

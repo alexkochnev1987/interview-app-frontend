@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useId, useRef, useState } from 'react'
+import { useId, useState } from 'react'
 import { useTranslations } from 'next-intl'
 
 import { AiSuggestionRow } from '@/components/questions/editor/ai-suggestion-row'
@@ -22,22 +22,55 @@ interface CandidateFeedbackBlockFieldsProps {
     recommendationText: string
     improvementText: string
   }) => Promise<void>
-  onUseAi: (payload: {
+  onAcceptAll: (payload: {
     recommendationText: string
     improvementText: string
   }) => Promise<void>
+}
+
+function getPersistedSourceKey(
+  block: Pick<
+    CandidateFeedbackBlock,
+    'recommendationText' | 'improvementText' | 'state'
+  >,
+): string | null {
+  if (block.state !== 'accepted' && block.state !== 'edited') {
+    return null
+  }
+
+  return `${block.state}:${block.recommendationText ?? ''}:${block.improvementText ?? ''}`
+}
+
+function getGeneratedSnapshotKey(
+  block: Pick<
+    CandidateFeedbackBlock,
+    'recommendationText' | 'improvementText' | 'state'
+  >,
+): string | null {
+  if (block.state !== 'generated') {
+    return null
+  }
+
+  return `${block.recommendationText ?? ''}|${block.improvementText ?? ''}`
 }
 
 export function CandidateFeedbackBlockFields({
   block,
   saving,
   onSave,
-  onUseAi,
+  onAcceptAll,
 }: CandidateFeedbackBlockFieldsProps) {
   const t = useTranslations('interviews.candidateFeedback')
   const recommendationId = useId()
   const improvementId = useId()
-  const previousStateRef = useRef(block.state)
+  const persistedSourceKey = getPersistedSourceKey(block)
+  const generatedSnapshotKey = getGeneratedSnapshotKey(block)
+  const [syncedPersistedKey, setSyncedPersistedKey] = useState<string | null>(
+    null,
+  )
+  const [syncedGeneratedKey, setSyncedGeneratedKey] = useState<string | null>(
+    null,
+  )
   const [recommendationText, setRecommendationText] = useState(
     block.recommendationText ?? '',
   )
@@ -47,20 +80,25 @@ export function CandidateFeedbackBlockFields({
   const [dismissedRecommendation, setDismissedRecommendation] = useState(false)
   const [dismissedImprovement, setDismissedImprovement] = useState(false)
 
-  useEffect(() => {
-    if (block.state === 'accepted' || block.state === 'edited') {
-      setRecommendationText(block.recommendationText ?? '')
-      setImprovementText(block.improvementText ?? '')
-    }
-  }, [block.improvementText, block.recommendationText, block.state])
+  if (persistedSourceKey && persistedSourceKey !== syncedPersistedKey) {
+    setSyncedPersistedKey(persistedSourceKey)
+    setRecommendationText(block.recommendationText ?? '')
+    setImprovementText(block.improvementText ?? '')
+  }
 
-  useEffect(() => {
-    if (block.state === 'generated' && previousStateRef.current !== 'generated') {
-      setDismissedRecommendation(false)
-      setDismissedImprovement(false)
-    }
-    previousStateRef.current = block.state
-  }, [block.state])
+  if (!persistedSourceKey && syncedPersistedKey !== null) {
+    setSyncedPersistedKey(null)
+  }
+
+  if (generatedSnapshotKey && generatedSnapshotKey !== syncedGeneratedKey) {
+    setSyncedGeneratedKey(generatedSnapshotKey)
+    setDismissedRecommendation(false)
+    setDismissedImprovement(false)
+  }
+
+  if (!generatedSnapshotKey && syncedGeneratedKey !== null) {
+    setSyncedGeneratedKey(null)
+  }
 
   const showRecommendationSuggestion =
     block.state === 'generated' &&
@@ -70,27 +108,48 @@ export function CandidateFeedbackBlockFields({
     block.state === 'generated' &&
     !dismissedImprovement &&
     Boolean(block.improvementText?.trim())
+  const hasPendingSuggestions =
+    showRecommendationSuggestion || showImprovementSuggestion
 
   function handleUseAiRecommendation() {
-    const nextRecommendation = block.recommendationText ?? ''
-    setRecommendationText(nextRecommendation)
-    void onUseAi({
-      recommendationText: nextRecommendation,
-      improvementText,
-    })
+    setRecommendationText(block.recommendationText ?? '')
+    setDismissedRecommendation(true)
   }
 
   function handleUseAiImprovement() {
+    setImprovementText(block.improvementText ?? '')
+    setDismissedImprovement(true)
+  }
+
+  function handleAcceptAllSuggestions() {
+    const nextRecommendation = block.recommendationText ?? ''
     const nextImprovement = block.improvementText ?? ''
+    setRecommendationText(nextRecommendation)
     setImprovementText(nextImprovement)
-    void onUseAi({
-      recommendationText,
+    void onAcceptAll({
+      recommendationText: nextRecommendation,
       improvementText: nextImprovement,
     })
   }
 
   return (
     <Stack gap={4}>
+      {hasPendingSuggestions ? (
+        <Inline gap={2} wrap="wrap">
+          <DemoWriteGuard disabled={saving}>
+            <Button
+              type="button"
+              variant="outline-pill"
+              shape="pill"
+              loading={saving}
+              onClick={() => void handleAcceptAllSuggestions()}
+            >
+              {t('acceptAllSuggestions')}
+            </Button>
+          </DemoWriteGuard>
+        </Inline>
+      ) : null}
+
       <Stack gap={3}>
         <FormField htmlFor={recommendationId} label={t('recommendationLabel')}>
           <Textarea

@@ -9,15 +9,19 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText, SectionHeading } from '@/components/ui/text'
-import { type CandidateFeedbackBlock } from '@/lib/candidate-feedback'
+import {
+  type CandidateFeedbackBlock,
+  isBlockUsingSharedCandidateFeedbackError,
+} from '@/lib/candidate-feedback'
 
 interface CandidateFeedbackOverallBlockProps {
   block: CandidateFeedbackBlock
   saving: boolean
   retrying: boolean
   retryDisabled: boolean
+  sharedGenerationError?: string | null
   onRetry: () => Promise<void>
-  onUseAi: (payload: {
+  onAcceptAll: (payload: {
     recommendationText: string
     improvementText: string
   }) => Promise<void>
@@ -32,11 +36,16 @@ export function CandidateFeedbackOverallBlock({
   saving,
   retrying,
   retryDisabled,
+  sharedGenerationError,
   onRetry,
-  onUseAi,
+  onAcceptAll,
   onSave,
 }: CandidateFeedbackOverallBlockProps) {
   const t = useTranslations('interviews.candidateFeedback')
+  const usesSharedError = isBlockUsingSharedCandidateFeedbackError(
+    block,
+    sharedGenerationError ?? null,
+  )
 
   return (
     <Card variant="surface" size="lg">
@@ -57,6 +66,7 @@ export function CandidateFeedbackOverallBlock({
               retrying={retrying}
               retryDisabled={retryDisabled}
               onRetry={onRetry}
+              showAlert={!usesSharedError}
             />
           ) : null}
 
@@ -64,7 +74,7 @@ export function CandidateFeedbackOverallBlock({
             block={block}
             saving={saving}
             onSave={onSave}
-            onUseAi={onUseAi}
+            onAcceptAll={onAcceptAll}
           />
         </Stack>
       </CardContent>

@@ -33,6 +33,7 @@
     },
     "candidateFeedback": {
       "acceptSuccess": "Suggestion accepted",
+      "applyAllSuccess": "All suggestions applied",
       "acceptError": "Failed to accept suggestion",
       "saveSuccess": "Feedback saved",
       "saveError": "Failed to save feedback",

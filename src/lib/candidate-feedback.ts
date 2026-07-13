@@ -263,3 +263,138 @@ export function getQuestionGenerateLabelKey(
     ? 'regenerateQuestion'
     : 'generateQuestion'
 }
+
+export type CandidateFeedbackErrorDisplay =
+  | { kind: 'location_not_supported' }
+  | { kind: 'raw'; message: string }
+
+export function parseCandidateFeedbackErrorMessage(
+  errorMessage: string,
+): CandidateFeedbackErrorDisplay {
+  const trimmed = errorMessage.trim()
+  if (!trimmed) {
+    return { kind: 'raw', message: trimmed }
+  }
+
+  const geminiJsonMatch = trimmed.match(/Gemini error \d+:\s*(\{[\s\S]*\})/i)
+  const jsonCandidate =
+    geminiJsonMatch?.[1] ?? (trimmed.startsWith('{') ? trimmed : null)
+
+  if (jsonCandidate) {
+    try {
+      const parsed = JSON.parse(jsonCandidate) as {
+        error?: { message?: string }
+      }
+      const nestedMessage = parsed.error?.message?.trim()
+      if (nestedMessage) {
+        return parseCandidateFeedbackErrorMessage(nestedMessage)
+      }
+    } catch {
+      /* fall through to raw matching */
+    }
+  }
+
+  if (trimmed.includes('User location is not supported')) {
+    return { kind: 'location_not_supported' }
+  }
+
+  return { kind: 'raw', message: trimmed }
+}
+
+function collectFailedBlockMessages(
+  feedback: CandidateFeedbackResponse,
+  questionCount: number,
+): string[] {
+  const messages: string[] = []
+
+  if (feedback.overall.state === 'failed') {
+    const message = feedback.overall.errorMessage?.trim()
+    if (message) {
+      messages.push(message)
+    }
+  }
+
+  for (const block of buildQuestionBlocksView(questionCount, feedback)) {
+    if (block.state === 'failed') {
+      const message = block.errorMessage?.trim()
+      if (message) {
+        messages.push(message)
+      }
+    }
+  }
+
+  return messages
+}
+
+export function getSharedCandidateFeedbackError(
+  feedback: CandidateFeedbackResponse,
+  questionCount: number,
+): string | null {
+  const messages = collectFailedBlockMessages(feedback, questionCount)
+  if (messages.length < 2) {
+    return null
+  }
+
+  const firstMessage = messages[0]
+  return messages.every((message) => message === firstMessage) ? firstMessage : null
+}
+
+export function hasGeneratedCandidateFeedbackBlocks(
+  feedback: CandidateFeedbackResponse,
+  questionCount: number,
+): boolean {
+  if (feedback.overall.state === 'generated') {
+    return true
+  }
+
+  return buildQuestionBlocksView(questionCount, feedback).some(
+    (block) => block.state === 'generated',
+  )
+}
+
+export function buildAcceptAllCandidateFeedbackPayload(
+  feedback: CandidateFeedbackResponse,
+  questionCount: number,
+): UpdateCandidateFeedbackPayload {
+  const payload: UpdateCandidateFeedbackPayload = {}
+
+  if (feedback.overall.state === 'generated') {
+    payload.overall = {
+      recommendationText: feedback.overall.recommendationText ?? '',
+      improvementText: feedback.overall.improvementText ?? '',
+      state: 'accepted',
+    }
+  }
+
+  const generatedQuestions = buildQuestionBlocksView(questionCount, feedback)
+    .filter((block) => block.state === 'generated')
+    .map((block) => ({
+      questionIndex: block.questionIndex,
+      recommendationText: block.recommendationText ?? '',
+      improvementText: block.improvementText ?? '',
+      state: 'accepted' as const,
+    }))
+
+  if (generatedQuestions.length > 0) {
+    payload.questions = generatedQuestions
+  }
+
+  return payload
+}
+
+export function isBlockUsingSharedCandidateFeedbackError(
+  block: CandidateFeedbackBlock,
+  sharedError: string | null,
+): boolean {
+  return (
+    Boolean(sharedError) &&
+    block.state === 'failed' &&
+    block.errorMessage?.trim() === sharedError
+  )
+}
+
+export function isAcceptAllCandidateFeedbackPayloadEmpty(
+  payload: UpdateCandidateFeedbackPayload,
+): boolean {
+  return !payload.overall && (payload.questions?.length ?? 0) === 0
+}

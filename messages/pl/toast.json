@@ -33,6 +33,7 @@
     },
     "candidateFeedback": {
       "acceptSuccess": "Sugestia zaakceptowana",
+      "applyAllSuccess": "Wszystkie sugestie zastosowano",
       "acceptError": "Nie udało się zaakceptować sugestii",
       "saveSuccess": "Informacja zwrotna zapisana",
       "saveError": "Nie udało się zapisać informacji zwrotnej",

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { MessageSquareText, Sparkles } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
@@ -27,14 +27,20 @@ import {
   type Interview,
 } from '@/lib/api'
 import {
+  buildAcceptAllCandidateFeedbackPayload,
   buildQuestionBlocksView,
   type CandidateFeedbackResponse,
+  getSharedCandidateFeedbackError,
+  hasGeneratedCandidateFeedbackBlocks,
+  isAcceptAllCandidateFeedbackPayloadEmpty,
   isCandidateFeedbackEmpty,
   isCandidateFeedbackGenerating,
   isOverallBlockGenerationBusy,
   isQuestionBlockGenerationBusy,
+  parseCandidateFeedbackErrorMessage,
 } from '@/lib/candidate-feedback'
 import { runMutation } from '@/lib/run-mutation'
+import { notifySuccess } from '@/lib/toast'
 import { useCandidateFeedbackToastMessages } from '@/lib/toast-messages/use-candidate-feedback-toast-messages'
 
 interface CandidateFeedbackEditorProps {
@@ -42,7 +48,7 @@ interface CandidateFeedbackEditorProps {
   initialFeedback: CandidateFeedbackResponse
 }
 
-type SavingTarget = 'overall' | `question-${number}` | null
+type SavingTarget = 'overall' | 'accept-all' | `question-${number}` | null
 type GeneratingTarget = 'all' | `question-${number}` | null
 
 type FeedbackMutationToast = {
@@ -60,7 +66,6 @@ export function CandidateFeedbackEditor({
     useCandidateFeedbackData(interview.id, initialFeedback)
   const [savingTarget, setSavingTarget] = useState<SavingTarget>(null)
   const [generatingTarget, setGeneratingTarget] = useState<GeneratingTarget>(null)
-  const [generateAllActive, setGenerateAllActive] = useState(false)
 
   const questionCount = interview.questions.length
   const interviewLocale = interview.interviewLocale ?? feedback.interviewLocale
@@ -68,13 +73,26 @@ export function CandidateFeedbackEditor({
   const isEmpty = isCandidateFeedbackEmpty(questionCount, feedback)
   const feedbackGenerating = isCandidateFeedbackGenerating(feedback)
   const generateAllBusy = generatingTarget !== null || feedbackGenerating
-  const generateAllLoading = generatingTarget === 'all' || generateAllActive
+  const generateAllLoading = generatingTarget === 'all'
+  const sharedGenerationError = getSharedCandidateFeedbackError(
+    feedback,
+    questionCount,
+  )
+  const hasGeneratedBlocks = hasGeneratedCandidateFeedbackBlocks(
+    feedback,
+    questionCount,
+  )
+  const acceptAllPageLoading = savingTarget === 'accept-all'
+  const acceptAllPageDisabled =
+    acceptAllPageLoading || savingTarget !== null || generateAllBusy
 
-  useEffect(() => {
-    if (!feedbackGenerating) {
-      setGenerateAllActive(false)
+  function formatSharedGenerationError(message: string): string {
+    const parsed = parseCandidateFeedbackErrorMessage(message)
+    if (parsed.kind === 'location_not_supported') {
+      return t('locationNotSupportedError')
     }
-  }, [feedbackGenerating])
+    return parsed.message
+  }
 
   async function applyPatchUpdate(
     mutation: () => Promise<CandidateFeedbackResponse>,
@@ -113,16 +131,14 @@ export function CandidateFeedbackEditor({
     mutation: () => Promise<CandidateFeedbackResponse>,
     toast: FeedbackMutationToast,
   ) {
-    if (target === 'all') {
-      setGenerateAllActive(true)
-    }
     setGeneratingTarget(target)
+    notifySuccess(toast.successMessage)
     try {
-      await runMutation(() => applyGenerationUpdate(mutation), toast)
+      await runMutation(() => applyGenerationUpdate(mutation), {
+        ...toast,
+        showSuccessToast: false,
+      })
     } catch {
-      if (target === 'all') {
-        setGenerateAllActive(false)
-      }
       /* toast handled by runMutation */
     } finally {
       setGeneratingTarget(null)
@@ -151,7 +167,26 @@ export function CandidateFeedbackEditor({
     )
   }
 
-  function handleUseAiOverall(payload: {
+  function handleAcceptAllPage() {
+    const payload = buildAcceptAllCandidateFeedbackPayload(
+      feedback,
+      questionCount,
+    )
+    if (isAcceptAllCandidateFeedbackPayloadEmpty(payload)) {
+      return Promise.resolve()
+    }
+
+    return runPatchMutation(
+      'accept-all',
+      () => updateCandidateFeedback(interview.id, payload, interviewLocale),
+      {
+        successMessage: toastMessages.applyAllSuccess,
+        errorMessage: toastMessages.acceptError,
+      },
+    )
+  }
+
+  function handleAcceptAllOverall(payload: {
     recommendationText: string
     improvementText: string
   }) {
@@ -201,7 +236,7 @@ export function CandidateFeedbackEditor({
     )
   }
 
-  function handleUseAiQuestion(
+  function handleAcceptAllQuestion(
     questionIndex: number,
     payload: { recommendationText: string; improvementText: string },
   ) {
@@ -280,6 +315,15 @@ export function CandidateFeedbackEditor({
             </Alert>
           ) : null}
 
+          {sharedGenerationError ? (
+            <Alert variant="danger">
+              <AlertTitle>{t('sharedGenerationErrorTitle')}</AlertTitle>
+              <AlertDescription>
+                {formatSharedGenerationError(sharedGenerationError)}
+              </AlertDescription>
+            </Alert>
+          ) : null}
+
           <Inline gap={2} wrap="wrap">
             <DemoWriteGuard disabled={generateAllBusy}>
               <Button
@@ -295,18 +339,36 @@ export function CandidateFeedbackEditor({
                 {questionCount > 0 ? t('generateAll') : t('generateOverall')}
               </Button>
             </DemoWriteGuard>
+            {hasGeneratedBlocks ? (
+              <DemoWriteGuard disabled={acceptAllPageDisabled}>
+                <Button
+                  type="button"
+                  variant="outline-pill"
+                  shape="pill"
+                  loading={acceptAllPageLoading}
+                  onClick={() => void handleAcceptAllPage()}
+                >
+                  {t('acceptAllSuggestionsPage')}
+                </Button>
+              </DemoWriteGuard>
+            ) : null}
           </Inline>
 
           <CandidateFeedbackOverallBlock
             block={feedback.overall}
-            saving={savingTarget === 'overall'}
+            saving={
+              savingTarget === 'overall' ||
+              (savingTarget === 'accept-all' &&
+                feedback.overall.state === 'generated')
+            }
             retrying={generateAllLoading}
             retryDisabled={isOverallBlockGenerationBusy(
               feedback.overall.state,
               generatingTarget,
             )}
+            sharedGenerationError={sharedGenerationError}
             onRetry={handleGenerateAll}
-            onUseAi={handleUseAiOverall}
+            onAcceptAll={handleAcceptAllOverall}
             onSave={handleSaveOverall}
           />
 
@@ -317,19 +379,23 @@ export function CandidateFeedbackEditor({
                 <CandidateFeedbackQuestionBlockEditor
                   key={block.questionIndex}
                   block={block}
-                  saving={savingTarget === `question-${block.questionIndex}`}
+                  saving={
+                    savingTarget === `question-${block.questionIndex}` ||
+                    (savingTarget === 'accept-all' &&
+                      block.state === 'generated')
+                  }
                   generating={
                     generatingTarget === `question-${block.questionIndex}`
                   }
-                  generateAllActive={generateAllActive}
                   generationDisabled={isQuestionBlockGenerationBusy(
                     block.state,
                     block.questionIndex,
                     generatingTarget,
                   )}
+                  sharedGenerationError={sharedGenerationError}
                   onGenerate={() => handleGenerateQuestion(block.questionIndex)}
-                  onUseAi={(payload) =>
-                    handleUseAiQuestion(block.questionIndex, payload)
+                  onAcceptAll={(payload) =>
+                    handleAcceptAllQuestion(block.questionIndex, payload)
                   }
                   onSave={(payload) =>
                     handleSaveQuestion(block.questionIndex, payload)

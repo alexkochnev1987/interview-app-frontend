@@ -13,6 +13,7 @@ import { Stack } from '@/components/ui/layout/stack'
 import { BodyText, SectionHeading } from '@/components/ui/text'
 import {
   getQuestionGenerateLabelKey,
+  isBlockUsingSharedCandidateFeedbackError,
   shouldShowQuestionGenerateButton,
   type CandidateFeedbackQuestionBlock,
 } from '@/lib/candidate-feedback'
@@ -21,10 +22,10 @@ interface CandidateFeedbackQuestionBlockEditorProps {
   block: CandidateFeedbackQuestionBlock
   saving: boolean
   generating: boolean
-  generateAllActive: boolean
   generationDisabled: boolean
+  sharedGenerationError?: string | null
   onGenerate: () => Promise<void>
-  onUseAi: (payload: {
+  onAcceptAll: (payload: {
     recommendationText: string
     improvementText: string
   }) => Promise<void>
@@ -38,18 +39,19 @@ export function CandidateFeedbackQuestionBlockEditor({
   block,
   saving,
   generating,
-  generateAllActive,
   generationDisabled,
+  sharedGenerationError,
   onGenerate,
-  onUseAi,
+  onAcceptAll,
   onSave,
 }: CandidateFeedbackQuestionBlockEditorProps) {
   const t = useTranslations('interviews.candidateFeedback')
   const showGenerateButton = shouldShowQuestionGenerateButton(block.state)
-  const isGenerating =
-    generating ||
-    (block.state === 'generating' && !generateAllActive)
   const generateLabelKey = getQuestionGenerateLabelKey(block.state)
+  const usesSharedError = isBlockUsingSharedCandidateFeedbackError(
+    block,
+    sharedGenerationError ?? null,
+  )
 
   return (
     <Card variant="surface" size="lg">
@@ -66,10 +68,10 @@ export function CandidateFeedbackQuestionBlockEditor({
             <BodyText tone="muted">{t('notGeneratedHint')}</BodyText>
           ) : null}
 
-          {block.state === 'failed' ? (
+          {block.state === 'failed' && !usesSharedError ? (
             <CandidateFeedbackFailedBlock
               errorMessage={block.errorMessage}
-              retrying={isGenerating}
+              retrying={generating}
               retryDisabled={generationDisabled}
               onRetry={onGenerate}
               showRetry={false}
@@ -81,7 +83,7 @@ export function CandidateFeedbackQuestionBlockEditor({
               <DemoWriteGuard disabled={generationDisabled}>
                 <CandidateFeedbackGenerateButton
                   label={t(generateLabelKey)}
-                  loading={isGenerating}
+                  loading={generating}
                   disabled={generationDisabled}
                   onClick={() => void onGenerate()}
                 />
@@ -93,7 +95,7 @@ export function CandidateFeedbackQuestionBlockEditor({
             block={block}
             saving={saving}
             onSave={onSave}
-            onUseAi={onUseAi}
+            onAcceptAll={onAcceptAll}
           />
         </Stack>
       </CardContent>

@@ -33,6 +33,7 @@
     },
     "candidateFeedback": {
       "acceptSuccess": "Предложение принято",
+      "applyAllSuccess": "Все предложения применены",
       "acceptError": "Не удалось принять предложение",
       "saveSuccess": "Обратная связь сохранена",
       "saveError": "Не удалось сохранить обратную связь",

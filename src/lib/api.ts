@@ -571,7 +571,6 @@ export type {
 export {
   buildQuestionBlocksView,
   candidateFeedbackPath,
-  canGenerateQuestionBlock,
   createEmptyCandidateFeedback,
   isCandidateFeedbackEmpty,
   isCandidateFeedbackGenerating,

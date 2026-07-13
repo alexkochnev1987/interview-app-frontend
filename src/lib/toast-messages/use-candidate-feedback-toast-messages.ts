@@ -5,6 +5,7 @@ export function useCandidateFeedbackToastMessages() {
 
   return {
     acceptSuccess: t('acceptSuccess'),
+    applyAllSuccess: t('applyAllSuccess'),
     acceptError: t('acceptError'),
     saveSuccess: t('saveSuccess'),
     saveError: t('saveError'),

@@ -33,6 +33,7 @@
     },
     "candidateFeedback": {
       "acceptSuccess": "Прапанова прынята",
+      "applyAllSuccess": "Усе прапановы прыменены",
       "acceptError": "Не ўдалося прыняць прапанову",
       "saveSuccess": "Зваротная сувязь захавана",
       "saveError": "Не ўдалося захаваць зваротную сувязь",
