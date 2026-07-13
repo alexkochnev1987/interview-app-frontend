@@ -40,6 +40,9 @@
       "generateStartSuccess": "Rozpoczęto generowanie",
       "generateStartError": "Nie udało się rozpocząć generowania"
     },
+    "interviewsLibrary": {
+      "loadFailedFallback": "Nie udało się załadować interview."
+    },
     "take": {
       "submitSuccess": "Odpowiedź wysłana",
       "submitError": "Nie udało się wysłać odpowiedzi"
@@ -88,6 +91,12 @@
         "loadDetailFallback": "Nie udało się załadować oceny.",
         "notFoundFallback": "Nie udało się załadować wybranej oceny."
       },
+      "interviews": {
+        "libraryForbiddenTitle": "Nie masz dostępu do interview",
+        "libraryForbiddenDescription": "Biblioteka interview jest dostępna wyłącznie dla użytkowników z rolami HR, administrator i superadministrator. Jeśli uważasz, że to pomyłka, skontaktuj się z właścicielem obszaru roboczego.",
+        "libraryUnavailableTitle": "Interview są obecnie niedostępne",
+        "libraryLoadFailedFallback": "Nie udało się załadować interview."
+      },
       "interview": {
         "forbiddenTitle": "Brak dostępu do tego interview",
         "forbiddenDescription": "Konfiguracja interview jest dostępna dla HR, administratorów i superadministratorów. Jeśli to błąd, skontaktuj się z właścicielem workspace.",
@@ -135,6 +144,16 @@
       "take": {
         "unavailableTitle": "Interview niedostępne",
         "loadFailedFallback": "Nie udało się załadować interview."
+      },
+      "templates": {
+        "forbiddenTitle": "Brak dostępu do szablonów",
+        "forbiddenDescription": "Szablony interview są zarezerwowane dla HR, administratorów i superadministratorów. Jeśli to błąd, skontaktuj się z właścicielem workspace.",
+        "unavailableTitle": "Szablony są teraz niedostępne",
+        "loadFailedFallback": "Nie udało się załadować szablonów.",
+        "notFoundFallback": "Nie udało się załadować wybranego szablonu.",
+        "nameRequired": "Nazwa szablonu jest wymagana.",
+        "questionsRequired": "Wybierz co najmniej jedno pytanie.",
+        "savingLabel": "Zapisywanie..."
       }
     },
     "rerun": {
@@ -154,6 +173,14 @@
       "updateSuccess": "Rola zaktualizowana",
       "updateError": "Nie udało się zaktualizować roli",
       "updateSuccessDescription": "{name} ma teraz rolę {role}."
+    },
+    "template": {
+      "createSuccess": "Szablon utworzony",
+      "createError": "Nie udało się utworzyć szablonu",
+      "updateSuccess": "Szablon zaktualizowany",
+      "updateError": "Nie udało się zaktualizować szablonu",
+      "deleteSuccess": "Szablon usunięty",
+      "deleteError": "Nie udało się usunąć szablonu"
     }
   }
 }

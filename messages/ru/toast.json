@@ -40,6 +40,9 @@
       "generateStartSuccess": "Генерация запущена",
       "generateStartError": "Не удалось запустить генерацию"
     },
+    "interviewsLibrary": {
+      "loadFailedFallback": "Не удалось загрузить интервью."
+    },
     "take": {
       "submitSuccess": "Ответ отправлен",
       "submitError": "Не удалось отправить ответ"
@@ -88,6 +91,12 @@
         "loadDetailFallback": "Не удалось загрузить оценку.",
         "notFoundFallback": "Запрошенную оценку не удалось загрузить."
       },
+      "interviews": {
+        "libraryForbiddenTitle": "У вас нет доступа к интервью",
+        "libraryForbiddenDescription": "Библиотека интервью доступна только пользователям с ролями HR, администратор и суперадминистратор. Если вы считаете, что это ошибка, обратитесь к владельцу рабочего пространства.",
+        "libraryUnavailableTitle": "Интервью сейчас недоступны",
+        "libraryLoadFailedFallback": "Не удалось загрузить интервью."
+      },
       "interview": {
         "forbiddenTitle": "У вас нет доступа к этому интервью",
         "forbiddenDescription": "Настройка интервью доступна только HR, администраторам и суперадминистраторам. Если это ошибка, обратитесь к владельцу рабочей области.",
@@ -135,6 +144,16 @@
       "take": {
         "unavailableTitle": "Интервью недоступно",
         "loadFailedFallback": "Не удалось загрузить интервью."
+      },
+      "templates": {
+        "forbiddenTitle": "У вас нет доступа к шаблонам",
+        "forbiddenDescription": "Шаблоны интервью доступны только HR, администраторам и суперадминистраторам. Если это ошибка, обратитесь к владельцу рабочей области.",
+        "unavailableTitle": "Шаблоны сейчас недоступны",
+        "loadFailedFallback": "Не удалось загрузить шаблоны.",
+        "notFoundFallback": "Запрошенный шаблон не удалось загрузить.",
+        "nameRequired": "Укажите название шаблона.",
+        "questionsRequired": "Выберите хотя бы один вопрос.",
+        "savingLabel": "Сохранение..."
       }
     },
     "rerun": {
@@ -154,6 +173,14 @@
       "updateSuccess": "Роль обновлена",
       "updateError": "Не удалось обновить роль",
       "updateSuccessDescription": "{name} теперь {role}."
+    },
+    "template": {
+      "createSuccess": "Шаблон создан",
+      "createError": "Не удалось создать шаблон",
+      "updateSuccess": "Шаблон обновлён",
+      "updateError": "Не удалось обновить шаблон",
+      "deleteSuccess": "Шаблон удалён",
+      "deleteError": "Не удалось удалить шаблон"
     }
   }
 }

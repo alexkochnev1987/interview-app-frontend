@@ -38,6 +38,7 @@ export function setClientApiLocale(locale?: string | null): void {
 
 const client = createClient<paths>({
   baseUrl: '/api',
+  credentials: 'include',
 });
 
 function buildClientApiHeaders(headers?: HeadersInit): Headers {
@@ -56,6 +57,7 @@ function buildClientBaseHeaders(headers?: HeadersInit): Headers {
 
 function fetchClientApi(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
   return fetch(input, {
+    credentials: 'include',
     ...init,
     headers: buildClientApiHeaders(init?.headers),
   });
@@ -147,6 +149,20 @@ export type InterviewAnswerMediaResponse = Schemas['InterviewAnswerMediaResponse
 export type CandidateLinkResponse = Schemas['CandidateLinkResponseDto'];
 export type FeedbackLinkResponse = Schemas['FeedbackLinkResponseDto'];
 export type InterviewCancelResponse = Schemas['InterviewCancelResponseDto'];
+
+export type InterviewListItem = Schemas['InterviewListItemDto'];
+export type PaginatedInterviews = Schemas['PaginatedInterviewsResponseDto'];
+export type InterviewFacetsResponse = Schemas['InterviewFacetsResponseDto'];
+export type InterviewFacetCount = Schemas['InterviewFacetCountDto'];
+export type FetchInterviewsParams = NonNullable<
+  paths['/interviews']['get']['parameters']['query']
+>;
+export type InterviewSortField = NonNullable<FetchInterviewsParams['sortBy']>;
+export type InterviewSortOrder = NonNullable<FetchInterviewsParams['sortOrder']>;
+export type InterviewStatusFilter = NonNullable<FetchInterviewsParams['status']>;
+export type FetchInterviewFacetsParams = NonNullable<
+  paths['/interviews/facets']['get']['parameters']['query']
+>;
 
 export type CreateInterviewPayload = Schemas['CreateInterviewDto'];
 
@@ -521,6 +537,36 @@ export async function getInterview(id: string): Promise<Interview> {
 export async function getInterviews(): Promise<Interview[]> {
   const data = await handle(client.GET('/interviews'));
   return normalizeInterviewsResponse<Interview>(data, 'client:/interviews');
+}
+
+export async function fetchInterviews(
+  params?: FetchInterviewsParams,
+  init?: { signal?: AbortSignal },
+): Promise<PaginatedInterviews> {
+  return handle(
+    client.GET('/interviews', {
+      ...LOCALIZED_HEADERS,
+      params: { query: params ?? {} },
+      signal: init?.signal,
+    }),
+  );
+}
+
+export async function fetchInterviewFacets(
+  params?: FetchInterviewFacetsParams,
+  init?: { signal?: AbortSignal },
+): Promise<InterviewFacetsResponse> {
+  return handle(
+    client.GET('/interviews/facets', {
+      ...LOCALIZED_HEADERS,
+      params: { query: params ?? {} },
+      signal: init?.signal,
+    }),
+  );
+}
+
+export function emptyPaginatedInterviews(limit = 20): PaginatedInterviews {
+  return { items: [], total: 0, page: 1, limit };
 }
 
 export async function updateInterview(
@@ -900,5 +946,54 @@ export async function submitTakeAnswer(
     ...LOCALIZED_HEADERS,
     params: { path: { id } },
     body: payload
+  }));
+}
+
+// Interview templates; questions are live-resolved for the request locale.
+export type Template = Omit<Schemas['TemplateResponseDto'], 'questions'> & {
+  questions: Question[];
+};
+// List item: summary fields only, no resolved questions (the list never reads them).
+export type TemplateSummary = Schemas['TemplateSummaryResponseDto'];
+export type CreateTemplatePayload = Schemas['CreateTemplateDto'];
+export type UpdateTemplatePayload = Schemas['UpdateTemplateDto'];
+export type DeleteTemplateResponse = Schemas['DeleteTemplateResponseDto'];
+
+export async function getTemplates(): Promise<TemplateSummary[]> {
+  return handle(client.GET('/templates', {
+    ...LOCALIZED_HEADERS,
+  }));
+}
+
+export async function getTemplate(id: string): Promise<Template> {
+  return handle(client.GET('/templates/{id}', {
+    ...LOCALIZED_HEADERS,
+    params: { path: { id } },
+  }));
+}
+
+export async function createTemplate(
+  data: CreateTemplatePayload,
+): Promise<Template> {
+  return handle(client.POST('/templates', {
+    ...LOCALIZED_HEADERS,
+    body: data,
+  }));
+}
+
+export async function updateTemplate(
+  id: string,
+  data: UpdateTemplatePayload,
+): Promise<Template> {
+  return handle(client.PATCH('/templates/{id}', {
+    ...LOCALIZED_HEADERS,
+    params: { path: { id } },
+    body: data,
+  }));
+}
+
+export async function deleteTemplate(id: string): Promise<DeleteTemplateResponse> {
+  return handle(client.DELETE('/templates/{id}', {
+    params: { path: { id } },
   }));
 }

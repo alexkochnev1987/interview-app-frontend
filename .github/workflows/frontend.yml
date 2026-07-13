@@ -11,8 +11,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: '22'
       - run: npm ci
@@ -22,9 +22,12 @@ jobs:
         run: git diff --exit-code -- src/lib/api-types.ts
       - run: npm run lint:ci
       - run: npm run test
-      - run: npx next build --webpack
+      - name: Production build for E2E
+        run: npx next build --webpack
+        env:
+          BACKEND_URL: http://127.0.0.1:3000
       - name: Upload production build for E2E
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: next-build
           path: .next
@@ -36,17 +39,17 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CI: true
-      BACKEND_URL: http://localhost:3000
-      E2E_BASE_URL: http://localhost:3001
+      BACKEND_URL: http://127.0.0.1:3000
+      E2E_BASE_URL: http://127.0.0.1:3001
       E2E_PREBUILT: '1'
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: '22'
       - run: npm ci
       - name: Download production build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: next-build
           path: .next

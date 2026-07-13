@@ -723,7 +723,7 @@ export function useTakeOrchestrator({
     setupError,
     interview?.currentQuestion,
     interview?.currentQuestionIndex,
-    interview?.currentAnswerMeta?.versionCount,
+    interview?.currentAnswerMeta,
     recording,
     uploading,
     recordingStartBusy,

@@ -40,6 +40,9 @@
       "generateStartSuccess": "Generation started",
       "generateStartError": "Failed to start generation"
     },
+    "interviewsLibrary": {
+      "loadFailedFallback": "Failed to load interviews."
+    },
     "take": {
       "submitSuccess": "Answer submitted",
       "submitError": "Failed to submit answer"
@@ -88,6 +91,12 @@
         "loadDetailFallback": "Failed to load assessment.",
         "notFoundFallback": "The requested assessment could not be loaded."
       },
+      "interviews": {
+        "libraryForbiddenTitle": "You don't have access to interviews",
+        "libraryForbiddenDescription": "The interview library is reserved for HR, admin, and super-admin users. If you think this is a mistake, contact your workspace owner.",
+        "libraryUnavailableTitle": "Interviews are unavailable right now",
+        "libraryLoadFailedFallback": "Failed to load interviews."
+      },
       "interview": {
         "forbiddenTitle": "You don't have access to this interview",
         "forbiddenDescription": "Configuring interviews is reserved for HR, admin, and super-admin users. If you think this is a mistake, contact your workspace owner.",
@@ -135,6 +144,16 @@
       "take": {
         "unavailableTitle": "Interview unavailable",
         "loadFailedFallback": "Failed to load interview."
+      },
+      "templates": {
+        "forbiddenTitle": "You don't have access to templates",
+        "forbiddenDescription": "Interview templates are reserved for HR, admin, and super-admin users. If you think this is a mistake, contact your workspace owner.",
+        "unavailableTitle": "Templates are unavailable right now",
+        "loadFailedFallback": "Failed to load templates.",
+        "notFoundFallback": "The requested template could not be loaded.",
+        "nameRequired": "Template name is required.",
+        "questionsRequired": "Select at least one question.",
+        "savingLabel": "Saving..."
       }
     },
     "rerun": {
@@ -154,6 +173,14 @@
       "updateSuccess": "Role updated",
       "updateError": "Could not update role",
       "updateSuccessDescription": "{name} is now {role}."
+    },
+    "template": {
+      "createSuccess": "Template created",
+      "createError": "Failed to create template",
+      "updateSuccess": "Template updated",
+      "updateError": "Failed to update template",
+      "deleteSuccess": "Template deleted",
+      "deleteError": "Failed to delete template"
     }
   }
 }

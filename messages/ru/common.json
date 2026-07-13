@@ -39,7 +39,8 @@
       "backToDashboard": "Вернуться на панель",
       "backToQuestionLibrary": "Вернуться в банк вопросов",
       "backToAssessments": "Вернуться к оценкам",
-      "backToInterview": "Вернуться к интервью"
+      "backToInterview": "Вернуться к интервью",
+      "backToTemplates": "Вернуться к шаблонам"
     },
     "labels": {
       "roles": {

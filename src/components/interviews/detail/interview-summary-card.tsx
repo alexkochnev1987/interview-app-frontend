@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowLeft, MessageSquareText } from 'lucide-react'
+import { ArrowLeft, ArrowRight, MessageSquareText } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
@@ -24,6 +24,7 @@ import {
   formatInterviewDate,
   getCandidateInitials,
 } from '@/lib/interview-formatters'
+import { isHrVisibleAssessment } from '@/lib/assessment-status'
 import { canEditInterview, canManageInterview } from '@/lib/interview-management'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
 
@@ -104,6 +105,24 @@ export function InterviewSummaryCard({
       </Button>
     ) : null
 
+  const visitAssessmentButton = isHrVisibleAssessment(interview) ? (
+    <Button asChild variant="outline">
+      <Link href={routes.assessments.detail(interview.id)}>
+        {tActions('visitAssessment')}
+        <Icon size="sm">
+          <ArrowRight />
+        </Icon>
+      </Link>
+    </Button>
+  ) : null
+
+  const headerActions = (
+    <Inline gap={2} align="center" wrap="wrap" justify="end">
+      {visitAssessmentButton}
+      {validateButton}
+    </Inline>
+  )
+
   const managementNotice =
     canManage && !canEdit && !isEditing ? (
       <BodyText size="sm" tone="muted">
@@ -137,7 +156,7 @@ export function InterviewSummaryCard({
           <Stack gap={3} width="full" visibility="below-sm">
             <Inline gap={3} align="center" justify="between" wrap="nowrap" width="full">
               {backLink}
-              {validateButton}
+              {headerActions}
             </Inline>
             {hasManagementActions ? (
               <Inline gap={3} wrap="wrap" justify="end" width="full">
@@ -156,7 +175,7 @@ export function InterviewSummaryCard({
                 {candidateFeedbackButton}
                 {editButton}
                 {cancelButton}
-                {validateButton}
+                {headerActions}
               </Inline>
               {managementNotice}
             </Stack>

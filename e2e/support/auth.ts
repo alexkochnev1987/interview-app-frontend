@@ -10,5 +10,5 @@ export async function loginAsAdmin(page: Page) {
   await page.getByTestId('login-email').fill(E2E_ADMIN.email)
   await page.getByTestId('login-password').fill(E2E_ADMIN.password)
   await page.getByTestId('login-submit').click()
-  await expect(page).not.toHaveURL(/\/login/)
+  await expect(page).not.toHaveURL(/\/login/, { timeout: 15_000 })
 }

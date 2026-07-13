@@ -10,14 +10,111 @@
     "detail": {
       "backToDashboard": "Вернуться к панели управления",
       "candidateFeedback": "Обратная связь кандидату",
-      "demoTryCandidateExperience": "Попробовать как кандидат",
       "validationStatus": {
         "idle": "Праздный",
         "queued": "В очереди",
         "processing": "Обработка",
         "completed": "Завершенный",
         "failed": "Неуспешный"
+      },
+      "demoTryCandidateExperience": "Попробовать как кандидат"
+    },
+    "library": {
+      "header": {
+        "eyebrow": "Воронка интервью",
+        "title": "Интервью",
+        "lead": "Просматривайте все интервью кандидатов, отслеживайте их прогресс и открывайте подробную информацию, не покидая список.",
+        "newInterview": "Новое интервью",
+        "overviewEyebrow": "Обзор",
+        "healthTitle": "Воронка",
+        "healthDescription": "Количество соответствует фильтрам, применённым к текущему представлению.",
+        "totalInterviews": "Всего",
+        "visibleNow": "Показано"
+      },
+      "card": {
+        "progress": "Ответы",
+        "score": "Оценка",
+        "updatedAt": "Дата обновления",
+        "createdAt": "Дата создания"
+      },
+      "table": {
+        "candidate": "Кандидат",
+        "position": "Должность",
+        "status": "Статус",
+        "progress": "Прогресс",
+        "score": "Оценка",
+        "updated": "Обновлено",
+        "created": "Создано"
+      },
+      "toolbar": {
+        "searchPlaceholder": "Поиск по имени кандидата",
+        "resultCount": "{count} интервью",
+        "removeChipAria": "Удалить {label}",
+        "sortLabel": "Сортировка",
+        "pageSizeLabel": "Строк на странице",
+        "pageSizeOption": "{count} на странице"
+      },
+      "sort": {
+        "updatedAt_desc": "Сначала недавно обновлённые",
+        "updatedAt_asc": "Сначала давно обновлённые",
+        "createdAt_desc": "Сначала недавно созданные",
+        "createdAt_asc": "Сначала давно созданные",
+        "candidateName_asc": "Кандидат А–Я",
+        "candidateName_desc": "Кандидат Я–А"
+      },
+      "facet": {
+        "filtersTitle": "Фильтры",
+        "activeFilters": "{count} активных",
+        "resetTitle": "Сбросить фильтры",
+        "reset": "Сбросить",
+        "resetAll": "Сбросить фильтры",
+        "resetAllWithCount": "Сбросить ({count})",
+        "positionTitle": "Должность",
+        "statusTitle": "Статус",
+        "retry": "Повторить",
+        "unavailable": "Фильтры недоступны",
+        "loading": "Загрузка…",
+        "noValues": "Нет подходящих значений",
+        "showAll": "Показать все ({count})",
+        "showFewer": "Показать меньше"
+      },
+      "viewToggle": {
+        "viewModeAria": "Режим просмотра",
+        "cards": "Карточки",
+        "table": "Таблица",
+        "switchToCards": "Переключиться на карточки",
+        "switchToTable": "Переключиться на таблицу"
+      },
+      "empty": {
+        "title": "Пока нет интервью",
+        "filteredTitle": "Ничего не найдено",
+        "description": "Создайте интервью, чтобы начать собирать ответы кандидатов.",
+        "filteredDescription": "Попробуйте сбросить фильтры или изменить поисковый запрос.",
+        "createCta": "Новое интервью"
+      },
+      "client": {
+        "hideFiltersSidebar": "Скрыть панель фильтров",
+        "showFiltersSidebar": "Показать панель фильтров"
+      },
+      "infinite": {
+        "loadMore": "Загрузить ещё",
+        "loadingMore": "Загрузка…",
+        "showing": "Показано {loaded} из {total}",
+        "allLoaded": "Загружены все {count} интервью",
+        "loadErrorTitle": "Не удалось загрузить дополнительные данные"
+      },
+      "feed": {
+        "loading": "Загрузка интервью…",
+        "retry": "Повторить",
+        "resetFilters": "Сбросить фильтры"
+      },
+      "refetch": {
+        "genericTitle": "Не удалось обновить страницу"
       }
+    },
+    "chips": {
+      "position": "Должность: {value}",
+      "status": "Статус: {value}"
     },
     "actions": {
       "edit": "Редактировать интервью",
@@ -30,7 +127,8 @@
       "confirmCancel": "Отменить интервью",
       "dismiss": "Оставить интервью",
       "discardEdit": "Отменить изменения",
-      "keepEditing": "Продолжить редактирование"
+      "keepEditing": "Продолжить редактирование",
+      "visitAssessment": "Перейти к оценке"
     },
     "edit": {
       "title": "Редактирование интервью",

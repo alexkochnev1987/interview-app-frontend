@@ -40,6 +40,9 @@
       "generateStartSuccess": "Генерацыя запушчана",
       "generateStartError": "Не ўдалося запусціць генерацыю"
     },
+    "interviewsLibrary": {
+      "loadFailedFallback": "Не ўдалося загрузіць інтэрв'ю."
+    },
     "take": {
       "submitSuccess": "Адказ адпраўлены",
       "submitError": "Не ўдалося адправіць адказ"
@@ -88,6 +91,12 @@
         "loadDetailFallback": "Не ўдалося загрузіць ацэнку.",
         "notFoundFallback": "Запытаную ацэнку не ўдалося загрузіць."
       },
+      "interviews": {
+        "libraryForbiddenTitle": "У вас няма доступу да інтэрв'ю",
+        "libraryForbiddenDescription": "Бібліятэка інтэрв'ю даступная толькі карыстальнікам з ролямі HR, адміністратар і суперадміністратар. Калі вы лічыце, што гэта памылка, звярніцеся да ўладальніка рабочай прасторы.",
+        "libraryUnavailableTitle": "Інтэрв'ю зараз недаступныя",
+        "libraryLoadFailedFallback": "Не ўдалося загрузіць інтэрв'ю."
+      },
       "interview": {
         "forbiddenTitle": "У вас няма доступу да гэтага інтэрв’ю",
         "forbiddenDescription": "Наладжванне інтэрв’ю даступнае толькі HR, адміністратарам і суперадміністратарам. Калі гэта памылка, звярніцеся да ўладальніка працоўнай прасторы.",
@@ -135,6 +144,16 @@
       "take": {
         "unavailableTitle": "Інтэрв’ю недаступнае",
         "loadFailedFallback": "Не ўдалося загрузіць інтэрв’ю."
+      },
+      "templates": {
+        "forbiddenTitle": "У вас няма доступу да шаблонаў",
+        "forbiddenDescription": "Шаблоны інтэрв’ю даступныя толькі HR, адміністратарам і суперадміністратарам. Калі гэта памылка, звярніцеся да ўладальніка працоўнай прасторы.",
+        "unavailableTitle": "Шаблоны зараз недаступныя",
+        "loadFailedFallback": "Не ўдалося загрузіць шаблоны.",
+        "notFoundFallback": "Запытаны шаблон не ўдалося загрузіць.",
+        "nameRequired": "Укажыце назву шаблона.",
+        "questionsRequired": "Выберыце хаця б адно пытанне.",
+        "savingLabel": "Захаванне..."
       }
     },
     "rerun": {
@@ -154,6 +173,14 @@
       "updateSuccess": "Роля абноўлена",
       "updateError": "Не ўдалося абнавіць ролю",
       "updateSuccessDescription": "{name} цяпер {role}."
+    },
+    "template": {
+      "createSuccess": "Шаблон створаны",
+      "createError": "Не ўдалося стварыць шаблон",
+      "updateSuccess": "Шаблон абноўлены",
+      "updateError": "Не ўдалося абнавіць шаблон",
+      "deleteSuccess": "Шаблон выдалены",
+      "deleteError": "Не ўдалося выдаліць шаблон"
     }
   }
 }

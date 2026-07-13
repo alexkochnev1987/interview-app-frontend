@@ -3,9 +3,11 @@
     "dashboard": "Panel",
     "questions": "Pytania",
     "assessments": "Oceny",
+    "interviews": "Interview",
     "newInterview": "Nowe interview",
     "team": "Zespół",
     "logout": "Wyloguj",
-    "signIn": "Zaloguj się"
+    "signIn": "Zaloguj się",
+    "templates": "Szablony"
   }
 }
