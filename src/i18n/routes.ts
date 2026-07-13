@@ -12,10 +12,16 @@ export const routes = {
       `/templates/new?fromInterview=${encodeURIComponent(interviewId)}`,
   },
   interviews: {
+    list: '/interviews',
     new: '/interviews/new',
+    detail: (id: string) => `/interviews/${encodeURIComponent(id)}`,
     newFromTemplate: (templateId: string) =>
       `/interviews/new?templateId=${encodeURIComponent(templateId)}`,
     newFromInterview: (interviewId: string) =>
       `/interviews/new?fromInterview=${encodeURIComponent(interviewId)}`,
+  },
+  assessments: {
+    list: '/assessments',
+    detail: (id: string) => `/assessments/${encodeURIComponent(id)}`,
   },
 } as const

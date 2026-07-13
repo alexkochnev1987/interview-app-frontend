@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from '@/i18n/navigation';
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useContext, useState, type ReactNode } from 'react';
 import {
   completeOnboarding as apiCompleteOnboarding,
   logout as apiLogout,
@@ -34,11 +34,20 @@ export function AuthProvider({
 }) {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(initialUser);
+  const [prevInitialUser, setPrevInitialUser] = useState(initialUser);
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- align client state with RSC session snapshot after router.refresh() / navigations
-    setUser(initialUser);
-  }, [initialUser]);
+  if (initialUser !== prevInitialUser) {
+    const previousSnapshot = prevInitialUser;
+    setPrevInitialUser(initialUser);
+    if (initialUser != null) {
+      setUser(initialUser);
+    } else if (previousSnapshot != null) {
+      // Server cleared the session (expired or signed out elsewhere).
+      setUser(null);
+    }
+    // When both snapshots are null, keep a client-established session until
+    // the first RSC refresh picks up the new cookie (post login/demo sign-in).
+  }
 
   const establishSession = (sessionUser: User) => {
     setUser(sessionUser);
