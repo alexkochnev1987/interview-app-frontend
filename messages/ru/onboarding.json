@@ -21,7 +21,11 @@
       "recapQuestions": "Создавать и обогащать вопросы с помощью AI Draft",
       "recapInterviews": "Собирать интервью из банка вопросов",
       "recapCandidates": "Делиться безопасными ссылками для кандидатов",
-      "recapAssessments": "Просматривать и оценивать интервью с помощью AI"
+      "recapAssessments": "Просматривать и оценивать интервью с помощью AI",
+      "journeyQuestions": "Вопросы",
+      "journeyAi": "AI Draft",
+      "journeyInterviews": "Интервью",
+      "journeyAssessments": "AI-оценка"
     },
     "tour": {
       "next": "Далее",

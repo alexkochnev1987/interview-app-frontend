@@ -6,11 +6,14 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useState,
   type ReactNode,
 } from 'react'
 
 import { OnboardingCompleteDialog } from '@/components/ui/onboarding/onboarding-complete-dialog'
 import { OnboardingWelcomeDialog } from '@/components/ui/onboarding/onboarding-welcome-dialog'
+import { DEFAULT_ONBOARDING_FLOW_ID } from '@/features/onboarding/flows/registry'
+import { getStoredOnboardingStep } from '@/features/onboarding/onboarding-progress'
 import { useOnboardingTour } from '@/features/onboarding/use-onboarding-tour'
 import { shouldOfferOnboarding } from '@/features/onboarding/onboarding-state'
 import { isCandidateFlowPath } from '@/i18n/html-lang'
@@ -21,10 +24,12 @@ import { useTranslations } from 'next-intl'
 
 type OnboardingContextValue = {
   replayTour: () => Promise<void>
+  canReplayTour: boolean
 }
 
 const OnboardingContext = createContext<OnboardingContextValue>({
   replayTour: async () => {},
+  canReplayTour: true,
 })
 
 export function useOnboardingReplay() {
@@ -44,6 +49,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
   const t = useTranslations('onboarding')
+  const [onboardingOfferDismissed, setOnboardingOfferDismissed] = useState(false)
 
   const runtimeContext = useMemo(
     () => ({
@@ -54,19 +60,33 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
   )
 
   const persistOnboarding = useCallback(
-    async (status: 'completed' | 'skipped') => {
+    async (status: 'completed' | 'skipped'): Promise<boolean> => {
       try {
         await completeOnboarding(status)
+        return true
       } catch {
         notifyError(t('errors.persistFailed'))
+        return false
       }
     },
     [completeOnboarding, t],
   )
 
+  const handleTourSkip = useCallback(async () => {
+    if (!shouldOfferOnboarding(user)) {
+      return
+    }
+
+    setOnboardingOfferDismissed(true)
+    const persisted = await persistOnboarding('skipped')
+    if (!persisted) {
+      setOnboardingOfferDismissed(false)
+    }
+  }, [persistOnboarding, user])
+
   const tour = useOnboardingTour({
     context: runtimeContext,
-    onTourSkip: () => persistOnboarding('skipped'),
+    onTourSkip: handleTourSkip,
   })
 
   const {
@@ -82,10 +102,16 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
   } = tour
 
   const shouldAutoStart =
-    isStaffAppPath(pathname) && shouldOfferOnboarding(user)
+    isStaffAppPath(pathname) &&
+    shouldOfferOnboarding(user) &&
+    !onboardingOfferDismissed
 
   useEffect(() => {
     if (!shouldAutoStart || phase !== 'idle') {
+      return
+    }
+
+    if (getStoredOnboardingStep(DEFAULT_ONBOARDING_FLOW_ID)) {
       return
     }
 
@@ -98,8 +124,16 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     }
   }, [stopTour])
 
+  const replayContextValue = useMemo(
+    () => ({
+      replayTour,
+      canReplayTour: phase === 'idle',
+    }),
+    [replayTour, phase],
+  )
+
   return (
-    <OnboardingContext.Provider value={{ replayTour }}>
+    <OnboardingContext.Provider value={replayContextValue}>
       {phase === 'welcome' ? (
         <OnboardingWelcomeDialog
           title={welcomeCopy.title}
@@ -107,7 +141,10 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
           startLabel={welcomeCopy.startLabel}
           skipLabel={welcomeCopy.skipLabel}
           onStart={() => void startFromWelcome()}
-          onSkip={() => void skipFromWelcome()}
+          onSkip={() => {
+            setOnboardingOfferDismissed(true)
+            void skipFromWelcome()
+          }}
         />
       ) : null}
 
@@ -117,9 +154,22 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
           description={completeCopy.description}
           actionLabel={completeCopy.actionLabel}
           onAction={() => {
-            void persistOnboarding('completed')
-            dismissComplete()
-            router.push('/')
+            void (async () => {
+              if (!shouldOfferOnboarding(user)) {
+                dismissComplete()
+                return
+              }
+
+              setOnboardingOfferDismissed(true)
+              const persisted = await persistOnboarding('completed')
+              if (!persisted) {
+                setOnboardingOfferDismissed(false)
+                return
+              }
+
+              dismissComplete()
+              router.push('/')
+            })()
           }}
         />
       ) : null}

@@ -29,7 +29,7 @@ const journeySteps = [
 ] as const
 
 export function OnboardingCompleteJourney() {
-  const t = useTranslations('onboarding.welcome')
+  const t = useTranslations('onboarding.complete')
 
   return (
     <div className={journeyTrackVariants()}>

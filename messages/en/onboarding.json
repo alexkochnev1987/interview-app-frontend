@@ -21,7 +21,11 @@
       "recapQuestions": "Build and enrich questions with AI Draft",
       "recapInterviews": "Assemble interviews from your question bank",
       "recapCandidates": "Share secure candidate links",
-      "recapAssessments": "Review and AI-score completed interviews"
+      "recapAssessments": "Review and AI-score completed interviews",
+      "journeyQuestions": "Questions",
+      "journeyAi": "AI Draft",
+      "journeyInterviews": "Interviews",
+      "journeyAssessments": "AI review"
     },
     "tour": {
       "next": "Next",

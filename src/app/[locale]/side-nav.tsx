@@ -51,7 +51,7 @@ import { useOnboardingReplay } from '@/features/onboarding/onboarding-provider'
 export function SideNav() {
   const { user, logout } = useAuth()
   const isDemo = useIsDemo()
-  const { replayTour } = useOnboardingReplay()
+  const { replayTour, canReplayTour } = useOnboardingReplay()
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const locale = useLocale() as Locale
@@ -184,6 +184,7 @@ export function SideNav() {
                   size="sm"
                   effects="blur"
                   width="full"
+                  disabled={!canReplayTour}
                   onClick={() => void replayTour()}
                 >
                   {tOnboarding('tour.replay')}

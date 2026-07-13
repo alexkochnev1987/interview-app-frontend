@@ -6,16 +6,13 @@ import { DEFAULT_ONBOARDING_FLOW_ID } from '@/features/onboarding/flows/registry
 import {
   getStoredOnboardingCreatedQuestionId,
   getStoredOnboardingStep,
+  subscribeOnboardingProgress,
 } from '@/features/onboarding/onboarding-progress'
-
-function emptySubscribe() {
-  return () => {}
-}
 
 export function useOnboardingCreatedQuestionId(): string | null {
   const getSnapshot = useCallback(() => getStoredOnboardingCreatedQuestionId(), [])
 
-  return useSyncExternalStore(emptySubscribe, getSnapshot, () => null)
+  return useSyncExternalStore(subscribeOnboardingProgress, getSnapshot, () => null)
 }
 
 function readAssessmentsCardHighlight(
@@ -40,5 +37,5 @@ export function useOnboardingAssessmentsCardHighlight(
     [interviewId],
   )
 
-  return useSyncExternalStore(emptySubscribe, getSnapshot, () => null)
+  return useSyncExternalStore(subscribeOnboardingProgress, getSnapshot, () => null)
 }

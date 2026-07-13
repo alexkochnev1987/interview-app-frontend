@@ -16,6 +16,7 @@ export const staffFirstLoginFlow: OnboardingFlowConfig = {
       route: '/',
       target: '[data-tour="dashboard-hero"]',
       contentKey: 'dashboardHero',
+      lockPopoverPlacement: 'bottom-start',
       ...pageTourStepDefaults,
     },
     {

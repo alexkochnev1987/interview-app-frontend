@@ -9,6 +9,26 @@ type StoredOnboardingProgress = {
   createdQuestionId?: string
 }
 
+type OnboardingProgressListener = () => void
+
+const listeners = new Set<OnboardingProgressListener>()
+
+export function subscribeOnboardingProgress(
+  listener: OnboardingProgressListener,
+): () => void {
+  listeners.add(listener)
+
+  return () => {
+    listeners.delete(listener)
+  }
+}
+
+function notifyOnboardingProgressListeners() {
+  for (const listener of listeners) {
+    listener()
+  }
+}
+
 function readStoredProgress(): StoredOnboardingProgress | null {
   if (typeof window === 'undefined') return null
 
@@ -19,6 +39,7 @@ function readStoredProgress(): StoredOnboardingProgress | null {
     return JSON.parse(raw) as StoredOnboardingProgress
   } catch {
     window.sessionStorage.removeItem(STORAGE_KEY)
+    notifyOnboardingProgressListeners()
     return null
   }
 }
@@ -27,6 +48,7 @@ function writeStoredProgress(progress: StoredOnboardingProgress) {
   if (typeof window === 'undefined') return
 
   window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(progress))
+  notifyOnboardingProgressListeners()
 }
 
 export function getStoredOnboardingStep(
@@ -62,26 +84,24 @@ export function storeOnboardingStep(flowId: OnboardingFlowId, stepId: string) {
 
 export function storeOnboardingCreatedQuestionId(questionId: string) {
   const existing = readStoredProgress()
+  if (!existing) return
 
   writeStoredProgress({
-    flowId: existing?.flowId ?? 'staff-first-login',
-    stepId: existing?.stepId ?? 'interview-select',
-    stepRoutes: existing?.stepRoutes,
+    ...existing,
     createdQuestionId: questionId,
   })
 }
 
 export function storeOnboardingStepRoute(stepId: string, route: string) {
   const existing = readStoredProgress()
+  if (!existing) return
 
   writeStoredProgress({
-    flowId: existing?.flowId ?? 'staff-first-login',
-    stepId: existing?.stepId ?? stepId,
+    ...existing,
     stepRoutes: {
-      ...existing?.stepRoutes,
+      ...existing.stepRoutes,
       [stepId]: route,
     },
-    createdQuestionId: existing?.createdQuestionId,
   })
 }
 
@@ -89,4 +109,5 @@ export function clearStoredOnboardingStep() {
   if (typeof window === 'undefined') return
 
   window.sessionStorage.removeItem(STORAGE_KEY)
+  notifyOnboardingProgressListeners()
 }

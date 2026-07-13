@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils'
 const overlayVariants = cva('fixed inset-0', {
   variants: {
     layer: {
-      default: 'z-50 bg-scrim/55',
+      default: 'z-50 bg-scrim/55 backdrop-blur-sm',
       tour: 'z-[1000000001] bg-black/45',
     },
   },

@@ -21,7 +21,11 @@
       "recapQuestions": "Tworzyć i wzbogacać pytania z AI Draft",
       "recapInterviews": "Składać interview z bazy pytań",
       "recapCandidates": "Udostępniać bezpieczne linki dla kandydatów",
-      "recapAssessments": "Przeglądać i oceniać interview z pomocą AI"
+      "recapAssessments": "Przeglądać i oceniać interview z pomocą AI",
+      "journeyQuestions": "Pytania",
+      "journeyAi": "AI Draft",
+      "journeyInterviews": "Interview",
+      "journeyAssessments": "Ocena AI"
     },
     "tour": {
       "next": "Dalej",

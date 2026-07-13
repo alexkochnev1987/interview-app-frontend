@@ -12,6 +12,8 @@ import {
 import { storeOnboardingCreatedQuestionId } from '@/features/onboarding/onboarding-progress';
 import { DEFAULT_STAGE_RADIUS } from '@/features/onboarding/create-onboarding-driver';
 
+const ONBOARDING_POPOVER_GAP = 16;
+
 function resolveInputElement(element: Element | undefined): HTMLInputElement | HTMLTextAreaElement | null {
   if (
     element instanceof HTMLInputElement
@@ -73,17 +75,23 @@ export function buildDriverSteps({
     step: ResolvedOnboardingStep,
   ) => {
     window.requestAnimationFrame(() => {
-      const applyLockedPlacement = () => {
+      const applyPopoverPlacement = () => {
         if (step.lockPopoverPlacement === 'bottom-start') {
           lockPopoverBelowTarget(element, driver, 'start');
-        } else if (step.lockPopoverPlacement === 'bottom-end') {
-          lockPopoverBelowTarget(element, driver, 'end');
+          return;
         }
+
+        if (step.lockPopoverPlacement === 'bottom-end') {
+          lockPopoverBelowTarget(element, driver, 'end');
+          return;
+        }
+
+        enforcePopoverGap(element, driver);
       };
 
       const refresh = () => {
         driver.refresh();
-        applyLockedPlacement();
+        window.requestAnimationFrame(applyPopoverPlacement);
       };
 
       if (step.preservePageTop) {
@@ -104,7 +112,10 @@ export function buildDriverSteps({
     driver: Driver,
     expectedIndex: number,
   ): Promise<void> => {
-    for (let frame = 0; frame < 60; frame += 1) {
+    const maxFrames = 30;
+    let stableFrames = 0;
+
+    for (let frame = 0; frame < maxFrames; frame += 1) {
       await new Promise<void>((resolve) => {
         window.requestAnimationFrame(() => resolve());
       });
@@ -114,13 +125,12 @@ export function buildDriverSteps({
       }
 
       if (driver.getActiveIndex() === expectedIndex) {
-        await new Promise<void>((resolve) => {
-          window.requestAnimationFrame(() => resolve());
-        });
-        await new Promise<void>((resolve) => {
-          window.requestAnimationFrame(() => resolve());
-        });
-        return;
+        stableFrames += 1;
+        if (stableFrames >= 2) {
+          return;
+        }
+      } else {
+        stableFrames = 0;
       }
     }
   };
@@ -167,8 +177,8 @@ export function buildDriverSteps({
 
       const targetRect = element.getBoundingClientRect();
       const wrapperRect = wrapper.getBoundingClientRect();
-      const viewportPadding = 16;
-      const gap = 14;
+      const viewportPadding = ONBOARDING_POPOVER_GAP;
+      const gap = ONBOARDING_POPOVER_GAP;
       const preferredLeft =
         align === 'end'
           ? targetRect.right - wrapperRect.width
@@ -201,6 +211,62 @@ export function buildDriverSteps({
         );
       }
     });
+  };
+
+  const enforcePopoverGap = (
+    element: Element | undefined,
+    driver: Driver,
+    minGap = ONBOARDING_POPOVER_GAP,
+  ) => {
+    if (!element) return;
+
+    const popover = driver.getState('popover') as
+      | { wrapper?: HTMLElement }
+      | undefined;
+    const wrapper = popover?.wrapper;
+    if (!wrapper) return;
+
+    const targetRect = element.getBoundingClientRect();
+    const popoverRect = wrapper.getBoundingClientRect();
+    const targetCenterX = targetRect.left + targetRect.width / 2;
+    const targetCenterY = targetRect.top + targetRect.height / 2;
+    const popoverCenterX = popoverRect.left + popoverRect.width / 2;
+    const popoverCenterY = popoverRect.top + popoverRect.height / 2;
+    const dx = popoverCenterX - targetCenterX;
+    const dy = popoverCenterY - targetCenterY;
+
+    if (Math.abs(dx) > Math.abs(dy)) {
+      if (dx > 0) {
+        const gap = popoverRect.left - targetRect.right;
+        if (gap < minGap) {
+          wrapper.style.left = `${targetRect.right + minGap}px`;
+          wrapper.style.right = 'auto';
+        }
+      } else {
+        const gap = targetRect.left - popoverRect.right;
+        if (gap < minGap) {
+          wrapper.style.left = `${targetRect.left - minGap - popoverRect.width}px`;
+          wrapper.style.right = 'auto';
+        }
+      }
+
+      return;
+    }
+
+    if (dy > 0) {
+      const gap = popoverRect.top - targetRect.bottom;
+      if (gap < minGap) {
+        wrapper.style.top = `${targetRect.bottom + minGap}px`;
+        wrapper.style.bottom = 'auto';
+      }
+      return;
+    }
+
+    const gap = targetRect.top - popoverRect.bottom;
+    if (gap < minGap) {
+      wrapper.style.top = `${targetRect.top - minGap - popoverRect.height}px`;
+      wrapper.style.bottom = 'auto';
+    }
   };
 
   const applyStageRadius = (driver: Driver, radius?: number) => {

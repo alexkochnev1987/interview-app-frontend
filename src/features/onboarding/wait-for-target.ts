@@ -1,12 +1,37 @@
 const DEFAULT_WAIT_TIMEOUT_MS = 2000;
 const MAX_LAYOUT_FRAMES = 12;
 
+function isVisibleTourTarget(element: Element): boolean {
+  const rect = element.getBoundingClientRect();
+  if (rect.width <= 0 || rect.height <= 0) {
+    return false;
+  }
+
+  const style = window.getComputedStyle(element);
+  return style.visibility !== 'hidden' && style.display !== 'none';
+}
+
 export function queryTourTarget(selector: string): Element | null {
   if (typeof document === 'undefined') {
     return null;
   }
 
-  return document.querySelector(selector);
+  const matches = document.querySelectorAll(selector);
+  if (matches.length === 0) {
+    return null;
+  }
+
+  if (matches.length === 1) {
+    return matches[0] ?? null;
+  }
+
+  for (const element of matches) {
+    if (isVisibleTourTarget(element)) {
+      return element;
+    }
+  }
+
+  return matches[0] ?? null;
 }
 
 function rectsAreStable(previous: DOMRect, next: DOMRect) {

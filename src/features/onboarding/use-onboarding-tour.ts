@@ -63,19 +63,6 @@ export function useOnboardingTour({
     pathnameRef.current = pathname
   }, [pathname])
 
-  useEffect(() => {
-    if (phase !== 'touring') {
-      return
-    }
-
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-
-    return () => {
-      document.body.style.overflow = previousOverflow
-    }
-  }, [phase])
-
   const prepareStep = useCallback(
     async (step: ResolvedOnboardingStep, detail?: OnboardingEventDetail) =>
       prepareOnboardingStep({
@@ -203,9 +190,13 @@ export function useOnboardingTour({
   }, [onTourSkip])
 
   const replayTour = useCallback(async () => {
+    if (phase !== 'idle') {
+      return
+    }
+
     clearStoredOnboardingStep()
     await runTour({ skipWelcome: true })
-  }, [runTour])
+  }, [phase, runTour])
 
   const dismissComplete = useCallback(() => {
     setPhase('idle')
