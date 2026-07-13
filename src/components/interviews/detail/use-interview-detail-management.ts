@@ -1,10 +1,12 @@
 'use client'
 
 import { useCallback, useState } from 'react'
-import { runPostDeleteInterviewSuccess } from '@/lib/interview-delete-flow'
+import { useQueryClient } from '@tanstack/react-query'
+
+import { interviewsRootQueryKey } from '@/components/interviews/library/query-keys'
 import { useRouter } from '@/i18n/navigation'
 import { cancelInterview, deleteInterview, type Interview } from '@/lib/api'
-import { runPostCancelInterviewSuccess } from '@/lib/interview-cancel-flow'
+import { runPostInterviewRemovalSuccess } from '@/lib/interview-removal-flow'
 import { runMutation } from '@/lib/run-mutation'
 import { useToastMessages } from '@/lib/use-toast-messages'
 
@@ -18,7 +20,12 @@ export function useInterviewDetailManagement({
   onInterviewUpdated,
 }: UseInterviewDetailManagementOptions) {
   const router = useRouter()
+  const queryClient = useQueryClient()
   const toastMessages = useToastMessages()
+
+  const invalidateInterviews = useCallback(() => {
+    void queryClient.invalidateQueries({ queryKey: interviewsRootQueryKey() })
+  }, [queryClient])
   const [isEditing, setIsEditing] = useState(false)
   const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false)
   const [canceling, setCanceling] = useState(false)
@@ -52,10 +59,10 @@ export function useInterviewDetailManagement({
         successMessage: toastMessages.interview.cancelSuccess,
         errorMessage: toastMessages.interview.cancelError,
       })
-      runPostCancelInterviewSuccess({
+      runPostInterviewRemovalSuccess({
         closeConfirm: () => setCancelConfirmOpen(false),
         push: router.push,
-        refresh: router.refresh,
+        invalidateInterviews,
       })
     } catch {
       /* toast handled by runMutation */
@@ -66,6 +73,7 @@ export function useInterviewDetailManagement({
     canceling,
     interviewId,
     router,
+    invalidateInterviews,
     toastMessages.interview.cancelError,
     toastMessages.interview.cancelSuccess,
   ])
@@ -80,10 +88,10 @@ export function useInterviewDetailManagement({
         successMessage: toastMessages.interview.deleteSuccess,
         errorMessage: toastMessages.interview.deleteError,
       })
-      runPostDeleteInterviewSuccess({
+      runPostInterviewRemovalSuccess({
         closeConfirm: () => setDeleteConfirmOpen(false),
         push: router.push,
-        refresh: router.refresh,
+        invalidateInterviews,
       })
     } catch {
       /* toast handled by runMutation */
@@ -91,11 +99,12 @@ export function useInterviewDetailManagement({
       setDeleting(false)
     }
   }, [
-      deleting,
-      interviewId,
-      router,
-      toastMessages.interview.deleteError,
-      toastMessages.interview.deleteSuccess
+    deleting,
+    interviewId,
+    invalidateInterviews,
+    router,
+    toastMessages.interview.deleteError,
+    toastMessages.interview.deleteSuccess,
   ])
 
 

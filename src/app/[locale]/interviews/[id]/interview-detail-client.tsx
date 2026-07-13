@@ -227,12 +227,12 @@ export default function InterviewDetailClient({
         }}
       />
       <InterviewDetailDeleteDialog
-          open={deleteConfirmOpen}
-          loading={deleting}
-          onConfirm={() => void handleDeleteInterview()}
-          onCancel={() => {
-            if (!deleting) setDeleteConfirmOpen(false)
-          }}
+        open={deleteConfirmOpen}
+        loading={deleting}
+        onConfirm={() => void handleDeleteInterview()}
+        onCancel={() => {
+          if (!deleting) setDeleteConfirmOpen(false)
+        }}
       />
     </PageShell>
   )
