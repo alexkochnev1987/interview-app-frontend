@@ -53,8 +53,8 @@ export function AuthProvider({
     setUser(sessionUser);
   };
 
-  const completeOnboarding = async (status?: CompleteOnboardingStatus) => {
-    const updatedUser = await apiCompleteOnboarding(status ? { status } : undefined);
+  const completeOnboarding = async (_status?: CompleteOnboardingStatus) => {
+    const updatedUser = await apiCompleteOnboarding();
     setUser(updatedUser);
     return updatedUser;
   };

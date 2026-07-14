@@ -67,8 +67,7 @@ export type AuthUserResponseDto = Schemas['AuthUserResponseDto'];
 export type MeResponse = AuthUserResponseDto;
 export type LoginPayload = Schemas['LoginDto'];
 export type LogoutResponse = Schemas['LogoutResponseDto'];
-export type CompleteOnboardingPayload = Schemas['CompleteOnboardingDto'];
-export type CompleteOnboardingStatus = NonNullable<CompleteOnboardingPayload['status']>;
+export type CompleteOnboardingStatus = 'completed' | 'skipped';
 export type FeedbackResponse = Schemas['FeedbackResponseDto'];
 
 export type QuestionExpectedConcept = Schemas['QuestionExpectedConceptDto'];
@@ -375,13 +374,10 @@ export async function logout(): Promise<LogoutResponse> {
   return handle(client.POST('/auth/logout', LOCALIZED_HEADERS));
 }
 
-export async function completeOnboarding(
-  body?: CompleteOnboardingPayload,
-): Promise<AuthUserResponseDto> {
+export async function completeOnboarding(): Promise<AuthUserResponseDto> {
   return handle(
     client.PATCH('/auth/me/onboarding', {
       ...LOCALIZED_HEADERS,
-      body: body ?? {},
     }),
   );
 }
