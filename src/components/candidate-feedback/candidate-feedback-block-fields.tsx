@@ -105,11 +105,12 @@ export function CandidateFeedbackBlockFields({
     if (generatedSnapshotKey === lastGeneratedSnapshotKeyRef.current) return
     lastGeneratedSnapshotKeyRef.current = generatedSnapshotKey
     if (!generatedSnapshotKey) return
+    /* eslint-disable react-hooks/set-state-in-effect -- reset working copy when a new AI snapshot arrives */
     setDismissedRecommendation(false)
     setDismissedImprovement(false)
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- reset working copy when a new AI snapshot arrives
     setRecommendationText('')
     setImprovementText('')
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [generatedSnapshotKey])
 
   const showRecommendationSuggestion =

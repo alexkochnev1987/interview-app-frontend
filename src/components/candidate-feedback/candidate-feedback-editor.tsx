@@ -21,6 +21,7 @@ import { Stack } from '@/components/ui/layout/stack'
 import { BodyText, SectionHeading } from '@/components/ui/text'
 import { EmptyStateCard } from '@/components/ui/state-card'
 import {
+  ApiError,
   generateCandidateFeedbackAll,
   generateCandidateFeedbackQuestion,
   updateCandidateFeedback,
@@ -39,7 +40,9 @@ import {
   isQuestionBlockGenerationBusy,
   parseCandidateFeedbackErrorMessage,
 } from '@/lib/candidate-feedback'
+import { getErrorMessage as getApiErrorMessage } from '@/lib/api-error'
 import { runMutation } from '@/lib/run-mutation'
+import { notifyError } from '@/lib/toast'
 import { useCandidateFeedbackToastMessages } from '@/lib/toast-messages/use-candidate-feedback-toast-messages'
 
 interface CandidateFeedbackEditorProps {
@@ -132,9 +135,20 @@ export function CandidateFeedbackEditor({
   ) {
     setGeneratingTarget(target)
     try {
-      await runMutation(() => applyGenerationUpdate(mutation), toast)
-    } catch {
-      /* toast handled by runMutation */
+      await runMutation(() => applyGenerationUpdate(mutation), {
+        ...toast,
+        showErrorToast: false,
+      })
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 409) {
+        // Race before GET reflects generating; sync quietly — buttons are disabled once state catches up.
+        kick()
+        void refresh()
+        return
+      }
+      notifyError(toast.errorMessage, {
+        description: getApiErrorMessage(err),
+      })
     } finally {
       setGeneratingTarget(null)
     }

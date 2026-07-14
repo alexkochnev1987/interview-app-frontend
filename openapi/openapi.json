@@ -5352,7 +5352,7 @@
       "post": {
         "operationId": "CandidateFeedbackController_generateAllCandidateFeedback",
         "summary": "Generate candidate-facing feedback for the whole interview",
-        "description": "Loops question blocks sequentially (skips accepted/edited), then regenerates overall from best-available per-question texts. Overall accepted/edited blocks are not overwritten.",
+        "description": "Starts generation in the background and returns immediately with queued/skipped plan. Poll GET `/interviews/{id}/candidate-feedback` for `generating` → `generated` progress. Locked accepted/edited blocks are not overwritten.",
         "parameters": [
           {
             "name": "id",
@@ -5424,6 +5424,16 @@
             }
           },
           "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "409": {
             "description": "",
             "content": {
               "application/json": {
@@ -9186,6 +9196,7 @@
           "status": {
             "type": "string",
             "enum": [
+              "queued",
               "generated",
               "skipped",
               "failed"
@@ -9221,6 +9232,7 @@
           "status": {
             "type": "string",
             "enum": [
+              "queued",
               "generated",
               "skipped",
               "failed"

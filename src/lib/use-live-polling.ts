@@ -48,6 +48,7 @@ export function useLivePolling<T>(
   const [visible, setVisible] = useState(true)
   if (syncedFrom !== initial) {
     setSyncedFrom(initial)
+    // eslint-disable-next-line react-hooks/refs -- bump poll generation when authoritative initial changes
     dataVersionRef.current += 1
     setData(initial)
     // Fresh authoritative data clears any prior pause/kick state so a lingering

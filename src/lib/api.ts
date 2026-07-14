@@ -13,7 +13,6 @@ import {
   createEmptyCandidateFeedback,
   mapCandidateFeedbackFromApi,
   parseCandidateFeedbackBody,
-  unwrapCandidateFeedbackPayload,
   type ApiCandidateFeedbackDto,
   type CandidateFeedbackResponse,
   type UpdateCandidateFeedbackPayload,
@@ -673,34 +672,6 @@ export async function updateCandidateFeedback(
   return parseCandidateFeedbackBody(body, id, interviewLocale);
 }
 
-async function parseCandidateFeedbackPostResponse(
-  interviewId: string,
-  interviewLocale: Locale,
-  path: string,
-  res: Response,
-): Promise<CandidateFeedbackResponse> {
-  if (!res.ok) {
-    const body = await res.text();
-    const { code, params } = extractApiErrorFieldsFromBody(body);
-    throw new ApiError(res.status, messageFromBody(body, res.status), path, body, code, params);
-  }
-
-  const body = await res.text();
-  if (!body) {
-    return getCandidateFeedback(interviewId, interviewLocale);
-  }
-
-  const parsed = JSON.parse(body) as unknown
-  const dto = unwrapCandidateFeedbackPayload(parsed)
-  return mapCandidateFeedbackFromApi(
-    {
-      ...dto,
-      interviewId: dto.interviewId ?? interviewId,
-    },
-    interviewLocale,
-  )
-}
-
 export async function generateCandidateFeedbackQuestion(
   interviewId: string,
   questionIndex: number,
@@ -731,12 +702,14 @@ export async function generateCandidateFeedbackAll(
     credentials: 'include',
   });
 
-  return parseCandidateFeedbackPostResponse(
-    interviewId,
-    interviewLocale,
-    path,
-    res,
-  );
+  if (!res.ok) {
+    const body = await res.text();
+    const { code, params } = extractApiErrorFieldsFromBody(body);
+    throw new ApiError(res.status, messageFromBody(body, res.status), path, body, code, params);
+  }
+
+  // POST only enqueues work; poll GET for generating → generated progress.
+  return getCandidateFeedback(interviewId, interviewLocale);
 }
 
 
