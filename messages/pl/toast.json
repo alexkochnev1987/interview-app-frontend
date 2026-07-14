@@ -33,6 +33,15 @@
       "deleteSuccess": "Interview zostało pomyślnie usunięte",
       "deleteError": "Nie udało się usunąć interview"
     },
+    "candidateFeedback": {
+      "acceptSuccess": "Sugestia zaakceptowana",
+      "applyAllSuccess": "Wszystkie sugestie zastosowano",
+      "acceptError": "Nie udało się zaakceptować sugestii",
+      "saveSuccess": "Informacja zwrotna zapisana",
+      "saveError": "Nie udało się zapisać informacji zwrotnej",
+      "generateStartSuccess": "Rozpoczęto generowanie",
+      "generateStartError": "Nie udało się rozpocząć generowania"
+    },
     "interviewsLibrary": {
       "loadFailedFallback": "Nie udało się załadować interview."
     },
@@ -106,6 +115,13 @@
       "feedback": {
         "unavailableTitle": "Feedback niedostępny",
         "loadFailedFallback": "Nie udało się załadować"
+      },
+      "candidateFeedback": {
+        "forbiddenTitle": "Brak dostępu do informacji zwrotnej dla kandydata",
+        "forbiddenDescription": "Edycja informacji zwrotnej dla kandydata jest dostępna tylko dla użytkowników HR, admin i super-admin. Jeśli to pomyłka, skontaktuj się z właścicielem przestrzeni roboczej.",
+        "unavailableTitle": "Informacja zwrotna dla kandydata jest niedostępna",
+        "loadFailedFallback": "Nie udało się załadować informacji zwrotnej dla kandydata.",
+        "notFoundFallback": "Nie udało się załadować żądanego wywiadu."
       },
       "team": {
         "forbiddenTitle": "Brak dostępu do zarządzania zespołem",
