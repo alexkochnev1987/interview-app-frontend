@@ -261,6 +261,26 @@ async function handleRequest(req, res) {
       return
     }
 
+    if (method === 'DELETE' && !action) {
+      if (isDemoSession(req)) {
+        json(res, 403, { message: 'Forbidden', statusCode: 403 })
+        return
+      }
+
+      if (current.status !== 'completed' && current.status !== 'failed') {
+        json(res, 409, {
+          message:
+            'Interview can only be deleted while status is completed or failed',
+          statusCode: 409,
+        })
+        return
+      }
+
+      interviews = interviews.filter((item) => item.id !== id)
+      json(res, 200, { id, deleted: true })
+      return
+    }
+
     if (method === 'PATCH' && !action) {
       const body = await readJsonBody(req)
       const updated = {

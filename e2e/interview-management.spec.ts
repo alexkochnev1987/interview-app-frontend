@@ -49,6 +49,7 @@ test.describe('interview management', () => {
     await expect(page.getByRole('heading', { name: 'Pending Candidate' })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Edit interview' })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Cancel interview' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Delete interview' })).toHaveCount(0)
   })
 
   test('canceling a pending interview returns to the dashboard', async ({ page }) => {
@@ -75,5 +76,56 @@ test.describe('interview management', () => {
     await expect(page.getByRole('heading', { name: 'Active Candidate' })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Edit interview' })).toHaveCount(0)
     await expect(page.getByRole('button', { name: 'Cancel interview' })).toHaveCount(0)
+    await expect(page.getByRole('button', { name: 'Delete interview' })).toHaveCount(0)
+  })
+
+  test('completed interview exposes delete action', async ({ page }) => {
+    await loginAsAdmin(page)
+    await page.goto('/interviews/iv-completed')
+
+    await expect(page.getByRole('heading', { name: 'Completed Candidate' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Delete interview' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Cancel interview' })).toHaveCount(0)
+  })
+
+  test('failed interview exposes delete action', async ({ page }) => {
+    await loginAsAdmin(page)
+    await page.goto('/interviews/iv-failed')
+
+    await expect(page.getByRole('heading', { name: 'Failed Candidate' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Delete interview' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Cancel interview' })).toHaveCount(0)
+  })
+
+  test('deleting a completed interview returns to the dashboard', async ({ page }) => {
+    await loginAsAdmin(page)
+    await page.goto('/interviews/iv-completed')
+
+    await expect(page.getByRole('heading', { name: 'Completed Candidate' })).toBeVisible()
+    await page.getByRole('button', { name: 'Delete interview' }).click()
+    await expect(page.getByRole('dialog')).toContainText('Delete this interview?')
+
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: 'Delete interview' })
+      .click()
+
+    await expect(page).toHaveURL(/\/$/)
+    await expect(page.getByText('Recruiter Dashboard')).toBeVisible()
+  })
+
+  test('demo user sees a disabled delete button on completed interviews', async ({
+    page,
+  }) => {
+    await page.goto('/login')
+    await page.getByTestId('login-demo').click()
+    await expect(page).not.toHaveURL(/\/login(\?|$)/, { timeout: 15_000 })
+
+    await page.goto('/interviews/iv-completed')
+    await expect(page.getByRole('heading', { name: 'Completed Candidate' })).toBeVisible()
+
+    const deleteButton = page.getByRole('button', { name: 'Delete interview' })
+    await expect(deleteButton).toBeVisible()
+    await expect(deleteButton).toBeDisabled()
   })
 })

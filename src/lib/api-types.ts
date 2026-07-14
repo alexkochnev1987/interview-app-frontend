@@ -487,7 +487,8 @@ export interface paths {
         get: operations["InterviewController_findOne"];
         put?: never;
         post?: never;
-        delete?: never;
+        /** Delete completed or failed interview */
+        delete: operations["InterviewController_deleteCompleted"];
         options?: never;
         head?: never;
         /** Update pending interview */
@@ -1667,6 +1668,11 @@ export interface components {
             id: string;
             /** @example true */
             canceled: boolean;
+        };
+        InterviewDeleteResponseDto: {
+            id: string;
+            /** @example true */
+            deleted: boolean;
         };
         UpdateInterviewDto: {
             candidateName?: string;
@@ -3438,6 +3444,54 @@ export interface operations {
                 };
             };
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    InterviewController_deleteCompleted: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterviewDeleteResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

@@ -25,7 +25,7 @@ import {
   getCandidateInitials,
 } from '@/lib/interview-formatters'
 import { isHrVisibleAssessment } from '@/lib/assessment-status'
-import { canEditInterview, canManageInterview } from '@/lib/interview-management'
+import { canDeleteInterview, canEditInterview, canManageInterview } from '@/lib/interview-management'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
 
 interface InterviewSummaryCardProps {
@@ -39,8 +39,10 @@ interface InterviewSummaryCardProps {
   onValidate: () => void
   isEditing: boolean
   canceling: boolean
+  deleting: boolean
   onStartEditing: () => void
   onOpenCancelConfirm: () => void
+  onOpenDeleteConfirm: () => void
 }
 
 export function InterviewSummaryCard({
@@ -54,8 +56,10 @@ export function InterviewSummaryCard({
   onValidate,
   isEditing,
   canceling,
+  deleting,
   onStartEditing,
   onOpenCancelConfirm,
+  onOpenDeleteConfirm
 }: InterviewSummaryCardProps) {
   const t = useTranslations('questions.common')
   const tDetail = useTranslations('interviews.detail')
@@ -65,6 +69,7 @@ export function InterviewSummaryCard({
 
   const canEdit = canEditInterview(interview)
   const canManage = canManageInterview(interview)
+  const canDelete = canDeleteInterview(interview)
 
   const editButton =
     canEdit && !isEditing ? (
@@ -80,6 +85,15 @@ export function InterviewSummaryCard({
       <DemoWriteGuard disabled={canceling}>
         <Button type="button" variant="destructive" onClick={onOpenCancelConfirm}>
           {canceling ? tActions('canceling') : tActions('cancelInterview')}
+        </Button>
+      </DemoWriteGuard>
+    ) : null
+
+  const deleteButton =
+    canDelete && !isEditing ? (
+      <DemoWriteGuard disabled={deleting}>
+        <Button type="button" variant="destructive" onClick={onOpenDeleteConfirm}>
+          {deleting ? tActions('deleting') : tActions('deleteInterview')}
         </Button>
       </DemoWriteGuard>
     ) : null
@@ -116,7 +130,7 @@ export function InterviewSummaryCard({
       </BodyText>
     ) : null
 
-  const hasManagementActions = Boolean(editButton || cancelButton)
+  const hasManagementActions = Boolean(editButton || cancelButton || deleteButton)
 
   const backLink = (
     <UnstyledLink href="/">
@@ -146,6 +160,7 @@ export function InterviewSummaryCard({
               <Inline gap={3} wrap="wrap" justify="end" width="full">
                 {editButton}
                 {cancelButton}
+                {deleteButton}
               </Inline>
             ) : null}
             {managementNotice}
@@ -157,6 +172,7 @@ export function InterviewSummaryCard({
               <Inline gap={3} wrap="wrap" justify="end">
                 {editButton}
                 {cancelButton}
+                {deleteButton}
                 {headerActions}
               </Inline>
               {managementNotice}
