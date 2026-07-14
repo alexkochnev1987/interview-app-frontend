@@ -15,7 +15,7 @@ export function DemoModeBanner() {
   }
 
   return (
-    <PageShell as="div" spacing="compact" padding="compact">
+    <PageShell as="div" spacing="compact" padding="compact" data-testid="demo-mode-banner">
       <Alert variant="warning">
         <AlertTitle>{t('demoMode.bannerTitle')}</AlertTitle>
         <AlertDescription>{t('demoMode.bannerDescription')}</AlertDescription>

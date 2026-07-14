@@ -8,7 +8,7 @@ import {
 
 const MOCK_API_BASE =
   process.env.BACKEND_URL ??
-  `http://localhost:${process.env.E2E_MOCK_API_PORT ?? '3000'}`
+  `http://127.0.0.1:${process.env.E2E_MOCK_API_PORT ?? '3000'}`
 
 test.describe('interview management', () => {
   test.beforeEach(async ({ request }) => {

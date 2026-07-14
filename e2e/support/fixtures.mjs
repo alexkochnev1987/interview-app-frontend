@@ -16,6 +16,7 @@ export function authUser(overrides = {}) {
     name: 'E2E Admin',
     role: 'admin',
     organizationId: 'org-e2e',
+    demo: false,
     createdAt: ISO,
     ...overrides,
   }
@@ -84,10 +85,52 @@ export function createInitialInterviews() {
   ]
 }
 
-export const EMPTY_FACETS = {
+export const EMPTY_QUESTION_FACETS = {
   difficulties: [],
   categories: [],
   subcategories: [],
   roles: [],
   tags: [],
+}
+
+export const EMPTY_INTERVIEW_FACETS = {
+  positions: [],
+  statuses: [],
+  totalQuestionCount: 0,
+}
+
+export function toInterviewListItem(item) {
+  const submittedAnswerCount = item.answers.filter(
+    (answer) => answer.status === 'submitted',
+  ).length
+
+  return {
+    id: item.id,
+    candidateName: item.candidateName,
+    position: item.position,
+    status: item.status,
+    questionCount: item.questions.length,
+    submittedAnswerCount,
+    createdAt: item.createdAt,
+    updatedAt: item.updatedAt,
+  }
+}
+
+export function buildInterviewFacets(items) {
+  const positions = new Map()
+  const statuses = new Map()
+
+  for (const item of items) {
+    positions.set(item.position, (positions.get(item.position) ?? 0) + 1)
+    statuses.set(item.status, (statuses.get(item.status) ?? 0) + 1)
+  }
+
+  return {
+    positions: [...positions.entries()].map(([value, count]) => ({ value, count })),
+    statuses: [...statuses.entries()].map(([value, count]) => ({ value, count })),
+    totalQuestionCount: items.reduce(
+      (sum, item) => sum + (item.questionCount ?? 0),
+      0,
+    ),
+  }
 }

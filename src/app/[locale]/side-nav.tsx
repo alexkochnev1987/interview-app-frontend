@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import { useSearchParams } from 'next/navigation'
 import {
+  BriefcaseBusiness,
   ClipboardList,
   LayoutDashboard,
   LayoutTemplate,
@@ -80,9 +81,12 @@ export function SideNav() {
     ...(canReviewAssessments(user?.role)
       ? [{ href: '/assessments', label: tNav('assessments'), icon: ClipboardList }]
       : []),
-    // Templates are read-only for demo accounts, so this entry is not gated on !isDemo.
     ...(canConfigureInterview(user?.role)
-      ? [{ href: routes.templates.list, label: tNav('templates'), icon: LayoutTemplate }]
+      ? [
+          { href: routes.interviews.list, label: tNav('interviews'), icon: BriefcaseBusiness },
+          // Templates are read-only for demo accounts, so this entry is not gated on !isDemo.
+          { href: routes.templates.list, label: tNav('templates'), icon: LayoutTemplate },
+        ]
       : []),
     ...(canConfigureInterview(user?.role) && !isDemo
       ? [{ href: '/interviews/new', label: tNav('newInterview'), icon: Plus }]

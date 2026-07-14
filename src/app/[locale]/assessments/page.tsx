@@ -6,18 +6,18 @@ import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallbac
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import type { Locale } from '@/i18n/locales'
-import { type Interview } from '@/lib/api'
-import { selectHrVisibleAssessments } from '@/lib/assessment-status'
+import { type InterviewListItem, type PaginatedInterviews, emptyPaginatedInterviews } from '@/lib/api'
+import { selectHrVisibleListItems } from '@/lib/assessment-status'
+import {
+  ASSESSMENTS_INTERVIEW_PAGE_SIZE,
+  fetchAllInterviewPages,
+} from '@/lib/fetch-all-interviews'
 import {
   loadAuthGate,
   redirectIfUnauthenticated,
   redirectIfUnauthorizedError,
 } from '@/lib/auth-gate'
 import { canReviewAssessments } from '@/lib/auth-roles'
-import {
-  normalizeInterviewsResponse,
-  type InterviewsListResponse,
-} from '@/lib/interviews-response'
 import { isForbiddenError, requestServer } from '@/lib/server-fetch'
 
 const ERROR_BACK_HREF = '/'
@@ -54,12 +54,27 @@ export default async function AssessmentsPage({
     )
   }
 
-  let interviews: Interview[] = []
+  let interviews: InterviewListItem[] = []
   let error: string | null = null
 
   try {
-    const response = await requestServer<InterviewsListResponse<Interview>>('/interviews', auth.ctx)
-    interviews = normalizeInterviewsResponse<Interview>(response, 'assessments:/interviews')
+    const items = await fetchAllInterviewPages(
+      (params) =>
+        requestServer<PaginatedInterviews>('/interviews', auth.ctx, {
+          query: params,
+        }).then(
+          (response) =>
+            response ??
+            emptyPaginatedInterviews(params.limit ?? ASSESSMENTS_INTERVIEW_PAGE_SIZE),
+        ),
+      {
+        limit: ASSESSMENTS_INTERVIEW_PAGE_SIZE,
+        sortBy: 'updatedAt',
+        sortOrder: 'desc',
+      },
+    )
+
+    interviews = items
   } catch (err) {
     redirectIfUnauthorizedError(err, '/assessments', locale)
     if (isForbiddenError(err)) {
@@ -87,7 +102,7 @@ export default async function AssessmentsPage({
     )
   }
 
-  const sorted = selectHrVisibleAssessments(interviews)
+  const sorted = selectHrVisibleListItems(interviews)
 
   return (
     <PageShell>

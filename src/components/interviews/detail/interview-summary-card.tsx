@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
@@ -17,11 +17,14 @@ import { MetricPanel } from '@/components/ui/metric-panel'
 import { StatusPill } from '@/components/ui/status-pill'
 import { BodyText } from '@/components/ui/text'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
+import { Link } from '@/i18n/navigation'
+import { routes } from '@/i18n/routes'
 import type { Interview, InterviewResult } from '@/lib/api'
 import {
   formatInterviewDate,
   getCandidateInitials,
 } from '@/lib/interview-formatters'
+import { isHrVisibleAssessment } from '@/lib/assessment-status'
 import { canEditInterview, canManageInterview } from '@/lib/interview-management'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
 
@@ -90,6 +93,22 @@ export function InterviewSummaryCard({
       </DemoWriteGuard>
     ) : null
 
+  const visitAssessmentButton = isHrVisibleAssessment(interview) ? (
+    <Button asChild variant="outline">
+      <Link href={routes.assessments.detail(interview.id)}>
+        {tActions('visitAssessment')}
+        <ArrowRight className="size-4" />
+      </Link>
+    </Button>
+  ) : null
+
+  const headerActions = (
+    <Inline gap={2} align="center" wrap="wrap" justify="end">
+      {visitAssessmentButton}
+      {validateButton}
+    </Inline>
+  )
+
   const managementNotice =
     canManage && !canEdit && !isEditing ? (
       <BodyText size="sm" tone="muted">
@@ -121,7 +140,7 @@ export function InterviewSummaryCard({
           <Stack gap={3} width="full" visibility="below-sm">
             <Inline gap={3} align="center" justify="between" wrap="nowrap" width="full">
               {backLink}
-              {validateButton}
+              {headerActions}
             </Inline>
             {hasManagementActions ? (
               <Inline gap={3} wrap="wrap" justify="end" width="full">
@@ -138,7 +157,7 @@ export function InterviewSummaryCard({
               <Inline gap={3} wrap="wrap" justify="end">
                 {editButton}
                 {cancelButton}
-                {validateButton}
+                {headerActions}
               </Inline>
               {managementNotice}
             </Stack>

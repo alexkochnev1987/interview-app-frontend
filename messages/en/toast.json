@@ -31,6 +31,9 @@
       "cancelSuccess": "Interview canceled",
       "cancelError": "Failed to cancel interview"
     },
+    "interviewsLibrary": {
+      "loadFailedFallback": "Failed to load interviews."
+    },
     "take": {
       "submitSuccess": "Answer submitted",
       "submitError": "Failed to submit answer"
@@ -78,6 +81,12 @@
         "unavailableTitle": "Assessment unavailable",
         "loadDetailFallback": "Failed to load assessment.",
         "notFoundFallback": "The requested assessment could not be loaded."
+      },
+      "interviews": {
+        "libraryForbiddenTitle": "You don't have access to interviews",
+        "libraryForbiddenDescription": "The interview library is reserved for HR, admin, and super-admin users. If you think this is a mistake, contact your workspace owner.",
+        "libraryUnavailableTitle": "Interviews are unavailable right now",
+        "libraryLoadFailedFallback": "Failed to load interviews."
       },
       "interview": {
         "forbiddenTitle": "You don't have access to this interview",
