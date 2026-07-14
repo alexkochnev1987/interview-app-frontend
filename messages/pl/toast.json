@@ -29,7 +29,9 @@
       "updateSuccess": "Interview zostało zaktualizowane",
       "updateError": "Nie udało się zaktualizować interview",
       "cancelSuccess": "Interview zostało anulowane",
-      "cancelError": "Nie udało się anulować interview"
+      "cancelError": "Nie udało się anulować interview",
+      "deleteSuccess": "Interview zostało pomyślnie usunięte",
+      "deleteError": "Nie udało się usunąć interview"
     },
     "interviewsLibrary": {
       "loadFailedFallback": "Nie udało się załadować interview."

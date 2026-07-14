@@ -18,5 +18,7 @@ export function useInterviewToastMessages() {
     updateError: t('interview.updateError'),
     cancelSuccess: t('interview.cancelSuccess'),
     cancelError: t('interview.cancelError'),
+    deleteSuccess: t('interview.deleteSuccess'),
+    deleteError: t('interview.deleteError')
   }
 }
