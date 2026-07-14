@@ -37,7 +37,11 @@ export type OnboardingStepConfig = {
   pageScrollTop?: number;
   scrollIntoViewBlock?: ScrollLogicalPosition;
   stageRadius?: number;
-  lockPopoverPlacement?: 'bottom-start' | 'bottom-end';
+  lockPopoverPlacement?:
+    | 'top-start'
+    | 'top-end'
+    | 'bottom-start'
+    | 'bottom-end';
   popoverSide?: 'top' | 'right' | 'bottom' | 'left';
   popoverAlign?: 'start' | 'center' | 'end';
   mobile?: Partial<

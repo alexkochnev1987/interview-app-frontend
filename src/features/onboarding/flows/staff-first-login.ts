@@ -36,8 +36,10 @@ export const staffFirstLoginFlow: OnboardingFlowConfig = {
       gate: { type: 'nonEmptyInput', autoFocus: true },
       ...pageTourStepDefaults,
       stageRadius: 24,
+      lockPopoverPlacement: 'top-start',
       popoverSide: 'top',
       popoverAlign: 'start',
+      scrollIntoViewBlock: 'center',
     },
     {
       id: 'questions-ai-draft',

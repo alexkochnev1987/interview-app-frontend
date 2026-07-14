@@ -76,13 +76,12 @@ export function buildDriverSteps({
   ) => {
     window.requestAnimationFrame(() => {
       const applyPopoverPlacement = () => {
-        if (step.lockPopoverPlacement === 'bottom-start') {
-          lockPopoverBelowTarget(element, driver, 'start');
-          return;
-        }
-
-        if (step.lockPopoverPlacement === 'bottom-end') {
-          lockPopoverBelowTarget(element, driver, 'end');
+        if (step.lockPopoverPlacement) {
+          const [side, align] = step.lockPopoverPlacement.split('-') as [
+            'top' | 'bottom',
+            'start' | 'end',
+          ];
+          lockPopoverToTarget(element, driver, side, align);
           return;
         }
 
@@ -160,9 +159,10 @@ export function buildDriverSteps({
     driver.drive(targetIndex);
   };
 
-  const lockPopoverBelowTarget = (
+  const lockPopoverToTarget = (
     element: Element | undefined,
     driver: Driver,
+    side: 'top' | 'bottom',
     align: 'start' | 'end',
   ) => {
     if (!element) return;
@@ -190,7 +190,13 @@ export function buildDriverSteps({
 
       wrapper.style.left = `${left}px`;
       wrapper.style.right = 'auto';
-      wrapper.style.top = `${targetRect.bottom + gap}px`;
+
+      if (side === 'bottom') {
+        wrapper.style.top = `${targetRect.bottom + gap}px`;
+      } else {
+        wrapper.style.top = `${targetRect.top - gap - wrapperRect.height}px`;
+      }
+
       wrapper.style.bottom = 'auto';
 
       if (arrow) {
@@ -198,13 +204,16 @@ export function buildDriverSteps({
           'driver-popover-arrow-side-left',
           'driver-popover-arrow-side-right',
           'driver-popover-arrow-side-top',
+          'driver-popover-arrow-side-bottom',
           'driver-popover-arrow-side-over',
           'driver-popover-arrow-align-center',
           'driver-popover-arrow-align-end',
           'driver-popover-arrow-align-start',
         );
         arrow.classList.add(
-          'driver-popover-arrow-side-bottom',
+          side === 'bottom'
+            ? 'driver-popover-arrow-side-bottom'
+            : 'driver-popover-arrow-side-top',
           align === 'end'
             ? 'driver-popover-arrow-align-end'
             : 'driver-popover-arrow-align-start',
