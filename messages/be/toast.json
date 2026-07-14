@@ -29,7 +29,9 @@
       "updateSuccess": "Інтэрв'ю абноўлена",
       "updateError": "Не ўдалося абнавіць інтэрв'ю",
       "cancelSuccess": "Інтэрв'ю адменена",
-      "cancelError": "Не ўдалося адмяніць інтэрв'ю"
+      "cancelError": "Не ўдалося адмяніць інтэрв'ю",
+      "deleteSuccess": "Інтэрв'ю паспяхова выдалена",
+      "deleteError": "Не ўдалося выдаліць інтэрв'ю"
     },
     "interviewsLibrary": {
       "loadFailedFallback": "Не ўдалося загрузіць інтэрв'ю."

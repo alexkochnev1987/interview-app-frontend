@@ -32,6 +32,7 @@ describe('auth-gate', () => {
     vi.mocked(getServerRequestContext).mockResolvedValue({
       cookieHeader: 'session=token',
       origin: 'http://localhost:3001',
+      locale: 'en',
     })
     vi.mocked(fetchCachedServerAuthMe).mockReset()
   })
@@ -40,6 +41,7 @@ describe('auth-gate', () => {
     vi.mocked(getServerRequestContext).mockResolvedValue({
       cookieHeader: '',
       origin: 'http://localhost:3001',
+      locale: 'en',
     })
 
     const auth = await loadAuthGate(() => true, 'en')

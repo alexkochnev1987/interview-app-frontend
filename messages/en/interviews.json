@@ -127,7 +127,13 @@
       "dismiss": "Keep interview",
       "discardEdit": "Discard changes",
       "keepEditing": "Keep editing",
-      "visitAssessment": "Visit assessment"
+      "visitAssessment": "Visit assessment",
+      "deleteInterview": "Delete interview",
+      "deleting": "Deleting...",
+      "deleteTitle": "Delete this interview?",
+      "deleteDescription": "All recordings, results, and assessment data for this interview will be permanently removed. This cannot be undone.",
+      "confirmDelete": "Delete interview",
+      "dismissDelete": "Keep interview"
     },
     "edit": {
       "title": "Edit interview",
