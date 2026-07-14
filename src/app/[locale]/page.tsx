@@ -12,8 +12,12 @@ import {
   redirectIfUnauthenticated,
   redirectIfUnauthorizedError,
 } from '@/lib/auth-gate'
+import type { InterviewFacetsResponse } from '@/lib/api'
 import { computeDashboardMetrics } from '@/lib/dashboard-metrics'
-import { prefetchInterviewsLibrary } from '@/lib/interviews-library-prefetch'
+import {
+  fetchUnfilteredInterviewFacets,
+  prefetchInterviewsLibrary,
+} from '@/lib/interviews-library-prefetch'
 import { toInterviewsSearchParams } from '@/lib/interviews-query-state'
 import { isForbiddenError } from '@/lib/server-fetch'
 
@@ -55,10 +59,16 @@ export default async function DashboardPage({
 
   const urlParams = toInterviewsSearchParams(await searchParams)
   let initialPrefetch
+  let metricsFacets: InterviewFacetsResponse | undefined
   let error: string | null = null
 
   try {
-    initialPrefetch = await prefetchInterviewsLibrary(auth.ctx, urlParams)
+    const [prefetch, unfilteredFacets] = await Promise.all([
+      prefetchInterviewsLibrary(auth.ctx, urlParams),
+      fetchUnfilteredInterviewFacets(auth.ctx),
+    ])
+    initialPrefetch = prefetch
+    metricsFacets = unfilteredFacets
   } catch (err) {
     redirectIfUnauthorizedError(err, '/', locale)
     if (isForbiddenError(err)) {
@@ -73,7 +83,7 @@ export default async function DashboardPage({
       err instanceof Error ? err.message : t('loadFailedFallback')
   }
 
-  if (error || !initialPrefetch) {
+  if (error || !initialPrefetch || !metricsFacets) {
     return (
       <FlashErrorPageFallback
         title={t('loadFailedTitle')}
@@ -84,7 +94,7 @@ export default async function DashboardPage({
     )
   }
 
-  const metrics = computeDashboardMetrics(initialPrefetch.facets)
+  const metrics = computeDashboardMetrics(metricsFacets)
 
   return (
     <QueryHydrationBoundary state={initialPrefetch.dehydratedState}>
