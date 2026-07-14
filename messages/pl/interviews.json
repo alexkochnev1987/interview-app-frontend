@@ -128,7 +128,13 @@
       "dismiss": "Pozostaw wywiad",
       "discardEdit": "Odrzuć zmiany",
       "keepEditing": "Kontynuuj edycję",
-      "visitAssessment": "Przejdź do oceny"
+      "visitAssessment": "Przejdź do oceny",
+      "deleteInterview": "Usuń interview",
+      "deleting": "Usuwanie...",
+      "deleteTitle": "Usunąć to interview?",
+      "deleteDescription": "Wszystkie nagrania, wyniki i dane oceny tego interview zostaną trwale usunięte. Tej operacji nie można cofnąć.",
+      "confirmDelete": "Usuń interview",
+      "dismissDelete": "Pozostaw interview"
     },
     "edit": {
       "title": "Edycja wywiadu",

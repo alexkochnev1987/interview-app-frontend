@@ -29,7 +29,9 @@
       "updateSuccess": "Interview updated",
       "updateError": "Failed to update interview",
       "cancelSuccess": "Interview canceled",
-      "cancelError": "Failed to cancel interview"
+      "cancelError": "Failed to cancel interview",
+      "deleteSuccess": "Interview deleted",
+      "deleteError": "Failed to delete interview"
     },
     "candidateFeedback": {
       "acceptSuccess": "Suggestion accepted",

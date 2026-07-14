@@ -1,6 +1,7 @@
 ﻿import { describe, expect, it } from 'vitest'
 
 import {
+  canDeleteInterview,
   canEditInterview,
   canManageInterview,
   hasInterviewAnswers,
@@ -67,6 +68,22 @@ describe('interview-management', () => {
     )
     expect(canManageInterview(interviewFixture({ status: 'failed' }))).toBe(false)
     expect(canManageInterview(interviewFixture({ status: 'completed' }))).toBe(
+      false,
+    )
+  })
+
+  it('allows delete only for completed or failed interviews', () => {
+    expect(canDeleteInterview(interviewFixture({ status: 'completed' }))).toBe(
+      true,
+    )
+    expect(canDeleteInterview(interviewFixture({ status: 'failed' }))).toBe(true)
+    expect(canDeleteInterview(interviewFixture({ status: 'pending' }))).toBe(
+      false,
+    )
+    expect(canDeleteInterview(interviewFixture({ status: 'in_progress' }))).toBe(
+      false,
+    )
+    expect(canDeleteInterview(interviewFixture({ status: 'processing' }))).toBe(
       false,
     )
   })

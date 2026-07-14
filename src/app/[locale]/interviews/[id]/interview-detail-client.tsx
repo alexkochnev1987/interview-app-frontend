@@ -18,7 +18,7 @@ import { InterviewScorecard } from '@/components/interviews/detail/interview-sco
 import { InterviewDetailCancelDialog } from '@/components/interviews/detail/interview-detail-cancel-dialog'
 import { InterviewDetailEditSection } from '@/components/interviews/detail/interview-detail-edit-section'
 import { useInterviewDetailManagement } from '@/components/interviews/detail/use-interview-detail-management'
-
+import { InterviewDetailDeleteDialog } from '@/components/interviews/detail/interview-detail-delete-dialog'
 import { useCandidateLink } from './use-candidate-link'
 import { useInterviewValidation } from './use-interview-validation'
 import { useAnswerUploads } from './use-answer-uploads'
@@ -94,6 +94,10 @@ export default function InterviewDetailClient({
     setCancelConfirmOpen,
     canceling,
     handleCancelInterview,
+    deleteConfirmOpen,
+    setDeleteConfirmOpen,
+    deleting,
+    handleDeleteInterview,
   } = useInterviewDetailManagement({
     interviewId: id,
     onInterviewUpdated: (updated) => {
@@ -166,8 +170,10 @@ export default function InterviewDetailClient({
           onValidate={handleValidate}
           isEditing={isEditing}
           canceling={canceling}
+          deleting={deleting}
           onStartEditing={startEditing}
           onOpenCancelConfirm={() => setCancelConfirmOpen(true)}
+          onOpenDeleteConfirm={() => setDeleteConfirmOpen(true)}
         />
 
         <CandidateAccessPanel
@@ -218,6 +224,14 @@ export default function InterviewDetailClient({
         onConfirm={() => void handleCancelInterview()}
         onCancel={() => {
           if (!canceling) setCancelConfirmOpen(false)
+        }}
+      />
+      <InterviewDetailDeleteDialog
+        open={deleteConfirmOpen}
+        loading={deleting}
+        onConfirm={() => void handleDeleteInterview()}
+        onCancel={() => {
+          if (!deleting) setDeleteConfirmOpen(false)
         }}
       />
     </PageShell>

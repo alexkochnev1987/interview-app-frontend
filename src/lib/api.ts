@@ -148,6 +148,7 @@ export type InterviewAnswerMediaResponse = Schemas['InterviewAnswerMediaResponse
 export type CandidateLinkResponse = Schemas['CandidateLinkResponseDto'];
 export type FeedbackLinkResponse = Schemas['FeedbackLinkResponseDto'];
 export type InterviewCancelResponse = Schemas['InterviewCancelResponseDto'];
+export type InterviewDeleteResponse = Schemas['InterviewDeleteResponseDto'];
 
 export type InterviewListItem = Schemas['InterviewListItemDto'];
 export type PaginatedInterviews = Schemas['PaginatedInterviewsResponseDto'];
@@ -580,6 +581,12 @@ export async function updateInterview(
 
 export async function cancelInterview(id: string): Promise<InterviewCancelResponse> {
   return handle(client.PATCH('/interviews/{id}/cancel', {
+    params: { path: { id } },
+  }));
+}
+
+export async function deleteInterview(id: string): Promise<InterviewDeleteResponse> {
+  return handle(client.DELETE('/interviews/{id}', {
     params: { path: { id } },
   }));
 }
