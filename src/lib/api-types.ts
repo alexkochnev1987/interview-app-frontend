@@ -136,7 +136,10 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** Mark first-time onboarding as completed or skipped */
+        /**
+         * Mark first-time onboarding as completed or skipped
+         * @description Sets onboardingCompletedAt when still pending. Optional client `status` in the body is ignored; refetch is not required — response matches GET /auth/me.
+         */
         patch: operations["AuthController_completeOnboarding"];
         trace?: never;
     };
@@ -454,8 +457,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * List interviews (paginated, filterable, sortable)
-         * @description Always returns { items, total, page, limit } with slim InterviewListItem rows. The legacy `paginated` query flag is accepted but ignored for backward compatibility. Plain-array responses from older clients are no longer supported on this endpoint.
+         * List interviews
+         * @description Default: JSON array with full questions[] (legacy clients). Pass paginated=true for { items, total, page, limit } with lightweight questionsPreview. questions[]/questionsPreview are resolved in interviewLocale.
          */
         get: operations["InterviewController_findAll"];
         put?: never;
@@ -464,26 +467,6 @@ export interface paths {
          * @description Question snapshots in the response are resolved for interviewLocale. If some selected questions have no translation for interviewLocale, creation still succeeds and `localeWarnings` is returned.
          */
         post: operations["InterviewController_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/interviews/facets": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Faceted counts for the interview list sidebar
-         * @description Returns total question volume plus position and status counts. Facet counts respect every other filter on the request (q, and the other facet) so the UI shows what is still available before clicking. totalQuestionCount sums questions across interviews matching all current filters.
-         */
-        get: operations["InterviewController_getFacets"];
-        put?: never;
-        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -964,14 +947,6 @@ export interface components {
         LogoutResponseDto: {
             /** @example true */
             ok: boolean;
-        };
-        CompleteOnboardingDto: {
-            /**
-             * @description How the user closed onboarding. Both values persist the same completion timestamp.
-             * @example completed
-             * @enum {string}
-             */
-            status?: "completed" | "skipped";
         };
         /** @enum {string} */
         ApiErrorCode: "BAD_REQUEST" | "VALIDATION_ERROR" | "INVALID_LOCALE" | "REGISTRATION_FAILED" | "UPLOAD_FAILED" | "UPLOAD_NOT_ALLOWED" | "ANSWER_ATTEMPT_LIMIT_REACHED" | "UNAUTHORIZED" | "INVALID_CREDENTIALS" | "AUTHENTICATION_REQUIRED" | "CANDIDATE_SESSION_REQUIRED" | "INVALID_CANDIDATE_SESSION" | "INTERVIEW_TOKEN_REQUIRED" | "INVALID_INTERVIEW_TOKEN" | "FORBIDDEN" | "INSUFFICIENT_PERMISSIONS" | "ACCESS_DENIED" | "NOT_FOUND" | "QUESTION_NOT_FOUND" | "INTERVIEW_NOT_FOUND" | "USER_NOT_FOUND" | "FEEDBACK_NOT_FOUND" | "CONFLICT" | "QUESTION_IN_USE" | "VALIDATION_RUNNING" | "QUESTION_DUPLICATE" | "SERVICE_UNAVAILABLE" | "AI_PROVIDER_NOT_CONFIGURED" | "EMBEDDING_PROVIDER_NOT_CONFIGURED" | "INTERNAL_SERVER_ERROR";
@@ -1627,46 +1602,6 @@ export interface components {
             candidateLink: string;
             localeWarnings: components["schemas"]["InterviewLocaleWarningDto"][];
         };
-        InterviewListItemDto: {
-            id: string;
-            candidateName: string;
-            candidateEmail?: string;
-            position: string;
-            /** @enum {string} */
-            status: "pending" | "in_progress" | "processing" | "completed" | "failed";
-            /** @description Total questions in this interview. */
-            questionCount: number;
-            /** @description Number of submitted answers. */
-            submittedAnswerCount: number;
-            /** @description Present when a result has been computed. */
-            overallScore?: number;
-            /** @enum {string} */
-            decision?: "proceed" | "review" | "reject";
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: date-time */
-            updatedAt: string;
-        };
-        PaginatedInterviewsResponseDto: {
-            items: components["schemas"]["InterviewListItemDto"][];
-            /** @description Total rows matching the filter, ignoring page/limit. */
-            total: number;
-            page: number;
-            limit: number;
-        };
-        InterviewFacetCountDto: {
-            value: string;
-            /** @description Number of interviews with this value, given all OTHER current filters. */
-            count: number;
-        };
-        InterviewFacetsResponseDto: {
-            /** @description Sum of question counts across interviews matching all current filters. */
-            totalQuestionCount: number;
-            /** @description Position value + count, given all OTHER current filters (position itself is not applied). */
-            positions: components["schemas"]["InterviewFacetCountDto"][];
-            /** @description Status value + count, given all OTHER current filters (status itself is not applied). */
-            statuses: components["schemas"]["InterviewFacetCountDto"][];
-        };
         InterviewResponseDto: {
             id: string;
             candidateName: string;
@@ -1690,6 +1625,42 @@ export interface components {
             /** Format: date-time */
             updatedAt: string;
             workflow?: components["schemas"]["InterviewWorkflowDto"];
+        };
+        InterviewQuestionPreviewDto: {
+            id: string;
+            questionText: string;
+            /** @enum {string} */
+            resolvedLocale: "en" | "be" | "ru" | "pl";
+        };
+        InterviewListItemResponseDto: {
+            id: string;
+            candidateName: string;
+            candidateEmail?: string;
+            position: string;
+            /** @enum {string} */
+            interviewLocale: "en" | "be" | "ru" | "pl";
+            /**
+             * @description Locale used for questionsPreview (always interviewLocale).
+             * @enum {string}
+             */
+            questionsDisplayLocale?: "en" | "be" | "ru" | "pl";
+            questionCount: number;
+            questionsPreview: components["schemas"]["InterviewQuestionPreviewDto"][];
+            answers: components["schemas"]["AnswerDto"][];
+            /** @enum {string} */
+            status: "pending" | "in_progress" | "processing" | "completed" | "failed";
+            result?: components["schemas"]["InterviewResultResponseDto"];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            workflow?: components["schemas"]["InterviewWorkflowDto"];
+        };
+        PaginatedInterviewListResponseDto: {
+            items: components["schemas"]["InterviewListItemResponseDto"][];
+            total: number;
+            page: number;
+            limit: number;
         };
         CandidateLinkResponseDto: {
             candidateLink: string;
@@ -2198,11 +2169,7 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["CompleteOnboardingDto"];
-            };
-        };
+        requestBody?: never;
         responses: {
             200: {
                 headers: {
@@ -3343,18 +3310,8 @@ export interface operations {
     InterviewController_findAll: {
         parameters: {
             query?: {
-                /** @description Search by candidates name */
-                q?: string;
-                /** @description Filter by position (exact match) */
-                position?: string;
-                status?: "pending" | "in_progress" | "processing" | "completed" | "failed";
-                /**
-                 * @deprecated
-                 * @description Deprecated legacy flag from the pre-filter list API. Accepted for backward compatibility but ignored; this endpoint always returns a paginated { items, total, page, limit } envelope.
-                 */
+                /** @description When true, response is { items, total, page, limit }. When false or omitted, returns a plain array (legacy clients). */
                 paginated?: boolean;
-                sortBy?: "candidateName" | "createdAt" | "updatedAt";
-                sortOrder?: "asc" | "desc";
                 page?: number;
                 limit?: number;
             };
@@ -3367,12 +3324,13 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Array when paginated is false/omitted; paginated object when paginated=true */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PaginatedInterviewsResponseDto"];
+                    "application/json": components["schemas"]["InterviewResponseDto"][] | components["schemas"]["PaginatedInterviewListResponseDto"];
                 };
             };
             401: {
@@ -3426,42 +3384,6 @@ export interface operations {
                 };
             };
             403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponseDto"];
-                };
-            };
-        };
-    };
-    InterviewController_getFacets: {
-        parameters: {
-            query?: {
-                status?: "pending" | "in_progress" | "processing" | "completed" | "failed";
-                /** @description Filter by position (exact match) */
-                position?: string;
-                /** @description Search by candidates name */
-                q?: string;
-            };
-            header?: {
-                /** @description Response language for localized content. Defaults to `en` when omitted. */
-                "X-Locale"?: "en" | "be" | "ru" | "pl";
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["InterviewFacetsResponseDto"];
-                };
-            };
-            401: {
                 headers: {
                     [name: string]: unknown;
                 };

@@ -45,8 +45,8 @@ export function useInterviewsInfinite({
             fetchInterviews({ ...params, page: pageParam }, { signal }),
         initialPageParam: 1,
         getNextPageParam: (lastPage, allPages) => {
-            if (lastPage.items.length === 0) return undefined
-            const loaded = allPages.reduce((sum, p) => sum + p.items.length, 0)
+            if (!lastPage?.items?.length) return undefined
+            const loaded = allPages.reduce((sum, p) => sum + (p.items?.length ?? 0), 0)
             if (loaded >= lastPage.total) return undefined
             return allPages.length + 1
         },
