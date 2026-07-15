@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { ArrowLeft, ArrowRight, MessageSquareText } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
@@ -107,11 +107,25 @@ export function InterviewSummaryCard({
       </DemoWriteGuard>
     ) : null
 
+  const candidateFeedbackButton =
+    interview.status === 'completed' ? (
+      <Button type="button" variant="gradient" shape="pill" asChild>
+        <Link href={routes.interviews.candidateFeedback(interview.id)}>
+          <Icon size="sm">
+            <MessageSquareText />
+          </Icon>
+          {tDetail('candidateFeedback')}
+        </Link>
+      </Button>
+    ) : null
+
   const visitAssessmentButton = isHrVisibleAssessment(interview) ? (
     <Button asChild variant="outline">
       <Link href={routes.assessments.detail(interview.id)}>
         {tActions('visitAssessment')}
-        <ArrowRight className="size-4" />
+        <Icon size="sm">
+          <ArrowRight />
+        </Icon>
       </Link>
     </Button>
   ) : null
@@ -130,7 +144,9 @@ export function InterviewSummaryCard({
       </BodyText>
     ) : null
 
-  const hasManagementActions = Boolean(editButton || cancelButton || deleteButton)
+  const hasManagementActions = Boolean(
+    editButton || cancelButton || deleteButton || candidateFeedbackButton,
+  )
 
   const backLink = (
     <UnstyledLink href="/">
@@ -158,6 +174,7 @@ export function InterviewSummaryCard({
             </Inline>
             {hasManagementActions ? (
               <Inline gap={3} wrap="wrap" justify="end" width="full">
+                {candidateFeedbackButton}
                 {editButton}
                 {cancelButton}
                 {deleteButton}
@@ -170,6 +187,7 @@ export function InterviewSummaryCard({
             {backLink}
             <Stack gap={2} align="end">
               <Inline gap={3} wrap="wrap" justify="end">
+                {candidateFeedbackButton}
                 {editButton}
                 {cancelButton}
                 {deleteButton}

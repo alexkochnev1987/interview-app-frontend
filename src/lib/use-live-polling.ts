@@ -11,6 +11,8 @@ export interface LivePolling<T> {
   data: T
   /** One-shot fetch. Also re-arms the loop if it was paused. */
   refresh: () => Promise<void>
+  /** Apply authoritative data without a network round-trip. */
+  replaceData: (next: T) => void
   /**
    * Force the live loop to run for a short grace window even if the data does
    * not yet show an active state. Use right after triggering backend work
@@ -40,9 +42,14 @@ export function useLivePolling<T>(
   const [kicking, setKicking] = useState(false)
   const inFlightRef = useRef(false)
   const failuresRef = useRef(0)
+  // Bumped on replaceData and on authoritative initial resync so an in-flight
+  // poll cannot overwrite a newer local mutation response.
+  const dataVersionRef = useRef(0)
   const [visible, setVisible] = useState(true)
   if (syncedFrom !== initial) {
     setSyncedFrom(initial)
+    // eslint-disable-next-line react-hooks/refs -- bump poll generation when authoritative initial changes
+    dataVersionRef.current += 1
     setData(initial)
     // Fresh authoritative data clears any prior pause/kick state so a lingering
     // "paused" notice does not survive a navigation or router refresh. The
@@ -54,8 +61,10 @@ export function useLivePolling<T>(
   const refresh = useCallback(async () => {
     if (inFlightRef.current) return
     inFlightRef.current = true
+    const versionAtStart = dataVersionRef.current
     try {
       const next = await fetcher()
+      if (versionAtStart !== dataVersionRef.current) return
       failuresRef.current = 0
       setData(next)
       setPaused(false)
@@ -71,6 +80,13 @@ export function useLivePolling<T>(
     failuresRef.current = 0
     setPaused(false)
     setKicking(true)
+  }, [])
+
+  const replaceData = useCallback((next: T) => {
+    dataVersionRef.current += 1
+    failuresRef.current = 0
+    setData(next)
+    setPaused(false)
   }, [])
 
   // The kick window is self-clearing; once it lapses, `shouldPoll` alone decides
@@ -110,5 +126,5 @@ export function useLivePolling<T>(
     }
   }, [active, refresh])
 
-  return { data, refresh, kick, paused }
+  return { data, refresh, replaceData, kick, paused }
 }
