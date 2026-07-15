@@ -33,16 +33,13 @@ import { useInterviewsQuery } from '../hooks/use-interviews-query'
 import { pickInterviewsViewSource } from '../picker/pick-interviews-view-source'
 import { InterviewViewToggle } from '../picker/interview-view-toggle'
 import { InterviewTable } from './interview-table'
-import { InterviewsLibraryHeader } from './interviews-library-header'
 
 type InterviewsLibraryClientProps = {
   initialPrefetch?: InterviewsLibraryPrefetch
-  showHeader?: boolean
 }
 
 export function InterviewsLibraryClient({
   initialPrefetch,
-  showHeader = true,
 }: InterviewsLibraryClientProps) {
   const router = useRouter()
   const t = useTranslations('interviews.library.client')
@@ -255,24 +252,12 @@ export function InterviewsLibraryClient({
     </Stack>
   )
 
-  return (
-    <>
-      {showHeader ? (
-        <InterviewsLibraryHeader
-          loading={view.loading}
-          totalCount={view.total}
-          visibleCount={view.items.length}
-        />
-      ) : null}
-
-      {sidebarHidden ? (
-        mainContent
-      ) : (
-        <Grid columns="aside-22-left" gap={6}>
-          {sidebar}
-          {mainContent}
-        </Grid>
-      )}
-    </>
+  return sidebarHidden ? (
+    mainContent
+  ) : (
+    <Grid columns="aside-22-left" gap={6}>
+      {sidebar}
+      {mainContent}
+    </Grid>
   )
 }

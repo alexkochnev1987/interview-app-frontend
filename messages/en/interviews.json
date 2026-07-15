@@ -19,17 +19,6 @@
       "demoTryCandidateExperience": "Try the candidate experience"
     },
     "library": {
-      "header": {
-        "eyebrow": "Interview pipeline",
-        "title": "Interviews",
-        "lead": "Browse every candidate interview, track progress, and open details without leaving the list.",
-        "newInterview": "New interview",
-        "overviewEyebrow": "Overview",
-        "healthTitle": "Pipeline",
-        "healthDescription": "Counts reflect the filters currently applied to this view.",
-        "totalInterviews": "Total",
-        "visibleNow": "Showing"
-      },
       "card": {
         "progress": "Answers",
         "score": "Score",

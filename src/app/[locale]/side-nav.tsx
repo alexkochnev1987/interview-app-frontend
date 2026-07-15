@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import { useSearchParams } from 'next/navigation'
 import {
-  BriefcaseBusiness,
   ClipboardList,
   LayoutDashboard,
   LayoutTemplate,

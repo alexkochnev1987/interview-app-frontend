@@ -19,17 +19,6 @@
       "demoTryCandidateExperience": "Wypróbuj jako kandydat"
     },
     "library": {
-      "header": {
-        "eyebrow": "Proces rekrutacyjny",
-        "title": "Interviews",
-        "lead": "Przeglądaj wszystkie interview kandydatów, śledź postępy i otwieraj szczegóły bez opuszczania listy.",
-        "newInterview": "Nowe interview",
-        "overviewEyebrow": "Przegląd",
-        "healthTitle": "Pipeline",
-        "healthDescription": "Liczby odzwierciedlają filtry zastosowane w bieżącym widoku.",
-        "totalInterviews": "Łącznie",
-        "visibleNow": "Wyświetlane"
-      },
       "card": {
         "progress": "Odpowiedzi",
         "score": "Wynik",
