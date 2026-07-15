@@ -1468,8 +1468,6 @@ export interface components {
             candidateName: string;
             candidateEmail?: string;
             position: string;
-            /** @description HR reviewer assigned to this interview. Admin/super_admin only. */
-            assignedHrId?: string;
             /**
              * @description Locale for interview UI and feedback. Defaults to en when omitted.
              * @default en
@@ -1479,11 +1477,6 @@ export interface components {
             /** @description Template this interview was started from. When set, the template popularity (usage_count) is incremented in the same transaction, so usage is recorded server-side rather than by a separate client call. */
             templateId?: string;
             questionIds: string[];
-        };
-        AssignedHrDto: {
-            id: string;
-            name: string;
-            email: string;
         };
         MediaArtifactDto: {
             mediaKey: string;
@@ -1647,10 +1640,6 @@ export interface components {
             candidateName: string;
             candidateEmail?: string;
             position: string;
-            /** @description Assigned HR reviewer user id. Omitted when unassigned. */
-            assignedHrId?: string;
-            /** @description Assigned HR reviewer details for display. */
-            assignedHr?: components["schemas"]["AssignedHrDto"];
             /** @enum {string} */
             interviewLocale: "en" | "be" | "ru" | "pl";
             /**
@@ -1717,10 +1706,6 @@ export interface components {
             candidateName: string;
             candidateEmail?: string;
             position: string;
-            /** @description Assigned HR reviewer user id. Omitted when unassigned. */
-            assignedHrId?: string;
-            /** @description Assigned HR reviewer details for display. */
-            assignedHr?: components["schemas"]["AssignedHrDto"];
             /** @enum {string} */
             interviewLocale: "en" | "be" | "ru" | "pl";
             /**
@@ -1757,8 +1742,6 @@ export interface components {
             candidateName?: string;
             candidateEmail?: string;
             position?: string;
-            /** @description HR reviewer UUID, or null to clear assignment. Admin/super_admin only. */
-            assignedHrId?: Record<string, never> | null;
             questionIds?: string[];
         };
         StartAnswerValidationResultDto: {
@@ -2083,7 +2066,7 @@ export interface components {
             /** @description Candidate-facing growth areas / improvement text. */
             improvementText?: string;
             /**
-             * @description HR may accept generated text or mark manual edits. `accepted` and `edited` require at least one non-empty text on the block (from the request or already stored).
+             * @description HR may accept generated text or mark manual edits.
              * @enum {string}
              */
             state?: "accepted" | "edited";
@@ -2095,7 +2078,7 @@ export interface components {
             /** @description Candidate-facing growth areas / improvement text. */
             improvementText?: string;
             /**
-             * @description HR may accept generated text or mark manual edits. `accepted` and `edited` require at least one non-empty text on the block (from the request or already stored).
+             * @description HR may accept generated text or mark manual edits.
              * @enum {string}
              */
             state?: "accepted" | "edited";
@@ -3650,14 +3633,6 @@ export interface operations {
                     "application/json": components["schemas"]["ApiErrorResponseDto"];
                 };
             };
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponseDto"];
-                };
-            };
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -3799,14 +3774,6 @@ export interface operations {
                 };
             };
             401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponseDto"];
-                };
-            };
-            403: {
                 headers: {
                     [name: string]: unknown;
                 };
