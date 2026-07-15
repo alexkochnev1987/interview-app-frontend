@@ -161,6 +161,9 @@
       "overallBlockTitle": "Агульная зваротная сувязь",
       "questionBlocksTitle": "Зваротная сувязь па пытаннях",
       "questionBlockTitle": "Пытанне {index}",
+      "context": {
+        "feedbackSection": "Зваротная сувязь для кандыдата"
+      },
       "recommendationLabel": "Рэкамендацыі",
       "improvementLabel": "Што можна палепшыць",
       "notGeneratedHint": "AI-зваротная сувязь для гэтага блока яшчэ не згенеравана.",

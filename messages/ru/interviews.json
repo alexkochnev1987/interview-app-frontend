@@ -161,6 +161,9 @@
       "overallBlockTitle": "Общая обратная связь",
       "questionBlocksTitle": "Обратная связь по вопросам",
       "questionBlockTitle": "Вопрос {index}",
+      "context": {
+        "feedbackSection": "Обратная связь для кандидата"
+      },
       "recommendationLabel": "Рекомендации",
       "improvementLabel": "Что можно улучшить",
       "notGeneratedHint": "AI-обратная связь для этого блока ещё не сгенерирована.",

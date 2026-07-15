@@ -7,8 +7,10 @@ import { CandidateFeedbackBlockFields } from '@/components/candidate-feedback/ca
 import { CandidateFeedbackBlockStatePill } from '@/components/candidate-feedback/candidate-feedback-block-state-pill'
 import { CandidateFeedbackFailedBlock } from '@/components/candidate-feedback/candidate-feedback-failed-block'
 import { CandidateFeedbackGenerateButton } from '@/components/candidate-feedback/candidate-feedback-generate-button'
+import { CandidateFeedbackQuestionContext } from '@/components/candidate-feedback/candidate-feedback-question-context'
 import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { Card, CardContent } from '@/components/ui/card'
+import { DividerLabel } from '@/components/ui/divider-label'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText, SectionHeading } from '@/components/ui/text'
@@ -20,9 +22,12 @@ import {
   shouldShowQuestionGenerateButton,
   type CandidateFeedbackQuestionBlock,
 } from '@/lib/candidate-feedback'
+import { type Answer, type InterviewQuestion } from '@/lib/api'
 
 interface CandidateFeedbackQuestionBlockEditorProps {
   block: CandidateFeedbackQuestionBlock
+  question: InterviewQuestion
+  answer: Answer | undefined
   saving: boolean
   generating: boolean
   generationDisabled: boolean
@@ -40,6 +45,8 @@ interface CandidateFeedbackQuestionBlockEditorProps {
 
 export function CandidateFeedbackQuestionBlockEditor({
   block,
+  question,
+  answer,
   saving,
   generating,
   generationDisabled,
@@ -68,6 +75,8 @@ export function CandidateFeedbackQuestionBlockEditor({
             </SectionHeading>
             <CandidateFeedbackBlockStatePill block={block} />
           </Inline>
+
+          <CandidateFeedbackQuestionContext question={question} answer={answer} />
 
           {block.state === 'not_generated' ? (
             <BodyText tone="muted">{t('notGeneratedHint')}</BodyText>
@@ -99,6 +108,8 @@ export function CandidateFeedbackQuestionBlockEditor({
               </DemoWriteGuard>
             </Inline>
           ) : null}
+
+          <DividerLabel>{t('context.feedbackSection')}</DividerLabel>
 
           <CandidateFeedbackBlockFields
             block={block}

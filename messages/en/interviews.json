@@ -161,6 +161,9 @@
       "overallBlockTitle": "Overall feedback",
       "questionBlocksTitle": "Per-question feedback",
       "questionBlockTitle": "Question {index}",
+      "context": {
+        "feedbackSection": "Candidate-facing feedback"
+      },
       "recommendationLabel": "Recommendations",
       "improvementLabel": "What could be improved",
       "notGeneratedHint": "AI feedback for this block has not been generated yet.",

@@ -90,6 +90,9 @@ export function CandidateFeedbackEditor({
 
   const questionCount = interview.questions.length
   const interviewLocale = interview.interviewLocale ?? feedback.interviewLocale
+  const answersByIndex = new Map(
+    interview.answers.map((answer) => [answer.questionIndex, answer]),
+  )
   const questionBlocks = buildQuestionBlocksView(questionCount, feedback)
   const isEmpty = isCandidateFeedbackEmpty(questionCount, feedback)
   const feedbackGenerating = isCandidateFeedbackGenerating(feedback)
@@ -473,6 +476,8 @@ export function CandidateFeedbackEditor({
                 <CandidateFeedbackQuestionBlockEditor
                   key={block.questionIndex}
                   block={block}
+                  question={interview.questions[block.questionIndex]}
+                  answer={answersByIndex.get(block.questionIndex)}
                   saving={
                     savingTarget === `question-${block.questionIndex}` ||
                     (savingTarget === 'accept-all' &&

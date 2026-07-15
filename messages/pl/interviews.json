@@ -161,6 +161,9 @@
       "overallBlockTitle": "Ogólna informacja zwrotna",
       "questionBlocksTitle": "Informacja zwrotna dla pytań",
       "questionBlockTitle": "Pytanie {index}",
+      "context": {
+        "feedbackSection": "Informacja zwrotna dla kandydata"
+      },
       "recommendationLabel": "Rekomendacje",
       "improvementLabel": "Co można poprawić",
       "notGeneratedHint": "Informacja zwrotna AI dla tego bloku nie została jeszcze wygenerowana.",
