@@ -1,5 +1,67 @@
 import type { Locale } from '@/i18n/locales'
 
+export type CandidateFeedbackSkipReason =
+  | 'locked'
+  | 'in_progress'
+  | 'not_submitted'
+  | 'missing_answer'
+  | 'missing_transcript'
+  | 'missing_question'
+  | 'unusable_transcript'
+  | 'off_topic'
+  | 'not_addressed'
+  | 'no_question_texts'
+
+export type CandidateFeedbackEligibilitySkipReason =
+  | 'not_submitted'
+  | 'missing_answer'
+  | 'missing_transcript'
+  | 'unusable_transcript'
+
+const CANDIDATE_FEEDBACK_ELIGIBILITY_SKIP_REASONS =
+  new Set<CandidateFeedbackEligibilitySkipReason>([
+    'not_submitted',
+    'missing_answer',
+    'missing_transcript',
+    'unusable_transcript',
+  ])
+
+const CANDIDATE_FEEDBACK_SKIP_REASONS = new Set<CandidateFeedbackSkipReason>([
+  'locked',
+  'in_progress',
+  'not_submitted',
+  'missing_answer',
+  'missing_transcript',
+  'missing_question',
+  'unusable_transcript',
+  'off_topic',
+  'not_addressed',
+  'no_question_texts',
+])
+
+export type GenerateAllCandidateFeedbackQuestionResult = {
+  status: 'queued' | 'generated' | 'skipped' | 'failed'
+  questionIndex: number
+  reason?: CandidateFeedbackSkipReason | string
+  errorMessage?: string
+}
+
+export type GenerateAllCandidateFeedbackOverallResult = {
+  status: 'queued' | 'generated' | 'skipped' | 'failed'
+  reason?: CandidateFeedbackSkipReason | string
+  errorMessage?: string
+}
+
+export type GenerateAllCandidateFeedbackPlan = {
+  questions: GenerateAllCandidateFeedbackQuestionResult[]
+  overall: GenerateAllCandidateFeedbackOverallResult
+}
+
+export type GenerateAllCandidateFeedbackOutcome = {
+  feedback: CandidateFeedbackResponse
+  plan?: GenerateAllCandidateFeedbackPlan
+}
+
 export type CandidateFeedbackEditableState = 'accepted' | 'edited'
 
 export type UpdateCandidateFeedbackOverallPayload = {
@@ -250,6 +312,19 @@ export function canGenerateQuestionBlock(
   )
 }
 
+export function canRegenerateAnyCandidateFeedbackBlock(
+  questionCount: number,
+  feedback: CandidateFeedbackResponse,
+): boolean {
+  if (canGenerateQuestionBlock(feedback.overall.state)) {
+    return true
+  }
+
+  return buildQuestionBlocksView(questionCount, feedback).some((block) =>
+    canGenerateQuestionBlock(block.state),
+  )
+}
+
 export function shouldShowQuestionGenerateButton(
   state: CandidateFeedbackBlockState,
 ): boolean {
@@ -266,7 +341,71 @@ export function getQuestionGenerateLabelKey(
 
 export type CandidateFeedbackErrorDisplay =
   | { kind: 'location_not_supported' }
+  | { kind: 'skip_reason'; reason: CandidateFeedbackSkipReason }
   | { kind: 'raw'; message: string }
+
+export function parseCandidateFeedbackSkipReason(
+  value: string | null | undefined,
+): CandidateFeedbackSkipReason | null {
+  const trimmed = value?.trim()
+  if (!trimmed || !CANDIDATE_FEEDBACK_SKIP_REASONS.has(trimmed as CandidateFeedbackSkipReason)) {
+    return null
+  }
+
+  return trimmed as CandidateFeedbackSkipReason
+}
+
+export function isCandidateFeedbackSkipReason(
+  display: CandidateFeedbackErrorDisplay,
+): display is { kind: 'skip_reason'; reason: CandidateFeedbackSkipReason } {
+  return display.kind === 'skip_reason'
+}
+
+export function isCandidateFeedbackEligibilitySkipReason(
+  reason: CandidateFeedbackSkipReason | null | undefined,
+): reason is CandidateFeedbackEligibilitySkipReason {
+  return (
+    reason != null &&
+    CANDIDATE_FEEDBACK_ELIGIBILITY_SKIP_REASONS.has(
+      reason as CandidateFeedbackEligibilitySkipReason,
+    )
+  )
+}
+
+export function getCandidateFeedbackBlockSkipReason(
+  block: Pick<CandidateFeedbackBlock, 'errorMessage'>,
+): CandidateFeedbackSkipReason | null {
+  return parseCandidateFeedbackSkipReason(block.errorMessage)
+}
+
+export function isSystemPrefilledCandidateFeedbackBlock(
+  block: Pick<
+    CandidateFeedbackBlock,
+    'state' | 'errorMessage' | 'recommendationText' | 'improvementText'
+  >,
+): boolean {
+  if (block.state !== 'edited') {
+    return false
+  }
+
+  const reason = getCandidateFeedbackBlockSkipReason(block)
+  if (!isCandidateFeedbackEligibilitySkipReason(reason)) {
+    return false
+  }
+
+  return Boolean(
+    block.recommendationText?.trim() || block.improvementText?.trim(),
+  )
+}
+
+export function isCandidateFeedbackSkippedFailureBlock(
+  block: Pick<CandidateFeedbackBlock, 'state' | 'errorMessage'>,
+): boolean {
+  return (
+    block.state === 'failed' &&
+    Boolean(getCandidateFeedbackBlockSkipReason(block))
+  )
+}
 
 export function parseCandidateFeedbackErrorMessage(
   errorMessage: string,
@@ -274,6 +413,11 @@ export function parseCandidateFeedbackErrorMessage(
   const trimmed = errorMessage.trim()
   if (!trimmed) {
     return { kind: 'raw', message: trimmed }
+  }
+
+  const skipReason = parseCandidateFeedbackSkipReason(trimmed)
+  if (skipReason) {
+    return { kind: 'skip_reason', reason: skipReason }
   }
 
   const geminiJsonMatch = trimmed.match(/Gemini error \d+:\s*(\{[\s\S]*\})/i)
@@ -336,6 +480,10 @@ export function getSharedCandidateFeedbackError(
   }
 
   const firstMessage = messages[0]
+  if (parseCandidateFeedbackSkipReason(firstMessage)) {
+    return null
+  }
+
   return messages.every((message) => message === firstMessage) ? firstMessage : null
 }
 
@@ -397,4 +545,89 @@ export function isAcceptAllCandidateFeedbackPayloadEmpty(
   payload: UpdateCandidateFeedbackPayload,
 ): boolean {
   return !payload.overall && (payload.questions?.length ?? 0) === 0
+}
+
+function resolveGenerateAllSkipReason(
+  result: Pick<
+    GenerateAllCandidateFeedbackQuestionResult,
+    'reason' | 'errorMessage'
+  >,
+): CandidateFeedbackSkipReason | null {
+  return (
+    parseCandidateFeedbackSkipReason(result.reason) ??
+    parseCandidateFeedbackSkipReason(result.errorMessage)
+  )
+}
+
+export function getSkippedGenerateAllQuestionResults(
+  questions: GenerateAllCandidateFeedbackQuestionResult[] | undefined,
+): GenerateAllCandidateFeedbackQuestionResult[] {
+  return (questions ?? []).filter((question) => question.status === 'skipped')
+}
+
+export type GenerateAllQuestionSkipEntry = {
+  questionIndex: number
+  reason: CandidateFeedbackSkipReason | null
+}
+
+export function buildGenerateAllQuestionSkipEntries(
+  skippedQuestions: GenerateAllCandidateFeedbackQuestionResult[],
+): GenerateAllQuestionSkipEntry[] {
+  return skippedQuestions
+    .slice()
+    .sort((left, right) => left.questionIndex - right.questionIndex)
+    .map((question) => ({
+      questionIndex: question.questionIndex,
+      reason: resolveGenerateAllSkipReason(question),
+    }))
+}
+
+export function resolveGenerateAllOverallSkipReason(
+  overall: GenerateAllCandidateFeedbackOverallResult | undefined,
+): CandidateFeedbackSkipReason | null {
+  if (overall?.status !== 'skipped') {
+    return null
+  }
+
+  return (
+    parseCandidateFeedbackSkipReason(overall.reason) ??
+    parseCandidateFeedbackSkipReason(overall.errorMessage)
+  )
+}
+
+export function parseGenerateAllCandidateFeedbackPostBody(body: string): {
+  plan?: GenerateAllCandidateFeedbackPlan
+  feedbackDto?: ApiCandidateFeedbackDto
+} {
+  if (!body.trim()) {
+    return {}
+  }
+
+  try {
+    const parsed = JSON.parse(body) as {
+      feedback?: ApiCandidateFeedbackDto
+      questions?: GenerateAllCandidateFeedbackQuestionResult[]
+      overall?: GenerateAllCandidateFeedbackOverallResult
+    }
+
+    const result: {
+      plan?: GenerateAllCandidateFeedbackPlan
+      feedbackDto?: ApiCandidateFeedbackDto
+    } = {}
+
+    if (parsed.questions !== undefined || parsed.overall !== undefined) {
+      result.plan = {
+        questions: parsed.questions ?? [],
+        overall: parsed.overall ?? { status: 'queued' },
+      }
+    }
+
+    if (parsed.feedback) {
+      result.feedbackDto = parsed.feedback
+    }
+
+    return result
+  } catch {
+    return {}
+  }
 }

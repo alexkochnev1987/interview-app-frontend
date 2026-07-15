@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl'
 
+import { CandidateFeedbackAutoTemplateHint } from '@/components/candidate-feedback/candidate-feedback-auto-template-hint'
 import { CandidateFeedbackBlockFields } from '@/components/candidate-feedback/candidate-feedback-block-fields'
 import { CandidateFeedbackBlockStatePill } from '@/components/candidate-feedback/candidate-feedback-block-state-pill'
 import { CandidateFeedbackFailedBlock } from '@/components/candidate-feedback/candidate-feedback-failed-block'
@@ -12,8 +13,10 @@ import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText, SectionHeading } from '@/components/ui/text'
 import {
+  getCandidateFeedbackBlockSkipReason,
   getQuestionGenerateLabelKey,
   isBlockUsingSharedCandidateFeedbackError,
+  isSystemPrefilledCandidateFeedbackBlock,
   shouldShowQuestionGenerateButton,
   type CandidateFeedbackQuestionBlock,
 } from '@/lib/candidate-feedback'
@@ -52,6 +55,8 @@ export function CandidateFeedbackQuestionBlockEditor({
     block,
     sharedGenerationError ?? null,
   )
+  const blockSkipReason = getCandidateFeedbackBlockSkipReason(block)
+  const isSystemPrefilled = isSystemPrefilledCandidateFeedbackBlock(block)
 
   return (
     <Card variant="surface" size="lg">
@@ -61,7 +66,7 @@ export function CandidateFeedbackQuestionBlockEditor({
             <SectionHeading as="h4">
               {t('questionBlockTitle', { index: block.questionIndex + 1 })}
             </SectionHeading>
-            <CandidateFeedbackBlockStatePill state={block.state} />
+            <CandidateFeedbackBlockStatePill block={block} />
           </Inline>
 
           {block.state === 'not_generated' ? (
@@ -76,6 +81,10 @@ export function CandidateFeedbackQuestionBlockEditor({
               onRetry={onGenerate}
               showRetry={false}
             />
+          ) : null}
+
+          {isSystemPrefilled ? (
+            <CandidateFeedbackAutoTemplateHint skipReason={blockSkipReason} />
           ) : null}
 
           {showGenerateButton ? (

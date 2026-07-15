@@ -121,7 +121,9 @@
         "forbiddenDescription": "Editing candidate feedback is reserved for HR, admin, and super-admin users. If you think this is a mistake, contact your workspace owner.",
         "unavailableTitle": "Candidate feedback unavailable",
         "loadFailedFallback": "Failed to load candidate feedback.",
-        "notFoundFallback": "The requested interview could not be loaded."
+        "notFoundFallback": "The requested interview could not be loaded.",
+        "statusUnavailableTitle": "Candidate feedback not ready",
+        "statusUnavailableDescription": "Candidate feedback is available only after the interview is completed or has failed."
       },
       "team": {
         "forbiddenTitle": "You don't have access to team management",

@@ -121,7 +121,9 @@
         "forbiddenDescription": "Edycja informacji zwrotnej dla kandydata jest dostępna tylko dla użytkowników HR, admin i super-admin. Jeśli to pomyłka, skontaktuj się z właścicielem przestrzeni roboczej.",
         "unavailableTitle": "Informacja zwrotna dla kandydata jest niedostępna",
         "loadFailedFallback": "Nie udało się załadować informacji zwrotnej dla kandydata.",
-        "notFoundFallback": "Nie udało się załadować żądanego wywiadu."
+        "notFoundFallback": "Nie udało się załadować żądanego wywiadu.",
+        "statusUnavailableTitle": "Informacja zwrotna dla kandydata nie jest jeszcze gotowa",
+        "statusUnavailableDescription": "Informacja zwrotna dla kandydata jest dostępna dopiero po zakończeniu wywiadu lub jego niepowodzeniu."
       },
       "team": {
         "forbiddenTitle": "Brak dostępu do zarządzania zespołem",

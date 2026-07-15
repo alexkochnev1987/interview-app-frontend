@@ -2066,7 +2066,7 @@ export interface components {
             /** @description Candidate-facing growth areas / improvement text. */
             improvementText?: string;
             /**
-             * @description HR may accept generated text or mark manual edits.
+             * @description HR may accept generated text or mark manual edits. `accepted` and `edited` require at least one non-empty text on the block (from the request or already stored).
              * @enum {string}
              */
             state?: "accepted" | "edited";
@@ -2078,7 +2078,7 @@ export interface components {
             /** @description Candidate-facing growth areas / improvement text. */
             improvementText?: string;
             /**
-             * @description HR may accept generated text or mark manual edits.
+             * @description HR may accept generated text or mark manual edits. `accepted` and `edited` require at least one non-empty text on the block (from the request or already stored).
              * @enum {string}
              */
             state?: "accepted" | "edited";
@@ -2094,7 +2094,7 @@ export interface components {
             status: "queued" | "generated" | "skipped" | "failed";
             questionIndex: number;
             /** @enum {string} */
-            reason?: "locked" | "in_progress" | "not_submitted" | "missing_answer" | "missing_transcript" | "missing_question";
+            reason?: "locked" | "in_progress" | "not_submitted" | "missing_answer" | "missing_transcript" | "unusable_transcript" | "missing_question";
             errorMessage?: string;
         };
         GenerateAllCandidateFeedbackOverallResultDto: {
@@ -3633,6 +3633,14 @@ export interface operations {
                     "application/json": components["schemas"]["ApiErrorResponseDto"];
                 };
             };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -3774,6 +3782,14 @@ export interface operations {
                 };
             };
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -4828,6 +4844,14 @@ export interface operations {
                     "application/json": components["schemas"]["ApiErrorResponseDto"];
                 };
             };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
         };
     };
     CandidateFeedbackController_patchCandidateFeedback: {
@@ -4874,6 +4898,14 @@ export interface operations {
                 };
             };
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
