@@ -32,6 +32,8 @@ type LoadState =
   | { phase: 'ready'; media: InterviewAnswerMediaResponse; loadedAt: number }
   | { phase: 'error'; message: string }
 
+type PlaybackIssue = 'playbackFailed' | 'durationUnavailable'
+
 const SIGNED_URL_LIFETIME_MS = 60 * 60 * 1000
 const SIGNED_URL_REFRESH_THRESHOLD_MS = SIGNED_URL_LIFETIME_MS - 5 * 60 * 1000
 
@@ -44,6 +46,7 @@ export function LazyMediaPlayback({
   const t = useTranslations('assessments.media')
   const [state, setState] = useState<LoadState>({ phase: 'idle' })
   const [isStale, setIsStale] = useState(false)
+  const [playbackIssue, setPlaybackIssue] = useState<PlaybackIssue | null>(null)
 
   useEffect(() => {
     if (state.phase !== 'ready') {
@@ -65,10 +68,15 @@ export function LazyMediaPlayback({
   }, [state])
 
   function handleMediaError() {
-    setIsStale(true)
+    setPlaybackIssue('playbackFailed')
+  }
+
+  function handleDurationUnavailable() {
+    setPlaybackIssue((current) => current ?? 'durationUnavailable')
   }
 
   async function handleLoad() {
+    setPlaybackIssue(null)
     setState({ phase: 'loading' })
     try {
       const media = await getInterviewAnswerMedia(interviewId, questionIndex)
@@ -149,14 +157,29 @@ export function LazyMediaPlayback({
 
   const { cameraUrl, screenUrl } = state.media
 
+  const notice =
+    playbackIssue === 'playbackFailed'
+      ? {
+          title: t('playbackFailedTitle'),
+          description: t('playbackFailedDescription'),
+        }
+      : playbackIssue === 'durationUnavailable'
+        ? {
+            title: t('durationUnavailableTitle'),
+            description: t('durationUnavailableDescription'),
+          }
+        : isStale
+          ? { title: t('expiredTitle'), description: t('expiredDescription') }
+          : null
+
   return (
     <Stack gap={3}>
-      {isStale ? (
+      {notice ? (
         <Alert variant="warning">
-          <AlertTitle>{t('expiredTitle')}</AlertTitle>
+          <AlertTitle>{notice.title}</AlertTitle>
           <AlertDescription>
             <Inline gap={3} align="center" wrap="wrap">
-              <span>{t('expiredDescription')}</span>
+              <span>{notice.description}</span>
               <Button
                 type="button"
                 variant="outline-pill"
@@ -178,7 +201,11 @@ export function LazyMediaPlayback({
           <SurfaceTile rounded="xl" padding="lg">
             <Stack gap={3}>
               <EyebrowLabel size="sm">{t('candidateCamera')}</EyebrowLabel>
-              <RecordingVideo src={cameraUrl} onError={handleMediaError} />
+              <RecordingVideo
+                src={cameraUrl}
+                onError={handleMediaError}
+                onDurationUnavailable={handleDurationUnavailable}
+              />
             </Stack>
           </SurfaceTile>
         ) : null}
@@ -186,7 +213,11 @@ export function LazyMediaPlayback({
           <SurfaceTile rounded="xl" padding="lg">
             <Stack gap={3}>
               <EyebrowLabel size="sm">{t('candidateScreen')}</EyebrowLabel>
-              <RecordingVideo src={screenUrl} onError={handleMediaError} />
+              <RecordingVideo
+                src={screenUrl}
+                onError={handleMediaError}
+                onDurationUnavailable={handleDurationUnavailable}
+              />
             </Stack>
           </SurfaceTile>
         ) : null}

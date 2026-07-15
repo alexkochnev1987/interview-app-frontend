@@ -18,12 +18,23 @@ interface RecordingVideoProps {
   src: string
   density?: VideoFrameVariants['density']
   onError?: () => void
+  onDurationUnavailable?: () => void
 }
 
-export function RecordingVideo({ src, density, onError }: RecordingVideoProps) {
+export function RecordingVideo({
+  src,
+  density,
+  onError,
+  onDurationUnavailable,
+}: RecordingVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const detachRef = useRef<(() => void) | null>(null)
+  const durationUnavailableRef = useRef(onDurationUnavailable)
   const [isPriming, setIsPriming] = useState(false)
+
+  useEffect(() => {
+    durationUnavailableRef.current = onDurationUnavailable
+  })
 
   useEffect(() => {
     const video = videoRef.current
@@ -41,7 +52,12 @@ export function RecordingVideo({ src, density, onError }: RecordingVideoProps) {
       setIsPriming(true)
       detachRef.current?.()
       detachRef.current = primeVideoDuration(video, {
-        onSettled: () => setIsPriming(false),
+        onSettled: (resolved) => {
+          setIsPriming(false)
+          if (!resolved) {
+            durationUnavailableRef.current?.()
+          }
+        },
       })
     }
 
