@@ -7273,6 +7273,10 @@
           "position": {
             "type": "string"
           },
+          "assignedHrId": {
+            "type": "string",
+            "description": "HR reviewer assigned to this interview. Admin/super_admin only."
+          },
           "interviewLocale": {
             "type": "string",
             "enum": [
@@ -7299,6 +7303,25 @@
           "candidateName",
           "position",
           "questionIds"
+        ]
+      },
+      "AssignedHrDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email"
         ]
       },
       "MediaArtifactDto": {
@@ -7843,6 +7866,18 @@
           "position": {
             "type": "string"
           },
+          "assignedHrId": {
+            "type": "string",
+            "description": "Assigned HR reviewer user id. Omitted when unassigned."
+          },
+          "assignedHr": {
+            "description": "Assigned HR reviewer details for display.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AssignedHrDto"
+              }
+            ]
+          },
           "interviewLocale": {
             "type": "string",
             "enum": [
@@ -8074,6 +8109,18 @@
           "position": {
             "type": "string"
           },
+          "assignedHrId": {
+            "type": "string",
+            "description": "Assigned HR reviewer user id. Omitted when unassigned."
+          },
+          "assignedHr": {
+            "description": "Assigned HR reviewer details for display.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AssignedHrDto"
+              }
+            ]
+          },
           "interviewLocale": {
             "type": "string",
             "enum": [
@@ -8197,6 +8244,11 @@
           },
           "position": {
             "type": "string"
+          },
+          "assignedHrId": {
+            "type": "object",
+            "description": "HR reviewer UUID, or null to clear assignment. Admin/super_admin only.",
+            "nullable": true
           },
           "questionIds": {
             "type": "array",
@@ -9242,11 +9294,13 @@
         "properties": {
           "recommendationText": {
             "type": "string",
-            "description": "Candidate-facing strengths / recommendations text."
+            "description": "Candidate-facing strengths / recommendations text.",
+            "maxLength": 10000
           },
           "improvementText": {
             "type": "string",
-            "description": "Candidate-facing growth areas / improvement text."
+            "description": "Candidate-facing growth areas / improvement text.",
+            "maxLength": 10000
           },
           "state": {
             "type": "string",
@@ -9254,7 +9308,7 @@
               "accepted",
               "edited"
             ],
-            "description": "HR may accept generated text or mark manual edits."
+            "description": "HR may accept generated text or mark manual edits. `accepted` and `edited` require at least one non-empty text on the block (from the request or already stored)."
           }
         }
       },
@@ -9267,11 +9321,13 @@
           },
           "recommendationText": {
             "type": "string",
-            "description": "Candidate-facing strengths / recommendations text."
+            "description": "Candidate-facing strengths / recommendations text.",
+            "maxLength": 10000
           },
           "improvementText": {
             "type": "string",
-            "description": "Candidate-facing growth areas / improvement text."
+            "description": "Candidate-facing growth areas / improvement text.",
+            "maxLength": 10000
           },
           "state": {
             "type": "string",
@@ -9279,7 +9335,7 @@
               "accepted",
               "edited"
             ],
-            "description": "HR may accept generated text or mark manual edits."
+            "description": "HR may accept generated text or mark manual edits. `accepted` and `edited` require at least one non-empty text on the block (from the request or already stored)."
           }
         },
         "required": [
