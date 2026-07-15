@@ -83,7 +83,6 @@ export function SideNav() {
       : []),
     ...(canConfigureInterview(user?.role)
       ? [
-          { href: routes.interviews.list, label: tNav('interviews'), icon: BriefcaseBusiness },
           // Templates are read-only for demo accounts, so this entry is not gated on !isDemo.
           { href: routes.templates.list, label: tNav('templates'), icon: LayoutTemplate },
         ]
