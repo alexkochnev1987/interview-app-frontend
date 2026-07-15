@@ -22,7 +22,7 @@ import { Stack } from '@/components/ui/layout/stack'
 import { StatusPill } from '@/components/ui/status-pill'
 import { SurfaceTile } from '@/components/ui/surface-tile'
 import { BodyText } from '@/components/ui/text'
-import { VideoFrame, VideoSurface } from '@/components/ui/video-frame'
+import { RecordingVideo } from '@/components/ui/recording-video'
 import type { Answer, InterviewQuestion } from '@/lib/api'
 import { formatInterviewDateTime } from '@/lib/interview-formatters'
 import {
@@ -263,14 +263,7 @@ function AnswerMediaPanels({ media }: AnswerMediaPanelsProps) {
         <SurfaceTile rounded="xl">
           <Stack gap={3}>
             <EyebrowLabel>{t('candidateCamera')}</EyebrowLabel>
-            <VideoFrame className="my-0 rounded-2xl">
-              <VideoSurface
-                controls
-                preload="metadata"
-                playsInline
-                src={media.cameraUrl}
-              />
-            </VideoFrame>
+            <RecordingVideo src={media.cameraUrl} density="compact" />
           </Stack>
         </SurfaceTile>
       ) : null}
@@ -278,14 +271,7 @@ function AnswerMediaPanels({ media }: AnswerMediaPanelsProps) {
         <SurfaceTile rounded="xl">
           <Stack gap={3}>
             <EyebrowLabel>{t('candidateScreen')}</EyebrowLabel>
-            <VideoFrame className="my-0 rounded-2xl">
-              <VideoSurface
-                controls
-                preload="metadata"
-                playsInline
-                src={media.screenUrl}
-              />
-            </VideoFrame>
+            <RecordingVideo src={media.screenUrl} density="compact" />
           </Stack>
         </SurfaceTile>
       ) : null}
