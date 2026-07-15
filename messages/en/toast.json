@@ -33,6 +33,15 @@
       "deleteSuccess": "Interview deleted",
       "deleteError": "Failed to delete interview"
     },
+    "candidateFeedback": {
+      "acceptSuccess": "Suggestion accepted",
+      "applyAllSuccess": "All suggestions applied",
+      "acceptError": "Failed to accept suggestion",
+      "saveSuccess": "Feedback saved",
+      "saveError": "Failed to save feedback",
+      "generateStartSuccess": "Generation started",
+      "generateStartError": "Failed to start generation"
+    },
     "interviewsLibrary": {
       "loadFailedFallback": "Failed to load interviews."
     },
@@ -100,6 +109,13 @@
       "feedback": {
         "unavailableTitle": "Feedback unavailable",
         "loadFailedFallback": "Failed to load"
+      },
+      "candidateFeedback": {
+        "forbiddenTitle": "You don't have access to candidate feedback",
+        "forbiddenDescription": "Editing candidate feedback is reserved for HR, admin, and super-admin users. If you think this is a mistake, contact your workspace owner.",
+        "unavailableTitle": "Candidate feedback unavailable",
+        "loadFailedFallback": "Failed to load candidate feedback.",
+        "notFoundFallback": "The requested interview could not be loaded."
       },
       "team": {
         "forbiddenTitle": "You don't have access to team management",

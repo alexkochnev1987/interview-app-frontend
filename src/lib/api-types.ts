@@ -902,6 +902,70 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/interviews/{id}/candidate-feedback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get candidate-facing feedback blocks for HR review
+         * @description Returns overall and per-question blocks with generation state and current texts.
+         */
+        get: operations["CandidateFeedbackController_getCandidateFeedback"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update candidate-facing feedback texts and block states
+         * @description Partial update: HR may set recommendation/improvement texts and move blocks to accepted or edited.
+         */
+        patch: operations["CandidateFeedbackController_patchCandidateFeedback"];
+        trace?: never;
+    };
+    "/interviews/{id}/candidate-feedback/generate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Generate candidate-facing feedback for the whole interview
+         * @description Starts generation in the background and returns immediately with queued/skipped plan. Poll GET `/interviews/{id}/candidate-feedback` for `generating` → `generated` progress. Locked accepted/edited blocks are not overwritten.
+         */
+        post: operations["CandidateFeedbackController_generateAllCandidateFeedback"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/interviews/{id}/candidate-feedback/questions/{questionIndex}/generate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Generate candidate-facing feedback for one question
+         * @description Uses answer.transcript.text and behaviorSignals to produce recommendationText and improvementText in interviewLocale. Locked blocks (accepted/edited) are not overwritten.
+         */
+        post: operations["CandidateFeedbackController_generateQuestionFeedback"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1958,6 +2022,92 @@ export interface components {
             url: string;
             /** Format: date-time */
             expiresAt: string;
+        };
+        CandidateFeedbackBlockDto: {
+            /** @description Candidate-facing strengths / recommendations text. */
+            recommendationText?: string;
+            /** @description Candidate-facing growth areas / improvement text. */
+            improvementText?: string;
+            /**
+             * @description Block lifecycle: not_generated → generating → generated; HR may lock via accepted/edited; failed when AI errors.
+             * @enum {string}
+             */
+            state: "not_generated" | "generating" | "generated" | "accepted" | "edited" | "failed";
+            /** @description Present when generation failed for this block. */
+            errorMessage?: string;
+        };
+        CandidateFeedbackQuestionBlockDto: {
+            /** @description Candidate-facing strengths / recommendations text. */
+            recommendationText?: string;
+            /** @description Candidate-facing growth areas / improvement text. */
+            improvementText?: string;
+            /**
+             * @description Block lifecycle: not_generated → generating → generated; HR may lock via accepted/edited; failed when AI errors.
+             * @enum {string}
+             */
+            state: "not_generated" | "generating" | "generated" | "accepted" | "edited" | "failed";
+            /** @description Present when generation failed for this block. */
+            errorMessage?: string;
+            questionIndex: number;
+            /** Format: uuid */
+            questionId: string;
+        };
+        CandidateFeedbackResponseDto: {
+            /** Format: uuid */
+            interviewId: string;
+            overall: components["schemas"]["CandidateFeedbackBlockDto"];
+            questions: components["schemas"]["CandidateFeedbackQuestionBlockDto"][];
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        PatchCandidateFeedbackOverallBlockDto: {
+            /** @description Candidate-facing strengths / recommendations text. */
+            recommendationText?: string;
+            /** @description Candidate-facing growth areas / improvement text. */
+            improvementText?: string;
+            /**
+             * @description HR may accept generated text or mark manual edits.
+             * @enum {string}
+             */
+            state?: "accepted" | "edited";
+        };
+        PatchCandidateFeedbackQuestionBlockDto: {
+            questionIndex: number;
+            /** @description Candidate-facing strengths / recommendations text. */
+            recommendationText?: string;
+            /** @description Candidate-facing growth areas / improvement text. */
+            improvementText?: string;
+            /**
+             * @description HR may accept generated text or mark manual edits.
+             * @enum {string}
+             */
+            state?: "accepted" | "edited";
+        };
+        PatchCandidateFeedbackDto: {
+            /** @description Partial overall block update. */
+            overall?: components["schemas"]["PatchCandidateFeedbackOverallBlockDto"];
+            /** @description Partial per-question block updates. */
+            questions?: components["schemas"]["PatchCandidateFeedbackQuestionBlockDto"][];
+        };
+        GenerateAllCandidateFeedbackQuestionResultDto: {
+            /** @enum {string} */
+            status: "queued" | "generated" | "skipped" | "failed";
+            questionIndex: number;
+            /** @enum {string} */
+            reason?: "locked" | "in_progress" | "not_submitted" | "missing_answer" | "missing_transcript" | "missing_question";
+            errorMessage?: string;
+        };
+        GenerateAllCandidateFeedbackOverallResultDto: {
+            /** @enum {string} */
+            status: "queued" | "generated" | "skipped" | "failed";
+            /** @enum {string} */
+            reason?: "locked" | "in_progress" | "no_question_texts";
+            errorMessage?: string;
+        };
+        GenerateAllCandidateFeedbackResponseDto: {
+            feedback: components["schemas"]["CandidateFeedbackResponseDto"];
+            questions: components["schemas"]["GenerateAllCandidateFeedbackQuestionResultDto"][];
+            overall: components["schemas"]["GenerateAllCandidateFeedbackOverallResultDto"];
         };
     };
     responses: never;
@@ -4646,6 +4796,235 @@ export interface operations {
                 content?: never;
             };
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    CandidateFeedbackController_getCandidateFeedback: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path: {
+                /** @description Interview ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CandidateFeedbackResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    CandidateFeedbackController_patchCandidateFeedback: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path: {
+                /** @description Interview ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PatchCandidateFeedbackDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CandidateFeedbackResponseDto"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    CandidateFeedbackController_generateAllCandidateFeedback: {
+        parameters: {
+            query: {
+                /** @description Generation scope. MVP supports only `all`. */
+                scope: "all";
+            };
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path: {
+                /** @description Interview ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenerateAllCandidateFeedbackResponseDto"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    CandidateFeedbackController_generateQuestionFeedback: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path: {
+                /** @description Interview ID */
+                id: string;
+                /** @description Zero-based question index */
+                questionIndex: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CandidateFeedbackQuestionBlockDto"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };

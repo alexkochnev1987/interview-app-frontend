@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback } from 'react'
-import { Sparkles } from 'lucide-react'
+import { MessageSquareText, Sparkles } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 import { EvaluationActionsProvider } from '@/components/assessments/actions/evaluation-actions-context'
@@ -14,6 +14,7 @@ import { QuestionSection } from '@/components/assessments/detail/question-sectio
 import { LiveRefreshNotice } from '@/components/assessments/live-refresh-notice'
 import { InterviewReuseActions } from '@/components/templates/interview-reuse-actions'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { EyebrowLabel } from '@/components/ui/eyebrow-label'
 import { Icon } from '@/components/ui/icon'
@@ -21,6 +22,8 @@ import { Inline } from '@/components/ui/layout/inline'
 import { Section } from '@/components/ui/layout/section'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText, SectionHeading } from '@/components/ui/text'
+import { Link } from '@/i18n/navigation'
+import { routes } from '@/i18n/routes'
 import { getInterview, type Interview } from '@/lib/api'
 import {
   canRerunReview,
@@ -38,6 +41,7 @@ export function AssessmentDetailContent({
   initialInterview,
 }: AssessmentDetailContentProps) {
   const tAssessments = useTranslations('assessments')
+  const tInterviewsDetail = useTranslations('interviews.detail')
   const interviewId = initialInterview.id
 
   const fetcher = useCallback(() => getInterview(interviewId), [interviewId])
@@ -67,12 +71,25 @@ export function AssessmentDetailContent({
     answer: answersByIndex.get(index),
   }))
 
+  const headerActions = (
+    <Inline gap={2} wrap="wrap" justify="end" width="full">
+      {interview.status === 'completed' ? (
+        <Button type="button" variant="gradient" shape="pill" asChild>
+          <Link href={routes.interviews.candidateFeedback(interviewId)}>
+            <Icon size="sm">
+              <MessageSquareText />
+            </Icon>
+            {tInterviewsDetail('candidateFeedback')}
+          </Link>
+        </Button>
+      ) : null}
+      <InterviewReuseActions interview={interview} />
+    </Inline>
+  )
+
   return (
     <EvaluationActionsProvider onEvaluationStarted={onEvaluationStarted}>
-      <DetailHeader
-        interview={interview}
-        actions={<InterviewReuseActions interview={interview} />}
-      />
+      <DetailHeader interview={interview} actions={headerActions} />
 
       {!isReadyToScore ? <EvaluationStatusBanner interview={interview} /> : null}
 
