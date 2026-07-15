@@ -12,8 +12,8 @@ import { Grid } from '@/components/ui/layout/grid'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { SurfaceTile } from '@/components/ui/surface-tile'
+import { RecordingVideo } from '@/components/ui/recording-video'
 import { BodyText } from '@/components/ui/text'
-import { VideoFrame, VideoSurface } from '@/components/ui/video-frame'
 import {
   getInterviewAnswerMedia,
   type InterviewAnswerMediaResponse,
@@ -63,6 +63,10 @@ export function LazyMediaPlayback({
       clearTimeout(id)
     }
   }, [state])
+
+  function handleMediaError() {
+    setIsStale(true)
+  }
 
   async function handleLoad() {
     setState({ phase: 'loading' })
@@ -174,14 +178,7 @@ export function LazyMediaPlayback({
           <SurfaceTile rounded="xl" padding="lg">
             <Stack gap={3}>
               <EyebrowLabel size="sm">{t('candidateCamera')}</EyebrowLabel>
-              <VideoFrame>
-                <VideoSurface
-                  controls
-                  preload="metadata"
-                  playsInline
-                  src={cameraUrl}
-                />
-              </VideoFrame>
+              <RecordingVideo src={cameraUrl} onError={handleMediaError} />
             </Stack>
           </SurfaceTile>
         ) : null}
@@ -189,14 +186,7 @@ export function LazyMediaPlayback({
           <SurfaceTile rounded="xl" padding="lg">
             <Stack gap={3}>
               <EyebrowLabel size="sm">{t('candidateScreen')}</EyebrowLabel>
-              <VideoFrame>
-                <VideoSurface
-                  controls
-                  preload="metadata"
-                  playsInline
-                  src={screenUrl}
-                />
-              </VideoFrame>
+              <RecordingVideo src={screenUrl} onError={handleMediaError} />
             </Stack>
           </SurfaceTile>
         ) : null}
