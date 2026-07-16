@@ -324,6 +324,33 @@ function toUpdateQuestionDto(data: UpdateQuestionInput): Schemas['UpdateQuestion
 
 export type TeamMember = Schemas['AuthUserResponseDto'];
 
+export type FetchUsersParams = NonNullable<paths['/users']['get']['parameters']['query']>;
+
+export type AssignedHr = Schemas['AssignedHrDto'];
+
+export async function fetchUsers(
+  params?: FetchUsersParams,
+  init?: { signal?: AbortSignal },
+): Promise<TeamMember[]> {
+  return handle(
+    client.GET('/users', {
+      ...LOCALIZED_HEADERS,
+      params: { query: params ?? {} },
+      signal: init?.signal,
+    }),
+  );
+}
+
+export async function fetchHrUsers(
+    init?: { signal?: AbortSignal },
+): Promise<AssignedHr[]> {
+  const users = await fetchUsers({ limit: 200 }, init);
+  return users
+      .filter((u) => u.role === 'hr')
+      .map(({ id, name, email }) => ({ id, name, email }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+}
+
 export async function updateUserRole(
   id: string,
   role: 'super_admin' | 'admin' | 'hr' | 'candidate',
