@@ -37,6 +37,7 @@ export function OnboardingWelcomeDialog({
     <ModalShell
       size="md"
       layer="tour"
+      dismissDisabled
       accessibilityTitle={title}
       accessibilityDescription={description}
     >

@@ -33,6 +33,7 @@ export function OnboardingCompleteDialog({
     <ModalShell
       size="md"
       layer="tour"
+      dismissDisabled
       accessibilityTitle={title}
       accessibilityDescription={description}
     >
