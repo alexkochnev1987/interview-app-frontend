@@ -29,7 +29,7 @@
       "scorecardEyebrow": "Karta wyników",
       "scorecardHeading": "Wynik ogólny",
       "assignedHrUnassigned": "Nieprzypisany",
-      "assignedHrAssigned": "{name}"
+      "assignedHrAssigned": "Przypisany do {name}"
     },
     "liveRefresh": {
       "title": "Aktualizacje na żywo są wstrzymane",

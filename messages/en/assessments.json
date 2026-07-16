@@ -29,7 +29,7 @@
       "scorecardEyebrow": "Scorecard",
       "scorecardHeading": "Overall result",
       "assignedHrUnassigned": "Unassigned",
-      "assignedHrAssigned": "{name}"
+      "assignedHrAssigned": "Assigned to {name}"
     },
     "liveRefresh": {
       "title": "Live updates are paused",

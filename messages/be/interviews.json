@@ -17,9 +17,8 @@
         "completed": "Завершана",
         "failed": "Не атрымалася"
       },
-      "assignedHrLabel": "Прызначаны HR",
       "assignedHrUnassigned": "Не прызначаны",
-      "assignedHrAssigned": "{name}",
+      "assignedHrAssigned": "Прызначаны: {name}",
       "demoTryCandidateExperience": "Паспрабаваць вопыт кандыдата"
     },
     "library": {

@@ -17,9 +17,8 @@
         "completed": "Completed",
         "failed": "Failed"
       },
-      "assignedHrLabel": "Assigned HR",
       "assignedHrUnassigned": "Unassigned",
-      "assignedHrAssigned": "{name}",
+      "assignedHrAssigned": "Assigned to {name}",
       "demoTryCandidateExperience": "Try the candidate experience"
     },
     "library": {

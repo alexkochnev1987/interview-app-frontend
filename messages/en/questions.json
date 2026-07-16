@@ -482,6 +482,7 @@
       "assignedHrLabel": "Assigned HR reviewer",
       "assignedHrUnassigned": "Unassigned",
       "assignedHrLoading": "Loading HR users…",
+      "assignedHrLoadError": "Failed to load HR users.",
       "candidateNamePlaceholder": "e.g. Jane Doe",
       "positionLabel": "Position",
       "positionPlaceholder": "e.g. Senior Frontend Engineer",
