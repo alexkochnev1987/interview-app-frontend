@@ -40,7 +40,10 @@
       "saveSuccess": "Зваротная сувязь захавана",
       "saveError": "Не ўдалося захаваць зваротную сувязь",
       "generateStartSuccess": "Генерацыя запушчана",
-      "generateStartError": "Не ўдалося запусціць генерацыю"
+      "generateStartError": "Не ўдалося запусціць генерацыю",
+      "generateStaleValidation": "Перазапусціце AI-ацэнку для выбранай версіі адказу перад генерацыяй зваротнай сувязі",
+      "generateLockedOnly": "Заблакаваныя блокі прапушчаны; генераваць няма чаго",
+      "generateNothingEligible": "Няма прыдатных пытанняў для генерацыі"
     },
     "interviewsLibrary": {
       "loadFailedFallback": "Не ўдалося загрузіць інтэрв'ю."

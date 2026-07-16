@@ -186,6 +186,7 @@
         "unusable_transcript": "The recorded response did not contain a substantive answer to this question.",
         "not_submitted": "No answer was submitted for this question.",
         "missing_answer": "No answer was submitted for this question.",
+        "stale_validation": "Re-run AI evaluation for the selected answer version before generating feedback.",
         "off_topic": "The answer did not stay on topic for this question.",
         "not_addressed": "The answer did not address what this question asked.",
         "missing_question": "This question could not be found.",

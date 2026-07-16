@@ -40,7 +40,10 @@
       "saveSuccess": "Feedback saved",
       "saveError": "Failed to save feedback",
       "generateStartSuccess": "Generation started",
-      "generateStartError": "Failed to start generation"
+      "generateStartError": "Failed to start generation",
+      "generateStaleValidation": "Re-run AI evaluation for the selected answer version before generating feedback",
+      "generateLockedOnly": "Locked blocks were skipped; nothing to generate",
+      "generateNothingEligible": "No eligible questions to generate"
     },
     "interviewsLibrary": {
       "loadFailedFallback": "Failed to load interviews."

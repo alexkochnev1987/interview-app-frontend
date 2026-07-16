@@ -40,7 +40,10 @@
       "saveSuccess": "Informacja zwrotna zapisana",
       "saveError": "Nie udało się zapisać informacji zwrotnej",
       "generateStartSuccess": "Rozpoczęto generowanie",
-      "generateStartError": "Nie udało się rozpocząć generowania"
+      "generateStartError": "Nie udało się rozpocząć generowania",
+      "generateStaleValidation": "Ponownie uruchom ocenę AI dla wybranej wersji odpowiedzi przed generowaniem informacji zwrotnej",
+      "generateLockedOnly": "Zablokowane bloki zostały pominięte; nie ma nic do wygenerowania",
+      "generateNothingEligible": "Brak kwalifikujących się pytań do wygenerowania"
     },
     "interviewsLibrary": {
       "loadFailedFallback": "Nie udało się załadować interview."

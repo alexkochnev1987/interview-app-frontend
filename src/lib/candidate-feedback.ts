@@ -5,6 +5,7 @@ export type CandidateFeedbackSkipReason =
   | 'in_progress'
   | 'not_submitted'
   | 'missing_answer'
+  | 'stale_validation'
   | 'missing_transcript'
   | 'missing_question'
   | 'unusable_transcript'
@@ -31,6 +32,7 @@ const CANDIDATE_FEEDBACK_SKIP_REASONS = new Set<CandidateFeedbackSkipReason>([
   'in_progress',
   'not_submitted',
   'missing_answer',
+  'stale_validation',
   'missing_transcript',
   'missing_question',
   'unusable_transcript',
@@ -593,6 +595,51 @@ export function resolveGenerateAllOverallSkipReason(
     parseCandidateFeedbackSkipReason(overall.reason) ??
     parseCandidateFeedbackSkipReason(overall.errorMessage)
   )
+}
+
+export type GenerateAllStartToastKind =
+  | 'started'
+  | 'stale_validation'
+  | 'locked_only'
+  | 'nothing_to_generate'
+
+export function isGenerateAllPlanQueued(
+  plan: GenerateAllCandidateFeedbackPlan | undefined,
+): boolean {
+  if (!plan) {
+    return true
+  }
+
+  if (plan.overall.status === 'queued') {
+    return true
+  }
+
+  return plan.questions.some((question) => question.status === 'queued')
+}
+
+export function resolveGenerateAllStartToastKind(
+  plan: GenerateAllCandidateFeedbackPlan | undefined,
+): GenerateAllStartToastKind {
+  if (isGenerateAllPlanQueued(plan)) {
+    return 'started'
+  }
+
+  const skipReasons = [
+    ...getSkippedGenerateAllQuestionResults(plan?.questions).map(
+      resolveGenerateAllSkipReason,
+    ),
+    resolveGenerateAllOverallSkipReason(plan?.overall),
+  ].filter((reason): reason is CandidateFeedbackSkipReason => reason != null)
+
+  if (skipReasons.includes('stale_validation')) {
+    return 'stale_validation'
+  }
+
+  if (skipReasons.length > 0 && skipReasons.every((reason) => reason === 'locked')) {
+    return 'locked_only'
+  }
+
+  return 'nothing_to_generate'
 }
 
 export function parseGenerateAllCandidateFeedbackPostBody(body: string): {

@@ -186,6 +186,7 @@
         "unusable_transcript": "Nagrana odpowiedź nie zawierała merytorycznej odpowiedzi na to pytanie.",
         "not_submitted": "Na to pytanie nie przesłano odpowiedzi.",
         "missing_answer": "Na to pytanie nie przesłano odpowiedzi.",
+        "stale_validation": "Ponownie uruchom ocenę AI dla wybranej wersji odpowiedzi przed generowaniem informacji zwrotnej.",
         "off_topic": "Odpowiedź nie pozostała na temat tego pytania.",
         "not_addressed": "Odpowiedź nie odnosi się do sedna tego pytania.",
         "missing_question": "Nie znaleziono tego pytania.",

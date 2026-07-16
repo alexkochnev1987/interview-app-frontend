@@ -40,7 +40,10 @@
       "saveSuccess": "Обратная связь сохранена",
       "saveError": "Не удалось сохранить обратную связь",
       "generateStartSuccess": "Генерация запущена",
-      "generateStartError": "Не удалось запустить генерацию"
+      "generateStartError": "Не удалось запустить генерацию",
+      "generateStaleValidation": "Перезапустите AI-оценку для выбранной версии ответа перед генерацией обратной связи",
+      "generateLockedOnly": "Заблокированные блоки пропущены; генерировать нечего",
+      "generateNothingEligible": "Нет подходящих вопросов для генерации"
     },
     "interviewsLibrary": {
       "loadFailedFallback": "Не удалось загрузить интервью."

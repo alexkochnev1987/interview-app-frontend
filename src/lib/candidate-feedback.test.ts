@@ -15,6 +15,7 @@ import {
   parseCandidateFeedbackErrorMessage,
   parseGenerateAllCandidateFeedbackPostBody,
   resolveGenerateAllOverallSkipReason,
+  resolveGenerateAllStartToastKind,
   isCandidateFeedbackSkippedFailureBlock,
   type CandidateFeedbackResponse,
 } from '@/lib/candidate-feedback'
@@ -176,6 +177,72 @@ describe('resolveGenerateAllOverallSkipReason', () => {
 
   it('returns null when overall is queued', () => {
     expect(resolveGenerateAllOverallSkipReason({ status: 'queued' })).toBeNull()
+  })
+})
+
+describe('resolveGenerateAllStartToastKind', () => {
+  it('returns started when any question is queued', () => {
+    expect(
+      resolveGenerateAllStartToastKind({
+        questions: [
+          { status: 'skipped', questionIndex: 0, reason: 'stale_validation' },
+          { status: 'queued', questionIndex: 1 },
+        ],
+        overall: { status: 'skipped', reason: 'locked' },
+      }),
+    ).toBe('started')
+  })
+
+  it('returns started when overall is queued', () => {
+    expect(
+      resolveGenerateAllStartToastKind({
+        questions: [
+          { status: 'skipped', questionIndex: 0, reason: 'locked' },
+        ],
+        overall: { status: 'queued' },
+      }),
+    ).toBe('started')
+  })
+
+  it('returns started when plan is missing', () => {
+    expect(resolveGenerateAllStartToastKind(undefined)).toBe('started')
+  })
+
+  it('prioritizes stale_validation when nothing is queued', () => {
+    expect(
+      resolveGenerateAllStartToastKind({
+        questions: [
+          { status: 'skipped', questionIndex: 0, reason: 'locked' },
+          { status: 'skipped', questionIndex: 1, reason: 'stale_validation' },
+          { status: 'skipped', questionIndex: 2, reason: 'missing_answer' },
+        ],
+        overall: { status: 'skipped', reason: 'locked' },
+      }),
+    ).toBe('stale_validation')
+  })
+
+  it('returns locked_only when every skip is locked', () => {
+    expect(
+      resolveGenerateAllStartToastKind({
+        questions: [
+          { status: 'skipped', questionIndex: 0, reason: 'locked' },
+          { status: 'skipped', questionIndex: 1, reason: 'locked' },
+        ],
+        overall: { status: 'skipped', reason: 'locked' },
+      }),
+    ).toBe('locked_only')
+  })
+
+  it('returns nothing_to_generate for other non-queued plans', () => {
+    expect(
+      resolveGenerateAllStartToastKind({
+        questions: [
+          { status: 'skipped', questionIndex: 0, reason: 'missing_answer' },
+          { status: 'failed', questionIndex: 1 },
+        ],
+        overall: { status: 'skipped', reason: 'no_question_texts' },
+      }),
+    ).toBe('nothing_to_generate')
   })
 })
 

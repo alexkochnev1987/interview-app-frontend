@@ -47,12 +47,13 @@ import {
   isOverallBlockGenerationBusy,
   isQuestionBlockGenerationBusy,
   resolveGenerateAllOverallSkipReason,
+  resolveGenerateAllStartToastKind,
   type GenerateAllCandidateFeedbackOutcome,
   type GenerateAllQuestionSkipEntry,
 } from '@/lib/candidate-feedback'
 import { getErrorMessage as getApiErrorMessage } from '@/lib/api-error'
 import { runMutation } from '@/lib/run-mutation'
-import { notifyError } from '@/lib/toast'
+import { notifyError, notifySuccess } from '@/lib/toast'
 import { useCandidateFeedbackToastMessages } from '@/lib/toast-messages/use-candidate-feedback-toast-messages'
 
 interface CandidateFeedbackEditorProps {
@@ -173,12 +174,14 @@ export function CandidateFeedbackEditor({
     >,
     toast: FeedbackMutationToast,
     onSuccess?: (result: GenerateAllCandidateFeedbackOutcome) => void,
+    options?: { showSuccessToast?: boolean },
   ) {
     setGeneratingTarget(target)
     try {
       const result = await runMutation(() => applyGenerationUpdate(mutation), {
         ...toast,
         showErrorToast: false,
+        showSuccessToast: options?.showSuccessToast,
       })
       onSuccess?.(result)
     } catch (err) {
@@ -211,6 +214,17 @@ export function CandidateFeedbackEditor({
         errorMessage: toastMessages.generateStartError,
       },
       (result) => {
+        const toastKind = resolveGenerateAllStartToastKind(result.plan)
+        if (toastKind === 'started') {
+          notifySuccess(toastMessages.generateStartSuccess)
+        } else if (toastKind === 'stale_validation') {
+          notifyError(toastMessages.generateStaleValidation)
+        } else if (toastKind === 'locked_only') {
+          notifyError(toastMessages.generateLockedOnly)
+        } else {
+          notifyError(toastMessages.generateNothingEligible)
+        }
+
         const skipped = getSkippedGenerateAllQuestionResults(result.plan?.questions)
         const overallReason = resolveGenerateAllOverallSkipReason(
           result.plan?.overall,
@@ -224,6 +238,7 @@ export function CandidateFeedbackEditor({
           overallReason,
         })
       },
+      { showSuccessToast: false },
     )
   }
 
@@ -444,7 +459,7 @@ export function CandidateFeedbackEditor({
             ) : null}
           </Inline>
 
-          {canRegenerateAny && generateAllSkipSummary ? (
+          {generateAllSkipSummary ? (
             <CandidateFeedbackSkippedSummary
               questionEntries={generateAllSkipSummary.questionEntries}
               overallReason={generateAllSkipSummary.overallReason}
