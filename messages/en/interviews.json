@@ -42,12 +42,14 @@
       "table": {
         "candidate": "Candidate",
         "position": "Position",
+        "hr": "HR",
         "status": "Status",
         "progress": "Progress",
         "score": "Score",
         "updated": "Updated",
         "created": "Created"
       },
+      "assignedHrNotAssigned": "Not assigned",
       "toolbar": {
         "searchPlaceholder": "Search by candidate name",
         "resultCount": "{count} interviews",

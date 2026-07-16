@@ -42,12 +42,14 @@
       "table": {
         "candidate": "Kandydat",
         "position": "Stanowisko",
+        "hr": "HR",
         "status": "Status",
         "progress": "Postęp",
         "score": "Wynik",
         "updated": "Zaktualizowano",
         "created": "Utworzono"
       },
+      "assignedHrNotAssigned": "Nieprzypisany",
       "toolbar": {
         "searchPlaceholder": "Szukaj według imienia i nazwiska kandydata",
         "resultCount": "{count} interview",
