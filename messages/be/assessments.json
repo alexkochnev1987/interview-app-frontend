@@ -29,7 +29,7 @@
       "scorecardEyebrow": "Карта вынікаў",
       "scorecardHeading": "Агульны вынік",
       "assignedHrUnassigned": "Не прызначаны",
-      "assignedHrAssigned": "{name}"
+      "assignedHrAssigned": "Прызначаны: {name}"
     },
     "liveRefresh": {
       "title": "Жывыя абнаўленні прыпынены",

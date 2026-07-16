@@ -17,9 +17,8 @@
         "completed": "Zakończony",
         "failed": "Przegrany"
       },
-      "assignedHrLabel": "Przypisany HR",
       "assignedHrUnassigned": "Nieprzypisany",
-      "assignedHrAssigned": "{name}",
+      "assignedHrAssigned": "Przypisany do {name}",
       "demoTryCandidateExperience": "Wypróbuj jako kandydat"
     },
     "library": {

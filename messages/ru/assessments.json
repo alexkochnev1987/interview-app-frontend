@@ -29,7 +29,7 @@
       "scorecardEyebrow": "Итоговая карта",
       "scorecardHeading": "Общий результат",
       "assignedHrUnassigned": "Не назначен",
-      "assignedHrAssigned": "{name}"
+      "assignedHrAssigned": "Назначен: {name}"
     },
     "liveRefresh": {
       "title": "Живые обновления приостановлены",

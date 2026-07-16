@@ -482,6 +482,7 @@
       "assignedHrLabel": "Прызначаны HR-спецыяліст",
       "assignedHrUnassigned": "Не прызначаны",
       "assignedHrLoading": "Загрузка карыстальнікаў HR…",
+      "assignedHrLoadError": "Не атрымалася загрузіць карыстальнікаў HR.",
       "candidateNamePlaceholder": "напр. Джэйн Доу",
       "positionLabel": "Пазіцыя",
       "positionPlaceholder": "напр. Старэйшы інтэрфейсны інжынер",

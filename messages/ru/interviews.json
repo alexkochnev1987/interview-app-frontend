@@ -17,9 +17,8 @@
         "completed": "Завершенный",
         "failed": "Неуспешный"
       },
-      "assignedHrLabel": "Назначенный HR",
       "assignedHrUnassigned": "Не назначен",
-      "assignedHrAssigned": "{name}",
+      "assignedHrAssigned": "Назначен: {name}",
       "demoTryCandidateExperience": "Попробовать как кандидат"
     },
     "library": {
