@@ -27,7 +27,9 @@
       "perQuestionEyebrow": "Прагляд па пытаннях",
       "perQuestionHeading": "Пытанні і адказы",
       "scorecardEyebrow": "Карта вынікаў",
-      "scorecardHeading": "Агульны вынік"
+      "scorecardHeading": "Агульны вынік",
+      "assignedHrUnassigned": "Не прызначаны",
+      "assignedHrAssigned": "{name}"
     },
     "liveRefresh": {
       "title": "Жывыя абнаўленні прыпынены",

@@ -27,7 +27,9 @@
       "perQuestionEyebrow": "Per-question review",
       "perQuestionHeading": "Questions and answers",
       "scorecardEyebrow": "Scorecard",
-      "scorecardHeading": "Overall result"
+      "scorecardHeading": "Overall result",
+      "assignedHrUnassigned": "Unassigned",
+      "assignedHrAssigned": "{name}"
     },
     "liveRefresh": {
       "title": "Live updates are paused",
