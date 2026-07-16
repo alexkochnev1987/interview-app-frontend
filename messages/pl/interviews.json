@@ -15,7 +15,10 @@
         "queued": "W kolejce",
         "processing": "Przetwarzanie",
         "completed": "Zakończony",
-        "failed": "Przegrany"
+        "failed": "Przegrany",
+        "assignedHrLabel": "Przypisany HR",
+        "assignedHrUnassigned": "Nieprzypisany",
+        "assignedHrAssigned": "{name}"
       },
       "demoTryCandidateExperience": "Wypróbuj jako kandydat"
     },
