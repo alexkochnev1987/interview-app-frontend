@@ -18,6 +18,13 @@ export async function createOnboardingDriver(
 ): Promise<Driver> {
   const { driver } = await import('driver.js');
 
+  // Only a deliberate dismissal (close button or Esc) counts as skipping the
+  // tour. A programmatic teardown via destroyOnboardingDriver (component
+  // unmount, locale switch, restart) also fires onDestroyed, and must not be
+  // treated as a skip or it would persist onboarding as done and never offer
+  // it again.
+  let userDismissed = false;
+
   const instance = driver({
     steps: params.steps,
     animate: true,
@@ -35,10 +42,15 @@ export async function createOnboardingDriver(
     allowClose: true,
     overlayClickBehavior: () => {},
     onCloseClick: () => {
+      userDismissed = true;
+      instance.destroy();
+    },
+    onDestroyStarted: () => {
+      userDismissed = true;
       instance.destroy();
     },
     onDestroyed: () => {
-      if (params.isComplete()) {
+      if (params.isComplete() || !userDismissed) {
         return;
       }
 
