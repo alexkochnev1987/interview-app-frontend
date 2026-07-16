@@ -19,6 +19,13 @@
       "exit": "Выйти из демо"
     }
   },
+  "recordingPlayer": {
+    "playbackFailedTitle": "Не удалось воспроизвести запись",
+    "playbackFailedDescription": "Запись не загрузилась.",
+    "durationUnavailableTitle": "Длительность записи недоступна",
+    "durationUnavailableDescription": "Не удалось определить длительность этой записи, поэтому индикатор выполнения может не работать. Воспроизведение по-прежнему работает.",
+    "refresh": "Обновить"
+  },
   "languageSwitcher": {
     "label": "Язык",
     "locales": {

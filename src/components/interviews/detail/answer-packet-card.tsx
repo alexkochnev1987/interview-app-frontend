@@ -22,7 +22,7 @@ import { Stack } from '@/components/ui/layout/stack'
 import { StatusPill } from '@/components/ui/status-pill'
 import { SurfaceTile } from '@/components/ui/surface-tile'
 import { BodyText } from '@/components/ui/text'
-import { RecordingVideo } from '@/components/ui/recording-video'
+import { RecordingPlayer } from '@/components/ui/recording-player'
 import type { Answer, InterviewQuestion } from '@/lib/api'
 import { formatInterviewDateTime } from '@/lib/interview-formatters'
 import {
@@ -263,7 +263,7 @@ function AnswerMediaPanels({ media }: AnswerMediaPanelsProps) {
         <SurfaceTile rounded="xl">
           <Stack gap={3}>
             <EyebrowLabel>{t('candidateCamera')}</EyebrowLabel>
-            <RecordingVideo src={media.cameraUrl} density="compact" />
+            <RecordingPlayer src={media.cameraUrl} density="compact" />
           </Stack>
         </SurfaceTile>
       ) : null}
@@ -271,7 +271,7 @@ function AnswerMediaPanels({ media }: AnswerMediaPanelsProps) {
         <SurfaceTile rounded="xl">
           <Stack gap={3}>
             <EyebrowLabel>{t('candidateScreen')}</EyebrowLabel>
-            <RecordingVideo src={media.screenUrl} density="compact" />
+            <RecordingPlayer src={media.screenUrl} density="compact" />
           </Stack>
         </SurfaceTile>
       ) : null}

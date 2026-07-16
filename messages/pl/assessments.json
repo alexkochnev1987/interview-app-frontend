@@ -101,10 +101,6 @@
       "expiredTitle": "Linki do nagrań mogły wygasnąć",
       "expiredDescription": "Podpisane adresy URL są ważne przez godzinę. Odśwież, aby uzyskać nowe linki do odtwarzania.",
       "refreshLinks": "Odśwież linki",
-      "playbackFailedTitle": "Nie udało się odtworzyć nagrania",
-      "playbackFailedDescription": "Nagranie nie zostało wczytane. Odśwież, aby spróbować ponownie.",
-      "durationUnavailableTitle": "Długość nagrania niedostępna",
-      "durationUnavailableDescription": "Nie udało się odczytać długości tego nagrania, więc pasek postępu może nie działać. Odtwarzanie nadal działa. Odśwież, aby spróbować ponownie.",
       "candidateCamera": "Kamera kandydata",
       "candidateScreen": "Ekran kandydata"
     },

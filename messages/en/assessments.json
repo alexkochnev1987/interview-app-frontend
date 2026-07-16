@@ -101,10 +101,6 @@
       "expiredTitle": "Recording links may have expired",
       "expiredDescription": "Signed URLs are valid for one hour. Refresh to get new playback links.",
       "refreshLinks": "Refresh links",
-      "playbackFailedTitle": "Recording could not be played",
-      "playbackFailedDescription": "The recording failed to load. Refresh to try again.",
-      "durationUnavailableTitle": "Recording length unavailable",
-      "durationUnavailableDescription": "The length of this recording could not be read, so the progress bar may not work. Playback still works. Refresh to try again.",
       "candidateCamera": "Candidate camera",
       "candidateScreen": "Candidate screen"
     },

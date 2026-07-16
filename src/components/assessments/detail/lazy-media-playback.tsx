@@ -12,7 +12,7 @@ import { Grid } from '@/components/ui/layout/grid'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { SurfaceTile } from '@/components/ui/surface-tile'
-import { RecordingVideo } from '@/components/ui/recording-video'
+import { RecordingPlayer } from '@/components/ui/recording-player'
 import { BodyText } from '@/components/ui/text'
 import {
   getInterviewAnswerMedia,
@@ -32,8 +32,6 @@ type LoadState =
   | { phase: 'ready'; media: InterviewAnswerMediaResponse; loadedAt: number }
   | { phase: 'error'; message: string }
 
-type PlaybackIssue = 'playbackFailed' | 'durationUnavailable'
-
 const SIGNED_URL_LIFETIME_MS = 60 * 60 * 1000
 const SIGNED_URL_REFRESH_THRESHOLD_MS = SIGNED_URL_LIFETIME_MS - 5 * 60 * 1000
 
@@ -46,7 +44,6 @@ export function LazyMediaPlayback({
   const t = useTranslations('assessments.media')
   const [state, setState] = useState<LoadState>({ phase: 'idle' })
   const [isStale, setIsStale] = useState(false)
-  const [playbackIssue, setPlaybackIssue] = useState<PlaybackIssue | null>(null)
 
   useEffect(() => {
     if (state.phase !== 'ready') {
@@ -67,16 +64,7 @@ export function LazyMediaPlayback({
     }
   }, [state])
 
-  function handleMediaError() {
-    setPlaybackIssue('playbackFailed')
-  }
-
-  function handleDurationUnavailable() {
-    setPlaybackIssue((current) => current ?? 'durationUnavailable')
-  }
-
   async function handleLoad() {
-    setPlaybackIssue(null)
     setState({ phase: 'loading' })
     try {
       const media = await getInterviewAnswerMedia(interviewId, questionIndex)
@@ -157,20 +145,9 @@ export function LazyMediaPlayback({
 
   const { cameraUrl, screenUrl } = state.media
 
-  const notice =
-    playbackIssue === 'playbackFailed'
-      ? {
-          title: t('playbackFailedTitle'),
-          description: t('playbackFailedDescription'),
-        }
-      : playbackIssue === 'durationUnavailable'
-        ? {
-            title: t('durationUnavailableTitle'),
-            description: t('durationUnavailableDescription'),
-          }
-        : isStale
-          ? { title: t('expiredTitle'), description: t('expiredDescription') }
-          : null
+  const notice = isStale
+    ? { title: t('expiredTitle'), description: t('expiredDescription') }
+    : null
 
   return (
     <Stack gap={3}>
@@ -201,11 +178,7 @@ export function LazyMediaPlayback({
           <SurfaceTile rounded="xl" padding="lg">
             <Stack gap={3}>
               <EyebrowLabel size="sm">{t('candidateCamera')}</EyebrowLabel>
-              <RecordingVideo
-                src={cameraUrl}
-                onError={handleMediaError}
-                onDurationUnavailable={handleDurationUnavailable}
-              />
+              <RecordingPlayer src={cameraUrl} onRetry={handleLoad} />
             </Stack>
           </SurfaceTile>
         ) : null}
@@ -213,11 +186,7 @@ export function LazyMediaPlayback({
           <SurfaceTile rounded="xl" padding="lg">
             <Stack gap={3}>
               <EyebrowLabel size="sm">{t('candidateScreen')}</EyebrowLabel>
-              <RecordingVideo
-                src={screenUrl}
-                onError={handleMediaError}
-                onDurationUnavailable={handleDurationUnavailable}
-              />
+              <RecordingPlayer src={screenUrl} onRetry={handleLoad} />
             </Stack>
           </SurfaceTile>
         ) : null}
