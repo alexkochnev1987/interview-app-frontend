@@ -12,6 +12,7 @@ export function shouldOfferOnboarding(
   user: AuthUserResponseDto | null | undefined,
 ): boolean {
   if (!user) return false;
+  if (user.demo === true) return false;
   if (!canAccessDashboard(user.role)) return false;
   return isOnboardingPending(user);
 }
