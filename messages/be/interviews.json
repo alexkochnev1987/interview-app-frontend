@@ -15,11 +15,11 @@
         "queued": "У чарзе",
         "processing": "Апрацоўка",
         "completed": "Завершана",
-        "failed": "Не атрымалася",
-        "assignedHrLabel": "Прызначаны HR",
-        "assignedHrUnassigned": "Не прызначаны",
-        "assignedHrAssigned": "{name}"
+        "failed": "Не атрымалася"
       },
+      "assignedHrLabel": "Прызначаны HR",
+      "assignedHrUnassigned": "Не прызначаны",
+      "assignedHrAssigned": "{name}",
       "demoTryCandidateExperience": "Паспрабаваць вопыт кандыдата"
     },
     "library": {

@@ -91,6 +91,11 @@ export function DetailHeader({ interview, actions }: DetailHeaderProps) {
                 </StatusPill>
               ) : null}
               <StatusPill tone="neutral" casing="chip">
+                {interview.assignedHr
+                  ? t('assignedHrAssigned', { name: interview.assignedHr.name })
+                  : t('assignedHrUnassigned')}
+              </StatusPill>
+              <StatusPill tone="neutral" casing="chip">
                 <Icon size="xs">
                   <ClipboardList />
                 </Icon>

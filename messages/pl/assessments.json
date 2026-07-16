@@ -27,7 +27,9 @@
       "perQuestionEyebrow": "Przegląd pytań",
       "perQuestionHeading": "Pytania i odpowiedzi",
       "scorecardEyebrow": "Karta wyników",
-      "scorecardHeading": "Wynik ogólny"
+      "scorecardHeading": "Wynik ogólny",
+      "assignedHrUnassigned": "Nieprzypisany",
+      "assignedHrAssigned": "{name}"
     },
     "liveRefresh": {
       "title": "Aktualizacje na żywo są wstrzymane",
