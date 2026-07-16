@@ -2,7 +2,7 @@ export const DURATION_PRIMING_SEEK_TARGET = 1e7
 
 export const DURATION_PRIMING_TIMEOUT_MS = 15_000
 
-type PrimingEvent = 'timeupdate'
+type PrimingEvent = 'timeupdate' | 'durationchange'
 
 export interface PrimeableVideo {
   duration: number
@@ -41,6 +41,7 @@ export function primeVideoDuration(
       clearTimeout(timeoutId)
     }
     video.removeEventListener('timeupdate', handleDurationResolved)
+    video.removeEventListener('durationchange', handleDurationResolved)
     return true
   }
 
@@ -64,6 +65,7 @@ export function primeVideoDuration(
   }, timeoutMs)
 
   video.addEventListener('timeupdate', handleDurationResolved)
+  video.addEventListener('durationchange', handleDurationResolved)
   video.currentTime = DURATION_PRIMING_SEEK_TARGET
 
   return detach
