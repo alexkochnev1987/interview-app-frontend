@@ -29,6 +29,9 @@ import { useRouter } from '@/i18n/navigation'
 import { LOCALES, type Locale } from '@/i18n/locales'
 import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { useIsDemo } from '@/lib/auth-context'
+import { AssignedHrSelect } from '@/components/interviews/assigned-hr-select'
+import { useAuth } from '@/lib/auth-context'
+import { canAssignInterviewHr } from '@/lib/auth-roles'
 import { createInterview, type Question } from '@/lib/api'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
 import { runMutation } from '@/lib/run-mutation'
@@ -67,6 +70,9 @@ export function InterviewCreateForm({
   const isDemo = useIsDemo()
   const [candidateName, setCandidateName] = useState('')
   const [position, setPosition] = useState(initialPosition ?? '')
+  const [assignedHrId, setAssignedHrId] = useState<string | undefined>()
+  const { user } = useAuth()
+  const canAssign = canAssignInterviewHr(user?.role)
   const [interviewLocale, setInterviewLocale] = useState<Locale>(uiLocale)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -111,6 +117,7 @@ export function InterviewCreateForm({
           createInterview({
             candidateName: candidateName.trim(),
             position: position.trim(),
+            ...(assignedHrId ? { assignedHrId } : {}),
             interviewLocale,
             questionIds: Array.from(selectedById.keys()),
             // Popularity is bumped server-side in the same transaction when set.
@@ -175,6 +182,19 @@ export function InterviewCreateForm({
                     />
                   </IconAffix>
                 </FormField>
+
+                {canAssign ? (
+                    <FormField htmlFor="assignedHr" label={t('assignedHrLabel')}>
+                      <AssignedHrSelect
+                          id="assignedHr"
+                          value={assignedHrId}
+                          onValueChange={setAssignedHrId}
+                          allowUnassigned
+                          enabled={canAssign}
+                          disabled={submitting || isDemo}
+                      />
+                    </FormField>
+                ): null}
 
                 <FormField htmlFor="interviewLocale" label={t('interviewLocaleLabel')}>
                   <Select
