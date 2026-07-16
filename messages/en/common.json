@@ -19,6 +19,13 @@
       "exit": "Exit demo"
     }
   },
+  "recordingPlayer": {
+    "playbackFailedTitle": "Recording could not be played",
+    "playbackFailedDescription": "The recording failed to load.",
+    "durationUnavailableTitle": "Recording length unavailable",
+    "durationUnavailableDescription": "The length of this recording could not be read, so the progress bar may not work. Playback still works.",
+    "refresh": "Refresh"
+  },
   "languageSwitcher": {
     "label": "Language",
     "locales": {
