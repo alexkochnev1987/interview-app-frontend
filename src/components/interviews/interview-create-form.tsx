@@ -85,7 +85,9 @@ export function InterviewCreateForm({
 
   const highlightQuestionId = useOnboardingCreatedQuestionId()
 
-  const selectionAnnouncedRef = useRef(false)
+  // Treat a prefilled selection (template) as already announced so the tour
+  // step only advances on a real user selection, not on mount.
+  const selectionAnnouncedRef = useRef((initialSelected?.length ?? 0) > 0)
   useEffect(() => {
     if (selectedCount > 0 && !selectionAnnouncedRef.current) {
       selectionAnnouncedRef.current = true
