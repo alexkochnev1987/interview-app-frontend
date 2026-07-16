@@ -15,7 +15,10 @@
         "queued": "В очереди",
         "processing": "Обработка",
         "completed": "Завершенный",
-        "failed": "Неуспешный"
+        "failed": "Неуспешный",
+        "assignedHrLabel": "Назначенный HR",
+        "assignedHrUnassigned": "Не назначен",
+        "assignedHrAssigned": "{name}"
       },
       "demoTryCandidateExperience": "Попробовать как кандидат"
     },

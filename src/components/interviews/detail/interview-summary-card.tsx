@@ -207,6 +207,12 @@ export function InterviewSummaryCard({
             </Stack>
           </Inline>
 
+          <StatusPill tone="neutral">
+            {interview.assignedHr
+                ? tDetail('assignedHrAssigned', { name: interview.assignedHr.name })
+                : tDetail('assignedHrUnassigned')}
+          </StatusPill>
+
           <Inline gap={3} align="center" wrap="wrap">
             <StatusPill tone={interview.status}>
               {sharedLabels.interviewStatus(interview.status)}
