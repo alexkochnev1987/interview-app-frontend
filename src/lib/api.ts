@@ -142,7 +142,12 @@ export type Answer = Schemas['AnswerDto'];
 
 export type InterviewResult = Schemas['InterviewResultResponseDto'];
 export type Interview = Schemas['InterviewResponseDto'];
-export type UpdateInterviewPayload = Schemas['UpdateInterviewDto'];
+export type UpdateInterviewPayload = Omit<
+  Schemas['UpdateInterviewDto'],
+  'assignedHrId'
+> & {
+  assignedHrId?: string | null;
+};
 export type InterviewStatus = Interview['status'];
 
 type ValidateAllAnswersResponse = Schemas['StartAllAnswerValidationsResponseDto'];
@@ -605,7 +610,7 @@ export async function updateInterview(
 ): Promise<Interview> {
   return handle(client.PATCH('/interviews/{id}', {
     params: { path: { id } },
-    body: data,
+    body: data as Schemas['UpdateInterviewDto'],
   }));
 }
 
