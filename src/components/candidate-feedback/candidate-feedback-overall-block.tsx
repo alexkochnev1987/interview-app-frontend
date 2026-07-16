@@ -53,7 +53,7 @@ export function CandidateFeedbackOverallBlock({
         <Stack gap={4}>
           <Inline gap={2} align="center" justify="between" wrap="wrap">
             <SectionHeading as="h3">{t('overallBlockTitle')}</SectionHeading>
-            <CandidateFeedbackBlockStatePill state={block.state} />
+            <CandidateFeedbackBlockStatePill block={block} />
           </Inline>
 
           {block.state === 'not_generated' ? (

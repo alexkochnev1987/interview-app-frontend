@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { MessageSquareText, Sparkles } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
@@ -8,10 +8,13 @@ import { CandidateFeedbackHeader } from '@/components/candidate-feedback/candida
 import { CandidateFeedbackLiveRefreshNotice } from '@/components/candidate-feedback/candidate-feedback-live-refresh-notice'
 import { CandidateFeedbackOverallBlock } from '@/components/candidate-feedback/candidate-feedback-overall-block'
 import { CandidateFeedbackQuestionBlockEditor } from '@/components/candidate-feedback/candidate-feedback-question-block'
+import { CandidateFeedbackSkippedSummary } from '@/components/candidate-feedback/candidate-feedback-skipped-summary'
 import { useCandidateFeedbackData } from '@/components/candidate-feedback/use-candidate-feedback-data'
+import { useCandidateFeedbackErrorLabel } from '@/components/candidate-feedback/use-candidate-feedback-error-label'
 import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
+import { DisabledHintTooltip } from '@/components/ui/disabled-hint-tooltip'
 import { EyebrowLabel } from '@/components/ui/eyebrow-label'
 import { Icon } from '@/components/ui/icon'
 import { Inline } from '@/components/ui/layout/inline'
@@ -30,19 +33,27 @@ import {
 import {
   buildAcceptAllCandidateFeedbackPayload,
   buildQuestionBlocksView,
+  buildGenerateAllQuestionSkipEntries,
+  canGenerateQuestionBlock,
+  canRegenerateAnyCandidateFeedbackBlock,
   type CandidateFeedbackResponse,
+  type CandidateFeedbackSkipReason,
   getSharedCandidateFeedbackError,
+  getSkippedGenerateAllQuestionResults,
   hasGeneratedCandidateFeedbackBlocks,
   isAcceptAllCandidateFeedbackPayloadEmpty,
   isCandidateFeedbackEmpty,
   isCandidateFeedbackGenerating,
   isOverallBlockGenerationBusy,
   isQuestionBlockGenerationBusy,
-  parseCandidateFeedbackErrorMessage,
+  resolveGenerateAllOverallSkipReason,
+  resolveGenerateAllStartToastKind,
+  type GenerateAllCandidateFeedbackOutcome,
+  type GenerateAllQuestionSkipEntry,
 } from '@/lib/candidate-feedback'
 import { getErrorMessage as getApiErrorMessage } from '@/lib/api-error'
 import { runMutation } from '@/lib/run-mutation'
-import { notifyError } from '@/lib/toast'
+import { notifyError, notifySuccess } from '@/lib/toast'
 import { useCandidateFeedbackToastMessages } from '@/lib/toast-messages/use-candidate-feedback-toast-messages'
 
 interface CandidateFeedbackEditorProps {
@@ -52,6 +63,11 @@ interface CandidateFeedbackEditorProps {
 
 type SavingTarget = 'overall' | 'accept-all' | `question-${number}` | null
 type GeneratingTarget = 'all' | `question-${number}` | null
+
+type GenerateAllSkipSummary = {
+  questionEntries: GenerateAllQuestionSkipEntry[]
+  overallReason: CandidateFeedbackSkipReason | null
+}
 
 type FeedbackMutationToast = {
   successMessage: string
@@ -64,17 +80,30 @@ export function CandidateFeedbackEditor({
 }: CandidateFeedbackEditorProps) {
   const t = useTranslations('interviews.candidateFeedback')
   const toastMessages = useCandidateFeedbackToastMessages()
+  const { formatErrorMessage } = useCandidateFeedbackErrorLabel()
   const { feedback, replaceFeedback, kick, refresh, paused } =
     useCandidateFeedbackData(interview.id, initialFeedback)
   const [savingTarget, setSavingTarget] = useState<SavingTarget>(null)
   const [generatingTarget, setGeneratingTarget] = useState<GeneratingTarget>(null)
+  const [generateAllSkipSummary, setGenerateAllSkipSummary] =
+    useState<GenerateAllSkipSummary | null>(null)
+  const skipSummaryFeedbackVersionRef = useRef<string | null>(null)
 
   const questionCount = interview.questions.length
   const interviewLocale = interview.interviewLocale ?? feedback.interviewLocale
+  const answersByIndex = new Map(
+    interview.answers.map((answer) => [answer.questionIndex, answer]),
+  )
   const questionBlocks = buildQuestionBlocksView(questionCount, feedback)
   const isEmpty = isCandidateFeedbackEmpty(questionCount, feedback)
   const feedbackGenerating = isCandidateFeedbackGenerating(feedback)
+  const canRegenerateAny = canRegenerateAnyCandidateFeedbackBlock(
+    questionCount,
+    feedback,
+  )
   const generateAllBusy = generatingTarget !== null || feedbackGenerating
+  const isGenerateAllLocked = !canRegenerateAny && !generateAllBusy
+  const generateAllDisabled = !canRegenerateAny || generateAllBusy
   const generateAllLoading = generatingTarget === 'all'
   const sharedGenerationError = getSharedCandidateFeedbackError(
     feedback,
@@ -88,13 +117,15 @@ export function CandidateFeedbackEditor({
   const acceptAllPageDisabled =
     acceptAllPageLoading || savingTarget !== null || generateAllBusy
 
-  function formatSharedGenerationError(message: string): string {
-    const parsed = parseCandidateFeedbackErrorMessage(message)
-    if (parsed.kind === 'location_not_supported') {
-      return t('locationNotSupportedError')
+  useEffect(() => {
+    const version = feedback.updatedAt ?? ''
+    if (
+      generateAllSkipSummary &&
+      skipSummaryFeedbackVersionRef.current !== version
+    ) {
+      setGenerateAllSkipSummary(null)
     }
-    return parsed.message
-  }
+  }, [feedback.updatedAt, generateAllSkipSummary])
 
   async function applyPatchUpdate(
     mutation: () => Promise<CandidateFeedbackResponse>,
@@ -105,12 +136,20 @@ export function CandidateFeedbackEditor({
   }
 
   async function applyGenerationUpdate(
-    mutation: () => Promise<CandidateFeedbackResponse>,
-  ) {
-    const updated = await mutation()
-    replaceFeedback(updated)
+    mutation: () => Promise<
+      CandidateFeedbackResponse | GenerateAllCandidateFeedbackOutcome
+    >,
+  ): Promise<GenerateAllCandidateFeedbackOutcome> {
+    const result = await mutation()
+    if ('feedback' in result) {
+      replaceFeedback(result.feedback)
+      kick()
+      return result
+    }
+
+    replaceFeedback(result)
     kick()
-    return updated
+    return { feedback: result }
   }
 
   async function runPatchMutation(
@@ -130,15 +169,21 @@ export function CandidateFeedbackEditor({
 
   async function runGenerateMutation(
     target: GeneratingTarget,
-    mutation: () => Promise<CandidateFeedbackResponse>,
+    mutation: () => Promise<
+      CandidateFeedbackResponse | GenerateAllCandidateFeedbackOutcome
+    >,
     toast: FeedbackMutationToast,
+    onSuccess?: (result: GenerateAllCandidateFeedbackOutcome) => void,
+    options?: { showSuccessToast?: boolean },
   ) {
     setGeneratingTarget(target)
     try {
-      await runMutation(() => applyGenerationUpdate(mutation), {
+      const result = await runMutation(() => applyGenerationUpdate(mutation), {
         ...toast,
         showErrorToast: false,
+        showSuccessToast: options?.showSuccessToast,
       })
+      onSuccess?.(result)
     } catch (err) {
       if (err instanceof ApiError && err.status === 409) {
         // Race before GET reflects generating; sync quietly — buttons are disabled once state catches up.
@@ -155,6 +200,12 @@ export function CandidateFeedbackEditor({
   }
 
   function handleGenerateAll() {
+    if (!canRegenerateAny) {
+      return Promise.resolve()
+    }
+
+    skipSummaryFeedbackVersionRef.current = null
+    setGenerateAllSkipSummary(null)
     return runGenerateMutation(
       'all',
       () => generateCandidateFeedbackAll(interview.id, interviewLocale),
@@ -162,6 +213,32 @@ export function CandidateFeedbackEditor({
         successMessage: toastMessages.generateStartSuccess,
         errorMessage: toastMessages.generateStartError,
       },
+      (result) => {
+        const toastKind = resolveGenerateAllStartToastKind(result.plan)
+        if (toastKind === 'started') {
+          notifySuccess(toastMessages.generateStartSuccess)
+        } else if (toastKind === 'stale_validation') {
+          notifyError(toastMessages.generateStaleValidation)
+        } else if (toastKind === 'locked_only') {
+          notifyError(toastMessages.generateLockedOnly)
+        } else {
+          notifyError(toastMessages.generateNothingEligible)
+        }
+
+        const skipped = getSkippedGenerateAllQuestionResults(result.plan?.questions)
+        const overallReason = resolveGenerateAllOverallSkipReason(
+          result.plan?.overall,
+        )
+        if (skipped.length === 0 && !overallReason) {
+          return
+        }
+        skipSummaryFeedbackVersionRef.current = result.feedback.updatedAt ?? ''
+        setGenerateAllSkipSummary({
+          questionEntries: buildGenerateAllQuestionSkipEntries(skipped),
+          overallReason,
+        })
+      },
+      { showSuccessToast: false },
     )
   }
 
@@ -193,6 +270,14 @@ export function CandidateFeedbackEditor({
         errorMessage: toastMessages.acceptError,
       },
     )
+  }
+
+  function handleRetryOverall() {
+    if (!canGenerateQuestionBlock(feedback.overall.state)) {
+      return Promise.resolve()
+    }
+    // POST /generate?scope=all skips locked blocks; retries overall via the same enqueue path.
+    return handleGenerateAll()
   }
 
   function handleAcceptAllOverall(payload: {
@@ -314,7 +399,13 @@ export function CandidateFeedbackEditor({
           </Stack>
 
           {paused ? (
-            <CandidateFeedbackLiveRefreshNotice onRefresh={() => void refresh()} />
+            <CandidateFeedbackLiveRefreshNotice
+              onRefresh={() => {
+                skipSummaryFeedbackVersionRef.current = null
+                setGenerateAllSkipSummary(null)
+                void refresh()
+              }}
+            />
           ) : null}
 
           {isEmpty ? (
@@ -328,26 +419,31 @@ export function CandidateFeedbackEditor({
             <Alert variant="danger">
               <AlertTitle>{t('sharedGenerationErrorTitle')}</AlertTitle>
               <AlertDescription>
-                {formatSharedGenerationError(sharedGenerationError)}
+                {formatErrorMessage(sharedGenerationError)}
               </AlertDescription>
             </Alert>
           ) : null}
 
           <Inline gap={2} wrap="wrap">
-            <DemoWriteGuard disabled={generateAllBusy}>
-              <Button
-                type="button"
-                variant="gradient"
-                shape="pill"
-                loading={generateAllLoading}
-                onClick={() => void handleGenerateAll()}
-              >
-                <Icon size="sm">
-                  <Sparkles />
-                </Icon>
-                {questionCount > 0 ? t('generateAll') : t('generateOverall')}
-              </Button>
-            </DemoWriteGuard>
+            <DisabledHintTooltip
+              active={isGenerateAllLocked}
+              hint={t('generateAllLockedHint')}
+            >
+              <DemoWriteGuard disabled={generateAllDisabled}>
+                <Button
+                  type="button"
+                  variant="gradient"
+                  shape="pill"
+                  loading={generateAllLoading}
+                  onClick={() => void handleGenerateAll()}
+                >
+                  <Icon size="sm">
+                    <Sparkles />
+                  </Icon>
+                  {questionCount > 0 ? t('generateAll') : t('generateOverall')}
+                </Button>
+              </DemoWriteGuard>
+            </DisabledHintTooltip>
             {hasGeneratedBlocks ? (
               <DemoWriteGuard disabled={acceptAllPageDisabled}>
                 <Button
@@ -363,6 +459,13 @@ export function CandidateFeedbackEditor({
             ) : null}
           </Inline>
 
+          {generateAllSkipSummary ? (
+            <CandidateFeedbackSkippedSummary
+              questionEntries={generateAllSkipSummary.questionEntries}
+              overallReason={generateAllSkipSummary.overallReason}
+            />
+          ) : null}
+
           <CandidateFeedbackOverallBlock
             block={feedback.overall}
             saving={
@@ -376,7 +479,7 @@ export function CandidateFeedbackEditor({
               generatingTarget,
             )}
             sharedGenerationError={sharedGenerationError}
-            onRetry={handleGenerateAll}
+            onRetry={handleRetryOverall}
             onAcceptAll={handleAcceptAllOverall}
             onSave={handleSaveOverall}
           />
@@ -388,6 +491,8 @@ export function CandidateFeedbackEditor({
                 <CandidateFeedbackQuestionBlockEditor
                   key={block.questionIndex}
                   block={block}
+                  question={interview.questions[block.questionIndex]}
+                  answer={answersByIndex.get(block.questionIndex)}
                   saving={
                     savingTarget === `question-${block.questionIndex}` ||
                     (savingTarget === 'accept-all' &&

@@ -2,24 +2,32 @@
 
 import { useTranslations } from 'next-intl'
 
+import { CandidateFeedbackAutoTemplateHint } from '@/components/candidate-feedback/candidate-feedback-auto-template-hint'
 import { CandidateFeedbackBlockFields } from '@/components/candidate-feedback/candidate-feedback-block-fields'
 import { CandidateFeedbackBlockStatePill } from '@/components/candidate-feedback/candidate-feedback-block-state-pill'
 import { CandidateFeedbackFailedBlock } from '@/components/candidate-feedback/candidate-feedback-failed-block'
 import { CandidateFeedbackGenerateButton } from '@/components/candidate-feedback/candidate-feedback-generate-button'
+import { CandidateFeedbackQuestionContext } from '@/components/candidate-feedback/candidate-feedback-question-context'
 import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { Card, CardContent } from '@/components/ui/card'
+import { DividerLabel } from '@/components/ui/divider-label'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText, SectionHeading } from '@/components/ui/text'
 import {
+  getCandidateFeedbackBlockSkipReason,
   getQuestionGenerateLabelKey,
   isBlockUsingSharedCandidateFeedbackError,
+  isSystemPrefilledCandidateFeedbackBlock,
   shouldShowQuestionGenerateButton,
   type CandidateFeedbackQuestionBlock,
 } from '@/lib/candidate-feedback'
+import { type Answer, type InterviewQuestion } from '@/lib/api'
 
 interface CandidateFeedbackQuestionBlockEditorProps {
   block: CandidateFeedbackQuestionBlock
+  question: InterviewQuestion
+  answer: Answer | undefined
   saving: boolean
   generating: boolean
   generationDisabled: boolean
@@ -37,6 +45,8 @@ interface CandidateFeedbackQuestionBlockEditorProps {
 
 export function CandidateFeedbackQuestionBlockEditor({
   block,
+  question,
+  answer,
   saving,
   generating,
   generationDisabled,
@@ -52,6 +62,8 @@ export function CandidateFeedbackQuestionBlockEditor({
     block,
     sharedGenerationError ?? null,
   )
+  const blockSkipReason = getCandidateFeedbackBlockSkipReason(block)
+  const isSystemPrefilled = isSystemPrefilledCandidateFeedbackBlock(block)
 
   return (
     <Card variant="surface" size="lg">
@@ -61,8 +73,10 @@ export function CandidateFeedbackQuestionBlockEditor({
             <SectionHeading as="h4">
               {t('questionBlockTitle', { index: block.questionIndex + 1 })}
             </SectionHeading>
-            <CandidateFeedbackBlockStatePill state={block.state} />
+            <CandidateFeedbackBlockStatePill block={block} />
           </Inline>
+
+          <CandidateFeedbackQuestionContext question={question} answer={answer} />
 
           {block.state === 'not_generated' ? (
             <BodyText tone="muted">{t('notGeneratedHint')}</BodyText>
@@ -78,6 +92,10 @@ export function CandidateFeedbackQuestionBlockEditor({
             />
           ) : null}
 
+          {isSystemPrefilled ? (
+            <CandidateFeedbackAutoTemplateHint skipReason={blockSkipReason} />
+          ) : null}
+
           {showGenerateButton ? (
             <Inline gap={2} wrap="wrap">
               <DemoWriteGuard disabled={generationDisabled}>
@@ -90,6 +108,8 @@ export function CandidateFeedbackQuestionBlockEditor({
               </DemoWriteGuard>
             </Inline>
           ) : null}
+
+          <DividerLabel>{t('context.feedbackSection')}</DividerLabel>
 
           <CandidateFeedbackBlockFields
             block={block}
