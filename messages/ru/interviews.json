@@ -31,12 +31,14 @@
       "table": {
         "candidate": "Кандидат",
         "position": "Должность",
+        "hr": "HR",
         "status": "Статус",
         "progress": "Прогресс",
         "score": "Оценка",
         "updated": "Обновлено",
         "created": "Создано"
       },
+      "assignedHrNotAssigned": "Не назначен",
       "toolbar": {
         "searchPlaceholder": "Поиск по имени кандидата",
         "resultCount": "{count} интервью",

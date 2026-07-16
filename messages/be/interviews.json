@@ -31,12 +31,14 @@
       "table": {
         "candidate": "Кандыдат",
         "position": "Пасада",
+        "hr": "HR",
         "status": "Статус",
         "progress": "Прагрэс",
         "score": "Ацэнка",
         "updated": "Абноўлена",
         "created": "Створана"
       },
+      "assignedHrNotAssigned": "Не прызначаны",
       "toolbar": {
         "searchPlaceholder": "Пошук па імені кандыдата",
         "resultCount": "{count} інтэрв'ю",
