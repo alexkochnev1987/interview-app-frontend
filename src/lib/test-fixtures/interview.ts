@@ -6,7 +6,7 @@ export type InterviewAnswer = Interview['answers'][number]
 
 export function questionFixture(
   partial: Partial<InterviewQuestion> = {},
-): InterviewQuestion {
+): Interview['questions'][number] {
   return {
     id: 'q1',
     questionText: 'Tell us about a hard problem you solved.',
@@ -24,6 +24,8 @@ export function questionFixture(
     deleted: false,
     pendingDeletion: false,
     usageCount: 0,
+    resolvedLocale: 'en',
+    availableLocales: ['en'],
     ...partial,
   }
 }

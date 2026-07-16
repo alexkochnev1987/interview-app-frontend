@@ -83,6 +83,29 @@ export function createInitialInterviews() {
       candidateName: 'Active Candidate',
       status: 'in_progress',
     }),
+    interview({
+      id: 'iv-completed',
+      candidateName: 'Completed Candidate',
+      interviewLocale: 'en',
+      status: 'completed',
+      result: {
+        interviewLocale: 'en',
+        overallScore: 82,
+        summary: 'Strong candidate',
+        categoryScores: {
+          relevance: 80,
+          depth: 84,
+          communication: 82,
+        },
+        completedAt: ISO,
+      },
+    }),
+    interview({
+      id: 'iv-failed',
+      candidateName: 'Failed Candidate',
+      interviewLocale: 'en',
+      status: 'failed',
+    }),
   ]
 }
 

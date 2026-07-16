@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { ArrowLeft, ArrowRight, MessageSquareText } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
@@ -25,7 +25,7 @@ import {
   getCandidateInitials,
 } from '@/lib/interview-formatters'
 import { isHrVisibleAssessment } from '@/lib/assessment-status'
-import { canEditInterview, canManageInterview } from '@/lib/interview-management'
+import { canDeleteInterview, canEditInterview, canManageInterview } from '@/lib/interview-management'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
 
 interface InterviewSummaryCardProps {
@@ -39,8 +39,10 @@ interface InterviewSummaryCardProps {
   onValidate: () => void
   isEditing: boolean
   canceling: boolean
+  deleting: boolean
   onStartEditing: () => void
   onOpenCancelConfirm: () => void
+  onOpenDeleteConfirm: () => void
 }
 
 export function InterviewSummaryCard({
@@ -54,8 +56,10 @@ export function InterviewSummaryCard({
   onValidate,
   isEditing,
   canceling,
+  deleting,
   onStartEditing,
   onOpenCancelConfirm,
+  onOpenDeleteConfirm
 }: InterviewSummaryCardProps) {
   const t = useTranslations('questions.common')
   const tDetail = useTranslations('interviews.detail')
@@ -65,6 +69,7 @@ export function InterviewSummaryCard({
 
   const canEdit = canEditInterview(interview)
   const canManage = canManageInterview(interview)
+  const canDelete = canDeleteInterview(interview)
 
   const editButton =
     canEdit && !isEditing ? (
@@ -84,6 +89,15 @@ export function InterviewSummaryCard({
       </DemoWriteGuard>
     ) : null
 
+  const deleteButton =
+    canDelete && !isEditing ? (
+      <DemoWriteGuard disabled={deleting}>
+        <Button type="button" variant="destructive" onClick={onOpenDeleteConfirm}>
+          {deleting ? tActions('deleting') : tActions('deleteInterview')}
+        </Button>
+      </DemoWriteGuard>
+    ) : null
+
   const validateButton =
     interview.status !== 'completed' ? (
       <DemoWriteGuard disabled={!canValidate || validating || hasActiveValidation}>
@@ -93,11 +107,25 @@ export function InterviewSummaryCard({
       </DemoWriteGuard>
     ) : null
 
+  const candidateFeedbackButton =
+    interview.status === 'completed' ? (
+      <Button type="button" variant="gradient" shape="pill" asChild>
+        <Link href={routes.interviews.candidateFeedback(interview.id)}>
+          <Icon size="sm">
+            <MessageSquareText />
+          </Icon>
+          {tDetail('candidateFeedback')}
+        </Link>
+      </Button>
+    ) : null
+
   const visitAssessmentButton = isHrVisibleAssessment(interview) ? (
     <Button asChild variant="outline">
       <Link href={routes.assessments.detail(interview.id)}>
         {tActions('visitAssessment')}
-        <ArrowRight className="size-4" />
+        <Icon size="sm">
+          <ArrowRight />
+        </Icon>
       </Link>
     </Button>
   ) : null
@@ -116,7 +144,9 @@ export function InterviewSummaryCard({
       </BodyText>
     ) : null
 
-  const hasManagementActions = Boolean(editButton || cancelButton)
+  const hasManagementActions = Boolean(
+    editButton || cancelButton || deleteButton || candidateFeedbackButton,
+  )
 
   const backLink = (
     <UnstyledLink href="/">
@@ -144,8 +174,10 @@ export function InterviewSummaryCard({
             </Inline>
             {hasManagementActions ? (
               <Inline gap={3} wrap="wrap" justify="end" width="full">
+                {candidateFeedbackButton}
                 {editButton}
                 {cancelButton}
+                {deleteButton}
               </Inline>
             ) : null}
             {managementNotice}
@@ -155,8 +187,10 @@ export function InterviewSummaryCard({
             {backLink}
             <Stack gap={2} align="end">
               <Inline gap={3} wrap="wrap" justify="end">
+                {candidateFeedbackButton}
                 {editButton}
                 {cancelButton}
+                {deleteButton}
                 {headerActions}
               </Inline>
               {managementNotice}

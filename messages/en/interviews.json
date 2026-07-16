@@ -9,6 +9,7 @@
     },
     "detail": {
       "backToDashboard": "Back to dashboard",
+      "candidateFeedback": "Candidate feedback",
       "validationStatus": {
         "idle": "Idle",
         "queued": "Queued",
@@ -127,7 +128,13 @@
       "dismiss": "Keep interview",
       "discardEdit": "Discard changes",
       "keepEditing": "Keep editing",
-      "visitAssessment": "Visit assessment"
+      "visitAssessment": "Visit assessment",
+      "deleteInterview": "Delete interview",
+      "deleting": "Deleting...",
+      "deleteTitle": "Delete this interview?",
+      "deleteDescription": "All recordings, results, and assessment data for this interview will be permanently removed. This cannot be undone.",
+      "confirmDelete": "Delete interview",
+      "dismissDelete": "Keep interview"
     },
     "edit": {
       "title": "Edit interview",
@@ -138,6 +145,47 @@
       "answersBlockEditNotice": "Editing is disabled after answers have been uploaded, because answers are tied to question order.",
       "discardTitle": "Discard unsaved changes?",
       "discardDescription": "Your edits to this interview will be lost."
+    },
+    "candidateFeedback": {
+      "backToInterview": "Back to interview",
+      "eyebrow": "Candidate feedback",
+      "title": "Review and edit candidate-facing feedback",
+      "shellLead": "This workspace is separate from scoring and evaluation. Generated suggestions and manual edits will appear here.",
+      "emptyTitle": "No candidate feedback yet",
+      "emptyDescription": "Generate AI feedback for the entire interview or start with individual questions below.",
+      "generateAll": "Generate AI for entire interview",
+      "generateOverall": "Generate overall AI feedback",
+      "generateQuestion": "Generate AI for this question",
+      "regenerateQuestion": "Regenerate AI for this question",
+      "overallBlockTitle": "Overall feedback",
+      "questionBlocksTitle": "Per-question feedback",
+      "questionBlockTitle": "Question {index}",
+      "recommendationLabel": "Recommendations",
+      "improvementLabel": "What could be improved",
+      "notGeneratedHint": "AI feedback for this block has not been generated yet.",
+      "failedTitle": "Generation failed",
+      "failedDescription": "This block could not be generated. Try generating it again.",
+      "retry": "Retry",
+      "saveChanges": "Save changes",
+      "acceptAllSuggestions": "Apply all in this block",
+      "acceptAllSuggestionsPage": "Apply all",
+      "sharedGenerationErrorTitle": "AI generation failed",
+      "locationNotSupportedError": "AI generation is not available from the server's region. Contact your administrator or try again later.",
+      "noQuestionsTitle": "No interview questions",
+      "noQuestionsDescription": "This interview has no questions, so there is no per-question feedback to edit.",
+      "blockState": {
+        "not_generated": "Not generated",
+        "generating": "Generating",
+        "generated": "Generated",
+        "accepted": "Accepted",
+        "edited": "Edited",
+        "failed": "Failed"
+      },
+      "liveRefresh": {
+        "title": "Live updates paused",
+        "description": "We stopped polling generation status after repeated failures or a timeout.",
+        "refresh": "Refresh now"
+      }
     }
   }
 }

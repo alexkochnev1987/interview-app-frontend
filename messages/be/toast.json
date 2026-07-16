@@ -29,7 +29,18 @@
       "updateSuccess": "Інтэрв'ю абноўлена",
       "updateError": "Не ўдалося абнавіць інтэрв'ю",
       "cancelSuccess": "Інтэрв'ю адменена",
-      "cancelError": "Не ўдалося адмяніць інтэрв'ю"
+      "cancelError": "Не ўдалося адмяніць інтэрв'ю",
+      "deleteSuccess": "Інтэрв'ю паспяхова выдалена",
+      "deleteError": "Не ўдалося выдаліць інтэрв'ю"
+    },
+    "candidateFeedback": {
+      "acceptSuccess": "Прапанова прынята",
+      "applyAllSuccess": "Усе прапановы прыменены",
+      "acceptError": "Не ўдалося прыняць прапанову",
+      "saveSuccess": "Зваротная сувязь захавана",
+      "saveError": "Не ўдалося захаваць зваротную сувязь",
+      "generateStartSuccess": "Генерацыя запушчана",
+      "generateStartError": "Не ўдалося запусціць генерацыю"
     },
     "interviewsLibrary": {
       "loadFailedFallback": "Не ўдалося загрузіць інтэрв'ю."
@@ -104,6 +115,13 @@
       "feedback": {
         "unavailableTitle": "Зваротная сувязь недаступна",
         "loadFailedFallback": "Не ўдалося загрузіць"
+      },
+      "candidateFeedback": {
+        "forbiddenTitle": "У вас няма доступу да зваротнай сувязі для кандыдата",
+        "forbiddenDescription": "Рэдагаванне зваротнай сувязі для кандыдата даступна толькі карыстальнікам HR, admin і super-admin. Калі гэта памылка, звярніцеся да ўладальніка прасторы.",
+        "unavailableTitle": "Зваротная сувязь для кандыдата недаступна",
+        "loadFailedFallback": "Не ўдалося загрузіць зваротную сувязь для кандыдата.",
+        "notFoundFallback": "Запытанае інтэрв'ю не ўдалося загрузіць."
       },
       "team": {
         "forbiddenTitle": "У вас няма доступу да кіравання камандай",
