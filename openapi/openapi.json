@@ -327,6 +327,20 @@
             }
           },
           {
+            "name": "role",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "super_admin",
+                "admin",
+                "hr",
+                "candidate"
+              ],
+              "type": "string"
+            }
+          },
+          {
             "name": "X-Locale",
             "in": "header",
             "required": false,

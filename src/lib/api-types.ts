@@ -2343,6 +2343,7 @@ export interface operations {
             query?: {
                 limit?: number;
                 offset?: number;
+                role?: "super_admin" | "admin" | "hr" | "candidate";
             };
             header?: {
                 /** @description Response language for localized content. Defaults to `en` when omitted. */
