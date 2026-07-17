@@ -20,6 +20,7 @@ import {
   type ApiCandidateFeedbackDto,
   type CandidateFeedbackResponse,
 } from '@/lib/candidate-feedback'
+import { canAccessCandidateFeedback } from '@/lib/interview-management'
 import { isForbiddenError, requestServer } from '@/lib/server-fetch'
 
 interface CandidateFeedbackPageProps {
@@ -153,6 +154,17 @@ export default async function CandidateFeedbackPage({
       <FlashErrorPageFallback
         title={t('unavailableTitle')}
         description={error ?? t('loadFailedFallback')}
+        backHref={backHref}
+        backLabel={tFallback('backToInterview')}
+      />
+    )
+  }
+
+  if (!canAccessCandidateFeedback(interview)) {
+    return (
+      <FlashErrorPageFallback
+        title={t('statusUnavailableTitle')}
+        description={t('statusUnavailableDescription')}
         backHref={backHref}
         backLabel={tFallback('backToInterview')}
       />

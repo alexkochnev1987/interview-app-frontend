@@ -13,8 +13,11 @@ import {
   createEmptyCandidateFeedback,
   mapCandidateFeedbackFromApi,
   parseCandidateFeedbackBody,
+  parseGenerateAllCandidateFeedbackPostBody,
   type ApiCandidateFeedbackDto,
   type CandidateFeedbackResponse,
+  type GenerateAllCandidateFeedbackOutcome,
+  type GenerateAllCandidateFeedbackPlan,
   type UpdateCandidateFeedbackPayload,
 } from './candidate-feedback';
 
@@ -654,6 +657,10 @@ export type {
   CandidateFeedbackEditableState,
   CandidateFeedbackQuestionBlock,
   CandidateFeedbackResponse,
+  CandidateFeedbackSkipReason,
+  GenerateAllCandidateFeedbackOutcome,
+  GenerateAllCandidateFeedbackPlan,
+  GenerateAllCandidateFeedbackQuestionResult,
   UpdateCandidateFeedbackOverallPayload,
   UpdateCandidateFeedbackPayload,
   UpdateCandidateFeedbackQuestionPayload,
@@ -661,7 +668,9 @@ export type {
 export {
   buildQuestionBlocksView,
   candidateFeedbackPath,
+  canRegenerateAnyCandidateFeedbackBlock,
   createEmptyCandidateFeedback,
+  getSkippedGenerateAllQuestionResults,
   isCandidateFeedbackEmpty,
   isCandidateFeedbackGenerating,
   isOverallBlockGenerationBusy,
@@ -740,21 +749,40 @@ export async function generateCandidateFeedbackQuestion(
 export async function generateCandidateFeedbackAll(
   interviewId: string,
   interviewLocale: Locale,
-): Promise<CandidateFeedbackResponse> {
+): Promise<GenerateAllCandidateFeedbackOutcome> {
   const path = `/interviews/${encodeURIComponent(interviewId)}/candidate-feedback/generate?scope=all`;
   const res = await fetchClientApi(`/api${path}`, {
     method: 'POST',
     credentials: 'include',
   });
 
+  const body = await res.text();
+
   if (!res.ok) {
-    const body = await res.text();
     const { code, params } = extractApiErrorFieldsFromBody(body);
     throw new ApiError(res.status, messageFromBody(body, res.status), path, body, code, params);
   }
 
-  // POST only enqueues work; poll GET for generating → generated progress.
-  return getCandidateFeedback(interviewId, interviewLocale);
+  let plan: GenerateAllCandidateFeedbackPlan | undefined
+  let postFeedback: CandidateFeedbackResponse | undefined
+
+  if (body.trim()) {
+    const parsed = parseGenerateAllCandidateFeedbackPostBody(body)
+    plan = parsed.plan
+    if (parsed.feedbackDto) {
+      postFeedback = mapCandidateFeedbackFromApi(
+        {
+          ...parsed.feedbackDto,
+          interviewId: parsed.feedbackDto.interviewId ?? interviewId,
+        },
+        interviewLocale,
+      )
+    }
+  }
+
+  const feedback =
+    postFeedback ?? (await getCandidateFeedback(interviewId, interviewLocale))
+  return { feedback, plan }
 }
 
 

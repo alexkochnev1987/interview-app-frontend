@@ -3,12 +3,14 @@
 import { RefreshCw } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
+import { useCandidateFeedbackErrorLabel } from '@/components/candidate-feedback/use-candidate-feedback-error-label'
 import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
+import { isCandidateFeedbackSkipReason, parseCandidateFeedbackErrorMessage } from '@/lib/candidate-feedback'
 
 interface CandidateFeedbackFailedBlockProps {
   errorMessage?: string | null
@@ -28,6 +30,9 @@ export function CandidateFeedbackFailedBlock({
   showAlert = true,
 }: CandidateFeedbackFailedBlockProps) {
   const t = useTranslations('interviews.candidateFeedback')
+  const { formatErrorMessage } = useCandidateFeedbackErrorLabel()
+  const parsed = parseCandidateFeedbackErrorMessage(errorMessage ?? '')
+  const isSkipReason = isCandidateFeedbackSkipReason(parsed)
 
   if (!showAlert && !showRetry) {
     return null
@@ -36,11 +41,11 @@ export function CandidateFeedbackFailedBlock({
   return (
     <Stack gap={4}>
       {showAlert ? (
-        <Alert variant="danger">
-          <AlertTitle>{t('failedTitle')}</AlertTitle>
-          <AlertDescription>
-            {errorMessage?.trim() ? errorMessage : t('failedDescription')}
-          </AlertDescription>
+        <Alert variant={isSkipReason ? 'warning' : 'danger'}>
+          <AlertTitle>
+            {isSkipReason ? t('skippedBlockTitle') : t('failedTitle')}
+          </AlertTitle>
+          <AlertDescription>{formatErrorMessage(errorMessage)}</AlertDescription>
         </Alert>
       ) : null}
       {showRetry ? (
