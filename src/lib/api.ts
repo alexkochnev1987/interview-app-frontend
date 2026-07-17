@@ -162,9 +162,15 @@ export type InterviewListItem = Schemas['InterviewListItemDto'];
 export type PaginatedInterviews = Schemas['PaginatedInterviewsResponseDto'];
 export type InterviewFacetsResponse = Schemas['InterviewFacetsResponseDto'];
 export type InterviewFacetCount = Schemas['InterviewFacetCountDto'];
-export type FetchInterviewsParams = NonNullable<
-  paths['/interviews']['get']['parameters']['query']
->;
+/** HR user UUID, or `unassigned` for interviews with no assignee. */
+export type InterviewAssignedHrFilter = string
+
+export type FetchInterviewsParams = Omit<
+  NonNullable<paths['/interviews']['get']['parameters']['query']>,
+  'assignedHrId'
+> & {
+  assignedHrId?: InterviewAssignedHrFilter
+};
 export type InterviewSortField = NonNullable<FetchInterviewsParams['sortBy']>;
 export type InterviewSortOrder = NonNullable<FetchInterviewsParams['sortOrder']>;
 export type InterviewStatusFilter = NonNullable<FetchInterviewsParams['status']>;

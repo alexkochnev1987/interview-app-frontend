@@ -2879,9 +2879,6 @@
             "in": "query",
             "description": "Filter by assigned HR reviewer UUID, or `unassigned` for interviews with no assignee.",
             "schema": {
-              "enum": [
-                "unassigned"
-              ],
               "type": "string"
             }
           },
