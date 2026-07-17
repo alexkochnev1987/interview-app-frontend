@@ -25,7 +25,12 @@ import {
   getCandidateInitials,
 } from '@/lib/interview-formatters'
 import { isHrVisibleAssessment } from '@/lib/assessment-status'
-import { canDeleteInterview, canEditInterview, canManageInterview } from '@/lib/interview-management'
+import {
+  canAccessCandidateFeedback,
+  canDeleteInterview,
+  canEditInterview,
+  canManageInterview,
+} from '@/lib/interview-management'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
 
 interface InterviewSummaryCardProps {
@@ -108,7 +113,7 @@ export function InterviewSummaryCard({
     ) : null
 
   const candidateFeedbackButton =
-    interview.status === 'completed' ? (
+    canAccessCandidateFeedback(interview) ? (
       <Button type="button" variant="gradient" shape="pill" asChild>
         <Link href={routes.interviews.candidateFeedback(interview.id)}>
           <Icon size="sm">

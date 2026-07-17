@@ -40,7 +40,10 @@
       "saveSuccess": "Feedback saved",
       "saveError": "Failed to save feedback",
       "generateStartSuccess": "Generation started",
-      "generateStartError": "Failed to start generation"
+      "generateStartError": "Failed to start generation",
+      "generateStaleValidation": "Re-run AI evaluation for the selected answer version before generating feedback",
+      "generateLockedOnly": "Locked blocks were skipped; nothing to generate",
+      "generateNothingEligible": "No eligible questions to generate"
     },
     "interviewsLibrary": {
       "loadFailedFallback": "Failed to load interviews."
@@ -115,7 +118,9 @@
         "forbiddenDescription": "Editing candidate feedback is reserved for HR, admin, and super-admin users. If you think this is a mistake, contact your workspace owner.",
         "unavailableTitle": "Candidate feedback unavailable",
         "loadFailedFallback": "Failed to load candidate feedback.",
-        "notFoundFallback": "The requested interview could not be loaded."
+        "notFoundFallback": "The requested interview could not be loaded.",
+        "statusUnavailableTitle": "Candidate feedback not ready",
+        "statusUnavailableDescription": "Candidate feedback is available only after the interview is completed or has failed."
       },
       "team": {
         "forbiddenTitle": "You don't have access to team management",

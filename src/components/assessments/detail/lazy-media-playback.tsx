@@ -12,8 +12,8 @@ import { Grid } from '@/components/ui/layout/grid'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { SurfaceTile } from '@/components/ui/surface-tile'
+import { RecordingPlayer } from '@/components/ui/recording-player'
 import { BodyText } from '@/components/ui/text'
-import { VideoFrame, VideoSurface } from '@/components/ui/video-frame'
 import {
   getInterviewAnswerMedia,
   type InterviewAnswerMediaResponse,
@@ -145,14 +145,18 @@ export function LazyMediaPlayback({
 
   const { cameraUrl, screenUrl } = state.media
 
+  const notice = isStale
+    ? { title: t('expiredTitle'), description: t('expiredDescription') }
+    : null
+
   return (
     <Stack gap={3}>
-      {isStale ? (
+      {notice ? (
         <Alert variant="warning">
-          <AlertTitle>{t('expiredTitle')}</AlertTitle>
+          <AlertTitle>{notice.title}</AlertTitle>
           <AlertDescription>
             <Inline gap={3} align="center" wrap="wrap">
-              <span>{t('expiredDescription')}</span>
+              <span>{notice.description}</span>
               <Button
                 type="button"
                 variant="outline-pill"
@@ -174,14 +178,7 @@ export function LazyMediaPlayback({
           <SurfaceTile rounded="xl" padding="lg">
             <Stack gap={3}>
               <EyebrowLabel size="sm">{t('candidateCamera')}</EyebrowLabel>
-              <VideoFrame>
-                <VideoSurface
-                  controls
-                  preload="metadata"
-                  playsInline
-                  src={cameraUrl}
-                />
-              </VideoFrame>
+              <RecordingPlayer src={cameraUrl} onRetry={handleLoad} />
             </Stack>
           </SurfaceTile>
         ) : null}
@@ -189,14 +186,7 @@ export function LazyMediaPlayback({
           <SurfaceTile rounded="xl" padding="lg">
             <Stack gap={3}>
               <EyebrowLabel size="sm">{t('candidateScreen')}</EyebrowLabel>
-              <VideoFrame>
-                <VideoSurface
-                  controls
-                  preload="metadata"
-                  playsInline
-                  src={screenUrl}
-                />
-              </VideoFrame>
+              <RecordingPlayer src={screenUrl} onRetry={handleLoad} />
             </Stack>
           </SurfaceTile>
         ) : null}

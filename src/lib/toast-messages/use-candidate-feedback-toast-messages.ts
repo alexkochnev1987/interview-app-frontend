@@ -11,5 +11,8 @@ export function useCandidateFeedbackToastMessages() {
     saveError: t('saveError'),
     generateStartSuccess: t('generateStartSuccess'),
     generateStartError: t('generateStartError'),
+    generateStaleValidation: t('generateStaleValidation'),
+    generateLockedOnly: t('generateLockedOnly'),
+    generateNothingEligible: t('generateNothingEligible'),
   }
 }

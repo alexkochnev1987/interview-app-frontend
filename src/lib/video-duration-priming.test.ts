@@ -78,6 +78,7 @@ describe('primeVideoDuration', () => {
 
     expect(video.currentTime).toBe(DURATION_PRIMING_SEEK_TARGET)
     expect(video.listenerCount('timeupdate')).toBe(1)
+    expect(video.listenerCount('durationchange')).toBe(1)
   })
 
   it('ignores interim timeupdates while the duration is still unknown', () => {
@@ -103,7 +104,21 @@ describe('primeVideoDuration', () => {
     expect(onSettled).toHaveBeenCalledExactlyOnceWith(true)
   })
 
-  it('detaches the listener when cleanup runs before duration resolves', () => {
+  it('resolves the duration from a durationchange event without a timeupdate', () => {
+    const video = new FakeVideo(Infinity)
+    const onSettled = vi.fn()
+
+    primeVideoDuration(video, { onSettled })
+    video.duration = 37
+    video.emit('durationchange')
+
+    expect(video.currentTime).toBe(0)
+    expect(video.listenerCount('timeupdate')).toBe(0)
+    expect(video.listenerCount('durationchange')).toBe(0)
+    expect(onSettled).toHaveBeenCalledExactlyOnceWith(true)
+  })
+
+  it('detaches both listeners when cleanup runs before duration resolves', () => {
     const video = new FakeVideo(Infinity)
     const onSettled = vi.fn()
 
@@ -111,6 +126,7 @@ describe('primeVideoDuration', () => {
     cleanup()
 
     expect(video.listenerCount('timeupdate')).toBe(0)
+    expect(video.listenerCount('durationchange')).toBe(0)
     expect(onSettled).not.toHaveBeenCalled()
   })
 
