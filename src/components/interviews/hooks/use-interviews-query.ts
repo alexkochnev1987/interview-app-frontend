@@ -85,6 +85,7 @@ export type UseInterviewsQueryResult = {
     setQ: Dispatch<SetStateAction<string>>
     setPosition: (value: string | undefined) => void
     setStatus: (value: InterviewStatusFilter | undefined) => void
+    setAssignedHrId: (value: string | undefined) => void
     setSort: (sortBy: InterviewSortField, sortOrder: InterviewSortOrder) => void
     setPage: (value: number) => void
     setView: (value: InterviewView) => void
@@ -98,6 +99,7 @@ function writeToSearchParams(state: InterviewsQueryState): URLSearchParams {
     if (state.q) params.set('q', state.q)
     if (state.position) params.set('position', state.position)
     if (state.status) params.set('status', state.status)
+    if (state.assignedHrId) params.set('assignedHrId', state.assignedHrId)
     if (state.sortBy !== 'updatedAt') params.set('sortBy', state.sortBy)
     if (state.sortOrder !== 'desc') params.set('sortOrder', state.sortOrder)
     if (state.view === 'table' && state.page !== 1) {
@@ -265,6 +267,10 @@ export function useInterviewsQuery(
         },
         [resetToPageOne],
     )
+    const setAssignedHrId = useCallback(
+        (value: string | undefined) => resetToPageOne({ assignedHrId: value }),
+        [resetToPageOne],
+    )
     const setSort = useCallback(
         (sortBy: InterviewSortField, sortOrder: InterviewSortOrder) =>
             resetToPageOne({ sortBy, sortOrder }),
@@ -303,6 +309,7 @@ export function useInterviewsQuery(
             state.q !== base.q ||
             state.position !== base.position ||
             state.status !== base.status ||
+            state.assignedHrId !== base.assignedHrId ||
             state.sortBy !== base.sortBy ||
             state.sortOrder !== base.sortOrder
         )
@@ -322,6 +329,7 @@ export function useInterviewsQuery(
         setQ,
         setPosition,
         setStatus,
+        setAssignedHrId,
         setSort,
         setPage,
         setLimit,

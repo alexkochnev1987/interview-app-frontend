@@ -3554,6 +3554,8 @@ export interface operations {
     InterviewController_getFacets: {
         parameters: {
             query?: {
+                /** @description Filter by assigned HR reviewer user id */
+                assignedHrId?: string;
                 status?: "pending" | "in_progress" | "processing" | "completed" | "failed";
                 /** @description Filter by position (exact match) */
                 position?: string;

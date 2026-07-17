@@ -64,6 +64,9 @@
         "resetAllWithCount": "Resetuj ({count})",
         "positionTitle": "Stanowisko",
         "statusTitle": "Status",
+        "hrTitle": "Recenzent HR",
+        "hrFilterAll": "Wszyscy recenzenci",
+        "hrFilterUnassigned": "Nieprzypisany",
         "retry": "Spróbuj ponownie",
         "unavailable": "Filtry są niedostępne",
         "loading": "Ładowanie…",
@@ -107,7 +110,9 @@
     },
     "chips": {
       "position": "Stanowisko: {value}",
-      "status": "Status: {value}"
+      "status": "Status: {value}",
+      "hr": "HR: {value}",
+      "hrUnassigned": "HR: Nieprzypisany"
     },
     "actions": {
       "edit": "Edytuj wywiad",

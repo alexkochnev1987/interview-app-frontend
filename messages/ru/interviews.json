@@ -64,6 +64,9 @@
         "resetAllWithCount": "Сбросить ({count})",
         "positionTitle": "Должность",
         "statusTitle": "Статус",
+        "hrTitle": "HR-специалист",
+        "hrFilterAll": "Все специалисты",
+        "hrFilterUnassigned": "Не назначен",
         "retry": "Повторить",
         "unavailable": "Фильтры недоступны",
         "loading": "Загрузка…",
@@ -107,7 +110,9 @@
     },
     "chips": {
       "position": "Должность: {value}",
-      "status": "Статус: {value}"
+      "status": "Статус: {value}",
+      "hr": "HR: {value}",
+      "hrUnassigned": "HR: Не назначен"
     },
     "actions": {
       "edit": "Редактировать интервью",
