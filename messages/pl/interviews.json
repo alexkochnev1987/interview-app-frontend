@@ -9,6 +9,7 @@
     },
     "detail": {
       "backToDashboard": "Powrót do deski rozdzielczej",
+      "candidateFeedback": "Informacja zwrotna dla kandydata",
       "validationStatus": {
         "idle": "Bezczynny",
         "queued": "W kolejce",
@@ -144,6 +145,71 @@
       "answersBlockEditNotice": "Edycja jest wyłączona po przesłaniu odpowiedzi, ponieważ odpowiedzi są powiązane z kolejnością pytań.",
       "discardTitle": "Odrzucić niezapisane zmiany?",
       "discardDescription": "Twoje zmiany w tym wywiadzie zostaną utracone."
+    },
+    "candidateFeedback": {
+      "backToInterview": "Wróć do wywiadu",
+      "eyebrow": "Informacja zwrotna dla kandydata",
+      "title": "Przeglądaj i edytuj informację zwrotną dla kandydata",
+      "shellLead": "To miejsce jest oddzielone od oceny i wyników. Wygenerowane sugestie i ręczne edycje pojawią się tutaj.",
+      "emptyTitle": "Brak informacji zwrotnej dla kandydata",
+      "emptyDescription": "Wygeneruj informację zwrotną AI dla całego wywiadu lub zacznij od pojedynczych pytań poniżej.",
+      "generateAll": "Wygeneruj AI dla całego wywiadu",
+      "generateAllLockedHint": "Wszystkie bloki informacji zwrotnej są już zaakceptowane lub edytowane.",
+      "generateOverall": "Wygeneruj ogólną informację zwrotną AI",
+      "generateQuestion": "Wygeneruj AI dla tego pytania",
+      "regenerateQuestion": "Wygeneruj ponownie AI dla tego pytania",
+      "overallBlockTitle": "Ogólna informacja zwrotna",
+      "questionBlocksTitle": "Informacja zwrotna dla pytań",
+      "questionBlockTitle": "Pytanie {index}",
+      "context": {
+        "feedbackSection": "Informacja zwrotna dla kandydata"
+      },
+      "recommendationLabel": "Rekomendacje",
+      "improvementLabel": "Co można poprawić",
+      "notGeneratedHint": "Informacja zwrotna AI dla tego bloku nie została jeszcze wygenerowana.",
+      "failedTitle": "Generowanie nie powiodło się",
+      "failedDescription": "Nie udało się wygenerować tego bloku. Spróbuj wygenerować go ponownie.",
+      "skippedBlockTitle": "Pominięto generowanie",
+      "autoTemplateHint": "Szablon wstawiono automatycznie — sprawdź treść przed udostępnieniem kandydatowi.",
+      "retry": "Spróbuj ponownie",
+      "saveChanges": "Zapisz zmiany",
+      "acceptAllSuggestions": "Zastosuj wszystko w tym bloku",
+      "acceptAllSuggestionsPage": "Zastosuj wszystko",
+      "sharedGenerationErrorTitle": "Generowanie AI nie powiodło się",
+      "locationNotSupportedError": "Generowanie AI nie jest dostępne w regionie serwera. Skontaktuj się z administratorem lub spróbuj ponownie później.",
+      "skippedQuestionsSummaryTitle": "{count, plural, one {Pominięto # pozycję podczas generowania} few {Pominięto # pozycje podczas generowania} many {Pominięto # pozycji podczas generowania} other {Pominięto # pozycji podczas generowania}}",
+      "skippedOverallItem": "Ogólna informacja zwrotna: {reason}",
+      "skippedQuestionItem": "Pytanie {index}: {reason}",
+      "skippedQuestionUnknownReason": "Pominięto",
+      "skipReason": {
+        "missing_transcript": "Nie mogliśmy przejrzeć ustnej odpowiedzi na to pytanie.",
+        "unusable_transcript": "Nagrana odpowiedź nie zawierała merytorycznej odpowiedzi na to pytanie.",
+        "not_submitted": "Na to pytanie nie przesłano odpowiedzi.",
+        "missing_answer": "Na to pytanie nie przesłano odpowiedzi.",
+        "stale_validation": "Ponownie uruchom ocenę AI dla wybranej wersji odpowiedzi przed generowaniem informacji zwrotnej.",
+        "off_topic": "Odpowiedź nie pozostała na temat tego pytania.",
+        "not_addressed": "Odpowiedź nie odnosi się do sedna tego pytania.",
+        "missing_question": "Nie znaleziono tego pytania.",
+        "locked": "Informacja zwrotna dla tego bloku została już zaakceptowana lub edytowana.",
+        "in_progress": "Generowanie dla tego bloku jest już w toku.",
+        "no_question_texts": "Brak tekstu pytań do przygotowania informacji zwrotnej."
+      },
+      "noQuestionsTitle": "Brak pytań wywiadu",
+      "noQuestionsDescription": "Ten wywiad nie ma pytań, więc nie ma informacji zwrotnej dla pytań do edycji.",
+      "blockState": {
+        "not_generated": "Nie wygenerowano",
+        "generating": "Generowanie",
+        "generated": "Wygenerowano",
+        "accepted": "Zaakceptowano",
+        "edited": "Edytowano",
+        "failed": "Błąd",
+        "skipped": "Pominięto"
+      },
+      "liveRefresh": {
+        "title": "Wstrzymano bieżące aktualizacje",
+        "description": "Zatrzymaliśmy odpytywanie statusu generowania po powtarzających się błędach lub limicie czasu.",
+        "refresh": "Odśwież teraz"
+      }
     }
   }
 }

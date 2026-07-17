@@ -9,6 +9,17 @@ import {
   buildTranslateDraftRequestPayload,
 } from './question-editor/ai-draft-request';
 import { LOCALES, type Locale } from '@/i18n/locales';
+import {
+  createEmptyCandidateFeedback,
+  mapCandidateFeedbackFromApi,
+  parseCandidateFeedbackBody,
+  parseGenerateAllCandidateFeedbackPostBody,
+  type ApiCandidateFeedbackDto,
+  type CandidateFeedbackResponse,
+  type GenerateAllCandidateFeedbackOutcome,
+  type GenerateAllCandidateFeedbackPlan,
+  type UpdateCandidateFeedbackPayload,
+} from './candidate-feedback';
 
 export { ApiError, QuestionInUseError } from './api-error';
 export { resolveApiLocale } from './api-locale';
@@ -599,6 +610,141 @@ export async function generateFeedbackLink(
     ...LOCALIZED_HEADERS,
     params: { path: { id } }
   }));
+}
+
+export type {
+  ApiCandidateFeedbackDto,
+  CandidateFeedbackBlock,
+  CandidateFeedbackBlockState,
+  CandidateFeedbackEditableState,
+  CandidateFeedbackQuestionBlock,
+  CandidateFeedbackResponse,
+  CandidateFeedbackSkipReason,
+  GenerateAllCandidateFeedbackOutcome,
+  GenerateAllCandidateFeedbackPlan,
+  GenerateAllCandidateFeedbackQuestionResult,
+  UpdateCandidateFeedbackOverallPayload,
+  UpdateCandidateFeedbackPayload,
+  UpdateCandidateFeedbackQuestionPayload,
+} from './candidate-feedback';
+export {
+  buildQuestionBlocksView,
+  candidateFeedbackPath,
+  canRegenerateAnyCandidateFeedbackBlock,
+  createEmptyCandidateFeedback,
+  getSkippedGenerateAllQuestionResults,
+  isCandidateFeedbackEmpty,
+  isCandidateFeedbackGenerating,
+  isOverallBlockGenerationBusy,
+  isQuestionBlockGenerationBusy,
+  mapCandidateFeedbackFromApi,
+  parseCandidateFeedbackBody,
+} from './candidate-feedback';
+
+export async function getCandidateFeedback(
+  id: string,
+  interviewLocale: Locale,
+): Promise<CandidateFeedbackResponse> {
+  const path = `/interviews/${encodeURIComponent(id)}/candidate-feedback`;
+  const res = await fetchClientApi(`/api${path}`, {
+    method: 'GET',
+    credentials: 'include',
+  });
+
+  if (!res.ok) {
+    const body = await res.text();
+    const { code, params } = extractApiErrorFieldsFromBody(body);
+    throw new ApiError(res.status, messageFromBody(body, res.status), path, body, code, params);
+  }
+
+  const body = await res.text();
+  return parseCandidateFeedbackBody(body, id, interviewLocale);
+}
+
+export async function updateCandidateFeedback(
+  id: string,
+  payload: UpdateCandidateFeedbackPayload,
+  interviewLocale: Locale,
+): Promise<CandidateFeedbackResponse> {
+  const path = `/interviews/${encodeURIComponent(id)}/candidate-feedback`;
+  const res = await fetchClientApi(`/api${path}`, {
+    method: 'PATCH',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const body = await res.text();
+    const { code, params } = extractApiErrorFieldsFromBody(body);
+    throw new ApiError(res.status, messageFromBody(body, res.status), path, body, code, params);
+  }
+
+  const body = await res.text();
+  if (!body) {
+    return getCandidateFeedback(id, interviewLocale);
+  }
+
+  return parseCandidateFeedbackBody(body, id, interviewLocale);
+}
+
+export async function generateCandidateFeedbackQuestion(
+  interviewId: string,
+  questionIndex: number,
+  interviewLocale: Locale,
+): Promise<CandidateFeedbackResponse> {
+  const path = `/interviews/${encodeURIComponent(interviewId)}/candidate-feedback/questions/${encodeURIComponent(String(questionIndex))}/generate`;
+  const res = await fetchClientApi(`/api${path}`, {
+    method: 'POST',
+    credentials: 'include',
+  });
+
+  if (!res.ok) {
+    const body = await res.text();
+    const { code, params } = extractApiErrorFieldsFromBody(body);
+    throw new ApiError(res.status, messageFromBody(body, res.status), path, body, code, params);
+  }
+
+  return getCandidateFeedback(interviewId, interviewLocale);
+}
+
+export async function generateCandidateFeedbackAll(
+  interviewId: string,
+  interviewLocale: Locale,
+): Promise<GenerateAllCandidateFeedbackOutcome> {
+  const path = `/interviews/${encodeURIComponent(interviewId)}/candidate-feedback/generate?scope=all`;
+  const res = await fetchClientApi(`/api${path}`, {
+    method: 'POST',
+    credentials: 'include',
+  });
+
+  const body = await res.text();
+
+  if (!res.ok) {
+    const { code, params } = extractApiErrorFieldsFromBody(body);
+    throw new ApiError(res.status, messageFromBody(body, res.status), path, body, code, params);
+  }
+
+  let plan: GenerateAllCandidateFeedbackPlan | undefined
+  let postFeedback: CandidateFeedbackResponse | undefined
+
+  if (body.trim()) {
+    const parsed = parseGenerateAllCandidateFeedbackPostBody(body)
+    plan = parsed.plan
+    if (parsed.feedbackDto) {
+      postFeedback = mapCandidateFeedbackFromApi(
+        {
+          ...parsed.feedbackDto,
+          interviewId: parsed.feedbackDto.interviewId ?? interviewId,
+        },
+        interviewLocale,
+      )
+    }
+  }
+
+  const feedback =
+    postFeedback ?? (await getCandidateFeedback(interviewId, interviewLocale))
+  return { feedback, plan }
 }
 
 

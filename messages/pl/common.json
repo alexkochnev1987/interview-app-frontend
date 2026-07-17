@@ -19,6 +19,13 @@
       "exit": "Zakończ demo"
     }
   },
+  "recordingPlayer": {
+    "playbackFailedTitle": "Nie udało się odtworzyć nagrania",
+    "playbackFailedDescription": "Nagranie nie zostało wczytane.",
+    "durationUnavailableTitle": "Długość nagrania niedostępna",
+    "durationUnavailableDescription": "Nie udało się odczytać długości tego nagrania, więc pasek postępu może nie działać. Odtwarzanie nadal działa.",
+    "refresh": "Odśwież"
+  },
   "languageSwitcher": {
     "label": "Język",
     "locales": {
@@ -39,6 +46,7 @@
       "backToDashboard": "Wróć do panelu",
       "backToQuestionLibrary": "Wróć do bazy pytań",
       "backToAssessments": "Wróć do ocen",
+      "backToInterview": "Wróć do wywiadu",
       "backToTemplates": "Wróć do szablonów"
     },
     "labels": {

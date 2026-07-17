@@ -19,6 +19,13 @@
       "exit": "Выйсці з дэма"
     }
   },
+  "recordingPlayer": {
+    "playbackFailedTitle": "Не ўдалося прайграць запіс",
+    "playbackFailedDescription": "Запіс не загрузіўся.",
+    "durationUnavailableTitle": "Працягласць запісу недаступная",
+    "durationUnavailableDescription": "Не ўдалося вызначыць працягласць гэтага запісу, таму паласа прагрэсу можа не працаваць. Прайграванне ўсё яшчэ працуе.",
+    "refresh": "Абнавіць"
+  },
   "languageSwitcher": {
     "label": "Мова",
     "locales": {
@@ -39,6 +46,7 @@
       "backToDashboard": "Вярнуцца на панэль",
       "backToQuestionLibrary": "Вярнуцца ў банк пытанняў",
       "backToAssessments": "Вярнуцца да ацэнак",
+      "backToInterview": "Вярнуцца да інтэрв'ю",
       "backToTemplates": "Вярнуцца да шаблонаў"
     },
     "labels": {

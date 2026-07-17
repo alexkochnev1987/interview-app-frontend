@@ -9,6 +9,7 @@
     },
     "detail": {
       "backToDashboard": "Back to dashboard",
+      "candidateFeedback": "Candidate feedback",
       "validationStatus": {
         "idle": "Idle",
         "queued": "Queued",
@@ -144,6 +145,71 @@
       "answersBlockEditNotice": "Editing is disabled after answers have been uploaded, because answers are tied to question order.",
       "discardTitle": "Discard unsaved changes?",
       "discardDescription": "Your edits to this interview will be lost."
+    },
+    "candidateFeedback": {
+      "backToInterview": "Back to interview",
+      "eyebrow": "Candidate feedback",
+      "title": "Review and edit candidate-facing feedback",
+      "shellLead": "This workspace is separate from scoring and evaluation. Generated suggestions and manual edits will appear here.",
+      "emptyTitle": "No candidate feedback yet",
+      "emptyDescription": "Generate AI feedback for the entire interview or start with individual questions below.",
+      "generateAll": "Generate AI for entire interview",
+      "generateAllLockedHint": "All feedback blocks are already accepted or edited.",
+      "generateOverall": "Generate overall AI feedback",
+      "generateQuestion": "Generate AI for this question",
+      "regenerateQuestion": "Regenerate AI for this question",
+      "overallBlockTitle": "Overall feedback",
+      "questionBlocksTitle": "Per-question feedback",
+      "questionBlockTitle": "Question {index}",
+      "context": {
+        "feedbackSection": "Candidate-facing feedback"
+      },
+      "recommendationLabel": "Recommendations",
+      "improvementLabel": "What could be improved",
+      "notGeneratedHint": "AI feedback for this block has not been generated yet.",
+      "failedTitle": "Generation failed",
+      "failedDescription": "This block could not be generated. Try generating it again.",
+      "skippedBlockTitle": "Generation skipped",
+      "autoTemplateHint": "Template inserted automatically — review before sharing with the candidate.",
+      "retry": "Retry",
+      "saveChanges": "Save changes",
+      "acceptAllSuggestions": "Apply all in this block",
+      "acceptAllSuggestionsPage": "Apply all",
+      "sharedGenerationErrorTitle": "AI generation failed",
+      "locationNotSupportedError": "AI generation is not available from the server's region. Contact your administrator or try again later.",
+      "skippedQuestionsSummaryTitle": "{count, plural, one {# item skipped during generation} other {# items skipped during generation}}",
+      "skippedOverallItem": "Overall feedback: {reason}",
+      "skippedQuestionItem": "Question {index}: {reason}",
+      "skippedQuestionUnknownReason": "Skipped",
+      "skipReason": {
+        "missing_transcript": "We could not review a spoken answer for this question.",
+        "unusable_transcript": "The recorded response did not contain a substantive answer to this question.",
+        "not_submitted": "No answer was submitted for this question.",
+        "missing_answer": "No answer was submitted for this question.",
+        "stale_validation": "Re-run AI evaluation for the selected answer version before generating feedback.",
+        "off_topic": "The answer did not stay on topic for this question.",
+        "not_addressed": "The answer did not address what this question asked.",
+        "missing_question": "This question could not be found.",
+        "locked": "Feedback for this block is already accepted or edited.",
+        "in_progress": "Generation for this block is already in progress.",
+        "no_question_texts": "No question text is available for feedback."
+      },
+      "noQuestionsTitle": "No interview questions",
+      "noQuestionsDescription": "This interview has no questions, so there is no per-question feedback to edit.",
+      "blockState": {
+        "not_generated": "Not generated",
+        "generating": "Generating",
+        "generated": "Generated",
+        "accepted": "Accepted",
+        "edited": "Edited",
+        "failed": "Failed",
+        "skipped": "Skipped"
+      },
+      "liveRefresh": {
+        "title": "Live updates paused",
+        "description": "We stopped polling generation status after repeated failures or a timeout.",
+        "refresh": "Refresh now"
+      }
     }
   }
 }
