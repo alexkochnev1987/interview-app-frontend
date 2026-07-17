@@ -142,12 +142,7 @@ export type Answer = Schemas['AnswerDto'];
 
 export type InterviewResult = Schemas['InterviewResultResponseDto'];
 export type Interview = Schemas['InterviewResponseDto'];
-export type UpdateInterviewPayload = Omit<
-  Schemas['UpdateInterviewDto'],
-  'assignedHrId'
-> & {
-  assignedHrId?: string | null;
-};
+export type UpdateInterviewPayload = Schemas['UpdateInterviewDto'];
 export type InterviewStatus = Interview['status'];
 
 type ValidateAllAnswersResponse = Schemas['StartAllAnswerValidationsResponseDto'];
@@ -358,11 +353,22 @@ export async function fetchUsers(
 export async function fetchHrUsers(
     init?: { signal?: AbortSignal },
 ): Promise<AssignedHr[]> {
-  const users = await fetchUsers({ limit: 200 }, init);
-  return users
-      .filter((u) => u.role === 'hr')
-      .map(({ id, name, email }) => ({ id, name, email }))
-      .sort((a, b) => a.name.localeCompare(b.name));
+  const pageSize = 200
+  const hrUsers: AssignedHr[] = []
+  let offset = 0
+
+  while (true) {
+    const users = await fetchUsers({ limit: pageSize, offset }, init)
+    hrUsers.push(
+      ...users
+        .filter((u) => u.role === 'hr')
+        .map(({ id, name, email }) => ({ id, name, email })),
+    )
+    if (users.length < pageSize) break
+    offset += pageSize
+  }
+
+  return hrUsers.sort((a, b) => a.name.localeCompare(b.name))
 }
 
 export async function updateUserRole(

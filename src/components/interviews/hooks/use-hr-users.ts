@@ -21,5 +21,6 @@ export function useHrUsers(options?: { enabled?: boolean }) {
     hrUsers: query.data ?? [],
     loading: query.isLoading,
     error: getErrorMessage(query.error, t('assignedHrLoadError')) ?? null,
+    refetch: query.refetch,
   }
 }

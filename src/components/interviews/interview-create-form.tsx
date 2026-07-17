@@ -117,7 +117,7 @@ export function InterviewCreateForm({
           createInterview({
             candidateName: candidateName.trim(),
             position: position.trim(),
-            ...(assignedHrId ? { assignedHrId } : {}),
+            ...(canAssign && assignedHrId ? { assignedHrId } : {}),
             interviewLocale,
             questionIds: Array.from(selectedById.keys()),
             // Popularity is bumped server-side in the same transaction when set.

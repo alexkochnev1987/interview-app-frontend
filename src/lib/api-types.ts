@@ -1761,8 +1761,11 @@ export interface components {
             candidateName?: string;
             candidateEmail?: string;
             position?: string;
-            /** @description HR reviewer UUID, or null to clear assignment. Admin/super_admin only. */
-            assignedHrId?: Record<string, never> | null;
+            /**
+             * Format: uuid
+             * @description HR reviewer UUID, or null to clear assignment. Admin/super_admin only.
+             */
+            assignedHrId?: string | null;
             questionIds?: string[];
         };
         StartAnswerValidationResultDto: {
@@ -3462,7 +3465,7 @@ export interface operations {
                 /** @description Filter by position (exact match) */
                 position?: string;
                 status?: "pending" | "in_progress" | "processing" | "completed" | "failed";
-                /** @description Filter by assigned HR reviewer UUID, or `unassigned` for interviews with no assignee. */
+                /** @description Filter by assigned HR reviewer UUID, or the literal `unassigned` for interviews with no assignee. */
                 assignedHrId?: string;
                 /**
                  * @deprecated
@@ -3554,7 +3557,7 @@ export interface operations {
     InterviewController_getFacets: {
         parameters: {
             query?: {
-                /** @description Filter by assigned HR reviewer user id */
+                /** @description Filter by assigned HR reviewer UUID, or the literal `unassigned` for interviews with no assignee. */
                 assignedHrId?: string;
                 status?: "pending" | "in_progress" | "processing" | "completed" | "failed";
                 /** @description Filter by position (exact match) */

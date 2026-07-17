@@ -8,7 +8,7 @@ import { PageShell } from '@/components/ui/layout/page-shell'
 import type { Locale } from '@/i18n/locales'
 import { routes } from '@/i18n/routes'
 import { loadAuthGate, redirectIfUnauthenticated } from '@/lib/auth-gate'
-import { canConfigureInterview } from '@/lib/auth-roles'
+import { canAssignInterviewHr, canConfigureInterview } from '@/lib/auth-roles'
 import { prefetchInterviewsLibrary } from '@/lib/interviews-library-prefetch'
 import { toInterviewsSearchParams } from '@/lib/interviews-query-state'
 
@@ -51,10 +51,13 @@ export default async function InterviewsPage({
   }
 
   const urlParams = toInterviewsSearchParams(await searchParams)
+  const allowAssignedHrFilter = canAssignInterviewHr(auth.me.role)
   let initialPrefetch
 
   try {
-    initialPrefetch = await prefetchInterviewsLibrary(auth.ctx, urlParams)
+    initialPrefetch = await prefetchInterviewsLibrary(auth.ctx, urlParams, {
+      allowAssignedHrFilter,
+    })
   } catch (err) {
     const message =
       err instanceof Error ? err.message : t('libraryLoadFailedFallback')

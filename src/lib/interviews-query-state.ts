@@ -6,6 +6,7 @@ import type {
   InterviewSortOrder,
   InterviewStatusFilter,
 } from '@/lib/api'
+import { isValidAssignedHrFilterId } from '@/lib/assigned-hr-filter'
 
 export { emptyPaginatedInterviews } from '@/lib/api'
 
@@ -58,8 +59,10 @@ export const EMPTY_INTERVIEW_FACETS: InterviewFacetsResponse = {
 export function readInterviewsFromSearchParams(
   params: URLSearchParams,
   fallback: InterviewsQueryState = DEFAULT_INTERVIEWS_QUERY,
+  options?: { allowAssignedHrFilter?: boolean },
 ): InterviewsQueryState {
   const next: InterviewsQueryState = { ...fallback }
+  const allowAssignedHrFilter = options?.allowAssignedHrFilter ?? true
 
   const q = params.get('q')
   if (q !== null) next.q = clampInterviewsSearchQuery(q)
@@ -79,7 +82,13 @@ export function readInterviewsFromSearchParams(
   }
 
   const assignedHrId = params.get('assignedHrId')
-  if (assignedHrId) next.assignedHrId = assignedHrId
+  if (
+    allowAssignedHrFilter &&
+    assignedHrId &&
+    isValidAssignedHrFilterId(assignedHrId)
+  ) {
+    next.assignedHrId = assignedHrId
+  }
 
   const sortBy = params.get('sortBy')
   if (
@@ -172,8 +181,9 @@ export function buildInterviewFacetsParams(
 
 export function resolveInterviewsQueryState(
   searchParams: URLSearchParams,
+  options?: { allowAssignedHrFilter?: boolean },
 ): InterviewsQueryState {
-  const state = readInterviewsFromSearchParams(searchParams)
+  const state = readInterviewsFromSearchParams(searchParams, DEFAULT_INTERVIEWS_QUERY, options)
   if (state.view === 'cards' && state.page !== 1) state.page = 1
   return state
 }

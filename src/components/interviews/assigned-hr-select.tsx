@@ -10,6 +10,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Button } from '@/components/ui/button'
+import { Stack } from '@/components/ui/layout/stack'
+import { BodyText } from '@/components/ui/text'
 import type { AssignedHr } from '@/lib/api'
 import {
   ASSIGNED_HR_FILTER_UNASSIGNED,
@@ -20,11 +23,14 @@ import { useHrUsers } from './hooks/use-hr-users'
 
 const CLEAR_VALUE = '__clear__'
 
+type AssignedHrSelectMode = 'form' | 'filter'
+
 type AssignedHrSelectProps = {
   id?: string
   value?: string
   onValueChange: (value: string | undefined) => void
   disabled?: boolean
+  mode?: AssignedHrSelectMode
   allowUnassigned?: boolean
   currentAssignee?: AssignedHr
   clearOptionLabel?: string
@@ -45,10 +51,10 @@ function mergeHrOptions(
 
 function resolveSelectValue(
   value: string | undefined,
-  filterMode: boolean,
+  mode: AssignedHrSelectMode,
   allowUnassigned: boolean,
 ): string | undefined {
-  if (filterMode) {
+  if (mode === 'filter') {
     if (!value) return CLEAR_VALUE
     if (isAssignedHrFilterUnassigned(value)) {
       return ASSIGNED_HR_FILTER_UNASSIGNED
@@ -63,6 +69,7 @@ export function AssignedHrSelect({
   value,
   onValueChange,
   disabled = false,
+  mode = 'form',
   allowUnassigned = false,
   currentAssignee,
   enabled = true,
@@ -70,15 +77,15 @@ export function AssignedHrSelect({
   unassignedOnlyLabel,
 }: AssignedHrSelectProps) {
   const t = useTranslations('questions.common')
-  const { hrUsers, loading } = useHrUsers({ enabled })
-  const filterMode = Boolean(unassignedOnlyLabel)
+  const { hrUsers, loading, error, refetch } = useHrUsers({ enabled })
+  const filterMode = mode === 'filter'
 
   const options = useMemo(
     () => mergeHrOptions(hrUsers, currentAssignee),
     [hrUsers, currentAssignee],
   )
 
-  const selectValue = resolveSelectValue(value, filterMode, allowUnassigned)
+  const selectValue = resolveSelectValue(value, mode, allowUnassigned)
 
   function handleValueChange(next: string) {
     if (filterMode) {
@@ -99,6 +106,25 @@ export function AssignedHrSelect({
       return
     }
     onValueChange(next)
+  }
+
+  if (error) {
+    return (
+      <Stack gap={2}>
+        <BodyText size="sm" tone="danger">
+          {error}
+        </BodyText>
+        <Button
+          type="button"
+          variant="outline-pill"
+          shape="pill"
+          size="sm"
+          onClick={() => void refetch()}
+        >
+          {t('assignedHrRetry')}
+        </Button>
+      </Stack>
+    )
   }
 
   return (
@@ -124,7 +150,7 @@ export function AssignedHrSelect({
             {clearOptionLabel ?? t('assignedHrUnassigned')}
           </SelectItem>
         ) : null}
-        {unassignedOnlyLabel ? (
+        {filterMode && unassignedOnlyLabel ? (
           <SelectItem value={ASSIGNED_HR_FILTER_UNASSIGNED}>
             {unassignedOnlyLabel}
           </SelectItem>

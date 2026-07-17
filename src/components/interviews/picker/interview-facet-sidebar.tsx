@@ -154,6 +154,7 @@ function AssignedHrFacetSection(props: {
     <FacetSection title={t('hrTitle')} activeCount={activeCount}>
       <AssignedHrSelect
         id="interview-filter-assignedHr"
+        mode="filter"
         value={selected}
         onValueChange={onChange}
         allowUnassigned

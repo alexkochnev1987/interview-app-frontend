@@ -483,6 +483,7 @@
       "assignedHrUnassigned": "Не назначен",
       "assignedHrLoading": "Загрузка пользователей HR…",
       "assignedHrLoadError": "Не удалось загрузить пользователей HR.",
+      "assignedHrRetry": "Повторить",
       "candidateNamePlaceholder": "например Джейн Доу",
       "positionLabel": "Позиция",
       "positionPlaceholder": "например Старший фронтенд-инженер",

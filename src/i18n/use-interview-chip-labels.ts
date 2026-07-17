@@ -9,12 +9,15 @@ import { canAssignInterviewHr } from '@/lib/auth-roles'
 import type { InterviewStatusFilter } from '@/lib/api'
 import { isAssignedHrFilterUnassigned } from '@/lib/assigned-hr-filter'
 
-export function useInterviewChipLabels() {
+export function useInterviewChipLabels(options?: { needsHrUserLookup?: boolean }) {
   const t = useTranslations('interviews.chips')
   const sharedLabels = useSharedLabels()
   const { user } = useAuth()
   const canAssign = canAssignInterviewHr(user?.role)
-  const { hrUsers } = useHrUsers({ enabled: canAssign })
+  const needsHrUserLookup = options?.needsHrUserLookup ?? false
+  const { hrUsers } = useHrUsers({
+    enabled: canAssign && needsHrUserLookup,
+  })
 
   return useCallback(
     (descriptor: ActiveInterviewFilterChipDescriptor) => {
