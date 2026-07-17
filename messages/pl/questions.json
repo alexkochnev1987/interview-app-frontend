@@ -483,6 +483,7 @@
       "assignedHrUnassigned": "Nieprzypisany",
       "assignedHrLoading": "Ładowanie użytkowników HR…",
       "assignedHrLoadError": "Nie udało się wczytać użytkowników HR.",
+      "assignedHrRetry": "Spróbuj ponownie",
       "candidateNamePlaceholder": "np. Jane Doe",
       "positionLabel": "Pozycja",
       "positionPlaceholder": "np. Starszy Inżynier Frontendu",

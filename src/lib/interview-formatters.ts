@@ -1,4 +1,4 @@
-import type { AssignedHr, Interview } from '@/lib/api'
+import type { Interview } from '@/lib/api'
 
 /**
  * Fixed calendar zone for interview UI timestamps. Using the runtime default
@@ -54,11 +54,4 @@ export function getCandidateInitials(name: string) {
     .join('')
     .slice(0, 2)
     .toUpperCase()
-}
-
-export function formatAssignedHrLabel(
-    assignedHr: AssignedHr | undefined,
-    unassignedLabel: string,
-): string {
-  return assignedHr?.name ?? unassignedLabel
 }

@@ -17,6 +17,7 @@ import { useInterviewChipLabels } from '@/i18n/use-interview-chip-labels'
 import type { InterviewsLibraryPrefetch } from '@/lib/interviews-library-prefetch'
 import { useAuth } from '@/lib/auth-context'
 import { canAssignInterviewHr } from '@/lib/auth-roles'
+import { isAssignedHrFilterUnassigned } from '@/lib/assigned-hr-filter'
 import {
   buildInterviewsInfiniteParams,
   DEFAULT_INTERVIEWS_LIMIT,
@@ -45,7 +46,6 @@ export function InterviewsLibraryClient({
 }: InterviewsLibraryClientProps) {
   const router = useRouter()
   const t = useTranslations('interviews.library.client')
-  const getChipLabel = useInterviewChipLabels()
   const { user } = useAuth()
   const showAssignedHrFilter = canAssignInterviewHr(user?.role)
 
@@ -54,7 +54,15 @@ export function InterviewsLibraryClient({
     serverHydrated: Boolean(initialPrefetch),
     syncUrl: true,
     disableFetchInCardsView: true,
+    allowAssignedHrFilter: showAssignedHrFilter,
   })
+
+  const needsHrUserLookup = Boolean(
+    showAssignedHrFilter &&
+      query.state.assignedHrId &&
+      !isAssignedHrFilterUnassigned(query.state.assignedHrId),
+  )
+  const getChipLabel = useInterviewChipLabels({ needsHrUserLookup })
 
   const isCardsView = query.state.view === 'cards'
   const cardsInfiniteParams = useMemo(

@@ -2877,7 +2877,15 @@
             "name": "assignedHrId",
             "required": false,
             "in": "query",
-            "description": "Filter by assigned HR reviewer UUID, or `unassigned` for interviews with no assignee.",
+            "description": "Filter by assigned HR reviewer UUID, or the literal `unassigned` for interviews with no assignee.",
+            "examples": {
+              "byHr": {
+                "value": "00000000-0000-4000-8000-000000000001"
+              },
+              "unassigned": {
+                "value": "unassigned"
+              }
+            },
             "schema": {
               "type": "string"
             }
@@ -2999,7 +3007,7 @@
             "name": "assignedHrId",
             "required": false,
             "in": "query",
-            "description": "Filter by assigned HR reviewer user id",
+            "description": "Filter by assigned HR reviewer UUID, or the literal `unassigned` for interviews with no assignee.",
             "schema": {
               "type": "string"
             }
@@ -8296,7 +8304,8 @@
             "type": "string"
           },
           "assignedHrId": {
-            "type": "object",
+            "type": "string",
+            "format": "uuid",
             "description": "HR reviewer UUID, or null to clear assignment. Admin/super_admin only.",
             "nullable": true
           },

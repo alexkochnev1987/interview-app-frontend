@@ -69,6 +69,7 @@ type UseInterviewsQueryOptions = {
     serverHydrated?: boolean
     syncUrl?: boolean
     disableFetchInCardsView?: boolean
+    allowAssignedHrFilter?: boolean
 }
 
 export type UseInterviewsQueryResult = {
@@ -120,6 +121,7 @@ export function useInterviewsQuery(
         serverHydrated,
         syncUrl,
         disableFetchInCardsView,
+        allowAssignedHrFilter = true,
     } = options
     const [capturedInitial] = useState<Partial<InterviewsQueryState> | undefined>(initial)
     const router = useRouter()
@@ -132,7 +134,9 @@ export function useInterviewsQuery(
         const base = withLockedDefaults(capturedInitial)
         const start =
             syncUrl && searchParams
-                ? readInterviewsFromSearchParams(searchParams, base)
+                ? readInterviewsFromSearchParams(searchParams, base, {
+                      allowAssignedHrFilter,
+                  })
                 : base
         if (start.view === 'cards' && start.page !== 1) start.page = 1
         return start
@@ -187,7 +191,9 @@ export function useInterviewsQuery(
         if (currentUrl !== lastWrittenUrlRef.current) {
             const base = withLockedDefaults(capturedInitial)
             const fromUrl = searchParams
-                ? readInterviewsFromSearchParams(searchParams, base)
+                ? readInterviewsFromSearchParams(searchParams, base, {
+                      allowAssignedHrFilter,
+                  })
                 : base
             if (fromUrl.view === 'cards' && fromUrl.page !== 1) fromUrl.page = 1
             lastWrittenUrlRef.current = currentUrl

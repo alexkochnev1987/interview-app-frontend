@@ -483,6 +483,7 @@
       "assignedHrUnassigned": "Unassigned",
       "assignedHrLoading": "Loading HR users…",
       "assignedHrLoadError": "Failed to load HR users.",
+      "assignedHrRetry": "Retry",
       "candidateNamePlaceholder": "e.g. Jane Doe",
       "positionLabel": "Position",
       "positionPlaceholder": "e.g. Senior Frontend Engineer",
