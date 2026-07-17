@@ -31,6 +31,7 @@ import {
   isScoring,
   isValidationInFlight,
 } from '@/lib/assessment-status'
+import { canAccessCandidateFeedback } from '@/lib/interview-management'
 import { useLivePolling } from '@/lib/use-live-polling'
 
 interface AssessmentDetailContentProps {
@@ -73,7 +74,7 @@ export function AssessmentDetailContent({
 
   const headerActions = (
     <Inline gap={2} wrap="wrap" justify="end" width="full">
-      {interview.status === 'completed' ? (
+      {canAccessCandidateFeedback(interview) ? (
         <Button type="button" variant="gradient" shape="pill" asChild>
           <Link href={routes.interviews.candidateFeedback(interviewId)}>
             <Icon size="sm">

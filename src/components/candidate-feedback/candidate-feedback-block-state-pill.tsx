@@ -3,9 +3,20 @@
 import { useTranslations } from 'next-intl'
 
 import { StatusPill, type StatusTone } from '@/components/ui/status-pill'
-import { type CandidateFeedbackBlockState } from '@/lib/candidate-feedback'
+import {
+  isCandidateFeedbackSkippedFailureBlock,
+  type CandidateFeedbackBlock,
+  type CandidateFeedbackBlockState,
+} from '@/lib/candidate-feedback'
 
-export function blockStateTone(state: CandidateFeedbackBlockState): StatusTone {
+export function blockStateTone(
+  state: CandidateFeedbackBlockState,
+  skippedFailure = false,
+): StatusTone {
+  if (skippedFailure) {
+    return 'pending'
+  }
+
   switch (state) {
     case 'generating':
       return 'processing'
@@ -23,17 +34,19 @@ export function blockStateTone(state: CandidateFeedbackBlockState): StatusTone {
 }
 
 interface CandidateFeedbackBlockStatePillProps {
-  state: CandidateFeedbackBlockState
+  block: Pick<CandidateFeedbackBlock, 'state' | 'errorMessage'>
 }
 
 export function CandidateFeedbackBlockStatePill({
-  state,
+  block,
 }: CandidateFeedbackBlockStatePillProps) {
   const t = useTranslations('interviews.candidateFeedback')
+  const skippedFailure = isCandidateFeedbackSkippedFailureBlock(block)
+  const labelKey = skippedFailure ? 'skipped' : block.state
 
   return (
-    <StatusPill tone={blockStateTone(state)} casing="chip">
-      {t(`blockState.${state}`)}
+    <StatusPill tone={blockStateTone(block.state, skippedFailure)} casing="chip">
+      {t(`blockState.${labelKey}`)}
     </StatusPill>
   )
 }

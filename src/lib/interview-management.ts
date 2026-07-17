@@ -22,3 +22,8 @@ export function canManageInterview(interview: Interview): boolean {
 export function canDeleteInterview(interview: Interview): boolean {
   return interview.status === 'completed' || interview.status === 'failed'
 }
+
+/** Candidate feedback is available once the interview has finished (success or failure). */
+export function canAccessCandidateFeedback(interview: Interview): boolean {
+  return interview.status === 'completed' || interview.status === 'failed'
+}
