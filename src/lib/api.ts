@@ -358,17 +358,15 @@ export async function fetchHrUsers(
   let offset = 0
 
   while (true) {
-    const users = await fetchUsers({ limit: pageSize, offset }, init)
+    const users = await fetchUsers({ limit: pageSize, offset, role: 'hr' }, init)
     hrUsers.push(
-      ...users
-        .filter((u) => u.role === 'hr')
-        .map(({ id, name, email }) => ({ id, name, email })),
+      ...users.map(({ id, name, email }) => ({ id, name, email })),
     )
     if (users.length < pageSize) break
     offset += pageSize
   }
 
-  return hrUsers.sort((a, b) => a.name.localeCompare(b.name))
+  return hrUsers
 }
 
 export async function updateUserRole(
@@ -622,7 +620,7 @@ export async function updateInterview(
 ): Promise<Interview> {
   return handle(client.PATCH('/interviews/{id}', {
     params: { path: { id } },
-    body: data as Schemas['UpdateInterviewDto'],
+    body: data,
   }));
 }
 
