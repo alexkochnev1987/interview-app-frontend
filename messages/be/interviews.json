@@ -75,6 +75,9 @@
         "resetAllWithCount": "Скінуць ({count})",
         "positionTitle": "Пасада",
         "statusTitle": "Статус",
+        "hrTitle": "HR-спецыяліст",
+        "hrFilterAll": "Усе спецыялісты",
+        "hrFilterUnassigned": "Не прызначаны",
         "retry": "Паўтарыць",
         "unavailable": "Фільтры недаступныя",
         "loading": "Загрузка…",
@@ -118,7 +121,9 @@
     },
     "chips": {
       "position": "Пасада: {value}",
-      "status": "Статус: {value}"
+      "status": "Статус: {value}",
+      "hr": "HR: {value}",
+      "hrUnassigned": "HR: Не прызначаны"
     },
     "actions": {
       "edit": "Рэдагаваць інтэрв'ю",

@@ -11,10 +11,14 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import type { AssignedHr } from '@/lib/api'
+import {
+  ASSIGNED_HR_FILTER_UNASSIGNED,
+  isAssignedHrFilterUnassigned,
+} from '@/lib/assigned-hr-filter'
 
 import { useHrUsers } from './hooks/use-hr-users'
 
-const UNASSIGNED_VALUE = '__unassigned__'
+const CLEAR_VALUE = '__clear__'
 
 type AssignedHrSelectProps = {
   id?: string
@@ -23,6 +27,8 @@ type AssignedHrSelectProps = {
   disabled?: boolean
   allowUnassigned?: boolean
   currentAssignee?: AssignedHr
+  clearOptionLabel?: string
+  unassignedOnlyLabel?: string
   enabled?: boolean
 }
 
@@ -37,6 +43,21 @@ function mergeHrOptions(
   )
 }
 
+function resolveSelectValue(
+  value: string | undefined,
+  filterMode: boolean,
+  allowUnassigned: boolean,
+): string | undefined {
+  if (filterMode) {
+    if (!value) return CLEAR_VALUE
+    if (isAssignedHrFilterUnassigned(value)) {
+      return ASSIGNED_HR_FILTER_UNASSIGNED
+    }
+    return value
+  }
+  return value ?? (allowUnassigned ? CLEAR_VALUE : undefined)
+}
+
 export function AssignedHrSelect({
   id,
   value,
@@ -45,20 +66,35 @@ export function AssignedHrSelect({
   allowUnassigned = false,
   currentAssignee,
   enabled = true,
+  clearOptionLabel,
+  unassignedOnlyLabel,
 }: AssignedHrSelectProps) {
   const t = useTranslations('questions.common')
   const { hrUsers, loading } = useHrUsers({ enabled })
+  const filterMode = Boolean(unassignedOnlyLabel)
 
   const options = useMemo(
     () => mergeHrOptions(hrUsers, currentAssignee),
     [hrUsers, currentAssignee],
   )
 
-  const selectValue =
-    value ?? (allowUnassigned ? UNASSIGNED_VALUE : undefined)
+  const selectValue = resolveSelectValue(value, filterMode, allowUnassigned)
 
   function handleValueChange(next: string) {
-    if (allowUnassigned && next === UNASSIGNED_VALUE) {
+    if (filterMode) {
+      if (next === CLEAR_VALUE) {
+        onValueChange(undefined)
+        return
+      }
+      if (next === ASSIGNED_HR_FILTER_UNASSIGNED) {
+        onValueChange(ASSIGNED_HR_FILTER_UNASSIGNED)
+        return
+      }
+      onValueChange(next)
+      return
+    }
+
+    if (allowUnassigned && next === CLEAR_VALUE) {
       onValueChange(undefined)
       return
     }
@@ -84,8 +120,13 @@ export function AssignedHrSelect({
       </SelectTrigger>
       <SelectContent>
         {allowUnassigned ? (
-          <SelectItem value={UNASSIGNED_VALUE}>
-            {t('assignedHrUnassigned')}
+          <SelectItem value={CLEAR_VALUE}>
+            {clearOptionLabel ?? t('assignedHrUnassigned')}
+          </SelectItem>
+        ) : null}
+        {unassignedOnlyLabel ? (
+          <SelectItem value={ASSIGNED_HR_FILTER_UNASSIGNED}>
+            {unassignedOnlyLabel}
           </SelectItem>
         ) : null}
         {options.map((user) => (

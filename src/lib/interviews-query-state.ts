@@ -29,6 +29,7 @@ export type InterviewsQueryState = {
   q: string
   position?: string
   status?: InterviewStatusFilter
+  assignedHrId?: string
   sortBy: InterviewSortField
   sortOrder: InterviewSortOrder
   page: number
@@ -40,6 +41,7 @@ export const DEFAULT_INTERVIEWS_QUERY: InterviewsQueryState = {
   q: '',
   position: undefined,
   status: undefined,
+  assignedHrId: undefined,
   sortBy: 'updatedAt',
   sortOrder: 'desc',
   page: 1,
@@ -75,6 +77,9 @@ export function readInterviewsFromSearchParams(
   ) {
     next.status = status
   }
+
+  const assignedHrId = params.get('assignedHrId')
+  if (assignedHrId) next.assignedHrId = assignedHrId
 
   const sortBy = params.get('sortBy')
   if (
@@ -123,13 +128,14 @@ export function toInterviewsSearchParams(
 }
 
 function buildInterviewFilterParams(
-  state: Pick<InterviewsQueryState, 'position' | 'status'>,
+  state: Pick<InterviewsQueryState, 'position' | 'status' | 'assignedHrId'>,
   debouncedQ: string,
 ): Omit<FetchInterviewsParams, 'sortBy' | 'sortOrder' | 'page' | 'limit'> {
   return {
     q: debouncedQ || undefined,
     position: state.position,
     status: state.status,
+    assignedHrId: state.assignedHrId,
   }
 }
 
@@ -158,7 +164,7 @@ export function buildInterviewsInfiniteParams(
 }
 
 export function buildInterviewFacetsParams(
-  state: Pick<InterviewsQueryState, 'position' | 'status'>,
+  state: Pick<InterviewsQueryState, 'position' | 'status' | 'assignedHrId'>,
   debouncedQ: string,
 ): FetchInterviewFacetsParams {
   return buildInterviewFilterParams(state, debouncedQ)

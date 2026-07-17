@@ -75,6 +75,9 @@
         "resetAllWithCount": "Reset ({count})",
         "positionTitle": "Position",
         "statusTitle": "Status",
+        "hrTitle": "HR reviewer",
+        "hrFilterAll": "All reviewers",
+        "hrFilterUnassigned": "Not assigned",
         "retry": "Retry",
         "unavailable": "Filters unavailable",
         "loading": "Loading…",
@@ -118,7 +121,9 @@
     },
     "chips": {
       "position": "Position: {value}",
-      "status": "Status: {value}"
+      "status": "Status: {value}",
+      "hr": "HR: {value}",
+      "hrUnassigned": "HR: Not assigned"
     },
     "actions": {
       "edit": "Edit interview",
