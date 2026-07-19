@@ -2,6 +2,7 @@
   "nav": {
     "dashboard": "Dashboard",
     "questions": "Questions",
+    "assistant": "Assistant",
     "assessments": "Assessments",
     "newInterview": "New Interview",
     "team": "Team",

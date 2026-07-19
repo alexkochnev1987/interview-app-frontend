@@ -1,4 +1,5 @@
 export const routes = {
+  assistant: '/assistant',
   questions: {
     list: '/questions',
     new: '/questions/new',

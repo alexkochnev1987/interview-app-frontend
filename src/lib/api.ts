@@ -168,6 +168,12 @@ export type FetchInterviewFacetsParams = NonNullable<
 >;
 
 export type CreateInterviewPayload = Schemas['CreateInterviewDto'];
+export type RecruiterAssistantChatPayload = Schemas['RecruiterAssistantChatDto'];
+export type RecruiterAssistantResponse = Schemas['RecruiterAssistantResponseDto'];
+export type RecruiterAssistantPendingAction =
+  Schemas['RecruiterAssistantPendingActionDto'];
+export type RecruiterAssistantSuggestedQuestion =
+  Schemas['RecruiterAssistantSuggestedQuestionDto'];
 
 export type PresignedUrlResponse = Schemas['PresignedUrlResponseDto'];
 
@@ -372,6 +378,15 @@ export async function fetchQuestionFacets(
 
 export async function login(data: LoginPayload): Promise<AuthUserResponseDto> {
   return handle(client.POST('/auth/login', {
+    ...LOCALIZED_HEADERS,
+    body: data,
+  }));
+}
+
+export async function sendRecruiterAssistantMessage(
+  data: RecruiterAssistantChatPayload,
+): Promise<RecruiterAssistantResponse> {
+  return handle(client.POST('/ai/recruiter-assistant/chat', {
     ...LOCALIZED_HEADERS,
     body: data,
   }));
