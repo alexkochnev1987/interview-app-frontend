@@ -154,10 +154,7 @@ export function DashboardView({
             <EyebrowLabel size="lg">{t('recent.eyebrow')}</EyebrowLabel>
             <SectionHeading>{t('recent.title')}</SectionHeading>
           </Stack>
-          <InterviewsLibraryClient
-            initialPrefetch={initialPrefetch}
-            showHeader={false}
-          />
+          <InterviewsLibraryClient initialPrefetch={initialPrefetch} />
         </Section>
       </Stack>
     </PageShell>
