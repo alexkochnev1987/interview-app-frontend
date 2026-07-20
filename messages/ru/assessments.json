@@ -28,7 +28,9 @@
       "perQuestionEyebrow": "Разбор по вопросам",
       "perQuestionHeading": "Вопросы и ответы",
       "scorecardEyebrow": "Итоговая карта",
-      "scorecardHeading": "Общий результат"
+      "scorecardHeading": "Общий результат",
+      "assignedHrUnassigned": "Не назначен",
+      "assignedHrAssigned": "Назначен: {name}"
     },
     "liveRefresh": {
       "title": "Живые обновления приостановлены",

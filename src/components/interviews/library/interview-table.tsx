@@ -29,6 +29,8 @@ import type {
 } from '@/lib/api'
 import { formatInterviewDate } from '@/lib/interview-formatters'
 
+import { AssignedHrListPill } from './assigned-hr-list-pill'
+
 const EMPTY = '—'
 
 type SortableField = Extract<
@@ -136,6 +138,7 @@ export function InterviewTable({
               onSortClick={() => handleSortClick('candidateName')}
             />
             <TableHead>{t('position')}</TableHead>
+            <TableHead>{t('hr')}</TableHead>
             <TableHead>{t('status')}</TableHead>
             <TableHead align="right">{t('progress')}</TableHead>
             <TableHead visibility="md-up" align="right">
@@ -175,6 +178,9 @@ export function InterviewTable({
                 </TableCell>
                 <TableCell truncate title={interview.position}>
                   {dashIfEmpty(interview.position)}
+                </TableCell>
+                <TableCell>
+                  <AssignedHrListPill assignedHr={interview.assignedHr} />
                 </TableCell>
                 <TableCell>
                   <Inline gap={2} align="center" wrap="nowrap">

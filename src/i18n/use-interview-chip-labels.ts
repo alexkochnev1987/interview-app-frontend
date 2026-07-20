@@ -2,12 +2,22 @@ import { useCallback } from 'react'
 import { useTranslations } from 'next-intl'
 
 import type { ActiveInterviewFilterChipDescriptor } from '@/components/interviews/picker/build-active-chips'
+import { useHrUsers } from '@/components/interviews/hooks/use-hr-users'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
+import { useAuth } from '@/lib/auth-context'
+import { canAssignInterviewHr } from '@/lib/auth-roles'
 import type { InterviewStatusFilter } from '@/lib/api'
+import { isAssignedHrFilterUnassigned } from '@/lib/assigned-hr-filter'
 
-export function useInterviewChipLabels() {
+export function useInterviewChipLabels(options?: { needsHrUserLookup?: boolean }) {
   const t = useTranslations('interviews.chips')
   const sharedLabels = useSharedLabels()
+  const { user } = useAuth()
+  const canAssign = canAssignInterviewHr(user?.role)
+  const needsHrUserLookup = options?.needsHrUserLookup ?? false
+  const { hrUsers } = useHrUsers({
+    enabled: canAssign && needsHrUserLookup,
+  })
 
   return useCallback(
     (descriptor: ActiveInterviewFilterChipDescriptor) => {
@@ -20,10 +30,19 @@ export function useInterviewChipLabels() {
               descriptor.value as InterviewStatusFilter,
             ),
           })
+        case 'assignedHr': {
+          if (isAssignedHrFilterUnassigned(descriptor.value)) {
+            return t('hrUnassigned')
+          }
+          const name =
+            hrUsers.find((hr) => hr.id === descriptor.value)?.name ??
+            descriptor.label
+          return t('hr', { value: name })
+        }
         default:
           return ''
       }
     },
-    [sharedLabels, t],
+    [hrUsers, sharedLabels, t],
   )
 }

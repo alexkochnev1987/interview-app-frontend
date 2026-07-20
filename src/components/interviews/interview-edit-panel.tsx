@@ -22,6 +22,9 @@ import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { Input } from '@/components/ui/input'
 import { updateInterview, type Interview } from '@/lib/api'
+import { AssignedHrSelect } from '@/components/interviews/assigned-hr-select'
+import { useAuth, useIsDemo } from '@/lib/auth-context'
+import { canAssignInterviewHr } from '@/lib/auth-roles'
 import {
   getSelectedQuestionIdsInEditOrder,
   isInterviewEditDirty,
@@ -50,6 +53,11 @@ export function InterviewEditPanel({
 
   const [candidateName, setCandidateName] = useState(interview.candidateName)
   const [position, setPosition] = useState(interview.position)
+  const initialAssignedHrId = interview.assignedHrId ?? interview.assignedHr?.id
+  const [assignedHrId, setAssignedHrId] = useState<string | undefined>(initialAssignedHrId)
+  const { user } = useAuth()
+  const isDemo = useIsDemo()
+  const canAssign = canAssignInterviewHr(user?.role)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [discardOpen, setDiscardOpen] = useState(false)
@@ -68,6 +76,7 @@ export function InterviewEditPanel({
         candidateName,
         position,
         selectedById,
+        assignedHrId
       )
     ) {
       setDiscardOpen(true)
@@ -105,6 +114,9 @@ export function InterviewEditPanel({
                 interview.questions,
                 selectedById,
             ),
+            ...(canAssign && assignedHrId !== initialAssignedHrId
+                ? { assignedHrId: assignedHrId ?? null }
+                : {}),
           }),
         {
           successMessage: toastMessages.interview.updateSuccess,
@@ -161,6 +173,20 @@ export function InterviewEditPanel({
                   />
                 </IconAffix>
               </FormField>
+
+              {canAssign ? (
+                  <FormField htmlFor="edit-assignedHr" label={tPicker('assignedHrLabel')}>
+                    <AssignedHrSelect
+                        id="edit-assignedHr"
+                        value={assignedHrId}
+                        onValueChange={setAssignedHrId}
+                        allowUnassigned
+                        currentAssignee={interview.assignedHr}
+                        enabled={canAssign}
+                        disabled={submitting || isDemo}
+                    />
+                  </FormField>
+              ) : null}
 
               <Inline gap={2} wrap="wrap">
                 <DemoWriteGuard disabled={submitting || selectedCount === 0}>

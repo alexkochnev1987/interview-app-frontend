@@ -17,6 +17,8 @@
         "completed": "Completed",
         "failed": "Failed"
       },
+      "assignedHrUnassigned": "Unassigned",
+      "assignedHrAssigned": "Assigned to {name}",
       "demoTryCandidateExperience": "Try the candidate experience"
     },
     "library": {
@@ -29,12 +31,14 @@
       "table": {
         "candidate": "Candidate",
         "position": "Position",
+        "hr": "HR",
         "status": "Status",
         "progress": "Progress",
         "score": "Score",
         "updated": "Updated",
         "created": "Created"
       },
+      "assignedHrNotAssigned": "Not assigned",
       "toolbar": {
         "searchPlaceholder": "Search by candidate name",
         "resultCount": "{count} interviews",
@@ -60,6 +64,9 @@
         "resetAllWithCount": "Reset ({count})",
         "positionTitle": "Position",
         "statusTitle": "Status",
+        "hrTitle": "HR reviewer",
+        "hrFilterAll": "All reviewers",
+        "hrFilterUnassigned": "Not assigned",
         "retry": "Retry",
         "unavailable": "Filters unavailable",
         "loading": "Loading…",
@@ -103,7 +110,9 @@
     },
     "chips": {
       "position": "Position: {value}",
-      "status": "Status: {value}"
+      "status": "Status: {value}",
+      "hr": "HR: {value}",
+      "hrUnassigned": "HR: Not assigned"
     },
     "actions": {
       "edit": "Edit interview",
