@@ -5,6 +5,10 @@ import { useTranslations } from 'next-intl'
 
 import { AsyncActionButton } from '@/components/assessments/actions/async-action-button'
 import { useEvaluationStarted } from '@/components/assessments/actions/evaluation-actions-context'
+import {
+  emitOnboardingEvent,
+  ONBOARDING_EVENT_NAMES,
+} from '@/features/onboarding/onboarding-events'
 import { validateInterview } from '@/lib/api'
 import { useToastMessages } from '@/lib/use-toast-messages'
 
@@ -24,6 +28,10 @@ export function StartEvaluationButton({
   const t = useTranslations('assessments.rerun')
   const toastMessages = useToastMessages()
   const onEvaluationStarted = useEvaluationStarted()
+  const handleSuccess = () => {
+    onEvaluationStarted()
+    emitOnboardingEvent(ONBOARDING_EVENT_NAMES.evaluationStarted)
+  }
 
   return (
     <AsyncActionButton
@@ -32,7 +40,7 @@ export function StartEvaluationButton({
       size={size}
       variant={variant}
       icon={<Sparkles />}
-      onSuccess={onEvaluationStarted}
+      onSuccess={handleSuccess}
       idleLabel={t('start')}
       submittedLabel={t('queued')}
       startingLabel={t('starting')}

@@ -15,6 +15,8 @@ const cardVariants = cva(
           "border border-hairline-strong bg-surface-glass shadow-none",
         floating:
           "border border-hairline-strong bg-surface-glass shadow-float",
+        floatingSolid:
+          "border border-hairline-strong bg-card shadow-float",
         recordingHero:
           "border border-hairline-strong bg-white shadow-float",
         metric:

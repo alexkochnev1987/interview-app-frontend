@@ -139,6 +139,7 @@ export function buildInterviewsFetchParams(
 ): FetchInterviewsParams {
   return {
     ...buildInterviewFilterParams(state, debouncedQ),
+    paginated: true,
     sortBy: state.sortBy,
     sortOrder: state.sortOrder,
     page: state.page,

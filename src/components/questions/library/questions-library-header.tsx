@@ -38,7 +38,7 @@ export function QuestionsLibraryHeader({
   return (
     <HeroGrid
       primary={
-        <Card variant="floating" size="lg">
+        <Card variant="floating" size="lg" data-tour="questions-library">
           <CardContent layout="fill-column" spacing="xl">
             <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
               {t('eyebrow')}

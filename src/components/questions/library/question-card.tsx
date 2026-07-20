@@ -37,6 +37,7 @@ interface QuestionCardProps {
   selected?: boolean
   onToggleSelected?: (id: string) => void
   disabled?: boolean
+  tourTarget?: string
 }
 
 type CardVariant = ComponentProps<typeof Card>['variant']
@@ -62,18 +63,26 @@ function CardSurface({
   reserveCorner,
   variant,
   state,
+  tourTarget,
 }: {
   question: Question
   listLocale: string
   reserveCorner: boolean
   variant: CardVariant
   state: CardState
+  tourTarget?: string
 }) {
   const t = useTranslations('questions.library.card')
   const sharedLabels = useSharedLabels()
 
   return (
-    <Card variant={variant} height="full" interaction="hover" state={state}>
+    <Card
+      variant={variant}
+      height="full"
+      interaction="hover"
+      state={state}
+      data-tour={tourTarget}
+    >
       <CardHeader spacing="md">
         <PillRow reserveCorner={reserveCorner}>
           {question.deleted ? (
@@ -147,6 +156,7 @@ export function QuestionCard({
   selected = false,
   onToggleSelected,
   disabled = false,
+  tourTarget,
 }: QuestionCardProps) {
   const t = useTranslations('questions.library.table')
 
@@ -160,6 +170,7 @@ export function QuestionCard({
       reserveCorner={isSelectable}
       variant={variant}
       state={state}
+      tourTarget={tourTarget}
     />
   )
 

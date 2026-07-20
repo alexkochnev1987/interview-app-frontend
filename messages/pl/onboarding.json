@@ -1,0 +1,82 @@
+{
+  "onboarding": {
+    "welcome": {
+      "title": "Witamy w AI Interview Architect",
+      "description": "Przewodnik po procesie rekrutacji — od bazy pytań po ocenę AI. Możesz pominąć w dowolnym momencie.",
+      "eyebrow": "Tour produktu",
+      "duration": "~1 minuta",
+      "journeyQuestions": "Pytania",
+      "journeyAi": "AI Draft",
+      "journeyInterviews": "Interview",
+      "journeyAssessments": "Ocena AI",
+      "start": "Rozpocznij tour",
+      "skip": "Pomiń na razie"
+    },
+    "complete": {
+      "title": "Wszystko gotowe",
+      "description": "Możesz już przejść przez cały workflow. Tour możesz powtórzyć w dowolnym momencie z poziomu „Tour produktu”.",
+      "eyebrow": "Tour ukończony",
+      "action": "Zakończ tour",
+      "recapTitle": "Czego się właśnie nauczyłeś",
+      "recapQuestions": "Tworzyć i wzbogacać pytania z AI Draft",
+      "recapInterviews": "Składać interview z bazy pytań",
+      "recapCandidates": "Udostępniać bezpieczne linki dla kandydatów",
+      "recapAssessments": "Przeglądać i oceniać interview z pomocą AI",
+      "journeyQuestions": "Pytania",
+      "journeyAi": "AI Draft",
+      "journeyInterviews": "Interview",
+      "journeyAssessments": "Ocena AI"
+    },
+    "tour": {
+      "next": "Dalej",
+      "back": "Wstecz",
+      "done": "Zakończ",
+      "replay": "Tour produktu"
+    },
+    "errors": {
+      "persistFailed": "Nie udało się zapisać postępu onboardingu"
+    },
+    "steps": {
+      "dashboardHero": {
+        "title": "Twoja baza główna",
+        "description": "Tutaj trafiasz po zalogowaniu. Znajdziesz tu ostatnie interview i szybkie akcje."
+      },
+      "questionsLibrary": {
+        "title": "Najpierw zbuduj bazę pytań",
+        "description": "Interview są składane z pytań, więc to naturalne miejsce startu."
+      },
+      "questionsText": {
+        "title": "Napisz treść pytania",
+        "description": "Zacznij od głównej treści pytania. Następnie użyj AI Draft, aby wygenerować follow-upy, rubric i przykładową dobrą odpowiedź."
+      },
+      "questionsAiDraft": {
+        "title": "Wygeneruj AI draft",
+        "description": "Kliknij Generate AI Draft, aby uzupełnić szczegóły pytania na podstawie promptu."
+      },
+      "questionsAiApply": {
+        "title": "Zastosuj draft",
+        "description": "Przejrzyj wygenerowane sugestie, a następnie kliknij Apply All, aby dodać je do pytania."
+      },
+      "questionsCreate": {
+        "title": "Zapisz pytanie",
+        "description": "Kliknij Create Question, aby zapisać pytanie z detalami wygenerowanymi przez AI."
+      },
+      "assessmentsEvaluation": {
+        "title": "Uruchom ocenę AI",
+        "description": "Gdy wszystkie odpowiedzi są przesłane, kliknij Start AI evaluation, aby ocenić rozmowę i wygenerować kartę wyników."
+      },
+      "candidateLink": {
+        "title": "Udostępnij link kandydatowi",
+        "description": "Skopiuj ten link i wyślij go kandydatowi. Kandydat przechodzi interview przez take flow."
+      },
+      "interviewCandidate": {
+        "title": "Profil kandydata",
+        "description": "Podaj imię i docelową rolę, a następnie kliknij Create Interview. Po utworzeniu interview przejdziemy do linku kandydata."
+      },
+      "interviewPicker": {
+        "title": "Wybierz co najmniej jedno pytanie",
+        "description": "Wyszukaj pytania w bazie i wybierz co najmniej jedno do tej sesji. Gdy tylko je zaznaczysz, przejdziemy do utworzenia interview."
+      }
+    }
+  }
+}
