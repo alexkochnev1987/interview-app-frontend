@@ -17,6 +17,8 @@
         "completed": "Zakończony",
         "failed": "Przegrany"
       },
+      "assignedHrUnassigned": "Nieprzypisany",
+      "assignedHrAssigned": "Przypisany do {name}",
       "demoTryCandidateExperience": "Wypróbuj jako kandydat"
     },
     "library": {
@@ -29,12 +31,14 @@
       "table": {
         "candidate": "Kandydat",
         "position": "Stanowisko",
+        "hr": "HR",
         "status": "Status",
         "progress": "Postęp",
         "score": "Wynik",
         "updated": "Zaktualizowano",
         "created": "Utworzono"
       },
+      "assignedHrNotAssigned": "Nieprzypisany",
       "toolbar": {
         "searchPlaceholder": "Szukaj według imienia i nazwiska kandydata",
         "resultCount": "{count} interview",
@@ -60,6 +64,9 @@
         "resetAllWithCount": "Resetuj ({count})",
         "positionTitle": "Stanowisko",
         "statusTitle": "Status",
+        "hrTitle": "Recenzent HR",
+        "hrFilterAll": "Wszyscy recenzenci",
+        "hrFilterUnassigned": "Nieprzypisany",
         "retry": "Spróbuj ponownie",
         "unavailable": "Filtry są niedostępne",
         "loading": "Ładowanie…",
@@ -103,7 +110,9 @@
     },
     "chips": {
       "position": "Stanowisko: {value}",
-      "status": "Status: {value}"
+      "status": "Status: {value}",
+      "hr": "HR: {value}",
+      "hrUnassigned": "HR: Nieprzypisany"
     },
     "actions": {
       "edit": "Edytuj wywiad",

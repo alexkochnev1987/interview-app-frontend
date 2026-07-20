@@ -15,6 +15,9 @@ import { useRouter } from '@/i18n/navigation'
 import { routes } from '@/i18n/routes'
 import { useInterviewChipLabels } from '@/i18n/use-interview-chip-labels'
 import type { InterviewsLibraryPrefetch } from '@/lib/interviews-library-prefetch'
+import { useAuth } from '@/lib/auth-context'
+import { canAssignInterviewHr } from '@/lib/auth-roles'
+import { isAssignedHrFilterUnassigned } from '@/lib/assigned-hr-filter'
 import {
   buildInterviewsInfiniteParams,
   DEFAULT_INTERVIEWS_LIMIT,
@@ -43,14 +46,23 @@ export function InterviewsLibraryClient({
 }: InterviewsLibraryClientProps) {
   const router = useRouter()
   const t = useTranslations('interviews.library.client')
-  const getChipLabel = useInterviewChipLabels()
+  const { user } = useAuth()
+  const showAssignedHrFilter = canAssignInterviewHr(user?.role)
 
   const query = useInterviewsQuery({
     initial: initialPrefetch?.queryState,
     serverHydrated: Boolean(initialPrefetch),
     syncUrl: true,
     disableFetchInCardsView: true,
+    allowAssignedHrFilter: showAssignedHrFilter,
   })
+
+  const needsHrUserLookup = Boolean(
+    showAssignedHrFilter &&
+      query.state.assignedHrId &&
+      !isAssignedHrFilterUnassigned(query.state.assignedHrId),
+  )
+  const getChipLabel = useInterviewChipLabels({ needsHrUserLookup })
 
   const isCardsView = query.state.view === 'cards'
   const cardsInfiniteParams = useMemo(
@@ -75,18 +87,26 @@ export function InterviewsLibraryClient({
     {
       position: query.state.position,
       status: query.state.status,
+      assignedHrId: query.state.assignedHrId,
     },
     query.debouncedQ,
   )
 
   const activeChips = buildActiveInterviewFilterChips(
     query.state,
-    { setPosition: query.setPosition, setStatus: query.setStatus },
+    {
+      setPosition: query.setPosition,
+      setStatus: query.setStatus,
+      setAssignedHrId: query.setAssignedHrId,
+    },
     getChipLabel,
   )
 
   const hasActiveFilters = Boolean(
-    query.debouncedQ || query.state.position || query.state.status,
+    query.debouncedQ ||
+      query.state.position ||
+      query.state.status ||
+      query.state.assignedHrId,
   )
 
   const view = pickInterviewsViewSource(
@@ -134,9 +154,12 @@ export function InterviewsLibraryClient({
       selected={{
         position: query.state.position,
         status: query.state.status,
+        assignedHrId: query.state.assignedHrId,
       }}
       onPositionChange={query.setPosition}
       onStatusChange={query.setStatus}
+      onAssignedHrIdChange={query.setAssignedHrId}
+      showAssignedHrFilter={showAssignedHrFilter}
       onReset={query.reset}
       canReset={query.canReset}
       loading={facetsResult.loading}

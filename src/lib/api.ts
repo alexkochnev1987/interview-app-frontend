@@ -158,9 +158,15 @@ export type InterviewListItem = Schemas['InterviewListItemDto'];
 export type PaginatedInterviews = Schemas['PaginatedInterviewsResponseDto'];
 export type InterviewFacetsResponse = Schemas['InterviewFacetsResponseDto'];
 export type InterviewFacetCount = Schemas['InterviewFacetCountDto'];
-export type FetchInterviewsParams = NonNullable<
-  paths['/interviews']['get']['parameters']['query']
->;
+/** HR user UUID, or `unassigned` for interviews with no assignee. */
+export type InterviewAssignedHrFilter = string
+
+export type FetchInterviewsParams = Omit<
+  NonNullable<paths['/interviews']['get']['parameters']['query']>,
+  'assignedHrId'
+> & {
+  assignedHrId?: InterviewAssignedHrFilter
+};
 export type InterviewSortField = NonNullable<FetchInterviewsParams['sortBy']>;
 export type InterviewSortOrder = NonNullable<FetchInterviewsParams['sortOrder']>;
 export type InterviewStatusFilter = NonNullable<FetchInterviewsParams['status']>;
@@ -327,6 +333,42 @@ function toUpdateQuestionDto(data: UpdateQuestionInput): Schemas['UpdateQuestion
 }
 
 export type TeamMember = Schemas['AuthUserResponseDto'];
+
+export type FetchUsersParams = NonNullable<paths['/users']['get']['parameters']['query']>;
+
+export type AssignedHr = Schemas['AssignedHrDto'];
+
+export async function fetchUsers(
+  params?: FetchUsersParams,
+  init?: { signal?: AbortSignal },
+): Promise<TeamMember[]> {
+  return handle(
+    client.GET('/users', {
+      ...LOCALIZED_HEADERS,
+      params: { query: params ?? {} },
+      signal: init?.signal,
+    }),
+  );
+}
+
+export async function fetchHrUsers(
+    init?: { signal?: AbortSignal },
+): Promise<AssignedHr[]> {
+  const pageSize = 200
+  const hrUsers: AssignedHr[] = []
+  let offset = 0
+
+  while (true) {
+    const users = await fetchUsers({ limit: pageSize, offset, role: 'hr' }, init)
+    hrUsers.push(
+      ...users.map(({ id, name, email }) => ({ id, name, email })),
+    )
+    if (users.length < pageSize) break
+    offset += pageSize
+  }
+
+  return hrUsers
+}
 
 export async function updateUserRole(
   id: string,

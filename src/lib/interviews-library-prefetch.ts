@@ -115,8 +115,11 @@ async function hydrateInterviewsLibrary(
 export async function prefetchInterviewsLibrary(
   ctx: ServerRequestContext,
   searchParams: URLSearchParams,
+  options?: { allowAssignedHrFilter?: boolean },
 ): Promise<InterviewsLibraryPrefetch> {
-  const queryState = resolveInterviewsQueryState(searchParams)
+  const queryState = resolveInterviewsQueryState(searchParams, {
+    allowAssignedHrFilter: options?.allowAssignedHrFilter,
+  })
   const isTableView = queryState.view === 'table'
 
   return hydrateInterviewsLibrary(ctx, queryState, {
