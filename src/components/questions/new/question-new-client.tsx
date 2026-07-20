@@ -7,6 +7,10 @@ import { useCreateQuestion } from '@/components/questions/use-question-mutations
 import { useRouter } from '@/i18n/navigation'
 import { type QuestionInput } from '@/lib/api'
 import { useToastMessages } from '@/lib/use-toast-messages'
+import {
+  emitOnboardingEvent,
+  ONBOARDING_EVENT_NAMES,
+} from '@/features/onboarding/onboarding-events'
 
 export function QuestionNewClient() {
   const t = useTranslations('questions.newPage')
@@ -16,7 +20,15 @@ export function QuestionNewClient() {
 
   async function handleSubmit(value: QuestionInput) {
     const question = await createQuestion(value)
-    router.push(`/questions/${question.id}`)
+    const handledByOnboarding = emitOnboardingEvent(
+      ONBOARDING_EVENT_NAMES.questionCreated,
+      { nextRoute: '/interviews/new', questionId: question.id },
+    )
+
+    if (!handledByOnboarding) {
+      router.push(`/questions/${question.id}`)
+    }
+
     return question
   }
 

@@ -18,6 +18,7 @@ export function authUser(overrides = {}) {
     organizationId: 'org-e2e',
     demo: false,
     createdAt: ISO,
+    onboardingCompletedAt: ISO,
     ...overrides,
   }
 }

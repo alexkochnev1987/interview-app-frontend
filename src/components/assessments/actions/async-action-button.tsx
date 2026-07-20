@@ -29,14 +29,12 @@ interface ActionInfo {
 type ActionResult = ActionInfo | undefined
 
 interface AsyncActionButtonProps {
-  /** Runs the action. Return an info payload to surface a toast on success. */
   onRun: () => Promise<ActionResult>
   idleLabel: string
   submittedLabel: string
   startingLabel: string
   errorTitle: string
   errorFallback: string
-  /** Title shown when the backend reports the work is already running (409). */
   inProgressTitle: string
   variant?: ButtonVariant
   size?: ButtonSize

@@ -54,13 +54,15 @@ interface SideNavLinkProps extends VariantProps<typeof sideNavLinkVariants> {
   href: ComponentProps<typeof Link>['href']
   label: string
   icon: ReactElement<{ className?: string }>
+  dataTour?: string
 }
 
-export function SideNavLink({ href, label, icon, active }: SideNavLinkProps) {
+export function SideNavLink({ href, label, icon, active, dataTour }: SideNavLinkProps) {
   return (
     <Link
       href={href}
       aria-current={active ? 'page' : undefined}
+      data-tour={dataTour}
       className={cn(sideNavLinkVariants({ active }))}
     >
       <Icon size="md">{icon}</Icon>

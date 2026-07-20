@@ -15,6 +15,7 @@ import { Icon } from '@/components/ui/icon'
 import { CardGrid } from '@/components/ui/layout/card-grid'
 import { Stack } from '@/components/ui/layout/stack'
 import { EmptyStateCard } from '@/components/ui/state-card'
+import { useOnboardingAssessmentsCardHighlight } from '@/features/onboarding/use-onboarding-tour-targets'
 import { fetchInterviews, type InterviewListItem } from '@/lib/api'
 import {
   deriveReviewStatusFromListItem,
@@ -25,6 +26,7 @@ import {
   ASSESSMENTS_INTERVIEW_PAGE_SIZE,
   fetchAllInterviewPages,
 } from '@/lib/fetch-all-interviews'
+import { isOnboardingStarterInterview } from '@/lib/onboarding-starter'
 import { useLivePolling } from '@/lib/use-live-polling'
 
 interface AssessmentsListClientProps {
@@ -35,6 +37,24 @@ function matchesQuery(interview: InterviewListItem, normalizedQuery: string): bo
   if (!normalizedQuery) return true
   const haystack = `${interview.candidateName} ${interview.position}`.toLowerCase()
   return haystack.includes(normalizedQuery)
+}
+
+function pickTourAssessment(
+  interviews: InterviewListItem[],
+): InterviewListItem | undefined {
+  const real = interviews.filter(
+    (interview) => !isOnboardingStarterInterview(interview),
+  )
+
+  return (
+    real.find(
+      (interview) => deriveReviewStatusFromListItem(interview) === 'ready_to_score',
+    )
+    ?? real.find((interview) => deriveReviewStatusFromListItem(interview) === 'ready')
+    ?? real[0]
+    ?? interviews.find((interview) => isOnboardingStarterInterview(interview))
+    ?? interviews[0]
+  )
 }
 
 export function AssessmentsListClient({
@@ -74,6 +94,12 @@ export function AssessmentsListClient({
     })
   }, [interviews, status, deferredQuery])
 
+  const tourAssessment = useMemo(
+    () => pickTourAssessment(filtered),
+    [filtered],
+  )
+  const tourHighlightId = useOnboardingAssessmentsCardHighlight(tourAssessment?.id)
+
   return (
     <EvaluationActionsProvider onEvaluationStarted={onEvaluationStarted}>
       <Stack gap={6}>
@@ -103,7 +129,13 @@ export function AssessmentsListClient({
         ) : (
           <CardGrid>
             {filtered.map((interview) => (
-              <AssessmentCard key={interview.id} interview={interview} />
+              <AssessmentCard
+                key={interview.id}
+                interview={interview}
+                tourTarget={
+                  interview.id === tourHighlightId ? 'assessments-card' : undefined
+                }
+              />
             ))}
           </CardGrid>
         )}
