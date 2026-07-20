@@ -80,6 +80,10 @@ import { runMutation } from '@/lib/run-mutation'
 import { notifyError } from '@/lib/toast'
 import { useToastMessages } from '@/lib/use-toast-messages'
 import { LOCALES, type Locale } from '@/i18n/locales'
+import {
+  emitOnboardingEvent,
+  ONBOARDING_EVENT_NAMES,
+} from '@/features/onboarding/onboarding-events'
 
 type AiStatus = 'idle' | 'loading' | 'error'
 type QuestionFormField = 'questionText' | 'metadata'
@@ -950,6 +954,7 @@ export function QuestionEditor({
       setAiDraft(draft as QuestionGenerateDraft)
       setDismissedDraftFields([])
       setAiStatus('idle')
+      emitOnboardingEvent(ONBOARDING_EVENT_NAMES.aiDraftGenerated)
     } catch (err) {
       setAiDraft(null)
       setAiStatus('error')
@@ -1018,6 +1023,7 @@ export function QuestionEditor({
     setAiDraft(null)
     setAiError(null)
     setDismissedDraftFields([])
+    emitOnboardingEvent(ONBOARDING_EVENT_NAMES.aiDraftApplied)
   }
 
   function applyDraftField(field: DraftFieldKey) {
@@ -1275,7 +1281,8 @@ export function QuestionEditor({
     }
   }
 
-  const primaryContentComplete = isPrimaryContentComplete(getLocaleDraft(primaryLocale))
+  const primaryDraft = getLocaleDraft(primaryLocale)
+  const primaryContentComplete = isPrimaryContentComplete(primaryDraft)
   const hasPendingAiDraft = pendingDraftFields.length > 0
   const hasPendingTranslationDraft = countPendingTranslationFields() > 0
   const canSubmit =

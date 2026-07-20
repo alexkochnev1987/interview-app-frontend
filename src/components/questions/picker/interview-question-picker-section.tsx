@@ -83,6 +83,7 @@ type InterviewQuestionPickerMainProps = {
   title: string
   description: string
   disabled?: boolean
+  highlightQuestionId?: string | null
 }
 
 export function InterviewQuestionPickerMain({
@@ -90,6 +91,7 @@ export function InterviewQuestionPickerMain({
   title,
   description,
   disabled = false,
+  highlightQuestionId = null,
 }: InterviewQuestionPickerMainProps) {
   const t = useTranslations('questions.common')
   const tToolbar = useTranslations('questions.picker.toolbar')
@@ -146,96 +148,107 @@ export function InterviewQuestionPickerMain({
         }
       />
 
-      <QuestionPickerFeed
-        items={view.items}
-        total={view.total}
-        loading={view.loading}
-        error={view.error}
-        onRetry={view.retry}
-        view={query.state.view}
-        debouncedQ={query.debouncedQ}
-        filterState={query.state}
-        onReset={query.reset}
-        tone="ghost"
-        copyVariant="interview"
-        renderTable={() => (
-          <QuestionTable
-            items={query.items}
-            listLocale={query.state.locale ?? 'en'}
-            selectable
-            selectedIds={selectedIds}
-            onToggleSelected={toggleQuestion}
-            onToggleSelectAll={toggleQuestionsBulk}
-            onRowClick={toggleQuestion}
-            sortBy={query.state.sortBy}
-            sortOrder={query.state.sortOrder}
-            onSortChange={query.setSort}
-            page={query.state.page}
-            loading={query.loading}
-            disabled={disabled}
+      <Stack gap={4}>
+        <QuestionPickerFeed
+          items={view.items}
+          total={view.total}
+          loading={view.loading}
+          error={view.error}
+          onRetry={view.retry}
+          view={query.state.view}
+          debouncedQ={query.debouncedQ}
+          filterState={query.state}
+          onReset={query.reset}
+          tone="ghost"
+          copyVariant="interview"
+          renderTable={() => (
+            <QuestionTable
+              items={query.items}
+              listLocale={query.state.locale ?? 'en'}
+              selectable
+              selectedIds={selectedIds}
+              onToggleSelected={toggleQuestion}
+              onToggleSelectAll={toggleQuestionsBulk}
+              onRowClick={toggleQuestion}
+              sortBy={query.state.sortBy}
+              sortOrder={query.state.sortOrder}
+              onSortChange={query.setSort}
+              page={query.state.page}
+              loading={query.loading}
+              disabled={disabled}
+            />
+          )}
+          renderCards={() => {
+            const rest = view.items.filter(
+              (question) => !selectedById.has(question.id),
+            )
+            return (
+              <CardGrid>
+                {selectedQuestions.map((question) => (
+                  <QuestionCard
+                    key={question.id}
+                    question={question}
+                    listLocale={query.state.locale ?? 'en'}
+                    mode="pick"
+                    selected
+                    onToggleSelected={() => toggleQuestion(question)}
+                    disabled={disabled}
+                    tourTarget={
+                      highlightQuestionId === question.id
+                        ? 'interview-question'
+                        : undefined
+                    }
+                  />
+                ))}
+                {rest.map((question) => (
+                  <QuestionCard
+                    key={question.id}
+                    question={question}
+                    listLocale={query.state.locale ?? 'en'}
+                    mode="pick"
+                    selected={false}
+                    onToggleSelected={() => toggleQuestion(question)}
+                    disabled={disabled}
+                    tourTarget={
+                      highlightQuestionId === question.id
+                        ? 'interview-question'
+                        : undefined
+                    }
+                  />
+                ))}
+              </CardGrid>
+            )
+          }}
+        />
+
+        {!isCardsView ? (
+          <QuestionPickerRefetchAlert
+            error={query.paginationError}
+            onRetry={query.refetch}
           />
-        )}
-        renderCards={() => {
-          // Pin selected questions to the top, then the rest with selected filtered out.
-          const rest = view.items.filter(
-            (question) => !selectedById.has(question.id),
-          )
-          return (
-            <CardGrid>
-              {selectedQuestions.map((question) => (
-                <QuestionCard
-                  key={question.id}
-                  question={question}
-                  listLocale={query.state.locale ?? 'en'}
-                  mode="pick"
-                  selected
-                  onToggleSelected={() => toggleQuestion(question)}
-                  disabled={disabled}
-                />
-              ))}
-              {rest.map((question) => (
-                <QuestionCard
-                  key={question.id}
-                  question={question}
-                  listLocale={query.state.locale ?? 'en'}
-                  mode="pick"
-                  selected={false}
-                  onToggleSelected={() => toggleQuestion(question)}
-                  disabled={disabled}
-                />
-              ))}
-            </CardGrid>
-          )
-        }}
-      />
+        ) : null}
 
-      {!isCardsView ? (
-        <QuestionPickerRefetchAlert
-          error={query.paginationError}
-          onRetry={query.refetch}
-        />
-      ) : null}
+        {isCardsView && view.items.length > 0 ? (
+          <InfiniteCardsLoader
+            hasNextPage={infinite.hasNextPage}
+            isFetchingNextPage={infinite.isFetchingNextPage}
+            totalLoaded={infinite.items.length}
+            total={infinite.total}
+            error={infinite.paginationError}
+            onLoadMore={infinite.fetchNextPage}
+          />
+        ) : null}
 
-      {isCardsView && view.items.length > 0 ? (
-        <InfiniteCardsLoader
-          hasNextPage={infinite.hasNextPage}
-          isFetchingNextPage={infinite.isFetchingNextPage}
-          totalLoaded={infinite.items.length}
-          total={infinite.total}
-          error={infinite.paginationError}
-          onLoadMore={infinite.fetchNextPage}
-        />
-      ) : null}
-
-      {!isCardsView && !view.error ? (
-        <Pagination
-          page={query.state.page}
-          totalPages={query.totalPages}
-          total={query.total}
-          limit={query.state.limit}
-          onPageChange={query.setPage}
-        />
-      ) : null}
+        {!isCardsView && !view.error ? (
+          <Pagination
+            page={query.state.page}
+            totalPages={query.totalPages}
+            total={query.total}
+            limit={query.state.limit}
+            onPageChange={query.setPage}
+          />
+        ) : null}
+      </Stack>
     </Stack>
   )
 }

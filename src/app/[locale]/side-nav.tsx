@@ -46,14 +46,17 @@ import {
 import { SurfaceTile } from '@/components/ui/surface-tile'
 import { BodyText } from '@/components/ui/text'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
+import { useOnboardingReplay } from '@/features/onboarding/onboarding-provider'
 
 export function SideNav() {
   const { user, logout } = useAuth()
   const isDemo = useIsDemo()
+  const { replayTour, canReplayTour } = useOnboardingReplay()
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const locale = useLocale() as Locale
   const tNav = useTranslations('nav')
+  const tOnboarding = useTranslations('onboarding')
   const tCommon = useTranslations('common')
   const tLanguage = useTranslations('languageSwitcher')
   const labels = useSharedLabels()
@@ -75,10 +78,22 @@ export function SideNav() {
       ? [{ href: '/', label: tNav('dashboard'), icon: LayoutDashboard }]
       : []),
     ...(canReadQuestions(user?.role)
-      ? [{ href: routes.questions.list, label: tNav('questions'), icon: LibraryBig }]
+      ? [
+          {
+            href: routes.questions.list,
+            label: tNav('questions'),
+            icon: LibraryBig,
+          },
+        ]
       : []),
     ...(canReviewAssessments(user?.role)
-      ? [{ href: '/assessments', label: tNav('assessments'), icon: ClipboardList }]
+      ? [
+          {
+            href: '/assessments',
+            label: tNav('assessments'),
+            icon: ClipboardList,
+          },
+        ]
       : []),
     ...(canConfigureInterview(user?.role)
       ? [
@@ -87,7 +102,13 @@ export function SideNav() {
         ]
       : []),
     ...(canConfigureInterview(user?.role) && !isDemo
-      ? [{ href: '/interviews/new', label: tNav('newInterview'), icon: Plus }]
+      ? [
+          {
+            href: '/interviews/new',
+            label: tNav('newInterview'),
+            icon: Plus,
+          },
+        ]
       : []),
     ...(canManageTeam(user?.role)
       ? [{ href: '/team', label: tNav('team'), icon: Users }]
@@ -157,6 +178,20 @@ export function SideNav() {
         user ? (
           <Stack gap={2} width="full">
             <Stack gap={2} className={sideNavRevealClass}>
+              {canAccessDashboard(user.role) ? (
+                <Button
+                  type="button"
+                  variant="outline-pill"
+                  shape="pill"
+                  size="sm"
+                  effects="blur"
+                  width="full"
+                  disabled={!canReplayTour}
+                  onClick={() => void replayTour()}
+                >
+                  {tOnboarding('tour.replay')}
+                </Button>
+              ) : null}
               {languageSwitcher}
               <SurfaceTile tone="soft" rounded="lg" padding="sm">
                 <IdentityBadge

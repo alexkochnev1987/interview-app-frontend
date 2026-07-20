@@ -24,6 +24,7 @@ interface FormFieldProps {
   hint?: ReactNode
   labelTooltip?: ReactNode
   labelTooltipLabel?: string
+  dataTour?: string
   error?: string
   children: ReactNode
 }
@@ -65,6 +66,7 @@ export function FormField({
   hint,
   labelTooltip,
   labelTooltipLabel = 'More information',
+  dataTour,
   error,
   children,
 }: FormFieldProps) {
@@ -78,7 +80,7 @@ export function FormField({
     Children.count(children) === 1 ? (Children.only(children) as ReactNode) : null
 
   return (
-    <Stack gap={2}>
+    <Stack gap={2} data-tour={dataTour}>
       <Stack gap={1}>
         {labelTooltip ? (
           <Inline gap={2} align="center">

@@ -39,7 +39,7 @@ export function AiDraftPanel({
   const labels = useQuestionEditorLabels()
 
   return (
-    <Card variant="surface">
+    <Card variant="surface" data-tour="ai-draft-panel">
       <CardHeader spacing="lg">
         <Stack gap={1.5}>
           <Inline gap={3} align="start" justify="between">
