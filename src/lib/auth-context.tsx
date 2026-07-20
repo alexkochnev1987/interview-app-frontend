@@ -2,17 +2,26 @@
 
 import { useRouter } from '@/i18n/navigation';
 import { createContext, useContext, useState, type ReactNode } from 'react';
-import { logout as apiLogout, type AuthUserResponseDto as User } from '@/lib/api';
+import {
+  completeOnboarding as apiCompleteOnboarding,
+  logout as apiLogout,
+  type AuthUserResponseDto as User,
+  type CompleteOnboardingStatus,
+} from '@/lib/api';
 
 interface AuthContextType {
   user: User | null;
   establishSession: (sessionUser: User) => void;
+  completeOnboarding: (status?: CompleteOnboardingStatus) => Promise<User>;
   logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   establishSession: () => {},
+  completeOnboarding: async () => {
+    throw new Error('AuthProvider is not mounted');
+  },
   logout: async () => {},
 });
 
@@ -44,6 +53,12 @@ export function AuthProvider({
     setUser(sessionUser);
   };
 
+  const completeOnboarding = async (_status?: CompleteOnboardingStatus) => {
+    const updatedUser = await apiCompleteOnboarding();
+    setUser(updatedUser);
+    return updatedUser;
+  };
+
   const logout = async () => {
     await apiLogout();
     setUser(null);
@@ -53,7 +68,7 @@ export function AuthProvider({
 
   return (
     <AuthContext.Provider
-      value={{ user, establishSession, logout }}
+      value={{ user, establishSession, completeOnboarding, logout }}
     >
       {children}
     </AuthContext.Provider>

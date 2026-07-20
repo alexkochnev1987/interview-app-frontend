@@ -12,7 +12,8 @@
       "emptyFilteredTitle": "Brak ocen dla bieżących filtrów",
       "emptyFilteredDescription": "Poszerz wyszukiwanie lub zresetuj filtr statusu.",
       "overallScore": "Wynik ogólny",
-      "completed": "Zakończono"
+      "completed": "Zakończono",
+      "sampleBadge": "Przykład"
     },
     "detail": {
       "backToAssessments": "Wróć do ocen",

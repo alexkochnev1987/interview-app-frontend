@@ -1,0 +1,82 @@
+{
+  "onboarding": {
+    "welcome": {
+      "title": "Welcome to AI Interview Architect",
+      "description": "A guided walkthrough of the hiring workflow — from question bank to AI-scored assessments. You can skip anytime.",
+      "eyebrow": "Product tour",
+      "duration": "~1 minute",
+      "journeyQuestions": "Questions",
+      "journeyAi": "AI Draft",
+      "journeyInterviews": "Interviews",
+      "journeyAssessments": "AI review",
+      "start": "Start tour",
+      "skip": "Skip for now"
+    },
+    "complete": {
+      "title": "You're all set",
+      "description": "You're ready to run the workflow. You can replay this tour anytime from Product tour.",
+      "eyebrow": "Tour complete",
+      "action": "Complete tour",
+      "recapTitle": "What you just learned",
+      "recapQuestions": "Build and enrich questions with AI Draft",
+      "recapInterviews": "Assemble interviews from your question bank",
+      "recapCandidates": "Share secure candidate links",
+      "recapAssessments": "Review and AI-score completed interviews",
+      "journeyQuestions": "Questions",
+      "journeyAi": "AI Draft",
+      "journeyInterviews": "Interviews",
+      "journeyAssessments": "AI review"
+    },
+    "tour": {
+      "next": "Next",
+      "back": "Back",
+      "done": "Complete",
+      "replay": "Product tour"
+    },
+    "errors": {
+      "persistFailed": "Could not save onboarding progress"
+    },
+    "steps": {
+      "dashboardHero": {
+        "title": "Your home base",
+        "description": "This is where you land after logging in. Recent interviews and quick actions live here."
+      },
+      "questionsLibrary": {
+        "title": "Build your question bank first",
+        "description": "Interviews are assembled from questions, so this is the natural place to start."
+      },
+      "questionsText": {
+        "title": "Write the question prompt",
+        "description": "Start with the main question text. Then use AI Draft to generate the follow-ups, rubric, and sample answer."
+      },
+      "questionsAiDraft": {
+        "title": "Generate an AI draft",
+        "description": "Click Generate AI Draft to fill in the supporting question details from your prompt."
+      },
+      "questionsAiApply": {
+        "title": "Apply the draft",
+        "description": "Review the generated suggestions, then click Apply All to add them to the question."
+      },
+      "questionsCreate": {
+        "title": "Save the question",
+        "description": "Click Create Question to save the question with the AI-generated details."
+      },
+      "assessmentsEvaluation": {
+        "title": "Start AI evaluation",
+        "description": "When every answer is submitted, click Start AI evaluation to score the interview and generate the scorecard."
+      },
+      "candidateLink": {
+        "title": "Share the candidate link",
+        "description": "Copy this link and send it to the candidate. They complete the interview through the take flow."
+      },
+      "interviewCandidate": {
+        "title": "Candidate profile",
+        "description": "Enter the candidate's name and target role, then click Create Interview. We'll continue on the candidate link after it is created."
+      },
+      "interviewPicker": {
+        "title": "Select at least one question",
+        "description": "Search your bank and pick at least one question for this session. As soon as you select one, we'll move on to creating the interview."
+      }
+    }
+  }
+}

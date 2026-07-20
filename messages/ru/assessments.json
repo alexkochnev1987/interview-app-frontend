@@ -12,7 +12,8 @@
       "emptyFilteredTitle": "Нет оценок по текущим фильтрам",
       "emptyFilteredDescription": "Расширьте поиск или сбросьте фильтр статуса.",
       "overallScore": "Общий балл",
-      "completed": "Завершено"
+      "completed": "Завершено",
+      "sampleBadge": "Пример"
     },
     "detail": {
       "backToAssessments": "Назад к оценкам",

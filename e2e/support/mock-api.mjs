@@ -184,6 +184,27 @@ async function handleRequest(req, res) {
     return
   }
 
+  if (method === 'PATCH' && pathname === '/auth/me/onboarding') {
+    if (!isAuthed(req)) {
+      json(res, 401, { message: 'Unauthorized', statusCode: 401 })
+      return
+    }
+    if (isDemoSession(req)) {
+      json(res, 200, { ...DEMO_USER, permissions: DEMO_PERMISSIONS })
+      return
+    }
+    const body = await readJsonBody(req)
+    json(
+      res,
+      200,
+      authUser({
+        onboardingCompletedAt: new Date().toISOString(),
+        onboardingStatus: body.status ?? 'completed',
+      }),
+    )
+    return
+  }
+
   if (!isAuthed(req)) {
     json(res, 401, { message: 'Unauthorized', statusCode: 401 })
     return

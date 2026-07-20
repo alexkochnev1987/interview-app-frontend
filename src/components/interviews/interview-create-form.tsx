@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { ArrowRight, BriefcaseBusiness, UserRound } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 
@@ -36,6 +36,11 @@ import { createInterview, type Question } from '@/lib/api'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
 import { runMutation } from '@/lib/run-mutation'
 import { useToastMessages } from '@/lib/use-toast-messages'
+import {
+  emitOnboardingEvent,
+  ONBOARDING_EVENT_NAMES,
+} from '@/features/onboarding/onboarding-events'
+import { useOnboardingCreatedQuestionId } from '@/features/onboarding/use-onboarding-tour-targets'
 
 type InterviewCreateFormProps = {
   initialPrefetch: QuestionsLibraryPrefetch
@@ -84,6 +89,20 @@ export function InterviewCreateForm({
   })
   const { selectedCount, selectedById } = picker
 
+  const highlightQuestionId = useOnboardingCreatedQuestionId()
+
+  // Treat a prefilled selection (template) as already announced so the tour
+  // step only advances on a real user selection, not on mount.
+  const selectionAnnouncedRef = useRef((initialSelected?.length ?? 0) > 0)
+  useEffect(() => {
+    if (selectedCount > 0 && !selectionAnnouncedRef.current) {
+      selectionAnnouncedRef.current = true
+      emitOnboardingEvent(ONBOARDING_EVENT_NAMES.questionSelected)
+    } else if (selectedCount === 0) {
+      selectionAnnouncedRef.current = false
+    }
+  }, [selectedCount])
+
   const questionsMissingInterviewLocale = useMemo(
     () =>
       Array.from(selectedById.values()).filter(
@@ -130,7 +149,14 @@ export function InterviewCreateForm({
             toastMessages.apiError.message(error) ?? toastMessages.interview.createError,
         },
       )
-      router.push(`/interviews/${interview.id}`)
+      const nextRoute = `/interviews/${interview.id}`
+      const handledByOnboarding = emitOnboardingEvent(ONBOARDING_EVENT_NAMES.interviewCreated, {
+        nextRoute,
+      })
+
+      if (!handledByOnboarding) {
+        router.push(nextRoute)
+      }
     } catch {
       return
     } finally {
@@ -150,7 +176,7 @@ export function InterviewCreateForm({
       <form onSubmit={handleSubmit}>
         <Grid columns="aside-22-left" gap={6}>
           <Stack gap={4}>
-            <Card variant="surface">
+            <Card variant="surface" data-tour="interview-candidate">
               <CardHeader spacing="xs">
                 <CardTitle size="lg">{t('candidateBriefTitle')}</CardTitle>
                 <CardDescription>{t('candidateBriefDescription')}</CardDescription>
@@ -268,6 +294,7 @@ export function InterviewCreateForm({
             title={t('selectionTitle')}
             description={t('selectionDescription')}
             disabled={submitting || isDemo}
+            highlightQuestionId={highlightQuestionId}
           />
         </Grid>
       </form>

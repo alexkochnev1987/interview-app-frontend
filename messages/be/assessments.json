@@ -12,7 +12,8 @@
       "emptyFilteredTitle": "Няма ацэнак па бягучых фільтрах",
       "emptyFilteredDescription": "Паспрабуйце пашырыць пошук або скінуць фільтр статусу.",
       "overallScore": "Агульны бал",
-      "completed": "Завершана"
+      "completed": "Завершана",
+      "sampleBadge": "Узор"
     },
     "detail": {
       "backToAssessments": "Назад да ацэнак",

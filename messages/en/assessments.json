@@ -12,7 +12,8 @@
       "emptyFilteredTitle": "No assessments match the current filters",
       "emptyFilteredDescription": "Try widening the search or reset the status filter to bring more interviews back in.",
       "overallScore": "Overall score",
-      "completed": "Completed"
+      "completed": "Completed",
+      "sampleBadge": "Sample"
     },
     "detail": {
       "backToAssessments": "Back to assessments",

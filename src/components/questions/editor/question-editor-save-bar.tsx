@@ -29,7 +29,11 @@ export function QuestionEditorSaveBar({
   const t = useTranslations('questions.saveBar')
   const fieldCount = dirtyFieldLabels.length
   return (
-    <Card variant={isDirty ? 'warning' : 'surface'} size="lg">
+    <Card
+      variant={isDirty ? 'warning' : 'surface'}
+      size="lg"
+      data-tour="question-save-bar"
+    >
       <CardContent layout="split-row" spacing="md">
         <Stack gap={2}>
           <Inline gap={2} align="center" wrap="wrap">

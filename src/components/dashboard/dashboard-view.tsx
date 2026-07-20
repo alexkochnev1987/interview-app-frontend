@@ -54,7 +54,7 @@ export function DashboardView({
     <PageShell>
       <Stack gap={6}>
         <Grid as="section" columns="split-13-7" gap={6}>
-          <Card variant="floating" size="lg" effects="blur-strong">
+          <Card variant="floating" size="lg" effects="blur-strong" data-tour="dashboard-hero">
             <CardContent layout="fill-column" spacing="2xl">
               <Inline gap={4} align="start" justify="between" wrap="wrap">
                 <Stack gap={4} width="lg">
