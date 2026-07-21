@@ -23,7 +23,7 @@ export type UseInterviewFacetsResult = {
     refetch: () => void
 }
 
-type FilterSnapshot = Pick<InterviewsQueryState, 'position' | 'status'>
+type FilterSnapshot = Pick<InterviewsQueryState, 'position' | 'status' | 'assignedHrId'>
 
 export function useInterviewFacets(
     snapshot: FilterSnapshot,

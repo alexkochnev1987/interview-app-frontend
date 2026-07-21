@@ -18,6 +18,8 @@ import { BodyText } from '@/components/ui/text'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
 import type { InterviewFacetCount, InterviewStatusFilter } from '@/lib/api'
 
+import { AssignedHrSelect } from '../assigned-hr-select'
+
 const COLLAPSED_LIMIT = 6
 
 export type InterviewFacetSidebarProps = {
@@ -26,9 +28,12 @@ export type InterviewFacetSidebarProps = {
   selected: {
     position?: string
     status?: InterviewStatusFilter
+    assignedHrId?: string
   }
   onPositionChange: (value: string | undefined) => void
   onStatusChange: (value: InterviewStatusFilter | undefined) => void
+  onAssignedHrIdChange: (value: string | undefined) => void
+  showAssignedHrFilter: boolean
   onReset: () => void
   canReset: boolean
   loading: boolean
@@ -43,6 +48,8 @@ export function InterviewFacetSidebar(props: InterviewFacetSidebarProps) {
     selected,
     onPositionChange,
     onStatusChange,
+    onAssignedHrIdChange,
+    showAssignedHrFilter,
     onReset,
     canReset,
     loading,
@@ -52,7 +59,9 @@ export function InterviewFacetSidebar(props: InterviewFacetSidebarProps) {
   const t = useTranslations('interviews.library.facet')
 
   const activeFilterCount =
-    (selected.position ? 1 : 0) + (selected.status ? 1 : 0)
+    (selected.position ? 1 : 0) +
+    (selected.status ? 1 : 0) +
+    (selected.assignedHrId ? 1 : 0)
 
   return (
     <Card variant="surface" size="sm">
@@ -109,6 +118,12 @@ export function InterviewFacetSidebar(props: InterviewFacetSidebarProps) {
         </Stack>
 
         <DividedStack>
+          {showAssignedHrFilter ? (
+            <AssignedHrFacetSection
+              selected={selected.assignedHrId}
+              onChange={onAssignedHrIdChange}
+            />
+          ) : null}
           <StatusFacetSection
             values={statuses}
             selected={selected.status}
@@ -124,6 +139,30 @@ export function InterviewFacetSidebar(props: InterviewFacetSidebarProps) {
         </DividedStack>
       </CardContent>
     </Card>
+  )
+}
+
+function AssignedHrFacetSection(props: {
+  selected: string | undefined
+  onChange: (value: string | undefined) => void
+}) {
+  const { selected, onChange } = props
+  const t = useTranslations('interviews.library.facet')
+  const activeCount = selected ? 1 : 0
+
+  return (
+    <FacetSection title={t('hrTitle')} activeCount={activeCount}>
+      <AssignedHrSelect
+        id="interview-filter-assignedHr"
+        mode="filter"
+        value={selected}
+        onValueChange={onChange}
+        allowUnassigned
+        clearOptionLabel={t('hrFilterAll')}
+        unassignedOnlyLabel={t('hrFilterUnassigned')}
+        enabled
+      />
+    </FacetSection>
   )
 }
 
