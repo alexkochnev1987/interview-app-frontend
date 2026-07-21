@@ -112,7 +112,8 @@
       "position": "Stanowisko: {value}",
       "status": "Status: {value}",
       "hr": "HR: {value}",
-      "hrUnassigned": "HR: Nieprzypisany"
+      "hrUnassigned": "HR: Nieprzypisany",
+      "hrLoading": "HR: …"
     },
     "actions": {
       "edit": "Edytuj wywiad",

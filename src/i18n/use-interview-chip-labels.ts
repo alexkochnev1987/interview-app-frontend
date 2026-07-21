@@ -15,7 +15,7 @@ export function useInterviewChipLabels(options?: { needsHrUserLookup?: boolean }
   const { user } = useAuth()
   const canAssign = canAssignInterviewHr(user?.role)
   const needsHrUserLookup = options?.needsHrUserLookup ?? false
-  const { hrUsers } = useHrUsers({
+  const { hrUsers, loading: hrUsersLoading } = useHrUsers({
     enabled: canAssign && needsHrUserLookup,
   })
 
@@ -34,15 +34,19 @@ export function useInterviewChipLabels(options?: { needsHrUserLookup?: boolean }
           if (isAssignedHrFilterUnassigned(descriptor.value)) {
             return t('hrUnassigned')
           }
-          const name =
-            hrUsers.find((hr) => hr.id === descriptor.value)?.name ??
-            descriptor.label
-          return t('hr', { value: name })
+          const name = hrUsers.find((hr) => hr.id === descriptor.value)?.name
+          if (name) {
+            return t('hr', { value: name })
+          }
+          if (hrUsersLoading) {
+            return t('hrLoading')
+          }
+          return t('hr', { value: descriptor.label })
         }
         default:
           return ''
       }
     },
-    [hrUsers, sharedLabels, t],
+    [hrUsers, hrUsersLoading, sharedLabels, t],
   )
 }

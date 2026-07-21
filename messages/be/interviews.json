@@ -112,7 +112,8 @@
       "position": "Пасада: {value}",
       "status": "Статус: {value}",
       "hr": "HR: {value}",
-      "hrUnassigned": "HR: Не прызначаны"
+      "hrUnassigned": "HR: Не прызначаны",
+      "hrLoading": "HR: …"
     },
     "actions": {
       "edit": "Рэдагаваць інтэрв'ю",
