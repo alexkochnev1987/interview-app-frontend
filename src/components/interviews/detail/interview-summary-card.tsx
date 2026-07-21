@@ -24,12 +24,15 @@ import {
   formatInterviewDate,
   getCandidateInitials,
 } from '@/lib/interview-formatters'
+import { useAuth } from '@/lib/auth-context'
+import { canAssignInterviewHr } from '@/lib/auth-roles'
 import { isHrVisibleAssessment } from '@/lib/assessment-status'
 import {
   canAccessCandidateFeedback,
   canDeleteInterview,
   canEditInterview,
   canManageInterview,
+  canOpenInterviewEdit,
 } from '@/lib/interview-management'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
 
@@ -71,13 +74,16 @@ export function InterviewSummaryCard({
   const tActions = useTranslations('interviews.actions')
   const tEdit = useTranslations('interviews.edit')
   const sharedLabels = useSharedLabels()
+  const { user } = useAuth()
+  const canAssignHr = canAssignInterviewHr(user?.role)
 
-  const canEdit = canEditInterview(interview)
+  const canEditDetails = canEditInterview(interview)
+  const canOpenEdit = canOpenInterviewEdit(interview, { canAssignHr })
   const canManage = canManageInterview(interview)
   const canDelete = canDeleteInterview(interview)
 
   const editButton =
-    canEdit && !isEditing ? (
+    canOpenEdit && !isEditing ? (
       <DemoWriteGuard>
         <Button type="button" variant="outline" onClick={onStartEditing}>
           {tActions('edit')}
@@ -143,7 +149,7 @@ export function InterviewSummaryCard({
   )
 
   const managementNotice =
-    canManage && !canEdit && !isEditing ? (
+    canManage && !canEditDetails && !isEditing ? (
       <BodyText size="sm" tone="muted">
         {tEdit('answersBlockEditNotice')}
       </BodyText>

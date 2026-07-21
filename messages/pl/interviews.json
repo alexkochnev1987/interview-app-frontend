@@ -142,6 +142,7 @@
       "position": "Stanowisko",
       "questionsTitle": "Pytania",
       "answersBlockEditNotice": "Edycja jest wyłączona po przesłaniu odpowiedzi, ponieważ odpowiedzi są powiązane z kolejnością pytań.",
+      "hrOnlyEditNotice": "Danych kandydata i pytań nie można zmienić w tym stanie. Możesz zaktualizować przypisanego recenzenta HR.",
       "discardTitle": "Odrzucić niezapisane zmiany?",
       "discardDescription": "Twoje zmiany w tym wywiadzie zostaną utracone."
     },

@@ -13,6 +13,22 @@ export function canEditInterview(interview: Interview): boolean {
   return isPendingInterview(interview) && !hasInterviewAnswers(interview)
 }
 
+/** Whether candidate details and questions can be edited in the edit panel. */
+export function canEditInterviewDetails(interview: Interview): boolean {
+  return canEditInterview(interview)
+}
+
+/** Whether the edit panel can be opened (full edit or HR-only reassignment). */
+export function canOpenInterviewEdit(
+  interview: Interview,
+  options?: { canAssignHr?: boolean },
+): boolean {
+  if (canEditInterview(interview)) {
+    return true
+  }
+  return options?.canAssignHr === true
+}
+
 /** Pending interviews can still be canceled even after uploads exist. */
 export function canManageInterview(interview: Interview): boolean {
   return isPendingInterview(interview)
