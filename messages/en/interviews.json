@@ -112,7 +112,8 @@
       "position": "Position: {value}",
       "status": "Status: {value}",
       "hr": "HR: {value}",
-      "hrUnassigned": "HR: Not assigned"
+      "hrUnassigned": "HR: Not assigned",
+      "hrLoading": "HR: …"
     },
     "actions": {
       "edit": "Edit interview",

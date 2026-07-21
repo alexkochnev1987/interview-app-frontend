@@ -112,7 +112,8 @@
       "position": "Должность: {value}",
       "status": "Статус: {value}",
       "hr": "HR: {value}",
-      "hrUnassigned": "HR: Не назначен"
+      "hrUnassigned": "HR: Не назначен",
+      "hrLoading": "HR: …"
     },
     "actions": {
       "edit": "Редактировать интервью",

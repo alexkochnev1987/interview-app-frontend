@@ -23,7 +23,7 @@ import { Stack } from '@/components/ui/layout/stack'
 import { Input } from '@/components/ui/input'
 import { updateInterview, type Interview } from '@/lib/api'
 import { AssignedHrSelect } from '@/components/interviews/assigned-hr-select'
-import { useAuth, useIsDemo } from '@/lib/auth-context'
+import { useAuth } from '@/lib/auth-context'
 import { canAssignInterviewHr } from '@/lib/auth-roles'
 import {
   getSelectedQuestionIdsInEditOrder,
@@ -56,7 +56,6 @@ export function InterviewEditPanel({
   const initialAssignedHrId = interview.assignedHrId ?? interview.assignedHr?.id
   const [assignedHrId, setAssignedHrId] = useState<string | undefined>(initialAssignedHrId)
   const { user } = useAuth()
-  const isDemo = useIsDemo()
   const canAssign = canAssignInterviewHr(user?.role)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -176,15 +175,17 @@ export function InterviewEditPanel({
 
               {canAssign ? (
                   <FormField htmlFor="edit-assignedHr" label={tPicker('assignedHrLabel')}>
-                    <AssignedHrSelect
-                        id="edit-assignedHr"
-                        value={assignedHrId}
-                        onValueChange={setAssignedHrId}
-                        allowUnassigned
-                        currentAssignee={interview.assignedHr}
-                        enabled={canAssign}
-                        disabled={submitting || isDemo}
-                    />
+                    <DemoWriteGuard width="full" disabled={submitting}>
+                      <AssignedHrSelect
+                          id="edit-assignedHr"
+                          value={assignedHrId}
+                          onValueChange={setAssignedHrId}
+                          allowUnassigned
+                          currentAssignee={interview.assignedHr}
+                          enabled={canAssign}
+                          disabled={submitting}
+                      />
+                    </DemoWriteGuard>
                   </FormField>
               ) : null}
 

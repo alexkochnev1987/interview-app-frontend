@@ -211,14 +211,16 @@ export function InterviewCreateForm({
 
                 {canAssign ? (
                     <FormField htmlFor="assignedHr" label={t('assignedHrLabel')}>
-                      <AssignedHrSelect
-                          id="assignedHr"
-                          value={assignedHrId}
-                          onValueChange={setAssignedHrId}
-                          allowUnassigned
-                          enabled={canAssign}
-                          disabled={submitting || isDemo}
-                      />
+                      <DemoWriteGuard width="full" disabled={submitting}>
+                        <AssignedHrSelect
+                            id="assignedHr"
+                            value={assignedHrId}
+                            onValueChange={setAssignedHrId}
+                            allowUnassigned
+                            enabled={canAssign}
+                            disabled={submitting}
+                        />
+                      </DemoWriteGuard>
                     </FormField>
                 ): null}
 
