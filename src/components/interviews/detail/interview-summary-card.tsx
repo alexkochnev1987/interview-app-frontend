@@ -141,12 +141,35 @@ export function InterviewSummaryCard({
     </Button>
   ) : null
 
-  const headerActions = (
-    <Inline gap={2} align="center" wrap="wrap" justify="end">
-      {visitAssessmentButton}
-      {validateButton}
-    </Inline>
-  )
+  const actionButtons = [
+    candidateFeedbackButton,
+    editButton,
+    cancelButton,
+    deleteButton,
+    visitAssessmentButton,
+    validateButton,
+  ].filter(Boolean)
+
+  const useTwoActionRows = actionButtons.length > 3
+  const actionRowSplit = Math.ceil(actionButtons.length / 2)
+
+  const actionButtonsLayout =
+    actionButtons.length > 0 ? (
+      useTwoActionRows ? (
+        <Stack gap={2} align="end" width="full">
+          <Inline gap={3} wrap="wrap" justify="end" width="full">
+            {actionButtons.slice(0, actionRowSplit)}
+          </Inline>
+          <Inline gap={3} wrap="wrap" justify="end" width="full">
+            {actionButtons.slice(actionRowSplit)}
+          </Inline>
+        </Stack>
+      ) : (
+        <Inline gap={3} wrap="wrap" justify="end" width="full">
+          {actionButtons}
+        </Inline>
+      )
+    ) : null
 
   const managementNotice =
     canManage && !canEditDetails && !isEditing ? (
@@ -154,10 +177,6 @@ export function InterviewSummaryCard({
         {tEdit('answersBlockEditNotice')}
       </BodyText>
     ) : null
-
-  const hasManagementActions = Boolean(
-    editButton || cancelButton || deleteButton || candidateFeedbackButton,
-  )
 
   const backLink = (
     <UnstyledLink href="/">
@@ -179,31 +198,15 @@ export function InterviewSummaryCard({
       <CardContent spacing="2xl">
         <Stack gap={4} width="full">
           <Stack gap={3} width="full" visibility="below-sm">
-            <Inline gap={3} align="center" justify="between" wrap="nowrap" width="full">
-              {backLink}
-              {headerActions}
-            </Inline>
-            {hasManagementActions ? (
-              <Inline gap={3} wrap="wrap" justify="end" width="full">
-                {candidateFeedbackButton}
-                {editButton}
-                {cancelButton}
-                {deleteButton}
-              </Inline>
-            ) : null}
+            {backLink}
+            {actionButtonsLayout}
             {managementNotice}
           </Stack>
 
           <Grid columns="page-header-actions" gap={3} visibility="sm-up">
             {backLink}
             <Stack gap={2} align="end">
-              <Inline gap={3} wrap="wrap" justify="end">
-                {candidateFeedbackButton}
-                {editButton}
-                {cancelButton}
-                {deleteButton}
-                {headerActions}
-              </Inline>
+              {actionButtonsLayout}
               {managementNotice}
             </Stack>
           </Grid>
