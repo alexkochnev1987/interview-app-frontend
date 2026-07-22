@@ -26,7 +26,7 @@ import { updateInterview, type Interview } from '@/lib/api'
 import { AssignedHrSelect } from '@/components/interviews/assigned-hr-select'
 import { useAuth } from '@/lib/auth-context'
 import { canAssignInterviewHr } from '@/lib/auth-roles'
-import { canEditInterviewDetails } from '@/lib/interview-management'
+import { canEditInterview } from '@/lib/interview-management'
 import {
   getSelectedQuestionIdsInEditOrder,
   isInterviewEditDirty,
@@ -43,19 +43,159 @@ type InterviewEditPanelProps = {
   onExitEdit: () => void
 }
 
-export function InterviewEditPanel({
+type InterviewEditPanelBaseProps = InterviewEditPanelProps
+
+function InterviewEditDiscardDialog({
+  open,
+  onConfirm,
+  onCancel,
+}: {
+  open: boolean
+  onConfirm: () => void
+  onCancel: () => void
+}) {
+  const tEdit = useTranslations('interviews.edit')
+  const tActions = useTranslations('interviews.actions')
+
+  return (
+    <ConfirmDialog
+      open={open}
+      title={tEdit('discardTitle')}
+      description={tEdit('discardDescription')}
+      confirmLabel={tActions('discardEdit')}
+      cancelLabel={tActions('keepEditing')}
+      onConfirm={onConfirm}
+      onCancel={onCancel}
+    />
+  )
+}
+
+function InterviewHrOnlyEditPanel({
   interview,
-  initialPrefetch,
   onSaved,
   onExitEdit,
-}: InterviewEditPanelProps) {
+}: InterviewEditPanelBaseProps) {
   const tEdit = useTranslations('interviews.edit')
   const tActions = useTranslations('interviews.actions')
   const tPicker = useTranslations('questions.common')
   const toastMessages = useToastMessages()
 
-  const canEditDetails = canEditInterviewDetails(interview)
-  const hrOnlyMode = !canEditDetails
+  const initialAssignedHrId = interview.assignedHrId ?? interview.assignedHr?.id
+  const [assignedHrId, setAssignedHrId] = useState<string | undefined>(initialAssignedHrId)
+  const { user } = useAuth()
+  const canAssign = canAssignInterviewHr(user?.role)
+  const [submitting, setSubmitting] = useState(false)
+  const [discardOpen, setDiscardOpen] = useState(false)
+
+  const hrAssignmentDirty = isInterviewHrAssignmentDirty(interview, assignedHrId)
+  const canSave = canAssign && hrAssignmentDirty
+
+  function handleDiscardClick() {
+    if (hrAssignmentDirty) {
+      setDiscardOpen(true)
+      return
+    }
+    onExitEdit()
+  }
+
+  async function handleSave() {
+    if (!canAssign || !hrAssignmentDirty) {
+      return
+    }
+
+    setSubmitting(true)
+
+    try {
+      const updated = await runMutation(
+        () =>
+          updateInterview(interview.id, {
+            assignedHrId: assignedHrId ?? null,
+          }),
+        {
+          successMessage: toastMessages.interview.updateSuccess,
+          errorMessage: toastMessages.interview.updateError,
+        },
+      )
+      onSaved(updated)
+    } catch {
+      /* toast handled by runMutation */
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  return (
+    <>
+      <Card variant="surface">
+        <CardHeader spacing="xs">
+          <CardTitle size="lg">{tEdit('title')}</CardTitle>
+        </CardHeader>
+        <CardContent spacing="lg">
+          <BodyText size="sm" tone="muted">
+            {tEdit('hrOnlyEditNotice')}
+          </BodyText>
+
+          {canAssign ? (
+            <FormField htmlFor="edit-assignedHr" label={tPicker('assignedHrLabel')}>
+              <DemoWriteGuard width="full" disabled={submitting}>
+                <AssignedHrSelect
+                  id="edit-assignedHr"
+                  value={assignedHrId}
+                  onValueChange={setAssignedHrId}
+                  allowUnassigned
+                  currentAssignee={interview.assignedHr}
+                  enabled={canAssign}
+                  disabled={submitting}
+                />
+              </DemoWriteGuard>
+            </FormField>
+          ) : null}
+
+          <Inline gap={2} wrap="wrap">
+            <DemoWriteGuard disabled={submitting || !canSave}>
+              <Button
+                type="button"
+                variant="gradient"
+                disabled={submitting || !canSave}
+                onClick={() => void handleSave()}
+              >
+                {submitting ? tActions('saving') : tActions('saveChanges')}
+              </Button>
+            </DemoWriteGuard>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={submitting}
+              onClick={handleDiscardClick}
+            >
+              {tActions('discardEdit')}
+            </Button>
+          </Inline>
+        </CardContent>
+      </Card>
+
+      <InterviewEditDiscardDialog
+        open={discardOpen}
+        onConfirm={() => {
+          setDiscardOpen(false)
+          onExitEdit()
+        }}
+        onCancel={() => setDiscardOpen(false)}
+      />
+    </>
+  )
+}
+
+function InterviewFullEditPanel({
+  interview,
+  initialPrefetch,
+  onSaved,
+  onExitEdit,
+}: InterviewEditPanelBaseProps) {
+  const tEdit = useTranslations('interviews.edit')
+  const tActions = useTranslations('interviews.actions')
+  const tPicker = useTranslations('questions.common')
+  const toastMessages = useToastMessages()
 
   const [candidateName, setCandidateName] = useState(interview.candidateName)
   const [position, setPosition] = useState(interview.position)
@@ -74,15 +214,9 @@ export function InterviewEditPanel({
   })
   const { selectedCount, selectedById } = picker
 
-  const hrAssignmentDirty = isInterviewHrAssignmentDirty(interview, assignedHrId)
-  const canSave = hrOnlyMode
-    ? canAssign && hrAssignmentDirty
-    : selectedCount > 0
+  const canSave = selectedCount > 0
 
   function isDirty() {
-    if (hrOnlyMode) {
-      return hrAssignmentDirty
-    }
     return isInterviewEditDirty(
       interview,
       candidateName,
@@ -102,33 +236,6 @@ export function InterviewEditPanel({
 
   async function handleSave() {
     setError(null)
-
-    if (hrOnlyMode) {
-      if (!canAssign || !hrAssignmentDirty) {
-        return
-      }
-
-      setSubmitting(true)
-
-      try {
-        const updated = await runMutation(
-          () =>
-            updateInterview(interview.id, {
-              assignedHrId: assignedHrId ?? null,
-            }),
-          {
-            successMessage: toastMessages.interview.updateSuccess,
-            errorMessage: toastMessages.interview.updateError,
-          },
-        )
-        onSaved(updated)
-      } catch {
-        /* toast handled by runMutation */
-      } finally {
-        setSubmitting(false)
-      }
-      return
-    }
 
     if (!candidateName.trim()) {
       setError(toastMessages.pageGate.interview.candidateNameRequired)
@@ -182,146 +289,92 @@ export function InterviewEditPanel({
         </Alert>
       ) : null}
 
-      {hrOnlyMode ? (
-        <Card variant="surface">
-          <CardHeader spacing="xs">
-            <CardTitle size="lg">{tEdit('title')}</CardTitle>
-          </CardHeader>
-          <CardContent spacing="lg">
-            <BodyText size="sm" tone="muted">
-              {tEdit('hrOnlyEditNotice')}
-            </BodyText>
-
-            {canAssign ? (
-              <FormField htmlFor="edit-assignedHr" label={tPicker('assignedHrLabel')}>
-                <DemoWriteGuard width="full" disabled={submitting}>
-                  <AssignedHrSelect
-                    id="edit-assignedHr"
-                    value={assignedHrId}
-                    onValueChange={setAssignedHrId}
-                    allowUnassigned
-                    currentAssignee={interview.assignedHr}
-                    enabled={canAssign}
+      <Grid columns="aside-22-left" gap={6}>
+        <Stack gap={4}>
+          <Card variant="surface">
+            <CardHeader spacing="xs">
+              <CardTitle size="lg">{tEdit('title')}</CardTitle>
+            </CardHeader>
+            <CardContent spacing="lg">
+              <FormField htmlFor="edit-candidateName" label={tEdit('candidateName')}>
+                <IconAffix icon={<Icon size="md"><UserRound /></Icon>}>
+                  <Input
+                    id="edit-candidateName"
+                    iconAffix="leading"
+                    value={candidateName}
+                    onChange={(event) => setCandidateName(event.target.value)}
+                    placeholder={tPicker('candidateNamePlaceholder')}
+                    autoComplete="name"
                     disabled={submitting}
                   />
-                </DemoWriteGuard>
+                </IconAffix>
               </FormField>
-            ) : null}
 
-            <Inline gap={2} wrap="wrap">
-              <DemoWriteGuard disabled={submitting || !canSave}>
-                <Button
-                  type="button"
-                  variant="gradient"
-                  disabled={submitting || !canSave}
-                  onClick={() => void handleSave()}
-                >
-                  {submitting ? tActions('saving') : tActions('saveChanges')}
-                </Button>
-              </DemoWriteGuard>
-              <Button
-                type="button"
-                variant="outline"
-                disabled={submitting}
-                onClick={handleDiscardClick}
-              >
-                {tActions('discardEdit')}
-              </Button>
-            </Inline>
-          </CardContent>
-        </Card>
-      ) : (
-        <Grid columns="aside-22-left" gap={6}>
-          <Stack gap={4}>
-            <Card variant="surface">
-              <CardHeader spacing="xs">
-                <CardTitle size="lg">{tEdit('title')}</CardTitle>
-              </CardHeader>
-              <CardContent spacing="lg">
-                <FormField htmlFor="edit-candidateName" label={tEdit('candidateName')}>
-                  <IconAffix icon={<Icon size="md"><UserRound /></Icon>}>
-                    <Input
-                      id="edit-candidateName"
-                      iconAffix="leading"
-                      value={candidateName}
-                      onChange={(event) => setCandidateName(event.target.value)}
-                      placeholder={tPicker('candidateNamePlaceholder')}
-                      autoComplete="name"
+              <FormField htmlFor="edit-position" label={tEdit('position')}>
+                <IconAffix icon={<Icon size="md"><BriefcaseBusiness /></Icon>}>
+                  <Input
+                    id="edit-position"
+                    iconAffix="leading"
+                    value={position}
+                    onChange={(event) => setPosition(event.target.value)}
+                    placeholder={tPicker('positionPlaceholder')}
+                    disabled={submitting}
+                  />
+                </IconAffix>
+              </FormField>
+
+              {canAssign ? (
+                <FormField htmlFor="edit-assignedHr" label={tPicker('assignedHrLabel')}>
+                  <DemoWriteGuard width="full" disabled={submitting}>
+                    <AssignedHrSelect
+                      id="edit-assignedHr"
+                      value={assignedHrId}
+                      onValueChange={setAssignedHrId}
+                      allowUnassigned
+                      currentAssignee={interview.assignedHr}
+                      enabled={canAssign}
                       disabled={submitting}
                     />
-                  </IconAffix>
-                </FormField>
-
-                <FormField htmlFor="edit-position" label={tEdit('position')}>
-                  <IconAffix icon={<Icon size="md"><BriefcaseBusiness /></Icon>}>
-                    <Input
-                      id="edit-position"
-                      iconAffix="leading"
-                      value={position}
-                      onChange={(event) => setPosition(event.target.value)}
-                      placeholder={tPicker('positionPlaceholder')}
-                      disabled={submitting}
-                    />
-                  </IconAffix>
-                </FormField>
-
-                {canAssign ? (
-                  <FormField htmlFor="edit-assignedHr" label={tPicker('assignedHrLabel')}>
-                    <DemoWriteGuard width="full" disabled={submitting}>
-                      <AssignedHrSelect
-                        id="edit-assignedHr"
-                        value={assignedHrId}
-                        onValueChange={setAssignedHrId}
-                        allowUnassigned
-                        currentAssignee={interview.assignedHr}
-                        enabled={canAssign}
-                        disabled={submitting}
-                      />
-                    </DemoWriteGuard>
-                  </FormField>
-                ) : null}
-
-                <Inline gap={2} wrap="wrap">
-                  <DemoWriteGuard disabled={submitting || !canSave}>
-                    <Button
-                      type="button"
-                      variant="gradient"
-                      disabled={submitting || !canSave}
-                      onClick={() => void handleSave()}
-                    >
-                      {submitting ? tActions('saving') : tActions('saveChanges')}
-                    </Button>
                   </DemoWriteGuard>
+                </FormField>
+              ) : null}
+
+              <Inline gap={2} wrap="wrap">
+                <DemoWriteGuard disabled={submitting || !canSave}>
                   <Button
                     type="button"
-                    variant="outline"
-                    disabled={submitting}
-                    onClick={handleDiscardClick}
+                    variant="gradient"
+                    disabled={submitting || !canSave}
+                    onClick={() => void handleSave()}
                   >
-                    {tActions('discardEdit')}
+                    {submitting ? tActions('saving') : tActions('saveChanges')}
                   </Button>
-                </Inline>
-              </CardContent>
-            </Card>
+                </DemoWriteGuard>
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={submitting}
+                  onClick={handleDiscardClick}
+                >
+                  {tActions('discardEdit')}
+                </Button>
+              </Inline>
+            </CardContent>
+          </Card>
 
-            <InterviewQuestionPickerAside picker={picker} />
-          </Stack>
+          <InterviewQuestionPickerAside picker={picker} />
+        </Stack>
 
-          <InterviewQuestionPickerMain
-            picker={picker}
-            title={tEdit('questionsTitle')}
-            description={tPicker('selectionDescription')}
-            disabled={submitting}
-          />
-        </Grid>
-      )}
+        <InterviewQuestionPickerMain
+          picker={picker}
+          title={tEdit('questionsTitle')}
+          description={tPicker('selectionDescription')}
+          disabled={submitting}
+        />
+      </Grid>
 
-      <ConfirmDialog
+      <InterviewEditDiscardDialog
         open={discardOpen}
-        title={tEdit('discardTitle')}
-        description={tEdit('discardDescription')}
-        confirmLabel={tActions('discardEdit')}
-        cancelLabel={tActions('keepEditing')}
         onConfirm={() => {
           setDiscardOpen(false)
           onExitEdit()
@@ -329,5 +382,31 @@ export function InterviewEditPanel({
         onCancel={() => setDiscardOpen(false)}
       />
     </>
+  )
+}
+
+export function InterviewEditPanel({
+  interview,
+  initialPrefetch,
+  onSaved,
+  onExitEdit,
+}: InterviewEditPanelProps) {
+  if (!canEditInterview(interview)) {
+    return (
+      <InterviewHrOnlyEditPanel
+        interview={interview}
+        onSaved={onSaved}
+        onExitEdit={onExitEdit}
+      />
+    )
+  }
+
+  return (
+    <InterviewFullEditPanel
+      interview={interview}
+      initialPrefetch={initialPrefetch}
+      onSaved={onSaved}
+      onExitEdit={onExitEdit}
+    />
   )
 }
