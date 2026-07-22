@@ -1,5 +1,6 @@
 'use client'
 
+import { Fragment } from 'react'
 import { ArrowLeft, ArrowRight, MessageSquareText } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
@@ -141,14 +142,29 @@ export function InterviewSummaryCard({
     </Button>
   ) : null
 
-  const actionButtons = [
-    candidateFeedbackButton,
-    editButton,
-    cancelButton,
-    deleteButton,
-    visitAssessmentButton,
-    validateButton,
-  ].filter(Boolean)
+  type InterviewActionId =
+    | 'candidateFeedback'
+    | 'edit'
+    | 'cancel'
+    | 'delete'
+    | 'visitAssessment'
+    | 'validate'
+
+  const actionButtons = (
+    [
+      { id: 'candidateFeedback', node: candidateFeedbackButton },
+      { id: 'edit', node: editButton },
+      { id: 'cancel', node: cancelButton },
+      { id: 'delete', node: deleteButton },
+      { id: 'visitAssessment', node: visitAssessmentButton },
+      { id: 'validate', node: validateButton },
+    ] as const
+  ).filter((entry): entry is { id: InterviewActionId; node: NonNullable<typeof entry.node> } =>
+    Boolean(entry.node),
+  )
+
+  const renderActionButtons = (buttons: typeof actionButtons) =>
+    buttons.map(({ id, node }) => <Fragment key={id}>{node}</Fragment>)
 
   const useTwoActionRows = actionButtons.length > 3
   const actionRowSplit = Math.ceil(actionButtons.length / 2)
@@ -158,15 +174,15 @@ export function InterviewSummaryCard({
       useTwoActionRows ? (
         <Stack gap={2} align="end" width="full">
           <Inline gap={3} wrap="wrap" justify="end" width="full">
-            {actionButtons.slice(0, actionRowSplit)}
+            {renderActionButtons(actionButtons.slice(0, actionRowSplit))}
           </Inline>
           <Inline gap={3} wrap="wrap" justify="end" width="full">
-            {actionButtons.slice(actionRowSplit)}
+            {renderActionButtons(actionButtons.slice(actionRowSplit))}
           </Inline>
         </Stack>
       ) : (
         <Inline gap={3} wrap="wrap" justify="end" width="full">
-          {actionButtons}
+          {renderActionButtons(actionButtons)}
         </Inline>
       )
     ) : null
