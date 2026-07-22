@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import { useSearchParams } from 'next/navigation'
 import {
+  Bot,
   ClipboardList,
   LayoutDashboard,
   LayoutTemplate,
@@ -97,6 +98,7 @@ export function SideNav() {
       : []),
     ...(canConfigureInterview(user?.role)
       ? [
+          { href: routes.assistant, label: tNav('assistant'), icon: Bot },
           // Templates are read-only for demo accounts, so this entry is not gated on !isDemo.
           { href: routes.templates.list, label: tNav('templates'), icon: LayoutTemplate },
         ]
