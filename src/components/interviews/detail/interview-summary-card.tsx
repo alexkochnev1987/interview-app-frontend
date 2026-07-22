@@ -1,5 +1,6 @@
 'use client'
 
+import { Fragment } from 'react'
 import { ArrowLeft, ArrowRight, MessageSquareText } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
@@ -24,12 +25,15 @@ import {
   formatInterviewDate,
   getCandidateInitials,
 } from '@/lib/interview-formatters'
+import { useAuth } from '@/lib/auth-context'
+import { canAssignInterviewHr } from '@/lib/auth-roles'
 import { isHrVisibleAssessment } from '@/lib/assessment-status'
 import {
   canAccessCandidateFeedback,
   canDeleteInterview,
   canEditInterview,
   canManageInterview,
+  canOpenInterviewEdit,
 } from '@/lib/interview-management'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
 
@@ -71,13 +75,16 @@ export function InterviewSummaryCard({
   const tActions = useTranslations('interviews.actions')
   const tEdit = useTranslations('interviews.edit')
   const sharedLabels = useSharedLabels()
+  const { user } = useAuth()
+  const canAssignHr = canAssignInterviewHr(user?.role)
 
-  const canEdit = canEditInterview(interview)
+  const canEditDetails = canEditInterview(interview)
+  const canOpenEdit = canOpenInterviewEdit(interview, { canAssignHr })
   const canManage = canManageInterview(interview)
   const canDelete = canDeleteInterview(interview)
 
   const editButton =
-    canEdit && !isEditing ? (
+    canOpenEdit && !isEditing ? (
       <DemoWriteGuard>
         <Button type="button" variant="outline" onClick={onStartEditing}>
           {tActions('edit')}
@@ -135,23 +142,57 @@ export function InterviewSummaryCard({
     </Button>
   ) : null
 
-  const headerActions = (
-    <Inline gap={2} align="center" wrap="wrap" justify="end">
-      {visitAssessmentButton}
-      {validateButton}
-    </Inline>
+  type InterviewActionId =
+    | 'candidateFeedback'
+    | 'edit'
+    | 'cancel'
+    | 'delete'
+    | 'visitAssessment'
+    | 'validate'
+
+  const actionButtons = (
+    [
+      { id: 'candidateFeedback', node: candidateFeedbackButton },
+      { id: 'edit', node: editButton },
+      { id: 'cancel', node: cancelButton },
+      { id: 'delete', node: deleteButton },
+      { id: 'visitAssessment', node: visitAssessmentButton },
+      { id: 'validate', node: validateButton },
+    ] as const
+  ).filter((entry): entry is { id: InterviewActionId; node: NonNullable<typeof entry.node> } =>
+    Boolean(entry.node),
   )
 
+  const renderActionButtons = (buttons: typeof actionButtons) =>
+    buttons.map(({ id, node }) => <Fragment key={id}>{node}</Fragment>)
+
+  const useTwoActionRows = actionButtons.length > 3
+  const actionRowSplit = Math.ceil(actionButtons.length / 2)
+
+  const actionButtonsLayout =
+    actionButtons.length > 0 ? (
+      useTwoActionRows ? (
+        <Stack gap={2} align="end" width="full">
+          <Inline gap={3} wrap="wrap" justify="end" width="full">
+            {renderActionButtons(actionButtons.slice(0, actionRowSplit))}
+          </Inline>
+          <Inline gap={3} wrap="wrap" justify="end" width="full">
+            {renderActionButtons(actionButtons.slice(actionRowSplit))}
+          </Inline>
+        </Stack>
+      ) : (
+        <Inline gap={3} wrap="wrap" justify="end" width="full">
+          {renderActionButtons(actionButtons)}
+        </Inline>
+      )
+    ) : null
+
   const managementNotice =
-    canManage && !canEdit && !isEditing ? (
+    canManage && !canEditDetails && !isEditing ? (
       <BodyText size="sm" tone="muted">
         {tEdit('answersBlockEditNotice')}
       </BodyText>
     ) : null
-
-  const hasManagementActions = Boolean(
-    editButton || cancelButton || deleteButton || candidateFeedbackButton,
-  )
 
   const backLink = (
     <UnstyledLink href="/">
@@ -173,31 +214,15 @@ export function InterviewSummaryCard({
       <CardContent spacing="2xl">
         <Stack gap={4} width="full">
           <Stack gap={3} width="full" visibility="below-sm">
-            <Inline gap={3} align="center" justify="between" wrap="nowrap" width="full">
-              {backLink}
-              {headerActions}
-            </Inline>
-            {hasManagementActions ? (
-              <Inline gap={3} wrap="wrap" justify="end" width="full">
-                {candidateFeedbackButton}
-                {editButton}
-                {cancelButton}
-                {deleteButton}
-              </Inline>
-            ) : null}
+            {backLink}
+            {actionButtonsLayout}
             {managementNotice}
           </Stack>
 
           <Grid columns="page-header-actions" gap={3} visibility="sm-up">
             {backLink}
             <Stack gap={2} align="end">
-              <Inline gap={3} wrap="wrap" justify="end">
-                {candidateFeedbackButton}
-                {editButton}
-                {cancelButton}
-                {deleteButton}
-                {headerActions}
-              </Inline>
+              {actionButtonsLayout}
               {managementNotice}
             </Stack>
           </Grid>

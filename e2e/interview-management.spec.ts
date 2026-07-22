@@ -69,14 +69,23 @@ test.describe('interview management', () => {
     await expect(page.getByText('Recruiter Dashboard')).toBeVisible()
   })
 
-  test('in-progress interview hides management actions', async ({ page }) => {
+  test('in-progress interview exposes HR-only edit for admins', async ({ page }) => {
     await loginAsAdmin(page)
     await page.goto('/interviews/iv-in-progress')
 
     await expect(page.getByRole('heading', { name: 'Active Candidate' })).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Edit interview' })).toHaveCount(0)
+    await expect(page.getByRole('button', { name: 'Edit interview' })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Cancel interview' })).toHaveCount(0)
     await expect(page.getByRole('button', { name: 'Delete interview' })).toHaveCount(0)
+
+    await page.getByRole('button', { name: 'Edit interview' }).click()
+    await expect(
+      page.getByText(
+        'Candidate details and questions cannot be changed in this state. You can update the assigned HR reviewer.',
+      ),
+    ).toBeVisible()
+    await expect(page.getByLabel('Assigned HR reviewer')).toBeVisible()
+    await expect(page.getByLabel('Candidate name')).toHaveCount(0)
   })
 
   test('completed interview exposes delete action', async ({ page }) => {
