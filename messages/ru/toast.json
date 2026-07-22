@@ -43,7 +43,10 @@
       "generateStartError": "Не удалось запустить генерацию",
       "generateStaleValidation": "Перезапустите AI-оценку для выбранной версии ответа перед генерацией обратной связи",
       "generateLockedOnly": "Заблокированные блоки пропущены; генерировать нечего",
-      "generateNothingEligible": "Нет подходящих вопросов для генерации"
+      "generateNothingEligible": "Нет подходящих вопросов для генерации",
+      "createShareLinkSuccess": "Ссылка для кандидата создана",
+      "createShareLinkError": "Не удалось создать ссылку для кандидата",
+      "createShareLinkNotPublishable": "Перед шарингом примите или отредактируйте хотя бы один блок с текстом"
     },
     "interviewsLibrary": {
       "loadFailedFallback": "Не удалось загрузить интервью."

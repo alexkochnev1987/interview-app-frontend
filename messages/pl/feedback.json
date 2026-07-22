@@ -15,6 +15,21 @@
     "wentWellTitle": "Co poszło dobrze",
     "recommendationsEyebrow": "Zalecenia",
     "improveTitle": "Co dalej poprawić",
-    "languageBadgeInterviewAs": "Język rozmowy {locale}"
+    "languageBadgeInterviewAs": "Język rozmowy {locale}",
+    "share": {
+      "eyebrow": "Informacja zwrotna dla kandydata",
+      "title": "Twoja informacja zwrotna z rozmowy",
+      "lead": "Na tej stronie udostępniono informację zwrotną dla kandydata z rozmowy na stanowisko <strong>{position}</strong>.",
+      "expiresOn": "Link wygasa {date}",
+      "overallEyebrow": "Ogólne",
+      "overallTitle": "Ogólna informacja zwrotna",
+      "questionEyebrow": "Pytanie",
+      "questionTitle": "Pytanie {index}",
+      "recommendationLabel": "Zalecenia",
+      "improvementLabel": "Co można poprawić",
+      "languageBadgeInterviewAs": "Język rozmowy {locale}",
+      "emptyTitle": "Brak informacji zwrotnej do wyświetlenia",
+      "emptyDescription": "Ten link nie zawiera opublikowanej informacji zwrotnej."
+    }
   }
 }

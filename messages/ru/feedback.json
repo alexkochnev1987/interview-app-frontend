@@ -15,6 +15,21 @@
     "wentWellTitle": "Что прошло хорошо",
     "recommendationsEyebrow": "Рекомендации",
     "improveTitle": "Что улучшить дальше",
-    "languageBadgeInterviewAs": "Язык интервью {locale}"
+    "languageBadgeInterviewAs": "Язык интервью {locale}",
+    "share": {
+      "eyebrow": "Обратная связь для кандидата",
+      "title": "Ваша обратная связь по интервью",
+      "lead": "На этой странице опубликована обратная связь для кандидата по собеседованию на позицию <strong>{position}</strong>.",
+      "expiresOn": "Ссылка действует до {date}",
+      "overallEyebrow": "Общее",
+      "overallTitle": "Общая обратная связь",
+      "questionEyebrow": "Вопрос",
+      "questionTitle": "Вопрос {index}",
+      "recommendationLabel": "Рекомендации",
+      "improvementLabel": "Что можно улучшить",
+      "languageBadgeInterviewAs": "Язык интервью {locale}",
+      "emptyTitle": "Нет обратной связи для показа",
+      "emptyDescription": "По этой ссылке нет опубликованного содержимого обратной связи."
+    }
   }
 }

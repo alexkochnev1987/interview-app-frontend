@@ -43,7 +43,10 @@
       "generateStartError": "Failed to start generation",
       "generateStaleValidation": "Re-run AI evaluation for the selected answer version before generating feedback",
       "generateLockedOnly": "Locked blocks were skipped; nothing to generate",
-      "generateNothingEligible": "No eligible questions to generate"
+      "generateNothingEligible": "No eligible questions to generate",
+      "createShareLinkSuccess": "Share link created",
+      "createShareLinkError": "Failed to create share link",
+      "createShareLinkNotPublishable": "Accept or edit at least one feedback block with text before sharing"
     },
     "interviewsLibrary": {
       "loadFailedFallback": "Failed to load interviews."

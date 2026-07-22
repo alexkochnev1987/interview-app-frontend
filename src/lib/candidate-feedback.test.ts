@@ -17,6 +17,7 @@ import {
   resolveGenerateAllOverallSkipReason,
   resolveGenerateAllStartToastKind,
   isCandidateFeedbackSkippedFailureBlock,
+  hasPublishableCandidateFeedback,
   type CandidateFeedbackResponse,
 } from '@/lib/candidate-feedback'
 
@@ -471,5 +472,54 @@ describe('system-prefilled eligibility skip blocks', () => {
         errorMessage: 'missing_transcript',
       }),
     ).toBe(false)
+  })
+})
+
+describe('hasPublishableCandidateFeedback', () => {
+  it('returns false when no accepted/edited blocks have text', () => {
+    const feedback = createFeedback({
+      overall: {
+        state: 'generated',
+        recommendationText: 'Nice work',
+        improvementText: null,
+      },
+      questionBlocks: [
+        {
+          questionIndex: 0,
+          state: 'accepted',
+          recommendationText: '   ',
+          improvementText: null,
+        },
+      ],
+    })
+
+    expect(hasPublishableCandidateFeedback(feedback, 1)).toBe(false)
+  })
+
+  it('returns true for an accepted overall block with text', () => {
+    const feedback = createFeedback({
+      overall: {
+        state: 'accepted',
+        recommendationText: 'Strong communication',
+        improvementText: null,
+      },
+    })
+
+    expect(hasPublishableCandidateFeedback(feedback, 0)).toBe(true)
+  })
+
+  it('returns true for an edited question block with improvement text', () => {
+    const feedback = createFeedback({
+      questionBlocks: [
+        {
+          questionIndex: 0,
+          state: 'edited',
+          recommendationText: null,
+          improvementText: 'Add more examples',
+        },
+      ],
+    })
+
+    expect(hasPublishableCandidateFeedback(feedback, 1)).toBe(true)
   })
 })

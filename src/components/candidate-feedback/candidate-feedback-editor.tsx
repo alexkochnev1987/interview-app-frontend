@@ -1,16 +1,18 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { MessageSquareText, Sparkles } from 'lucide-react'
+import { Link2, MessageSquareText, Sparkles } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 import { CandidateFeedbackHeader } from '@/components/candidate-feedback/candidate-feedback-header'
 import { CandidateFeedbackLiveRefreshNotice } from '@/components/candidate-feedback/candidate-feedback-live-refresh-notice'
 import { CandidateFeedbackOverallBlock } from '@/components/candidate-feedback/candidate-feedback-overall-block'
 import { CandidateFeedbackQuestionBlockEditor } from '@/components/candidate-feedback/candidate-feedback-question-block'
+import { CandidateFeedbackSharePanel } from '@/components/candidate-feedback/candidate-feedback-share-panel'
 import { CandidateFeedbackSkippedSummary } from '@/components/candidate-feedback/candidate-feedback-skipped-summary'
 import { useCandidateFeedbackData } from '@/components/candidate-feedback/use-candidate-feedback-data'
 import { useCandidateFeedbackErrorLabel } from '@/components/candidate-feedback/use-candidate-feedback-error-label'
+import { useCandidateFeedbackShareLink } from '@/components/candidate-feedback/use-candidate-feedback-share-link'
 import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -41,6 +43,7 @@ import {
   getSharedCandidateFeedbackError,
   getSkippedGenerateAllQuestionResults,
   hasGeneratedCandidateFeedbackBlocks,
+  hasPublishableCandidateFeedback,
   isAcceptAllCandidateFeedbackPayloadEmpty,
   isCandidateFeedbackEmpty,
   isCandidateFeedbackGenerating,
@@ -113,6 +116,28 @@ export function CandidateFeedbackEditor({
     feedback,
     questionCount,
   )
+  const hasPublishable = hasPublishableCandidateFeedback(
+    feedback,
+    questionCount,
+  )
+  const {
+    shareUrl,
+    expiresAt,
+    hasActiveLink,
+    statusLoadState,
+    creating: creatingShareLink,
+    copyStatus,
+    createShareLink,
+    copyShareLink,
+  } = useCandidateFeedbackShareLink({
+    interviewId: interview.id,
+    interviewLocale,
+    hasPublishable,
+    toastMessages,
+  })
+  const shareCreateLocked = !hasPublishable
+  const shareCreateDisabled =
+    shareCreateLocked || creatingShareLink || statusLoadState === 'loading'
   const acceptAllPageLoading = savingTarget === 'accept-all'
   const acceptAllPageDisabled =
     acceptAllPageLoading || savingTarget !== null || generateAllBusy
@@ -457,7 +482,36 @@ export function CandidateFeedbackEditor({
                 </Button>
               </DemoWriteGuard>
             ) : null}
+            <DisabledHintTooltip
+              active={shareCreateLocked}
+              hint={t('createShareLinkLockedHint')}
+            >
+              <DemoWriteGuard disabled={shareCreateDisabled}>
+                <Button
+                  type="button"
+                  variant="outline-pill"
+                  shape="pill"
+                  loading={creatingShareLink}
+                  onClick={() => void createShareLink()}
+                >
+                  <Icon size="sm">
+                    <Link2 />
+                  </Icon>
+                  {hasActiveLink || shareUrl
+                    ? t('recreateShareLink')
+                    : t('createShareLink')}
+                </Button>
+              </DemoWriteGuard>
+            </DisabledHintTooltip>
           </Inline>
+
+          <CandidateFeedbackSharePanel
+            shareUrl={shareUrl}
+            expiresAt={expiresAt}
+            hasActiveLink={hasActiveLink}
+            copyStatus={copyStatus}
+            onCopy={() => void copyShareLink()}
+          />
 
           {generateAllSkipSummary ? (
             <CandidateFeedbackSkippedSummary

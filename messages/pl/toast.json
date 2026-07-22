@@ -43,7 +43,10 @@
       "generateStartError": "Nie udało się rozpocząć generowania",
       "generateStaleValidation": "Ponownie uruchom ocenę AI dla wybranej wersji odpowiedzi przed generowaniem informacji zwrotnej",
       "generateLockedOnly": "Zablokowane bloki zostały pominięte; nie ma nic do wygenerowania",
-      "generateNothingEligible": "Brak kwalifikujących się pytań do wygenerowania"
+      "generateNothingEligible": "Brak kwalifikujących się pytań do wygenerowania",
+      "createShareLinkSuccess": "Utworzono link do udostępnienia",
+      "createShareLinkError": "Nie udało się utworzyć linku do udostępnienia",
+      "createShareLinkNotPublishable": "Przed udostępnieniem zaakceptuj lub edytuj co najmniej jeden blok z tekstem"
     },
     "interviewsLibrary": {
       "loadFailedFallback": "Nie udało się załadować interview."

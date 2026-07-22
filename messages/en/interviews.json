@@ -208,7 +208,17 @@
         "title": "Live updates paused",
         "description": "We stopped polling generation status after repeated failures or a timeout.",
         "refresh": "Refresh now"
-      }
+      },
+      "createShareLink": "Create share link",
+      "recreateShareLink": "Create new share link",
+      "createShareLinkLockedHint": "Accept or edit at least one feedback block with text before sharing.",
+      "shareLinkLabel": "Candidate share link",
+      "copyShareLink": "Copy link",
+      "shareLinkCopied": "Copied",
+      "shareLinkCopyFailed": "Copy failed",
+      "shareLinkActive": "A share link is active. Create a new link to get a fresh URL (the previous URL will stop working).",
+      "shareLinkExpires": "Link expires {date}",
+      "shareLinkPreviewHelp": "Copy the full link to share with the candidate."
     }
   }
 }

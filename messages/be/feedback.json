@@ -15,6 +15,21 @@
     "wentWellTitle": "Што добра пайшло",
     "recommendationsEyebrow": "Рэкамендацыі",
     "improveTitle": "Што палепшыць далей",
-    "languageBadgeInterviewAs": "Мова інтэрв'ю {locale}"
+    "languageBadgeInterviewAs": "Мова інтэрв'ю {locale}",
+    "share": {
+      "eyebrow": "Зваротная сувязь для кандыдата",
+      "title": "Ваша зваротная сувязь па інтэрв'ю",
+      "lead": "На гэтай старонцы апублікавана зваротная сувязь для кандыдата па інтэрв'ю на пазіцыю <strong>{position}</strong>.",
+      "expiresOn": "Спасылка дзейнічае да {date}",
+      "overallEyebrow": "Агульнае",
+      "overallTitle": "Агульная зваротная сувязь",
+      "questionEyebrow": "Пытанне",
+      "questionTitle": "Пытанне {index}",
+      "recommendationLabel": "Рэкамендацыі",
+      "improvementLabel": "Што можна палепшыць",
+      "languageBadgeInterviewAs": "Мова інтэрв'ю {locale}",
+      "emptyTitle": "Няма зваротнай сувязі для паказу",
+      "emptyDescription": "Па гэтай спасылцы няма апублікаванага змесціва зваротнай сувязі."
+    }
   }
 }

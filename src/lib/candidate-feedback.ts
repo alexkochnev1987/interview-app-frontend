@@ -502,6 +502,35 @@ export function hasGeneratedCandidateFeedbackBlocks(
   )
 }
 
+export function isPublishableCandidateFeedbackBlock(
+  block: Pick<
+    CandidateFeedbackBlock,
+    'state' | 'recommendationText' | 'improvementText'
+  >,
+): boolean {
+  if (block.state !== 'accepted' && block.state !== 'edited') {
+    return false
+  }
+
+  return Boolean(
+    block.recommendationText?.trim() || block.improvementText?.trim(),
+  )
+}
+
+/** True when at least one accepted/edited block has publishable text (share-link gate). */
+export function hasPublishableCandidateFeedback(
+  feedback: CandidateFeedbackResponse,
+  questionCount: number,
+): boolean {
+  if (isPublishableCandidateFeedbackBlock(feedback.overall)) {
+    return true
+  }
+
+  return buildQuestionBlocksView(questionCount, feedback).some(
+    isPublishableCandidateFeedbackBlock,
+  )
+}
+
 export function buildAcceptAllCandidateFeedbackPayload(
   feedback: CandidateFeedbackResponse,
   questionCount: number,

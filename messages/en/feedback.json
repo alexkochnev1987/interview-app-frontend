@@ -15,6 +15,21 @@
     "wentWellTitle": "What went well",
     "recommendationsEyebrow": "Recommendations",
     "improveTitle": "What to improve next",
-    "languageBadgeInterviewAs": "Interview language {locale}"
+    "languageBadgeInterviewAs": "Interview language {locale}",
+    "share": {
+      "eyebrow": "Candidate feedback",
+      "title": "Your interview feedback",
+      "lead": "This page shares candidate-facing feedback for the <strong>{position}</strong> interview.",
+      "expiresOn": "Link expires {date}",
+      "overallEyebrow": "Overall",
+      "overallTitle": "Overall feedback",
+      "questionEyebrow": "Question",
+      "questionTitle": "Question {index}",
+      "recommendationLabel": "Recommendations",
+      "improvementLabel": "What could be improved",
+      "languageBadgeInterviewAs": "Interview language {locale}",
+      "emptyTitle": "No feedback to show",
+      "emptyDescription": "This share link has no published feedback content."
+    }
   }
 }

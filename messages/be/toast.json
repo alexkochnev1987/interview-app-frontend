@@ -43,7 +43,10 @@
       "generateStartError": "Не ўдалося запусціць генерацыю",
       "generateStaleValidation": "Перазапусціце AI-ацэнку для выбранай версіі адказу перад генерацыяй зваротнай сувязі",
       "generateLockedOnly": "Заблакаваныя блокі прапушчаны; генераваць няма чаго",
-      "generateNothingEligible": "Няма прыдатных пытанняў для генерацыі"
+      "generateNothingEligible": "Няма прыдатных пытанняў для генерацыі",
+      "createShareLinkSuccess": "Спасылка для кандыдата створана",
+      "createShareLinkError": "Не ўдалося стварыць спасылку для кандыдата",
+      "createShareLinkNotPublishable": "Перад шэрынгам прыміце або адрэдагуйце хаця б адзін блок з тэкстам"
     },
     "interviewsLibrary": {
       "loadFailedFallback": "Не ўдалося загрузіць інтэрв'ю."
