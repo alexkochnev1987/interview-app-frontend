@@ -3,7 +3,6 @@
 import {
   canDeleteInterview,
   canEditInterview,
-  canEditInterviewDetails,
   canManageInterview,
   canOpenInterviewEdit,
   hasInterviewAnswers,
@@ -36,9 +35,6 @@ describe('interview-management', () => {
 
   it('allows editing only for pending interviews without answers', () => {
     expect(canEditInterview(interviewFixture({ status: 'pending' }))).toBe(true)
-    expect(canEditInterviewDetails(interviewFixture({ status: 'pending' }))).toBe(
-      true,
-    )
     expect(
       canEditInterview(
         interviewFixture({
