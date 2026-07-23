@@ -97,6 +97,11 @@
     "beforeUnloadLeaveInterview": "Jeśli załadujesz ponownie lub wyjdziesz teraz, opuścisz tę rozmowę kwalifikacyjną i możesz stracić swoje postępy. Czy jesteś pewien?",
     "attemptsMetricLabel": "Próby:",
     "retakeDisabledAtLimitHint": "Ponowne nagranie jest dostępne tylko dla prób 1 i 2.",
-    "answerAttemptLimitReached": "Osiągnięto limit prób nagrywania"
+    "answerAttemptLimitReached": "Osiągnięto limit prób nagrywania",
+    "lobbyToolbarMicTest": "Testuj mikrofon",
+    "lobbyMicStartRecord": "Rozpocznij nagrywanie",
+    "lobbyMicStopRecord": "Zatrzymaj nagrywanie",
+    "lobbyMicPlay": "Odtwórz",
+    "lobbyMicPause": "Pauza"
   }
 }
