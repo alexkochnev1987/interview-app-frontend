@@ -1,0 +1,23 @@
+{
+  "profile": {
+    "heading": "Mój profil",
+    "lead": "Zarządzaj ustawieniami swojego konta i danymi osobowymi.",
+    "memberHeading": "Profil członka zespołu",
+    "memberLead": "Wyświetl dane konta tego członka workspace.",
+    "summary": {
+      "editProfile": "Edytuj profil"
+    },
+    "personalInformation": {
+      "title": "Dane osobowe",
+      "name": "Imię i nazwisko",
+      "email": "E-mail",
+      "role": "Rola",
+      "organizationId": "ID organizacji",
+      "organizationUnassigned": "Nie przypisano"
+    },
+    "security": {
+      "title": "Bezpieczeństwo konta",
+      "changePassword": "Zmień hasło"
+    }
+  }
+}

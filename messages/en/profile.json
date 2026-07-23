@@ -1,0 +1,23 @@
+{
+  "profile": {
+    "heading": "My Profile",
+    "lead": "Manage your personal account settings and information.",
+    "memberHeading": "Team member profile",
+    "memberLead": "View account details for this workspace member.",
+    "summary": {
+      "editProfile": "Edit Profile"
+    },
+    "personalInformation": {
+      "title": "Personal Information",
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "organizationId": "Organization ID",
+      "organizationUnassigned": "Not assigned"
+    },
+    "security": {
+      "title": "Account Security",
+      "changePassword": "Change Password"
+    }
+  }
+}
