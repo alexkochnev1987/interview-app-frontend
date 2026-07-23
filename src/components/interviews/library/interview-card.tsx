@@ -26,6 +26,8 @@ import {
   getCandidateInitials,
 } from '@/lib/interview-formatters'
 
+import { AssignedHrListPill } from './assigned-hr-list-pill'
+
 interface InterviewCardProps {
   interview: InterviewListItem
 }
@@ -43,6 +45,7 @@ export function InterviewCard({ interview }: InterviewCardProps) {
             <StatusPill tone={interview.status}>
               {sharedLabels.interviewStatus(interview.status)}
             </StatusPill>
+            <AssignedHrListPill assignedHr={interview.assignedHr} />
             {decision ? (
               <StatusPill tone={decisionTone(decision)} casing="chip">
                 {sharedLabels.decision(decision)}

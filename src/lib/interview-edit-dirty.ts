@@ -12,12 +12,28 @@ export function getSelectedQuestionIdsInEditOrder(
   return [...keptInOrder, ...addedInPickerOrder]
 }
 
+export function isInterviewHrAssignmentDirty(
+  interview: Pick<Interview, 'assignedHrId' | 'assignedHr'>,
+  assignedHrId?: string,
+): boolean {
+  const initialAssignedHrId = interview.assignedHrId ?? interview.assignedHr?.id
+  return (assignedHrId ?? undefined) !== (initialAssignedHrId ?? undefined)
+}
+
 export function isInterviewEditDirty(
-  interview: Pick<Interview, 'candidateName' | 'position' | 'questions'>,
+  interview: Pick<
+    Interview,
+    'candidateName' | 'position' | 'questions' | 'assignedHrId' | 'assignedHr'
+  >,
   candidateName: string,
   position: string,
   selectedById: ReadonlyMap<string, unknown>,
+  assignedHrId?: string
 ): boolean {
+  const initialAssignedHrId = interview.assignedHrId ?? interview.assignedHr?.id
+  if ((assignedHrId ?? undefined) !== (initialAssignedHrId ?? undefined)) {
+    return true
+  }
   if (candidateName.trim() !== interview.candidateName.trim()) {
     return true
   }
