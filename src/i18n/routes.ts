@@ -25,4 +25,8 @@ export const routes = {
     list: '/assessments',
     detail: (id: string) => `/assessments/${encodeURIComponent(id)}`,
   },
+  profile: {
+    me: '/profile',
+    detail: (id: string) => `/users/${encodeURIComponent(id)}`,
+  }
 } as const

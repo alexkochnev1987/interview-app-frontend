@@ -193,14 +193,16 @@ export function SideNav() {
                 </Button>
               ) : null}
               {languageSwitcher}
-              <SurfaceTile tone="soft" rounded="lg" padding="sm">
-                <IdentityBadge
-                  layout="stacked"
-                  nameMaxWidth="none"
-                  name={user.name}
-                  role={labels.role(user.role)}
-                />
-              </SurfaceTile>
+              <UnstyledLink href={routes.profile.me} aria-label={tNav('profile')}>
+                <SurfaceTile tone="soft" rounded="lg" padding="sm">
+                  <IdentityBadge
+                    layout="stacked"
+                    nameMaxWidth="none"
+                    name={user.name}
+                    role={labels.role(user.role)}
+                  />
+                </SurfaceTile>
+              </UnstyledLink>
             </Stack>
             <SideNavButton
               tone="danger"
