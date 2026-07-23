@@ -15,6 +15,28 @@
     "wentWellTitle": "Co poszło dobrze",
     "recommendationsEyebrow": "Zalecenia",
     "improveTitle": "Co dalej poprawić",
-    "languageBadgeInterviewAs": "Język rozmowy {locale}"
+    "languageBadgeInterviewAs": "Język rozmowy {locale}",
+    "share": {
+      "eyebrow": "Informacja zwrotna dla kandydata",
+      "title": "Twoja informacja zwrotna z rozmowy",
+      "lead": "Na tej stronie udostępniono informację zwrotną dla kandydata z rozmowy na stanowisko <strong>{position}</strong>.",
+      "expiresOn": "Link wygasa {date}",
+      "overallScore": "Ogólny wynik",
+      "linkExpiry": "Wygaśnięcie łącza",
+      "outcomeEyebrow": "Kolejny krok",
+      "outcome": {
+        "next_stage": "Dziękujemy za poświęcony nam czas na rozmowę kwalifikacyjną. Doceniamy Twoje doświadczenie i z przyjemnością zapraszamy Cię do kolejnego etapu rekrutacji. Nasz zespół wkrótce skontaktuje się z Tobą, aby przekazać szczegóły kolejnych kroków i podpowiedzieć, jak się przygotować.",
+        "keep_in_touch": "Dziękujemy za Twój czas, zaangażowanie i zainteresowanie tą rolą. Po uważnej ocenie na tym etapie nie kontynuujemy procesu. Szczerze doceniamy Twoją rozmowę i chętnie zachowamy Twój profil z myślą o przyszłych możliwościach, które mogą lepiej pasować."
+      },
+      "overallEyebrow": "Ogólne",
+      "overallTitle": "Ogólna informacja zwrotna",
+      "questionEyebrow": "Pytanie",
+      "questionTitle": "Pytanie {index}",
+      "recommendationLabel": "Zalecenia",
+      "improvementLabel": "Co można poprawić",
+      "languageBadgeInterviewAs": "Język rozmowy {locale}",
+      "emptyTitle": "Brak informacji zwrotnej do wyświetlenia",
+      "emptyDescription": "Ten link nie zawiera opublikowanej informacji zwrotnej."
+    }
   }
 }

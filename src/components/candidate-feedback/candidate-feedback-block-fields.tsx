@@ -1,16 +1,20 @@
 'use client'
 
-import { useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 
 import { AiSuggestionRow } from '@/components/questions/editor/ai-suggestion-row'
 import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { Button } from '@/components/ui/button'
+import { DisabledHintTooltip } from '@/components/ui/disabled-hint-tooltip'
 import { FormField } from '@/components/ui/form-field'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { Textarea } from '@/components/ui/textarea'
-import { type CandidateFeedbackBlock } from '@/lib/candidate-feedback'
+import {
+  resolveCandidateFeedbackSavePayload,
+  type CandidateFeedbackBlock,
+} from '@/lib/candidate-feedback'
 
 interface CandidateFeedbackBlockFieldsProps {
   block: Pick<
@@ -124,6 +128,22 @@ export function CandidateFeedbackBlockFields({
   const hasPendingSuggestions =
     showRecommendationSuggestion || showImprovementSuggestion
 
+  const savePayload = useMemo(
+    () =>
+      resolveCandidateFeedbackSavePayload(block, {
+        recommendationText,
+        improvementText,
+      }),
+    [block, improvementText, recommendationText],
+  )
+  const saveLocked = savePayload === null
+  const isDirty =
+    block.state === 'accepted' || block.state === 'edited'
+      ? recommendationText !== (block.recommendationText ?? '') ||
+        improvementText !== (block.improvementText ?? '')
+      : // generated / empty / failed: drafts start empty; any typing is an unsaved edit
+        recommendationText !== '' || improvementText !== ''
+
   function handleUseAiRecommendation() {
     setRecommendationText(block.recommendationText ?? '')
     setDismissedRecommendation(true)
@@ -143,6 +163,13 @@ export function CandidateFeedbackBlockFields({
       recommendationText: nextRecommendation,
       improvementText: nextImprovement,
     })
+  }
+
+  function handleSave() {
+    if (!savePayload) {
+      return
+    }
+    void onSave(savePayload)
   }
 
   return (
@@ -201,24 +228,26 @@ export function CandidateFeedbackBlockFields({
         ) : null}
       </Stack>
 
-      <Inline gap={2} wrap="wrap">
-        <DemoWriteGuard disabled={saving}>
-          <Button
-            type="button"
-            variant="gradient"
-            shape="pill"
-            loading={saving}
-            onClick={() =>
-              void onSave({
-                recommendationText,
-                improvementText,
-              })
-            }
+      {isDirty ? (
+        <Inline gap={2} wrap="wrap">
+          <DisabledHintTooltip
+            active={saveLocked}
+            hint={t('saveChangesLockedHint')}
           >
-            {t('saveChanges')}
-          </Button>
-        </DemoWriteGuard>
-      </Inline>
+            <DemoWriteGuard disabled={saving || saveLocked}>
+              <Button
+                type="button"
+                variant="gradient"
+                shape="pill"
+                loading={saving}
+                onClick={handleSave}
+              >
+                {t('saveChanges')}
+              </Button>
+            </DemoWriteGuard>
+          </DisabledHintTooltip>
+        </Inline>
+      ) : null}
     </Stack>
   )
 }

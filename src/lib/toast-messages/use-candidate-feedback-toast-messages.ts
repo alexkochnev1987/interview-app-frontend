@@ -14,5 +14,10 @@ export function useCandidateFeedbackToastMessages() {
     generateStaleValidation: t('generateStaleValidation'),
     generateLockedOnly: t('generateLockedOnly'),
     generateNothingEligible: t('generateNothingEligible'),
+    createShareLinkSuccess: t('createShareLinkSuccess'),
+    createShareLinkError: t('createShareLinkError'),
+    createShareLinkNotPublishable: t('createShareLinkNotPublishable'),
+    revokeShareLinkSuccess: t('revokeShareLinkSuccess'),
+    revokeShareLinkError: t('revokeShareLinkError'),
   }
 }

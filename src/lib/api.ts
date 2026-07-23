@@ -75,7 +75,10 @@ type Schemas = components['schemas'];
 
 export type QuestionDifficulty = Schemas['ResolvedQuestionResponseDto']['difficulty'];
 export type AuthUserResponseDto = Schemas['AuthUserResponseDto'];
-export type MeResponse = AuthUserResponseDto;
+/** `/auth/me` includes effective permissions; OpenAPI DTO does not list them yet. */
+export type MeResponse = AuthUserResponseDto & {
+  permissions?: readonly string[];
+};
 export type LoginPayload = Schemas['LoginDto'];
 export type LogoutResponse = Schemas['LogoutResponseDto'];
 export type CompleteOnboardingStatus = 'completed' | 'skipped';
@@ -151,6 +154,16 @@ export type StartAnswerValidationResult = Schemas['StartAnswerValidationResultDt
 export type InterviewAnswerMediaResponse = Schemas['InterviewAnswerMediaResponseDto'];
 export type CandidateLinkResponse = Schemas['CandidateLinkResponseDto'];
 export type FeedbackLinkResponse = Schemas['FeedbackLinkResponseDto'];
+export type CandidateFeedbackShareLinkResponse =
+  Schemas['CandidateFeedbackShareLinkResponseDto'];
+export type CandidateFeedbackShareLinkStatus =
+  Schemas['CandidateFeedbackShareLinkStatusResponseDto'];
+export type PublicCandidateFeedbackResponse =
+  Schemas['PublicCandidateFeedbackResponseDto'];
+export type PublicCandidateFeedbackTextBlock =
+  Schemas['PublicCandidateFeedbackTextBlockDto'];
+export type PublicCandidateFeedbackQuestionBlock =
+  Schemas['PublicCandidateFeedbackQuestionBlockDto'];
 export type InterviewCancelResponse = Schemas['InterviewCancelResponseDto'];
 export type InterviewDeleteResponse = Schemas['InterviewDeleteResponseDto'];
 
@@ -792,6 +805,83 @@ export async function generateCandidateFeedbackAll(
   return { feedback, plan }
 }
 
+export async function createCandidateFeedbackShareLink(
+  id: string,
+): Promise<CandidateFeedbackShareLinkResponse> {
+  return handle(
+    client.POST('/interviews/{id}/candidate-feedback/share-link', {
+      ...LOCALIZED_HEADERS,
+      params: { path: { id } },
+    }),
+  );
+}
+
+/** Returns `null` when no usable share link exists (HTTP 404) or caller lacks create permission (HTTP 403). */
+export async function getCandidateFeedbackShareLinkStatus(
+  id: string,
+): Promise<CandidateFeedbackShareLinkStatus | null> {
+  try {
+    return await handle(
+      client.GET('/interviews/{id}/candidate-feedback/share-link', {
+        ...LOCALIZED_HEADERS,
+        params: { path: { id } },
+      }),
+    );
+  } catch (err) {
+    if (err instanceof ApiError && (err.status === 404 || err.status === 403)) {
+      return null;
+    }
+    throw err;
+  }
+}
+
+export type CandidateFeedbackShareLinkRevokeResponse = {
+  revoked: boolean;
+};
+
+/** Invalidates the active share URL without creating a replacement. */
+export async function revokeCandidateFeedbackShareLink(
+  id: string,
+): Promise<CandidateFeedbackShareLinkRevokeResponse> {
+  return handle(
+    client.DELETE('/interviews/{id}/candidate-feedback/share-link', {
+      ...LOCALIZED_HEADERS,
+      params: { path: { id } },
+    }),
+  );
+}
+
+/** Public GET `/feedback/share/:token` — pass `getServerRequestContext()` from RSC. */
+export async function getSharedCandidateFeedback(
+  token: string,
+  ctx: { origin: string; cookieHeader: string },
+): Promise<PublicCandidateFeedbackResponse> {
+  const path = `/feedback/share/${encodeURIComponent(token)}`;
+  const res = await fetch(`${ctx.origin}/api${path}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      cookie: ctx.cookieHeader,
+    },
+    cache: 'no-store',
+    signal: AbortSignal.timeout(15_000),
+  });
+
+  if (!res.ok) {
+    const body = await res.text();
+    const { code, params } = extractApiErrorFieldsFromBody(body);
+    throw new ApiError(
+      res.status,
+      messageFromBody(body, res.status),
+      path,
+      body,
+      code,
+      params,
+    );
+  }
+
+  return (await res.json()) as PublicCandidateFeedbackResponse;
+}
 
 export async function getPresignedUrl(
   interviewId: string,

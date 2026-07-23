@@ -12,6 +12,7 @@ type FlashErrorPageFallbackProps = {
   description: string
   backHref?: string
   backLabel?: string
+  showAction?: boolean
 }
 
 export function FlashErrorPageFallback({
@@ -19,6 +20,7 @@ export function FlashErrorPageFallback({
   description,
   backHref = '/',
   backLabel,
+  showAction = true,
 }: FlashErrorPageFallbackProps) {
   const t = useTranslations('common')
 
@@ -32,11 +34,11 @@ export function FlashErrorPageFallback({
         }
         title={title}
         description={description}
-        action={
+        action={showAction ? (
           <Button variant="outline" shape="pill" asChild>
             <Link href={backHref}>{backLabel ?? t('backToHome')}</Link>
           </Button>
-        }
+        ) : undefined}
       />
     </PageShell>
   )

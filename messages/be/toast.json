@@ -43,7 +43,12 @@
       "generateStartError": "Не ўдалося запусціць генерацыю",
       "generateStaleValidation": "Перазапусціце AI-ацэнку для выбранай версіі адказу перад генерацыяй зваротнай сувязі",
       "generateLockedOnly": "Заблакаваныя блокі прапушчаны; генераваць няма чаго",
-      "generateNothingEligible": "Няма прыдатных пытанняў для генерацыі"
+      "generateNothingEligible": "Няма прыдатных пытанняў для генерацыі",
+      "createShareLinkSuccess": "Спасылка для кандыдата створана",
+      "createShareLinkError": "Не ўдалося стварыць спасылку для кандыдата",
+      "createShareLinkNotPublishable": "Перад шэрынгам прыміце або адрэдагуйце хаця б адзін блок з тэкстам",
+      "revokeShareLinkSuccess": "Спасылка для кандыдата адклікана",
+      "revokeShareLinkError": "Не ўдалося адклікаць спасылку для кандыдата"
     },
     "interviewsLibrary": {
       "loadFailedFallback": "Не ўдалося загрузіць інтэрв'ю."
@@ -109,9 +114,19 @@
         "questionsRequired": "Выберыце хаця б адно пытанне.",
         "creatingLabel": "Стварэнне..."
       },
+      "interviews": {
+        "libraryForbiddenTitle": "У вас няма доступу да бібліятэкі інтэрв’ю",
+        "libraryForbiddenDescription": "Бібліятэка інтэрв’ю даступная толькі HR, адміністратарам і суперадміністратарам. Калі гэта памылка, звярніцеся да ўладальніка працоўнай прасторы.",
+        "libraryUnavailableTitle": "Бібліятэка інтэрв’ю зараз недаступная",
+        "libraryLoadFailedFallback": "Не ўдалося загрузіць інтэрв’ю."
+      },
       "feedback": {
         "unavailableTitle": "Зваротная сувязь недаступна",
         "loadFailedFallback": "Не ўдалося загрузіць"
+      },
+      "feedbackShare": {
+        "unavailableTitle": "Агульная зваротная сувязь недаступна",
+        "loadFailedFallback": "Гэтая спасылка недаступная або тэрмін яе дзеяння скончыўся. Папрасіце HR даслаць новую спасылку на зваротную сувязь."
       },
       "candidateFeedback": {
         "forbiddenTitle": "У вас няма доступу да зваротнай сувязі для кандыдата",

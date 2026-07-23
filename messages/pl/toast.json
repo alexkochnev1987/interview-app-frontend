@@ -43,7 +43,12 @@
       "generateStartError": "Nie udało się rozpocząć generowania",
       "generateStaleValidation": "Ponownie uruchom ocenę AI dla wybranej wersji odpowiedzi przed generowaniem informacji zwrotnej",
       "generateLockedOnly": "Zablokowane bloki zostały pominięte; nie ma nic do wygenerowania",
-      "generateNothingEligible": "Brak kwalifikujących się pytań do wygenerowania"
+      "generateNothingEligible": "Brak kwalifikujących się pytań do wygenerowania",
+      "createShareLinkSuccess": "Utworzono link do udostępnienia",
+      "createShareLinkError": "Nie udało się utworzyć linku do udostępnienia",
+      "createShareLinkNotPublishable": "Przed udostępnieniem zaakceptuj lub edytuj co najmniej jeden blok z tekstem",
+      "revokeShareLinkSuccess": "Unieważniono link do udostępnienia",
+      "revokeShareLinkError": "Nie udało się unieważnić linku do udostępnienia"
     },
     "interviewsLibrary": {
       "loadFailedFallback": "Nie udało się załadować interview."
@@ -109,9 +114,19 @@
         "questionsRequired": "Wybierz co najmniej jedno pytanie.",
         "creatingLabel": "Tworzenie..."
       },
+      "interviews": {
+        "libraryForbiddenTitle": "Brak dostępu do biblioteki interview",
+        "libraryForbiddenDescription": "Biblioteka interview jest dostępna dla HR, administratorów i superadministratorów. Jeśli to błąd, skontaktuj się z właścicielem workspace.",
+        "libraryUnavailableTitle": "Biblioteka interview jest teraz niedostępna",
+        "libraryLoadFailedFallback": "Nie udało się załadować interview."
+      },
       "feedback": {
         "unavailableTitle": "Feedback niedostępny",
         "loadFailedFallback": "Nie udało się załadować"
+      },
+      "feedbackShare": {
+        "unavailableTitle": "Udostępniona informacja zwrotna jest niedostępna",
+        "loadFailedFallback": "Ten link jest niedostępny lub wygasł. Poproś HR o nowy link do informacji zwrotnej."
       },
       "candidateFeedback": {
         "forbiddenTitle": "Brak dostępu do informacji zwrotnej dla kandydata",
