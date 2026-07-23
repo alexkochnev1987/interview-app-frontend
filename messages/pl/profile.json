@@ -16,8 +16,12 @@
       "organizationUnassigned": "Nie przypisano"
     },
     "security": {
-      "title": "Bezpieczeństwo konta",
+      "title": "Preferencje konta",
       "changePassword": "Zmień hasło"
+    },
+    "preferences": {
+      "language": "Język",
+      "productTour": "Przewodnik po produkcie"
     }
   }
 }

@@ -1,7 +1,8 @@
 'use client'
 
 import { LockKeyhole, Pencil } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
+import { useSearchParams } from 'next/navigation'
 
 import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { TeamRoleBadge } from '@/components/team/team-role-badge'
@@ -10,11 +11,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { HeroTitle } from '@/components/ui/hero-text'
 import { Icon } from '@/components/ui/icon'
 import { IconBadge } from '@/components/ui/icon-badge'
+import { LanguageSwitcher } from '@/components/ui/language-switcher'
 import { Grid } from '@/components/ui/layout/grid'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText, SectionHeading } from '@/components/ui/text'
+import { useOnboardingReplay } from '@/features/onboarding/onboarding-provider'
+import { LOCALES, type Locale } from '@/i18n/locales'
+import { usePathname } from '@/i18n/navigation'
 import type { MeResponse } from '@/lib/api'
+import { canAccessDashboard } from '@/lib/auth-roles'
 import { getCandidateInitials } from '@/lib/interview-formatters'
 
 import { ProfileField } from './profile-field'
@@ -26,7 +32,20 @@ interface ProfileViewProps {
 
 export function ProfileView({ user, mode = 'self' }: ProfileViewProps) {
   const t = useTranslations('profile')
+  const tOnboarding = useTranslations('onboarding')
+  const tLanguage = useTranslations('languageSwitcher')
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const locale = useLocale() as Locale
+  const { replayTour, canReplayTour } = useOnboardingReplay()
   const isSelf = mode === 'self'
+
+  const queryString = searchParams.toString()
+  const languageHref = queryString ? `${pathname}?${queryString}` : pathname
+  const languageOptions = LOCALES.map((optionLocale) => ({
+    locale: optionLocale,
+    label: tLanguage(`locales.${optionLocale}`),
+  }))
 
   const personalInformationCard = (
     <Card variant="surface">
@@ -75,25 +94,51 @@ export function ProfileView({ user, mode = 'self' }: ProfileViewProps) {
     </Card>
   )
 
-  const securityCard = (
+  const accountPreferencesCard = (
     <Card variant="surface">
       <CardHeader spacing="xs">
         <CardTitle size="lg">{t('security.title')}</CardTitle>
       </CardHeader>
       <CardContent spacing="lg">
-        <Inline justify="between" align="center" wrap="wrap" width="full">
-          <Inline gap={3} align="center">
-            <Icon size="md">
-              <LockKeyhole />
-            </Icon>
-            <BodyText weight="medium">{t('security.changePassword')}</BodyText>
+        <Stack gap={5}>
+          <Inline justify="between" align="center" wrap="wrap" width="full">
+            <Inline gap={3} align="center">
+              <Icon size="md">
+                <LockKeyhole />
+              </Icon>
+              <BodyText weight="medium">{t('security.changePassword')}</BodyText>
+            </Inline>
+            <DemoWriteGuard>
+              <Button type="button" variant="outline" disabled>
+                {t('security.changePassword')}
+              </Button>
+            </DemoWriteGuard>
           </Inline>
-          <DemoWriteGuard>
-            <Button type="button" variant="outline" disabled>
-              {t('security.changePassword')}
-            </Button>
-          </DemoWriteGuard>
-        </Inline>
+          <Inline justify="between" align="center" wrap="wrap" width="full">
+            <BodyText weight="medium">{t('preferences.language')}</BodyText>
+            <LanguageSwitcher
+              ariaLabel={tLanguage('label')}
+              currentLocale={locale}
+              href={languageHref}
+              options={languageOptions}
+              width="fit"
+              align="end"
+            />
+          </Inline>
+          {canAccessDashboard(user.role) ? (
+            <Inline justify="between" align="center" wrap="wrap" width="full">
+              <BodyText weight="medium">{t('preferences.productTour')}</BodyText>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={!canReplayTour}
+                onClick={() => void replayTour()}
+              >
+                {tOnboarding('tour.replay')}
+              </Button>
+            </Inline>
+          ) : null}
+        </Stack>
       </CardContent>
     </Card>
   )
@@ -139,7 +184,7 @@ export function ProfileView({ user, mode = 'self' }: ProfileViewProps) {
       {isSelf ? (
         <Grid columns="split-12-8" gap={6}>
           {personalInformationCard}
-          {securityCard}
+          {accountPreferencesCard}
         </Grid>
       ) : (
         personalInformationCard

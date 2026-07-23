@@ -16,8 +16,12 @@
       "organizationUnassigned": "Не назначено"
     },
     "security": {
-      "title": "Безопасность аккаунта",
+      "title": "Настройки аккаунта",
       "changePassword": "Изменить пароль"
+    },
+    "preferences": {
+      "language": "Язык",
+      "productTour": "Обзор продукта"
     }
   }
 }

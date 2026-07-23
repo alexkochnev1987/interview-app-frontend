@@ -16,8 +16,12 @@
       "organizationUnassigned": "Не прызначана"
     },
     "security": {
-      "title": "Бяспека ўліковага запісу",
+      "title": "Налады ўліковага запісу",
       "changePassword": "Змяніць пароль"
+    },
+    "preferences": {
+      "language": "Мова",
+      "productTour": "Тур па прадукте"
     }
   }
 }

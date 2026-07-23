@@ -16,8 +16,12 @@
       "organizationUnassigned": "Not assigned"
     },
     "security": {
-      "title": "Account Security",
+      "title": "Account Preferences",
       "changePassword": "Change Password"
+    },
+    "preferences": {
+      "language": "Language",
+      "productTour": "Product tour"
     }
   }
 }
