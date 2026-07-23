@@ -1,12 +1,18 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import {
   createCandidateFeedbackShareLink,
   getCandidateFeedbackShareLinkStatus,
 } from '@/lib/api'
 import type { Locale } from '@/i18n/locales'
+import {
+  candidateFeedbackShareExpiresAtMatches,
+  clearStoredCandidateFeedbackShareLink,
+  readStoredCandidateFeedbackShareLink,
+  writeStoredCandidateFeedbackShareLink,
+} from '@/lib/candidate-feedback-share-link-storage'
 import { buildCandidateFeedbackShareUrl } from '@/lib/interview-detail-format'
 import { runMutation } from '@/lib/run-mutation'
 import { notifyError } from '@/lib/toast'
@@ -37,6 +43,7 @@ export function useCandidateFeedbackShareLink({
     useState<ShareLinkStatus>('idle')
   const [creating, setCreating] = useState(false)
   const [copyStatus, setCopyStatus] = useState<CopyStatus>('idle')
+  const statusRequestIdRef = useRef(0)
 
   const normalizeShareUrl = useCallback(
     (apiUrl: string) => {
@@ -53,25 +60,50 @@ export function useCandidateFeedbackShareLink({
   )
 
   const loadStatus = useCallback(async () => {
+    const requestId = ++statusRequestIdRef.current
     setStatusLoadState('loading')
     try {
       const result = await getCandidateFeedbackShareLinkStatus(interviewId)
+      if (requestId !== statusRequestIdRef.current) {
+        return
+      }
+
       if (result && hasPublishable) {
         setHasActiveLink(true)
         setExpiresAt(result.expiresAt)
+        setShareUrl((current) => {
+          if (current) {
+            return current
+          }
+          const stored = readStoredCandidateFeedbackShareLink(interviewId)
+          if (
+            stored &&
+            candidateFeedbackShareExpiresAtMatches(
+              stored.expiresAt,
+              result.expiresAt,
+            )
+          ) {
+            return stored.url
+          }
+          return null
+        })
       } else {
         setHasActiveLink(false)
         setShareUrl(null)
         setExpiresAt(null)
+        clearStoredCandidateFeedbackShareLink(interviewId)
       }
       setStatusLoadState('ready')
     } catch {
+      if (requestId !== statusRequestIdRef.current) {
+        return
+      }
       setStatusLoadState('error')
     }
   }, [hasPublishable, interviewId])
 
   useEffect(() => {
-    // Reload when publishability flips so stale active/url state is cleared.
+    // Reload when publishability flips so inactive links are cleared.
     // eslint-disable-next-line react-hooks/set-state-in-effect -- sync share-link status with publishable feedback
     void loadStatus()
   }, [loadStatus])
@@ -92,9 +124,17 @@ export function useCandidateFeedbackShareLink({
           errorMessage: toastMessages.createShareLinkError,
         },
       )
-      setShareUrl(normalizeShareUrl(data.url))
+      // Invalidate in-flight status fetches so a stale 404 cannot wipe the new URL.
+      statusRequestIdRef.current += 1
+      const normalizedUrl = normalizeShareUrl(data.url)
+      setShareUrl(normalizedUrl)
       setExpiresAt(data.expiresAt)
       setHasActiveLink(true)
+      setStatusLoadState('ready')
+      writeStoredCandidateFeedbackShareLink(interviewId, {
+        url: normalizedUrl,
+        expiresAt: data.expiresAt,
+      })
     } catch {
       // toast handled by runMutation
     } finally {

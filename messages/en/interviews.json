@@ -158,6 +158,23 @@
       "generateQuestion": "Generate AI for this question",
       "regenerateQuestion": "Regenerate AI for this question",
       "overallBlockTitle": "Overall feedback",
+      "outcomeLabel": "Next step for the candidate",
+      "outcomeHint": "Shown on the shared feedback page as a short candidate-facing message.",
+      "outcomePlaceholder": "Select an outcome",
+      "outcomeClear": "Not set",
+      "outcome": {
+        "next_stage": "Moved to the next stage",
+        "keep_in_touch": "Keep in touch",
+        "custom": "Write my own"
+      },
+      "outcomeMessageLabel": "Custom message",
+      "outcomeMessagePlaceholder": "Write the message the candidate will see…",
+      "outcomeMessageSaveLockedHint": "Enter a custom message before saving.",
+      "outcomeCustomPreview": "Candidate will see: {message}",
+      "outcomePreview": {
+        "next_stage": "Candidate will see: Thank you for taking the time to interview with us. We were impressed by your conversation and are pleased to invite you to the next stage of our hiring process. Our team will contact you shortly with details on what comes next and how to prepare.",
+        "keep_in_touch": "Candidate will see: Thank you for your time, effort, and interest in this role. After careful review, we won’t be moving forward with your application at this stage. We truly appreciate what you shared with us and would like to keep your profile for future opportunities that may be a strong match."
+      },
       "questionBlocksTitle": "Per-question feedback",
       "questionBlockTitle": "Question {index}",
       "context": {
@@ -172,6 +189,7 @@
       "autoTemplateHint": "Template inserted automatically — review before sharing with the candidate.",
       "retry": "Retry",
       "saveChanges": "Save changes",
+      "saveChangesLockedHint": "Add recommendation or improvement text before saving. One field is enough.",
       "acceptAllSuggestions": "Apply all in this block",
       "acceptAllSuggestionsPage": "Apply all",
       "sharedGenerationErrorTitle": "AI generation failed",

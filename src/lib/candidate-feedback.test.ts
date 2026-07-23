@@ -18,6 +18,7 @@ import {
   resolveGenerateAllStartToastKind,
   isCandidateFeedbackSkippedFailureBlock,
   hasPublishableCandidateFeedback,
+  resolveCandidateFeedbackSavePayload,
   type CandidateFeedbackResponse,
 } from '@/lib/candidate-feedback'
 
@@ -391,6 +392,100 @@ describe('buildAcceptAllCandidateFeedbackPayload', () => {
       },
     ])
     expect(isAcceptAllCandidateFeedbackPayloadEmpty(payload)).toBe(false)
+  })
+
+  it('skips generated blocks that have no publishable text', () => {
+    const feedback = createFeedback({
+      overall: {
+        state: 'generated',
+        recommendationText: '   ',
+        improvementText: null,
+      },
+      questionBlocks: [
+        {
+          questionIndex: 0,
+          state: 'generated',
+          recommendationText: 'Only this',
+          improvementText: '',
+        },
+        {
+          questionIndex: 1,
+          state: 'generated',
+          recommendationText: null,
+          improvementText: '  ',
+        },
+      ],
+    })
+
+    const payload = buildAcceptAllCandidateFeedbackPayload(feedback, 2)
+
+    expect(payload.overall).toBeUndefined()
+    expect(payload.questions).toEqual([
+      {
+        questionIndex: 0,
+        recommendationText: 'Only this',
+        improvementText: '',
+        state: 'accepted',
+      },
+    ])
+  })
+})
+
+describe('resolveCandidateFeedbackSavePayload', () => {
+  it('keeps AI texts when saving an untouched generated block', () => {
+    expect(
+      resolveCandidateFeedbackSavePayload(
+        {
+          state: 'generated',
+          recommendationText: 'AI rec',
+          improvementText: 'AI imp',
+        },
+        { recommendationText: '', improvementText: '' },
+      ),
+    ).toEqual({
+      recommendationText: 'AI rec',
+      improvementText: 'AI imp',
+    })
+  })
+
+  it('allows saving a generated block with only one draft field filled', () => {
+    expect(
+      resolveCandidateFeedbackSavePayload(
+        {
+          state: 'generated',
+          recommendationText: 'AI rec',
+          improvementText: 'AI imp',
+        },
+        { recommendationText: 'Manual rec', improvementText: '' },
+      ),
+    ).toEqual({
+      recommendationText: 'Manual rec',
+      improvementText: '',
+    })
+  })
+
+  it('returns null when there is no publishable text to save', () => {
+    expect(
+      resolveCandidateFeedbackSavePayload(
+        {
+          state: 'not_generated',
+          recommendationText: null,
+          improvementText: null,
+        },
+        { recommendationText: '  ', improvementText: '' },
+      ),
+    ).toBeNull()
+
+    expect(
+      resolveCandidateFeedbackSavePayload(
+        {
+          state: 'generated',
+          recommendationText: '   ',
+          improvementText: null,
+        },
+        { recommendationText: '', improvementText: '' },
+      ),
+    ).toBeNull()
   })
 })
 

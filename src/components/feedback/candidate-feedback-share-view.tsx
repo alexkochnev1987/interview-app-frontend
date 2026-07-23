@@ -4,6 +4,7 @@ import { BadgeCheck, Sparkles, Target } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
+import { EyebrowLabel } from '@/components/ui/eyebrow-label'
 import { HeroLead, HeroTitle } from '@/components/ui/hero-text'
 import { Icon } from '@/components/ui/icon'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -13,6 +14,7 @@ import { Section } from '@/components/ui/layout/section'
 import { Stack } from '@/components/ui/layout/stack'
 import { EmptyStateCard } from '@/components/ui/state-card'
 import { StatusPill } from '@/components/ui/status-pill'
+import { SurfaceTile } from '@/components/ui/surface-tile'
 import { BodyText, SectionHeading } from '@/components/ui/text'
 import type { Locale } from '@/i18n/locales'
 import type {
@@ -24,6 +26,8 @@ import { formatInterviewDate } from '@/lib/interview-formatters'
 
 type CandidateFeedbackShareViewProps = {
   feedback: PublicCandidateFeedbackResponse
+  /** Already resolved in interviewLocale for presets; custom text as published. */
+  outcomeMessage: string
 }
 
 function hasText(value?: string): boolean {
@@ -36,6 +40,40 @@ function hasPublishableText(
   return hasText(block?.recommendationText) || hasText(block?.improvementText)
 }
 
+function FeedbackTextField({
+  label,
+  text,
+  tone,
+}: {
+  label: string
+  text: string
+  tone: 'recommendation' | 'improvement'
+}) {
+  const isRecommendation = tone === 'recommendation'
+
+  return (
+    <SurfaceTile
+      tone={isRecommendation ? 'primary-soft' : 'soft'}
+      padding="md"
+      rounded="xl"
+    >
+      <Stack gap={2}>
+        <Inline gap={2} align="center">
+          <Icon size="sm" tone={isRecommendation ? 'primary' : 'inherit'}>
+            {isRecommendation ? <BadgeCheck /> : <Target />}
+          </Icon>
+          <SectionHeading as="h3" size="sm">
+            {label}
+          </SectionHeading>
+        </Inline>
+        <BodyText size="base" tone="foreground">
+          {text}
+        </BodyText>
+      </Stack>
+    </SurfaceTile>
+  )
+}
+
 function FeedbackTextFields({
   block,
   recommendationLabel,
@@ -46,26 +84,20 @@ function FeedbackTextFields({
   improvementLabel: string
 }) {
   return (
-    <Stack gap={5}>
+    <Stack gap={3}>
       {hasText(block.recommendationText) ? (
-        <Stack gap={2}>
-          <SectionHeading as="h3" size="sm">
-            {recommendationLabel}
-          </SectionHeading>
-          <BodyText size="lead" tone="foreground">
-            {block.recommendationText}
-          </BodyText>
-        </Stack>
+        <FeedbackTextField
+          tone="recommendation"
+          label={recommendationLabel}
+          text={block.recommendationText ?? ''}
+        />
       ) : null}
       {hasText(block.improvementText) ? (
-        <Stack gap={2}>
-          <SectionHeading as="h3" size="sm">
-            {improvementLabel}
-          </SectionHeading>
-          <BodyText size="lead" tone="foreground">
-            {block.improvementText}
-          </BodyText>
-        </Stack>
+        <FeedbackTextField
+          tone="improvement"
+          label={improvementLabel}
+          text={block.improvementText ?? ''}
+        />
       ) : null}
     </Stack>
   )
@@ -73,13 +105,11 @@ function FeedbackTextFields({
 
 function QuestionBlockCard({
   block,
-  eyebrow,
   title,
   recommendationLabel,
   improvementLabel,
 }: {
   block: PublicCandidateFeedbackQuestionBlock
-  eyebrow: string
   title: string
   recommendationLabel: string
   improvementLabel: string
@@ -89,17 +119,7 @@ function QuestionBlockCard({
   return (
     <Card variant="surface">
       <CardHeader spacing="xs">
-        <EyebrowBadge
-          icon={
-            <Icon size="sm">
-              <Target />
-            </Icon>
-          }
-          tone="primary"
-        >
-          {eyebrow}
-        </EyebrowBadge>
-        <CardTitle size="lg">{title}</CardTitle>
+        <CardTitle size="md">{title}</CardTitle>
       </CardHeader>
       <CardContent>
         <FeedbackTextFields
@@ -112,8 +132,43 @@ function QuestionBlockCard({
   )
 }
 
+function OutcomeCard({
+  outcome,
+  eyebrow,
+  message,
+}: {
+  outcome: 'next_stage' | 'keep_in_touch' | 'custom'
+  eyebrow: string
+  message: string
+}) {
+  const isPositive = outcome === 'next_stage'
+
+  return (
+    <SurfaceTile
+      tone={isPositive ? 'primary-soft' : 'soft'}
+      padding="md"
+      rounded="xl"
+    >
+      <Stack gap={2}>
+        <Inline gap={2} align="center">
+          <Icon size="sm" tone={isPositive ? 'primary' : 'inherit'}>
+            {isPositive ? <BadgeCheck /> : <Target />}
+          </Icon>
+          <SectionHeading as="h3" size="sm">
+            {eyebrow}
+          </SectionHeading>
+        </Inline>
+        <BodyText size="base" tone="foreground">
+          {message}
+        </BodyText>
+      </Stack>
+    </SurfaceTile>
+  )
+}
+
 export function CandidateFeedbackShareView({
   feedback,
+  outcomeMessage,
 }: CandidateFeedbackShareViewProps) {
   const t = useTranslations('feedback.share')
   const uiLocale = useLocale() as Locale
@@ -125,12 +180,16 @@ export function CandidateFeedbackShareView({
     : undefined
   const questions = (feedback.questions ?? []).filter(hasPublishableText)
   const hasContent = Boolean(overall) || questions.length > 0
+  const hasOutcome =
+    feedback.outcome === 'next_stage' ||
+    feedback.outcome === 'keep_in_touch' ||
+    (feedback.outcome === 'custom' && Boolean(outcomeMessage.trim()))
 
   return (
     <PageShell>
       <Section width="reading" gap={6}>
         <Card variant="floating" size="lg">
-          <CardContent spacing="xl">
+          <CardContent spacing="lg">
             <EyebrowBadge
               icon={
                 <Icon size="sm">
@@ -149,24 +208,44 @@ export function CandidateFeedbackShareView({
                   strong: (chunks) => <strong>{chunks}</strong>,
                 })}
               </HeroLead>
+
+              <Inline gap={6} align="start" wrap="wrap">
+                {feedback.overallScore != null ? (
+                  <Stack gap={1}>
+                    <EyebrowLabel tone="muted">{t('overallScore')}</EyebrowLabel>
+                    <BodyText size="sm" tone="primary" weight="semibold">
+                      {feedback.overallScore} / 100
+                    </BodyText>
+                  </Stack>
+                ) : null}
+                <Stack gap={1}>
+                  <EyebrowLabel tone="muted">{t('linkExpiry')}</EyebrowLabel>
+                  <BodyText size="sm" tone="muted">
+                    {formatInterviewDate(feedback.expiresAt)}
+                  </BodyText>
+                </Stack>
+              </Inline>
             </Stack>
 
-            <Inline gap={3} align="center" wrap="wrap">
-              <StatusPill tone="neutral">
-                {t('expiresOn', {
-                  date: formatInterviewDate(feedback.expiresAt),
-                })}
-              </StatusPill>
-              {showLanguageMismatchBadge ? (
+            {showLanguageMismatchBadge ? (
+              <Inline gap={3} align="center" wrap="wrap">
                 <StatusPill tone="neutral_meta" casing="chip" size="compact">
                   {t('languageBadgeInterviewAs', {
                     locale: interviewLocale.toUpperCase(),
                   })}
                 </StatusPill>
-              ) : null}
-            </Inline>
+              </Inline>
+            ) : null}
           </CardContent>
         </Card>
+
+        {hasOutcome && feedback.outcome ? (
+          <OutcomeCard
+            outcome={feedback.outcome}
+            eyebrow={t('outcomeEyebrow')}
+            message={outcomeMessage}
+          />
+        ) : null}
 
         {!hasContent ? (
           <EmptyStateCard
@@ -174,9 +253,9 @@ export function CandidateFeedbackShareView({
             description={t('emptyDescription')}
           />
         ) : (
-          <Stack gap={6}>
+          <Stack gap={4}>
             {overall ? (
-              <Card variant="surface">
+              <Card variant="tinted">
                 <CardHeader spacing="xs">
                   <EyebrowBadge
                     icon={
@@ -184,10 +263,11 @@ export function CandidateFeedbackShareView({
                         <BadgeCheck />
                       </Icon>
                     }
+                    tone="muted"
                   >
                     {t('overallEyebrow')}
                   </EyebrowBadge>
-                  <CardTitle size="lg">{t('overallTitle')}</CardTitle>
+                  <CardTitle size="md">{t('overallTitle')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <FeedbackTextFields
@@ -203,7 +283,6 @@ export function CandidateFeedbackShareView({
               <QuestionBlockCard
                 key={block.questionId}
                 block={block}
-                eyebrow={t('questionEyebrow')}
                 title={t('questionTitle', { index: block.questionIndex + 1 })}
                 recommendationLabel={t('recommendationLabel')}
                 improvementLabel={t('improvementLabel')}

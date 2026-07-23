@@ -112,9 +112,19 @@
         "questionsRequired": "Выберите хотя бы один вопрос.",
         "creatingLabel": "Создание..."
       },
+      "interviews": {
+        "libraryForbiddenTitle": "У вас нет доступа к библиотеке интервью",
+        "libraryForbiddenDescription": "Библиотека интервью доступна только HR, администраторам и суперадминистраторам. Если это ошибка, обратитесь к владельцу рабочей области.",
+        "libraryUnavailableTitle": "Библиотека интервью сейчас недоступна",
+        "libraryLoadFailedFallback": "Не удалось загрузить интервью."
+      },
       "feedback": {
         "unavailableTitle": "Обратная связь недоступна",
         "loadFailedFallback": "Не удалось загрузить"
+      },
+      "feedbackShare": {
+        "unavailableTitle": "Общая обратная связь недоступна",
+        "loadFailedFallback": "Эта ссылка недоступна или срок её действия истёк. Попросите HR отправить новую ссылку на обратную связь."
       },
       "candidateFeedback": {
         "forbiddenTitle": "У вас нет доступа к обратной связи для кандидата",

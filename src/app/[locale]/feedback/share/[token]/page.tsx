@@ -19,7 +19,7 @@ export default async function CandidateFeedbackSharePage({
   const { token, locale } = await params
   const t = await getTranslations({
     locale,
-    namespace: 'toast.pageGate.feedback',
+    namespace: 'toast.pageGate.feedbackShare',
   })
   const ctx = await getServerRequestContext(locale)
 
@@ -37,9 +37,28 @@ export default async function CandidateFeedbackSharePage({
       <FlashErrorPageFallback
         title={t('unavailableTitle')}
         description={error ?? t('loadFailedFallback')}
+        showAction={false}
       />
     )
   }
 
-  return <CandidateFeedbackShareView feedback={feedback} />
+  // Preset outcome copy is candidate-facing content and must match interviewLocale,
+  // even when the share chrome stays in the UI locale.
+  const tShareOutcome = await getTranslations({
+    locale: feedback.interviewLocale,
+    namespace: 'feedback.share',
+  })
+  const outcomeMessage =
+    feedback.outcome === 'custom'
+      ? (feedback.outcomeMessage?.trim() ?? '')
+      : feedback.outcome === 'next_stage' || feedback.outcome === 'keep_in_touch'
+        ? tShareOutcome(`outcome.${feedback.outcome}`)
+        : ''
+
+  return (
+    <CandidateFeedbackShareView
+      feedback={feedback}
+      outcomeMessage={outcomeMessage}
+    />
+  )
 }

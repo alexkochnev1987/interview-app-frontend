@@ -39,6 +39,7 @@ import {
   canGenerateQuestionBlock,
   canRegenerateAnyCandidateFeedbackBlock,
   type CandidateFeedbackResponse,
+  type CandidateFeedbackOutcome,
   type CandidateFeedbackSkipReason,
   getSharedCandidateFeedbackError,
   getSkippedGenerateAllQuestionResults,
@@ -64,7 +65,12 @@ interface CandidateFeedbackEditorProps {
   initialFeedback: CandidateFeedbackResponse
 }
 
-type SavingTarget = 'overall' | 'accept-all' | `question-${number}` | null
+type SavingTarget =
+  | 'overall'
+  | 'outcome'
+  | 'accept-all'
+  | `question-${number}`
+  | null
 type GeneratingTarget = 'all' | `question-${number}` | null
 
 type GenerateAllSkipSummary = {
@@ -355,6 +361,41 @@ export function CandidateFeedbackEditor({
     )
   }
 
+  function handleOutcomeChange(next: {
+    outcome: CandidateFeedbackOutcome | null
+    outcomeMessage?: string | null
+  }) {
+    const currentOutcome = feedback.outcome ?? null
+    const currentMessage = feedback.outcomeMessage?.trim() ?? ''
+    const nextMessage = next.outcomeMessage?.trim() ?? ''
+
+    if (
+      currentOutcome === next.outcome &&
+      (next.outcome !== 'custom' || currentMessage === nextMessage)
+    ) {
+      return Promise.resolve()
+    }
+
+    return runPatchMutation(
+      'outcome',
+      () =>
+        updateCandidateFeedback(
+          interview.id,
+          {
+            outcome: next.outcome,
+            ...(next.outcome === 'custom'
+              ? { outcomeMessage: nextMessage }
+              : {}),
+          },
+          interviewLocale,
+        ),
+      {
+        successMessage: toastMessages.saveSuccess,
+        errorMessage: toastMessages.saveError,
+      },
+    )
+  }
+
   function handleAcceptAllQuestion(
     questionIndex: number,
     payload: { recommendationText: string; improvementText: string },
@@ -522,11 +563,14 @@ export function CandidateFeedbackEditor({
 
           <CandidateFeedbackOverallBlock
             block={feedback.overall}
+            outcome={feedback.outcome}
+            outcomeMessage={feedback.outcomeMessage}
             saving={
               savingTarget === 'overall' ||
               (savingTarget === 'accept-all' &&
                 feedback.overall.state === 'generated')
             }
+            outcomeSaving={savingTarget === 'outcome'}
             retrying={generateAllLoading}
             retryDisabled={isOverallBlockGenerationBusy(
               feedback.overall.state,
@@ -536,6 +580,7 @@ export function CandidateFeedbackEditor({
             onRetry={handleRetryOverall}
             onAcceptAll={handleAcceptAllOverall}
             onSave={handleSaveOverall}
+            onOutcomeChange={handleOutcomeChange}
           />
 
           {questionCount > 0 ? (

@@ -66,6 +66,17 @@ export type GenerateAllCandidateFeedbackOutcome = {
 
 export type CandidateFeedbackEditableState = 'accepted' | 'edited'
 
+export type CandidateFeedbackOutcome =
+  | 'next_stage'
+  | 'keep_in_touch'
+  | 'custom'
+
+export const CANDIDATE_FEEDBACK_OUTCOMES = [
+  'next_stage',
+  'keep_in_touch',
+  'custom',
+] as const satisfies readonly CandidateFeedbackOutcome[]
+
 export type UpdateCandidateFeedbackOverallPayload = {
   recommendationText: string
   improvementText: string
@@ -82,6 +93,8 @@ export type UpdateCandidateFeedbackQuestionPayload = {
 export type UpdateCandidateFeedbackPayload = {
   overall?: UpdateCandidateFeedbackOverallPayload
   questions?: UpdateCandidateFeedbackQuestionPayload[]
+  outcome?: CandidateFeedbackOutcome | null
+  outcomeMessage?: string | null
 }
 
 export type CandidateFeedbackBlockState =
@@ -109,6 +122,8 @@ export type CandidateFeedbackResponse = {
   interviewLocale: Locale
   overall: CandidateFeedbackBlock
   questionBlocks: CandidateFeedbackQuestionBlock[]
+  outcome?: CandidateFeedbackOutcome | null
+  outcomeMessage?: string | null
   updatedAt?: string
 }
 
@@ -128,6 +143,8 @@ export type ApiCandidateFeedbackDto = {
   interviewId: string
   overall?: ApiCandidateFeedbackBlockDto | null
   questions?: ApiCandidateFeedbackQuestionDto[] | null
+  outcome?: CandidateFeedbackOutcome | null
+  outcomeMessage?: string | null
   updatedAt?: string
 }
 
@@ -151,6 +168,19 @@ function normalizeBlockState(state: unknown): CandidateFeedbackBlockState {
   }
 
   return 'not_generated'
+}
+
+function normalizeOutcome(
+  outcome: unknown,
+): CandidateFeedbackOutcome | undefined {
+  if (
+    outcome === 'next_stage' ||
+    outcome === 'keep_in_touch' ||
+    outcome === 'custom'
+  ) {
+    return outcome
+  }
+  return undefined
 }
 
 function mapBlock(
@@ -203,6 +233,8 @@ export function mapCandidateFeedbackFromApi(
     interviewLocale,
     overall: mapBlock(dto.overall),
     questionBlocks: (dto.questions ?? []).map(mapQuestionBlock),
+    outcome: normalizeOutcome(dto.outcome),
+    outcomeMessage: dto.outcomeMessage?.trim() || undefined,
     updatedAt: dto.updatedAt,
   }
 }
@@ -531,13 +563,66 @@ export function hasPublishableCandidateFeedback(
   )
 }
 
+function hasCandidateFeedbackBlockText(
+  block: Pick<CandidateFeedbackBlock, 'recommendationText' | 'improvementText'>,
+): boolean {
+  return Boolean(
+    block.recommendationText?.trim() || block.improvementText?.trim(),
+  )
+}
+
+/**
+ * Builds the PATCH text payload for Save.
+ * For `generated` blocks, an untouched empty draft pair keeps the AI texts
+ * (so HR can save/accept without retyping both fields). A single non-empty
+ * draft field is enough; the other may stay empty.
+ */
+export function resolveCandidateFeedbackSavePayload(
+  block: Pick<
+    CandidateFeedbackBlock,
+    'state' | 'recommendationText' | 'improvementText'
+  >,
+  drafts: { recommendationText: string; improvementText: string },
+): { recommendationText: string; improvementText: string } | null {
+  const draftRecommendation = drafts.recommendationText
+  const draftImprovement = drafts.improvementText
+  const bothDraftsEmpty =
+    !draftRecommendation.trim() && !draftImprovement.trim()
+
+  if (bothDraftsEmpty && block.state === 'generated') {
+    const recommendationText = block.recommendationText ?? ''
+    const improvementText = block.improvementText ?? ''
+    if (!hasCandidateFeedbackBlockText({ recommendationText, improvementText })) {
+      return null
+    }
+    return { recommendationText, improvementText }
+  }
+
+  if (
+    !hasCandidateFeedbackBlockText({
+      recommendationText: draftRecommendation,
+      improvementText: draftImprovement,
+    })
+  ) {
+    return null
+  }
+
+  return {
+    recommendationText: draftRecommendation,
+    improvementText: draftImprovement,
+  }
+}
+
 export function buildAcceptAllCandidateFeedbackPayload(
   feedback: CandidateFeedbackResponse,
   questionCount: number,
 ): UpdateCandidateFeedbackPayload {
   const payload: UpdateCandidateFeedbackPayload = {}
 
-  if (feedback.overall.state === 'generated') {
+  if (
+    feedback.overall.state === 'generated' &&
+    hasCandidateFeedbackBlockText(feedback.overall)
+  ) {
     payload.overall = {
       recommendationText: feedback.overall.recommendationText ?? '',
       improvementText: feedback.overall.improvementText ?? '',
@@ -546,7 +631,10 @@ export function buildAcceptAllCandidateFeedbackPayload(
   }
 
   const generatedQuestions = buildQuestionBlocksView(questionCount, feedback)
-    .filter((block) => block.state === 'generated')
+    .filter(
+      (block) =>
+        block.state === 'generated' && hasCandidateFeedbackBlockText(block),
+    )
     .map((block) => ({
       questionIndex: block.questionIndex,
       recommendationText: block.recommendationText ?? '',
