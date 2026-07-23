@@ -36,11 +36,22 @@ export default async function UserProfilePage({ params }: UserProfilePageProps) 
     )
   }
 
+  if (auth.kind !== 'authorized') {
+    return (
+      <FlashErrorPageFallback
+        title={tCommon('profileLoadFailed')}
+        description={tCommon('sessionVerificationFailed')}
+      />
+    )
+  }
+
   let user: TeamMember | null = null
   let error: string | null = null
 
   try {
-    user = await requestServer<TeamMember>(`/users/${encodeURIComponent(id)}`, auth.ctx)
+    user =
+      (await requestServer<TeamMember>(`/users/${encodeURIComponent(id)}`, auth.ctx)) ??
+      null
   } catch (err) {
     redirectIfUnauthorizedError(err, returnPath, locale)
     if (isForbiddenError(err)) {

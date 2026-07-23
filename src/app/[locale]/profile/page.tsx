@@ -29,6 +29,15 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     )
   }
 
+  if (auth.kind !== 'authorized') {
+    return (
+      <FlashErrorPageFallback
+        title={tCommon('profileLoadFailed')}
+        description={tCommon('sessionVerificationFailed')}
+      />
+    )
+  }
+
   return (
     <PageShell>
       <ProfileView user={auth.me} />
