@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 
 import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
@@ -37,6 +37,13 @@ interface CandidateFeedbackOutcomeFieldProps {
   onChange: (next: CandidateFeedbackOutcomeChange) => void
 }
 
+function getPersistedOutcomeKey(
+  value?: CandidateFeedbackOutcome | null,
+  message?: string | null,
+): string {
+  return `${value ?? ''}:${message ?? ''}`
+}
+
 export function CandidateFeedbackOutcomeField({
   value,
   message,
@@ -44,10 +51,15 @@ export function CandidateFeedbackOutcomeField({
   onChange,
 }: CandidateFeedbackOutcomeFieldProps) {
   const t = useTranslations('interviews.candidateFeedback')
+  const persistedOutcomeKey = getPersistedOutcomeKey(value, message)
+  const lastPersistedOutcomeKeyRef = useRef(persistedOutcomeKey)
   const [draftCustom, setDraftCustom] = useState(value === 'custom')
   const [draftMessage, setDraftMessage] = useState(message ?? '')
 
   useEffect(() => {
+    if (persistedOutcomeKey === lastPersistedOutcomeKeyRef.current) return
+    lastPersistedOutcomeKeyRef.current = persistedOutcomeKey
+    /* eslint-disable react-hooks/set-state-in-effect -- sync drafts when saved outcome changes from server */
     setDraftCustom(value === 'custom')
     if (value === 'custom') {
       setDraftMessage(message ?? '')
@@ -55,7 +67,8 @@ export function CandidateFeedbackOutcomeField({
     if (value == null || value === 'next_stage' || value === 'keep_in_touch') {
       setDraftMessage('')
     }
-  }, [value, message])
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [persistedOutcomeKey, value, message])
 
   const showingCustom = draftCustom || value === 'custom'
   const trimmedDraft = draftMessage.trim()
