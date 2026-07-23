@@ -46,7 +46,9 @@
       "generateNothingEligible": "Няма прыдатных пытанняў для генерацыі",
       "createShareLinkSuccess": "Спасылка для кандыдата створана",
       "createShareLinkError": "Не ўдалося стварыць спасылку для кандыдата",
-      "createShareLinkNotPublishable": "Перад шэрынгам прыміце або адрэдагуйце хаця б адзін блок з тэкстам"
+      "createShareLinkNotPublishable": "Перад шэрынгам прыміце або адрэдагуйце хаця б адзін блок з тэкстам",
+      "revokeShareLinkSuccess": "Спасылка для кандыдата адклікана",
+      "revokeShareLinkError": "Не ўдалося адклікаць спасылку для кандыдата"
     },
     "interviewsLibrary": {
       "loadFailedFallback": "Не ўдалося загрузіць інтэрв'ю."

@@ -46,7 +46,9 @@
       "generateNothingEligible": "No eligible questions to generate",
       "createShareLinkSuccess": "Share link created",
       "createShareLinkError": "Failed to create share link",
-      "createShareLinkNotPublishable": "Accept or edit at least one feedback block with text before sharing"
+      "createShareLinkNotPublishable": "Accept or edit at least one feedback block with text before sharing",
+      "revokeShareLinkSuccess": "Share link revoked",
+      "revokeShareLinkError": "Failed to revoke share link"
     },
     "interviewsLibrary": {
       "loadFailedFallback": "Failed to load interviews."

@@ -3,6 +3,7 @@
 import { Copy } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
+import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { Inline } from '@/components/ui/layout/inline'
@@ -19,7 +20,11 @@ interface CandidateFeedbackSharePanelProps {
   expiresAt: string | null
   hasActiveLink: boolean
   copyStatus: CopyStatus
+  canRevoke: boolean
+  revoking: boolean
+  createBusy?: boolean
   onCopy: () => void
+  onRevoke: () => void
 }
 
 export function CandidateFeedbackSharePanel({
@@ -27,13 +32,20 @@ export function CandidateFeedbackSharePanel({
   expiresAt,
   hasActiveLink,
   copyStatus,
+  canRevoke,
+  revoking,
+  createBusy = false,
   onCopy,
+  onRevoke,
 }: CandidateFeedbackSharePanelProps) {
   const t = useTranslations('interviews.candidateFeedback')
 
   if (!shareUrl && !expiresAt && !hasActiveLink) {
     return null
   }
+
+  const showRevoke = canRevoke && hasActiveLink
+  const revokeBusy = revoking || createBusy
 
   return (
     <SurfaceTile
@@ -46,24 +58,40 @@ export function CandidateFeedbackSharePanel({
           <BodyText as="span" size="sm-tight" tone="foreground">
             {t('shareLinkLabel')}
           </BodyText>
-          {shareUrl ? (
-            <Button
-              type="button"
-              variant="gradient"
-              shape="pill"
-              size="sm"
-              onClick={onCopy}
-            >
-              <Icon size="md">
-                <Copy />
-              </Icon>
-              {copyStatus === 'copied'
-                ? t('shareLinkCopied')
-                : copyStatus === 'error'
-                  ? t('shareLinkCopyFailed')
-                  : t('copyShareLink')}
-            </Button>
-          ) : null}
+          <Inline gap={2} wrap="wrap">
+            {shareUrl ? (
+              <Button
+                type="button"
+                variant="gradient"
+                shape="pill"
+                size="sm"
+                onClick={onCopy}
+              >
+                <Icon size="md">
+                  <Copy />
+                </Icon>
+                {copyStatus === 'copied'
+                  ? t('shareLinkCopied')
+                  : copyStatus === 'error'
+                    ? t('shareLinkCopyFailed')
+                    : t('copyShareLink')}
+              </Button>
+            ) : null}
+            {showRevoke ? (
+              <DemoWriteGuard disabled={revokeBusy}>
+                <Button
+                  type="button"
+                  variant="outline-pill"
+                  shape="pill"
+                  size="sm"
+                  loading={revoking}
+                  onClick={onRevoke}
+                >
+                  {t('revokeShareLink')}
+                </Button>
+              </DemoWriteGuard>
+            ) : null}
+          </Inline>
         </Inline>
 
         {shareUrl ? (

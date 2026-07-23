@@ -46,7 +46,9 @@
       "generateNothingEligible": "Brak kwalifikujących się pytań do wygenerowania",
       "createShareLinkSuccess": "Utworzono link do udostępnienia",
       "createShareLinkError": "Nie udało się utworzyć linku do udostępnienia",
-      "createShareLinkNotPublishable": "Przed udostępnieniem zaakceptuj lub edytuj co najmniej jeden blok z tekstem"
+      "createShareLinkNotPublishable": "Przed udostępnieniem zaakceptuj lub edytuj co najmniej jeden blok z tekstem",
+      "revokeShareLinkSuccess": "Unieważniono link do udostępnienia",
+      "revokeShareLinkError": "Nie udało się unieważnić linku do udostępnienia"
     },
     "interviewsLibrary": {
       "loadFailedFallback": "Nie udało się załadować interview."

@@ -46,7 +46,9 @@
       "generateNothingEligible": "Нет подходящих вопросов для генерации",
       "createShareLinkSuccess": "Ссылка для кандидата создана",
       "createShareLinkError": "Не удалось создать ссылку для кандидата",
-      "createShareLinkNotPublishable": "Перед шарингом примите или отредактируйте хотя бы один блок с текстом"
+      "createShareLinkNotPublishable": "Перед шарингом примите или отредактируйте хотя бы один блок с текстом",
+      "revokeShareLinkSuccess": "Ссылка для кандидата отозвана",
+      "revokeShareLinkError": "Не удалось отозвать ссылку для кандидата"
     },
     "interviewsLibrary": {
       "loadFailedFallback": "Не удалось загрузить интервью."

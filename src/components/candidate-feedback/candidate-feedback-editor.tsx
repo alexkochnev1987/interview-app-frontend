@@ -32,6 +32,11 @@ import {
   updateCandidateFeedback,
   type Interview,
 } from '@/lib/api'
+import { useAuth } from '@/lib/auth-context'
+import {
+  canCreateFeedbackShareLink,
+  canRevokeFeedbackShareLink,
+} from '@/lib/auth-permissions'
 import {
   buildAcceptAllCandidateFeedbackPayload,
   buildQuestionBlocksView,
@@ -90,6 +95,9 @@ export function CandidateFeedbackEditor({
   const t = useTranslations('interviews.candidateFeedback')
   const toastMessages = useCandidateFeedbackToastMessages()
   const { formatErrorMessage } = useCandidateFeedbackErrorLabel()
+  const { user } = useAuth()
+  const canCreateShareLink = canCreateFeedbackShareLink(user)
+  const canRevokeShareLink = canRevokeFeedbackShareLink(user)
   const { feedback, replaceFeedback, kick, refresh, paused } =
     useCandidateFeedbackData(interview.id, initialFeedback)
   const [savingTarget, setSavingTarget] = useState<SavingTarget>(null)
@@ -132,18 +140,25 @@ export function CandidateFeedbackEditor({
     hasActiveLink,
     statusLoadState,
     creating: creatingShareLink,
+    revoking: revokingShareLink,
     copyStatus,
     createShareLink,
+    revokeShareLink,
     copyShareLink,
   } = useCandidateFeedbackShareLink({
     interviewId: interview.id,
     interviewLocale,
     hasPublishable,
+    canCreateShareLink,
+    canRevokeShareLink,
     toastMessages,
   })
   const shareCreateLocked = !hasPublishable
   const shareCreateDisabled =
-    shareCreateLocked || creatingShareLink || statusLoadState === 'loading'
+    shareCreateLocked ||
+    creatingShareLink ||
+    revokingShareLink ||
+    statusLoadState === 'loading'
   const acceptAllPageLoading = savingTarget === 'accept-all'
   const acceptAllPageDisabled =
     acceptAllPageLoading || savingTarget !== null || generateAllBusy
@@ -523,27 +538,29 @@ export function CandidateFeedbackEditor({
                 </Button>
               </DemoWriteGuard>
             ) : null}
-            <DisabledHintTooltip
-              active={shareCreateLocked}
-              hint={t('createShareLinkLockedHint')}
-            >
-              <DemoWriteGuard disabled={shareCreateDisabled}>
-                <Button
-                  type="button"
-                  variant="outline-pill"
-                  shape="pill"
-                  loading={creatingShareLink}
-                  onClick={() => void createShareLink()}
-                >
-                  <Icon size="sm">
-                    <Link2 />
-                  </Icon>
-                  {hasActiveLink || shareUrl
-                    ? t('recreateShareLink')
-                    : t('createShareLink')}
-                </Button>
-              </DemoWriteGuard>
-            </DisabledHintTooltip>
+            {canCreateShareLink ? (
+              <DisabledHintTooltip
+                active={shareCreateLocked}
+                hint={t('createShareLinkLockedHint')}
+              >
+                <DemoWriteGuard disabled={shareCreateDisabled}>
+                  <Button
+                    type="button"
+                    variant="outline-pill"
+                    shape="pill"
+                    loading={creatingShareLink}
+                    onClick={() => void createShareLink()}
+                  >
+                    <Icon size="sm">
+                      <Link2 />
+                    </Icon>
+                    {hasActiveLink || shareUrl
+                      ? t('recreateShareLink')
+                      : t('createShareLink')}
+                  </Button>
+                </DemoWriteGuard>
+              </DisabledHintTooltip>
+            ) : null}
           </Inline>
 
           <CandidateFeedbackSharePanel
@@ -551,7 +568,11 @@ export function CandidateFeedbackEditor({
             expiresAt={expiresAt}
             hasActiveLink={hasActiveLink}
             copyStatus={copyStatus}
+            canRevoke={canRevokeShareLink}
+            revoking={revokingShareLink}
+            createBusy={creatingShareLink}
             onCopy={() => void copyShareLink()}
+            onRevoke={() => void revokeShareLink()}
           />
 
           {generateAllSkipSummary ? (

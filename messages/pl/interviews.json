@@ -231,11 +231,12 @@
       "createShareLink": "Utwórz link",
       "recreateShareLink": "Utwórz nowy link",
       "createShareLinkLockedHint": "Przed udostępnieniem zaakceptuj lub edytuj co najmniej jeden blok z tekstem.",
+      "revokeShareLink": "Unieważnij link",
       "shareLinkLabel": "Link dla kandydata",
       "copyShareLink": "Kopiuj link",
       "shareLinkCopied": "Skopiowano",
       "shareLinkCopyFailed": "Nie udało się skopiować",
-      "shareLinkActive": "Aktywny link już istnieje. Utwórz nowy, aby otrzymać świeży URL (poprzedni przestanie działać).",
+      "shareLinkActive": "Aktywny link już istnieje. Utwórz nowy, aby otrzymać świeży URL, albo unieważnij bez tworzenia nowego.",
       "shareLinkExpires": "Link wygasa {date}",
       "shareLinkPreviewHelp": "Skopiuj pełny link, aby udostępnić go kandydatowi."
     }

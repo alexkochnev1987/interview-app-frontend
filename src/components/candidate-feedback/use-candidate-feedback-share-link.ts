@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   createCandidateFeedbackShareLink,
   getCandidateFeedbackShareLinkStatus,
+  revokeCandidateFeedbackShareLink,
 } from '@/lib/api'
 import type { Locale } from '@/i18n/locales'
 import {
@@ -27,6 +28,8 @@ interface UseCandidateFeedbackShareLinkParams {
   interviewId: string
   interviewLocale: Locale
   hasPublishable: boolean
+  canCreateShareLink: boolean
+  canRevokeShareLink: boolean
   toastMessages: ToastMessages
 }
 
@@ -34,6 +37,8 @@ export function useCandidateFeedbackShareLink({
   interviewId,
   interviewLocale,
   hasPublishable,
+  canCreateShareLink,
+  canRevokeShareLink,
   toastMessages,
 }: UseCandidateFeedbackShareLinkParams) {
   const [shareUrl, setShareUrl] = useState<string | null>(null)
@@ -42,8 +47,16 @@ export function useCandidateFeedbackShareLink({
   const [statusLoadState, setStatusLoadState] =
     useState<ShareLinkStatus>('idle')
   const [creating, setCreating] = useState(false)
+  const [revoking, setRevoking] = useState(false)
   const [copyStatus, setCopyStatus] = useState<CopyStatus>('idle')
   const statusRequestIdRef = useRef(0)
+
+  const clearLocalShareLink = useCallback(() => {
+    setHasActiveLink(false)
+    setShareUrl(null)
+    setExpiresAt(null)
+    clearStoredCandidateFeedbackShareLink(interviewId)
+  }, [interviewId])
 
   const normalizeShareUrl = useCallback(
     (apiUrl: string) => {
@@ -60,6 +73,12 @@ export function useCandidateFeedbackShareLink({
   )
 
   const loadStatus = useCallback(async () => {
+    if (!canCreateShareLink) {
+      clearLocalShareLink()
+      setStatusLoadState('ready')
+      return
+    }
+
     const requestId = ++statusRequestIdRef.current
     setStatusLoadState('loading')
     try {
@@ -88,10 +107,7 @@ export function useCandidateFeedbackShareLink({
           return null
         })
       } else {
-        setHasActiveLink(false)
-        setShareUrl(null)
-        setExpiresAt(null)
-        clearStoredCandidateFeedbackShareLink(interviewId)
+        clearLocalShareLink()
       }
       setStatusLoadState('ready')
     } catch {
@@ -100,15 +116,18 @@ export function useCandidateFeedbackShareLink({
       }
       setStatusLoadState('error')
     }
-  }, [hasPublishable, interviewId])
+  }, [canCreateShareLink, clearLocalShareLink, hasPublishable, interviewId])
 
   useEffect(() => {
-    // Reload when publishability flips so inactive links are cleared.
+    // Reload when publishability or create permission flips.
     // eslint-disable-next-line react-hooks/set-state-in-effect -- sync share-link status with publishable feedback
     void loadStatus()
   }, [loadStatus])
 
   const createShareLink = useCallback(async () => {
+    if (!canCreateShareLink) {
+      return
+    }
     if (!hasPublishable) {
       notifyError(toastMessages.createShareLinkNotPublishable)
       return
@@ -141,12 +160,41 @@ export function useCandidateFeedbackShareLink({
       setCreating(false)
     }
   }, [
+    canCreateShareLink,
     hasPublishable,
     interviewId,
     normalizeShareUrl,
     toastMessages.createShareLinkError,
     toastMessages.createShareLinkNotPublishable,
     toastMessages.createShareLinkSuccess,
+  ])
+
+  const revokeShareLink = useCallback(async () => {
+    if (!canRevokeShareLink) {
+      return
+    }
+
+    setRevoking(true)
+    setCopyStatus('idle')
+    try {
+      await runMutation(() => revokeCandidateFeedbackShareLink(interviewId), {
+        successMessage: toastMessages.revokeShareLinkSuccess,
+        errorMessage: toastMessages.revokeShareLinkError,
+      })
+      statusRequestIdRef.current += 1
+      clearLocalShareLink()
+      setStatusLoadState('ready')
+    } catch {
+      // toast handled by runMutation
+    } finally {
+      setRevoking(false)
+    }
+  }, [
+    canRevokeShareLink,
+    clearLocalShareLink,
+    interviewId,
+    toastMessages.revokeShareLinkError,
+    toastMessages.revokeShareLinkSuccess,
   ])
 
   const copyShareLink = useCallback(async () => {
@@ -168,8 +216,10 @@ export function useCandidateFeedbackShareLink({
     hasActiveLink,
     statusLoadState,
     creating,
+    revoking,
     copyStatus,
     createShareLink,
+    revokeShareLink,
     copyShareLink,
   }
 }

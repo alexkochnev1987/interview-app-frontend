@@ -75,7 +75,10 @@ type Schemas = components['schemas'];
 
 export type QuestionDifficulty = Schemas['ResolvedQuestionResponseDto']['difficulty'];
 export type AuthUserResponseDto = Schemas['AuthUserResponseDto'];
-export type MeResponse = AuthUserResponseDto;
+/** `/auth/me` includes effective permissions; OpenAPI DTO does not list them yet. */
+export type MeResponse = AuthUserResponseDto & {
+  permissions?: readonly string[];
+};
 export type LoginPayload = Schemas['LoginDto'];
 export type LogoutResponse = Schemas['LogoutResponseDto'];
 export type CompleteOnboardingStatus = 'completed' | 'skipped';
@@ -813,7 +816,7 @@ export async function createCandidateFeedbackShareLink(
   );
 }
 
-/** Returns `null` when no usable share link exists (HTTP 404). */
+/** Returns `null` when no usable share link exists (HTTP 404) or caller lacks create permission (HTTP 403). */
 export async function getCandidateFeedbackShareLinkStatus(
   id: string,
 ): Promise<CandidateFeedbackShareLinkStatus | null> {
@@ -825,11 +828,27 @@ export async function getCandidateFeedbackShareLinkStatus(
       }),
     );
   } catch (err) {
-    if (err instanceof ApiError && err.status === 404) {
+    if (err instanceof ApiError && (err.status === 404 || err.status === 403)) {
       return null;
     }
     throw err;
   }
+}
+
+export type CandidateFeedbackShareLinkRevokeResponse = {
+  revoked: boolean;
+};
+
+/** Invalidates the active share URL without creating a replacement. */
+export async function revokeCandidateFeedbackShareLink(
+  id: string,
+): Promise<CandidateFeedbackShareLinkRevokeResponse> {
+  return handle(
+    client.DELETE('/interviews/{id}/candidate-feedback/share-link', {
+      ...LOCALIZED_HEADERS,
+      params: { path: { id } },
+    }),
+  );
 }
 
 /** Public GET `/feedback/share/:token` — pass `getServerRequestContext()` from RSC. */

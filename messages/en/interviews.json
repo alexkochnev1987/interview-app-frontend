@@ -231,11 +231,12 @@
       "createShareLink": "Create share link",
       "recreateShareLink": "Create new share link",
       "createShareLinkLockedHint": "Accept or edit at least one feedback block with text before sharing.",
+      "revokeShareLink": "Revoke link",
       "shareLinkLabel": "Candidate share link",
       "copyShareLink": "Copy link",
       "shareLinkCopied": "Copied",
       "shareLinkCopyFailed": "Copy failed",
-      "shareLinkActive": "A share link is active. Create a new link to get a fresh URL (the previous URL will stop working).",
+      "shareLinkActive": "A share link is active. Create a new link for a fresh URL, or revoke to invalidate without replacing it.",
       "shareLinkExpires": "Link expires {date}",
       "shareLinkPreviewHelp": "Copy the full link to share with the candidate."
     }

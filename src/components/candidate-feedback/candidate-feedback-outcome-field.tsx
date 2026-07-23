@@ -53,24 +53,25 @@ export function CandidateFeedbackOutcomeField({
   const t = useTranslations('interviews.candidateFeedback')
   const persistedOutcomeKey = getPersistedOutcomeKey(value, message)
   const lastPersistedOutcomeKeyRef = useRef(persistedOutcomeKey)
-  const [draftCustom, setDraftCustom] = useState(value === 'custom')
+  const [draftOutcome, setDraftOutcome] = useState<CandidateFeedbackOutcome | null>(
+    value ?? null,
+  )
   const [draftMessage, setDraftMessage] = useState(message ?? '')
 
   useEffect(() => {
     if (persistedOutcomeKey === lastPersistedOutcomeKeyRef.current) return
     lastPersistedOutcomeKeyRef.current = persistedOutcomeKey
     /* eslint-disable react-hooks/set-state-in-effect -- sync drafts when saved outcome changes from server */
-    setDraftCustom(value === 'custom')
+    setDraftOutcome(value ?? null)
     if (value === 'custom') {
       setDraftMessage(message ?? '')
-    }
-    if (value == null || value === 'next_stage' || value === 'keep_in_touch') {
+    } else {
       setDraftMessage('')
     }
     /* eslint-enable react-hooks/set-state-in-effect */
   }, [persistedOutcomeKey, value, message])
 
-  const showingCustom = draftCustom || value === 'custom'
+  const showingCustom = draftOutcome === 'custom'
   const trimmedDraft = draftMessage.trim()
   const savedMessage = message?.trim() ?? ''
   const customDirty =
@@ -80,21 +81,22 @@ export function CandidateFeedbackOutcomeField({
 
   function handleSelectChange(next: string) {
     if (next === OUTCOME_CLEAR_VALUE) {
-      setDraftCustom(false)
+      setDraftOutcome(null)
       setDraftMessage('')
       onChange({ outcome: null })
       return
     }
 
     if (next === 'custom') {
-      setDraftCustom(true)
+      setDraftOutcome('custom')
       setDraftMessage(value === 'custom' ? (message ?? '') : '')
       return
     }
 
-    setDraftCustom(false)
+    const outcome = next as CandidateFeedbackOutcome
+    setDraftOutcome(outcome)
     setDraftMessage('')
-    onChange({ outcome: next as CandidateFeedbackOutcome })
+    onChange({ outcome })
   }
 
   function handleSaveCustom() {
@@ -105,9 +107,7 @@ export function CandidateFeedbackOutcomeField({
     })
   }
 
-  const selectValue = showingCustom
-    ? 'custom'
-    : (value ?? OUTCOME_CLEAR_VALUE)
+  const selectValue = draftOutcome ?? OUTCOME_CLEAR_VALUE
 
   return (
     <Stack gap={3}>
@@ -186,9 +186,9 @@ export function CandidateFeedbackOutcomeField({
             </BodyText>
           ) : null}
         </Stack>
-      ) : value ? (
+      ) : draftOutcome ? (
         <BodyText size="xs" tone="muted">
-          {t(`outcomePreview.${value}`)}
+          {t(`outcomePreview.${draftOutcome}`)}
         </BodyText>
       ) : null}
     </Stack>
