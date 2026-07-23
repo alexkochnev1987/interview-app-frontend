@@ -142,6 +142,7 @@
       "position": "Position",
       "questionsTitle": "Questions",
       "answersBlockEditNotice": "Editing is disabled after answers have been uploaded, because answers are tied to question order.",
+      "hrOnlyEditNotice": "Candidate details and questions cannot be changed in this state. You can update the assigned HR reviewer.",
       "discardTitle": "Discard unsaved changes?",
       "discardDescription": "Your edits to this interview will be lost."
     },
