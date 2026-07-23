@@ -78,3 +78,7 @@ export function isSuperAdmin(role: string | null | undefined): boolean {
 export function canManageTeam(role: string | null | undefined): boolean {
   return role === 'super_admin' || role === 'admin'
 }
+
+export function canAssignInterviewHr(role: string | null | undefined): boolean {
+  return canManageTeam(role)
+}

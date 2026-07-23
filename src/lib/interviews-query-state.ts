@@ -6,6 +6,7 @@ import type {
   InterviewSortOrder,
   InterviewStatusFilter,
 } from '@/lib/api'
+import { isValidAssignedHrFilterId } from '@/lib/assigned-hr-filter'
 
 export { emptyPaginatedInterviews } from '@/lib/api'
 
@@ -29,6 +30,7 @@ export type InterviewsQueryState = {
   q: string
   position?: string
   status?: InterviewStatusFilter
+  assignedHrId?: string
   sortBy: InterviewSortField
   sortOrder: InterviewSortOrder
   page: number
@@ -40,6 +42,7 @@ export const DEFAULT_INTERVIEWS_QUERY: InterviewsQueryState = {
   q: '',
   position: undefined,
   status: undefined,
+  assignedHrId: undefined,
   sortBy: 'updatedAt',
   sortOrder: 'desc',
   page: 1,
@@ -56,8 +59,10 @@ export const EMPTY_INTERVIEW_FACETS: InterviewFacetsResponse = {
 export function readInterviewsFromSearchParams(
   params: URLSearchParams,
   fallback: InterviewsQueryState = DEFAULT_INTERVIEWS_QUERY,
+  options?: { allowAssignedHrFilter?: boolean },
 ): InterviewsQueryState {
   const next: InterviewsQueryState = { ...fallback }
+  const allowAssignedHrFilter = options?.allowAssignedHrFilter ?? true
 
   const q = params.get('q')
   if (q !== null) next.q = clampInterviewsSearchQuery(q)
@@ -74,6 +79,15 @@ export function readInterviewsFromSearchParams(
     status === 'failed'
   ) {
     next.status = status
+  }
+
+  const assignedHrId = params.get('assignedHrId')
+  if (
+    allowAssignedHrFilter &&
+    assignedHrId &&
+    isValidAssignedHrFilterId(assignedHrId)
+  ) {
+    next.assignedHrId = assignedHrId
   }
 
   const sortBy = params.get('sortBy')
@@ -123,13 +137,14 @@ export function toInterviewsSearchParams(
 }
 
 function buildInterviewFilterParams(
-  state: Pick<InterviewsQueryState, 'position' | 'status'>,
+  state: Pick<InterviewsQueryState, 'position' | 'status' | 'assignedHrId'>,
   debouncedQ: string,
 ): Omit<FetchInterviewsParams, 'sortBy' | 'sortOrder' | 'page' | 'limit'> {
   return {
     q: debouncedQ || undefined,
     position: state.position,
     status: state.status,
+    assignedHrId: state.assignedHrId,
   }
 }
 
@@ -159,7 +174,7 @@ export function buildInterviewsInfiniteParams(
 }
 
 export function buildInterviewFacetsParams(
-  state: Pick<InterviewsQueryState, 'position' | 'status'>,
+  state: Pick<InterviewsQueryState, 'position' | 'status' | 'assignedHrId'>,
   debouncedQ: string,
 ): FetchInterviewFacetsParams {
   return buildInterviewFilterParams(state, debouncedQ)
@@ -167,8 +182,9 @@ export function buildInterviewFacetsParams(
 
 export function resolveInterviewsQueryState(
   searchParams: URLSearchParams,
+  options?: { allowAssignedHrFilter?: boolean },
 ): InterviewsQueryState {
-  const state = readInterviewsFromSearchParams(searchParams)
+  const state = readInterviewsFromSearchParams(searchParams, DEFAULT_INTERVIEWS_QUERY, options)
   if (state.view === 'cards' && state.page !== 1) state.page = 1
   return state
 }

@@ -17,6 +17,8 @@
         "completed": "Завершана",
         "failed": "Не атрымалася"
       },
+      "assignedHrUnassigned": "Не прызначаны",
+      "assignedHrAssigned": "Прызначаны: {name}",
       "demoTryCandidateExperience": "Паспрабаваць вопыт кандыдата"
     },
     "library": {
@@ -29,12 +31,14 @@
       "table": {
         "candidate": "Кандыдат",
         "position": "Пасада",
+        "hr": "HR",
         "status": "Статус",
         "progress": "Прагрэс",
         "score": "Ацэнка",
         "updated": "Абноўлена",
         "created": "Створана"
       },
+      "assignedHrNotAssigned": "Не прызначаны",
       "toolbar": {
         "searchPlaceholder": "Пошук па імені кандыдата",
         "resultCount": "{count} інтэрв'ю",
@@ -60,6 +64,9 @@
         "resetAllWithCount": "Скінуць ({count})",
         "positionTitle": "Пасада",
         "statusTitle": "Статус",
+        "hrTitle": "HR-спецыяліст",
+        "hrFilterAll": "Усе спецыялісты",
+        "hrFilterUnassigned": "Не прызначаны",
         "retry": "Паўтарыць",
         "unavailable": "Фільтры недаступныя",
         "loading": "Загрузка…",
@@ -103,7 +110,10 @@
     },
     "chips": {
       "position": "Пасада: {value}",
-      "status": "Статус: {value}"
+      "status": "Статус: {value}",
+      "hr": "HR: {value}",
+      "hrUnassigned": "HR: Не прызначаны",
+      "hrLoading": "HR: …"
     },
     "actions": {
       "edit": "Рэдагаваць інтэрв'ю",
@@ -132,6 +142,7 @@
       "position": "Пасада",
       "questionsTitle": "Пытанні",
       "answersBlockEditNotice": "Рэдагаванне адключана пасля загрузкі адказаў, бо адказы прывязаны да парадку пытанняў.",
+      "hrOnlyEditNotice": "Дадзеныя кандыдата і пытанні нельга змяніць у гэтым статусе. Можна абнавіць прызначанага HR-рэцэнзента.",
       "discardTitle": "Адмяніць незахаваныя змены?",
       "discardDescription": "Вашы змены ў гэтым інтэрв'ю будуць страчаны."
     },
