@@ -146,24 +146,26 @@ export function CandidateFeedbackOutcomeField({
             />
           </FormField>
 
-          <Inline gap={2} wrap="wrap">
-            <DisabledHintTooltip
-              active={customSaveLocked}
-              hint={t('outcomeMessageSaveLockedHint')}
-            >
-              <DemoWriteGuard disabled={disabled || customSaveLocked || !customDirty}>
-                <Button
-                  type="button"
-                  variant="gradient"
-                  shape="pill"
-                  loading={disabled}
-                  onClick={handleSaveCustom}
-                >
-                  {t('saveChanges')}
-                </Button>
-              </DemoWriteGuard>
-            </DisabledHintTooltip>
-          </Inline>
+          {customDirty ? (
+            <Inline gap={2} wrap="wrap">
+              <DisabledHintTooltip
+                active={customSaveLocked}
+                hint={t('outcomeMessageSaveLockedHint')}
+              >
+                <DemoWriteGuard disabled={disabled || customSaveLocked}>
+                  <Button
+                    type="button"
+                    variant="gradient"
+                    shape="pill"
+                    loading={disabled}
+                    onClick={handleSaveCustom}
+                  >
+                    {t('saveChanges')}
+                  </Button>
+                </DemoWriteGuard>
+              </DisabledHintTooltip>
+            </Inline>
+          ) : null}
 
           {trimmedDraft ? (
             <BodyText size="xs" tone="muted">

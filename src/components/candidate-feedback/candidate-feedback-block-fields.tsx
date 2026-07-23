@@ -137,6 +137,12 @@ export function CandidateFeedbackBlockFields({
     [block, improvementText, recommendationText],
   )
   const saveLocked = savePayload === null
+  const isDirty =
+    block.state === 'accepted' || block.state === 'edited'
+      ? recommendationText !== (block.recommendationText ?? '') ||
+        improvementText !== (block.improvementText ?? '')
+      : // generated / empty / failed: drafts start empty; any typing is an unsaved edit
+        recommendationText !== '' || improvementText !== ''
 
   function handleUseAiRecommendation() {
     setRecommendationText(block.recommendationText ?? '')
@@ -222,24 +228,26 @@ export function CandidateFeedbackBlockFields({
         ) : null}
       </Stack>
 
-      <Inline gap={2} wrap="wrap">
-        <DisabledHintTooltip
-          active={saveLocked}
-          hint={t('saveChangesLockedHint')}
-        >
-          <DemoWriteGuard disabled={saving || saveLocked}>
-            <Button
-              type="button"
-              variant="gradient"
-              shape="pill"
-              loading={saving}
-              onClick={handleSave}
-            >
-              {t('saveChanges')}
-            </Button>
-          </DemoWriteGuard>
-        </DisabledHintTooltip>
-      </Inline>
+      {isDirty ? (
+        <Inline gap={2} wrap="wrap">
+          <DisabledHintTooltip
+            active={saveLocked}
+            hint={t('saveChangesLockedHint')}
+          >
+            <DemoWriteGuard disabled={saving || saveLocked}>
+              <Button
+                type="button"
+                variant="gradient"
+                shape="pill"
+                loading={saving}
+                onClick={handleSave}
+              >
+                {t('saveChanges')}
+              </Button>
+            </DemoWriteGuard>
+          </DisabledHintTooltip>
+        </Inline>
+      ) : null}
     </Stack>
   )
 }
