@@ -136,10 +136,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /**
-         * Mark first-time onboarding as completed or skipped
-         * @description Sets onboardingCompletedAt when still pending. Optional client `status` in the body is ignored; refetch is not required — response matches GET /auth/me.
-         */
+        /** Mark the staff onboarding tour as completed or skipped */
         patch: operations["AuthController_completeOnboarding"];
         trace?: never;
     };
@@ -152,6 +149,23 @@ export interface paths {
         };
         /** List all users */
         get: operations["UserController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get user profile by id */
+        get: operations["UserController_findOne"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1017,15 +1031,20 @@ export interface components {
             demo: boolean;
             /**
              * Format: date-time
+             * @description Set when the staff onboarding tour was completed or skipped.
+             * @example 2026-05-05T12:00:00.000Z
+             */
+            onboardingCompletedAt?: string;
+            /**
+             * @description How the staff onboarding tour was dismissed.
+             * @enum {string}
+             */
+            onboardingStatus?: "completed" | "skipped";
+            /**
+             * Format: date-time
              * @example 2026-05-05T12:00:00.000Z
              */
             createdAt: string;
-            /**
-             * Format: date-time
-             * @description When the user finished or skipped first-time onboarding. Null means onboarding is pending.
-             * @example 2026-06-10T14:30:00.000Z
-             */
-            onboardingCompletedAt?: string | null;
         };
         RegisterDto: {
             email: string;
@@ -1035,6 +1054,13 @@ export interface components {
         LogoutResponseDto: {
             /** @example true */
             ok: boolean;
+        };
+        CompleteOnboardingDto: {
+            /**
+             * @example completed
+             * @enum {string}
+             */
+            status: "completed" | "skipped";
         };
         /** @enum {string} */
         ApiErrorCode: "BAD_REQUEST" | "VALIDATION_ERROR" | "INVALID_LOCALE" | "REGISTRATION_FAILED" | "UPLOAD_FAILED" | "UPLOAD_NOT_ALLOWED" | "ANSWER_ATTEMPT_LIMIT_REACHED" | "UNAUTHORIZED" | "INVALID_CREDENTIALS" | "AUTHENTICATION_REQUIRED" | "CANDIDATE_SESSION_REQUIRED" | "INVALID_CANDIDATE_SESSION" | "INTERVIEW_TOKEN_REQUIRED" | "INVALID_INTERVIEW_TOKEN" | "FORBIDDEN" | "INSUFFICIENT_PERMISSIONS" | "ACCESS_DENIED" | "NOT_FOUND" | "QUESTION_NOT_FOUND" | "INTERVIEW_NOT_FOUND" | "USER_NOT_FOUND" | "FEEDBACK_NOT_FOUND" | "CONFLICT" | "QUESTION_IN_USE" | "VALIDATION_RUNNING" | "QUESTION_DUPLICATE" | "SERVICE_UNAVAILABLE" | "AI_PROVIDER_NOT_CONFIGURED" | "EMBEDDING_PROVIDER_NOT_CONFIGURED" | "INTERNAL_SERVER_ERROR";
@@ -2377,7 +2403,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CompleteOnboardingDto"];
+            };
+        };
         responses: {
             200: {
                 headers: {
@@ -2421,6 +2451,54 @@ export interface operations {
                 };
             };
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    UserController_findOne: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuthUserResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

@@ -129,6 +129,13 @@
         "loadFailedTitle": "Could not load team members",
         "loadFailedFallback": "Failed to load team members."
       },
+      "profile": {
+        "forbiddenTitle": "You don't have access to this profile",
+        "forbiddenDescription": "Your role does not allow viewing this user's profile. If you think this is a mistake, contact your workspace owner.",
+        "loadFailedTitle": "Could not load profile",
+        "loadFailedFallback": "Failed to load profile.",
+        "notFoundFallback": "The requested profile could not be loaded."
+      },
       "questions": {
         "editorIssueTitle": "Question editor issue",
         "unavailableTitle": "Question unavailable",

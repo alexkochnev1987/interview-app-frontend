@@ -1,8 +1,5 @@
 'use client'
 
-import { useState } from 'react'
-import { useLocale, useTranslations } from 'next-intl'
-import { useSearchParams } from 'next/navigation'
 import {
   ClipboardList,
   LayoutDashboard,
@@ -13,10 +10,9 @@ import {
   Sparkles,
   Users,
 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
-import { LanguageSwitcher } from '@/components/ui/language-switcher'
 import { isCandidateFlowPath } from '@/i18n/html-lang'
-import { LOCALES, type Locale } from '@/i18n/locales'
 import { usePathname } from '@/i18n/navigation'
 import { routes } from '@/i18n/routes'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
@@ -46,28 +42,14 @@ import {
 import { SurfaceTile } from '@/components/ui/surface-tile'
 import { BodyText } from '@/components/ui/text'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
-import { useOnboardingReplay } from '@/features/onboarding/onboarding-provider'
 
 export function SideNav() {
   const { user, logout } = useAuth()
   const isDemo = useIsDemo()
-  const { replayTour, canReplayTour } = useOnboardingReplay()
   const pathname = usePathname()
-  const searchParams = useSearchParams()
-  const locale = useLocale() as Locale
   const tNav = useTranslations('nav')
-  const tOnboarding = useTranslations('onboarding')
   const tCommon = useTranslations('common')
-  const tLanguage = useTranslations('languageSwitcher')
   const labels = useSharedLabels()
-  const [languageMenuOpen, setLanguageMenuOpen] = useState(false)
-
-  const queryString = searchParams.toString()
-  const languageHref = queryString ? `${pathname}?${queryString}` : pathname
-  const languageOptions = LOCALES.map((optionLocale) => ({
-    locale: optionLocale,
-    label: tLanguage(`locales.${optionLocale}`),
-  }))
 
   if (isCandidateFlowPath(pathname)) {
     return null
@@ -97,7 +79,6 @@ export function SideNav() {
       : []),
     ...(canConfigureInterview(user?.role)
       ? [
-          // Templates are read-only for demo accounts, so this entry is not gated on !isDemo.
           { href: routes.templates.list, label: tNav('templates'), icon: LayoutTemplate },
         ]
       : []),
@@ -122,22 +103,9 @@ export function SideNav() {
     return pathname === href || pathname.startsWith(`${href}/`)
   }
 
-  const languageSwitcher = (
-    <LanguageSwitcher
-      ariaLabel={tLanguage('label')}
-      currentLocale={locale}
-      href={languageHref}
-      options={languageOptions}
-      side="right"
-      align="end"
-      onOpenChange={setLanguageMenuOpen}
-    />
-  )
-
   return (
     <AppSidebar
       aria-label={tCommon('appName')}
-      expanded={languageMenuOpen}
       brand={
         <UnstyledLink href="/">
           <Inline gap={2} align="center" wrap="nowrap">
@@ -178,29 +146,16 @@ export function SideNav() {
         user ? (
           <Stack gap={2} width="full">
             <Stack gap={2} className={sideNavRevealClass}>
-              {canAccessDashboard(user.role) ? (
-                <Button
-                  type="button"
-                  variant="outline-pill"
-                  shape="pill"
-                  size="sm"
-                  effects="blur"
-                  width="full"
-                  disabled={!canReplayTour}
-                  onClick={() => void replayTour()}
-                >
-                  {tOnboarding('tour.replay')}
-                </Button>
-              ) : null}
-              {languageSwitcher}
-              <SurfaceTile tone="soft" rounded="lg" padding="sm">
-                <IdentityBadge
-                  layout="stacked"
-                  nameMaxWidth="none"
-                  name={user.name}
-                  role={labels.role(user.role)}
-                />
-              </SurfaceTile>
+              <UnstyledLink href={routes.profile.me} aria-label={tNav('profile')}>
+                <SurfaceTile tone="soft" rounded="lg" padding="sm">
+                  <IdentityBadge
+                    layout="stacked"
+                    nameMaxWidth="none"
+                    name={user.name}
+                    role={labels.role(user.role)}
+                  />
+                </SurfaceTile>
+              </UnstyledLink>
             </Stack>
             <SideNavButton
               tone="danger"
@@ -211,7 +166,6 @@ export function SideNav() {
           </Stack>
         ) : (
           <Stack gap={2} width="full" className={sideNavRevealClass}>
-            {languageSwitcher}
             <Button asChild variant="gradient" size="sm" width="full">
               <UnstyledLink href="/login">{tNav('signIn')}</UnstyledLink>
             </Button>

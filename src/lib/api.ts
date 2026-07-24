@@ -422,10 +422,13 @@ export async function logout(): Promise<LogoutResponse> {
   return handle(client.POST('/auth/logout', LOCALIZED_HEADERS));
 }
 
-export async function completeOnboarding(): Promise<AuthUserResponseDto> {
+export async function completeOnboarding(
+  status: CompleteOnboardingStatus = 'completed',
+): Promise<AuthUserResponseDto> {
   return handle(
     client.PATCH('/auth/me/onboarding', {
       ...LOCALIZED_HEADERS,
+      body: { status },
     }),
   );
 }

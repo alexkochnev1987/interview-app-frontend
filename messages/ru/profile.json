@@ -1,0 +1,27 @@
+{
+  "profile": {
+    "heading": "Мой профиль",
+    "lead": "Управляйте настройками и личной информацией своей учетной записи.",
+    "memberHeading": "Профиль участника команды",
+    "memberLead": "Просмотр данных учетной записи этого участника рабочей области.",
+    "summary": {
+      "editProfile": "Редактировать профиль"
+    },
+    "personalInformation": {
+      "title": "Личная информация",
+      "name": "Имя",
+      "email": "Email",
+      "role": "Роль",
+      "organizationId": "ID организации",
+      "organizationUnassigned": "Не назначено"
+    },
+    "security": {
+      "title": "Настройки аккаунта",
+      "changePassword": "Изменить пароль"
+    },
+    "preferences": {
+      "language": "Язык",
+      "productTour": "Обзор продукта"
+    }
+  }
+}

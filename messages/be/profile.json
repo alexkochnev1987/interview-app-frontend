@@ -1,0 +1,27 @@
+{
+  "profile": {
+    "heading": "Мой профіль",
+    "lead": "Кіруйце наладамі і асабістай інфармацыяй свайго ўліковага запісу.",
+    "memberHeading": "Профіль удзельніка каманды",
+    "memberLead": "Прагляд дадзеных уліковага запісу гэтага ўдзельніка працоўнай прасторы.",
+    "summary": {
+      "editProfile": "Рэдагаваць профіль"
+    },
+    "personalInformation": {
+      "title": "Асабістая інфармацыя",
+      "name": "Імя",
+      "email": "Email",
+      "role": "Роля",
+      "organizationId": "ID арганізацыі",
+      "organizationUnassigned": "Не прызначана"
+    },
+    "security": {
+      "title": "Налады ўліковага запісу",
+      "changePassword": "Змяніць пароль"
+    },
+    "preferences": {
+      "language": "Мова",
+      "productTour": "Тур па прадукте"
+    }
+  }
+}

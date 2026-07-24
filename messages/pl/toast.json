@@ -129,6 +129,13 @@
         "loadFailedTitle": "Nie udało się załadować członków zespołu",
         "loadFailedFallback": "Nie udało się załadować członków zespołu."
       },
+      "profile": {
+        "forbiddenTitle": "Brak dostępu do tego profilu",
+        "forbiddenDescription": "Twoja rola nie pozwala wyświetlić tego profilu użytkownika. Jeśli to błąd, skontaktuj się z właścicielem workspace.",
+        "loadFailedTitle": "Nie udało się załadować profilu",
+        "loadFailedFallback": "Nie udało się załadować profilu.",
+        "notFoundFallback": "Nie udało się załadować żądanego profilu."
+      },
       "questions": {
         "editorIssueTitle": "Problem z edytorem pytań",
         "unavailableTitle": "Pytanie niedostępne",

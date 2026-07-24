@@ -1,0 +1,161 @@
+'use client'
+
+import { LockKeyhole } from 'lucide-react'
+import { useLocale, useTranslations } from 'next-intl'
+import { useSearchParams } from 'next/navigation'
+
+import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
+import { TeamRoleBadge } from '@/components/team/team-role-badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { HeroTitle } from '@/components/ui/hero-text'
+import { Icon } from '@/components/ui/icon'
+import { IconBadge } from '@/components/ui/icon-badge'
+import { LanguageSwitcher } from '@/components/ui/language-switcher'
+import { Grid } from '@/components/ui/layout/grid'
+import { Inline } from '@/components/ui/layout/inline'
+import { Stack } from '@/components/ui/layout/stack'
+import { BodyText, SectionHeading } from '@/components/ui/text'
+import { useOnboardingReplay } from '@/features/onboarding/onboarding-provider'
+import { LOCALES, type Locale } from '@/i18n/locales'
+import { usePathname } from '@/i18n/navigation'
+import type { MeResponse } from '@/lib/api'
+import { canAccessDashboard } from '@/lib/auth-roles'
+import { getCandidateInitials } from '@/lib/interview-formatters'
+
+import { ProfileField } from './profile-field'
+
+interface ProfileViewProps {
+  user: MeResponse
+  mode?: 'self' | 'member'
+}
+
+export function ProfileView({ user, mode = 'self' }: ProfileViewProps) {
+  const t = useTranslations('profile')
+  const tOnboarding = useTranslations('onboarding')
+  const tLanguage = useTranslations('languageSwitcher')
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const locale = useLocale() as Locale
+  const { replayTour, canReplayTour } = useOnboardingReplay()
+  const isSelf = mode === 'self'
+
+  const queryString = searchParams.toString()
+  const languageHref = queryString ? `${pathname}?${queryString}` : pathname
+  const languageOptions = LOCALES.map((optionLocale) => ({
+    locale: optionLocale,
+    label: tLanguage(`locales.${optionLocale}`),
+  }))
+
+  const personalInformationCard = (
+    <Card variant="surface">
+      <CardHeader spacing="xs">
+        <CardTitle size="lg">{t('personalInformation.title')}</CardTitle>
+      </CardHeader>
+      <CardContent spacing="lg">
+        <Stack gap={5}>
+          <ProfileField
+            label={t('personalInformation.name')}
+            value={user.name}
+          />
+          <ProfileField
+            label={t('personalInformation.email')}
+            value={user.email}
+          />
+          <ProfileField
+            label={t('personalInformation.role')}
+            value={<TeamRoleBadge role={user.role} />}
+          />
+          <ProfileField
+            label={t('personalInformation.organizationId')}
+            value={
+              user.organizationId ?? t('personalInformation.organizationUnassigned')
+            }
+          />
+        </Stack>
+      </CardContent>
+    </Card>
+  )
+
+  const accountPreferencesCard = (
+    <Card variant="surface">
+      <CardHeader spacing="xs">
+        <CardTitle size="lg">{t('security.title')}</CardTitle>
+      </CardHeader>
+      <CardContent spacing="lg">
+        <Stack gap={5}>
+          <Inline justify="between" align="center" wrap="wrap" width="full">
+            <Inline gap={3} align="center">
+              <Icon size="md">
+                <LockKeyhole />
+              </Icon>
+              <BodyText weight="medium">{t('security.changePassword')}</BodyText>
+            </Inline>
+            <DemoWriteGuard>
+              <Button type="button" variant="outline" disabled>
+                {t('security.changePassword')}
+              </Button>
+            </DemoWriteGuard>
+          </Inline>
+          <Inline justify="between" align="center" wrap="wrap" width="full">
+            <BodyText weight="medium">{t('preferences.language')}</BodyText>
+            <LanguageSwitcher
+              ariaLabel={tLanguage('label')}
+              currentLocale={locale}
+              href={languageHref}
+              options={languageOptions}
+              width="fit"
+              align="end"
+            />
+          </Inline>
+          {canAccessDashboard(user.role) ? (
+            <Inline justify="between" align="center" wrap="wrap" width="full">
+              <BodyText weight="medium">{t('preferences.productTour')}</BodyText>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={!canReplayTour}
+                onClick={() => void replayTour()}
+              >
+                {tOnboarding('tour.replay')}
+              </Button>
+            </Inline>
+          ) : null}
+        </Stack>
+      </CardContent>
+    </Card>
+  )
+
+  return (
+    <Stack gap={8} width="full">
+      <Stack gap={2} width="full">
+        <SectionHeading size="xl">
+          {isSelf ? t('heading') : t('memberHeading')}
+        </SectionHeading>
+        <BodyText as="p" size="responsive-sm" width="prose">
+          {isSelf ? t('lead') : t('memberLead')}
+        </BodyText>
+      </Stack>
+
+      <Card variant="floating" size="lg">
+        <CardContent spacing="xl">
+          <Inline gap={4} align="center">
+            <IconBadge tone="surface" size="xl" shape="circle" textSize="lg">
+              {getCandidateInitials(user.name)}
+            </IconBadge>
+            <HeroTitle>{user.name}</HeroTitle>
+          </Inline>
+        </CardContent>
+      </Card>
+
+      {isSelf ? (
+        <Grid columns="split-12-8" gap={6}>
+          {personalInformationCard}
+          {accountPreferencesCard}
+        </Grid>
+      ) : (
+        personalInformationCard
+      )}
+    </Stack>
+  )
+}
