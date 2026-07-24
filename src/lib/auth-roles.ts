@@ -20,9 +20,13 @@ const ROLE_AUTHORITY: Readonly<Record<AppRole, number>> = {
   [APP_ROLE.candidate]: 1,
 }
 
+function isAppRole(role: string): role is AppRole {
+  return role in ROLE_AUTHORITY
+}
+
 function roleAuthority(role: string | null | undefined): number {
-  if (!role) return 0
-  return ROLE_AUTHORITY[role] ?? 0
+  if (!role || !isAppRole(role)) return 0
+  return ROLE_AUTHORITY[role]
 }
 
 export function roleOutranks(
@@ -52,7 +56,7 @@ export function canActorReassignMemberRole(params: {
 }
 
 function hasAdminRole(role: string | null | undefined): boolean {
-  if (!role) return false
+  if (!role || !isAppRole(role)) return false
   return ADMIN_ROLES.has(role)
 }
 
