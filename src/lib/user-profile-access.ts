@@ -1,3 +1,5 @@
+import { APP_ROLE, isSuperAdmin } from '@/lib/auth-roles'
+
 export type UserProfileAccessTarget = {
   id: string
   role: string
@@ -10,16 +12,20 @@ export type UserProfileAccessActor = {
 
 export const USER_PROFILE_ACCESS_DENIED_MESSAGE = 'USER_PROFILE_ACCESS_DENIED'
 
+/** Mirrors GET /users/{id} visibility for client-side link gating only. */
 export function getUserProfileReadDenialReason(
   target: UserProfileAccessTarget,
   actor: UserProfileAccessActor,
 ): string | null {
-  if (actor.role === 'super_admin') return null
-  if (actor.role === 'admin' && target.role !== 'super_admin') return null
-  if (actor.role === 'hr' && (target.role === 'hr' || target.role === 'candidate')) {
+  if (isSuperAdmin(actor.role)) return null
+  if (actor.role === APP_ROLE.admin && !isSuperAdmin(target.role)) return null
+  if (
+    actor.role === APP_ROLE.hr &&
+    (target.role === APP_ROLE.hr || target.role === APP_ROLE.candidate)
+  ) {
     return null
   }
-  if (actor.role === 'candidate' && actor.id === target.id) return null
+  if (actor.role === APP_ROLE.candidate && actor.id === target.id) return null
   return USER_PROFILE_ACCESS_DENIED_MESSAGE
 }
 

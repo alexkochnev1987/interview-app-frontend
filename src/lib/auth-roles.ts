@@ -1,10 +1,23 @@
-const ADMIN_ROLES: ReadonlySet<string> = new Set(['super_admin', 'admin', 'hr'])
+export const APP_ROLE = {
+  super_admin: 'super_admin',
+  admin: 'admin',
+  hr: 'hr',
+  candidate: 'candidate',
+} as const
 
-const ROLE_AUTHORITY: Readonly<Record<string, number>> = {
-  super_admin: 4,
-  admin: 3,
-  hr: 2,
-  candidate: 1,
+export type AppRole = (typeof APP_ROLE)[keyof typeof APP_ROLE]
+
+const ADMIN_ROLES: ReadonlySet<AppRole> = new Set([
+  APP_ROLE.super_admin,
+  APP_ROLE.admin,
+  APP_ROLE.hr,
+])
+
+const ROLE_AUTHORITY: Readonly<Record<AppRole, number>> = {
+  [APP_ROLE.super_admin]: 4,
+  [APP_ROLE.admin]: 3,
+  [APP_ROLE.hr]: 2,
+  [APP_ROLE.candidate]: 1,
 }
 
 function roleAuthority(role: string | null | undefined): number {
@@ -60,7 +73,7 @@ export function canReadQuestions(role: string | null | undefined): boolean {
 }
 
 export function canCreateQuestions(role: string | null | undefined): boolean {
-  return role === 'super_admin' || role === 'admin'
+  return role === APP_ROLE.super_admin || role === APP_ROLE.admin
 }
 
 export function canUpdateQuestions(role: string | null | undefined): boolean {
@@ -68,15 +81,15 @@ export function canUpdateQuestions(role: string | null | undefined): boolean {
 }
 
 export function canDeleteQuestions(role: string | null | undefined): boolean {
-  return role === 'super_admin'
+  return role === APP_ROLE.super_admin
 }
 
 export function isSuperAdmin(role: string | null | undefined): boolean {
-  return role === 'super_admin'
+  return role === APP_ROLE.super_admin
 }
 
 export function canManageTeam(role: string | null | undefined): boolean {
-  return role === 'super_admin' || role === 'admin'
+  return role === APP_ROLE.super_admin || role === APP_ROLE.admin
 }
 
 export function canAssignInterviewHr(role: string | null | undefined): boolean {

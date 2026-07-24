@@ -12,7 +12,6 @@ import {
   redirectIfUnauthorizedError,
 } from '@/lib/auth-gate'
 import { isForbiddenError, requestServer } from '@/lib/server-fetch'
-import { getUserProfileReadDenialReason } from '@/lib/user-profile-access'
 
 interface UserProfilePageProps {
   params: Promise<{ locale: Locale; id: string }>
@@ -70,20 +69,6 @@ export default async function UserProfilePage({ params }: UserProfilePageProps) 
       <FlashErrorPageFallback
         title={t('loadFailedTitle')}
         description={error ?? t('notFoundFallback')}
-      />
-    )
-  }
-
-  const denialReason = getUserProfileReadDenialReason(
-    { id: user.id, role: user.role },
-    { id: auth.me.id, role: auth.me.role },
-  )
-
-  if (denialReason) {
-    return (
-      <ForbiddenAccessPage
-        title={t('forbiddenTitle')}
-        description={t('forbiddenDescription')}
       />
     )
   }

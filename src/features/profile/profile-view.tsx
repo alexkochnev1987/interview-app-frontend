@@ -1,6 +1,6 @@
 'use client'
 
-import { LockKeyhole, Pencil } from 'lucide-react'
+import { LockKeyhole } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import { useSearchParams } from 'next/navigation'
 
@@ -57,23 +57,6 @@ export function ProfileView({ user, mode = 'self' }: ProfileViewProps) {
           <ProfileField
             label={t('personalInformation.name')}
             value={user.name}
-            action={
-              isSelf ? (
-                <DemoWriteGuard>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon-sm"
-                    disabled
-                    aria-label={t('summary.editProfile')}
-                  >
-                    <Icon size="sm">
-                      <Pencil />
-                    </Icon>
-                  </Button>
-                </DemoWriteGuard>
-              ) : undefined
-            }
           />
           <ProfileField
             label={t('personalInformation.email')}
@@ -156,28 +139,12 @@ export function ProfileView({ user, mode = 'self' }: ProfileViewProps) {
 
       <Card variant="floating" size="lg">
         <CardContent spacing="xl">
-          {isSelf ? (
-            <Grid columns="page-header-actions" align="center">
-              <Inline gap={4} align="center">
-                <IconBadge tone="surface" size="xl" shape="circle" textSize="lg">
-                  {getCandidateInitials(user.name)}
-                </IconBadge>
-                <HeroTitle>{user.name}</HeroTitle>
-              </Inline>
-              <DemoWriteGuard>
-                <Button type="button" variant="gradient" disabled>
-                  {t('summary.editProfile')}
-                </Button>
-              </DemoWriteGuard>
-            </Grid>
-          ) : (
-            <Inline gap={4} align="center">
-              <IconBadge tone="surface" size="xl" shape="circle" textSize="lg">
-                {getCandidateInitials(user.name)}
-              </IconBadge>
-              <HeroTitle>{user.name}</HeroTitle>
-            </Inline>
-          )}
+          <Inline gap={4} align="center">
+            <IconBadge tone="surface" size="xl" shape="circle" textSize="lg">
+              {getCandidateInitials(user.name)}
+            </IconBadge>
+            <HeroTitle>{user.name}</HeroTitle>
+          </Inline>
         </CardContent>
       </Card>
 
