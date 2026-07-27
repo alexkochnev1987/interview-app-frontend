@@ -431,6 +431,13 @@ export async function demoLogin(): Promise<AuthUserResponseDto> {
   return handle(client.POST('/auth/demo', LOCALIZED_HEADERS));
 }
 
+/** Full session user from GET /auth/me (includes effective permissions). */
+export async function getAuthMe(): Promise<MeResponse> {
+  return handle(
+    client.GET('/auth/me', LOCALIZED_HEADERS),
+  ) as Promise<MeResponse>;
+}
+
 export async function logout(): Promise<LogoutResponse> {
   return handle(client.POST('/auth/logout', LOCALIZED_HEADERS));
 }

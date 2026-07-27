@@ -22,6 +22,7 @@
       "lead": "Na tej stronie udostępniono informację zwrotną dla kandydata z rozmowy na stanowisko <strong>{position}</strong>.",
       "expiresOn": "Link wygasa {date}",
       "overallScore": "Ogólny wynik",
+      "interviewDate": "Data rozmowy",
       "linkExpiry": "Wygaśnięcie łącza",
       "outcomeEyebrow": "Kolejny krok",
       "outcome": {

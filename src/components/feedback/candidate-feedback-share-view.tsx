@@ -116,10 +116,17 @@ function QuestionBlockCard({
 }) {
   if (!hasPublishableText(block)) return null
 
+  const questionText = block.questionText?.trim()
+
   return (
     <Card variant="surface">
       <CardHeader spacing="xs">
         <CardTitle size="md">{title}</CardTitle>
+        {questionText ? (
+          <BodyText size="base" tone="foreground">
+            {questionText}
+          </BodyText>
+        ) : null}
       </CardHeader>
       <CardContent>
         <FeedbackTextFields
@@ -215,6 +222,14 @@ export function CandidateFeedbackShareView({
                     <EyebrowLabel tone="muted">{t('overallScore')}</EyebrowLabel>
                     <BodyText size="sm" tone="primary" weight="semibold">
                       {feedback.overallScore} / 100
+                    </BodyText>
+                  </Stack>
+                ) : null}
+                {feedback.interviewDate ? (
+                  <Stack gap={1}>
+                    <EyebrowLabel tone="muted">{t('interviewDate')}</EyebrowLabel>
+                    <BodyText size="sm" tone="muted">
+                      {formatInterviewDate(feedback.interviewDate)}
                     </BodyText>
                   </Stack>
                 ) : null}
