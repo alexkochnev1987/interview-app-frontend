@@ -755,7 +755,6 @@ export function QuestionEditor({
     return () => {
       window.clearTimeout(timeoutId)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- only react to header locale changes
   }, [uiLocale])
 
   function dismissDraftField(field: DraftFieldKey) {
