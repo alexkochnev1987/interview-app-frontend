@@ -15,6 +15,28 @@
     "wentWellTitle": "What went well",
     "recommendationsEyebrow": "Recommendations",
     "improveTitle": "What to improve next",
-    "languageBadgeInterviewAs": "Interview language {locale}"
+    "languageBadgeInterviewAs": "Interview language {locale}",
+    "share": {
+      "eyebrow": "Candidate feedback",
+      "title": "Your interview feedback",
+      "lead": "This page shares candidate-facing feedback for the <strong>{position}</strong> interview.",
+      "expiresOn": "Link expires {date}",
+      "overallScore": "Overall score",
+      "linkExpiry": "Link expiry",
+      "outcomeEyebrow": "Next step",
+      "outcome": {
+        "next_stage": "Thank you for taking the time to interview with us. We were impressed by your conversation and are pleased to invite you to the next stage of our hiring process. Our team will contact you shortly with details on what comes next and how to prepare.",
+        "keep_in_touch": "Thank you for your time, effort, and interest in this role. After careful review, we won’t be moving forward with your application at this stage. We truly appreciate what you shared with us and would like to keep your profile for future opportunities that may be a strong match."
+      },
+      "overallEyebrow": "Overall",
+      "overallTitle": "Overall feedback",
+      "questionEyebrow": "Question",
+      "questionTitle": "Question {index}",
+      "recommendationLabel": "Recommendations",
+      "improvementLabel": "What could be improved",
+      "languageBadgeInterviewAs": "Interview language {locale}",
+      "emptyTitle": "No feedback to show",
+      "emptyDescription": "This share link has no published feedback content."
+    }
   }
 }
