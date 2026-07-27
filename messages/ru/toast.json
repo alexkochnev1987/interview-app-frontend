@@ -43,7 +43,12 @@
       "generateStartError": "Не удалось запустить генерацию",
       "generateStaleValidation": "Перезапустите AI-оценку для выбранной версии ответа перед генерацией обратной связи",
       "generateLockedOnly": "Заблокированные блоки пропущены; генерировать нечего",
-      "generateNothingEligible": "Нет подходящих вопросов для генерации"
+      "generateNothingEligible": "Нет подходящих вопросов для генерации",
+      "createShareLinkSuccess": "Ссылка для кандидата создана",
+      "createShareLinkError": "Не удалось создать ссылку для кандидата",
+      "createShareLinkNotPublishable": "Перед шарингом примите или отредактируйте хотя бы один блок с текстом",
+      "revokeShareLinkSuccess": "Ссылка для кандидата отозвана",
+      "revokeShareLinkError": "Не удалось отозвать ссылку для кандидата"
     },
     "interviewsLibrary": {
       "loadFailedFallback": "Не удалось загрузить интервью."
@@ -109,9 +114,19 @@
         "questionsRequired": "Выберите хотя бы один вопрос.",
         "creatingLabel": "Создание..."
       },
+      "interviews": {
+        "libraryForbiddenTitle": "У вас нет доступа к библиотеке интервью",
+        "libraryForbiddenDescription": "Библиотека интервью доступна только HR, администраторам и суперадминистраторам. Если это ошибка, обратитесь к владельцу рабочей области.",
+        "libraryUnavailableTitle": "Библиотека интервью сейчас недоступна",
+        "libraryLoadFailedFallback": "Не удалось загрузить интервью."
+      },
       "feedback": {
         "unavailableTitle": "Обратная связь недоступна",
         "loadFailedFallback": "Не удалось загрузить"
+      },
+      "feedbackShare": {
+        "unavailableTitle": "Общая обратная связь недоступна",
+        "loadFailedFallback": "Эта ссылка недоступна или срок её действия истёк. Попросите HR отправить новую ссылку на обратную связь."
       },
       "candidateFeedback": {
         "forbiddenTitle": "У вас нет доступа к обратной связи для кандидата",

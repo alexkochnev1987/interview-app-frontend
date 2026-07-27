@@ -1,6 +1,6 @@
 import { cache } from 'react';
 
-import type { AuthUserResponseDto } from '@/lib/api';
+import type { MeResponse } from '@/lib/api';
 import { DEFAULT_LOCALE } from '@/i18n/locales';
 
 import { getServerRequestContext, requestServer } from './server-fetch';
@@ -9,8 +9,8 @@ export const fetchCachedServerAuthMe = cache(
   async (
     cookieHeader: string,
     origin: string,
-  ): Promise<AuthUserResponseDto | undefined> => {
-    return requestServer<AuthUserResponseDto>('/auth/me', {
+  ): Promise<MeResponse | undefined> => {
+    return requestServer<MeResponse>('/auth/me', {
       cookieHeader,
       origin,
       locale: DEFAULT_LOCALE,
@@ -19,7 +19,7 @@ export const fetchCachedServerAuthMe = cache(
 );
 
 export type ServerSessionSnapshot = {
-  user: AuthUserResponseDto | null;
+  user: MeResponse | null;
 };
 
 export async function getServerSessionSnapshot(): Promise<ServerSessionSnapshot> {
