@@ -12,7 +12,7 @@ import {
   redirectIfUnauthenticated,
   redirectIfUnauthorizedError,
 } from '@/lib/auth-gate'
-import { isForbiddenError, requestServer } from '@/lib/server-fetch'
+import { requestServer } from '@/lib/server-fetch'
 import { canViewUserProfile } from '@/lib/user-profile-access'
 
 interface UserProfilePageProps {
@@ -55,14 +55,6 @@ export default async function UserProfilePage({ params }: UserProfilePageProps) 
       null
   } catch (err) {
     redirectIfUnauthorizedError(err, returnPath, locale)
-    if (isForbiddenError(err)) {
-      return (
-        <ForbiddenAccessPage
-          title={t('forbiddenTitle')}
-          description={t('forbiddenDescription')}
-        />
-      )
-    }
     if (isApiError(err) && err.status === 404) {
       return (
         <FlashErrorPageFallback
