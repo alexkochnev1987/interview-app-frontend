@@ -12,7 +12,18 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 const languageSwitcherTriggerVariants = cva(
-  'flex w-full items-center justify-between gap-1.5 rounded-full border border-border/60 bg-background/70 px-3 py-1.5 text-xs font-semibold text-foreground shadow-sm transition-colors hover:bg-surface-low-soft',
+  'flex items-center justify-between gap-1.5 rounded-full border border-border/60 bg-background/70 px-3 py-1.5 text-xs font-semibold text-foreground shadow-sm transition-colors hover:bg-surface-low-soft',
+  {
+    variants: {
+      width: {
+        full: 'w-full',
+        fit: 'col-start-1 row-start-1 w-full min-w-0 whitespace-nowrap',
+      },
+    },
+    defaultVariants: {
+      width: 'full',
+    },
+  },
 )
 
 const languageSwitcherItemVariants = cva(
@@ -41,6 +52,7 @@ type LanguageSwitcherProps = {
   options: LanguageOption[]
   side?: 'top' | 'right' | 'bottom' | 'left'
   align?: 'start' | 'center' | 'end'
+  width?: 'full' | 'fit'
   onOpenChange?: (open: boolean) => void
 } & (
   | { href: string; onSelectLocale?: never }
@@ -55,22 +67,45 @@ export function LanguageSwitcher({
   options,
   side,
   align = 'end',
+  width = 'full',
   onOpenChange,
 }: LanguageSwitcherProps) {
   const activeLabel =
     options.find((option) => option.locale === currentLocale)?.label ??
     currentLocale.toUpperCase()
 
-  return (
+  const fitWidthSizer =
+    width === 'fit' ? (
+      <div
+        aria-hidden
+        className="invisible col-start-1 row-start-1 grid px-3 py-1.5 text-xs font-semibold [&>*]:col-start-1 [&>*]:row-start-1"
+      >
+        {options.map(({ locale, label }) => (
+          <span key={locale} className="inline-flex items-center gap-1.5 whitespace-nowrap">
+            <span>{label}</span>
+            <span className="size-3.5 shrink-0" />
+          </span>
+        ))}
+      </div>
+    ) : null
+
+  const menu = (
     <DropdownMenu onOpenChange={onOpenChange}>
       <DropdownMenuTrigger
         aria-label={ariaLabel}
-        className={cn(languageSwitcherTriggerVariants())}
+        className={cn(languageSwitcherTriggerVariants({ width }))}
       >
         <span className="truncate">{activeLabel}</span>
         <ChevronDown className="size-3.5 shrink-0 text-muted-foreground" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent side={side} align={align} className="w-max !min-w-0">
+      <DropdownMenuContent
+        side={side}
+        align={align}
+        className={cn(
+          'w-max !min-w-0',
+          width === 'fit' && 'min-w-[var(--radix-dropdown-menu-trigger-width)]',
+        )}
+      >
         {options.map(({ locale, label }) => {
           const active = locale === currentLocale
 
@@ -116,4 +151,15 @@ export function LanguageSwitcher({
       </DropdownMenuContent>
     </DropdownMenu>
   )
+
+  if (width === 'fit') {
+    return (
+      <div className="inline-grid">
+        {fitWidthSizer}
+        {menu}
+      </div>
+    )
+  }
+
+  return menu
 }

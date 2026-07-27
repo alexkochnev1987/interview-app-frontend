@@ -7,8 +7,11 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { BodyText } from '@/components/ui/text'
+import { UnstyledLink } from '@/components/ui/unstyled-link'
+import { routes } from '@/i18n/routes'
 import type { TeamMember } from '@/lib/api'
 import { formatInterviewDate } from '@/lib/interview-formatters'
+import { canViewUserProfile } from '@/lib/user-profile-access'
 
 import { getMemberInitials } from '@/features/team/team-member-list'
 import type { TeamRowActorRole } from '@/features/team/team-row-policy'
@@ -29,6 +32,18 @@ export function TeamMemberRow({
   actorRole,
   onChangeRole,
 }: TeamMemberRowProps) {
+  const actor = { id: actorId, role: actorRole }
+  const target = { id: member.id, role: member.role }
+  const canOpenProfile = canViewUserProfile(target, actor)
+  const profileHref =
+    member.id === actorId ? routes.profile.me : routes.profile.detail(member.id)
+
+  const memberName = (
+    <BodyText weight="medium" tone="foreground">
+      {member.name}
+    </BodyText>
+  )
+
   return (
     <TableRow>
       <TableCell>
@@ -36,9 +51,13 @@ export function TeamMemberRow({
           <IconBadge tone="surface" size="sm" shape="circle" textSize="sm">
             {getMemberInitials(member.name)}
           </IconBadge>
-          <BodyText weight="medium" tone="foreground">
-            {member.name}
-          </BodyText>
+          {canOpenProfile ? (
+            <UnstyledLink href={profileHref}>
+              {memberName}
+            </UnstyledLink>
+          ) : (
+            memberName
+          )}
         </Inline>
       </TableCell>
       <TableCell>
