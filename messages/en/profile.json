@@ -1,0 +1,25 @@
+{
+  "profile": {
+    "heading": "My Profile",
+    "lead": "Manage your personal account settings and information.",
+    "memberHeading": "Team member profile",
+    "memberLead": "View account details for this workspace member.",
+    "personalInformation": {
+      "title": "Personal Information",
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "organizationId": "Organization ID",
+      "organizationUnassigned": "Not assigned"
+    },
+    "security": {
+      "title": "Account Preferences",
+      "changePassword": "Change Password",
+      "comingSoon": "Coming soon"
+    },
+    "preferences": {
+      "language": "Language",
+      "productTour": "Product tour"
+    }
+  }
+}
