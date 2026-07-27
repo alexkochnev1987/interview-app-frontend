@@ -24,7 +24,7 @@ export function MicLevelMeter({
       )}
     >
       <div
-        className="absolute bottom-0 left-0 right-0 h-full origin-bottom rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)] transition-transform duration-75 ease-out will-change-transform"
+        className="absolute bottom-0 left-0 right-0 h-full origin-bottom rounded-full bg-primary shadow-[0_0_8px_rgba(16,185,129,0.6)] transition-transform duration-75 ease-out will-change-transform"
         style={{ transform: `scaleY(${(0.05 + Math.min(level, 1) * 0.60).toFixed(3)})` }}
       />
     </div>
