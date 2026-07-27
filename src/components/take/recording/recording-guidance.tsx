@@ -10,6 +10,7 @@ interface TakeRecordingGuidanceProps {
   recording: boolean;
   recordingStartBusy: boolean;
   interviewerPresence: InterviewerPresence;
+  attemptsExhausted: boolean;
 }
 
 export function TakeRecordingGuidance({
@@ -17,25 +18,32 @@ export function TakeRecordingGuidance({
   recording,
   recordingStartBusy,
   interviewerPresence,
+  attemptsExhausted,
 }: TakeRecordingGuidanceProps) {
   const tTake = useTranslations('takeFlow');
+
+  let guidance = tTake('guidanceInterview');
+  if (attemptsExhausted && !recording) {
+    guidance = tTake('attemptsExhaustedGuidance');
+  } else if (stage === 'transition') {
+    guidance = tTake('guidanceInterview');
+  } else if (stage === 'interview' && !recording) {
+    if (recordingStartBusy) {
+      guidance = tTake('recordingStartingBusy');
+    } else if (interviewerPresence === 'speaking') {
+      guidance = tTake('guidanceInterviewerSpeaking');
+    } else {
+      guidance = `${tTake('guidanceBeforeRecording')} ${tTake('attemptBurnsOnRecordStart')}`;
+    }
+  }
+
   return (
     <Panel>
       <Stack gap={3}>
         <Text as="span" variant="eyebrowLabel">
           {tTake('recordingGuidanceTitle')}
         </Text>
-        <Text variant="bodyMutedSm">
-          {stage === 'transition'
-            ? tTake('guidanceInterview')
-            : stage === 'interview' && !recording
-              ? recordingStartBusy
-                ? tTake('recordingStartingBusy')
-                : interviewerPresence === 'speaking'
-                  ? tTake('guidanceInterviewerSpeaking')
-                  : tTake('guidanceBeforeRecording')
-              : tTake('guidanceInterview')}
-        </Text>
+        <Text variant="bodyMutedSm">{guidance}</Text>
       </Stack>
     </Panel>
   );

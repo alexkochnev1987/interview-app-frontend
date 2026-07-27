@@ -15,6 +15,7 @@ import { LiveTranscriptPanel } from './recording-live-transcript-panel';
 import { TakeRecordingActions } from './recording-actions';
 import { TakeRecordingGuidance } from './recording-guidance';
 import type { InterviewDataView, TakeStage } from '@/components/take/types';
+import type { ExhaustedHint } from '@/features/take/session-machine';
 import type { InterviewerPresence } from '@/features/take/use-take-question-tts';
 
 interface TakeRecordingHeroColumnProps {
@@ -65,6 +66,10 @@ interface TakeRecordingSidebarColumnProps {
   recordingStartBusy: boolean;
   retakeDisabled: boolean;
   displayedAttemptNumber: number;
+  maxAttempts: number;
+  attemptsExhausted: boolean;
+  submitAllowed: boolean;
+  exhaustedHint: ExhaustedHint | null;
   isBrowserTranscriptSupported: boolean;
   finalTranscript: string;
   interimTranscript: string;
@@ -88,6 +93,10 @@ export function TakeRecordingSidebarColumn({
   recordingStartBusy,
   retakeDisabled,
   displayedAttemptNumber,
+  maxAttempts,
+  attemptsExhausted,
+  submitAllowed,
+  exhaustedHint,
   isBrowserTranscriptSupported,
   finalTranscript,
   interimTranscript,
@@ -137,6 +146,7 @@ export function TakeRecordingSidebarColumn({
               recording={recording}
               recordingStartBusy={recordingStartBusy}
               interviewerPresence={interviewerPresence}
+              attemptsExhausted={attemptsExhausted}
             />
 
             <TakeRecordingActions
@@ -149,6 +159,10 @@ export function TakeRecordingSidebarColumn({
               interviewerPresence={interviewerPresence}
               retakeDisabled={retakeDisabled}
               displayedAttemptNumber={displayedAttemptNumber}
+              maxAttempts={maxAttempts}
+              attemptsExhausted={attemptsExhausted}
+              submitAllowed={submitAllowed}
+              exhaustedHint={exhaustedHint}
               onReconnect={onReconnect}
               onRerecord={onRerecord}
               onSubmit={onSubmit}

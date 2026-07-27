@@ -7,7 +7,7 @@ import {
 import { TakeRecordingHeader } from './recording-header';
 import type { InterviewDataView, TakeStage } from '@/components/take/types';
 import type { InterviewerPresence } from '@/features/take/use-take-question-tts';
-import type { VersionPersistKind } from '@/features/take/session-machine';
+import type { ExhaustedHint, VersionPersistKind } from '@/features/take/session-machine';
 import { Grid, Stack } from '@/components/ui/layout';
 import { submitAnswerActionLabel } from '@/features/take';
 import { useTranslations } from 'next-intl';
@@ -36,6 +36,10 @@ interface TakeRecordingScreenProps {
   recordingStartBusy: boolean;
   retakeDisabled: boolean;
   displayedAttemptNumber: number;
+  maxAttempts: number;
+  attemptsExhausted: boolean;
+  submitAllowed: boolean;
+  exhaustedHint: ExhaustedHint | null;
   onReconnect: () => void;
   onRerecord: () => void;
   onSubmit: () => void;
@@ -65,6 +69,10 @@ export function TakeRecordingScreen({
   recordingStartBusy,
   retakeDisabled,
   displayedAttemptNumber,
+  maxAttempts,
+  attemptsExhausted,
+  submitAllowed,
+  exhaustedHint,
   onReconnect,
   onRerecord,
   onSubmit,
@@ -108,6 +116,10 @@ export function TakeRecordingScreen({
             recordingStartBusy={recordingStartBusy}
             retakeDisabled={retakeDisabled}
             displayedAttemptNumber={displayedAttemptNumber}
+            maxAttempts={maxAttempts}
+            attemptsExhausted={attemptsExhausted}
+            submitAllowed={submitAllowed}
+            exhaustedHint={exhaustedHint}
             isBrowserTranscriptSupported={isBrowserTranscriptSupported}
             finalTranscript={finalTranscript}
             interimTranscript={interimTranscript}

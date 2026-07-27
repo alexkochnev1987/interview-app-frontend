@@ -96,7 +96,13 @@
     "languageBadgeInterviewAs": "Język rozmowy {locale}",
     "beforeUnloadLeaveInterview": "Jeśli załadujesz ponownie lub wyjdziesz teraz, opuścisz tę rozmowę kwalifikacyjną i możesz stracić swoje postępy. Czy jesteś pewien?",
     "attemptsMetricLabel": "Próby:",
-    "retakeDisabledAtLimitHint": "Ponowne nagranie jest dostępne tylko dla prób 1 i 2.",
-    "answerAttemptLimitReached": "Osiągnięto limit prób nagrywania"
+    "retakeDisabledAtLimitHint": "Brak dostępnych ponownych nagrań dla tego pytania.",
+    "answerAttemptLimitReached": "Osiągnięto limit prób nagrywania ({max})",
+    "recordingSessionMismatch": "Ta rozmowa jest już nagrywana w innej karcie. Kontynuuj tam albo zamknij drugą kartę i odśwież stronę.",
+    "attemptBurnsOnRecordStart": "Każde rozpoczęcie nagrywania zużywa jedną próbę. Odświeżenie strony w trakcie nagrywania również zużywa tę próbę.",
+    "attemptsExhaustedGuidance": "Wszystkie próby nagrywania dla tego pytania zostały wykorzystane. Nie można rozpocząć kolejnego nagrania.",
+    "attemptsExhaustedNoMedia": "Brak nagrania, które można wysłać dla tego pytania.",
+    "attemptsExhaustedSubmitHint": "Nagranie z tej próby jest dostępne. Wyślij je, aby kontynuować.",
+    "attemptsExhaustedSubmitUnavailable": "Ta karta nie może sfinalizować zapisanego nagrania po odświeżeniu. Otwórz oryginalną kartę, jeśli jest nadal dostępna, albo skontaktuj się z rekruterem."
   }
 }

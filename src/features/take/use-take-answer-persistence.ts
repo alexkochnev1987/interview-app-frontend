@@ -30,11 +30,19 @@ import {
 } from './progress';
 import { abortMultipartUploads as abortMultipartUploadsData, completeMultipartUpload as completeMultipartUploadData } from './uploads';
 import { shouldSendAnswerProgressDuringRecording } from './attempt-limit';
+import { patchTakeUploadCheckpoint } from './upload-checkpoint';
 
 interface UseTakeAnswerPersistenceParams {
   id: string;
-  onAnswerMetaUpdated?: (meta: TakeProgressResponse) => void;
+  onAnswerMetaUpdated?: (meta: {
+    versionCount: number;
+    selectedVersionNumber: number;
+    status?: 'recording' | 'submitted';
+    hasMediaOnSelectedVersion?: boolean;
+    recordingSessionId?: string;
+  }) => void;
   currentVersionNumberRef: React.MutableRefObject<number>;
+  recordingSessionIdRef: React.MutableRefObject<string | null>;
   answerStartedAtRef: React.MutableRefObject<string | null>;
   answerStoppedAtMsRef: React.MutableRefObject<number | null>;
   answerDurationSecondsRef: React.MutableRefObject<number>;
@@ -61,6 +69,7 @@ export function useTakeAnswerPersistence({
   id,
   onAnswerMetaUpdated,
   currentVersionNumberRef,
+  recordingSessionIdRef,
   answerStartedAtRef,
   answerStoppedAtMsRef,
   answerDurationSecondsRef,
@@ -82,14 +91,18 @@ export function useTakeAnswerPersistence({
     async (
       questionIndex: number,
       mediaType: CaptureTarget,
-      options?: { versionNumber?: number },
+      options: { versionNumber: number; recordingSessionId: string },
     ): Promise<MultipartUploadSession> => {
       const session = await startMultipartUpload(questionIndex, mediaType, {
-        ...(options?.versionNumber !== undefined
-          ? { versionNumber: options.versionNumber }
-          : {}),
+        versionNumber: options.versionNumber,
+        recordingSessionId: options.recordingSessionId,
       });
-      return createMultipartUploadSession({ ...session, questionIndex });
+      return createMultipartUploadSession({
+        ...session,
+        questionIndex,
+        versionNumber: options.versionNumber,
+        recordingSessionId: options.recordingSessionId,
+      });
     },
     [],
   );
@@ -98,6 +111,12 @@ export function useTakeAnswerPersistence({
     async (forceAllEvents = false): Promise<TakeProgressResponse | undefined> => {
       const cameraUpload = multipartUploadsRef.current.camera;
       if (!cameraUpload) {
+        return undefined;
+      }
+
+      const recordingSessionId =
+        recordingSessionIdRef.current ?? cameraUpload.recordingSessionId;
+      if (!recordingSessionId) {
         return undefined;
       }
 
@@ -119,6 +138,7 @@ export function useTakeAnswerPersistence({
           questionIndex: cameraUpload.questionIndex,
           versionNumber: currentVersionNumberRef.current,
           mediaKey: cameraUpload.mediaKey,
+          recordingSessionId,
           screenMediaKey: screenUpload?.mediaKey,
           durationSeconds: answerDurationSecondsRef.current,
           startedAt: answerStartedAtRef.current ?? undefined,
@@ -142,7 +162,26 @@ export function useTakeAnswerPersistence({
 
       flushedBehaviorEventCountRef.current = behaviorEventsRef.current.length;
       currentVersionNumberRef.current = progressResponse.selectedVersionNumber;
-      onAnswerMetaUpdated?.(progressResponse);
+      const hasMedia =
+        (cameraUpload.recordedBytes ?? 0) > 0 || (screenUpload?.recordedBytes ?? 0) > 0;
+      if (hasMedia) {
+        patchTakeUploadCheckpoint(id, {
+          versionNumber: currentVersionNumberRef.current,
+          cameraMediaKey: cameraUpload.mediaKey,
+          screenMediaKey: screenUpload?.mediaKey ?? cameraUpload.mediaKey,
+          recordingSessionId:
+            recordingSessionIdRef.current ?? cameraUpload.recordingSessionId,
+          cameraUploadId: cameraUpload.uploadId,
+          screenUploadId: screenUpload?.uploadId,
+          hasMedia: true,
+        });
+      }
+      onAnswerMetaUpdated?.({
+        ...progressResponse,
+        hasMediaOnSelectedVersion: hasMedia,
+        recordingSessionId:
+          recordingSessionIdRef.current ?? cameraUpload.recordingSessionId,
+      });
       return progressResponse;
     },
     [
@@ -151,6 +190,7 @@ export function useTakeAnswerPersistence({
       flushedBehaviorEventCountRef,
       id,
       currentVersionNumberRef,
+      recordingSessionIdRef,
       answerDurationSecondsRef,
       answerStartedAtRef,
       answerStoppedAtMsRef,
@@ -224,6 +264,10 @@ export function useTakeAnswerPersistence({
           session.mediaKey,
           session.uploadId,
           partNumber,
+          {
+            versionNumber: session.versionNumber,
+            recordingSessionId: session.recordingSessionId,
+          },
         );
       } catch (error) {
         throw new Error(

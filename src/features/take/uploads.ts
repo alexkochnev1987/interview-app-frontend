@@ -7,6 +7,10 @@ interface CompleteMultipartUploadParams {
     questionIndex: number,
     mediaKey: string,
     uploadId: string,
+    options: {
+      versionNumber: number;
+      recordingSessionId: string;
+    },
   ) => Promise<void>;
 }
 
@@ -29,7 +33,10 @@ export async function completeMultipartUpload({
   }
 
   try {
-    await completeMultipartUploadRequest(session.questionIndex, session.mediaKey, session.uploadId);
+    await completeMultipartUploadRequest(session.questionIndex, session.mediaKey, session.uploadId, {
+      versionNumber: session.versionNumber,
+      recordingSessionId: session.recordingSessionId,
+    });
   } catch {
     throw new Error(`Failed to finalize ${target} upload.`);
   }
@@ -43,6 +50,10 @@ interface AbortMultipartUploadsParams {
     questionIndex: number,
     mediaKey: string,
     uploadId: string,
+    options: {
+      versionNumber: number;
+      recordingSessionId: string;
+    },
   ) => Promise<void>;
 }
 
@@ -68,7 +79,10 @@ export async function abortMultipartUploads({
 
       try {
         await session.uploadChain.catch(() => undefined);
-        await abortMultipartUploadRequest(session.questionIndex, session.mediaKey, session.uploadId);
+        await abortMultipartUploadRequest(session.questionIndex, session.mediaKey, session.uploadId, {
+          versionNumber: session.versionNumber,
+          recordingSessionId: session.recordingSessionId,
+        });
       } catch {
         console.error(`Failed to abort ${target} multipart upload.`);
       }

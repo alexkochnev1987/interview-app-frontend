@@ -96,7 +96,13 @@
     "languageBadgeInterviewAs": "Interview language {locale}",
     "beforeUnloadLeaveInterview": "If you reload or leave now, you will exit this interview and may lose your progress. Are you sure?",
     "attemptsMetricLabel": "Attempts:",
-    "retakeDisabledAtLimitHint": "Retake is available only for attempts 1 and 2.",
-    "answerAttemptLimitReached": "Recording attempt limit reached"
+    "retakeDisabledAtLimitHint": "No retakes left for this question.",
+    "answerAttemptLimitReached": "Recording attempt limit reached ({max})",
+    "recordingSessionMismatch": "This interview is already being recorded in another tab. Continue there, or close the other tab and refresh.",
+    "attemptBurnsOnRecordStart": "Each time recording starts it uses one attempt. Reloading the page during a recording also uses that attempt.",
+    "attemptsExhaustedGuidance": "All recording attempts for this question are used. You cannot start another recording.",
+    "attemptsExhaustedNoMedia": "There is no usable recording left to submit for this question.",
+    "attemptsExhaustedSubmitHint": "A recording from this attempt is available. Submit it to continue.",
+    "attemptsExhaustedSubmitUnavailable": "This tab cannot finalize the saved recording after reload. Open the original tab if it is still available, or ask your recruiter for help."
   }
 }

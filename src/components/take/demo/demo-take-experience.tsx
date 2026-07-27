@@ -92,6 +92,10 @@ export function DemoTakeExperience({
           recordingStartBusy={false}
           retakeDisabled={false}
           displayedAttemptNumber={1}
+          maxAttempts={demo.interview.maxAttempts}
+          attemptsExhausted={false}
+          submitAllowed={demo.recording}
+          exhaustedHint={null}
           onReconnect={() => undefined}
           onRerecord={demo.onRerecord}
           onSubmit={demo.onSubmit}

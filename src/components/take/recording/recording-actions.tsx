@@ -4,8 +4,8 @@ import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Inline, Stack } from '@/components/ui/layout';
 import { BodyText } from '@/components/ui/text';
-import { MAX_ANSWER_ATTEMPTS_PER_QUESTION } from '@/features/take';
 import type { TakeStage } from '@/components/take/types';
+import type { ExhaustedHint } from '@/features/take/session-machine';
 import type { InterviewerPresence } from '@/features/take/use-take-question-tts';
 
 interface TakeRecordingActionsProps {
@@ -18,11 +18,21 @@ interface TakeRecordingActionsProps {
   interviewerPresence: InterviewerPresence;
   retakeDisabled: boolean;
   displayedAttemptNumber: number;
+  maxAttempts: number;
+  attemptsExhausted: boolean;
+  submitAllowed: boolean;
+  exhaustedHint: ExhaustedHint | null;
   onReconnect: () => void;
   onRerecord: () => void;
   onSubmit: () => void;
   submitAnswerLabel: string;
 }
+
+const EXHAUSTED_HINT_KEY = {
+  submit: 'attemptsExhaustedSubmitHint',
+  'no-media': 'attemptsExhaustedNoMedia',
+  unavailable: 'attemptsExhaustedSubmitUnavailable',
+} as const;
 
 export function TakeRecordingActions({
   stage,
@@ -34,6 +44,10 @@ export function TakeRecordingActions({
   interviewerPresence,
   retakeDisabled,
   displayedAttemptNumber,
+  maxAttempts,
+  attemptsExhausted,
+  submitAllowed,
+  exhaustedHint,
   onReconnect,
   onRerecord,
   onSubmit,
@@ -47,6 +61,11 @@ export function TakeRecordingActions({
     !recordingStartBusy &&
     interviewerPresence === 'listening';
   const retakeEnabled = versionActionsEnabled && !retakeDisabled;
+  const submitEnabled =
+    !uploading &&
+    stage !== 'transition' &&
+    submitAllowed &&
+    (versionActionsEnabled || (attemptsExhausted && !recording));
 
   return (
     <Stack align="stretch" gap={3} width="full">
@@ -68,24 +87,31 @@ export function TakeRecordingActions({
           {tTake('attemptsMetricLabel')}
         </BodyText>
         <BodyText as="span" size="xs" tone="foreground" weight="semibold">
-          {displayedAttemptNumber}/{MAX_ANSWER_ATTEMPTS_PER_QUESTION}
+          {displayedAttemptNumber}/{maxAttempts}
         </BodyText>
       </Inline>
 
-      <Button
-        type="button"
-        variant="outline"
-        size="xl"
-        width="full"
-        onClick={onRerecord}
-        disabled={!retakeEnabled}
-      >
-        <RotateCcw size={18} strokeWidth={2} aria-hidden />
-        {tTake('rerecordAsNewVersion')}
-      </Button>
+      {!attemptsExhausted || recording ? (
+        <Button
+          type="button"
+          variant="outline"
+          size="xl"
+          width="full"
+          onClick={onRerecord}
+          disabled={!retakeEnabled}
+        >
+          <RotateCcw size={18} strokeWidth={2} aria-hidden />
+          {tTake('rerecordAsNewVersion')}
+        </Button>
+      ) : null}
       {versionActionsEnabled && retakeDisabled ? (
         <BodyText size="xs" tone="muted">
           {tTake('retakeDisabledAtLimitHint')}
+        </BodyText>
+      ) : null}
+      {exhaustedHint ? (
+        <BodyText size="xs" tone="muted">
+          {tTake(EXHAUSTED_HINT_KEY[exhaustedHint])}
         </BodyText>
       ) : null}
       <Button
@@ -94,7 +120,7 @@ export function TakeRecordingActions({
         size="xl"
         width="full"
         onClick={onSubmit}
-        disabled={!versionActionsEnabled}
+        disabled={!submitEnabled}
       >
         {submitAnswerLabel}
         <ArrowRight size={18} strokeWidth={2} aria-hidden />

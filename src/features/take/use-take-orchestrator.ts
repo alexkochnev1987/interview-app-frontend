@@ -4,7 +4,7 @@ import { useBrowserTranscript } from '@/lib/use-browser-transcript';
 import { type TakeInterviewData } from '@/lib/api';
 import type { PermissionStatus, TakeStage } from '@/components/take/types';
 import type { TakeMessageGetter } from './messages';
-import { progressValueForStage, stageAfterInterviewLoad, type VersionPersistKind } from './session-machine';
+import { progressValueForStage, stageAfterInterviewLoad, type VersionPersistKind, answerAttemptMetaFromInterview, isAttemptsExhausted, resolveExhaustedHint } from './session-machine';
 import {
   clearProgressTimers,
   releaseAllInterviewCaptures,
@@ -38,11 +38,15 @@ import {
 } from './use-take-question-tts';
 import type { Locale } from '@/i18n/locales';
 import {
+  MAX_ANSWER_ATTEMPTS_PER_QUESTION,
   canStartNewAttempt,
   canRequestRetake,
   getDisplayedAttemptNumber,
   resolveInitialVersionNumber,
 } from './attempt-limit';
+import { getSubmitCheckpoint } from './upload-checkpoint';
+import { resolveRecordingSessionId } from './recording-session-id';
+import type { BeginRecordingInput } from './use-take-begin-recording';
 
 type PendingVersionAction = 'submit' | 'rerecord' | null;
 
@@ -115,18 +119,20 @@ export function useTakeOrchestrator({
 
   const [stage, setStage] = useState<TakeStage>(() =>
     initialInterview
-      ? stageAfterInterviewLoad(initialInterview, 'initial')
+      ? stageAfterInterviewLoad(initialInterview, 'returning')
       : 'loading',
   );
   const [interview, setInterview] = useState<TakeInterviewData | null>(
     initialInterview ?? null,
   );
   const [error, setError] = useState('');
-  const [consent, setConsent] = useState(false);
+  const [consent, setConsent] = useState(() => Boolean(initialInterview));
   const [recording, setRecording] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TAKE_RECORDING_LIMIT_SECONDS);
   const [retakeCount, setRetakeCount] = useState(0);
-  const [currentVersionNumber, setCurrentVersionNumber] = useState(1);
+  const [currentVersionNumber, setCurrentVersionNumber] = useState(() =>
+    initialInterview?.currentAnswerMeta?.selectedVersionNumber ?? 1,
+  );
   const [uploading, setUploading] = useState(false);
   const [cameraStatus, setCameraStatus] = useState<PermissionStatus>('idle');
   const [screenStatus, setScreenStatus] = useState<PermissionStatus>('idle');
@@ -171,7 +177,14 @@ export function useTakeOrchestrator({
   const answerDurationSecondsRef = useRef<number>(0);
   const stoppedRecordersRef = useRef(0);
   const expectedRecorderStopsRef = useRef(0);
-  const currentVersionNumberRef = useRef(1);
+  const currentVersionNumberRef = useRef(
+    initialInterview?.currentAnswerMeta?.selectedVersionNumber ?? 1,
+  );
+  const recordingSessionIdRef = useRef<string | null>(
+    initialInterview?.currentAnswerMeta?.recordingSessionId
+      ? resolveRecordingSessionId(initialInterview.currentAnswerMeta.recordingSessionId)
+      : null,
+  );
   const behaviorSignalsRef = useRef<TakeBehaviorSignals>(createEmptyBehaviorSignals());
   const behaviorEventsRef = useRef<AnswerBehaviorEvent[]>([]);
   const flushedBehaviorEventCountRef = useRef(0);
@@ -179,7 +192,11 @@ export function useTakeOrchestrator({
   const pendingVersionActionRef = useRef<PendingVersionAction>(null);
   const multipartUploadsRef = useRef<MultipartUploadState>({ camera: null, screen: null });
   const beginRecordingRef = useRef<
-    (nextVersionNumber: number, currentQuestionIndex: number) => Promise<void>
+    (
+      nextVersionNumber: number,
+      currentQuestionIndex: number,
+      options?: Omit<BeginRecordingInput, 'nextVersionNumber' | 'hasCurrentQuestion' | 'currentQuestionIndex'>,
+    ) => Promise<void>
   >(async () => undefined);
   const requestVersionActionRef = useRef<(action: PendingVersionAction) => void>(() => undefined);
   const autoStartedQuestionKeyRef = useRef('');
@@ -257,21 +274,36 @@ export function useTakeOrchestrator({
       versionCount: number;
       selectedVersionNumber: number;
       status?: 'recording' | 'submitted';
+      maxAttempts?: number;
+      hasMediaOnSelectedVersion?: boolean;
+      recordingSessionId?: string;
     }) => {
       setInterview((previous) => {
         if (!previous) {
           return previous;
         }
 
+        const previousMeta = previous.currentAnswerMeta;
         return {
           ...previous,
+          ...(typeof meta.maxAttempts === 'number' ? { maxAttempts: meta.maxAttempts } : {}),
           currentAnswerMeta: {
-            status: meta.status ?? previous.currentAnswerMeta?.status ?? 'recording',
+            status: meta.status ?? previousMeta?.status ?? 'recording',
             versionCount: meta.versionCount,
             selectedVersionNumber: meta.selectedVersionNumber,
+            hasMediaOnSelectedVersion:
+              meta.hasMediaOnSelectedVersion ?? previousMeta?.hasMediaOnSelectedVersion ?? false,
+            ...(meta.recordingSessionId
+              ? { recordingSessionId: resolveRecordingSessionId(meta.recordingSessionId) }
+              : previousMeta?.recordingSessionId
+                ? { recordingSessionId: previousMeta.recordingSessionId }
+                : {}),
           },
         };
       });
+      if (meta.recordingSessionId) {
+        recordingSessionIdRef.current = resolveRecordingSessionId(meta.recordingSessionId);
+      }
       setCurrentVersionNumber(meta.selectedVersionNumber);
       currentVersionNumberRef.current = meta.selectedVersionNumber;
     },
@@ -293,6 +325,7 @@ export function useTakeOrchestrator({
     id,
     onAnswerMetaUpdated: syncAnswerMetaFromProgress,
     currentVersionNumberRef,
+    recordingSessionIdRef,
     answerStartedAtRef,
     answerStoppedAtMsRef,
     answerDurationSecondsRef,
@@ -437,7 +470,7 @@ export function useTakeOrchestrator({
     screenSurface === 'monitor' &&
     !setupError;
 
-  const { persistCurrentVersion } = useTakeVersionPersistence({
+  const { persistCurrentVersion, submitCheckpointedAttempt } = useTakeVersionPersistence({
     id,
     interview,
     setUploading,
@@ -453,6 +486,7 @@ export function useTakeOrchestrator({
     abortMultipartUploads,
     multipartUploadsRef,
     currentVersionNumberRef,
+    recordingSessionIdRef,
     pendingVersionActionRef,
     answerStartedAtRef,
     answerStoppedAtMsRef,
@@ -464,8 +498,8 @@ export function useTakeOrchestrator({
       stopBrowserTranscript({ finalize: true, timeoutMs: 700 }),
     loadInterview,
     clearRecordingArtifacts,
-    invokeBeginRecording: (nextVersionNumber, currentQuestionIndex) =>
-      beginRecordingRef.current(nextVersionNumber, currentQuestionIndex),
+    invokeBeginRecording: (nextVersionNumber, currentQuestionIndex, options) =>
+      beginRecordingRef.current(nextVersionNumber, currentQuestionIndex, options),
     onAnswerMetaUpdated: syncAnswerMetaFromProgress,
     takeMessage,
   });
@@ -610,7 +644,18 @@ export function useTakeOrchestrator({
     baseRequestVersionAction(action);
   }
 
+  function requestSubmitOrCheckpointedAction() {
+    if (recording) {
+      requestVersionAction('submit');
+      return;
+    }
+    if (isAttemptsExhausted(answerAttemptMetaFromInterview(interview))) {
+      void submitCheckpointedAttempt();
+    }
+  }
+
   const { beginRecording } = useTakeBeginRecording({
+    interviewId: id,
     cameraStreamRef,
     screenStreamRef,
     cameraRecorderRef,
@@ -621,6 +666,7 @@ export function useTakeOrchestrator({
     discardRecordingRef,
     pendingVersionActionRef,
     currentVersionNumberRef,
+    recordingSessionIdRef,
     answerStartedAtRef,
     answerStartedAtMsRef,
     answerStoppedAtMsRef,
@@ -636,6 +682,8 @@ export function useTakeOrchestrator({
     clearVersionPersistKind: () => setVersionPersistKind(null),
     clearRecordingArtifacts,
     resetInterviewSetup,
+    onAnswerMetaUpdated: syncAnswerMetaFromProgress,
+    getAnswerMaxAttempts: () => interview?.maxAttempts ?? MAX_ANSWER_ATTEMPTS_PER_QUESTION,
     startMultipartUploadSession,
     flushAnswerProgress,
     startProgressHeartbeat,
@@ -651,11 +699,12 @@ export function useTakeOrchestrator({
   });
 
   useEffect(() => {
-    beginRecordingRef.current = async (nextVersionNumber, currentQuestionIndex) => {
+    beginRecordingRef.current = async (nextVersionNumber, currentQuestionIndex, options) => {
       await beginRecording({
         nextVersionNumber,
         hasCurrentQuestion: true,
         currentQuestionIndex,
+        ...options,
       });
     };
   }, [beginRecording]);
@@ -695,7 +744,7 @@ export function useTakeOrchestrator({
     if (!questionSpeechRecordingAllowedRef.current) {
       return;
     }
-    if (!canStartNewAttempt(interview.currentAnswerMeta)) {
+    if (!canStartNewAttempt(answerAttemptMetaFromInterview(interview))) {
       return;
     }
 
@@ -705,7 +754,9 @@ export function useTakeOrchestrator({
     }
 
     autoStartedQuestionKeyRef.current = questionKey;
-    const nextVersionNumber = resolveInitialVersionNumber(interview.currentAnswerMeta);
+    const nextVersionNumber = resolveInitialVersionNumber(
+      answerAttemptMetaFromInterview(interview),
+    );
 
     setRecordingStartBusy(true);
     void (async () => {
@@ -724,6 +775,7 @@ export function useTakeOrchestrator({
     interview?.currentQuestion,
     interview?.currentQuestionIndex,
     interview?.currentAnswerMeta,
+    interview?.maxAttempts,
     recording,
     uploading,
     recordingStartBusy,
@@ -741,12 +793,29 @@ export function useTakeOrchestrator({
     stage === 'transition' ||
     interviewerPresence === 'speaking';
 
-  const retakeDisabled = !canRequestRetake(currentVersionNumber);
+  const attemptMeta = answerAttemptMetaFromInterview(interview);
+  const attemptsExhausted = isAttemptsExhausted(attemptMeta);
+  const submitCheckpoint = interview
+    ? getSubmitCheckpoint(id, interview.currentQuestionIndex)
+    : null;
+  const submitAllowed = recording || (attemptsExhausted && Boolean(submitCheckpoint));
+  const exhaustedHint = resolveExhaustedHint({
+    attemptsExhausted,
+    recording,
+    submitAllowed,
+    serverHasMedia: Boolean(interview?.currentAnswerMeta?.hasMediaOnSelectedVersion),
+  });
+  const retakeDisabled =
+    attemptsExhausted ||
+    !canRequestRetake(currentVersionNumber, {
+      maxAttempts: interview?.maxAttempts,
+    });
   const displayedAttemptNumber = getDisplayedAttemptNumber(
-    interview?.currentAnswerMeta,
+    attemptMeta,
     currentVersionNumber,
     recording,
   );
+  const maxAttempts = interview?.maxAttempts ?? MAX_ANSWER_ATTEMPTS_PER_QUESTION;
 
   return {
     stage,
@@ -796,6 +865,11 @@ export function useTakeOrchestrator({
     progressValue: interview ? progressValueForStage({ interview, stage }) : 0,
     loadInterview,
     displayedAttemptNumber,
+    maxAttempts,
     retakeDisabled,
+    attemptsExhausted,
+    submitAllowed,
+    exhaustedHint,
+    requestSubmitOrCheckpointedAction,
   };
 }
