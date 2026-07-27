@@ -43,7 +43,12 @@
       "generateStartError": "Failed to start generation",
       "generateStaleValidation": "Re-run AI evaluation for the selected answer version before generating feedback",
       "generateLockedOnly": "Locked blocks were skipped; nothing to generate",
-      "generateNothingEligible": "No eligible questions to generate"
+      "generateNothingEligible": "No eligible questions to generate",
+      "createShareLinkSuccess": "Share link created",
+      "createShareLinkError": "Failed to create share link",
+      "createShareLinkNotPublishable": "Accept or edit at least one feedback block with text before sharing",
+      "revokeShareLinkSuccess": "Share link revoked",
+      "revokeShareLinkError": "Failed to revoke share link"
     },
     "interviewsLibrary": {
       "loadFailedFallback": "Failed to load interviews."
@@ -109,9 +114,19 @@
         "questionsRequired": "Select at least one question.",
         "creatingLabel": "Creating..."
       },
+      "interviews": {
+        "libraryForbiddenTitle": "You don't have access to the interview library",
+        "libraryForbiddenDescription": "The interview library is reserved for HR, admin, and super-admin users. If you think this is a mistake, contact your workspace owner.",
+        "libraryUnavailableTitle": "Interview library is unavailable right now",
+        "libraryLoadFailedFallback": "Failed to load interviews."
+      },
       "feedback": {
         "unavailableTitle": "Feedback unavailable",
         "loadFailedFallback": "Failed to load"
+      },
+      "feedbackShare": {
+        "unavailableTitle": "Shared feedback unavailable",
+        "loadFailedFallback": "This link is unavailable or has expired. Please ask HR for a new shared feedback link."
       },
       "candidateFeedback": {
         "forbiddenTitle": "You don't have access to candidate feedback",

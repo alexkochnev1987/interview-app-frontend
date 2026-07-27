@@ -159,6 +159,23 @@
       "generateQuestion": "Wygeneruj AI dla tego pytania",
       "regenerateQuestion": "Wygeneruj ponownie AI dla tego pytania",
       "overallBlockTitle": "Ogólna informacja zwrotna",
+      "outcomeLabel": "Kolejny krok dla kandydata",
+      "outcomeHint": "Wyświetlane na stronie udostępnionej jako krótka wiadomość dla kandydata.",
+      "outcomePlaceholder": "Wybierz wynik",
+      "outcomeClear": "Nie ustawiono",
+      "outcome": {
+        "next_stage": "Przejście do kolejnego etapu",
+        "keep_in_touch": "Pozostajemy w kontakcie",
+        "custom": "Napisz własny tekst"
+      },
+      "outcomeMessageLabel": "Własna wiadomość",
+      "outcomeMessagePlaceholder": "Napisz wiadomość, którą zobaczy kandydat…",
+      "outcomeMessageSaveLockedHint": "Wprowadź treść wiadomości przed zapisaniem.",
+      "outcomeCustomPreview": "Kandydat zobaczy: {message}",
+      "outcomePreview": {
+        "next_stage": "Kandydat zobaczy: Dziękujemy za poświęcony nam czas na rozmowę kwalifikacyjną. Doceniamy Twoje doświadczenie i z przyjemnością zapraszamy Cię do kolejnego etapu rekrutacji. Nasz zespół wkrótce skontaktuje się z Tobą, aby przekazać szczegóły kolejnych kroków i podpowiedzieć, jak się przygotować.",
+        "keep_in_touch": "Kandydat zobaczy: Dziękujemy za Twój czas, zaangażowanie i zainteresowanie tą rolą. Po uważnej ocenie na tym etapie nie kontynuujemy procesu. Szczerze doceniamy Twoją rozmowę i chętnie zachowamy Twój profil z myślą o przyszłych możliwościach, które mogą lepiej pasować."
+      },
       "questionBlocksTitle": "Informacja zwrotna dla pytań",
       "questionBlockTitle": "Pytanie {index}",
       "context": {
@@ -173,6 +190,7 @@
       "autoTemplateHint": "Szablon wstawiono automatycznie — sprawdź treść przed udostępnieniem kandydatowi.",
       "retry": "Spróbuj ponownie",
       "saveChanges": "Zapisz zmiany",
+      "saveChangesLockedHint": "Przed zapisem dodaj tekst zaleceń lub obszarów do poprawy. Wystarczy jedno pole.",
       "acceptAllSuggestions": "Zastosuj wszystko w tym bloku",
       "acceptAllSuggestionsPage": "Zastosuj wszystko",
       "sharedGenerationErrorTitle": "Generowanie AI nie powiodło się",
@@ -209,7 +227,18 @@
         "title": "Wstrzymano bieżące aktualizacje",
         "description": "Zatrzymaliśmy odpytywanie statusu generowania po powtarzających się błędach lub limicie czasu.",
         "refresh": "Odśwież teraz"
-      }
+      },
+      "createShareLink": "Utwórz link",
+      "recreateShareLink": "Utwórz nowy link",
+      "createShareLinkLockedHint": "Przed udostępnieniem zaakceptuj lub edytuj co najmniej jeden blok z tekstem.",
+      "revokeShareLink": "Unieważnij link",
+      "shareLinkLabel": "Link dla kandydata",
+      "copyShareLink": "Kopiuj link",
+      "shareLinkCopied": "Skopiowano",
+      "shareLinkCopyFailed": "Nie udało się skopiować",
+      "shareLinkActive": "Aktywny link już istnieje. Utwórz nowy, aby otrzymać świeży URL, albo unieważnij bez tworzenia nowego.",
+      "shareLinkExpires": "Link wygasa {date}",
+      "shareLinkPreviewHelp": "Skopiuj pełny link, aby udostępnić go kandydatowi."
     }
   }
 }
