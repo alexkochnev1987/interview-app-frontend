@@ -29,5 +29,9 @@ export const routes = {
   profile: {
     me: '/profile',
     detail: (id: string) => `/users/${encodeURIComponent(id)}`,
-  }
+  },
+  feedback: {
+    share: (token: string) =>
+      `/feedback/share/${encodeURIComponent(token)}`,
+  },
 } as const

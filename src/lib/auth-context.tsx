@@ -5,7 +5,7 @@ import { createContext, useContext, useState, type ReactNode } from 'react';
 import {
   completeOnboarding as apiCompleteOnboarding,
   logout as apiLogout,
-  type AuthUserResponseDto as User,
+  type MeResponse as User,
   type CompleteOnboardingStatus,
 } from '@/lib/api';
 

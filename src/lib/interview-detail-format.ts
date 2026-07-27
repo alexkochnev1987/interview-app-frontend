@@ -1,4 +1,7 @@
 import type { Answer } from '@/lib/api'
+import type { Locale } from '@/i18n/locales'
+import { localizedPath } from '@/i18n/pathname'
+import { routes } from '@/i18n/routes'
 
 import type { QuestionUploadState } from '@/app/[locale]/interviews/[id]/interview-detail-types'
 
@@ -78,6 +81,72 @@ export function formatCandidateLinkPreview(candidateLink: string) {
 
     return `${candidateLink.slice(0, 72)}...${candidateLink.slice(-20)}`
   }
+}
+
+/** Shortens path-token share URLs (`/feedback/share/:token`) for display. */
+export function formatFeedbackShareLinkPreview(shareLink: string) {
+  if (!shareLink) {
+    return ''
+  }
+
+  try {
+    const url = new URL(shareLink)
+    const segments = url.pathname.split('/').filter(Boolean)
+    const token = segments[segments.length - 1] ?? ''
+    if (token.length <= 20) {
+      return `${url.origin}${url.pathname}`
+    }
+
+    const shortToken = `${token.slice(0, 12)}...${token.slice(-8)}`
+    const prefix = segments.slice(0, -1).join('/')
+    const path = prefix ? `/${prefix}/${shortToken}` : `/${shortToken}`
+    return `${url.origin}${path}`
+  } catch {
+    return formatCandidateLinkPreview(shareLink)
+  }
+}
+
+/** Extracts the share token from a backend or absolute share URL. */
+export function extractFeedbackShareToken(shareUrl: string): string | null {
+  if (!shareUrl.trim()) {
+    return null
+  }
+
+  try {
+    const url = new URL(shareUrl, 'http://localhost')
+    const segments = url.pathname.split('/').filter(Boolean)
+    const shareIdx = segments.findIndex(
+      (segment, index) =>
+        segment === 'feedback' && segments[index + 1] === 'share',
+    )
+    if (shareIdx < 0) {
+      return null
+    }
+    const token = segments[shareIdx + 2]
+    return token || null
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Rebuilds the API share URL on the current origin with the interview locale
+ * prefix (mirrors candidate take-link client normalization).
+ */
+export function buildCandidateFeedbackShareUrl(
+  apiUrl: string,
+  interviewLocale: Locale,
+  origin: string,
+): string {
+  const token = extractFeedbackShareToken(apiUrl)
+  if (!token || !origin) {
+    return apiUrl
+  }
+
+  return `${origin.replace(/\/$/, '')}${localizedPath(
+    routes.feedback.share(token),
+    interviewLocale,
+  )}`
 }
 
 // Precedence matters: submitted -> draft -> uploading -> error -> pending.

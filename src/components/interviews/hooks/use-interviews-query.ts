@@ -204,7 +204,15 @@ export function useInterviewsQuery(
         const url = stateUrl.length > 0 ? `${pathname}?${stateUrl}` : pathname
         lastWrittenUrlRef.current = stateUrl
         router.replace(url, { scroll: false })
-    }, [stateUrl, pathname, router, syncUrl, capturedInitial, searchParams])
+    }, [
+        stateUrl,
+        pathname,
+        router,
+        syncUrl,
+        capturedInitial,
+        searchParams,
+        allowAssignedHrFilter,
+    ])
 
     const fetchParams = useMemo(
         () => buildInterviewsFetchParams(state, debouncedQ),
