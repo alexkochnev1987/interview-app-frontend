@@ -22,6 +22,7 @@
       "lead": "На этой странице опубликована обратная связь для кандидата по собеседованию на позицию <strong>{position}</strong>.",
       "expiresOn": "Ссылка действует до {date}",
       "overallScore": "Общий балл",
+      "interviewDate": "Дата интервью",
       "linkExpiry": "Срок действия ссылки",
       "outcomeEyebrow": "Следующий шаг",
       "outcome": {

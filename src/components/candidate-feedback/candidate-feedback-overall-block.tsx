@@ -87,9 +87,7 @@ export function CandidateFeedbackOverallBlock({
             value={outcome}
             message={outcomeMessage}
             disabled={outcomeSaving || saving}
-            onChange={(next) => {
-              void onOutcomeChange(next)
-            }}
+            onChange={onOutcomeChange}
           />
 
           <CandidateFeedbackBlockFields

@@ -588,6 +588,7 @@ export function CandidateFeedbackEditor({
             outcomeMessage={feedback.outcomeMessage}
             saving={
               savingTarget === 'overall' ||
+              savingTarget === 'outcome' ||
               (savingTarget === 'accept-all' &&
                 feedback.overall.state === 'generated')
             }

@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input'
 import { Stack } from '@/components/ui/layout/stack'
 import { useRouter } from '@/i18n/navigation'
 import { stripLocalePrefix } from '@/i18n/pathname'
-import { demoLogin, login } from '@/lib/api'
+import { demoLogin, getAuthMe, login } from '@/lib/api'
 import { ApiError } from '@/lib/api-error'
 import { useAuth } from '@/lib/auth-context'
 import { safeRedirectPath } from '@/lib/safe-redirect-path'
@@ -37,13 +37,14 @@ export function LoginForm() {
 
   async function runAuth(
     action: 'login' | 'demo',
-    authCall: () => Promise<Awaited<ReturnType<typeof login>>>,
+    authCall: () => Promise<void>,
   ) {
     setError('')
     setPendingAction(action)
 
     try {
-      const sessionUser = await authCall()
+      await authCall()
+      const sessionUser = await getAuthMe()
       establishSession(sessionUser)
       router.replace(redirectPath)
     } catch (err) {
@@ -61,11 +62,15 @@ export function LoginForm() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    await runAuth('login', () => login({ email, password }))
+    await runAuth('login', async () => {
+      await login({ email, password })
+    })
   }
 
   async function handleDemo() {
-    await runAuth('demo', () => demoLogin())
+    await runAuth('demo', async () => {
+      await demoLogin()
+    })
   }
 
   return (
