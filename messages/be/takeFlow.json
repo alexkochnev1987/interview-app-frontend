@@ -97,6 +97,11 @@
     "beforeUnloadLeaveInterview": "Калі вы зараз перазагрузіце старонку або выйдзеце, інтэрв'ю будзе перапынена, і прагрэс можа быць страчаны. Вы ўпэўнены?",
     "attemptsMetricLabel": "Спробы:",
     "retakeDisabledAtLimitHint": "Паўтор даступны толькі для спроб 1 і 2.",
-    "answerAttemptLimitReached": "Дасягнуты ліміт спробаў запісу"
+    "answerAttemptLimitReached": "Дасягнуты ліміт спробаў запісу",
+    "lobbyToolbarMicTest": "Праверыць мікрафон",
+    "lobbyMicStartRecord": "Пачаць запіс",
+    "lobbyMicStopRecord": "Спыніць запіс",
+    "lobbyMicPlay": "Узнавіць",
+    "lobbyMicPause": "Паўза"
   }
 }
