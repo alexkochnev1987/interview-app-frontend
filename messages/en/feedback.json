@@ -22,6 +22,7 @@
       "lead": "This page shares candidate-facing feedback for the <strong>{position}</strong> interview.",
       "expiresOn": "Link expires {date}",
       "overallScore": "Overall score",
+      "interviewDate": "Interview date",
       "linkExpiry": "Link expiry",
       "outcomeEyebrow": "Next step",
       "outcome": {

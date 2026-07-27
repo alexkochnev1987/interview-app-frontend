@@ -2100,6 +2100,8 @@ export interface components {
             questionIndex: number;
             /** Format: uuid */
             questionId: string;
+            /** @description Interview question snapshot text in interviewLocale when available on the interview. */
+            questionText?: string;
         };
         PublicCandidateFeedbackResponseDto: {
             /**
@@ -2110,6 +2112,11 @@ export interface components {
             position: string;
             /** Format: date-time */
             expiresAt: string;
+            /**
+             * Format: date-time
+             * @description When the candidate completed the interview (result completion time), when available.
+             */
+            interviewDate?: string;
             /** @description Interview overall score (0–100) when a result exists; omitted otherwise. */
             overallScore?: number;
             /**
@@ -2236,7 +2243,7 @@ export interface components {
              * @enum {string|null}
              */
             outcome?: "next_stage" | "keep_in_touch" | "custom" | null;
-            /** @description Candidate-facing custom next-step message. Required when outcome is `custom`; ignored/cleared for presets. */
+            /** @description Candidate-facing custom next-step message. Required when outcome is `custom`. Message-only patches require current outcome `custom`; sending a preset outcome clears any stored message. */
             outcomeMessage?: string | null;
         };
         GenerateAllCandidateFeedbackQuestionResultDto: {
@@ -5210,7 +5217,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: {
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };

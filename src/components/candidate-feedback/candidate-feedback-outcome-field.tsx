@@ -34,7 +34,7 @@ interface CandidateFeedbackOutcomeFieldProps {
   value?: CandidateFeedbackOutcome | null
   message?: string | null
   disabled?: boolean
-  onChange: (next: CandidateFeedbackOutcomeChange) => void
+  onChange: (next: CandidateFeedbackOutcomeChange) => void | Promise<void>
 }
 
 function getPersistedOutcomeKey(
@@ -79,11 +79,29 @@ export function CandidateFeedbackOutcomeField({
     (value !== 'custom' || trimmedDraft !== savedMessage)
   const customSaveLocked = !trimmedDraft
 
+  function revertDraftFromPersisted() {
+    setDraftOutcome(value ?? null)
+    if (value === 'custom') {
+      setDraftMessage(message ?? '')
+    } else {
+      setDraftMessage('')
+    }
+  }
+
+  function commitChange(next: CandidateFeedbackOutcomeChange) {
+    const result = onChange(next)
+    if (result && typeof result.then === 'function') {
+      void result.catch(() => {
+        revertDraftFromPersisted()
+      })
+    }
+  }
+
   function handleSelectChange(next: string) {
     if (next === OUTCOME_CLEAR_VALUE) {
       setDraftOutcome(null)
       setDraftMessage('')
-      onChange({ outcome: null })
+      commitChange({ outcome: null })
       return
     }
 
@@ -96,12 +114,12 @@ export function CandidateFeedbackOutcomeField({
     const outcome = next as CandidateFeedbackOutcome
     setDraftOutcome(outcome)
     setDraftMessage('')
-    onChange({ outcome })
+    commitChange({ outcome })
   }
 
   function handleSaveCustom() {
     if (customSaveLocked) return
-    onChange({
+    commitChange({
       outcome: 'custom',
       outcomeMessage: trimmedDraft,
     })
