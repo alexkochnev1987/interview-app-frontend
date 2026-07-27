@@ -15,3 +15,5 @@ export {
 
 export { RecordingStageHero } from './recording-stage-hero';
 export { TakeLocaleBar, type TakeLocaleBarProps } from './take-locale-bar';
+export { MicLevelMeter } from './mic-level-meter';
+export { useMicLevel } from './use-mic-level';
