@@ -68,17 +68,32 @@ describe('user-profile-access', () => {
     ).toBe(USER_PROFILE_ACCESS_DENIED_MESSAGE)
   })
 
+  it('allows any user to view their own profile', () => {
+    expect(
+      getUserProfileReadDenialReason(
+        { id: 'u1', role: APP_ROLE.admin },
+        { id: 'u1', role: APP_ROLE.admin },
+      ),
+    ).toBeNull()
+    expect(
+      getUserProfileReadDenialReason(
+        { id: 'u1', role: APP_ROLE.hr },
+        { id: 'u1', role: APP_ROLE.hr },
+      ),
+    ).toBeNull()
+  })
+
   it('exposes canViewUserProfile as a boolean helper', () => {
     expect(
       canViewUserProfile(
-        { id: 'a1', role: APP_ROLE.admin },
         { id: 'u1', role: APP_ROLE.hr },
+        { id: 'a1', role: APP_ROLE.admin },
       ),
     ).toBe(true)
     expect(
       canViewUserProfile(
-        { id: 'a1', role: APP_ROLE.admin },
         { id: 'u1', role: APP_ROLE.super_admin },
+        { id: 'a1', role: APP_ROLE.admin },
       ),
     ).toBe(false)
   })

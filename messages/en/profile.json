@@ -4,9 +4,6 @@
     "lead": "Manage your personal account settings and information.",
     "memberHeading": "Team member profile",
     "memberLead": "View account details for this workspace member.",
-    "summary": {
-      "editProfile": "Edit Profile"
-    },
     "personalInformation": {
       "title": "Personal Information",
       "name": "Name",
@@ -17,7 +14,8 @@
     },
     "security": {
       "title": "Account Preferences",
-      "changePassword": "Change Password"
+      "changePassword": "Change Password",
+      "comingSoon": "Coming soon"
     },
     "preferences": {
       "language": "Language",

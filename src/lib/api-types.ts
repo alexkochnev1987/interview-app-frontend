@@ -136,7 +136,10 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** Mark the staff onboarding tour as completed or skipped */
+        /**
+         * Mark the staff onboarding tour as completed or skipped
+         * @description Sets onboardingCompletedAt and onboardingStatus. Response matches GET /auth/me.
+         */
         patch: operations["AuthController_completeOnboarding"];
         trace?: never;
     };
@@ -1031,10 +1034,10 @@ export interface components {
             demo: boolean;
             /**
              * Format: date-time
-             * @description Set when the staff onboarding tour was completed or skipped.
-             * @example 2026-05-05T12:00:00.000Z
+             * @description When the user finished or skipped first-time onboarding. Null means onboarding is pending.
+             * @example 2026-06-10T14:30:00.000Z
              */
-            onboardingCompletedAt?: string;
+            onboardingCompletedAt?: string | null;
             /**
              * @description How the staff onboarding tour was dismissed.
              * @enum {string}
@@ -2483,14 +2486,6 @@ export interface operations {
                 };
             };
             401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponseDto"];
-                };
-            };
-            403: {
                 headers: {
                     [name: string]: unknown;
                 };

@@ -18,6 +18,7 @@ export function getUserProfileReadDenialReason(
   actor: UserProfileAccessActor,
 ): string | null {
   if (isSuperAdmin(actor.role)) return null
+  if (actor.id === target.id) return null
   if (actor.role === APP_ROLE.admin && !isSuperAdmin(target.role)) return null
   if (
     actor.role === APP_ROLE.hr &&
@@ -25,13 +26,12 @@ export function getUserProfileReadDenialReason(
   ) {
     return null
   }
-  if (actor.role === APP_ROLE.candidate && actor.id === target.id) return null
   return USER_PROFILE_ACCESS_DENIED_MESSAGE
 }
 
 export function canViewUserProfile(
-  actor: UserProfileAccessActor,
   target: UserProfileAccessTarget,
+  actor: UserProfileAccessActor,
 ): boolean {
   return getUserProfileReadDenialReason(target, actor) === null
 }

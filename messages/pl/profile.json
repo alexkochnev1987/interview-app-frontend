@@ -4,9 +4,6 @@
     "lead": "Zarządzaj ustawieniami swojego konta i danymi osobowymi.",
     "memberHeading": "Profil członka zespołu",
     "memberLead": "Wyświetl dane konta tego członka workspace.",
-    "summary": {
-      "editProfile": "Edytuj profil"
-    },
     "personalInformation": {
       "title": "Dane osobowe",
       "name": "Imię i nazwisko",
@@ -17,7 +14,8 @@
     },
     "security": {
       "title": "Preferencje konta",
-      "changePassword": "Zmień hasło"
+      "changePassword": "Zmień hasło",
+      "comingSoon": "Wkrótce"
     },
     "preferences": {
       "language": "Język",

@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import {
   ClipboardList,
   LayoutDashboard,
@@ -10,9 +11,12 @@ import {
   Sparkles,
   Users,
 } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
+import { useSearchParams } from 'next/navigation'
 
+import { LanguageSwitcher } from '@/components/ui/language-switcher'
 import { isCandidateFlowPath } from '@/i18n/html-lang'
+import { LOCALES, type Locale } from '@/i18n/locales'
 import { usePathname } from '@/i18n/navigation'
 import { routes } from '@/i18n/routes'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
@@ -47,9 +51,20 @@ export function SideNav() {
   const { user, logout } = useAuth()
   const isDemo = useIsDemo()
   const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const locale = useLocale() as Locale
   const tNav = useTranslations('nav')
   const tCommon = useTranslations('common')
+  const tLanguage = useTranslations('languageSwitcher')
   const labels = useSharedLabels()
+  const [languageMenuOpen, setLanguageMenuOpen] = useState(false)
+
+  const queryString = searchParams.toString()
+  const languageHref = queryString ? `${pathname}?${queryString}` : pathname
+  const languageOptions = LOCALES.map((optionLocale) => ({
+    locale: optionLocale,
+    label: tLanguage(`locales.${optionLocale}`),
+  }))
 
   if (isCandidateFlowPath(pathname)) {
     return null
@@ -103,9 +118,30 @@ export function SideNav() {
     return pathname === href || pathname.startsWith(`${href}/`)
   }
 
+  function isProfileActive() {
+    if (!user) return false
+    if (pathname === routes.profile.me) return true
+    return pathname === routes.profile.detail(user.id)
+  }
+
+  const profileActive = isProfileActive()
+
+  const languageSwitcher = (
+    <LanguageSwitcher
+      ariaLabel={tLanguage('label')}
+      currentLocale={locale}
+      href={languageHref}
+      options={languageOptions}
+      side="right"
+      align="end"
+      onOpenChange={setLanguageMenuOpen}
+    />
+  )
+
   return (
     <AppSidebar
       aria-label={tCommon('appName')}
+      expanded={languageMenuOpen}
       brand={
         <UnstyledLink href="/">
           <Inline gap={2} align="center" wrap="nowrap">
@@ -146,8 +182,13 @@ export function SideNav() {
         user ? (
           <Stack gap={2} width="full">
             <Stack gap={2} className={sideNavRevealClass}>
-              <UnstyledLink href={routes.profile.me} aria-label={tNav('profile')}>
-                <SurfaceTile tone="soft" rounded="lg" padding="sm">
+              {languageSwitcher}
+              <UnstyledLink
+                href={routes.profile.me}
+                aria-label={tNav('profile')}
+                aria-current={profileActive ? 'page' : undefined}
+              >
+                <SurfaceTile tone="soft" rounded="lg" padding="sm" active={profileActive}>
                   <IdentityBadge
                     layout="stacked"
                     nameMaxWidth="none"
@@ -166,6 +207,7 @@ export function SideNav() {
           </Stack>
         ) : (
           <Stack gap={2} width="full" className={sideNavRevealClass}>
+            {languageSwitcher}
             <Button asChild variant="gradient" size="sm" width="full">
               <UnstyledLink href="/login">{tNav('signIn')}</UnstyledLink>
             </Button>

@@ -10,7 +10,6 @@ import { BodyText } from '@/components/ui/text'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
 import { routes } from '@/i18n/routes'
 import type { TeamMember } from '@/lib/api'
-import { useAuth } from '@/lib/auth-context'
 import { formatInterviewDate } from '@/lib/interview-formatters'
 import { canViewUserProfile } from '@/lib/user-profile-access'
 
@@ -33,10 +32,11 @@ export function TeamMemberRow({
   actorRole,
   onChangeRole,
 }: TeamMemberRowProps) {
-  const { user } = useAuth()
-  const actor = { id: user?.id ?? '', role: user?.role ?? '' }
+  const actor = { id: actorId, role: actorRole }
   const target = { id: member.id, role: member.role }
-  const canOpenProfile = canViewUserProfile(actor, target)
+  const canOpenProfile = canViewUserProfile(target, actor)
+  const profileHref =
+    member.id === actorId ? routes.profile.me : routes.profile.detail(member.id)
 
   const memberName = (
     <BodyText weight="medium" tone="foreground">
@@ -52,7 +52,7 @@ export function TeamMemberRow({
             {getMemberInitials(member.name)}
           </IconBadge>
           {canOpenProfile ? (
-            <UnstyledLink href={routes.profile.detail(member.id)}>
+            <UnstyledLink href={profileHref}>
               {memberName}
             </UnstyledLink>
           ) : (

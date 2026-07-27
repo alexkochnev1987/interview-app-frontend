@@ -6,12 +6,14 @@ import { PageShell } from '@/components/ui/layout/page-shell'
 import { ProfileView } from '@/features/profile/profile-view'
 import type { Locale } from '@/i18n/locales'
 import { type TeamMember } from '@/lib/api'
+import { isApiError } from '@/lib/api-error'
 import {
   loadAuthGate,
   redirectIfUnauthenticated,
   redirectIfUnauthorizedError,
 } from '@/lib/auth-gate'
 import { isForbiddenError, requestServer } from '@/lib/server-fetch'
+import { canViewUserProfile } from '@/lib/user-profile-access'
 
 interface UserProfilePageProps {
   params: Promise<{ locale: Locale; id: string }>
@@ -61,6 +63,14 @@ export default async function UserProfilePage({ params }: UserProfilePageProps) 
         />
       )
     }
+    if (isApiError(err) && err.status === 404) {
+      return (
+        <FlashErrorPageFallback
+          title={t('loadFailedTitle')}
+          description={t('notFoundFallback')}
+        />
+      )
+    }
     error = err instanceof Error ? err.message : t('loadFailedFallback')
   }
 
@@ -69,6 +79,20 @@ export default async function UserProfilePage({ params }: UserProfilePageProps) 
       <FlashErrorPageFallback
         title={t('loadFailedTitle')}
         description={error ?? t('notFoundFallback')}
+      />
+    )
+  }
+
+  if (
+    !canViewUserProfile(
+      { id: user.id, role: user.role },
+      { id: auth.me.id, role: auth.me.role },
+    )
+  ) {
+    return (
+      <ForbiddenAccessPage
+        title={t('forbiddenTitle')}
+        description={t('forbiddenDescription')}
       />
     )
   }

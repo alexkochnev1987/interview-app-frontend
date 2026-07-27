@@ -1,6 +1,6 @@
 'use client'
 
-import { LockKeyhole } from 'lucide-react'
+import { LockKeyhole, LogOut } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import { useSearchParams } from 'next/navigation'
 
@@ -20,6 +20,7 @@ import { useOnboardingReplay } from '@/features/onboarding/onboarding-provider'
 import { LOCALES, type Locale } from '@/i18n/locales'
 import { usePathname } from '@/i18n/navigation'
 import type { MeResponse } from '@/lib/api'
+import { useAuth } from '@/lib/auth-context'
 import { canAccessDashboard } from '@/lib/auth-roles'
 import { getCandidateInitials } from '@/lib/interview-formatters'
 
@@ -31,7 +32,9 @@ interface ProfileViewProps {
 }
 
 export function ProfileView({ user, mode = 'self' }: ProfileViewProps) {
+  const { logout } = useAuth()
   const t = useTranslations('profile')
+  const tNav = useTranslations('nav')
   const tOnboarding = useTranslations('onboarding')
   const tLanguage = useTranslations('languageSwitcher')
   const pathname = usePathname()
@@ -92,9 +95,14 @@ export function ProfileView({ user, mode = 'self' }: ProfileViewProps) {
               <BodyText weight="medium">{t('security.changePassword')}</BodyText>
             </Inline>
             <DemoWriteGuard>
-              <Button type="button" variant="outline" disabled>
-                {t('security.changePassword')}
-              </Button>
+              <Inline gap={2} align="center">
+                <BodyText size="xs" tone="muted">
+                  {t('security.comingSoon')}
+                </BodyText>
+                <Button type="button" variant="outline" disabled>
+                  {t('security.changePassword')}
+                </Button>
+              </Inline>
             </DemoWriteGuard>
           </Inline>
           <Inline justify="between" align="center" wrap="wrap" width="full">
@@ -121,6 +129,12 @@ export function ProfileView({ user, mode = 'self' }: ProfileViewProps) {
               </Button>
             </Inline>
           ) : null}
+          <Button type="button" variant="destructive" width="full" onClick={logout}>
+            <Icon size="md">
+              <LogOut />
+            </Icon>
+            {tNav('logout')}
+          </Button>
         </Stack>
       </CardContent>
     </Card>
