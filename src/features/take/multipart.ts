@@ -28,16 +28,16 @@ export function queueBufferedUpload({
     return Promise.resolve()
   }
 
+  // oxlint-disable-next-line promise/always-return
   session.uploadChain = session.uploadChain.then(async () => {
     let activeSession = multipartUploadsRef.current[target]
 
-    while (
-      activeSession &&
-      !activeSession.aborted &&
-      !activeSession.completed &&
-      (activeSession.bufferedBytes >= MULTIPART_PART_SIZE_BYTES ||
-        (forceFinal && activeSession.bufferedBytes > 0))
-    ) {
+    while (activeSession && !activeSession.aborted && !activeSession.completed) {
+      const hasEnoughBytes = activeSession.bufferedBytes >= MULTIPART_PART_SIZE_BYTES
+      const hasFinalBytes = forceFinal && activeSession.bufferedBytes > 0
+      if (!hasEnoughBytes && !hasFinalBytes) {
+        break
+      }
       const inferredType =
         activeSession.partBlobType?.trim() ||
         activeSession.bufferedChunks[0]?.type?.trim() ||
