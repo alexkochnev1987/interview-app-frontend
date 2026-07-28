@@ -1,21 +1,16 @@
 'use client'
 
-import {
-  useEffect,
-  useRef,
-  useState,
-  type ComponentProps,
-  type ReactElement,
-} from 'react'
 import { RefreshCw } from 'lucide-react'
+import { useEffect, useRef, useState, type ComponentProps, type ReactElement } from 'react'
 
+import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
-import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { ApiError } from '@/lib/api'
 import { notifyError, notifyInfo } from '@/lib/toast'
 
 const SUCCESS_AUTORESET_MS = 2500
+const DEFAULT_ICON = <RefreshCw />
 
 type ButtonVariant = ComponentProps<typeof Button>['variant']
 type ButtonSize = ComponentProps<typeof Button>['size']
@@ -56,14 +51,12 @@ export function AsyncActionButton({
   variant = 'outline-pill',
   size = 'sm',
   iconSize = 'md',
-  icon = <RefreshCw />,
+  icon = DEFAULT_ICON,
   disabled,
   toastId,
   onSuccess,
 }: AsyncActionButtonProps) {
-  const [phase, setPhase] = useState<'idle' | 'submitting' | 'submitted'>(
-    'idle',
-  )
+  const [phase, setPhase] = useState<'idle' | 'submitting' | 'submitted'>('idle')
   const mountedRef = useRef(true)
 
   useEffect(() => {
@@ -115,13 +108,7 @@ export function AsyncActionButton({
 
   return (
     <DemoWriteGuard disabled={disabled || phase !== 'idle'}>
-      <Button
-        type="button"
-        variant={variant}
-        size={size}
-        shape="pill"
-        onClick={handleClick}
-      >
+      <Button type="button" variant={variant} size={size} shape="pill" onClick={handleClick}>
         <Icon size={iconSize}>{icon}</Icon>
         {phase === 'submitting'
           ? startingLabel
