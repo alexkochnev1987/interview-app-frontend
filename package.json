@@ -10,6 +10,7 @@
     "lint": "oxlint",
     "fmt": "oxfmt --write",
     "fmt:check": "oxfmt --check",
+    "typecheck": "tsc --noEmit",
     "i18n:check": "node scripts/i18n-check-parity.mjs",
     "lint:ci": "npm run lint && npm run fmt:check && npm run i18n:check",
     "test": "vitest run",
@@ -22,7 +23,8 @@
     "openapi:backend:generate": "node scripts/generate-backend-openapi.mjs",
     "openapi:sync": "node scripts/sync-openapi.mjs",
     "openapi:generate": "npx --yes openapi-typescript openapi/openapi.json -o src/lib/api-types.ts",
-    "openapi:refresh": "npm run openapi:backend:generate && npm run openapi:sync && npm run openapi:generate"
+    "openapi:refresh": "npm run openapi:backend:generate && npm run openapi:sync && npm run openapi:generate",
+    "prepare": "husky"
   },
   "dependencies": {
     "@swc/helpers": "^0.5.23",
@@ -47,6 +49,8 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "autoprefixer": "^10.5.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.2.0",
     "openapi-typescript": "^7.13.0",
     "oxfmt": "^0.61.0",
     "oxlint": "^1.75.0",
@@ -57,5 +61,13 @@
     "vite": "^7.3.5",
     "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^4.1.8"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,css,md}": [
+      "oxfmt --write"
+    ],
+    "*.{js,jsx,ts,tsx}": [
+      "oxlint"
+    ]
   }
 }
