@@ -69,8 +69,8 @@
     }
   },
   "lint-staged": {
-    "!(openapi/**|src/lib/api-types.ts)*.{js,jsx,ts,tsx,json,css,md}": [
-      "node scripts/fmt-staged.mjs"
+    "!(openapi/**|src/lib/api-types.ts|*.md|**/*.md)*.{js,jsx,ts,tsx,json,css}": [
+      "oxfmt --write"
     ],
     "!(openapi/**|src/lib/api-types.ts)*.{js,jsx,ts,tsx}": [
       "oxlint"
