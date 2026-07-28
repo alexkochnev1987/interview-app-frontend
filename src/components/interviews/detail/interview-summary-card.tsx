@@ -190,7 +190,7 @@ export function InterviewSummaryCard({
   const managementNotice =
     canManage && !canEditDetails && !isEditing ? (
       <BodyText size="sm" tone="muted">
-        {tEdit('answersBlockEditNotice')}
+        {canOpenEdit ? tEdit('hrOnlyEditNotice') : tEdit('answersBlockEditNotice')}
       </BodyText>
     ) : null
 

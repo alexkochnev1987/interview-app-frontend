@@ -5,7 +5,7 @@ import { createContext, useContext, useState, type ReactNode } from 'react';
 import {
   completeOnboarding as apiCompleteOnboarding,
   logout as apiLogout,
-  type AuthUserResponseDto as User,
+  type MeResponse as User,
   type CompleteOnboardingStatus,
 } from '@/lib/api';
 
@@ -53,8 +53,8 @@ export function AuthProvider({
     setUser(sessionUser);
   };
 
-  const completeOnboarding = async (_status?: CompleteOnboardingStatus) => {
-    const updatedUser = await apiCompleteOnboarding();
+  const completeOnboarding = async (status: CompleteOnboardingStatus = 'completed') => {
+    const updatedUser = await apiCompleteOnboarding(status);
     setUser(updatedUser);
     return updatedUser;
   };

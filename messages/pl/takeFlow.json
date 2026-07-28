@@ -104,6 +104,11 @@
     "attemptBurnsOnRecordStart": "Każde rozpoczęcie nagrywania zużywa jedną próbę. Odświeżenie strony w trakcie nagrywania również zużywa tę próbę.",
     "reloadUsesCurrentAttemptHint": "Odświeżenie zużywa bieżącą próbę.",
     "attemptsExhaustedNoMedia": "Brak nagrania, które można wysłać dla tego pytania.",
-    "reviewSubmitBanner": "Wykorzystano wszystkie próby. Naciśnij Wyślij, aby kontynuować."
+    "reviewSubmitBanner": "Wykorzystano wszystkie próby. Naciśnij Wyślij, aby kontynuować.",
+    "lobbyToolbarMicTest": "Testuj mikrofon",
+    "lobbyMicStartRecord": "Rozpocznij nagrywanie",
+    "lobbyMicStopRecord": "Zatrzymaj nagrywanie",
+    "lobbyMicPlay": "Odtwórz",
+    "lobbyMicPause": "Pauza"
   }
 }

@@ -99,6 +99,7 @@ function TakeInterviewClientInner({
     interimTranscript,
     browserTranscriptWarning,
     videoRef,
+    cameraStream,
     screenVideoRef,
     progressValue,
     setConsent,
@@ -243,6 +244,7 @@ function TakeInterviewClientInner({
         setupBusy={setupBusy}
         setupError={setupError}
         videoRef={videoRef}
+        cameraStream={cameraStream}
         permissionLabel={permissionLabel}
         permissionTone={permissionTone}
         lobbyMicOn={lobbyMicOn}

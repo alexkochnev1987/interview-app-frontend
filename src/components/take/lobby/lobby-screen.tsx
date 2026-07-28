@@ -30,6 +30,7 @@ interface TakeLobbyScreenProps {
   setupBusy: boolean;
   setupError: string;
   videoRef: RefObject<HTMLVideoElement | null>;
+  cameraStream?: MediaStream | null;
   permissionLabel: (status: PermissionStatus) => string;
   permissionTone: (status: PermissionStatus) => StatusTone;
   lobbyMicOn: boolean;
@@ -50,6 +51,7 @@ export function TakeLobbyScreen({
   setupBusy,
   setupError,
   videoRef,
+  cameraStream,
   permissionLabel,
   permissionTone,
   lobbyMicOn,
@@ -104,6 +106,7 @@ export function TakeLobbyScreen({
                       micOn={permissionGranted && lobbyMicOn}
                       cameraOn={permissionGranted && lobbyCameraOn}
                       screenShareReady={screenShareReady}
+                      cameraStream={cameraStream ?? null}
                       onToggleMic={onToggleMic}
                       onToggleCamera={onToggleCamera}
                       onScreenShare={onScreenShare}

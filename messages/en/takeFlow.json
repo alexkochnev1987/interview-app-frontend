@@ -104,6 +104,11 @@
     "attemptBurnsOnRecordStart": "Each time recording starts it uses one attempt. Reloading the page during a recording also uses that attempt.",
     "reloadUsesCurrentAttemptHint": "Reloading uses up the current attempt.",
     "attemptsExhaustedNoMedia": "There is no usable recording left to submit for this question.",
-    "reviewSubmitBanner": "All attempts used. Press Submit to continue."
+    "reviewSubmitBanner": "All attempts used. Press Submit to continue.",
+    "lobbyToolbarMicTest": "Test Microphone",
+    "lobbyMicStartRecord": "Start Record",
+    "lobbyMicStopRecord": "Stop Record",
+    "lobbyMicPlay": "Play",
+    "lobbyMicPause": "Pause"
   }
 }

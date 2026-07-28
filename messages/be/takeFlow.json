@@ -104,6 +104,11 @@
     "attemptBurnsOnRecordStart": "Кожны старт запісу выкарыстоўвае адну спробу. Перазагрузка старонкі падчас запісу таксама выкарыстоўвае гэтую спробу.",
     "reloadUsesCurrentAttemptHint": "Перазагрузка выкарыстоўвае бягучую спробу.",
     "attemptsExhaustedNoMedia": "Няма захаванага запісу, які можна адправіць для гэтага пытання.",
-    "reviewSubmitBanner": "Усе спробы выкарыстаны. Націсніце «Адправіць», каб працягнуць."
+    "reviewSubmitBanner": "Усе спробы выкарыстаны. Націсніце «Адправіць», каб працягнуць.",
+    "lobbyToolbarMicTest": "Праверыць мікрафон",
+    "lobbyMicStartRecord": "Пачаць запіс",
+    "lobbyMicStopRecord": "Спыніць запіс",
+    "lobbyMicPlay": "Узнавіць",
+    "lobbyMicPause": "Паўза"
   }
 }
