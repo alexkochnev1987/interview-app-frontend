@@ -58,6 +58,15 @@ export function SideNav() {
   const tLanguage = useTranslations('languageSwitcher')
   const labels = useSharedLabels()
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  function toggleSidebar() {
+    setSidebarOpen((prev) => !prev)
+  }
+
+  function closeSidebar() {
+    setSidebarOpen(false)
+  }
 
   const queryString = searchParams.toString()
   const languageHref = queryString ? `${pathname}?${queryString}` : pathname
@@ -141,7 +150,12 @@ export function SideNav() {
   return (
     <AppSidebar
       aria-label={tCommon('appName')}
-      expanded={languageMenuOpen}
+      expanded={sidebarOpen || languageMenuOpen}
+      toggleOpen={sidebarOpen}
+      onToggle={toggleSidebar}
+      onClose={closeSidebar}
+      expandLabel={tNav('expandSidebar')}
+      collapseLabel={tNav('collapseSidebar')}
       brand={
         <UnstyledLink href="/">
           <Inline gap={2} align="center" wrap="nowrap">
@@ -149,7 +163,7 @@ export function SideNav() {
               <Icon size="md"><Sparkles /></Icon>
             </IconBadge>
             <Stack gap={0} className={cn('min-w-0', sideNavRevealClass)}>
-              <EyebrowLabel size="sm" className="whitespace-nowrap">
+              <EyebrowLabel size="sm" className="truncate">
                 {tCommon('brandEyebrow')}
               </EyebrowLabel>
               <BodyText
@@ -157,7 +171,7 @@ export function SideNav() {
                 size="sm"
                 weight="semibold"
                 tone="foreground"
-                className="whitespace-nowrap"
+                className="truncate"
               >
                 {tCommon('appName')}
               </BodyText>
