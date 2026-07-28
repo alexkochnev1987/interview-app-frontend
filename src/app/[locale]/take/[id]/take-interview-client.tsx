@@ -89,6 +89,7 @@ function TakeInterviewClientInner({
     setupBusy,
     setupError,
     submitError,
+    actionErrorKind,
     timeLeft,
     versionPersistKind,
     uploading,
@@ -125,7 +126,8 @@ function TakeInterviewClientInner({
     attemptsExhausted,
     submitAllowed,
     exhaustedHint,
-    requestSubmitOrCheckpointedAction,
+    showDeviceReconnect,
+    requestSubmitAction,
   } = useTakeOrchestrator({
     id,
     candidateToken,
@@ -264,6 +266,7 @@ function TakeInterviewClientInner({
       setupError={setupError}
       capturePipelineReady={capturePipelineReady}
       submitError={submitError}
+      actionErrorKind={actionErrorKind}
       timeLeft={timeLeft}
       versionPersistKind={versionPersistKind}
       uploading={uploading}
@@ -282,9 +285,10 @@ function TakeInterviewClientInner({
       attemptsExhausted={attemptsExhausted}
       submitAllowed={submitAllowed}
       exhaustedHint={exhaustedHint}
+      showDeviceReconnect={showDeviceReconnect}
       onReconnect={restartFullInterviewCapture}
       onRerecord={() => requestVersionAction('rerecord')}
-      onSubmit={requestSubmitOrCheckpointedAction}
+      onSubmit={requestSubmitAction}
     />,
   )
 }

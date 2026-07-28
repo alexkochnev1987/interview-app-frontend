@@ -1,3 +1,5 @@
+import { ApiError } from '@/lib/api-error';
+
 import type { CaptureTarget, MultipartUploadState } from './runtime';
 
 interface CompleteMultipartUploadParams {
@@ -37,7 +39,10 @@ export async function completeMultipartUpload({
       versionNumber: session.versionNumber,
       recordingSessionId: session.recordingSessionId,
     });
-  } catch {
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
     throw new Error(`Failed to finalize ${target} upload.`);
   }
 

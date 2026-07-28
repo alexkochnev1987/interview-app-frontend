@@ -11,6 +11,7 @@ import {
   type ClientTranscriptPayload,
   type TakeProgressResponse,
 } from '@/lib/api';
+import { ApiError } from '@/lib/api-error';
 
 import {
   createMultipartUploadSession,
@@ -29,18 +30,11 @@ import {
   startProgressHeartbeat as startProgressHeartbeatData,
 } from './progress';
 import { abortMultipartUploads as abortMultipartUploadsData, completeMultipartUpload as completeMultipartUploadData } from './uploads';
-import { shouldSendAnswerProgressDuringRecording } from './attempt-limit';
-import { patchTakeUploadCheckpoint } from './upload-checkpoint';
+import type { AnswerMetaUpdate } from './use-take-begin-recording';
 
 interface UseTakeAnswerPersistenceParams {
   id: string;
-  onAnswerMetaUpdated?: (meta: {
-    versionCount: number;
-    selectedVersionNumber: number;
-    status?: 'recording' | 'submitted';
-    hasMediaOnSelectedVersion?: boolean;
-    recordingSessionId?: string;
-  }) => void;
+  onAnswerMetaUpdated?: (meta: AnswerMetaUpdate) => void;
   currentVersionNumberRef: React.MutableRefObject<number>;
   recordingSessionIdRef: React.MutableRefObject<string | null>;
   answerStartedAtRef: React.MutableRefObject<string | null>;
@@ -120,10 +114,6 @@ export function useTakeAnswerPersistence({
         return undefined;
       }
 
-      if (!shouldSendAnswerProgressDuringRecording(currentVersionNumberRef.current)) {
-        return undefined;
-      }
-
       const screenUpload = multipartUploadsRef.current.screen;
       const behaviorEvents = buildFlushBehaviorEvents({
         behaviorEvents: behaviorEventsRef.current,
@@ -162,23 +152,12 @@ export function useTakeAnswerPersistence({
 
       flushedBehaviorEventCountRef.current = behaviorEventsRef.current.length;
       currentVersionNumberRef.current = progressResponse.selectedVersionNumber;
-      const hasMedia =
-        (cameraUpload.recordedBytes ?? 0) > 0 || (screenUpload?.recordedBytes ?? 0) > 0;
-      if (hasMedia) {
-        patchTakeUploadCheckpoint(id, {
-          versionNumber: currentVersionNumberRef.current,
-          cameraMediaKey: cameraUpload.mediaKey,
-          screenMediaKey: screenUpload?.mediaKey ?? cameraUpload.mediaKey,
-          recordingSessionId:
-            recordingSessionIdRef.current ?? cameraUpload.recordingSessionId,
-          cameraUploadId: cameraUpload.uploadId,
-          screenUploadId: screenUpload?.uploadId,
-          hasMedia: true,
-        });
+      cameraUpload.mediaKeyPersisted = true;
+      if (screenUpload) {
+        screenUpload.mediaKeyPersisted = true;
       }
       onAnswerMetaUpdated?.({
         ...progressResponse,
-        hasMediaOnSelectedVersion: hasMedia,
         recordingSessionId:
           recordingSessionIdRef.current ?? cameraUpload.recordingSessionId,
       });
@@ -270,6 +249,9 @@ export function useTakeAnswerPersistence({
           },
         );
       } catch (error) {
+        if (error instanceof ApiError) {
+          throw error;
+        }
         throw new Error(
           error instanceof Error
             ? error.message.replace('upload', target)

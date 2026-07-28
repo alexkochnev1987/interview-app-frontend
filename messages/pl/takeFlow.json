@@ -9,6 +9,8 @@
     "recordingStoppedWithoutAction": "Nagrywanie zatrzymane bez dalszych działań. Uruchom nową wersję tej odpowiedzi.",
     "uploadFailedFallback": "Przesyłanie nie powiodło się",
     "submitFailedTitle": "Przesyłanie nie powiodło się",
+    "retakeFailedTitle": "Ponowne nagranie nie powiodło się",
+    "answerVersionOverwriteForbidden": "Ta próba nagrywania ma już przesłane media. Rozpocznij nową próbę zamiast nadpisywać istniejącą.",
     "reconnectCameraAndScreen": "Podłącz ponownie kamerę + ekran",
     "rerecordAsNewVersion": "Nagraj ponownie",
     "submitAndNext": "Prześlij i dalej",
@@ -100,9 +102,10 @@
     "answerAttemptLimitReached": "Osiągnięto limit prób nagrywania ({max})",
     "recordingSessionMismatch": "Ta rozmowa jest już nagrywana w innej karcie. Kontynuuj tam albo zamknij drugą kartę i odśwież stronę.",
     "attemptBurnsOnRecordStart": "Każde rozpoczęcie nagrywania zużywa jedną próbę. Odświeżenie strony w trakcie nagrywania również zużywa tę próbę.",
+    "reloadUsesCurrentAttemptHint": "Odświeżenie strony zużywa bieżącą próbę nagrywania. Po odświeżeniu nie możesz kontynuować ani ponownie nagrać tej samej próby.",
     "attemptsExhaustedGuidance": "Wszystkie próby nagrywania dla tego pytania zostały wykorzystane. Nie można rozpocząć kolejnego nagrania.",
     "attemptsExhaustedNoMedia": "Brak nagrania, które można wysłać dla tego pytania.",
-    "attemptsExhaustedSubmitHint": "Nagranie z tej próby jest dostępne. Wyślij je, aby kontynuować.",
-    "attemptsExhaustedSubmitUnavailable": "Ta karta nie może sfinalizować zapisanego nagrania po odświeżeniu. Otwórz oryginalną kartę, jeśli jest nadal dostępna, albo skontaktuj się z rekruterem."
+    "attemptsExhaustedSubmitHint": "Zapisane nagranie jest gotowe. Naciśnij Wyślij, aby je zachować i kontynuować.",
+    "reviewSubmitBanner": "Nagrywanie nie uruchomi się ponownie. Naciśnij Wyślij, aby zapisać tę odpowiedź i przejść do następnego pytania — albo zakończyć rozmowę, jeśli to ostatnie pytanie."
   }
 }

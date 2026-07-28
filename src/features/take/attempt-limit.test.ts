@@ -1,14 +1,24 @@
 import { describe, expect, it } from 'vitest';
 
+import { canStartNewAttempt, shouldReuseReservedAttemptForRetake } from './attempt-limit';
 import {
-  canStartNewAttempt,
-  shouldSendAnswerProgressDuringRecording,
-} from './attempt-limit';
-import {
-  resolveExhaustedHint,
+  resolveQuestionAnswerPhase,
   stageAfterInterviewLoad,
 } from './session-machine';
 import type { TakeInterviewData } from '@/lib/api';
+
+function answerMetaFixture(
+  overrides: Partial<NonNullable<TakeInterviewData['currentAnswerMeta']>> = {},
+): NonNullable<TakeInterviewData['currentAnswerMeta']> {
+  return {
+    status: 'recording',
+    versionCount: 0,
+    selectedVersionNumber: 1,
+    hasSubmittableMedia: false,
+    latestSubmittableVersionNumber: null,
+    ...overrides,
+  };
+}
 
 function interviewFixture(
   overrides: Partial<TakeInterviewData> = {},
@@ -27,31 +37,67 @@ function interviewFixture(
   };
 }
 
-describe('attempt helpers + resume UX', () => {
-  it('gates new attempts on versionCount/maxAttempts and still allows progress on the final reserved attempt', () => {
+describe('take attempt UX', () => {
+  it('gates new attempts and retake reuse vs advance when version already has media', () => {
     expect(canStartNewAttempt({ versionCount: 2, maxAttempts: 3 })).toBe(true);
     expect(canStartNewAttempt({ versionCount: 3, maxAttempts: 3 })).toBe(false);
-    expect(shouldSendAnswerProgressDuringRecording(3, { versionCount: 3 })).toBe(true);
+
+    expect(
+      shouldReuseReservedAttemptForRetake({
+        currentVersionNumber: 1,
+        hasSubmittableMedia: false,
+        latestSubmittableVersionNumber: null,
+        localVersionHasMedia: false,
+      }),
+    ).toBe(true);
+    expect(
+      shouldReuseReservedAttemptForRetake({
+        currentVersionNumber: 1,
+        hasSubmittableMedia: false,
+        latestSubmittableVersionNumber: null,
+        localVersionHasMedia: true,
+      }),
+    ).toBe(false);
+    expect(
+      shouldReuseReservedAttemptForRetake({
+        currentVersionNumber: 2,
+        hasSubmittableMedia: true,
+        latestSubmittableVersionNumber: 2,
+        localVersionHasMedia: false,
+      }),
+    ).toBe(false);
+    expect(
+      shouldReuseReservedAttemptForRetake({
+        currentVersionNumber: 2,
+        hasSubmittableMedia: true,
+        latestSubmittableVersionNumber: 1,
+        localVersionHasMedia: false,
+      }),
+    ).toBe(true);
   });
 
-  it('skips consent for returning sessions and maps exhausted submit hints', () => {
+  it('maps phases and returning reload stages for recording/review/blocked', () => {
+    const recording = interviewFixture({
+      currentAnswerMeta: answerMetaFixture({ versionCount: 1 }),
+    });
+    const review = interviewFixture({
+      currentAnswerMeta: answerMetaFixture({
+        versionCount: 3,
+        hasSubmittableMedia: true,
+        latestSubmittableVersionNumber: 2,
+      }),
+    });
+    const blocked = interviewFixture({
+      currentAnswerMeta: answerMetaFixture({ versionCount: 3 }),
+    });
+
+    expect(resolveQuestionAnswerPhase(recording)).toBe('recording');
+    expect(resolveQuestionAnswerPhase(review)).toBe('review');
+    expect(resolveQuestionAnswerPhase(blocked)).toBe('blocked');
+
     expect(stageAfterInterviewLoad(interviewFixture(), 'initial')).toBe('consent');
-    expect(stageAfterInterviewLoad(interviewFixture(), 'returning')).toBe('lobby');
-    expect(
-      resolveExhaustedHint({
-        attemptsExhausted: true,
-        recording: false,
-        submitAllowed: true,
-        serverHasMedia: true,
-      }),
-    ).toBe('submit');
-    expect(
-      resolveExhaustedHint({
-        attemptsExhausted: true,
-        recording: false,
-        submitAllowed: false,
-        serverHasMedia: false,
-      }),
-    ).toBe('no-media');
+    expect(stageAfterInterviewLoad(recording, 'returning')).toBe('lobby');
+    expect(stageAfterInterviewLoad(review, 'returning')).toBe('interview');
+    expect(stageAfterInterviewLoad(blocked, 'returning')).toBe('interview');
   });
 });

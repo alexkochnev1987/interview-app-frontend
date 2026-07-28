@@ -5,13 +5,32 @@ import {
   type AnswerAttemptMeta,
 } from './attempt-limit';
 
+export type ClientInterviewLoadMode = 'initial' | 'resume' | 'locale';
+
 export type PendingVersionAction = 'submit' | 'rerecord' | null;
 export type VersionPersistKind = Exclude<PendingVersionAction, null>;
 
 /** initial = first-time invite (consent); resume = soft continue in-tab; returning = cookie reload. */
 export type InterviewLoadMode = 'initial' | 'resume' | 'returning';
 
-export type ExhaustedHint = 'submit' | 'no-media' | 'unavailable';
+/** Per-question UX: record (lobby + autostart), review media (exhausted), or blocked (no media). */
+export type QuestionAnswerPhase = 'recording' | 'review' | 'blocked';
+
+/** UI copy key for exhausted review/blocked states. */
+export type ExhaustedHint = 'submit' | 'no-media';
+
+export function resolveQuestionAnswerPhase(
+  interview: TakeInterviewData | null | undefined,
+): QuestionAnswerPhase {
+  const meta = answerAttemptMetaFromInterview(interview);
+  if (!isAttemptsExhausted(meta)) {
+    return 'recording';
+  }
+  if (interview?.currentAnswerMeta?.hasSubmittableMedia) {
+    return 'review';
+  }
+  return 'blocked';
+}
 
 export function stageAfterInterviewLoad(
   interview: TakeInterviewData,
@@ -24,10 +43,25 @@ export function stageAfterInterviewLoad(
     return 'consent';
   }
   if (mode === 'returning') {
-    // Devices/MediaRecorder cannot resume after F5 — re-check capture in lobby.
+    // Devices/MediaRecorder cannot resume after F5 — re-check capture in lobby
+    // unless attempts are exhausted (review/blocked go straight to interview).
+    if (!canStartNewAttempt(answerAttemptMetaFromInterview(interview))) {
+      return 'interview';
+    }
     return 'lobby';
   }
   return 'interview';
+}
+
+/** Maps client loader modes to session routing (SSR prefetch counts as returning). */
+export function resolveInterviewLoadMode(
+  mode: ClientInterviewLoadMode,
+  options: { serverPrefetched?: boolean },
+): InterviewLoadMode {
+  if (mode === 'resume' || mode === 'locale') {
+    return 'resume';
+  }
+  return options.serverPrefetched ? 'returning' : 'initial';
 }
 
 export function answerAttemptMetaFromInterview(
@@ -36,29 +70,16 @@ export function answerAttemptMetaFromInterview(
   if (!interview) {
     return undefined;
   }
+  const meta = interview.currentAnswerMeta;
   return {
-    ...interview.currentAnswerMeta,
-    maxAttempts: interview.maxAttempts,
+    versionCount: meta?.versionCount,
+    selectedVersionNumber: meta?.selectedVersionNumber,
+    maxAttempts: meta?.maxAttempts ?? interview.maxAttempts,
   };
 }
 
 export function isAttemptsExhausted(meta?: AnswerAttemptMeta): boolean {
   return !canStartNewAttempt(meta);
-}
-
-export function resolveExhaustedHint(params: {
-  attemptsExhausted: boolean;
-  recording: boolean;
-  submitAllowed: boolean;
-  serverHasMedia: boolean;
-}): ExhaustedHint | null {
-  if (!params.attemptsExhausted || params.recording) {
-    return null;
-  }
-  if (params.submitAllowed) {
-    return 'submit';
-  }
-  return params.serverHasMedia ? 'unavailable' : 'no-media';
 }
 
 export function canRequestVersionAction(params: {

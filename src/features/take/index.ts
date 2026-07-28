@@ -6,7 +6,6 @@ export * from './recording-session-id';
 export * from './runtime';
 export * from './recording-header-status';
 export * from './session-machine';
-export * from './upload-checkpoint';
 export * from './uploads';
 export * from './use-take-answer-persistence';
 export * from './use-take-behavior-tracking';

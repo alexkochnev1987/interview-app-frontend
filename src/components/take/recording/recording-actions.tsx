@@ -22,6 +22,7 @@ interface TakeRecordingActionsProps {
   attemptsExhausted: boolean;
   submitAllowed: boolean;
   exhaustedHint: ExhaustedHint | null;
+  showDeviceReconnect: boolean;
   onReconnect: () => void;
   onRerecord: () => void;
   onSubmit: () => void;
@@ -29,9 +30,8 @@ interface TakeRecordingActionsProps {
 }
 
 const EXHAUSTED_HINT_KEY = {
-  submit: 'attemptsExhaustedSubmitHint',
+  submit: 'reviewSubmitBanner',
   'no-media': 'attemptsExhaustedNoMedia',
-  unavailable: 'attemptsExhaustedSubmitUnavailable',
 } as const;
 
 export function TakeRecordingActions({
@@ -48,6 +48,7 @@ export function TakeRecordingActions({
   attemptsExhausted,
   submitAllowed,
   exhaustedHint,
+  showDeviceReconnect,
   onReconnect,
   onRerecord,
   onSubmit,
@@ -69,7 +70,7 @@ export function TakeRecordingActions({
 
   return (
     <Stack align="stretch" gap={3} width="full">
-      {!capturePipelineReady || setupError ? (
+      {showDeviceReconnect && (!capturePipelineReady || setupError) ? (
         <Button
           type="button"
           variant="outline"
@@ -90,6 +91,11 @@ export function TakeRecordingActions({
           {displayedAttemptNumber}/{maxAttempts}
         </BodyText>
       </Inline>
+      {!attemptsExhausted || recording ? (
+        <BodyText size="xs" tone="muted">
+          {tTake('reloadUsesCurrentAttemptHint')}
+        </BodyText>
+      ) : null}
 
       {!attemptsExhausted || recording ? (
         <Button
@@ -109,9 +115,14 @@ export function TakeRecordingActions({
           {tTake('retakeDisabledAtLimitHint')}
         </BodyText>
       ) : null}
-      {exhaustedHint ? (
+      {exhaustedHint === 'submit' ? (
+        <BodyText size="sm" tone="foreground" weight="medium">
+          {tTake(EXHAUSTED_HINT_KEY.submit)}
+        </BodyText>
+      ) : null}
+      {exhaustedHint === 'no-media' ? (
         <BodyText size="xs" tone="muted">
-          {tTake(EXHAUSTED_HINT_KEY[exhaustedHint])}
+          {tTake(EXHAUSTED_HINT_KEY['no-media'])}
         </BodyText>
       ) : null}
       <Button

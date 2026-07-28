@@ -1,3 +1,11 @@
+import { ApiError } from '@/lib/api-error';
+import {
+  MAX_ANSWER_ATTEMPTS_PER_QUESTION,
+  isAnswerAttemptLimitError,
+  isAnswerVersionOverwriteError,
+  isRecordingSessionMismatchError,
+} from './attempt-limit';
+
 export const TAKE_MESSAGES = {
   questionCountOne: '{count} question',
   questionCountOther: '{count} questions',
@@ -10,6 +18,9 @@ export const TAKE_MESSAGES = {
     'Recording stopped without a follow-up action. Start a new version for this answer.',
   uploadFailedFallback: 'Upload failed',
   submitFailedTitle: 'Submit failed',
+  retakeFailedTitle: 'Retake failed',
+  answerVersionOverwriteForbidden:
+    'This recording attempt already has uploaded media. Start a new attempt instead of overwriting it.',
   reconnectCameraAndScreen: 'Reconnect camera + screen',
   rerecordAsNewVersion: 'Retake',
   submitAndNext: 'Submit & Next',
@@ -119,14 +130,16 @@ export const TAKE_MESSAGES = {
     'This interview is already being recorded in another tab. Continue there, or close the other tab and refresh.',
   attemptBurnsOnRecordStart:
     'Each time recording starts it uses one attempt. Reloading the page during a recording also uses that attempt.',
+  reloadUsesCurrentAttemptHint:
+    'Reloading the page uses up the current recording attempt. You cannot continue or re-record that same attempt after reload.',
   attemptsExhaustedGuidance:
     'All recording attempts for this question are used. You cannot start another recording.',
   attemptsExhaustedNoMedia:
     'There is no usable recording left to submit for this question.',
   attemptsExhaustedSubmitHint:
-    'A recording from this attempt is available. Submit it to continue.',
-  attemptsExhaustedSubmitUnavailable:
-    'This tab cannot finalize the saved recording after reload. Open the original tab if it is still available, or ask your recruiter for help.',
+    'A saved recording is ready. Press Submit to keep it and continue.',
+  reviewSubmitBanner:
+    'Recording will not restart. Press Submit to save this answer and continue to the next question, or finish the interview if this is the last question.',
 } as const;
 
 export type TakeMessageKey = keyof typeof TAKE_MESSAGES;
@@ -136,6 +149,36 @@ export type TakeMessageGetter = (
   key: TakeMessageKey,
   values?: TakeMessageValues,
 ) => string;
+
+export function mapTakeSubmitErrorMessage(
+  error: unknown,
+  takeMessage: TakeMessageGetter,
+  options?: { maxAttempts?: number },
+): string {
+  if (isRecordingSessionMismatchError(error)) {
+    return takeMessage('recordingSessionMismatch');
+  }
+  if (isAnswerAttemptLimitError(error)) {
+    return takeMessage('answerAttemptLimitReached', {
+      max: options?.maxAttempts ?? MAX_ANSWER_ATTEMPTS_PER_QUESTION,
+    });
+  }
+  if (isAnswerVersionOverwriteError(error)) {
+    return takeMessage('answerVersionOverwriteForbidden');
+  }
+  if (error instanceof ApiError) {
+    if (error.code === 'ANSWER_VERSION_NOT_RESERVED') {
+      return takeMessage('attemptsExhaustedNoMedia');
+    }
+    if (error.message.trim()) {
+      return error.message;
+    }
+  }
+  if (error instanceof Error && error.message.trim()) {
+    return error.message;
+  }
+  return takeMessage('submitFallbackDetail');
+}
 
 export function formatTakeQuestionCountLabel(
   count: number,

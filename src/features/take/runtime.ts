@@ -21,6 +21,8 @@ export interface MultipartUploadSession {
   bufferedChunks: Blob[];
   bufferedBytes: number;
   recordedBytes: number;
+  /** True after answer progress has persisted this session's mediaKey on the server. */
+  mediaKeyPersisted: boolean;
   uploadChain: Promise<void>;
   completed: boolean;
   aborted: boolean;
@@ -155,6 +157,7 @@ export function createMultipartUploadSession(session: MultipartSessionSeed): Mul
     bufferedChunks: [],
     bufferedBytes: 0,
     recordedBytes: 0,
+    mediaKeyPersisted: false,
     uploadChain: Promise.resolve(),
     completed: false,
     aborted: false,

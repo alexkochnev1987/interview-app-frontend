@@ -7,13 +7,21 @@ import {
   MAX_ANSWER_ATTEMPTS_PER_QUESTION,
   isAnswerAttemptLimitError,
   isRecordingSessionMismatchError,
-  shouldSendAnswerProgressDuringRecording,
 } from './attempt-limit';
 import { resolveRecordingSessionId } from './recording-session-id';
-import { saveTakeUploadCheckpoint } from './upload-checkpoint';
 import type { TakeMessageGetter } from './messages';
 
 type PendingVersionAction = 'submit' | 'rerecord' | null;
+
+export interface AnswerMetaUpdate {
+  versionCount: number;
+  selectedVersionNumber: number;
+  status?: 'recording' | 'submitted';
+  maxAttempts?: number;
+  recordingSessionId?: string;
+  hasSubmittableMedia?: boolean;
+  latestSubmittableVersionNumber?: number | null;
+}
 
 interface UseTakeBeginRecordingParams {
   interviewId: string;
@@ -43,14 +51,7 @@ interface UseTakeBeginRecordingParams {
   clearVersionPersistKind: () => void;
   clearRecordingArtifacts: () => void;
   resetInterviewSetup: (message: string) => void;
-  onAnswerMetaUpdated: (meta: {
-    versionCount: number;
-    selectedVersionNumber: number;
-    status?: 'recording' | 'submitted';
-    maxAttempts?: number;
-    hasMediaOnSelectedVersion?: boolean;
-    recordingSessionId?: string;
-  }) => void;
+  onAnswerMetaUpdated: (meta: AnswerMetaUpdate) => void;
   getAnswerMaxAttempts?: () => number;
   startMultipartUploadSession: (
     questionIndex: number,
@@ -74,7 +75,6 @@ export interface BeginRecordingInput {
   reuseReservedAttempt?: boolean;
   versionCount?: number;
   maxAttempts?: number;
-  hasMediaOnSelectedVersion?: boolean;
 }
 
 export function useTakeBeginRecording({
@@ -131,7 +131,6 @@ export function useTakeBeginRecording({
     reuseReservedAttempt = false,
     versionCount,
     maxAttempts,
-    hasMediaOnSelectedVersion,
   }: BeginRecordingInput) {
     if (!cameraStreamRef.current || !screenStreamRef.current) {
       resetInterviewSetup(takeMessage('lobbyInterviewStartBlocked'));
@@ -161,7 +160,6 @@ export function useTakeBeginRecording({
       let resolvedVersionCount = versionCount ?? Math.max(nextVersionNumber, 0);
       let resolvedMaxAttempts =
         maxAttempts ?? getAnswerMaxAttempts?.() ?? MAX_ANSWER_ATTEMPTS_PER_QUESTION;
-      let resolvedHasMedia = Boolean(hasMediaOnSelectedVersion);
       let resolvedStatus: 'recording' | 'submitted' = 'recording';
 
       if (!reuseReservedAttempt) {
@@ -174,8 +172,6 @@ export function useTakeBeginRecording({
         resolvedVersionCount = reserved.versionCount;
         resolvedMaxAttempts = reserved.maxAttempts;
         resolvedStatus = reserved.status;
-        // A freshly reserved stub never has media yet.
-        resolvedHasMedia = false;
       }
 
       currentVersionNumberRef.current = versionNumber;
@@ -186,7 +182,6 @@ export function useTakeBeginRecording({
         selectedVersionNumber: versionNumber,
         status: resolvedStatus,
         maxAttempts: resolvedMaxAttempts,
-        hasMediaOnSelectedVersion: resolvedHasMedia,
         recordingSessionId,
       });
 
@@ -204,26 +199,8 @@ export function useTakeBeginRecording({
         screen: screenUpload,
       };
 
-      saveTakeUploadCheckpoint(interviewId, {
-        questionIndex: currentQuestionIndex,
-        versionNumber,
-        cameraMediaKey: cameraUpload.mediaKey,
-        screenMediaKey: screenUpload.mediaKey,
-        recordingSessionId,
-        startedAt: answerStartedAtRef.current ?? undefined,
-        cameraUploadId: cameraUpload.uploadId,
-        screenUploadId: screenUpload.uploadId,
-        multipartCompleted: false,
-        hasMedia: resolvedHasMedia,
-      });
-
-      if (shouldSendAnswerProgressDuringRecording(versionNumber, {
-        versionCount: resolvedVersionCount,
-        maxAttempts: resolvedMaxAttempts,
-      })) {
-        await flushAnswerProgress(true);
-        startProgressHeartbeat();
-      }
+      await flushAnswerProgress(true);
+      startProgressHeartbeat();
     } catch (err) {
       await abortMultipartUploads();
       clearRecordingArtifacts();

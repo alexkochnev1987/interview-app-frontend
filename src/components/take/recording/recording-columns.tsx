@@ -63,6 +63,7 @@ interface TakeRecordingSidebarColumnProps {
   recording: boolean;
   progressValue: number;
   submitError: string;
+  actionErrorKind: 'submit' | 'rerecord' | null;
   recordingStartBusy: boolean;
   retakeDisabled: boolean;
   displayedAttemptNumber: number;
@@ -70,6 +71,7 @@ interface TakeRecordingSidebarColumnProps {
   attemptsExhausted: boolean;
   submitAllowed: boolean;
   exhaustedHint: ExhaustedHint | null;
+  showDeviceReconnect: boolean;
   isBrowserTranscriptSupported: boolean;
   finalTranscript: string;
   interimTranscript: string;
@@ -90,6 +92,7 @@ export function TakeRecordingSidebarColumn({
   recording,
   progressValue,
   submitError,
+  actionErrorKind,
   recordingStartBusy,
   retakeDisabled,
   displayedAttemptNumber,
@@ -97,6 +100,7 @@ export function TakeRecordingSidebarColumn({
   attemptsExhausted,
   submitAllowed,
   exhaustedHint,
+  showDeviceReconnect,
   isBrowserTranscriptSupported,
   finalTranscript,
   interimTranscript,
@@ -147,6 +151,7 @@ export function TakeRecordingSidebarColumn({
               recordingStartBusy={recordingStartBusy}
               interviewerPresence={interviewerPresence}
               attemptsExhausted={attemptsExhausted}
+              exhaustedHint={exhaustedHint}
             />
 
             <TakeRecordingActions
@@ -163,6 +168,7 @@ export function TakeRecordingSidebarColumn({
               attemptsExhausted={attemptsExhausted}
               submitAllowed={submitAllowed}
               exhaustedHint={exhaustedHint}
+              showDeviceReconnect={showDeviceReconnect}
               onReconnect={onReconnect}
               onRerecord={onRerecord}
               onSubmit={onSubmit}
@@ -171,7 +177,11 @@ export function TakeRecordingSidebarColumn({
 
             {submitError ? (
               <Alert variant="destructive">
-                <AlertTitle>{tTake('submitFailedTitle')}</AlertTitle>
+                <AlertTitle>
+                  {tTake(
+                    actionErrorKind === 'rerecord' ? 'retakeFailedTitle' : 'submitFailedTitle',
+                  )}
+                </AlertTitle>
                 <AlertDescription>{submitError}</AlertDescription>
               </Alert>
             ) : null}

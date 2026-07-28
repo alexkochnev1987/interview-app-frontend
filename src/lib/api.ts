@@ -182,6 +182,8 @@ export type ReserveAnswerAttemptPayload = Schemas['ReserveAnswerAttemptDto'];
 export type ReserveTakeAnswerResponse = Schemas['ReserveTakeAnswerResponseDto'];
 
 export type SubmitTakeAnswerPayload = Schemas['SubmitAnswerDto'];
+export type FinalizeTakeAnswerPayload = Schemas['FinalizeAnswerAttemptDto'];
+export type FinalizeTakeAnswerResponse = Schemas['FinalizeTakeAnswerResponseDto'];
 
 export type CaptureTarget = 'camera' | 'screen';
 
@@ -1032,6 +1034,17 @@ export async function submitTakeAnswer(
     ...LOCALIZED_HEADERS,
     params: { path: { id } },
     body: payload
+  }));
+}
+
+export async function finalizeTakeAnswer(
+  id: string,
+  payload: FinalizeTakeAnswerPayload,
+): Promise<FinalizeTakeAnswerResponse> {
+  return handle(client.POST('/take/{id}/answer/finalize', {
+    ...LOCALIZED_HEADERS,
+    params: { path: { id } },
+    body: payload,
   }));
 }
 

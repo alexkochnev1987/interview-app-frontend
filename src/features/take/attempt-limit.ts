@@ -4,6 +4,7 @@ export const MAX_ANSWER_ATTEMPTS_PER_QUESTION = 3;
 
 export const ANSWER_ATTEMPT_LIMIT_REACHED_CODE = 'ANSWER_ATTEMPT_LIMIT_REACHED';
 export const RECORDING_SESSION_MISMATCH_CODE = 'RECORDING_SESSION_MISMATCH';
+export const ANSWER_VERSION_OVERWRITE_FORBIDDEN_CODE = 'ANSWER_VERSION_OVERWRITE_FORBIDDEN';
 
 export interface AnswerAttemptMeta {
   versionCount?: number;
@@ -55,15 +56,19 @@ export function canRequestRetake(
 }
 
 /**
- * Progress is sent for every in-flight reserved attempt, including the final one.
- * Do not gate on versionCount: reserve already increments versionCount before upload.
+ * Reuse the same reserved slot only for a true stub (no media on this version yet).
+ * Once progress/upload has a mediaKey for the current version, retake must reserve N+1.
  */
-export function shouldSendAnswerProgressDuringRecording(
-  versionNumber: number,
-  meta?: AnswerAttemptMeta,
-): boolean {
-  const max = getMaxAttempts(meta);
-  return versionNumber >= 1 && versionNumber <= max;
+export function shouldReuseReservedAttemptForRetake(params: {
+  currentVersionNumber: number;
+  hasSubmittableMedia?: boolean;
+  latestSubmittableVersionNumber?: number | null;
+  localVersionHasMedia: boolean;
+}): boolean {
+  const serverHasMediaOnCurrent =
+    Boolean(params.hasSubmittableMedia) &&
+    params.latestSubmittableVersionNumber === params.currentVersionNumber;
+  return !serverHasMediaOnCurrent && !params.localVersionHasMedia;
 }
 
 export function getDisplayedAttemptNumber(
@@ -84,4 +89,8 @@ export function isAnswerAttemptLimitError(error: unknown): boolean {
 
 export function isRecordingSessionMismatchError(error: unknown): boolean {
   return error instanceof ApiError && error.code === RECORDING_SESSION_MISMATCH_CODE;
+}
+
+export function isAnswerVersionOverwriteError(error: unknown): boolean {
+  return error instanceof ApiError && error.code === ANSWER_VERSION_OVERWRITE_FORBIDDEN_CODE;
 }

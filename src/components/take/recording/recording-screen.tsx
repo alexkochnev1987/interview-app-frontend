@@ -22,6 +22,7 @@ interface TakeRecordingScreenProps {
   setupError: string;
   capturePipelineReady: boolean;
   submitError: string;
+  actionErrorKind: 'submit' | 'rerecord' | null;
   timeLeft: number;
   versionPersistKind: VersionPersistKind | null;
   uploading: boolean;
@@ -40,6 +41,7 @@ interface TakeRecordingScreenProps {
   attemptsExhausted: boolean;
   submitAllowed: boolean;
   exhaustedHint: ExhaustedHint | null;
+  showDeviceReconnect: boolean;
   onReconnect: () => void;
   onRerecord: () => void;
   onSubmit: () => void;
@@ -55,6 +57,7 @@ export function TakeRecordingScreen({
   setupError,
   capturePipelineReady,
   submitError,
+  actionErrorKind,
   timeLeft,
   versionPersistKind,
   uploading,
@@ -73,6 +76,7 @@ export function TakeRecordingScreen({
   attemptsExhausted,
   submitAllowed,
   exhaustedHint,
+  showDeviceReconnect,
   onReconnect,
   onRerecord,
   onSubmit,
@@ -113,6 +117,7 @@ export function TakeRecordingScreen({
             recording={recording}
             progressValue={progressValue}
             submitError={submitError}
+            actionErrorKind={actionErrorKind}
             recordingStartBusy={recordingStartBusy}
             retakeDisabled={retakeDisabled}
             displayedAttemptNumber={displayedAttemptNumber}
@@ -120,6 +125,7 @@ export function TakeRecordingScreen({
             attemptsExhausted={attemptsExhausted}
             submitAllowed={submitAllowed}
             exhaustedHint={exhaustedHint}
+            showDeviceReconnect={showDeviceReconnect}
             isBrowserTranscriptSupported={isBrowserTranscriptSupported}
             finalTranscript={finalTranscript}
             interimTranscript={interimTranscript}

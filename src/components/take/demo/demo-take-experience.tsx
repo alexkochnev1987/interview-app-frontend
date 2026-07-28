@@ -79,6 +79,7 @@ export function DemoTakeExperience({
           setupError={demo.setupError}
           capturePipelineReady={demo.cameraStatus === 'granted'}
           submitError=""
+          actionErrorKind={null}
           timeLeft={demo.timeLeft}
           versionPersistKind={null}
           uploading={false}
@@ -96,6 +97,7 @@ export function DemoTakeExperience({
           attemptsExhausted={false}
           submitAllowed={demo.recording}
           exhaustedHint={null}
+          showDeviceReconnect
           onReconnect={() => undefined}
           onRerecord={demo.onRerecord}
           onSubmit={demo.onSubmit}
