@@ -544,10 +544,12 @@ export function useTakeOrchestrator({
       setStage('interview')
     }
 
+    // eslint-disable-next-line unicorn/prefer-add-event-listener
     screenTrack.onended = onEnded
 
     return () => {
       if (screenTrack.onended === onEnded) {
+        // eslint-disable-next-line unicorn/prefer-add-event-listener
         screenTrack.onended = null
       }
     }

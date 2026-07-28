@@ -80,6 +80,7 @@ export function TemplateForm({
       if (value) seen.add(value)
     }
     if (template?.position?.trim()) seen.add(template.position.trim())
+    // eslint-disable-next-line unicorn/no-array-sort
     return Array.from(seen).sort((a, b) => a.localeCompare(b))
   }, [templates, template])
 

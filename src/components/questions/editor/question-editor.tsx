@@ -718,6 +718,7 @@ export function QuestionEditor({
     return () => {
       window.clearTimeout(timeoutId)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uiLocale])
 
   function dismissDraftField(field: DraftFieldKey) {
