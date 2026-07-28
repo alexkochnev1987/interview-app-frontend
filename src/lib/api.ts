@@ -350,6 +350,7 @@ export async function fetchHrUsers(init?: { signal?: AbortSignal }): Promise<Ass
   let offset = 0
 
   while (true) {
+    // oxlint-disable-next-line no-await-in-loop
     const users = await fetchUsers({ limit: pageSize, offset, role: 'hr' }, init)
     hrUsers.push(...users.map(({ id, name, email }) => ({ id, name, email })))
     if (users.length < pageSize) break

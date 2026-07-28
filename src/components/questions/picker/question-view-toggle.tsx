@@ -1,12 +1,11 @@
 'use client'
 
-import { type KeyboardEvent } from 'react'
 import { LayoutGrid, Rows3 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { type KeyboardEvent } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { SegmentedGroup } from '@/components/ui/segmented-group'
-
 import type { QuestionView } from '@/lib/questions-query-state'
 
 export type QuestionViewToggleProps = {
@@ -24,8 +23,12 @@ export function QuestionViewToggle({ view, onViewChange }: QuestionViewTogglePro
     event.preventDefault()
     const next: QuestionView =
       event.key === 'ArrowRight' || event.key === 'ArrowDown'
-        ? view === 'cards' ? 'table' : 'cards'
-        : view === 'table' ? 'cards' : 'table'
+        ? view === 'cards'
+          ? 'table'
+          : 'cards'
+        : view === 'table'
+          ? 'cards'
+          : 'table'
     onViewChange(next)
     const label = next === 'cards' ? t('switchToCards') : t('switchToTable')
     event.currentTarget.querySelector<HTMLElement>(`[aria-label="${label}"]`)?.focus()
@@ -38,6 +41,7 @@ export function QuestionViewToggle({ view, onViewChange }: QuestionViewTogglePro
         variant={view === 'cards' ? 'secondary' : 'ghost'}
         shape="pill"
         size="sm"
+        // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role
         role="radio"
         aria-checked={view === 'cards'}
         aria-label={t('switchToCards')}
@@ -52,6 +56,7 @@ export function QuestionViewToggle({ view, onViewChange }: QuestionViewTogglePro
         variant={view === 'table' ? 'secondary' : 'ghost'}
         shape="pill"
         size="sm"
+        // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role
         role="radio"
         aria-checked={view === 'table'}
         aria-label={t('switchToTable')}
