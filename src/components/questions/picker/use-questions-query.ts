@@ -1,5 +1,6 @@
 'use client'
 
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { useSearchParams } from 'next/navigation'
 import {
   useCallback,
@@ -10,7 +11,6 @@ import {
   type Dispatch,
   type SetStateAction,
 } from 'react'
-import { keepPreviousData, useQuery } from '@tanstack/react-query'
 
 import { usePathname, useRouter } from '@/i18n/navigation'
 import {
@@ -22,6 +22,7 @@ import {
   type QuestionSortOrder,
   type QuestionStatusFilter,
 } from '@/lib/api'
+import { getErrorMessage } from '@/lib/api-error'
 import {
   buildQuestionsFetchParams,
   DEFAULT_QUESTIONS_LIMIT,
@@ -31,12 +32,11 @@ import {
   type QuestionView,
   type QuestionsQueryState,
 } from '@/lib/questions-query-state'
-
-import { questionsListQueryKey } from './query-keys'
-import { isPlaceholderLoading, useVoidCallback } from './query-hook-helpers'
-import { splitListQueryErrors } from './split-questions-query-errors'
-import {getErrorMessage} from '@/lib/api-error';
 import { useToastMessages } from '@/lib/use-toast-messages'
+
+import { isPlaceholderLoading, useVoidCallback } from './query-hook-helpers'
+import { questionsListQueryKey } from './query-keys'
+import { splitListQueryErrors } from './split-questions-query-errors'
 
 const VIEW_STORAGE_KEY = 'questions:view'
 
@@ -44,7 +44,7 @@ function withLockedDefaults(
   initial?: Partial<QuestionsQueryState>,
   lockStatus?: QuestionStatusFilter,
 ): QuestionsQueryState {
-  const base = { ...DEFAULT_QUESTIONS_QUERY, ...(initial ?? {}) }
+  const base = { ...DEFAULT_QUESTIONS_QUERY, ...initial }
   if (lockStatus) base.status = lockStatus
   return base
 }
@@ -121,16 +121,14 @@ function writeToSearchParams(state: QuestionsQueryState): URLSearchParams {
   return params
 }
 
-export function useQuestionsQuery(
-  options: UseQuestionsQueryOptions = {},
-): UseQuestionsQueryResult {
+export function useQuestionsQuery(options: UseQuestionsQueryOptions = {}): UseQuestionsQueryResult {
   const {
     initial,
     serverHydrated,
     syncUrl,
     lockStatus,
     disableFetchInCardsView,
-    eligibleForInterview
+    eligibleForInterview,
   } = options
   const [capturedInitial] = useState<Partial<QuestionsQueryState> | undefined>(initial)
   const router = useRouter()
@@ -141,10 +139,7 @@ export function useQuestionsQuery(
 
   const [state, setState] = useState<QuestionsQueryState>(() => {
     const base = withLockedDefaults(capturedInitial, lockStatus)
-    const start =
-      syncUrl && searchParams
-        ? readQuestionsFromSearchParams(searchParams, base)
-        : base
+    const start = syncUrl && searchParams ? readQuestionsFromSearchParams(searchParams, base) : base
     if (start.view === 'cards' && start.page !== 1) start.page = 1
     return start
   })
@@ -167,10 +162,7 @@ export function useQuestionsQuery(
 
   useEffect(() => {
     if (state.q === debouncedQ) return
-    const handle = window.setTimeout(
-      () => setDebouncedQ(state.q),
-      QUESTIONS_SEARCH_DEBOUNCE_MS,
-    )
+    const handle = window.setTimeout(() => setDebouncedQ(state.q), QUESTIONS_SEARCH_DEBOUNCE_MS)
     return () => window.clearTimeout(handle)
   }, [state.q, debouncedQ])
 
@@ -194,9 +186,7 @@ export function useQuestionsQuery(
     }
     if (currentUrl !== lastWrittenUrlRef.current) {
       const base = withLockedDefaults(capturedInitial, lockStatus)
-      const fromUrl = searchParams
-        ? readQuestionsFromSearchParams(searchParams, base)
-        : base
+      const fromUrl = searchParams ? readQuestionsFromSearchParams(searchParams, base) : base
       lastWrittenUrlRef.current = currentUrl
       setState(fromUrl)
       setDebouncedQ(fromUrl.q)
@@ -230,7 +220,8 @@ export function useQuestionsQuery(
 
   const items = query.data?.items ?? []
   const loading = isPlaceholderLoading(query)
-  const errorMessage = getErrorMessage(query.error, toastMessages.questions.loadFailedFallback) ?? null
+  const errorMessage =
+    getErrorMessage(query.error, toastMessages.questions.loadFailedFallback) ?? null
   const { blockingError, paginationError } = splitListQueryErrors(
     errorMessage,
     items.length,
@@ -251,8 +242,7 @@ export function useQuestionsQuery(
   }, [])
 
   const resetToPageOne = useCallback(
-    (patch: Partial<QuestionsQueryState>) =>
-      setState((prev) => ({ ...prev, ...patch, page: 1 })),
+    (patch: Partial<QuestionsQueryState>) => setState((prev) => ({ ...prev, ...patch, page: 1 })),
     [],
   )
 
@@ -305,14 +295,11 @@ export function useQuestionsQuery(
     })
     writeStoredView(value)
   }, [])
-  const reset = useCallback(
-    () => {
-      const base = withLockedDefaults(capturedInitial, lockStatus)
-      setState((prev) => ({ ...base, view: prev.view }))
-      setDebouncedQ(base.q)
-    },
-    [capturedInitial, lockStatus],
-  )
+  const reset = useCallback(() => {
+    const base = withLockedDefaults(capturedInitial, lockStatus)
+    setState((prev) => ({ ...base, view: prev.view }))
+    setDebouncedQ(base.q)
+  }, [capturedInitial, lockStatus])
   const refetch = useVoidCallback(query.refetch)
 
   const canReset = useMemo(() => {
