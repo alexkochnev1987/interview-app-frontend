@@ -208,7 +208,6 @@ export function useTakeVersionPersistence({
             hasUploadedCameraParts ||
             hasUploadedScreenParts;
 
-          // Progress can set mediaKeyPersisted with no bytes/parts; do not POST @Min(1) zeros.
           const isEmptyPersistedStub =
             (cameraUpload.mediaKeyPersisted || screenUpload.mediaKeyPersisted) &&
             cameraUpload.uploadedPartCount === 0 &&
@@ -229,7 +228,6 @@ export function useTakeVersionPersistence({
             await abortMultipartUploads();
             clearRecordingArtifacts();
             pendingVersionActionRef.current = null;
-            // True stub only — restart the same reserved slot.
             await startNextRecording(currentVersion, {
               reuseReservedAttempt: true,
               versionCount: answerMeta?.versionCount ?? currentVersion,
@@ -239,7 +237,6 @@ export function useTakeVersionPersistence({
           }
 
           if (isEmptyPersistedStub) {
-            // mediaKey was persisted via progress but nothing uploaded — skip empty answer POST.
             await abortMultipartUploads();
             clearRecordingArtifacts();
             pendingVersionActionRef.current = null;

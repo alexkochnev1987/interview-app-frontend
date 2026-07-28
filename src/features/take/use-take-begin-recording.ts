@@ -49,17 +49,11 @@ interface UseTakeBeginRecordingParams {
   resetInterviewSetup: (message: string) => void;
   onAnswerMetaUpdated: (meta: AnswerMetaUpdate) => void;
   getAnswerMaxAttempts?: () => number;
-  /** Double-guard: exhausted / non-recording phases must not reserve or progress. */
   canStartRecordingAttempt?: () => boolean;
-  /**
-   * After reserve succeeds but start fails, stash slot so immediate autostart can
-   * retry with reuseReservedAttempt (no second reserve).
-   */
   pendingReuseReservedRef: MutableRefObject<{
     versionNumber: number;
     versionCount: number;
     maxAttempts: number;
-    /** How many start failures already happened for this reserved slot. */
     failCount: number;
   } | null>;
   startMultipartUploadSession: (
@@ -80,7 +74,6 @@ export interface BeginRecordingInput {
   nextVersionNumber: number;
   hasCurrentQuestion: boolean;
   currentQuestionIndex: number;
-  /** Reuse an already-reserved attempt slot (e.g. retake before any parts uploaded). */
   reuseReservedAttempt?: boolean;
   versionCount?: number;
   maxAttempts?: number;
@@ -231,7 +224,6 @@ export function useTakeBeginRecording({
       clearRecordingArtifacts();
       const priorFails = pendingReuseReservedRef.current?.failCount ?? 0;
       const nextFailCount = priorFails + 1;
-      // Keep reserved slot for immediate autostart retry — do not burn another attempt.
       pendingReuseReservedRef.current = reservedSlot
         ? { ...reservedSlot, failCount: nextFailCount }
         : null;
@@ -243,7 +235,6 @@ export function useTakeBeginRecording({
           }),
         );
       } else if (reservedSlot && nextFailCount <= 1) {
-        // One immediate reuse autostart while devices are still live.
         setSetupError('');
       } else {
         setSetupError(

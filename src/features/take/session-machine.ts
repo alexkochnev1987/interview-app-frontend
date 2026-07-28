@@ -11,13 +11,10 @@ export type ClientInterviewLoadMode = 'initial' | 'resume' | 'locale';
 export type PendingVersionAction = 'submit' | 'rerecord' | null;
 export type VersionPersistKind = Exclude<PendingVersionAction, null>;
 
-/** initial = first-time invite (consent); resume = soft continue in-tab; returning = cookie reload. */
 export type InterviewLoadMode = 'initial' | 'resume' | 'returning';
 
-/** Per-question UX: record (lobby + autostart), review media (exhausted), or blocked (no media). */
 export type QuestionAnswerPhase = 'recording' | 'review' | 'blocked';
 
-/** UI copy key for exhausted review/blocked states. */
 export type ExhaustedHint = 'submit' | 'no-media';
 
 export function resolveQuestionAnswerPhase(
@@ -44,9 +41,6 @@ export function stageAfterInterviewLoad(
     return 'consent';
   }
   if (mode === 'returning') {
-    // Devices/MediaRecorder cannot resume after F5 — go through lobby when more
-    // recording may follow (attempts left, or exhausted mid-interview before next Q).
-    // Exhausted on the last question: Submit finishes — skip lobby.
     const exhausted = isAttemptsExhausted(answerAttemptMetaFromInterview(interview));
     if (
       exhausted &&
@@ -59,7 +53,6 @@ export function stageAfterInterviewLoad(
   return 'interview';
 }
 
-/** Maps client loader modes to session routing (SSR prefetch counts as returning). */
 export function resolveInterviewLoadMode(
   mode: ClientInterviewLoadMode,
   options: { serverPrefetched?: boolean },
@@ -88,7 +81,6 @@ export function isAttemptsExhausted(meta?: AnswerAttemptMeta): boolean {
   return !canStartNewAttempt(meta);
 }
 
-/** True when review/blocked idle — never while a reserve/recording is in flight. */
 export function shouldCleanupExhaustedSession(params: {
   phase: QuestionAnswerPhase;
   recording: boolean;

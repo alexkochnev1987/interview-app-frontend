@@ -20,7 +20,6 @@ export interface MultipartUploadSession {
   bufferedChunks: Blob[];
   bufferedBytes: number;
   recordedBytes: number;
-  /** True after answer progress has persisted this session's mediaKey on the server. */
   mediaKeyPersisted: boolean;
   uploadChain: Promise<void>;
   completed: boolean;

@@ -102,7 +102,6 @@ describe('take attempt UX', () => {
     expect(stageAfterInterviewLoad(reviewMid, 'returning')).toBe('lobby');
     expect(stageAfterInterviewLoad(exhaustedLast, 'returning')).toBe('interview');
 
-    // After reserve of attempt 3, meta looks like review — still must not abort in-flight start/record.
     expect(
       shouldCleanupExhaustedSession({
         phase: 'review',

@@ -383,7 +383,6 @@ export function useTakeOrchestrator({
         serverPrefetched: Boolean(initialInterview),
       });
 
-      // After finalize/resume: next recording question needs lobby if devices are gone.
       if (mode === 'resume' && resolveQuestionAnswerPhase(data) === 'recording') {
         if (hasLiveCaptureStreams()) {
           setStage('interview');
@@ -797,7 +796,6 @@ export function useTakeOrchestrator({
     ) {
       return;
     }
-    // Idle review/blocked only — never abort an in-flight final attempt after reserve.
     clearProgressTimers(timerRef, progressHeartbeatRef, progressFlushTimeoutRef);
     void abortMultipartUploads();
     setRecording(false);
@@ -860,7 +858,6 @@ export function useTakeOrchestrator({
       }
     }
 
-    // One autostart per question — do not re-fire when versionCount changes after reserve.
     const questionKey = String(interview.currentQuestionIndex);
     if (autoStartedQuestionKeyRef.current === questionKey) {
       return;
@@ -916,7 +913,6 @@ export function useTakeOrchestrator({
 
   const attemptMeta = answerAttemptMetaFromInterview(interview);
   const questionAnswerPhase = resolveQuestionAnswerPhase(interview);
-  // Meta may already be exhausted after reserve of the last slot while still recording.
   const inFlightAttempt = recording || recordingStartBusy;
   const attemptsExhausted = !inFlightAttempt && questionAnswerPhase !== 'recording';
   const submitAllowed =

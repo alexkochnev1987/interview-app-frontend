@@ -8,7 +8,6 @@ export const ANSWER_VERSION_OVERWRITE_FORBIDDEN_CODE = 'ANSWER_VERSION_OVERWRITE
 export interface AnswerAttemptMeta {
   versionCount?: number;
   selectedVersionNumber?: number;
-  /** Interview-level max (or reserve response); falls back to MAX_ANSWER_ATTEMPTS_PER_QUESTION. */
   maxAttempts?: number;
 }
 
@@ -30,7 +29,6 @@ export function resolveInitialVersionNumber(meta?: AnswerAttemptMeta): number {
   if (used >= max) {
     return meta?.selectedVersionNumber ?? used;
   }
-  // After reload, never retarget an already-reserved version — always next unused slot.
   return used + 1;
 }
 
@@ -54,10 +52,6 @@ export function canRequestRetake(
   return currentVersionNumber < getMaxAttempts(meta);
 }
 
-/**
- * Reuse the same reserved slot only for a true stub (no media on this version yet).
- * Once progress/upload has a mediaKey for the current version, retake must reserve N+1.
- */
 export function shouldReuseReservedAttemptForRetake(params: {
   currentVersionNumber: number;
   hasSubmittableMedia?: boolean;

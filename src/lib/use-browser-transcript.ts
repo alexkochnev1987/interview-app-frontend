@@ -42,7 +42,6 @@ function getDefaultLanguage(): string {
 }
 
 export function useBrowserTranscript() {
-  // false on SSR and first client paint to avoid hydration mismatch; detect after mount.
   const [isSupported, setIsSupported] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [interimTranscript, setInterimTranscript] = useState('');

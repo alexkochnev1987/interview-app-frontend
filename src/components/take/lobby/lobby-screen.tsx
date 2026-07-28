@@ -36,7 +36,6 @@ interface TakeLobbyScreenProps {
   lobbyMicOn: boolean;
   lobbyCameraOn: boolean;
   lobbyJoinReady: boolean;
-  /** When true, show copy that devices are for Submit → next question (exhausted review). */
   reviewContinueHint?: boolean;
   onToggleMic: () => void;
   onToggleCamera: () => void;

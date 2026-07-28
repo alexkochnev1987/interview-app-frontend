@@ -140,7 +140,6 @@ export function useTakeAnswerPersistence({
       );
 
       flushedBehaviorEventCountRef.current = behaviorEventsRef.current.length;
-      // Server may keep an older selectedVersionNumber; do not rewind the in-flight attempt.
       const activeVersionNumber = cameraUpload.versionNumber;
       if (progressResponse.selectedVersionNumber === activeVersionNumber) {
         currentVersionNumberRef.current = progressResponse.selectedVersionNumber;
