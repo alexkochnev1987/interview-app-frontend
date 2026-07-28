@@ -63,6 +63,11 @@
     "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^4.1.8"
   },
+  "overrides": {
+    "openapi-typescript": {
+      "typescript": "$typescript"
+    }
+  },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,json,css,md}": [
       "oxfmt --write"
