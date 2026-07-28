@@ -1,38 +1,29 @@
 'use client'
 
-import { useMemo, useState, type FormEvent } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { useLocale, useTranslations } from 'next-intl'
+import { useMemo, useState, type FormEvent } from 'react'
 
+import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import {
   InterviewQuestionPickerAside,
   InterviewQuestionPickerMain,
 } from '@/components/questions/picker/interview-question-picker-section'
 import { useInterviewQuestionPicker } from '@/components/questions/picker/use-interview-question-picker'
 import { templatesListQueryKey } from '@/components/templates/query-keys'
-import {
-  useCreateTemplate,
-  useUpdateTemplate,
-} from '@/components/templates/use-template-mutations'
-import { FormField } from '@/components/ui/form-field'
+import { useCreateTemplate, useUpdateTemplate } from '@/components/templates/use-template-mutations'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { FormField } from '@/components/ui/form-field'
+import { Input } from '@/components/ui/input'
 import { Grid } from '@/components/ui/layout/grid'
 import { Stack } from '@/components/ui/layout/stack'
-import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { useRouter } from '@/i18n/navigation'
 import { routes } from '@/i18n/routes'
-import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { getTemplates, type Question, type Template } from '@/lib/api'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
-import { useLocale, useTranslations } from 'next-intl'
 
 type TemplateFormProps = {
   initialPrefetch: QuestionsLibraryPrefetch
@@ -125,17 +116,13 @@ export function TemplateForm({
       {templateQuestionsUnavailable ? (
         <Alert variant="warning">
           <AlertTitle>{t('form.questionsUnavailableTitle')}</AlertTitle>
-          <AlertDescription>
-            {t('form.questionsUnavailableDescription')}
-          </AlertDescription>
+          <AlertDescription>{t('form.questionsUnavailableDescription')}</AlertDescription>
         </Alert>
       ) : null}
 
       {error ? (
         <Alert variant="danger">
-          <AlertTitle>
-            {isEdit ? t('form.editTitle') : t('form.createTitle')}
-          </AlertTitle>
+          <AlertTitle>{isEdit ? t('form.editTitle') : t('form.createTitle')}</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       ) : null}
@@ -183,7 +170,9 @@ export function TemplateForm({
                   />
                   <datalist id="template-position-options">
                     {positionOptions.map((option) => (
-                      <option key={option} value={option} />
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
                     ))}
                   </datalist>
                 </FormField>
