@@ -1,12 +1,12 @@
-import type { QuestionInput } from '@/lib/api'
 import type { Locale } from '@/i18n/locales'
+import type { QuestionInput } from '@/lib/api'
+import { type ContentFieldKey } from '@/lib/question-editor/field-keys'
 import {
   coerceLocaleTranslation,
   hasLocaleDraftContent,
   localeDraftFromInput,
   type QuestionContentBlock,
 } from '@/lib/question-editor/parsers'
-import { CONTENT_FIELD_KEYS, type ContentFieldKey } from '@/lib/question-editor/field-keys'
 
 export type EditorPhase = 1 | 2
 
@@ -39,9 +39,7 @@ export function resolveInitialEditorPhase(args: {
     return 1
   }
 
-  const fromTranslation = coerceLocaleTranslation(
-    args.input.translations?.[args.primaryLocale],
-  )
+  const fromTranslation = coerceLocaleTranslation(args.input.translations?.[args.primaryLocale])
   if (isPrimaryContentComplete(fromTranslation)) {
     return 2
   }
@@ -53,29 +51,18 @@ export function resolveInitialEditorPhase(args: {
   return 1
 }
 
-export function hasPersistedPrimaryContent(
-  input: QuestionInput,
-  primaryLocale: Locale,
-): boolean {
-  return isPrimaryContentComplete(
-    coerceLocaleTranslation(input.translations?.[primaryLocale]),
-  )
+export function hasPersistedPrimaryContent(input: QuestionInput, primaryLocale: Locale): boolean {
+  return isPrimaryContentComplete(coerceLocaleTranslation(input.translations?.[primaryLocale]))
 }
 
-export function shouldUnlockPhase2AfterSave(
-  input: QuestionInput,
-  primaryLocale: Locale,
-): boolean {
+export function shouldUnlockPhase2AfterSave(input: QuestionInput, primaryLocale: Locale): boolean {
   return (
     isPrimaryContentComplete(coerceLocaleTranslation(input.translations?.[primaryLocale])) ||
     isPrimaryContentComplete(localeDraftFromInput(input))
   )
 }
 
-export function hasAnyTranslationLocale(
-  input: QuestionInput,
-  primaryLocale: Locale,
-): boolean {
+export function hasAnyTranslationLocale(input: QuestionInput, primaryLocale: Locale): boolean {
   return Object.entries(input.translations ?? {}).some(
     ([locale, block]) =>
       locale !== primaryLocale && hasLocaleDraftContent(coerceLocaleTranslation(block)),

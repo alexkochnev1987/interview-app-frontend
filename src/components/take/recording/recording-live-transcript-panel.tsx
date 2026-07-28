@@ -1,15 +1,16 @@
-import { Stack } from '@/components/ui/layout';
-import { Panel } from '@/components/ui/panel';
-import { Text } from '@/components/ui/text';
-import type { TakeStage } from '@/components/take/types';
-import { useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl'
+
+import type { TakeStage } from '@/components/take/types'
+import { Stack } from '@/components/ui/layout'
+import { Panel } from '@/components/ui/panel'
+import { Text } from '@/components/ui/text'
 
 interface LiveTranscriptPanelProps {
-  isSupported: boolean;
-  finalTranscript: string;
-  interimTranscript: string;
-  warning?: string;
-  stage: TakeStage;
+  isSupported: boolean
+  finalTranscript: string
+  interimTranscript: string
+  warning?: string
+  stage: TakeStage
 }
 
 export function LiveTranscriptPanel({
@@ -17,9 +18,8 @@ export function LiveTranscriptPanel({
   finalTranscript,
   interimTranscript,
   warning,
-  stage,
 }: LiveTranscriptPanelProps) {
-  const tTake = useTranslations('takeFlow');
+  const tTake = useTranslations('takeFlow')
   return (
     <Panel minHeight="transcript">
       <Stack gap={2} grow="fill" height="full">
@@ -28,9 +28,7 @@ export function LiveTranscriptPanel({
         </Text>
         <Stack gap={2} grow="fill" overflow="y">
           {!isSupported ? (
-            <Text variant="bodyMutedSm">
-              {tTake('liveTranscriptUnavailable')}
-            </Text>
+            <Text variant="bodyMutedSm">{tTake('liveTranscriptUnavailable')}</Text>
           ) : (
             <Text variant="bodySm">
               {finalTranscript || interimTranscript ? (
@@ -51,5 +49,5 @@ export function LiveTranscriptPanel({
         </Stack>
       </Stack>
     </Panel>
-  );
+  )
 }
