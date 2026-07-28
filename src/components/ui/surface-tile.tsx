@@ -1,6 +1,6 @@
-import type { HTMLAttributes } from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { X } from 'lucide-react'
+import type { HTMLAttributes } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -11,8 +11,7 @@ const surfaceTileVariants = cva('ring-1 ring-hairline', {
       soft: 'bg-surface-low-soft',
       elevated: 'bg-surface-low-glass',
       glass: 'bg-surface-glass',
-      'primary-soft':
-        'bg-[hsl(var(--primary-fixed)/0.55)] ring-[hsl(var(--primary)/0.15)]',
+      'primary-soft': 'bg-[hsl(var(--primary-fixed)/0.55)] ring-[hsl(var(--primary)/0.15)]',
     },
     padding: {
       none: '',
@@ -57,8 +56,7 @@ const surfaceTileVariants = cva('ring-1 ring-hairline', {
 })
 
 interface SurfaceTileProps
-  extends HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof surfaceTileVariants> {
+  extends HTMLAttributes<HTMLDivElement>, VariantProps<typeof surfaceTileVariants> {
   onDismiss?: () => void
   dismissLabel?: string
 }

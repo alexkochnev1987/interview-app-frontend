@@ -1,9 +1,6 @@
 'use client'
 
-import {
-  HydrationBoundary,
-  type DehydratedState,
-} from '@tanstack/react-query'
+import { HydrationBoundary, type DehydratedState } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
 
 type QueryHydrationBoundaryProps = {
@@ -11,9 +8,6 @@ type QueryHydrationBoundaryProps = {
   children: ReactNode
 }
 
-export function QueryHydrationBoundary({
-  state,
-  children,
-}: QueryHydrationBoundaryProps) {
+export function QueryHydrationBoundary({ state, children }: QueryHydrationBoundaryProps) {
   return <HydrationBoundary state={state}>{children}</HydrationBoundary>
 }

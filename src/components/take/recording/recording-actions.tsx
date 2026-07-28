@@ -1,27 +1,27 @@
-import { ArrowRight, RotateCcw } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { ArrowRight, RotateCcw } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
-import { Button } from '@/components/ui/button';
-import { Inline, Stack } from '@/components/ui/layout';
-import { BodyText } from '@/components/ui/text';
-import { MAX_ANSWER_ATTEMPTS_PER_QUESTION } from '@/features/take';
-import type { TakeStage } from '@/components/take/types';
-import type { InterviewerPresence } from '@/features/take/use-take-question-tts';
+import type { TakeStage } from '@/components/take/types'
+import { Button } from '@/components/ui/button'
+import { Inline, Stack } from '@/components/ui/layout'
+import { BodyText } from '@/components/ui/text'
+import { MAX_ANSWER_ATTEMPTS_PER_QUESTION } from '@/features/take'
+import type { InterviewerPresence } from '@/features/take/use-take-question-tts'
 
 interface TakeRecordingActionsProps {
-  stage: TakeStage;
-  uploading: boolean;
-  setupError: string;
-  capturePipelineReady: boolean;
-  recording: boolean;
-  recordingStartBusy: boolean;
-  interviewerPresence: InterviewerPresence;
-  retakeDisabled: boolean;
-  displayedAttemptNumber: number;
-  onReconnect: () => void;
-  onRerecord: () => void;
-  onSubmit: () => void;
-  submitAnswerLabel: string;
+  stage: TakeStage
+  uploading: boolean
+  setupError: string
+  capturePipelineReady: boolean
+  recording: boolean
+  recordingStartBusy: boolean
+  interviewerPresence: InterviewerPresence
+  retakeDisabled: boolean
+  displayedAttemptNumber: number
+  onReconnect: () => void
+  onRerecord: () => void
+  onSubmit: () => void
+  submitAnswerLabel: string
 }
 
 export function TakeRecordingActions({
@@ -39,14 +39,14 @@ export function TakeRecordingActions({
   onSubmit,
   submitAnswerLabel,
 }: TakeRecordingActionsProps) {
-  const tTake = useTranslations('takeFlow');
+  const tTake = useTranslations('takeFlow')
   const versionActionsEnabled =
     recording &&
     !uploading &&
     stage !== 'transition' &&
     !recordingStartBusy &&
-    interviewerPresence === 'listening';
-  const retakeEnabled = versionActionsEnabled && !retakeDisabled;
+    interviewerPresence === 'listening'
+  const retakeEnabled = versionActionsEnabled && !retakeDisabled
 
   return (
     <Stack align="stretch" gap={3} width="full">
@@ -100,5 +100,5 @@ export function TakeRecordingActions({
         <ArrowRight size={18} strokeWidth={2} aria-hidden />
       </Button>
     </Stack>
-  );
+  )
 }

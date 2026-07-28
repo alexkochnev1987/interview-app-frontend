@@ -9,10 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import {
-  INTERVIEW_PAGE_LIMIT_OPTIONS,
-  type InterviewPageLimit,
-} from '@/lib/interviews-query-state'
+import { INTERVIEW_PAGE_LIMIT_OPTIONS, type InterviewPageLimit } from '@/lib/interviews-query-state'
 
 export type InterviewPageSizeSelectProps = {
   limit: number

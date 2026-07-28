@@ -1,9 +1,8 @@
 'use client'
 
-import * as React from 'react'
-
-import { Dialog as DialogPrimitive } from 'radix-ui'
 import { cva, type VariantProps } from 'class-variance-authority'
+import { Dialog as DialogPrimitive } from 'radix-ui'
+import * as React from 'react'
 
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
@@ -87,9 +86,7 @@ export function ModalShell({
             if (dismissDisabled) event.preventDefault()
           }}
         >
-          <DialogPrimitive.Title className="sr-only">
-            {accessibilityTitle}
-          </DialogPrimitive.Title>
+          <DialogPrimitive.Title className="sr-only">{accessibilityTitle}</DialogPrimitive.Title>
           {accessibilityDescription ? (
             <DialogPrimitive.Description className="sr-only">
               {accessibilityDescription}

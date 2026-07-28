@@ -138,7 +138,7 @@ function buildQuestionFilterParams(
 export function buildQuestionsFetchParams(
   state: QuestionsQueryState,
   debouncedQ: string,
-  options?: QuestionFetchOptions
+  options?: QuestionFetchOptions,
 ): FetchQuestionsParams {
   return {
     ...buildQuestionFilterParams(state, debouncedQ),
@@ -153,13 +153,9 @@ export function buildQuestionsFetchParams(
 export function buildQuestionsInfiniteParams(
   state: QuestionsQueryState,
   debouncedQ: string,
-  options?: QuestionFetchOptions
+  options?: QuestionFetchOptions,
 ): Omit<FetchQuestionsParams, 'page'> {
-  const { page: _page, ...infiniteParams } = buildQuestionsFetchParams(
-    state,
-    debouncedQ,
-    options,
-  )
+  const { page: _page, ...infiniteParams } = buildQuestionsFetchParams(state, debouncedQ, options)
   return infiniteParams
 }
 
@@ -170,7 +166,7 @@ export function buildQuestionFacetsParams(
   >,
   debouncedQ: string,
 
-  options?: QuestionFetchOptions
+  options?: QuestionFetchOptions,
 ): FetchQuestionFacetsParams {
   return {
     ...buildQuestionFilterParams(state, debouncedQ),

@@ -1,7 +1,7 @@
 'use client'
 
-import * as React from 'react'
 import { useTranslations } from 'next-intl'
+import * as React from 'react'
 
 import { DisabledHintTooltip } from '@/components/ui/disabled-hint-tooltip'
 import { useIsDemo } from '@/lib/auth-context'
@@ -23,11 +23,7 @@ export function DemoWriteGuard({
   })
 
   return (
-    <DisabledHintTooltip
-      active={isDemo}
-      hint={t('demoMode.readOnlyHint')}
-      width={width}
-    >
+    <DisabledHintTooltip active={isDemo} hint={t('demoMode.readOnlyHint')} width={width}>
       {guarded}
     </DisabledHintTooltip>
   )

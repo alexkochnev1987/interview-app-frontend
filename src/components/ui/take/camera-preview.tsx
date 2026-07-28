@@ -1,13 +1,13 @@
-'use client';
+'use client'
 
-import type { RefObject } from 'react';
+import type { RefObject } from 'react'
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils'
 
-export const cameraPreviewSurfaceClass = 'bg-[hsl(var(--surface-low))]';
+export const cameraPreviewSurfaceClass = 'bg-[hsl(var(--surface-low))]'
 
 export interface CameraPreviewVideoRefProps {
-  videoRef: RefObject<HTMLVideoElement | null>;
+  videoRef: RefObject<HTMLVideoElement | null>
 }
 
 export function CameraPreviewVideo({
@@ -26,5 +26,5 @@ export function CameraPreviewVideo({
         objectFit === 'cover' ? 'object-cover' : 'object-contain',
       )}
     />
-  );
+  )
 }

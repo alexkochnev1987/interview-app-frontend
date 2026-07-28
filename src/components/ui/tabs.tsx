@@ -1,7 +1,7 @@
 'use client'
 
-import * as React from 'react'
 import { cva } from 'class-variance-authority'
+import * as React from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'

@@ -97,9 +97,7 @@ describe('questions-query-state', () => {
 
   it('locks status and resets card view pagination', () => {
     const params = new URLSearchParams({ page: '3', view: 'cards' })
-    expect(
-      resolveQuestionsQueryState(params, { lockStatus: 'inactive' }).status,
-    ).toBe('inactive')
+    expect(resolveQuestionsQueryState(params, { lockStatus: 'inactive' }).status).toBe('inactive')
     expect(resolveQuestionsQueryState(params).page).toBe(1)
   })
 
@@ -116,12 +114,13 @@ describe('questions-query-state', () => {
   it('adds eligibleForInterview when requested', () => {
     const state = DEFAULT_QUESTIONS_QUERY
 
-    expect(
-        buildQuestionsFetchParams(state, '', { eligibleForInterview: true }),
-    ).toMatchObject({ eligibleForInterview: true, status: 'active' })
+    expect(buildQuestionsFetchParams(state, '', { eligibleForInterview: true })).toMatchObject({
+      eligibleForInterview: true,
+      status: 'active',
+    })
 
-    expect(
-        buildQuestionFacetsParams(state, '', { eligibleForInterview: true }),
-    ).toMatchObject({ eligibleForInterview: true })
+    expect(buildQuestionFacetsParams(state, '', { eligibleForInterview: true })).toMatchObject({
+      eligibleForInterview: true,
+    })
   })
 })

@@ -1,15 +1,15 @@
 'use client'
 
-import { type FormEvent, useState } from 'react'
-import Link from 'next/link'
 import { useTranslations } from 'next-intl'
+import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
+import { type FormEvent, useState } from 'react'
 
-import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { DividerLabel } from '@/components/ui/divider-label'
+import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
 import { FormField } from '@/components/ui/form-field'
 import { Input } from '@/components/ui/input'
 import { Stack } from '@/components/ui/layout/stack'
@@ -51,9 +51,7 @@ export function LoginForm() {
         setError(toastMessages.pageGate.login.failedFallback)
         return
       }
-      setError(
-        toastMessages.apiError.message(err) ?? toastMessages.pageGate.login.failedFallback,
-      )
+      setError(toastMessages.apiError.message(err) ?? toastMessages.pageGate.login.failedFallback)
     } finally {
       setPendingAction(null)
     }
@@ -141,9 +139,7 @@ export function LoginForm() {
               disabled={pending}
               data-testid="login-demo"
             >
-              {pendingAction === 'demo'
-                ? toastMessages.pageGate.login.signingInLabel
-                : t('demo')}
+              {pendingAction === 'demo' ? toastMessages.pageGate.login.signingInLabel : t('demo')}
             </Button>
           </Stack>
         </form>

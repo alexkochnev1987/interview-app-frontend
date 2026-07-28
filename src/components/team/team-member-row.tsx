@@ -2,16 +2,12 @@
 
 import { IconBadge } from '@/components/ui/icon-badge'
 import { Inline } from '@/components/ui/layout/inline'
-import {
-  TableCell,
-  TableRow,
-} from '@/components/ui/table'
+import { TableCell, TableRow } from '@/components/ui/table'
 import { BodyText } from '@/components/ui/text'
-import type { TeamMember } from '@/lib/api'
-import { formatInterviewDate } from '@/lib/interview-formatters'
-
 import { getMemberInitials } from '@/features/team/team-member-list'
 import type { TeamRowActorRole } from '@/features/team/team-row-policy'
+import type { TeamMember } from '@/lib/api'
+import { formatInterviewDate } from '@/lib/interview-formatters'
 
 import { TeamMemberRowActions } from './team-member-row-actions'
 import { TeamRoleBadge } from './team-role-badge'
@@ -23,12 +19,7 @@ interface TeamMemberRowProps {
   onChangeRole: () => void
 }
 
-export function TeamMemberRow({
-  member,
-  actorId,
-  actorRole,
-  onChangeRole,
-}: TeamMemberRowProps) {
+export function TeamMemberRow({ member, actorId, actorRole, onChangeRole }: TeamMemberRowProps) {
   return (
     <TableRow>
       <TableCell>
@@ -48,9 +39,7 @@ export function TeamMemberRow({
         <TeamRoleBadge role={member.role} />
       </TableCell>
       <TableCell>
-        <BodyText size="sm">
-          {formatInterviewDate(member.createdAt)}
-        </BodyText>
+        <BodyText size="sm">{formatInterviewDate(member.createdAt)}</BodyText>
       </TableCell>
       <TableCell>
         <TeamMemberRowActions

@@ -18,9 +18,7 @@ interface AssessmentDetailPageProps {
   params: Promise<{ id: string; locale: Locale }>
 }
 
-export default async function AssessmentDetailPage({
-  params,
-}: AssessmentDetailPageProps) {
+export default async function AssessmentDetailPage({ params }: AssessmentDetailPageProps) {
   const { id, locale } = await params
   const t = await getTranslations({ locale, namespace: 'toast.pageGate.assessments' })
   const tCommon = await getTranslations({ locale, namespace: 'common' })
@@ -31,10 +29,7 @@ export default async function AssessmentDetailPage({
   redirectIfUnauthenticated(auth, returnPath, locale)
   if (auth.kind === 'forbidden') {
     return (
-      <ForbiddenAccessPage
-        title={t('forbiddenTitle')}
-        description={t('forbiddenDescription')}
-      />
+      <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
     )
   }
   if (auth.kind === 'error') {
@@ -56,22 +51,15 @@ export default async function AssessmentDetailPage({
     interview =
       (await requestServer<Interview>(`/interviews/${encodedId}`, auth.ctx, {
         withLocaleHeader: false,
-      })) ??
-      null
+      })) ?? null
   } catch (err) {
     redirectIfUnauthorizedError(err, returnPath, locale)
     if (isForbiddenError(err)) {
       return (
-        <ForbiddenAccessPage
-          title={t('forbiddenTitle')}
-          description={t('forbiddenDescription')}
-        />
+        <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
       )
     }
-    error =
-      err instanceof Error
-        ? err.message
-        : t('loadDetailFallback')
+    error = err instanceof Error ? err.message : t('loadDetailFallback')
   }
 
   if (error || !interview) {

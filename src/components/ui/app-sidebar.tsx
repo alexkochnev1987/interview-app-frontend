@@ -31,9 +31,7 @@ export function AppSidebar({
         {...props}
       >
         <div className="flex shrink-0 flex-col pb-4">{brand}</div>
-        <nav className="flex flex-1 flex-col gap-1 overflow-y-auto overflow-x-hidden">
-          {nav}
-        </nav>
+        <nav className="flex flex-1 flex-col gap-1 overflow-y-auto overflow-x-hidden">{nav}</nav>
         <div className="flex shrink-0 flex-col gap-2">{actions}</div>
       </aside>
     </>

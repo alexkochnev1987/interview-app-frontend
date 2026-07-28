@@ -1,8 +1,8 @@
 'use client'
 
 import { AlertCircle } from 'lucide-react'
-import type { ReactNode } from 'react'
 import { useTranslations } from 'next-intl'
+import type { ReactNode } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
@@ -95,9 +95,7 @@ export function QuestionPickerFeed({
     return (
       <EmptyStateCard
         tone={tone}
-        title={
-          allEmpty ? t(`${copyPath}.emptyBankTitle`) : t(`${copyPath}.emptyFilteredTitle`)
-        }
+        title={allEmpty ? t(`${copyPath}.emptyBankTitle`) : t(`${copyPath}.emptyFilteredTitle`)}
         description={
           allEmpty
             ? t(`${copyPath}.emptyBankDescription`)

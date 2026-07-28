@@ -1,19 +1,15 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
 import { cva } from 'class-variance-authority'
+import { useTranslations } from 'next-intl'
 
 import { Text } from '@/components/ui/text'
 
 const journeyTrackVariants = cva('relative w-full')
 
-const journeyRowVariants = cva(
-  'relative z-10 grid w-full grid-cols-4 items-start gap-3',
-)
+const journeyRowVariants = cva('relative z-10 grid w-full grid-cols-4 items-start gap-3')
 
-const journeyNodeVariants = cva(
-  'flex min-w-0 flex-col items-center gap-2 px-1',
-)
+const journeyNodeVariants = cva('flex min-w-0 flex-col items-center gap-2 px-1')
 
 const journeyMarkerVariants = cva(
   'flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold shadow-soft ring-1',
@@ -43,27 +39,25 @@ export function OnboardingWelcomeJourney() {
 
   return (
     <div className={journeyTrackVariants()}>
-        <div
-          aria-hidden
-          className="pointer-events-none absolute left-[12%] right-[12%] top-4 z-0 h-px bg-gradient-to-r from-[hsl(var(--primary)/0.08)] via-[hsl(var(--primary)/0.28)] to-[hsl(var(--primary)/0.08)]"
-        />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-[12%] right-[12%] top-4 z-0 h-px bg-gradient-to-r from-[hsl(var(--primary)/0.08)] via-[hsl(var(--primary)/0.28)] to-[hsl(var(--primary)/0.08)]"
+      />
 
-        <div className={journeyRowVariants()}>
-          {journeySteps.map((step, index) => (
-            <div key={step.key} className={journeyNodeVariants()}>
-              <div className={journeyMarkerVariants({ tone: step.tone })}>
-                {index + 1}
-              </div>
-              <Text
-                as="span"
-                variant="captionMutedXs"
-                className="max-w-full text-center text-[0.65rem] leading-4"
-              >
-                {t(step.key)}
-              </Text>
-            </div>
-          ))}
-        </div>
+      <div className={journeyRowVariants()}>
+        {journeySteps.map((step, index) => (
+          <div key={step.key} className={journeyNodeVariants()}>
+            <div className={journeyMarkerVariants({ tone: step.tone })}>{index + 1}</div>
+            <Text
+              as="span"
+              variant="captionMutedXs"
+              className="max-w-full text-center text-[0.65rem] leading-4"
+            >
+              {t(step.key)}
+            </Text>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

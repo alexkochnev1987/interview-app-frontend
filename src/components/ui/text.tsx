@@ -1,6 +1,6 @@
+import { cva, type VariantProps } from 'class-variance-authority'
 import * as React from 'react'
 import type { HTMLAttributes, ReactNode } from 'react'
-import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '@/lib/utils'
 
@@ -20,20 +20,12 @@ const sectionHeadingVariants = cva('font-semibold text-foreground', {
 })
 
 interface SectionHeadingProps
-  extends HTMLAttributes<HTMLHeadingElement>,
-    VariantProps<typeof sectionHeadingVariants> {
+  extends HTMLAttributes<HTMLHeadingElement>, VariantProps<typeof sectionHeadingVariants> {
   as?: 'h2' | 'h3' | 'h4'
 }
 
-export function SectionHeading({
-  className,
-  size,
-  as: Tag = 'h2',
-  ...props
-}: SectionHeadingProps) {
-  return (
-    <Tag className={cn(sectionHeadingVariants({ size }), className)} {...props} />
-  )
+export function SectionHeading({ className, size, as: Tag = 'h2', ...props }: SectionHeadingProps) {
+  return <Tag className={cn(sectionHeadingVariants({ size }), className)} {...props} />
 }
 
 const bodyTextVariants = cva('', {
@@ -87,9 +79,7 @@ const bodyTextVariants = cva('', {
   },
 })
 
-interface BodyTextProps
-  extends HTMLAttributes<HTMLElement>,
-    VariantProps<typeof bodyTextVariants> {
+interface BodyTextProps extends HTMLAttributes<HTMLElement>, VariantProps<typeof bodyTextVariants> {
   as?: 'p' | 'span' | 'div' | 'li' | 'strong'
 }
 
@@ -107,10 +97,7 @@ export function BodyText({
   const Comp = Tag as React.ElementType
   return (
     <Comp
-      className={cn(
-        bodyTextVariants({ size, tone, weight, width, italic, clamp }),
-        className,
-      )}
+      className={cn(bodyTextVariants({ size, tone, weight, width, italic, clamp }), className)}
       {...props}
     />
   )
@@ -119,23 +106,19 @@ export function BodyText({
 const takeTextVariants = cva('', {
   variants: {
     variant: {
-      heroDescription:
-        'max-w-2xl text-base leading-7 text-muted-foreground md:text-lg',
+      heroDescription: 'max-w-2xl text-base leading-7 text-muted-foreground md:text-lg',
       bodyMutedSm: 'text-sm leading-6 text-muted-foreground',
       bodySm: 'text-sm leading-6 text-foreground',
-      eyebrowLabel:
-        'text-xs font-semibold uppercase tracking-eyebrow text-muted-foreground',
+      eyebrowLabel: 'text-xs font-semibold uppercase tracking-eyebrow text-muted-foreground',
       metricLabel: 'text-xs font-semibold uppercase tracking-eyebrow-wider',
       metricLabelCompact:
         'text-xs font-semibold uppercase tracking-eyebrow-wide text-muted-foreground',
       metricValueLg: 'text-3xl font-semibold tracking-display-tight text-foreground',
       metricValueXl: 'text-4xl font-semibold tracking-display-tight text-foreground',
-      headerMetricEyebrow:
-        'text-xs font-semibold uppercase tracking-eyebrow text-muted-foreground',
+      headerMetricEyebrow: 'text-xs font-semibold uppercase tracking-eyebrow text-muted-foreground',
       headerMetricMeta: 'text-xs text-muted-foreground',
       headerMetricMetaMedium: 'text-xs font-medium text-muted-foreground',
-      toolbarEyebrow:
-        'text-xs font-semibold leading-none uppercase tracking-eyebrow',
+      toolbarEyebrow: 'text-xs font-semibold leading-none uppercase tracking-eyebrow',
       labelSmStrong: 'text-sm font-semibold text-foreground',
       labelSm: 'text-sm font-medium text-foreground',
       captionMutedXs: 'text-xs leading-5 text-muted-foreground',
@@ -159,11 +142,7 @@ interface TextProps extends VariantProps<typeof takeTextVariants> {
 
 export function Text({ as = 'p', children, variant, className }: TextProps) {
   if (as === 'span') {
-    return (
-      <span className={cn(takeTextVariants({ variant }), className)}>
-        {children}
-      </span>
-    )
+    return <span className={cn(takeTextVariants({ variant }), className)}>{children}</span>
   }
 
   return <p className={cn(takeTextVariants({ variant }), className)}>{children}</p>

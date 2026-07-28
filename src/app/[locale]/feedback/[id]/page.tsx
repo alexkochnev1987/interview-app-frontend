@@ -12,10 +12,7 @@ interface FeedbackPageProps {
   searchParams: Promise<{ token?: string | string[] }>
 }
 
-export default async function FeedbackPage({
-  params,
-  searchParams,
-}: FeedbackPageProps) {
+export default async function FeedbackPage({ params, searchParams }: FeedbackPageProps) {
   const { id, locale } = await params
   const t = await getTranslations({ locale, namespace: 'toast.pageGate.feedback' })
   const token = readSearchParamToken((await searchParams).token)
@@ -33,10 +30,7 @@ export default async function FeedbackPage({
         withLocaleHeader: false,
       })) ?? null
   } catch (err) {
-    error =
-      err instanceof Error
-        ? err.message
-        : t('loadFailedFallback')
+    error = err instanceof Error ? err.message : t('loadFailedFallback')
   }
 
   if (error || !feedback) {

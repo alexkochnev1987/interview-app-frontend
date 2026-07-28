@@ -1,16 +1,16 @@
-import { Camera, Mic, ShieldCheck, Video } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
-import type { ReactNode } from 'react';
-import { useTranslations } from 'next-intl';
+import { Camera, Mic, ShieldCheck, Video } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import type { ReactNode } from 'react'
 
-import { Grid, Stack } from '@/components/ui/layout';
-import { Text } from '@/components/ui/text';
-import { Panel } from '@/components/ui/panel';
+import { Grid, Stack } from '@/components/ui/layout'
+import { Panel } from '@/components/ui/panel'
+import { Text } from '@/components/ui/text'
 
 interface CapabilityCardProps {
-  icon: LucideIcon;
-  title: string;
-  description: ReactNode;
+  icon: LucideIcon
+  title: string
+  description: ReactNode
 }
 
 function CapabilityCard({ icon: Icon, title, description }: CapabilityCardProps) {
@@ -28,14 +28,22 @@ function CapabilityCard({ icon: Icon, title, description }: CapabilityCardProps)
         </Stack>
       </Stack>
     </Panel>
-  );
+  )
 }
 
 export function TakeCapabilityCards() {
-  const tTake = useTranslations('takeFlow');
+  const tTake = useTranslations('takeFlow')
   const capabilityItems: CapabilityCardProps[] = [
-    { icon: Camera, title: tTake('capabilityCameraTitle'), description: tTake('capabilityCameraDescription') },
-    { icon: Mic, title: tTake('capabilityMicTitle'), description: tTake('capabilityMicDescription') },
+    {
+      icon: Camera,
+      title: tTake('capabilityCameraTitle'),
+      description: tTake('capabilityCameraDescription'),
+    },
+    {
+      icon: Mic,
+      title: tTake('capabilityMicTitle'),
+      description: tTake('capabilityMicDescription'),
+    },
     {
       icon: Video,
       title: tTake('capabilityScreenTitle'),
@@ -46,13 +54,18 @@ export function TakeCapabilityCards() {
       title: tTake('capabilityFairnessTitle'),
       description: tTake('capabilityFairnessDescription'),
     },
-  ];
+  ]
 
   return (
     <Grid columns={2} gap={6}>
       {capabilityItems.map((item) => (
-        <CapabilityCard key={item.title} icon={item.icon} title={item.title} description={item.description} />
+        <CapabilityCard
+          key={item.title}
+          icon={item.icon}
+          title={item.title}
+          description={item.description}
+        />
       ))}
     </Grid>
-  );
+  )
 }

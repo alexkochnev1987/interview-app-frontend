@@ -25,25 +25,11 @@ export function SortableTableHead({
   ...rest
 }: SortableTableHeadProps) {
   const isActive = direction !== 'none'
-  const Icon = !isActive
-    ? ChevronsUpDown
-    : direction === 'desc'
-      ? ChevronDown
-      : ChevronUp
-  const ariaSort =
-    direction === 'desc'
-      ? 'descending'
-      : direction === 'asc'
-        ? 'ascending'
-        : 'none'
+  const Icon = !isActive ? ChevronsUpDown : direction === 'desc' ? ChevronDown : ChevronUp
+  const ariaSort = direction === 'desc' ? 'descending' : direction === 'asc' ? 'ascending' : 'none'
 
   return (
-    <TableHead
-      align={align}
-      className={className}
-      aria-sort={ariaSort}
-      {...rest}
-    >
+    <TableHead align={align} className={className} aria-sort={ariaSort} {...rest}>
       <button
         type="button"
         onClick={onSortClick}

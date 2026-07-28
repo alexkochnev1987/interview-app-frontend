@@ -11,11 +11,7 @@ import {
   redirectIfUnauthenticated,
   redirectIfUnauthorizedError,
 } from '@/lib/auth-gate'
-import {
-  canDeleteQuestions,
-  canReadQuestions,
-  canUpdateQuestions,
-} from '@/lib/auth-roles'
+import { canDeleteQuestions, canReadQuestions, canUpdateQuestions } from '@/lib/auth-roles'
 import { isForbiddenError, requestServer } from '@/lib/server-fetch'
 
 interface EditQuestionPageProps {
@@ -57,11 +53,9 @@ export default async function EditQuestionPage({ params }: EditQuestionPageProps
 
   try {
     question =
-      (await requestServer<Question>(
-        `/questions/${encodeURIComponent(id)}`,
-        auth.ctx,
-        { query: { includeTranslations: true } },
-      )) ?? null
+      (await requestServer<Question>(`/questions/${encodeURIComponent(id)}`, auth.ctx, {
+        query: { includeTranslations: true },
+      })) ?? null
   } catch (err) {
     redirectIfUnauthorizedError(err, returnPath, locale)
     if (isForbiddenError(err)) {
@@ -72,10 +66,7 @@ export default async function EditQuestionPage({ params }: EditQuestionPageProps
         />
       )
     }
-    error =
-      err instanceof Error
-        ? err.message
-        : t('loadFailedCardDescription')
+    error = err instanceof Error ? err.message : t('loadFailedCardDescription')
   }
 
   if (error || !question) {

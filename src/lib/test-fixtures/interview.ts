@@ -30,9 +30,7 @@ export function questionFixture(
   }
 }
 
-export function interviewResultFixture(
-  partial: Partial<InterviewResult> = {},
-): InterviewResult {
+export function interviewResultFixture(partial: Partial<InterviewResult> = {}): InterviewResult {
   return {
     interviewLocale: 'en',
     overallScore: 75,
@@ -47,9 +45,7 @@ export function interviewResultFixture(
   }
 }
 
-export function submittedAnswerFixture(
-  partial: Partial<InterviewAnswer> = {},
-): InterviewAnswer {
+export function submittedAnswerFixture(partial: Partial<InterviewAnswer> = {}): InterviewAnswer {
   return {
     questionIndex: 0,
     questionId: 'q1',

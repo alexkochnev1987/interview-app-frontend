@@ -2,17 +2,16 @@
 
 import { useTranslations } from 'next-intl'
 
+import type {
+  AnswerMediaState,
+  QuestionUploadState,
+} from '@/app/[locale]/interviews/[id]/interview-detail-types'
 import { EyebrowLabel } from '@/components/ui/eyebrow-label'
 import { Inline } from '@/components/ui/layout/inline'
 import { Section } from '@/components/ui/layout/section'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText, SectionHeading } from '@/components/ui/text'
 import type { Answer, Interview } from '@/lib/api'
-
-import type {
-  AnswerMediaState,
-  QuestionUploadState,
-} from '@/app/[locale]/interviews/[id]/interview-detail-types'
 
 import { AnswerPacketCard } from './answer-packet-card'
 

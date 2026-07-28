@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { EyebrowLabel } from '@/components/ui/eyebrow-label'
 import { Grid } from '@/components/ui/layout/grid'
 import { Inline } from '@/components/ui/layout/inline'
+import { SearchInput } from '@/components/ui/search-input'
 import {
   Select,
   SelectContent,
@@ -12,11 +13,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { SearchInput } from '@/components/ui/search-input'
-import { useSharedLabels } from '@/i18n/use-shared-labels'
-
 import type { TeamRoleFilter } from '@/features/team/team-member-list'
 import { teamRoleFilterValues } from '@/features/team/team-roles'
+import { useSharedLabels } from '@/i18n/use-shared-labels'
 
 interface TeamMembersFiltersProps {
   roleFilter: TeamRoleFilter
@@ -40,16 +39,8 @@ export function TeamMembersFilters({
         <EyebrowLabel size="md" tone="neutral" weight="bold">
           {t('filters.label')}
         </EyebrowLabel>
-        <Select
-          value={roleFilter}
-          onValueChange={(v) => onRoleFilterChange(v as TeamRoleFilter)}
-        >
-          <SelectTrigger
-            variant="surface"
-            size="md"
-            shape="rounded"
-            width="full-md-auto"
-          >
+        <Select value={roleFilter} onValueChange={(v) => onRoleFilterChange(v as TeamRoleFilter)}>
+          <SelectTrigger variant="surface" size="md" shape="rounded" width="full-md-auto">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

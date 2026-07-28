@@ -1,8 +1,8 @@
 'use client'
 
-import { useCallback, useDeferredValue, useMemo, useState } from 'react'
 import { Search } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { useCallback, useDeferredValue, useMemo, useState } from 'react'
 
 import { EvaluationActionsProvider } from '@/components/assessments/actions/evaluation-actions-context'
 import { AssessmentCard } from '@/components/assessments/list/assessment-card'
@@ -22,10 +22,7 @@ import {
   hasScoringInProgressListItems,
   selectHrVisibleListItems,
 } from '@/lib/assessment-status'
-import {
-  ASSESSMENTS_INTERVIEW_PAGE_SIZE,
-  fetchAllInterviewPages,
-} from '@/lib/fetch-all-interviews'
+import { ASSESSMENTS_INTERVIEW_PAGE_SIZE, fetchAllInterviewPages } from '@/lib/fetch-all-interviews'
 import { isOnboardingStarterInterview } from '@/lib/onboarding-starter'
 import { useLivePolling } from '@/lib/use-live-polling'
 
@@ -39,21 +36,15 @@ function matchesQuery(interview: InterviewListItem, normalizedQuery: string): bo
   return haystack.includes(normalizedQuery)
 }
 
-function pickTourAssessment(
-  interviews: InterviewListItem[],
-): InterviewListItem | undefined {
-  const real = interviews.filter(
-    (interview) => !isOnboardingStarterInterview(interview),
-  )
+function pickTourAssessment(interviews: InterviewListItem[]): InterviewListItem | undefined {
+  const real = interviews.filter((interview) => !isOnboardingStarterInterview(interview))
 
   return (
-    real.find(
-      (interview) => deriveReviewStatusFromListItem(interview) === 'ready_to_score',
-    )
-    ?? real.find((interview) => deriveReviewStatusFromListItem(interview) === 'ready')
-    ?? real[0]
-    ?? interviews.find((interview) => isOnboardingStarterInterview(interview))
-    ?? interviews[0]
+    real.find((interview) => deriveReviewStatusFromListItem(interview) === 'ready_to_score') ??
+    real.find((interview) => deriveReviewStatusFromListItem(interview) === 'ready') ??
+    real[0] ??
+    interviews.find((interview) => isOnboardingStarterInterview(interview)) ??
+    interviews[0]
   )
 }
 
@@ -73,11 +64,12 @@ export function AssessmentsListClient({
     })
     return selectHrVisibleListItems(items)
   }, [])
-  const { data: interviews, refresh, kick, paused } = useLivePolling(
-    initialInterviews,
-    fetcher,
-    hasScoringInProgressListItems,
-  )
+  const {
+    data: interviews,
+    refresh,
+    kick,
+    paused,
+  } = useLivePolling(initialInterviews, fetcher, hasScoringInProgressListItems)
 
   const onEvaluationStarted = useCallback(() => {
     kick()
@@ -94,10 +86,7 @@ export function AssessmentsListClient({
     })
   }, [interviews, status, deferredQuery])
 
-  const tourAssessment = useMemo(
-    () => pickTourAssessment(filtered),
-    [filtered],
-  )
+  const tourAssessment = useMemo(() => pickTourAssessment(filtered), [filtered])
   const tourHighlightId = useOnboardingAssessmentsCardHighlight(tourAssessment?.id)
 
   return (
@@ -114,16 +103,14 @@ export function AssessmentsListClient({
 
         {filtered.length === 0 ? (
           <EmptyStateCard
-            icon={<Icon size="lg"><Search /></Icon>}
-            title={
-              interviews.length === 0
-                ? t('emptyTitle')
-                : t('emptyFilteredTitle')
+            icon={
+              <Icon size="lg">
+                <Search />
+              </Icon>
             }
+            title={interviews.length === 0 ? t('emptyTitle') : t('emptyFilteredTitle')}
             description={
-              interviews.length === 0
-                ? t('emptyDescription')
-                : t('emptyFilteredDescription')
+              interviews.length === 0 ? t('emptyDescription') : t('emptyFilteredDescription')
             }
           />
         ) : (
@@ -132,9 +119,7 @@ export function AssessmentsListClient({
               <AssessmentCard
                 key={interview.id}
                 interview={interview}
-                tourTarget={
-                  interview.id === tourHighlightId ? 'assessments-card' : undefined
-                }
+                tourTarget={interview.id === tourHighlightId ? 'assessments-card' : undefined}
               />
             ))}
           </CardGrid>

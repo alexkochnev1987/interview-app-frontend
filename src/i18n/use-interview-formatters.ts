@@ -1,5 +1,5 @@
-import { useMemo } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
+import { useMemo } from 'react'
 
 import { LOCALE_FORMATS, type Locale } from './locales'
 

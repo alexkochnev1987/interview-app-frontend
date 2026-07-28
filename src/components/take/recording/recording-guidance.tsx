@@ -1,15 +1,16 @@
-import type { TakeStage } from '@/components/take/types';
-import { Panel } from '@/components/ui/panel';
-import { Stack } from '@/components/ui/layout';
-import { Text } from '@/components/ui/text';
-import type { InterviewerPresence } from '@/features/take/use-take-question-tts';
-import { useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl'
+
+import type { TakeStage } from '@/components/take/types'
+import { Stack } from '@/components/ui/layout'
+import { Panel } from '@/components/ui/panel'
+import { Text } from '@/components/ui/text'
+import type { InterviewerPresence } from '@/features/take/use-take-question-tts'
 
 interface TakeRecordingGuidanceProps {
-  stage: TakeStage;
-  recording: boolean;
-  recordingStartBusy: boolean;
-  interviewerPresence: InterviewerPresence;
+  stage: TakeStage
+  recording: boolean
+  recordingStartBusy: boolean
+  interviewerPresence: InterviewerPresence
 }
 
 export function TakeRecordingGuidance({
@@ -18,7 +19,7 @@ export function TakeRecordingGuidance({
   recordingStartBusy,
   interviewerPresence,
 }: TakeRecordingGuidanceProps) {
-  const tTake = useTranslations('takeFlow');
+  const tTake = useTranslations('takeFlow')
   return (
     <Panel>
       <Stack gap={3}>
@@ -38,5 +39,5 @@ export function TakeRecordingGuidance({
         </Text>
       </Stack>
     </Panel>
-  );
+  )
 }

@@ -1,4 +1,4 @@
-import type { TakeInterviewData } from '@/lib/api';
+import type { TakeInterviewData } from '@/lib/api'
 
 export type TakeStage =
   | 'loading'
@@ -7,11 +7,17 @@ export type TakeStage =
   | 'interview'
   | 'recording'
   | 'transition'
-  | 'complete';
+  | 'complete'
 
 export type InterviewDataView = Pick<
   TakeInterviewData,
-  'id' | 'position' | 'candidateName' | 'totalQuestions' | 'currentQuestion' | 'currentQuestionIndex' | 'currentAnswerMeta'
->;
+  | 'id'
+  | 'position'
+  | 'candidateName'
+  | 'totalQuestions'
+  | 'currentQuestion'
+  | 'currentQuestionIndex'
+  | 'currentAnswerMeta'
+>
 
-export type PermissionStatus = 'idle' | 'pending' | 'granted' | 'denied';
+export type PermissionStatus = 'idle' | 'pending' | 'granted' | 'denied'

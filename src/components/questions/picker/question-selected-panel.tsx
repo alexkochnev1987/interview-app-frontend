@@ -17,10 +17,7 @@ export type QuestionSelectedPanelProps = {
   onRemove: (id: string) => void
 }
 
-export function QuestionSelectedPanel({
-  selected,
-  onRemove,
-}: QuestionSelectedPanelProps) {
+export function QuestionSelectedPanel({ selected, onRemove }: QuestionSelectedPanelProps) {
   const t = useTranslations('questions.picker.selected')
   const sharedLabels = useSharedLabels()
 

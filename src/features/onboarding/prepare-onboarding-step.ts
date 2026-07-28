@@ -1,16 +1,10 @@
 import {
-  isOnboardingRoute,
-  waitForOnboardingRoute,
-} from '@/features/onboarding/onboarding-routes'
-import {
   getStoredOnboardingStepRoute,
   storeOnboardingStepRoute,
 } from '@/features/onboarding/onboarding-progress'
-import {
-  waitForElementLayout,
-  waitForTourTarget,
-} from '@/features/onboarding/wait-for-target'
+import { isOnboardingRoute, waitForOnboardingRoute } from '@/features/onboarding/onboarding-routes'
 import type { OnboardingStepConfig } from '@/features/onboarding/types'
+import { waitForElementLayout, waitForTourTarget } from '@/features/onboarding/wait-for-target'
 
 type PrepareOnboardingStepParams = {
   step: Pick<
@@ -30,10 +24,7 @@ type PrepareOnboardingStepParams = {
 }
 
 async function settleStepViewport(
-  step: Pick<
-    OnboardingStepConfig,
-    'preservePageTop' | 'pageScrollTop' | 'scrollIntoViewBlock'
-  >,
+  step: Pick<OnboardingStepConfig, 'preservePageTop' | 'pageScrollTop' | 'scrollIntoViewBlock'>,
   element: Element,
 ) {
   if (step.preservePageTop) {
@@ -69,21 +60,14 @@ export async function prepareOnboardingStep({
     storeOnboardingStepRoute(step.id, routeOverride)
   }
 
-  const route =
-    routeOverride ??
-    getStoredOnboardingStepRoute(step.id) ??
-    step.route
+  const route = routeOverride ?? getStoredOnboardingStepRoute(step.id) ?? step.route
   const routeMatch = step.routeMatch ?? 'exact'
   const pathname = getPathname()
 
   if (route && !isOnboardingRoute(pathname, route, routeMatch)) {
     push(route)
 
-    const navigated = await waitForOnboardingRoute(
-      getPathname,
-      route,
-      routeMatch,
-    )
+    const navigated = await waitForOnboardingRoute(getPathname, route, routeMatch)
 
     if (!navigated) {
       return false

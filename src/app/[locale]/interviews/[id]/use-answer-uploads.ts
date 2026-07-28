@@ -2,11 +2,7 @@
 
 import { useCallback, useState } from 'react'
 
-import {
-  completeUploadAndFetchInterview,
-  getPresignedUrl,
-  type Interview,
-} from '@/lib/api'
+import { completeUploadAndFetchInterview, getPresignedUrl, type Interview } from '@/lib/api'
 import { runMutation } from '@/lib/run-mutation'
 import type { useToastMessages } from '@/lib/use-toast-messages'
 
@@ -31,9 +27,7 @@ export function useAnswerUploads({
 }: UseAnswerUploadsParams) {
   const [uploadStates, setUploadStates] = useState<QuestionUploadState[]>(
     initialInterview.questions.map((_, qi) => {
-      const hasAnswer = initialInterview.answers.some(
-        (answer) => answer.questionIndex === qi,
-      )
+      const hasAnswer = initialInterview.answers.some((answer) => answer.questionIndex === qi)
       return {
         status: hasAnswer ? 'uploaded' : 'idle',
       } as QuestionUploadState
@@ -49,9 +43,7 @@ export function useAnswerUploads({
       const file = fileInput.files[0]
 
       setUploadStates((current) =>
-        current.map((state, index) =>
-          index === questionIndex ? { status: 'uploading' } : state,
-        ),
+        current.map((state, index) => (index === questionIndex ? { status: 'uploading' } : state)),
       )
 
       try {
@@ -73,24 +65,16 @@ export function useAnswerUploads({
               throw new Error(uploadToStorageFailedLabel)
             }
 
-            return completeUploadAndFetchInterview(
-              interview.id,
-              questionIndex,
-              mediaKey,
-            )
+            return completeUploadAndFetchInterview(interview.id, questionIndex, mediaKey)
           },
           {
-            successMessage: toastMessages.interview.uploadSuccess(
-              questionIndex + 1,
-            ),
+            successMessage: toastMessages.interview.uploadSuccess(questionIndex + 1),
             errorMessage: toastMessages.interview.uploadError(questionIndex + 1),
           },
         )
         setInterview(refreshedInterview)
         setUploadStates((current) =>
-          current.map((state, index) =>
-            index === questionIndex ? { status: 'uploaded' } : state,
-          ),
+          current.map((state, index) => (index === questionIndex ? { status: 'uploaded' } : state)),
         )
       } catch (err) {
         setUploadStates((current) =>
@@ -98,8 +82,7 @@ export function useAnswerUploads({
             index === questionIndex
               ? {
                   status: 'error',
-                  errorMessage:
-                    err instanceof Error ? err.message : uploadFailedLabel,
+                  errorMessage: err instanceof Error ? err.message : uploadFailedLabel,
                 }
               : state,
           ),

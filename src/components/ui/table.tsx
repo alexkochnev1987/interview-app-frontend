@@ -1,5 +1,5 @@
-import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
+import * as React from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -46,9 +46,7 @@ function Table({
         data-slot="table-wrapper"
         data-scrollbar="top"
         className="w-full min-w-0 overflow-x-auto [transform:rotateX(180deg)]"
-        style={
-          minHeightRem != null ? { minHeight: `${minHeightRem}rem` } : undefined
-        }
+        style={minHeightRem != null ? { minHeight: `${minHeightRem}rem` } : undefined}
       >
         <div className="[transform:rotateX(180deg)]">{tableNode}</div>
       </div>
@@ -59,9 +57,7 @@ function Table({
     <div
       data-slot="table-wrapper"
       className={cn('w-full min-w-0 overflow-x-auto')}
-      style={
-        minHeightRem != null ? { minHeight: `${minHeightRem}rem` } : undefined
-      }
+      style={minHeightRem != null ? { minHeight: `${minHeightRem}rem` } : undefined}
     >
       {tableNode}
     </div>
@@ -109,8 +105,7 @@ const tableRowVariants = cva('transition-colors', {
   },
 })
 
-type TableRowProps = React.ComponentProps<'tr'> &
-  VariantProps<typeof tableRowVariants>
+type TableRowProps = React.ComponentProps<'tr'> & VariantProps<typeof tableRowVariants>
 
 function TableRow({
   className,
@@ -182,8 +177,7 @@ const tableCellShared = cva('', {
   },
 })
 
-type TableHeadProps = React.ComponentProps<'th'> &
-  VariantProps<typeof tableCellShared>
+type TableHeadProps = React.ComponentProps<'th'> & VariantProps<typeof tableCellShared>
 
 function TableHead({
   className,
@@ -208,8 +202,7 @@ function TableHead({
   )
 }
 
-type TableCellProps = React.ComponentProps<'td'> &
-  VariantProps<typeof tableCellShared>
+type TableCellProps = React.ComponentProps<'td'> & VariantProps<typeof tableCellShared>
 
 function TableCell({
   className,

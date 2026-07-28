@@ -1,29 +1,30 @@
-import type { RefObject } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl'
+import type { RefObject } from 'react'
 
-import { SurfaceCard } from '@/components/ui/surface-card';
-import { CardContent } from '@/components/ui/card';
-import { Heading } from '@/components/ui/heading';
-import { Progress } from '@/components/ui/progress';
-import { StatusPill } from '@/components/ui/status-pill';
-import { Text } from '@/components/ui/text';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Inline, Stack } from '@/components/ui/layout';
-import { Panel } from '@/components/ui/panel';
-import { RecordingStageHero } from '@/components/ui/take';
-import { LiveTranscriptPanel } from './recording-live-transcript-panel';
-import { TakeRecordingActions } from './recording-actions';
-import { TakeRecordingGuidance } from './recording-guidance';
-import type { InterviewDataView, TakeStage } from '@/components/take/types';
-import type { InterviewerPresence } from '@/features/take/use-take-question-tts';
+import type { InterviewDataView, TakeStage } from '@/components/take/types'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { CardContent } from '@/components/ui/card'
+import { Heading } from '@/components/ui/heading'
+import { Inline, Stack } from '@/components/ui/layout'
+import { Panel } from '@/components/ui/panel'
+import { Progress } from '@/components/ui/progress'
+import { StatusPill } from '@/components/ui/status-pill'
+import { SurfaceCard } from '@/components/ui/surface-card'
+import { RecordingStageHero } from '@/components/ui/take'
+import { Text } from '@/components/ui/text'
+import type { InterviewerPresence } from '@/features/take/use-take-question-tts'
+
+import { TakeRecordingActions } from './recording-actions'
+import { TakeRecordingGuidance } from './recording-guidance'
+import { LiveTranscriptPanel } from './recording-live-transcript-panel'
 
 interface TakeRecordingHeroColumnProps {
-  stage: TakeStage;
-  timeLeft: number;
-  formatTime: (seconds: number) => string;
-  videoRef: RefObject<HTMLVideoElement | null>;
-  screenVideoRef: RefObject<HTMLVideoElement | null>;
-  interviewerPresence: InterviewerPresence;
+  stage: TakeStage
+  timeLeft: number
+  formatTime: (seconds: number) => string
+  videoRef: RefObject<HTMLVideoElement | null>
+  screenVideoRef: RefObject<HTMLVideoElement | null>
+  interviewerPresence: InterviewerPresence
 }
 
 export function TakeRecordingHeroColumn({
@@ -35,13 +36,7 @@ export function TakeRecordingHeroColumn({
   interviewerPresence,
 }: TakeRecordingHeroColumnProps) {
   return (
-    <SurfaceCard
-      tone="recordingHero"
-      height="full"
-      size="flush"
-      grow="fill"
-      flexChild="contain"
-    >
+    <SurfaceCard tone="recordingHero" height="full" size="flush" grow="fill" flexChild="contain">
       <CardContent inset="none" layout="fill-column" spacing="none">
         <RecordingStageHero
           showTimer={stage === 'recording' || stage === 'transition'}
@@ -53,30 +48,30 @@ export function TakeRecordingHeroColumn({
         />
       </CardContent>
     </SurfaceCard>
-  );
+  )
 }
 
 interface TakeRecordingSidebarColumnProps {
-  interview: InterviewDataView;
-  stage: TakeStage;
-  recording: boolean;
-  progressValue: number;
-  submitError: string;
-  recordingStartBusy: boolean;
-  retakeDisabled: boolean;
-  displayedAttemptNumber: number;
-  isBrowserTranscriptSupported: boolean;
-  finalTranscript: string;
-  interimTranscript: string;
-  browserTranscriptWarning?: string;
-  interviewerPresence: InterviewerPresence;
-  uploading: boolean;
-  setupError: string;
-  capturePipelineReady: boolean;
-  submitAnswerLabel: string;
-  onReconnect: () => void;
-  onRerecord: () => void;
-  onSubmit: () => void;
+  interview: InterviewDataView
+  stage: TakeStage
+  recording: boolean
+  progressValue: number
+  submitError: string
+  recordingStartBusy: boolean
+  retakeDisabled: boolean
+  displayedAttemptNumber: number
+  isBrowserTranscriptSupported: boolean
+  finalTranscript: string
+  interimTranscript: string
+  browserTranscriptWarning?: string
+  interviewerPresence: InterviewerPresence
+  uploading: boolean
+  setupError: string
+  capturePipelineReady: boolean
+  submitAnswerLabel: string
+  onReconnect: () => void
+  onRerecord: () => void
+  onSubmit: () => void
 }
 
 export function TakeRecordingSidebarColumn({
@@ -101,7 +96,7 @@ export function TakeRecordingSidebarColumn({
   onRerecord,
   onSubmit,
 }: TakeRecordingSidebarColumnProps) {
-  const tTake = useTranslations('takeFlow');
+  const tTake = useTranslations('takeFlow')
   return (
     <SurfaceCard tone="glassSoft" height="full">
       <CardContent layout="fill-column" spacing="md">
@@ -165,5 +160,5 @@ export function TakeRecordingSidebarColumn({
         </Stack>
       </CardContent>
     </SurfaceCard>
-  );
+  )
 }

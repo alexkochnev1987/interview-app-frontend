@@ -3,21 +3,18 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { EyebrowLabel } from '@/components/ui/eyebrow-label'
 import { Stack } from '@/components/ui/layout/stack'
 
-const statVariants = cva(
-  'rounded-2xl p-4 ring-1',
-  {
-    variants: {
-      severity: {
-        ok: 'bg-surface-low-soft ring-hairline',
-        watch: 'bg-amber-50 ring-amber-200',
-        risk: 'bg-rose-50 ring-rose-200',
-      },
-    },
-    defaultVariants: {
-      severity: 'ok',
+const statVariants = cva('rounded-2xl p-4 ring-1', {
+  variants: {
+    severity: {
+      ok: 'bg-surface-low-soft ring-hairline',
+      watch: 'bg-amber-50 ring-amber-200',
+      risk: 'bg-rose-50 ring-rose-200',
     },
   },
-)
+  defaultVariants: {
+    severity: 'ok',
+  },
+})
 
 const valueVariants = cva('text-2xl font-semibold tracking-display', {
   variants: {
@@ -54,9 +51,7 @@ export function BehaviorSignalStat({
 }: BehaviorSignalStatProps) {
   const resolved =
     severity ??
-    (watchAt !== undefined && riskAt !== undefined
-      ? severityFor(value, watchAt, riskAt)
-      : 'ok')
+    (watchAt !== undefined && riskAt !== undefined ? severityFor(value, watchAt, riskAt) : 'ok')
 
   return (
     <div className={statVariants({ severity: resolved })}>

@@ -11,8 +11,7 @@ export function splitListQueryErrors(
   if (!errorMessage) {
     return { blockingError: null, paginationError: null }
   }
-  const paginationError =
-    visibleItemCount > 0 && isPlaceholderData ? errorMessage : null
+  const paginationError = visibleItemCount > 0 && isPlaceholderData ? errorMessage : null
   const blockingError = paginationError == null ? errorMessage : null
   return { blockingError, paginationError }
 }
@@ -25,8 +24,7 @@ export function splitInfiniteQueryErrors(
   if (!errorMessage) {
     return { blockingError: null, paginationError: null }
   }
-  const paginationError =
-    visibleItemCount > 0 && !isPlaceholderData ? errorMessage : null
+  const paginationError = visibleItemCount > 0 && !isPlaceholderData ? errorMessage : null
   const blockingError = paginationError == null ? errorMessage : null
   return { blockingError, paginationError }
 }

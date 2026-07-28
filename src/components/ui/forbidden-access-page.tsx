@@ -9,10 +9,7 @@ interface ForbiddenAccessPageProps {
   description: string
 }
 
-export function ForbiddenAccessPage({
-  title,
-  description,
-}: ForbiddenAccessPageProps) {
+export function ForbiddenAccessPage({ title, description }: ForbiddenAccessPageProps) {
   return (
     <PageShell>
       <EmptyStateCard

@@ -1,24 +1,24 @@
-import type { ComponentProps, ReactNode } from "react"
-import { cva, type VariantProps } from "class-variance-authority"
+import { cva, type VariantProps } from 'class-variance-authority'
+import type { ComponentProps, ReactNode } from 'react'
 
-import { cn } from "@/lib/utils"
+import { cn } from '@/lib/utils'
 
 const facetRowButtonVariants = cva(
-  "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors",
+  'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors',
   {
     variants: {
       state: {
-        default: "text-foreground hover:bg-muted",
-        selected: "bg-primary/10 font-medium text-primary",
+        default: 'text-foreground hover:bg-muted',
+        selected: 'bg-primary/10 font-medium text-primary',
       },
     },
     defaultVariants: {
-      state: "default",
+      state: 'default',
     },
   },
 )
 
-type FacetRowButtonProps = Omit<ComponentProps<"button">, "type"> &
+type FacetRowButtonProps = Omit<ComponentProps<'button'>, 'type'> &
   VariantProps<typeof facetRowButtonVariants> & {
     label: string
     trailing?: ReactNode
@@ -31,7 +31,7 @@ export function FacetRowButton({
   trailing,
   ...props
 }: FacetRowButtonProps) {
-  const isSelected = state === "selected"
+  const isSelected = state === 'selected'
   return (
     <button
       type="button"
@@ -43,8 +43,8 @@ export function FacetRowButton({
       {trailing != null ? (
         <span
           className={cn(
-            "tabular-nums text-xs",
-            isSelected ? "text-primary" : "text-muted-foreground",
+            'tabular-nums text-xs',
+            isSelected ? 'text-primary' : 'text-muted-foreground',
           )}
         >
           {trailing}

@@ -1,9 +1,8 @@
 'use client'
 
-import { useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { useState } from 'react'
 
-import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { DeletedQuestionBanner } from '@/components/questions/detail/deleted-question-banner'
 import { QuestionDangerZone } from '@/components/questions/detail/question-danger-zone'
 import { QuestionDeleteScheduledAlert } from '@/components/questions/detail/question-delete-scheduled-alert'
@@ -13,6 +12,7 @@ import {
   useRestoreQuestion,
   useUpdateQuestion,
 } from '@/components/questions/use-question-mutations'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Stack } from '@/components/ui/layout/stack'
 import { useRouter } from '@/i18n/navigation'
 import {
@@ -54,13 +54,13 @@ export function QuestionEditClient({
   const [question, setQuestion] = useState(initialQuestion)
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [restoreOpen, setRestoreOpen] = useState(false)
-  const [scheduledDelete, setScheduledDelete] = useState<
-    Extract<DeleteQuestionResult, { scheduled: true }> | null
-  >(null)
+  const [scheduledDelete, setScheduledDelete] = useState<Extract<
+    DeleteQuestionResult,
+    { scheduled: true }
+  > | null>(null)
 
-  const blockingInterviews = scheduledDelete?.blockingInterviews
-      ?? question.blockingInterviews
-      ?? []
+  const blockingInterviews =
+    scheduledDelete?.blockingInterviews ?? question.blockingInterviews ?? []
 
   async function handleSubmit(
     value: QuestionInput,
@@ -118,16 +118,13 @@ export function QuestionEditClient({
   return (
     <>
       {question.deleted && canUpdate ? (
-        <DeletedQuestionBanner
-          restoring={restoring}
-          onRestore={() => setRestoreOpen(true)}
-        />
+        <DeletedQuestionBanner restoring={restoring} onRestore={() => setRestoreOpen(true)} />
       ) : null}
       {!question.deleted && (question.pendingDeletion || scheduledDelete) ? (
-          <QuestionDeleteScheduledAlert
-            intro={toastMessages.deleteQuestion.scheduledIntro}
-            blockingInterviews={blockingInterviews}
-          />
+        <QuestionDeleteScheduledAlert
+          intro={toastMessages.deleteQuestion.scheduledIntro}
+          blockingInterviews={blockingInterviews}
+        />
       ) : null}
       <QuestionEditor
         questionId={id}
@@ -139,10 +136,7 @@ export function QuestionEditClient({
       />
       {!question.deleted && canDelete ? (
         <Stack gap={4}>
-          <QuestionDangerZone
-            deleting={deleting}
-            onRequestDelete={() => setConfirmOpen(true)}
-          />
+          <QuestionDangerZone deleting={deleting} onRequestDelete={() => setConfirmOpen(true)} />
         </Stack>
       ) : null}
       <ConfirmDialog

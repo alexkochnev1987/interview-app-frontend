@@ -1,8 +1,5 @@
 'use client'
 
-import { useState } from 'react'
-import { useLocale, useTranslations } from 'next-intl'
-import { useSearchParams } from 'next/navigation'
 import {
   ClipboardList,
   LayoutDashboard,
@@ -13,22 +10,9 @@ import {
   Sparkles,
   Users,
 } from 'lucide-react'
-
-import { LanguageSwitcher } from '@/components/ui/language-switcher'
-import { isCandidateFlowPath } from '@/i18n/html-lang'
-import { LOCALES, type Locale } from '@/i18n/locales'
-import { usePathname } from '@/i18n/navigation'
-import { routes } from '@/i18n/routes'
-import { useSharedLabels } from '@/i18n/use-shared-labels'
-import { useAuth, useIsDemo } from '@/lib/auth-context'
-import { cn } from '@/lib/utils'
-import {
-  canAccessDashboard,
-  canConfigureInterview,
-  canManageTeam,
-  canReadQuestions,
-  canReviewAssessments,
-} from '@/lib/auth-roles'
+import { useLocale, useTranslations } from 'next-intl'
+import { useSearchParams } from 'next/navigation'
+import { useState } from 'react'
 
 import { AppSidebar } from '@/components/ui/app-sidebar'
 import { Button } from '@/components/ui/button'
@@ -36,17 +20,28 @@ import { EyebrowLabel } from '@/components/ui/eyebrow-label'
 import { Icon } from '@/components/ui/icon'
 import { IconBadge } from '@/components/ui/icon-badge'
 import { IdentityBadge } from '@/components/ui/identity-badge'
+import { LanguageSwitcher } from '@/components/ui/language-switcher'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
-import {
-  SideNavButton,
-  SideNavLink,
-  sideNavRevealClass,
-} from '@/components/ui/side-nav-item'
+import { SideNavButton, SideNavLink, sideNavRevealClass } from '@/components/ui/side-nav-item'
 import { SurfaceTile } from '@/components/ui/surface-tile'
 import { BodyText } from '@/components/ui/text'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
 import { useOnboardingReplay } from '@/features/onboarding/onboarding-provider'
+import { isCandidateFlowPath } from '@/i18n/html-lang'
+import { LOCALES, type Locale } from '@/i18n/locales'
+import { usePathname } from '@/i18n/navigation'
+import { routes } from '@/i18n/routes'
+import { useSharedLabels } from '@/i18n/use-shared-labels'
+import { useAuth, useIsDemo } from '@/lib/auth-context'
+import {
+  canAccessDashboard,
+  canConfigureInterview,
+  canManageTeam,
+  canReadQuestions,
+  canReviewAssessments,
+} from '@/lib/auth-roles'
+import { cn } from '@/lib/utils'
 
 export function SideNav() {
   const { user, logout } = useAuth()
@@ -110,9 +105,7 @@ export function SideNav() {
           },
         ]
       : []),
-    ...(canManageTeam(user?.role)
-      ? [{ href: '/team', label: tNav('team'), icon: Users }]
-      : []),
+    ...(canManageTeam(user?.role) ? [{ href: '/team', label: tNav('team'), icon: Users }] : []),
   ]
 
   function isActive(href: string) {
@@ -142,7 +135,9 @@ export function SideNav() {
         <UnstyledLink href="/">
           <Inline gap={2} align="center" wrap="nowrap">
             <IconBadge tone="gradient" size="sm">
-              <Icon size="md"><Sparkles /></Icon>
+              <Icon size="md">
+                <Sparkles />
+              </Icon>
             </IconBadge>
             <Stack gap={0} className={cn('min-w-0', sideNavRevealClass)}>
               <EyebrowLabel size="sm" className="whitespace-nowrap">

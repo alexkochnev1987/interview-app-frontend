@@ -1,20 +1,21 @@
-'use client';
+'use client'
 
-import type { ReactNode } from 'react';
-import { cva } from 'class-variance-authority';
+import { cva } from 'class-variance-authority'
+import type { ReactNode } from 'react'
 
-import { BodyText } from '@/components/ui/text';
+import { Inline, Stack } from '@/components/ui/layout'
+import { BodyText } from '@/components/ui/text'
+import { cn } from '@/lib/utils'
+
 import {
   CameraPreviewVideo,
   cameraPreviewSurfaceClass,
   type CameraPreviewVideoRefProps,
-} from './camera-preview';
-import { Inline, Stack } from '@/components/ui/layout';
-import { cn } from '@/lib/utils';
+} from './camera-preview'
 
 const lobbyPreviewFrameLayout = cva(
   'h-full min-h-0 min-w-0 flex-1 overflow-hidden rounded-xl bg-[hsl(var(--surface-low)/0.92)] shadow-none ring-1 ring-border/45 isolate',
-);
+)
 
 export function LobbyPrepFloatingControls({ children }: { children: ReactNode }) {
   return (
@@ -27,25 +28,23 @@ export function LobbyPrepFloatingControls({ children }: { children: ReactNode })
         {children}
       </Inline>
     </Inline>
-  );
+  )
 }
 
 export function LobbyPreviewFrame({ children }: { children: ReactNode }) {
-  return (
-    <div className={cn('relative isolate w-full', lobbyPreviewFrameLayout())}>{children}</div>
-  );
+  return <div className={cn('relative isolate w-full', lobbyPreviewFrameLayout())}>{children}</div>
 }
 
 export function LobbyScreenVideo({ videoRef }: CameraPreviewVideoRefProps) {
-  return <CameraPreviewVideo videoRef={videoRef} objectFit="cover" />;
+  return <CameraPreviewVideo videoRef={videoRef} objectFit="cover" />
 }
 
 export function LobbyPreviewPlaceholder({
   title,
   description,
 }: {
-  title: string;
-  description?: string;
+  title: string
+  description?: string
 }) {
   return (
     <Stack
@@ -72,5 +71,5 @@ export function LobbyPreviewPlaceholder({
         ) : null}
       </Stack>
     </Stack>
-  );
+  )
 }

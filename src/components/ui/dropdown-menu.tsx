@@ -1,15 +1,12 @@
 'use client'
 
-import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { DropdownMenu as DM } from 'radix-ui'
+import * as React from 'react'
 
 import { cn } from '@/lib/utils'
 
-function DropdownMenu({
-  modal = false,
-  ...props
-}: React.ComponentProps<typeof DM.Root>) {
+function DropdownMenu({ modal = false, ...props }: React.ComponentProps<typeof DM.Root>) {
   return <DM.Root data-slot="dropdown-menu" modal={modal} {...props} />
 }
 
@@ -48,7 +45,7 @@ function DropdownMenuContent({
 }
 
 const dropdownMenuItemVariants = cva(
-  'relative flex w-full cursor-pointer select-none items-center gap-2 rounded-lg border-0 bg-transparent px-3 py-2.5 text-left text-sm font-semibold outline-none transition-colors [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*=\'size-\'])]:size-4 data-[disabled]:pointer-events-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-45 data-[highlighted]:bg-muted/75',
+  "relative flex w-full cursor-pointer select-none items-center gap-2 rounded-lg border-0 bg-transparent px-3 py-2.5 text-left text-sm font-semibold outline-none transition-colors [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 data-[disabled]:pointer-events-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-45 data-[highlighted]:bg-muted/75",
   {
     variants: {
       tone: {
@@ -80,9 +77,4 @@ export type DropdownMenuItemTone = NonNullable<
   VariantProps<typeof dropdownMenuItemVariants>['tone']
 >
 
-export {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-}
+export { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem }

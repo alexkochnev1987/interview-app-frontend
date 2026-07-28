@@ -21,13 +21,9 @@ export function notifyBulkDeleteOutcome(
   messages: BulkDeleteToastMessages,
 ) {
   if (result.scheduled.length > 0) {
-    notifyInfo(
-      messages.partialTitle(
-        result.deleted.length,
-        result.scheduled.length,
-      ),
-      { id: BULK_DELETE_TOAST_IDS.partial },
-    )
+    notifyInfo(messages.partialTitle(result.deleted.length, result.scheduled.length), {
+      id: BULK_DELETE_TOAST_IDS.partial,
+    })
     return
   }
 

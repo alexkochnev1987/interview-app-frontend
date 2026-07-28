@@ -1,5 +1,5 @@
-import type { QuestionInput } from '@/lib/api'
 import type { Locale } from '@/i18n/locales'
+import type { QuestionInput } from '@/lib/api'
 import { CONTENT_FIELD_KEYS, type ContentFieldKey } from '@/lib/question-editor/field-keys'
 import {
   areEqual,
@@ -10,10 +10,7 @@ import {
   type LocaleQuestionDraft,
 } from '@/lib/question-editor/parsers'
 
-export type PrimaryContentSnapshot = Pick<
-  LocaleQuestionDraft,
-  ContentFieldKey
->
+export type PrimaryContentSnapshot = Pick<LocaleQuestionDraft, ContentFieldKey>
 
 export function primaryContentSnapshotFromDraft(
   draft?: Partial<LocaleQuestionDraft>,

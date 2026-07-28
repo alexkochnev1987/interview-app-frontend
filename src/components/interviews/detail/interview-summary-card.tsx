@@ -3,9 +3,9 @@
 import { ArrowLeft, ArrowRight, MessageSquareText } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
+import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
 import { HeroLead, HeroTitle } from '@/components/ui/hero-text'
 import { Icon } from '@/components/ui/icon'
@@ -19,19 +19,16 @@ import { BodyText } from '@/components/ui/text'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
 import { Link } from '@/i18n/navigation'
 import { routes } from '@/i18n/routes'
+import { useSharedLabels } from '@/i18n/use-shared-labels'
 import type { Interview, InterviewResult } from '@/lib/api'
-import {
-  formatInterviewDate,
-  getCandidateInitials,
-} from '@/lib/interview-formatters'
 import { isHrVisibleAssessment } from '@/lib/assessment-status'
+import { formatInterviewDate, getCandidateInitials } from '@/lib/interview-formatters'
 import {
   canAccessCandidateFeedback,
   canDeleteInterview,
   canEditInterview,
   canManageInterview,
 } from '@/lib/interview-management'
-import { useSharedLabels } from '@/i18n/use-shared-labels'
 
 interface InterviewSummaryCardProps {
   interview: Interview
@@ -64,7 +61,7 @@ export function InterviewSummaryCard({
   deleting,
   onStartEditing,
   onOpenCancelConfirm,
-  onOpenDeleteConfirm
+  onOpenDeleteConfirm,
 }: InterviewSummaryCardProps) {
   const t = useTranslations('questions.common')
   const tDetail = useTranslations('interviews.detail')
@@ -112,17 +109,16 @@ export function InterviewSummaryCard({
       </DemoWriteGuard>
     ) : null
 
-  const candidateFeedbackButton =
-    canAccessCandidateFeedback(interview) ? (
-      <Button type="button" variant="gradient" shape="pill" asChild>
-        <Link href={routes.interviews.candidateFeedback(interview.id)}>
-          <Icon size="sm">
-            <MessageSquareText />
-          </Icon>
-          {tDetail('candidateFeedback')}
-        </Link>
-      </Button>
-    ) : null
+  const candidateFeedbackButton = canAccessCandidateFeedback(interview) ? (
+    <Button type="button" variant="gradient" shape="pill" asChild>
+      <Link href={routes.interviews.candidateFeedback(interview.id)}>
+        <Icon size="sm">
+          <MessageSquareText />
+        </Icon>
+        {tDetail('candidateFeedback')}
+      </Link>
+    </Button>
+  ) : null
 
   const visitAssessmentButton = isHrVisibleAssessment(interview) ? (
     <Button asChild variant="outline">
@@ -214,8 +210,8 @@ export function InterviewSummaryCard({
 
           <StatusPill tone="neutral">
             {interview.assignedHr
-                ? tDetail('assignedHrAssigned', { name: interview.assignedHr.name })
-                : tDetail('assignedHrUnassigned')}
+              ? tDetail('assignedHrAssigned', { name: interview.assignedHr.name })
+              : tDetail('assignedHrUnassigned')}
           </StatusPill>
 
           <Inline gap={3} align="center" wrap="wrap">
@@ -229,16 +225,8 @@ export function InterviewSummaryCard({
         </Stack>
 
         <Grid columns="metrics-3" gap={4}>
-          <MetricPanel
-            label={t('metricsQuestions')}
-            value={totalQuestions}
-            valueSize="lg"
-          />
-          <MetricPanel
-            label={t('metricsUploaded')}
-            value={answeredCount}
-            valueSize="lg"
-          />
+          <MetricPanel label={t('metricsQuestions')} value={totalQuestions} valueSize="lg" />
+          <MetricPanel label={t('metricsUploaded')} value={answeredCount} valueSize="lg" />
           <MetricPanel
             label={t('metricsOverallScore')}
             value={results ? results.overallScore : '--'}

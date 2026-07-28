@@ -86,9 +86,7 @@ function filterQuestions(query) {
 
   const q = query.get('q')?.trim()
   if (q) {
-    items = items.filter((item) =>
-      item.questionText.toLowerCase().includes(q.toLowerCase()),
-    )
+    items = items.filter((item) => item.questionText.toLowerCase().includes(q.toLowerCase()))
   }
 
   return items
@@ -99,9 +97,7 @@ function filterInterviewListItems(query) {
 
   const q = query.get('q')?.trim()
   if (q) {
-    items = items.filter((item) =>
-      item.candidateName.toLowerCase().includes(q.toLowerCase()),
-    )
+    items = items.filter((item) => item.candidateName.toLowerCase().includes(q.toLowerCase()))
   }
 
   const status = query.get('status')
@@ -165,9 +161,14 @@ async function handleRequest(req, res) {
   }
 
   if (method === 'POST' && pathname === '/auth/logout') {
-    json(res, 200, { ok: true }, {
-      'Set-Cookie': 'session=; Path=/; HttpOnly; Max-Age=0; SameSite=Lax',
-    })
+    json(
+      res,
+      200,
+      { ok: true },
+      {
+        'Set-Cookie': 'session=; Path=/; HttpOnly; Max-Age=0; SameSite=Lax',
+      },
+    )
     return
   }
 
@@ -222,22 +223,12 @@ async function handleRequest(req, res) {
 
   if (method === 'GET' && pathname === '/interviews/facets') {
     const filtered = filterInterviewListItems(url.searchParams)
-    json(
-      res,
-      200,
-      filtered.length > 0
-        ? buildInterviewFacets(filtered)
-        : EMPTY_INTERVIEW_FACETS,
-    )
+    json(res, 200, filtered.length > 0 ? buildInterviewFacets(filtered) : EMPTY_INTERVIEW_FACETS)
     return
   }
 
   if (method === 'GET' && pathname === '/interviews') {
-    json(
-      res,
-      200,
-      paginate(filterInterviewListItems(url.searchParams), url.searchParams),
-    )
+    json(res, 200, paginate(filterInterviewListItems(url.searchParams), url.searchParams))
     return
   }
 
@@ -260,12 +251,16 @@ async function handleRequest(req, res) {
     }
 
     if (method === 'GET' && action === 'results') {
-      json(res, 200, current.result ?? {
-        overallScore: 0,
-        summary: 'No results yet',
-        categoryScores: {},
-        completedAt: current.updatedAt,
-      })
+      json(
+        res,
+        200,
+        current.result ?? {
+          overallScore: 0,
+          summary: 'No results yet',
+          categoryScores: {},
+          completedAt: current.updatedAt,
+        },
+      )
       return
     }
 
@@ -290,8 +285,7 @@ async function handleRequest(req, res) {
 
       if (current.status !== 'completed' && current.status !== 'failed') {
         json(res, 409, {
-          message:
-            'Interview can only be deleted while status is completed or failed',
+          message: 'Interview can only be deleted while status is completed or failed',
           statusCode: 409,
         })
         return

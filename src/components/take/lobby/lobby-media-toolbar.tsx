@@ -1,17 +1,17 @@
-import { Mic, MicOff, SquareArrowUp, Video, VideoOff } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { Mic, MicOff, SquareArrowUp, Video, VideoOff } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
-import { Button } from '@/components/ui/button';
-import { Inline } from '@/components/ui/layout';
+import { Button } from '@/components/ui/button'
+import { Inline } from '@/components/ui/layout'
 
 interface TakeLobbyMediaToolbarProps {
-  setupBusy: boolean;
-  micOn: boolean;
-  cameraOn: boolean;
-  screenShareReady: boolean;
-  onToggleMic: () => void;
-  onToggleCamera: () => void;
-  onScreenShare: () => void;
+  setupBusy: boolean
+  micOn: boolean
+  cameraOn: boolean
+  screenShareReady: boolean
+  onToggleMic: () => void
+  onToggleCamera: () => void
+  onScreenShare: () => void
 }
 
 export function TakeLobbyMediaToolbar({
@@ -23,7 +23,7 @@ export function TakeLobbyMediaToolbar({
   onToggleCamera,
   onScreenShare,
 }: TakeLobbyMediaToolbarProps) {
-  const tTake = useTranslations('takeFlow');
+  const tTake = useTranslations('takeFlow')
   return (
     <Inline justify="center" gap={3}>
       <Button
@@ -63,5 +63,5 @@ export function TakeLobbyMediaToolbar({
         <SquareArrowUp />
       </Button>
     </Inline>
-  );
+  )
 }

@@ -3,10 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { Textarea } from '@/components/ui/textarea'
-import {
-  type QuestionExpectedConcept,
-  type QuestionRedFlag,
-} from '@/lib/api'
+import { type QuestionExpectedConcept, type QuestionRedFlag } from '@/lib/api'
 
 type ListItem = QuestionExpectedConcept | QuestionRedFlag
 

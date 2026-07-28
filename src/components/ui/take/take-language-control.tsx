@@ -78,10 +78,7 @@ export function TakeLanguageControl({
             >
               <span>{label}</span>
               <Check
-                className={cn(
-                  'size-4 text-primary',
-                  active ? 'opacity-100' : 'opacity-0',
-                )}
+                className={cn('size-4 text-primary', active ? 'opacity-100' : 'opacity-0')}
                 aria-hidden
               />
             </DropdownMenuItem>

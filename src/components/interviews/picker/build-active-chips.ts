@@ -1,7 +1,7 @@
 import type { InterviewsQueryState } from '@/lib/interviews-query-state'
 
-import type { ActiveFilterChip } from './interview-picker-toolbar'
 import type { UseInterviewsQueryResult } from '../hooks/use-interviews-query'
+import type { ActiveFilterChip } from './interview-picker-toolbar'
 
 export type ActiveInterviewFilterChipDescriptor =
   | { kind: 'position'; value: string }
@@ -10,10 +10,7 @@ export type ActiveInterviewFilterChipDescriptor =
 
 export function buildActiveInterviewFilterChips(
   state: InterviewsQueryState,
-  setters: Pick<
-    UseInterviewsQueryResult,
-    'setPosition' | 'setStatus' | 'setAssignedHrId'
-  >,
+  setters: Pick<UseInterviewsQueryResult, 'setPosition' | 'setStatus' | 'setAssignedHrId'>,
   getChipLabel: (descriptor: ActiveInterviewFilterChipDescriptor) => string,
 ): ActiveFilterChip[] {
   const chips: ActiveFilterChip[] = []

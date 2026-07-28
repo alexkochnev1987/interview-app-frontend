@@ -1,34 +1,31 @@
 'use client'
 
-import { useState } from 'react'
 import { BriefcaseBusiness, UserRound } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { useState } from 'react'
 
+import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
+import { AssignedHrSelect } from '@/components/interviews/assigned-hr-select'
 import {
   InterviewQuestionPickerAside,
   InterviewQuestionPickerMain,
 } from '@/components/questions/picker/interview-question-picker-section'
 import { useInterviewQuestionPicker } from '@/components/questions/picker/use-interview-question-picker'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { FormField } from '@/components/ui/form-field'
-import { IconAffix } from '@/components/ui/icon-affix'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
-import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { IconAffix } from '@/components/ui/icon-affix'
+import { Input } from '@/components/ui/input'
 import { Grid } from '@/components/ui/layout/grid'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
-import { Input } from '@/components/ui/input'
 import { updateInterview, type Interview } from '@/lib/api'
-import { AssignedHrSelect } from '@/components/interviews/assigned-hr-select'
 import { useAuth } from '@/lib/auth-context'
 import { canAssignInterviewHr } from '@/lib/auth-roles'
-import {
-  getSelectedQuestionIdsInEditOrder,
-  isInterviewEditDirty,
-} from '@/lib/interview-edit-dirty'
+import { getSelectedQuestionIdsInEditOrder, isInterviewEditDirty } from '@/lib/interview-edit-dirty'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
 import { runMutation } from '@/lib/run-mutation'
 import { useToastMessages } from '@/lib/use-toast-messages'
@@ -69,15 +66,7 @@ export function InterviewEditPanel({
   const { selectedCount, selectedById } = picker
 
   function handleDiscardClick() {
-    if (
-      isInterviewEditDirty(
-        interview,
-        candidateName,
-        position,
-        selectedById,
-        assignedHrId
-      )
-    ) {
+    if (isInterviewEditDirty(interview, candidateName, position, selectedById, assignedHrId)) {
       setDiscardOpen(true)
       return
     }
@@ -109,13 +98,10 @@ export function InterviewEditPanel({
           updateInterview(interview.id, {
             candidateName: candidateName.trim(),
             position: position.trim(),
-            questionIds: getSelectedQuestionIdsInEditOrder(
-                interview.questions,
-                selectedById,
-            ),
+            questionIds: getSelectedQuestionIdsInEditOrder(interview.questions, selectedById),
             ...(canAssign && assignedHrId !== initialAssignedHrId
-                ? { assignedHrId: assignedHrId ?? null }
-                : {}),
+              ? { assignedHrId: assignedHrId ?? null }
+              : {}),
           }),
         {
           successMessage: toastMessages.interview.updateSuccess,
@@ -147,7 +133,13 @@ export function InterviewEditPanel({
             </CardHeader>
             <CardContent spacing="lg">
               <FormField htmlFor="edit-candidateName" label={tEdit('candidateName')}>
-                <IconAffix icon={<Icon size="md"><UserRound /></Icon>}>
+                <IconAffix
+                  icon={
+                    <Icon size="md">
+                      <UserRound />
+                    </Icon>
+                  }
+                >
                   <Input
                     id="edit-candidateName"
                     iconAffix="leading"
@@ -161,7 +153,13 @@ export function InterviewEditPanel({
               </FormField>
 
               <FormField htmlFor="edit-position" label={tEdit('position')}>
-                <IconAffix icon={<Icon size="md"><BriefcaseBusiness /></Icon>}>
+                <IconAffix
+                  icon={
+                    <Icon size="md">
+                      <BriefcaseBusiness />
+                    </Icon>
+                  }
+                >
                   <Input
                     id="edit-position"
                     iconAffix="leading"
@@ -174,19 +172,19 @@ export function InterviewEditPanel({
               </FormField>
 
               {canAssign ? (
-                  <FormField htmlFor="edit-assignedHr" label={tPicker('assignedHrLabel')}>
-                    <DemoWriteGuard width="full" disabled={submitting}>
-                      <AssignedHrSelect
-                          id="edit-assignedHr"
-                          value={assignedHrId}
-                          onValueChange={setAssignedHrId}
-                          allowUnassigned
-                          currentAssignee={interview.assignedHr}
-                          enabled={canAssign}
-                          disabled={submitting}
-                      />
-                    </DemoWriteGuard>
-                  </FormField>
+                <FormField htmlFor="edit-assignedHr" label={tPicker('assignedHrLabel')}>
+                  <DemoWriteGuard width="full" disabled={submitting}>
+                    <AssignedHrSelect
+                      id="edit-assignedHr"
+                      value={assignedHrId}
+                      onValueChange={setAssignedHrId}
+                      allowUnassigned
+                      currentAssignee={interview.assignedHr}
+                      enabled={canAssign}
+                      disabled={submitting}
+                    />
+                  </DemoWriteGuard>
+                </FormField>
               ) : null}
 
               <Inline gap={2} wrap="wrap">

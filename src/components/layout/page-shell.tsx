@@ -23,10 +23,7 @@ export function PageMain({ children }: ChildrenProps) {
   )
 }
 
-export function PageMainViewport({
-  children,
-  spacing = 'page',
-}: PageMainViewportProps) {
+export function PageMainViewport({ children, spacing = 'page' }: PageMainViewportProps) {
   return (
     <PageFrame as="main" spacing={spacing} stretch="viewport">
       <Container width="default" layout="viewportColumn">

@@ -1,8 +1,9 @@
-import type { PermissionStatus } from '@/components/take/types';
-import type { StatusTone } from '@/components/ui/status-pill';
-import type { TakeMessageGetter } from './messages';
+import type { PermissionStatus } from '@/components/take/types'
+import type { StatusTone } from '@/components/ui/status-pill'
 
-export const TAKE_RECORDING_LIMIT_SECONDS = 240;
+import type { TakeMessageGetter } from './messages'
+
+export const TAKE_RECORDING_LIMIT_SECONDS = 240
 
 const MEDIA_RECORDER_CANDIDATE_TYPES = [
   'video/webm;codecs=vp9,opus',
@@ -12,41 +13,39 @@ const MEDIA_RECORDER_CANDIDATE_TYPES = [
   'video/webm',
   'video/mp4',
   'video/mp4;codecs=avc1.42E01E,mp4a.40.2',
-] as const;
+] as const
 
 export function pickSupportedMediaRecorderMimeType(): string | undefined {
   if (typeof MediaRecorder === 'undefined' || !MediaRecorder.isTypeSupported) {
-    return undefined;
+    return undefined
   }
 
   for (const type of MEDIA_RECORDER_CANDIDATE_TYPES) {
     if (MediaRecorder.isTypeSupported(type)) {
-      return type;
+      return type
     }
   }
 
-  return undefined;
+  return undefined
 }
 
-export function buildMediaRecorderOptions(
-  videoBitsPerSecond = 1_500_000,
-): MediaRecorderOptions {
-  const mimeType = pickSupportedMediaRecorderMimeType();
+export function buildMediaRecorderOptions(videoBitsPerSecond = 1_500_000): MediaRecorderOptions {
+  const mimeType = pickSupportedMediaRecorderMimeType()
 
   if (mimeType) {
-    return { mimeType, videoBitsPerSecond };
+    return { mimeType, videoBitsPerSecond }
   }
 
-  return { videoBitsPerSecond };
+  return { videoBitsPerSecond }
 }
 
 export interface TakeBehaviorSignals {
-  tabHiddenCount: number;
-  windowBlurCount: number;
-  copyCount: number;
-  pasteCount: number;
-  keydownCount: number;
-  resizeCount: number;
+  tabHiddenCount: number
+  windowBlurCount: number
+  copyCount: number
+  pasteCount: number
+  keydownCount: number
+  resizeCount: number
 }
 
 export function createEmptyBehaviorSignals(): TakeBehaviorSignals {
@@ -57,32 +56,32 @@ export function createEmptyBehaviorSignals(): TakeBehaviorSignals {
     pasteCount: 0,
     keydownCount: 0,
     resizeCount: 0,
-  };
+  }
 }
 
 export function permissionLabel(status: PermissionStatus, takeMessage: TakeMessageGetter) {
   switch (status) {
     case 'pending':
-      return takeMessage('permissionPending');
+      return takeMessage('permissionPending')
     case 'granted':
-      return takeMessage('permissionReady');
+      return takeMessage('permissionReady')
     case 'denied':
-      return takeMessage('permissionBlocked');
+      return takeMessage('permissionBlocked')
     default:
-      return takeMessage('permissionIdle');
+      return takeMessage('permissionIdle')
   }
 }
 
 export function permissionTone(status: PermissionStatus): StatusTone {
   switch (status) {
     case 'pending':
-      return 'pending';
+      return 'pending'
     case 'granted':
-      return 'completed';
+      return 'completed'
     case 'denied':
-      return 'failed';
+      return 'failed'
     default:
-      return 'neutral_meta';
+      return 'neutral_meta'
   }
 }
 
@@ -92,39 +91,39 @@ export function getPermissionErrorMessage(
   takeMessage: TakeMessageGetter,
 ) {
   if (requiresEntireScreen) {
-    return takeMessage('chooseEntireScreen');
+    return takeMessage('chooseEntireScreen')
   }
 
   if (error instanceof DOMException) {
     if (error.name === 'NotAllowedError') {
-      return takeMessage('permissionNotAllowed');
+      return takeMessage('permissionNotAllowed')
     }
     if (error.name === 'NotFoundError') {
-      return takeMessage('permissionNotFound');
+      return takeMessage('permissionNotFound')
     }
     if (error.name === 'AbortError') {
-      return takeMessage('permissionAborted');
+      return takeMessage('permissionAborted')
     }
   }
 
   if (error instanceof Error && error.message) {
-    return error.message;
+    return error.message
   }
 
-  return takeMessage('permissionGeneric');
+  return takeMessage('permissionGeneric')
 }
 
 export function formatTime(seconds: number) {
-  const minutes = Math.floor(seconds / 60);
-  const remainder = seconds % 60;
-  return `${minutes}:${remainder.toString().padStart(2, '0')}`;
+  const minutes = Math.floor(seconds / 60)
+  const remainder = seconds % 60
+  return `${minutes}:${remainder.toString().padStart(2, '0')}`
 }
 
 export function formatRecordingLimitLabel(seconds: number) {
-  const minutes = Math.floor(seconds / 60);
-  const remainder = seconds % 60;
+  const minutes = Math.floor(seconds / 60)
+  const remainder = seconds % 60
   if (remainder === 0) {
-    return `${minutes} min`;
+    return `${minutes} min`
   }
-  return `${minutes} min ${remainder} sec`;
+  return `${minutes} min ${remainder} sec`
 }

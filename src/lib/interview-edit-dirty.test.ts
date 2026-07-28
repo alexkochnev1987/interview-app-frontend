@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  getSelectedQuestionIdsInEditOrder,
-  isInterviewEditDirty,
-} from '@/lib/interview-edit-dirty'
+import { getSelectedQuestionIdsInEditOrder, isInterviewEditDirty } from '@/lib/interview-edit-dirty'
 import { interviewFixture, questionFixture } from '@/lib/test-fixtures/interview'
 
 describe('interview-edit-dirty', () => {
@@ -15,47 +12,34 @@ describe('interview-edit-dirty', () => {
       ['q1', {}],
     ])
 
-    expect(getSelectedQuestionIdsInEditOrder(initial, selectedById)).toEqual([
-      'q1',
-      'q2',
-      'q3',
-    ])
+    expect(getSelectedQuestionIdsInEditOrder(initial, selectedById)).toEqual(['q1', 'q2', 'q3'])
   })
 
   it('detects dirty candidate, position, and question changes', () => {
     const interview = interviewFixture({
       candidateName: 'Alex',
       position: 'Engineer',
-      questions: [
-        questionFixture({ id: 'q1' }),
-        questionFixture({ id: 'q2' }),
-      ],
+      questions: [questionFixture({ id: 'q1' }), questionFixture({ id: 'q2' })],
     })
     const unchangedSelection = new Map([
       ['q1', {}],
       ['q2', {}],
     ])
 
-    expect(
-      isInterviewEditDirty(interview, 'Alex', 'Engineer', unchangedSelection, undefined),
-    ).toBe(false)
+    expect(isInterviewEditDirty(interview, 'Alex', 'Engineer', unchangedSelection, undefined)).toBe(
+      false,
+    )
     expect(
       isInterviewEditDirty(interview, 'Alex ', 'Engineer', unchangedSelection, undefined),
     ).toBe(false)
     expect(
       isInterviewEditDirty(interview, 'Jordan', 'Engineer', unchangedSelection, undefined),
     ).toBe(true)
+    expect(isInterviewEditDirty(interview, 'Alex', 'Lead', unchangedSelection, undefined)).toBe(
+      true,
+    )
     expect(
-      isInterviewEditDirty(interview, 'Alex', 'Lead', unchangedSelection, undefined),
-    ).toBe(true)
-    expect(
-      isInterviewEditDirty(
-        interview,
-        'Alex',
-        'Engineer',
-        new Map([['q1', {}]]),
-        undefined,
-      ),
+      isInterviewEditDirty(interview, 'Alex', 'Engineer', new Map([['q1', {}]]), undefined),
     ).toBe(true)
     expect(
       isInterviewEditDirty(

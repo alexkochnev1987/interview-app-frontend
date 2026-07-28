@@ -1,15 +1,16 @@
-'use client';
+'use client'
 
-import type { ReactNode, RefObject } from 'react';
-import { Sparkles, UserRound } from 'lucide-react';
+import { Sparkles, UserRound } from 'lucide-react'
+import type { ReactNode, RefObject } from 'react'
 
-import { Panel } from '@/components/ui/panel';
-import { CameraPreviewVideo, type CameraPreviewVideoRefProps } from './camera-preview';
-import { BodyText, Text } from '@/components/ui/text';
-import { Inline, Stack } from '@/components/ui/layout';
-import { cn } from '@/lib/utils';
+import { Inline, Stack } from '@/components/ui/layout'
+import { Panel } from '@/components/ui/panel'
+import { BodyText, Text } from '@/components/ui/text'
+import { cn } from '@/lib/utils'
 
-type RecordingAiPresence = 'speaking' | 'listening';
+import { CameraPreviewVideo, type CameraPreviewVideoRefProps } from './camera-preview'
+
+type RecordingAiPresence = 'speaking' | 'listening'
 
 function RecordingHiddenCaptureVideo({ videoRef }: CameraPreviewVideoRefProps) {
   return (
@@ -19,11 +20,10 @@ function RecordingHiddenCaptureVideo({ videoRef }: CameraPreviewVideoRefProps) {
     >
       <video ref={videoRef} autoPlay muted playsInline className="block h-px w-px" />
     </div>
-  );
+  )
 }
 
-const RECORDING_TOOLBAR_PILL_ROW =
-  'inline-flex h-7 shrink-0 items-center lg:h-8';
+const RECORDING_TOOLBAR_PILL_ROW = 'inline-flex h-7 shrink-0 items-center lg:h-8'
 
 function AiInterviewerLabelBadge() {
   return (
@@ -47,7 +47,7 @@ function AiInterviewerLabelBadge() {
         AI interviewer
       </Text>
     </Inline>
-  );
+  )
 }
 
 function AiInterviewerOrbRing({
@@ -55,11 +55,11 @@ function AiInterviewerOrbRing({
   animationDelayS,
   presence,
 }: {
-  sizeClassName: string;
-  animationDelayS: number;
-  presence: RecordingAiPresence;
+  sizeClassName: string
+  animationDelayS: number
+  presence: RecordingAiPresence
 }) {
-  const isSpeaking = presence === 'speaking';
+  const isSpeaking = presence === 'speaking'
 
   return (
     <span
@@ -80,7 +80,7 @@ function AiInterviewerOrbRing({
         style={isSpeaking ? { animationDelay: `${animationDelayS}s` } : undefined}
       />
     </span>
-  );
+  )
 }
 
 function AiInterviewerAvatarPlaceholder({ presence }: { presence: RecordingAiPresence }) {
@@ -124,14 +124,14 @@ function AiInterviewerAvatarPlaceholder({ presence }: { presence: RecordingAiPre
         />
       </Inline>
     </Inline>
-  );
+  )
 }
 
 interface RecordingAiInterviewerSessionLayoutProps {
-  cameraVideoRef: RefObject<HTMLVideoElement | null>;
-  screenVideoRef: RefObject<HTMLVideoElement | null>;
-  timerOverlay?: ReactNode;
-  interviewerPresence: RecordingAiPresence;
+  cameraVideoRef: RefObject<HTMLVideoElement | null>
+  screenVideoRef: RefObject<HTMLVideoElement | null>
+  timerOverlay?: ReactNode
+  interviewerPresence: RecordingAiPresence
 }
 
 function RecordingAiInterviewerSessionLayout({
@@ -147,14 +147,15 @@ function RecordingAiInterviewerSessionLayout({
       height="full"
       grow="fill"
       align="stretch"
-      className={cn(
-        'relative overflow-hidden bg-white',
-        'min-h-0 lg:min-h-[min(360px,48vh)]',
-      )}
+      className={cn('relative overflow-hidden bg-white', 'min-h-0 lg:min-h-[min(360px,48vh)]')}
     >
       <RecordingHiddenCaptureVideo videoRef={screenVideoRef} />
 
-      <Inline justify="center" align="center" className="pointer-events-none absolute inset-0 z-[1]">
+      <Inline
+        justify="center"
+        align="center"
+        className="pointer-events-none absolute inset-0 z-[1]"
+      >
         <AiInterviewerAvatarPlaceholder presence={interviewerPresence} />
       </Inline>
 
@@ -184,11 +185,11 @@ function RecordingAiInterviewerSessionLayout({
         <CameraPreviewVideo videoRef={cameraVideoRef} objectFit="cover" />
       </Panel>
     </Stack>
-  );
+  )
 }
 
 interface RecordingTimerBadgeProps {
-  timeLabel: string;
+  timeLabel: string
 }
 
 function RecordingTimerBadge({ timeLabel }: RecordingTimerBadgeProps) {
@@ -221,16 +222,16 @@ function RecordingTimerBadge({ timeLabel }: RecordingTimerBadgeProps) {
         {timeLabel}
       </BodyText>
     </Inline>
-  );
+  )
 }
 
 interface RecordingStageHeroProps {
-  showTimer: boolean;
-  timeLeft: number;
-  formatTime: (seconds: number) => string;
-  cameraVideoRef: RefObject<HTMLVideoElement | null>;
-  screenVideoRef: RefObject<HTMLVideoElement | null>;
-  interviewerPresence: RecordingAiPresence;
+  showTimer: boolean
+  timeLeft: number
+  formatTime: (seconds: number) => string
+  cameraVideoRef: RefObject<HTMLVideoElement | null>
+  screenVideoRef: RefObject<HTMLVideoElement | null>
+  interviewerPresence: RecordingAiPresence
 }
 
 export function RecordingStageHero({
@@ -241,15 +242,11 @@ export function RecordingStageHero({
   screenVideoRef,
   interviewerPresence,
 }: RecordingStageHeroProps) {
-  const timerOverlay = showTimer ? (
-    <RecordingTimerBadge timeLabel={formatTime(timeLeft)} />
-  ) : null;
+  const timerOverlay = showTimer ? <RecordingTimerBadge timeLabel={formatTime(timeLeft)} /> : null
 
   return (
     <div
-      className={cn(
-        'relative isolate w-full min-h-0 min-w-0 flex-1 overflow-hidden shadow-none',
-      )}
+      className={cn('relative isolate w-full min-h-0 min-w-0 flex-1 overflow-hidden shadow-none')}
     >
       <RecordingAiInterviewerSessionLayout
         cameraVideoRef={cameraVideoRef}
@@ -258,5 +255,5 @@ export function RecordingStageHero({
         timerOverlay={timerOverlay}
       />
     </div>
-  );
+  )
 }

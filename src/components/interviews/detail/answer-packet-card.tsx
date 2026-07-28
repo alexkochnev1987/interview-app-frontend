@@ -1,49 +1,40 @@
 'use client'
 
-import { useRef } from 'react'
 import { CircleAlert, LoaderCircle, Upload } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { useRef } from 'react'
 
+import type {
+  AnswerMediaState,
+  QuestionUploadState,
+} from '@/app/[locale]/interviews/[id]/interview-detail-types'
+import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { EyebrowLabel } from '@/components/ui/eyebrow-label'
-import { Grid } from '@/components/ui/layout/grid'
 import { HiddenFileInput } from '@/components/ui/hidden-file-input'
 import { HoverGroup } from '@/components/ui/hover-group'
+import { Grid } from '@/components/ui/layout/grid'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
+import { RecordingPlayer } from '@/components/ui/recording-player'
 import { StatusPill } from '@/components/ui/status-pill'
 import { SurfaceTile } from '@/components/ui/surface-tile'
 import { BodyText } from '@/components/ui/text'
-import { RecordingPlayer } from '@/components/ui/recording-player'
+import { useSharedLabels } from '@/i18n/use-shared-labels'
 import type { Answer, InterviewQuestion } from '@/lib/api'
-import { formatInterviewDateTime } from '@/lib/interview-formatters'
 import {
   formatAnswerDuration,
   formatFileSize,
   getAnswerStatusPill,
   getValidationTone,
 } from '@/lib/interview-detail-format'
-import { useSharedLabels } from '@/i18n/use-shared-labels'
-
-import type {
-  AnswerMediaState,
-  QuestionUploadState,
-} from '@/app/[locale]/interviews/[id]/interview-detail-types'
+import { formatInterviewDateTime } from '@/lib/interview-formatters'
 
 type CommonTranslate = ReturnType<typeof useTranslations>
 
-function validationStatusLabel(
-  tDetail: CommonTranslate,
-  status?: string,
-): string {
+function validationStatusLabel(tDetail: CommonTranslate, status?: string): string {
   if (!status) {
     return tDetail('validationStatus.idle')
   }
@@ -79,9 +70,7 @@ function CardStatusPills({ questionIndex, question }: StatusPillsProps) {
           {question.category}
         </StatusPill>
       ) : null}
-      <StatusPill tone="neutral">
-        {t('weightInline', { weight: question.weight })}
-      </StatusPill>
+      <StatusPill tone="neutral">{t('weightInline', { weight: question.weight })}</StatusPill>
     </Inline>
   )
 }
@@ -100,23 +89,14 @@ function AnswerMetaGrid({ answer, media }: AnswerMetaGridProps) {
         <EyebrowLabel>{t('recordedAnswer')}</EyebrowLabel>
         <BodyText size="sm">
           {t('answerDuration', {
-            duration: formatAnswerDuration(
-              answer.durationSeconds,
-              t('notAvailable'),
-            ),
+            duration: formatAnswerDuration(answer.durationSeconds, t('notAvailable')),
             count: answer.retakeCount ?? 0,
           })}
         </BodyText>
         <BodyText size="sm">
           {t('answerMediaSizes', {
-            camera: formatFileSize(
-              answer.camera?.fileSizeBytes,
-              t('notAvailable'),
-            ),
-            screen: formatFileSize(
-              answer.screen?.fileSizeBytes,
-              t('notAvailable'),
-            ),
+            camera: formatFileSize(answer.camera?.fileSizeBytes, t('notAvailable')),
+            screen: formatFileSize(answer.screen?.fileSizeBytes, t('notAvailable')),
           })}
         </BodyText>
         <BodyText size="sm">
@@ -156,22 +136,19 @@ function BehaviorSignalsGrid({ answer }: BehaviorSignalsGridProps) {
       <Stack gap={3}>
         <EyebrowLabel>{t('validationStatus')}</EyebrowLabel>
         <BodyText size="sm">
-          {t('hiddenTabs')} {answer.behaviorSignals?.tabHiddenCount ?? 0} •{' '}
-          {t('blur')} {answer.behaviorSignals?.windowBlurCount ?? 0} •{' '}
-          {t('copy')} {answer.behaviorSignals?.copyCount ?? 0} • {t('paste')}{' '}
+          {t('hiddenTabs')} {answer.behaviorSignals?.tabHiddenCount ?? 0} • {t('blur')}{' '}
+          {answer.behaviorSignals?.windowBlurCount ?? 0} • {t('copy')}{' '}
+          {answer.behaviorSignals?.copyCount ?? 0} • {t('paste')}{' '}
           {answer.behaviorSignals?.pasteCount ?? 0}
         </BodyText>
         <BodyText size="sm">
-          {t('keydown')} {answer.behaviorSignals?.keydownCount ?? 0} •{' '}
-          {t('resize')} {answer.behaviorSignals?.resizeCount ?? 0}
+          {t('keydown')} {answer.behaviorSignals?.keydownCount ?? 0} • {t('resize')}{' '}
+          {answer.behaviorSignals?.resizeCount ?? 0}
         </BodyText>
         <BodyText size="sm">
-          {t('transcript')}{' '}
-          {answer.transcript?.text ? t('ready') : t('pending')} •{' '}
+          {t('transcript')} {answer.transcript?.text ? t('ready') : t('pending')} •{' '}
           {t('evaluation')}{' '}
-          {answer.evaluation?.overallScore !== undefined
-            ? t('ready')
-            : t('pending')}
+          {answer.evaluation?.overallScore !== undefined ? t('ready') : t('pending')}
         </BodyText>
         {answer.validation?.errorMessage ? (
           <BodyText size="sm" tone="danger">
@@ -210,11 +187,8 @@ function EvaluationGrid({ evaluation }: EvaluationGridProps) {
               </StatusPill>
             ) : null}
           </Inline>
-          <BodyText size="sm">
-            {evaluation.summary ?? t('summaryUnavailable')}
-          </BodyText>
-          {evaluation.categoryScores &&
-          Object.keys(evaluation.categoryScores).length > 0 ? (
+          <BodyText size="sm">{evaluation.summary ?? t('summaryUnavailable')}</BodyText>
+          {evaluation.categoryScores && Object.keys(evaluation.categoryScores).length > 0 ? (
             <BodyText size="sm">
               {Object.entries(evaluation.categoryScores)
                 .map(([category, score]) => `${category}: ${score}`)
@@ -240,9 +214,7 @@ function EvaluationGrid({ evaluation }: EvaluationGridProps) {
           </BodyText>
           <BodyText size="sm">
             {t('redFlags')}:{' '}
-            {evaluation.redFlagIds?.length
-              ? evaluation.redFlagIds.join(', ')
-              : t('none')}
+            {evaluation.redFlagIds?.length ? evaluation.redFlagIds.join(', ') : t('none')}
           </BodyText>
         </Stack>
       </SurfaceTile>
@@ -347,19 +319,14 @@ export function AnswerPacketCard({
         <CardHeader spacing="md">
           <Inline gap={4} align="start" justify="between" wrap="wrap">
             <Stack gap={3}>
-              <CardStatusPills
-                questionIndex={questionIndex}
-                question={question}
-              />
+              <CardStatusPills questionIndex={questionIndex} question={question} />
               <CardTitle size="md" width="xl">
                 {question.questionText}
               </CardTitle>
             </Stack>
 
             <Stack gap={2} align="end">
-              <StatusPill tone={statusPill.tone}>
-                {t(statusPill.labelKey)}
-              </StatusPill>
+              <StatusPill tone={statusPill.tone}>{t(statusPill.labelKey)}</StatusPill>
               {answer?.validation ? (
                 <StatusPill tone={getValidationTone(answer.validation.status)}>
                   {validationStatusLabel(tDetail, answer.validation.status)}
@@ -376,19 +343,13 @@ export function AnswerPacketCard({
                   <DemoWriteGuard>
                     <Button
                       type="button"
-                      variant={
-                        uploadState.status === 'error'
-                          ? 'destructive'
-                          : 'outline-pill'
-                      }
+                      variant={uploadState.status === 'error' ? 'destructive' : 'outline-pill'}
                       shape="pill"
                       size="sm"
                       onClick={() => fileInputRef.current?.click()}
                     >
                       <Upload className="size-4" />
-                      {uploadState.status === 'error'
-                        ? t('retryUpload')
-                        : t('uploadManualHint')}
+                      {uploadState.status === 'error' ? t('retryUpload') : t('uploadManualHint')}
                     </Button>
                   </DemoWriteGuard>
                 </>
@@ -404,9 +365,7 @@ export function AnswerPacketCard({
             </Grid>
           ) : null}
 
-          {answer?.evaluation ? (
-            <EvaluationGrid evaluation={answer.evaluation} />
-          ) : null}
+          {answer?.evaluation ? <EvaluationGrid evaluation={answer.evaluation} /> : null}
 
           {answer?.transcript?.text ? (
             <SurfaceTile rounded="xl">
@@ -417,9 +376,7 @@ export function AnswerPacketCard({
             </SurfaceTile>
           ) : null}
 
-          {media?.cameraUrl || media?.screenUrl ? (
-            <AnswerMediaPanels media={media} />
-          ) : null}
+          {media?.cameraUrl || media?.screenUrl ? <AnswerMediaPanels media={media} /> : null}
 
           <ConceptsGrid question={question} />
 

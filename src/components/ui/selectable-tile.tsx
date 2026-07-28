@@ -1,7 +1,7 @@
 'use client'
 
-import type { LabelHTMLAttributes, ReactNode } from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
+import type { LabelHTMLAttributes, ReactNode } from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -11,8 +11,7 @@ const selectableTileVariants = cva(
     variants: {
       selected: {
         true: 'bg-[hsl(var(--primary-fixed)/0.86)] shadow-soft ring-[hsl(var(--primary)/0.24)]',
-        false:
-          'bg-surface-low-soft ring-hairline hover:bg-surface-low-glass',
+        false: 'bg-surface-low-soft ring-hairline hover:bg-surface-low-glass',
       },
     },
     defaultVariants: {
@@ -22,22 +21,13 @@ const selectableTileVariants = cva(
 )
 
 interface SelectableTileProps
-  extends LabelHTMLAttributes<HTMLLabelElement>,
-    VariantProps<typeof selectableTileVariants> {
+  extends LabelHTMLAttributes<HTMLLabelElement>, VariantProps<typeof selectableTileVariants> {
   children: ReactNode
 }
 
-export function SelectableTile({
-  className,
-  selected,
-  children,
-  ...props
-}: SelectableTileProps) {
+export function SelectableTile({ className, selected, children, ...props }: SelectableTileProps) {
   return (
-    <label
-      className={cn(selectableTileVariants({ selected }), className)}
-      {...props}
-    >
+    <label className={cn(selectableTileVariants({ selected }), className)} {...props}>
       {children}
     </label>
   )

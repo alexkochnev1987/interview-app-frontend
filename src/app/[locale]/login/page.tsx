@@ -8,7 +8,7 @@ export default function LoginPage() {
     <PageShell align="center">
       <Grid columns="login-shell" gap={8} align="center">
         <LoginMarketingPanel />
-          <LoginForm />
+        <LoginForm />
       </Grid>
     </PageShell>
   )

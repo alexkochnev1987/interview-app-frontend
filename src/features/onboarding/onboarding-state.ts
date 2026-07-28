@@ -1,18 +1,14 @@
-import type { AuthUserResponseDto } from '@/lib/api';
-import { canAccessDashboard } from '@/lib/auth-roles';
+import type { AuthUserResponseDto } from '@/lib/api'
+import { canAccessDashboard } from '@/lib/auth-roles'
 
-function isOnboardingPending(
-  user: AuthUserResponseDto | null | undefined,
-): boolean {
-  if (!user) return false;
-  return user.onboardingCompletedAt == null;
+function isOnboardingPending(user: AuthUserResponseDto | null | undefined): boolean {
+  if (!user) return false
+  return user.onboardingCompletedAt == null
 }
 
-export function shouldOfferOnboarding(
-  user: AuthUserResponseDto | null | undefined,
-): boolean {
-  if (!user) return false;
-  if (user.demo === true) return false;
-  if (!canAccessDashboard(user.role)) return false;
-  return isOnboardingPending(user);
+export function shouldOfferOnboarding(user: AuthUserResponseDto | null | undefined): boolean {
+  if (!user) return false
+  if (user.demo === true) return false
+  if (!canAccessDashboard(user.role)) return false
+  return isOnboardingPending(user)
 }

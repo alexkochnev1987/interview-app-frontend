@@ -1,19 +1,20 @@
 'use client'
 
 import { Sparkles } from 'lucide-react'
-import { type ReactNode } from 'react'
 import { useTranslations } from 'next-intl'
+import { type ReactNode } from 'react'
 
 import { Stack } from '@/components/ui/layout/stack'
 import { Textarea } from '@/components/ui/textarea'
 import { type Locale } from '@/i18n/locales'
+import { type EditorPhase } from '@/lib/question-editor/editor-phase'
+import { type DraftFieldKey } from '@/lib/question-editor/field-keys'
 import {
   joinStringList,
   parseStringList,
   type LocaleQuestionDraft,
 } from '@/lib/question-editor/parsers'
-import { type DraftFieldKey } from '@/lib/question-editor/field-keys'
-import { type EditorPhase } from '@/lib/question-editor/editor-phase'
+
 import { EditorSectionCard } from './editor-section-card'
 import { QuestionEditorField } from './question-editor-field'
 
@@ -65,9 +66,7 @@ export function EditorPromptSection({
               data-tour={isPrimaryLocale ? 'question-text' : undefined}
               size="xs"
               value={contentDraft.questionText}
-              onChange={(event) =>
-                onContentUpdate({ questionText: event.target.value })
-              }
+              onChange={(event) => onContentUpdate({ questionText: event.target.value })}
               placeholder={
                 isPrimaryLocale
                   ? t('questionTextPlaceholder')

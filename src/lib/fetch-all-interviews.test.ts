@@ -2,10 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import type { InterviewListItem, PaginatedInterviews } from '@/lib/api'
 
-import {
-  ASSESSMENTS_INTERVIEW_PAGE_SIZE,
-  fetchAllInterviewPages,
-} from './fetch-all-interviews'
+import { ASSESSMENTS_INTERVIEW_PAGE_SIZE, fetchAllInterviewPages } from './fetch-all-interviews'
 
 function listItem(id: string): InterviewListItem {
   return {

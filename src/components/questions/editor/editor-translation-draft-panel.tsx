@@ -1,14 +1,14 @@
 'use client'
 
-import { type ReactNode } from 'react'
 import { useTranslations } from 'next-intl'
+import { type ReactNode } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText } from '@/components/ui/text'
-import { type TranslateDraftFieldKey } from '@/lib/question-editor/field-keys'
 import { draftFieldLabel, useQuestionEditorLabels } from '@/i18n/use-question-editor-labels'
+import { type TranslateDraftFieldKey } from '@/lib/question-editor/field-keys'
 
 interface EditorTranslationDraftPanelProps {
   localeLabel: string

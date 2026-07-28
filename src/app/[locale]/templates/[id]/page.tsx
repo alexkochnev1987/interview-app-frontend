@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server'
 
-import { TemplateForm } from '@/components/templates/template-form'
 import { QueryHydrationBoundary } from '@/components/questions/query-hydration-boundary'
+import { TemplateForm } from '@/components/templates/template-form'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
@@ -28,10 +28,7 @@ export default async function EditTemplatePage({ params }: EditTemplatePageProps
 
   if (auth.kind === 'forbidden') {
     return (
-      <ForbiddenAccessPage
-        title={t('forbiddenTitle')}
-        description={t('forbiddenDescription')}
-      />
+      <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
     )
   }
 

@@ -3,15 +3,15 @@
 import { Sparkles } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
+import { Card, CardContent } from '@/components/ui/card'
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
 import { HeroLead, HeroTitle } from '@/components/ui/hero-text'
-import { MetricPanel } from '@/components/ui/metric-panel'
-import { StatusPill } from '@/components/ui/status-pill'
-import { Card, CardContent } from '@/components/ui/card'
 import { Grid } from '@/components/ui/layout/grid'
 import { Stack } from '@/components/ui/layout/stack'
-import { type QuestionInput } from '@/lib/api'
+import { MetricPanel } from '@/components/ui/metric-panel'
+import { StatusPill } from '@/components/ui/status-pill'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
+import { type QuestionInput } from '@/lib/api'
 
 interface QuestionEditorHeaderProps {
   title: string
@@ -35,14 +35,10 @@ export function QuestionEditorHeader({
     <Card variant="floating" size="lg">
       <CardContent spacing="xl">
         <Stack gap={4}>
-          <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
-            {t('headerEyebrow')}
-          </EyebrowBadge>
+          <EyebrowBadge icon={<Sparkles className="size-3.5" />}>{t('headerEyebrow')}</EyebrowBadge>
           <Stack gap={3}>
             <HeroTitle>{title}</HeroTitle>
-            <HeroLead width="prose">
-              {t('headerLead')}
-            </HeroLead>
+            <HeroLead width="prose">{t('headerLead')}</HeroLead>
           </Stack>
         </Stack>
 
