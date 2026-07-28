@@ -70,10 +70,10 @@
   },
   "lint-staged": {
     "!(openapi/**|src/lib/api-types.ts|*.md|**/*.md)*.{js,jsx,ts,tsx,json,css}": [
-      "oxfmt --write"
+      "npx oxfmt --write"
     ],
     "!(openapi/**|src/lib/api-types.ts)*.{js,jsx,ts,tsx}": [
-      "oxlint"
+      "npx oxlint"
     ]
   }
 }
