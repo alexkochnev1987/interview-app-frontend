@@ -7,7 +7,7 @@
     "dev:server": "next dev -p 3001 --webpack",
     "build": "npm run openapi:generate && next build --webpack",
     "start": "next start",
-    "lint": "oxlint",
+    "lint": "oxlint -f unix",
     "fmt": "oxfmt --write",
     "fmt:check": "oxfmt --check",
     "typecheck": "tsc --noEmit",
