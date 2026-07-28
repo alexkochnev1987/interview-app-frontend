@@ -28,12 +28,12 @@ function isMissingModuleImportError(error: unknown): boolean {
 
 async function loadModule(locale: string, moduleName: string): Promise<Messages> {
   try {
-    return (
-      await import(`../../messages/${locale}/${moduleName}.json`)
-    ).default as Messages
+    return (await import(`../../messages/${locale}/${moduleName}.json`)).default as Messages
   } catch (error) {
     if (isMissingModuleImportError(error)) {
-      throw new Error(`Missing i18n module file: messages/${locale}/${moduleName}.json`)
+      throw new Error(`Missing i18n module file: messages/${locale}/${moduleName}.json`, {
+        cause: error,
+      })
     }
     throw error
   }
@@ -50,6 +50,4 @@ async function loadLocaleMessagesUncached(locale: string): Promise<Messages> {
 const loadLocaleMessagesCached = cache(loadLocaleMessagesUncached)
 
 export const loadLocaleMessages =
-  process.env.NODE_ENV === 'development'
-    ? loadLocaleMessagesUncached
-    : loadLocaleMessagesCached
+  process.env.NODE_ENV === 'development' ? loadLocaleMessagesUncached : loadLocaleMessagesCached
