@@ -10,7 +10,7 @@
     "lint": "oxlint -f unix",
     "fmt": "oxfmt --write",
     "fmt:check": "oxfmt --check",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "node node_modules/typescript7/bin/tsc --noEmit",
     "i18n:check": "node scripts/i18n-check-parity.mjs",
     "lint:ci": "npm run lint && npm run fmt:check && npm run i18n:check",
     "test": "vitest run",
@@ -48,7 +48,6 @@
     "@types/node": "^20.0.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@typescript/native": "npm:typescript@^7.0.2",
     "autoprefixer": "^10.5.0",
     "husky": "^9.1.7",
     "lint-staged": "^17.2.0",
@@ -58,15 +57,11 @@
     "postcss": "^8.5.10",
     "tailwindcss": "^3.4.17",
     "tailwindcss-animate": "^1.0.7",
-    "typescript": "npm:@typescript/typescript6@^6.0.2",
+    "typescript": "^5.9.3",
+    "typescript7": "npm:typescript@^7.0.2",
     "vite": "^7.3.5",
     "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^4.1.8"
-  },
-  "overrides": {
-    "openapi-typescript": {
-      "typescript": "$typescript"
-    }
   },
   "lint-staged": {
     "!(openapi/**|src/lib/api-types.ts|*.md|**/*.md)*.{js,jsx,ts,tsx,json,css}": [
