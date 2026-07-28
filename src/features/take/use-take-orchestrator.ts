@@ -53,7 +53,6 @@ import {
   getDisplayedAttemptNumber,
   resolveInitialVersionNumber,
 } from './attempt-limit';
-import { resolveRecordingSessionId } from './recording-session-id';
 import type { BeginRecordingInput, AnswerMetaUpdate } from './use-take-begin-recording';
 
 type PendingVersionAction = 'submit' | 'rerecord' | null;
@@ -190,11 +189,6 @@ export function useTakeOrchestrator({
   const currentVersionNumberRef = useRef(
     initialInterview?.currentAnswerMeta?.selectedVersionNumber ?? 1,
   );
-  const recordingSessionIdRef = useRef<string | null>(
-    initialInterview?.currentAnswerMeta?.recordingSessionId
-      ? resolveRecordingSessionId(initialInterview.currentAnswerMeta.recordingSessionId)
-      : null,
-  );
   const behaviorSignalsRef = useRef<TakeBehaviorSignals>(createEmptyBehaviorSignals());
   const behaviorEventsRef = useRef<AnswerBehaviorEvent[]>([]);
   const flushedBehaviorEventCountRef = useRef(0);
@@ -319,17 +313,9 @@ export function useTakeOrchestrator({
             meta.latestSubmittableVersionNumber !== undefined
               ? meta.latestSubmittableVersionNumber
               : (previousMeta?.latestSubmittableVersionNumber ?? null),
-          ...(meta.recordingSessionId
-            ? { recordingSessionId: resolveRecordingSessionId(meta.recordingSessionId) }
-            : previousMeta?.recordingSessionId
-              ? { recordingSessionId: previousMeta.recordingSessionId }
-              : {}),
         },
       };
     });
-    if (meta.recordingSessionId) {
-      recordingSessionIdRef.current = resolveRecordingSessionId(meta.recordingSessionId);
-    }
     setCurrentVersionNumber(meta.selectedVersionNumber);
     currentVersionNumberRef.current = meta.selectedVersionNumber;
   }, []);
@@ -349,7 +335,6 @@ export function useTakeOrchestrator({
     id,
     onAnswerMetaUpdated: syncAnswerMetaFromProgress,
     currentVersionNumberRef,
-    recordingSessionIdRef,
     answerStartedAtRef,
     answerStoppedAtMsRef,
     answerDurationSecondsRef,
@@ -536,7 +521,6 @@ export function useTakeOrchestrator({
     abortMultipartUploads,
     multipartUploadsRef,
     currentVersionNumberRef,
-    recordingSessionIdRef,
     pendingVersionActionRef,
     answerStartedAtRef,
     answerStoppedAtMsRef,
@@ -719,7 +703,6 @@ export function useTakeOrchestrator({
     discardRecordingRef,
     pendingVersionActionRef,
     currentVersionNumberRef,
-    recordingSessionIdRef,
     answerStartedAtRef,
     answerStartedAtMsRef,
     answerStoppedAtMsRef,
@@ -784,17 +767,11 @@ export function useTakeOrchestrator({
     }
     setCurrentVersionNumber(submittableVersion);
     currentVersionNumberRef.current = submittableVersion;
-    if (interview.currentAnswerMeta.recordingSessionId) {
-      recordingSessionIdRef.current = resolveRecordingSessionId(
-        interview.currentAnswerMeta.recordingSessionId,
-      );
-    }
   }, [
     interview?.currentQuestionIndex,
     interview?.currentAnswerMeta?.versionCount,
     interview?.currentAnswerMeta?.hasSubmittableMedia,
     interview?.currentAnswerMeta?.latestSubmittableVersionNumber,
-    interview?.currentAnswerMeta?.recordingSessionId,
   ]);
 
   useEffect(() => {

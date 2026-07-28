@@ -7,7 +7,6 @@
   "INTERVIEW_VALIDATION_RUNNING": "Interview validation is already running.",
   "UPLOAD_FAILED": "Upload failed. Please try again.",
   "ANSWER_ATTEMPT_LIMIT_REACHED": "Recording attempt limit reached",
-  "RECORDING_SESSION_MISMATCH": "This interview is already being recorded in another tab. Continue there, or close the other tab and refresh.",
   "ANSWER_VERSION_NOT_RESERVED": "Recording attempt must be reserved before upload",
   "ANSWER_VERSION_OVERWRITE_FORBIDDEN": "This recording attempt already has uploaded media. Start a new attempt instead of overwriting it."
 }

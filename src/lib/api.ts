@@ -923,7 +923,6 @@ export async function startMultipartUpload(
   options: {
     contentType?: 'video/webm';
     versionNumber: number;
-    recordingSessionId: string;
   },
 ): Promise<MultipartUploadSessionResponse> {
   const contentType = options.contentType ?? 'video/webm';
@@ -934,7 +933,6 @@ export async function startMultipartUpload(
       contentType,
       mediaType,
       versionNumber: options.versionNumber,
-      recordingSessionId: options.recordingSessionId,
     },
   }));
 }
@@ -957,7 +955,6 @@ export async function presignMultipartPart(
   partNumber: number,
   options: {
     versionNumber: number;
-    recordingSessionId: string;
   },
 ): Promise<MultipartUploadPartResponse> {
   return handle(client.POST('/upload/multipart/part', {
@@ -968,7 +965,6 @@ export async function presignMultipartPart(
       uploadId,
       partNumber,
       versionNumber: options.versionNumber,
-      recordingSessionId: options.recordingSessionId,
     }
   }));
 }
@@ -990,7 +986,6 @@ export async function completeMultipartUpload(
   uploadId: string,
   options: {
     versionNumber: number;
-    recordingSessionId: string;
   },
 ): Promise<void> {
   await handle(client.POST('/upload/multipart/complete', {
@@ -1000,7 +995,6 @@ export async function completeMultipartUpload(
       mediaKey,
       uploadId,
       versionNumber: options.versionNumber,
-      recordingSessionId: options.recordingSessionId,
     }
   }));
 }
@@ -1011,7 +1005,6 @@ export async function abortMultipartUpload(
   uploadId: string,
   options: {
     versionNumber: number;
-    recordingSessionId: string;
   },
 ): Promise<void> {
   await handle(client.POST('/upload/multipart/abort', {
@@ -1021,7 +1014,6 @@ export async function abortMultipartUpload(
       mediaKey,
       uploadId,
       versionNumber: options.versionNumber,
-      recordingSessionId: options.recordingSessionId,
     }
   }));
 }

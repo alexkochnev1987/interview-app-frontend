@@ -101,10 +101,9 @@
     "attemptsMetricLabel": "Próby:",
     "retakeDisabledAtLimitHint": "Brak dostępnych ponownych nagrań dla tego pytania.",
     "answerAttemptLimitReached": "Osiągnięto limit prób nagrywania ({max})",
-    "recordingSessionMismatch": "Ta rozmowa jest już nagrywana w innej karcie. Kontynuuj tam albo zamknij drugą kartę i odśwież stronę.",
     "attemptBurnsOnRecordStart": "Każde rozpoczęcie nagrywania zużywa jedną próbę. Odświeżenie strony w trakcie nagrywania również zużywa tę próbę.",
-    "reloadUsesCurrentAttemptHint": "Odświeżenie strony zużywa bieżącą próbę nagrywania. Po odświeżeniu nie możesz kontynuować ani ponownie nagrać tej samej próby.",
+    "reloadUsesCurrentAttemptHint": "Odświeżenie zużywa bieżącą próbę.",
     "attemptsExhaustedNoMedia": "Brak nagrania, które można wysłać dla tego pytania.",
-    "reviewSubmitBanner": "Nagrywanie nie uruchomi się ponownie. Naciśnij Wyślij, aby zapisać tę odpowiedź i przejść do następnego pytania — albo zakończyć rozmowę, jeśli to ostatnie pytanie."
+    "reviewSubmitBanner": "Wykorzystano wszystkie próby. Naciśnij Wyślij, aby kontynuować."
   }
 }

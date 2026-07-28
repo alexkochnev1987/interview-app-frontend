@@ -3,7 +3,6 @@ import {
   MAX_ANSWER_ATTEMPTS_PER_QUESTION,
   isAnswerAttemptLimitError,
   isAnswerVersionOverwriteError,
-  isRecordingSessionMismatchError,
 } from './attempt-limit';
 
 export const TAKE_MESSAGES = {
@@ -128,16 +127,12 @@ export const TAKE_MESSAGES = {
   attemptsMetricLabel: 'Attempts:',
   retakeDisabledAtLimitHint: 'No retakes left for this question.',
   answerAttemptLimitReached: 'Recording attempt limit reached ({max})',
-  recordingSessionMismatch:
-    'This interview is already being recorded in another tab. Continue there, or close the other tab and refresh.',
   attemptBurnsOnRecordStart:
     'Each time recording starts it uses one attempt. Reloading the page during a recording also uses that attempt.',
-  reloadUsesCurrentAttemptHint:
-    'Reloading the page uses up the current recording attempt. You cannot continue or re-record that same attempt after reload.',
+  reloadUsesCurrentAttemptHint: 'Reloading uses up the current attempt.',
   attemptsExhaustedNoMedia:
     'There is no usable recording left to submit for this question.',
-  reviewSubmitBanner:
-    'Recording will not restart. Press Submit to save this answer and continue to the next question, or finish the interview if this is the last question.',
+  reviewSubmitBanner: 'All attempts used. Press Submit to continue.',
 } as const;
 
 export type TakeMessageKey = keyof typeof TAKE_MESSAGES;
@@ -153,9 +148,6 @@ export function mapTakeSubmitErrorMessage(
   takeMessage: TakeMessageGetter,
   options?: { maxAttempts?: number },
 ): string {
-  if (isRecordingSessionMismatchError(error)) {
-    return takeMessage('recordingSessionMismatch');
-  }
   if (isAnswerAttemptLimitError(error)) {
     return takeMessage('answerAttemptLimitReached', {
       max: options?.maxAttempts ?? MAX_ANSWER_ATTEMPTS_PER_QUESTION,

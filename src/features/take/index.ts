@@ -2,7 +2,6 @@ export * from './attempt-limit';
 export * from './multipart';
 export * from './messages';
 export * from './progress';
-export * from './recording-session-id';
 export * from './runtime';
 export * from './recording-header-status';
 export * from './session-machine';

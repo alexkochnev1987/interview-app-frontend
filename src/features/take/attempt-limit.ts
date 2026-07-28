@@ -3,7 +3,6 @@ import { ApiError } from '@/lib/api-error';
 export const MAX_ANSWER_ATTEMPTS_PER_QUESTION = 3;
 
 export const ANSWER_ATTEMPT_LIMIT_REACHED_CODE = 'ANSWER_ATTEMPT_LIMIT_REACHED';
-export const RECORDING_SESSION_MISMATCH_CODE = 'RECORDING_SESSION_MISMATCH';
 export const ANSWER_VERSION_OVERWRITE_FORBIDDEN_CODE = 'ANSWER_VERSION_OVERWRITE_FORBIDDEN';
 
 export interface AnswerAttemptMeta {
@@ -85,10 +84,6 @@ export function getDisplayedAttemptNumber(
 
 export function isAnswerAttemptLimitError(error: unknown): boolean {
   return error instanceof ApiError && error.code === ANSWER_ATTEMPT_LIMIT_REACHED_CODE;
-}
-
-export function isRecordingSessionMismatchError(error: unknown): boolean {
-  return error instanceof ApiError && error.code === RECORDING_SESSION_MISMATCH_CODE;
 }
 
 export function isAnswerVersionOverwriteError(error: unknown): boolean {

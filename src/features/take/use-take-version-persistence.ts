@@ -12,7 +12,6 @@ import {
   MAX_ANSWER_ATTEMPTS_PER_QUESTION,
   getUsedAttempts,
   isAnswerAttemptLimitError,
-  isRecordingSessionMismatchError,
   canRequestRetake,
   resolveNextVersionAfterSave,
   shouldReuseReservedAttemptForRetake,
@@ -29,7 +28,6 @@ import {
 } from './messages';
 import type { TakeBehaviorSignals } from './utils';
 import type { PendingVersionAction, VersionPersistKind } from './session-machine';
-import { resolveRecordingSessionId } from './recording-session-id';
 import type { AnswerMetaUpdate } from './use-take-begin-recording';
 
 interface TranscriptFinalizeSnapshot {
@@ -58,7 +56,6 @@ export interface UseTakeVersionPersistenceParams {
   abortMultipartUploads: () => Promise<void>;
   multipartUploadsRef: MutableRefObject<MultipartUploadState>;
   currentVersionNumberRef: MutableRefObject<number>;
-  recordingSessionIdRef: MutableRefObject<string | null>;
   pendingVersionActionRef: MutableRefObject<PendingVersionAction>;
   answerStartedAtRef: MutableRefObject<string | null>;
   answerStoppedAtMsRef: MutableRefObject<number | null>;
@@ -100,7 +97,6 @@ export function useTakeVersionPersistence({
   abortMultipartUploads,
   multipartUploadsRef,
   currentVersionNumberRef,
-  recordingSessionIdRef,
   pendingVersionActionRef,
   answerStartedAtRef,
   answerStoppedAtMsRef,
@@ -160,15 +156,9 @@ export function useTakeVersionPersistence({
 
         const cameraUpload = getMultipartSession(multipartUploadsRef.current, 'camera');
         const screenUpload = getMultipartSession(multipartUploadsRef.current, 'screen');
-        const recordingSessionId =
-          recordingSessionIdRef.current ?? cameraUpload.recordingSessionId;
-        if (!recordingSessionId) {
-          throw new Error(takeMessage('recordingSessionMismatch'));
-        }
 
         const hasUploadedCameraParts = cameraUpload.uploadedPartCount > 0;
         const hasUploadedScreenParts = screenUpload.uploadedPartCount > 0;
-        const hasUploadedAllParts = hasUploadedCameraParts && hasUploadedScreenParts;
 
         if (action === 'submit' && (!hasUploadedCameraParts || !hasUploadedScreenParts)) {
           throw new Error(takeMessage('shortRecordingSubmit'));
@@ -282,7 +272,6 @@ export function useTakeVersionPersistence({
             screenFileSizeBytes: screenUpload.recordedBytes || undefined,
             behaviorSignals: behaviorSignalsRef.current,
             behaviorEvents: behaviorEventsRef.current,
-            recordingSessionId,
           });
 
           const savedVersion = currentVersion;
@@ -291,7 +280,6 @@ export function useTakeVersionPersistence({
             versionCount: usedAfterSave,
             selectedVersionNumber: savedVersion,
             status: 'recording',
-            recordingSessionId,
             hasSubmittableMedia: true,
             latestSubmittableVersionNumber: savedVersion,
           });
@@ -337,7 +325,6 @@ export function useTakeVersionPersistence({
             screenFileSizeBytes: screenUpload.recordedBytes || undefined,
             behaviorSignals: behaviorSignalsRef.current,
             behaviorEvents: behaviorEventsRef.current,
-            recordingSessionId,
             ...(transcriptSnapshot.text.trim()
               ? {
                   clientTranscript: {
@@ -386,11 +373,6 @@ export function useTakeVersionPersistence({
         if (handleAttemptLimitApiError(err)) {
           autoStartedQuestionKeyRef.current = '';
           setStage('interview');
-        } else if (isRecordingSessionMismatchError(err)) {
-          setActionErrorKind(action);
-          setSubmitError(takeMessage('recordingSessionMismatch'));
-          autoStartedQuestionKeyRef.current = '';
-          setStage('interview');
         } else if (action === 'submit') {
           setActionErrorKind('submit');
           setSubmitError(
@@ -433,7 +415,6 @@ export function useTakeVersionPersistence({
       abortMultipartUploads,
       multipartUploadsRef,
       currentVersionNumberRef,
-      recordingSessionIdRef,
       pendingVersionActionRef,
       answerStartedAtRef,
       answerStoppedAtMsRef,
@@ -465,21 +446,11 @@ export function useTakeVersionPersistence({
       return;
     }
 
-    const recordingSessionId =
-      meta.recordingSessionId?.trim() ||
-      recordingSessionIdRef.current?.trim() ||
-      null;
-    if (!recordingSessionId) {
-      setSubmitError(takeMessage('recordingSessionMismatch'));
-      return;
-    }
-
     persistInFlightRef.current = true;
     setUploading(true);
     setVersionPersistKind('submit');
     setSubmitError('');
     setActionErrorKind(null);
-    recordingSessionIdRef.current = resolveRecordingSessionId(recordingSessionId);
     setCurrentVersionNumber(latestSubmittableVersionNumber);
     currentVersionNumberRef.current = latestSubmittableVersionNumber;
 
@@ -495,7 +466,6 @@ export function useTakeVersionPersistence({
         async () => {
           await finalizeTakeAnswer(id, {
             questionIndex: interview.currentQuestionIndex,
-            recordingSessionId,
           });
 
           clearRecordingArtifacts();
@@ -541,7 +511,6 @@ export function useTakeVersionPersistence({
     setRetakeCount,
     autoStartedQuestionKeyRef,
     currentVersionNumberRef,
-    recordingSessionIdRef,
     pendingVersionActionRef,
     clearRecordingArtifacts,
     loadInterview,

@@ -6,9 +6,7 @@ import { buildMediaRecorderOptions, pickSupportedMediaRecorderMimeType, TAKE_REC
 import {
   MAX_ANSWER_ATTEMPTS_PER_QUESTION,
   isAnswerAttemptLimitError,
-  isRecordingSessionMismatchError,
 } from './attempt-limit';
-import { resolveRecordingSessionId } from './recording-session-id';
 import type { TakeMessageGetter } from './messages';
 
 type PendingVersionAction = 'submit' | 'rerecord' | null;
@@ -18,7 +16,6 @@ export interface AnswerMetaUpdate {
   selectedVersionNumber: number;
   status?: 'recording' | 'submitted';
   maxAttempts?: number;
-  recordingSessionId?: string;
   hasSubmittableMedia?: boolean;
   latestSubmittableVersionNumber?: number | null;
 }
@@ -35,7 +32,6 @@ interface UseTakeBeginRecordingParams {
   discardRecordingRef: MutableRefObject<boolean>;
   pendingVersionActionRef: MutableRefObject<PendingVersionAction>;
   currentVersionNumberRef: MutableRefObject<number>;
-  recordingSessionIdRef: MutableRefObject<string | null>;
   answerStartedAtRef: MutableRefObject<string | null>;
   answerStartedAtMsRef: MutableRefObject<number | null>;
   answerStoppedAtMsRef: MutableRefObject<number | null>;
@@ -69,7 +65,7 @@ interface UseTakeBeginRecordingParams {
   startMultipartUploadSession: (
     questionIndex: number,
     mediaType: CaptureTarget,
-    options: { versionNumber: number; recordingSessionId: string },
+    options: { versionNumber: number },
   ) => Promise<MultipartUploadSession>;
   flushAnswerProgress: (forceAllEvents: boolean) => Promise<TakeProgressResponse | undefined>;
   startProgressHeartbeat: () => void;
@@ -102,7 +98,6 @@ export function useTakeBeginRecording({
   discardRecordingRef,
   pendingVersionActionRef,
   currentVersionNumberRef,
-  recordingSessionIdRef,
   answerStartedAtRef,
   answerStartedAtMsRef,
   answerStoppedAtMsRef,
@@ -182,9 +177,6 @@ export function useTakeBeginRecording({
     } | null = null;
 
     try {
-      const recordingSessionId = resolveRecordingSessionId(recordingSessionIdRef.current);
-      recordingSessionIdRef.current = recordingSessionId;
-
       let versionNumber = nextVersionNumber;
       let resolvedVersionCount = versionCount ?? Math.max(nextVersionNumber, 0);
       let resolvedMaxAttempts =
@@ -194,7 +186,6 @@ export function useTakeBeginRecording({
       if (!reuseReservedAttempt) {
         const reserved = await reserveTakeAnswerAttempt(interviewId, {
           questionIndex: currentQuestionIndex,
-          recordingSessionId,
         });
 
         versionNumber = reserved.versionNumber;
@@ -217,12 +208,10 @@ export function useTakeBeginRecording({
         selectedVersionNumber: versionNumber,
         status: resolvedStatus,
         maxAttempts: resolvedMaxAttempts,
-        recordingSessionId,
       });
 
       const uploadOptions = {
         versionNumber,
-        recordingSessionId,
       };
       const [cameraUpload, screenUpload] = await Promise.all([
         startMultipartUploadSession(currentQuestionIndex, 'camera', uploadOptions),
@@ -253,9 +242,6 @@ export function useTakeBeginRecording({
             max: getAnswerMaxAttempts?.() ?? MAX_ANSWER_ATTEMPTS_PER_QUESTION,
           }),
         );
-      } else if (isRecordingSessionMismatchError(err)) {
-        pendingReuseReservedRef.current = null;
-        setSetupError(takeMessage('recordingSessionMismatch'));
       } else if (reservedSlot && nextFailCount <= 1) {
         // One immediate reuse autostart while devices are still live.
         setSetupError('');

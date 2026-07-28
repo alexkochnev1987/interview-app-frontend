@@ -36,7 +36,6 @@ interface UseTakeAnswerPersistenceParams {
   id: string;
   onAnswerMetaUpdated?: (meta: AnswerMetaUpdate) => void;
   currentVersionNumberRef: React.MutableRefObject<number>;
-  recordingSessionIdRef: React.MutableRefObject<string | null>;
   answerStartedAtRef: React.MutableRefObject<string | null>;
   answerStoppedAtMsRef: React.MutableRefObject<number | null>;
   answerDurationSecondsRef: React.MutableRefObject<number>;
@@ -63,7 +62,6 @@ export function useTakeAnswerPersistence({
   id,
   onAnswerMetaUpdated,
   currentVersionNumberRef,
-  recordingSessionIdRef,
   answerStartedAtRef,
   answerStoppedAtMsRef,
   answerDurationSecondsRef,
@@ -85,17 +83,15 @@ export function useTakeAnswerPersistence({
     async (
       questionIndex: number,
       mediaType: CaptureTarget,
-      options: { versionNumber: number; recordingSessionId: string },
+      options: { versionNumber: number },
     ): Promise<MultipartUploadSession> => {
       const session = await startMultipartUpload(questionIndex, mediaType, {
         versionNumber: options.versionNumber,
-        recordingSessionId: options.recordingSessionId,
       });
       return createMultipartUploadSession({
         ...session,
         questionIndex,
         versionNumber: options.versionNumber,
-        recordingSessionId: options.recordingSessionId,
       });
     },
     [],
@@ -105,12 +101,6 @@ export function useTakeAnswerPersistence({
     async (forceAllEvents = false): Promise<TakeProgressResponse | undefined> => {
       const cameraUpload = multipartUploadsRef.current.camera;
       if (!cameraUpload) {
-        return undefined;
-      }
-
-      const recordingSessionId =
-        recordingSessionIdRef.current ?? cameraUpload.recordingSessionId;
-      if (!recordingSessionId) {
         return undefined;
       }
 
@@ -128,7 +118,6 @@ export function useTakeAnswerPersistence({
           questionIndex: cameraUpload.questionIndex,
           versionNumber: cameraUpload.versionNumber,
           mediaKey: cameraUpload.mediaKey,
-          recordingSessionId,
           screenMediaKey: screenUpload?.mediaKey,
           durationSeconds: answerDurationSecondsRef.current,
           startedAt: answerStartedAtRef.current ?? undefined,
@@ -166,8 +155,6 @@ export function useTakeAnswerPersistence({
         versionCount: progressResponse.versionCount,
         selectedVersionNumber: activeVersionNumber,
         status: progressResponse.status,
-        recordingSessionId:
-          recordingSessionIdRef.current ?? cameraUpload.recordingSessionId,
       });
       return progressResponse;
     },
@@ -177,7 +164,6 @@ export function useTakeAnswerPersistence({
       flushedBehaviorEventCountRef,
       id,
       currentVersionNumberRef,
-      recordingSessionIdRef,
       answerDurationSecondsRef,
       answerStartedAtRef,
       answerStoppedAtMsRef,
@@ -253,7 +239,6 @@ export function useTakeAnswerPersistence({
           partNumber,
           {
             versionNumber: session.versionNumber,
-            recordingSessionId: session.recordingSessionId,
           },
         );
       } catch (error) {

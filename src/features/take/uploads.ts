@@ -11,7 +11,6 @@ interface CompleteMultipartUploadParams {
     uploadId: string,
     options: {
       versionNumber: number;
-      recordingSessionId: string;
     },
   ) => Promise<void>;
 }
@@ -37,7 +36,6 @@ export async function completeMultipartUpload({
   try {
     await completeMultipartUploadRequest(session.questionIndex, session.mediaKey, session.uploadId, {
       versionNumber: session.versionNumber,
-      recordingSessionId: session.recordingSessionId,
     });
   } catch (error) {
     if (error instanceof ApiError) {
@@ -57,7 +55,6 @@ interface AbortMultipartUploadsParams {
     uploadId: string,
     options: {
       versionNumber: number;
-      recordingSessionId: string;
     },
   ) => Promise<void>;
 }
@@ -86,7 +83,6 @@ export async function abortMultipartUploads({
         await session.uploadChain.catch(() => undefined);
         await abortMultipartUploadRequest(session.questionIndex, session.mediaKey, session.uploadId, {
           versionNumber: session.versionNumber,
-          recordingSessionId: session.recordingSessionId,
         });
       } catch {
         console.error(`Failed to abort ${target} multipart upload.`);

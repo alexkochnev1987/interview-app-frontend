@@ -14,7 +14,6 @@ export interface MultipartUploadSession {
   mediaKey: string;
   uploadId: string;
   versionNumber: number;
-  recordingSessionId: string;
   partBlobType?: string;
   nextPartNumber: number;
   uploadedPartCount: number;
@@ -38,7 +37,6 @@ export interface MultipartSessionSeed {
   mediaKey: string;
   uploadId: string;
   versionNumber: number;
-  recordingSessionId: string;
 }
 
 export function stopMediaStream(stream: MediaStream | null) {
@@ -151,7 +149,6 @@ export function createMultipartUploadSession(session: MultipartSessionSeed): Mul
     mediaKey: session.mediaKey,
     uploadId: session.uploadId,
     versionNumber: session.versionNumber,
-    recordingSessionId: session.recordingSessionId,
     nextPartNumber: 1,
     uploadedPartCount: 0,
     bufferedChunks: [],
@@ -180,7 +177,6 @@ export interface ProgressPayloadArgs {
   questionIndex: number;
   versionNumber: number;
   mediaKey: string;
-  recordingSessionId: string;
   screenMediaKey?: string;
   durationSeconds?: number;
   startedAt?: string;
@@ -197,7 +193,6 @@ export function buildProgressPayload(args: ProgressPayloadArgs) {
     questionIndex: args.questionIndex,
     versionNumber: args.versionNumber,
     mediaKey: args.mediaKey,
-    recordingSessionId: args.recordingSessionId,
     screenMediaKey: args.screenMediaKey,
     durationSeconds: args.durationSeconds || undefined,
     startedAt: args.startedAt ?? undefined,

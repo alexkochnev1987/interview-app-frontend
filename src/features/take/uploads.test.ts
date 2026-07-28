@@ -13,7 +13,6 @@ function sessionFixture(
     mediaKey: 'uploads/interviews/x/answers/q0-camera-1.webm',
     uploadId: 'upload-1',
     versionNumber: 1,
-    recordingSessionId: 'session-1',
     nextPartNumber: 2,
     uploadedPartCount: 1,
     bufferedChunks: [],

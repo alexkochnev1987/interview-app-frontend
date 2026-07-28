@@ -7,7 +7,6 @@
   "INTERVIEW_VALIDATION_RUNNING": "Walidacja interview już trwa.",
   "UPLOAD_FAILED": "Upload nie powiódł się. Spróbuj ponownie.",
   "ANSWER_ATTEMPT_LIMIT_REACHED": "Osiągnięto limit prób nagrywania",
-  "RECORDING_SESSION_MISMATCH": "Ta rozmowa jest już nagrywana w innej karcie. Kontynuuj tam albo zamknij drugą kartę i odśwież stronę.",
   "ANSWER_VERSION_NOT_RESERVED": "Przed przesłaniem trzeba zarezerwować próbę nagrywania",
   "ANSWER_VERSION_OVERWRITE_FORBIDDEN": "Ta próba nagrywania ma już przesłane media. Rozpocznij nową próbę zamiast nadpisywać istniejącą."
 }
