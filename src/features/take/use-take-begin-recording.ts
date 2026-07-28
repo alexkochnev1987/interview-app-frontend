@@ -201,7 +201,7 @@ export function useTakeBeginRecording({
     setStage('recording')
     clearVersionPersistKind()
 
-    const countdownInterval = setInterval(() => {
+    timerRef.current = setInterval(() => {
       setTimeLeft((current) => {
         if (current <= 1) {
           const intervalId = timerRef.current
@@ -215,7 +215,6 @@ export function useTakeBeginRecording({
         return current - 1
       })
     }, 1000)
-    timerRef.current = countdownInterval
   }
 
   return { beginRecording }

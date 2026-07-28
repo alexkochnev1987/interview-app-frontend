@@ -3,13 +3,13 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { useSearchParams } from 'next/navigation'
 import {
+  type Dispatch,
+  type SetStateAction,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
-  type Dispatch,
-  type SetStateAction,
 } from 'react'
 
 import {
@@ -31,11 +31,11 @@ import {
   clampInterviewsSearchQuery,
   DEFAULT_INTERVIEWS_LIMIT,
   DEFAULT_INTERVIEWS_QUERY,
-  INTERVIEWS_SEARCH_DEBOUNCE_MS,
-  readInterviewsFromSearchParams,
   InterviewPageLimit,
-  type InterviewView,
+  INTERVIEWS_SEARCH_DEBOUNCE_MS,
   type InterviewsQueryState,
+  type InterviewView,
+  readInterviewsFromSearchParams,
 } from '@/lib/interviews-query-state'
 import { useToastMessages } from '@/lib/use-toast-messages'
 
@@ -44,8 +44,7 @@ import { interviewsListQueryKey } from '../library/query-keys'
 const VIEW_STORAGE_KEY = 'interviews:view'
 
 function withLockedDefaults(initial?: Partial<InterviewsQueryState>): InterviewsQueryState {
-  const base = { ...DEFAULT_INTERVIEWS_QUERY, ...initial }
-  return base
+  return { ...DEFAULT_INTERVIEWS_QUERY, ...initial }
 }
 
 function readStoredView(): InterviewView | null {

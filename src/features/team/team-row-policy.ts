@@ -14,10 +14,7 @@ export function isTeamRowActionVisible(
   actorId: string,
   member: TeamMember,
 ): boolean {
-  if (actionId === 'delete-user' && actorId !== '' && member.id === actorId) {
-    return false
-  }
-  return true
+  return !(actionId === 'delete-user' && actorId !== '' && member.id === actorId)
 }
 
 export function isTeamRowActionEnabled(

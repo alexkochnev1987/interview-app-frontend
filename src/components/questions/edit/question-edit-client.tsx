@@ -36,7 +36,7 @@ type QuestionEditClientProps = {
 function isDeleteScheduled(
   result: DeleteQuestionResult,
 ): result is Extract<DeleteQuestionResult, { scheduled: true }> {
-  return 'scheduled' in result && result.scheduled === true
+  return 'scheduled' in result && result.scheduled
 }
 
 export function QuestionEditClient({

@@ -129,11 +129,9 @@ export function formatTakeQuestionCountLabel(
   count: number,
   takeMessage: TakeMessageGetter,
 ): string {
-  const template =
-    count === 1
-      ? takeMessage('questionCountOne', { count })
-      : takeMessage('questionCountOther', { count })
-  return template
+  return count === 1
+    ? takeMessage('questionCountOne', { count })
+    : takeMessage('questionCountOther', { count })
 }
 
 export function isLastInterviewQuestion(
