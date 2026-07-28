@@ -126,7 +126,7 @@ export function useTakeAnswerPersistence({
         id,
         buildProgressPayload({
           questionIndex: cameraUpload.questionIndex,
-          versionNumber: currentVersionNumberRef.current,
+          versionNumber: cameraUpload.versionNumber,
           mediaKey: cameraUpload.mediaKey,
           recordingSessionId,
           screenMediaKey: screenUpload?.mediaKey,
@@ -151,13 +151,21 @@ export function useTakeAnswerPersistence({
       );
 
       flushedBehaviorEventCountRef.current = behaviorEventsRef.current.length;
-      currentVersionNumberRef.current = progressResponse.selectedVersionNumber;
+      // Server may keep an older selectedVersionNumber; do not rewind the in-flight attempt.
+      const activeVersionNumber = cameraUpload.versionNumber;
+      if (progressResponse.selectedVersionNumber === activeVersionNumber) {
+        currentVersionNumberRef.current = progressResponse.selectedVersionNumber;
+      } else if (currentVersionNumberRef.current !== activeVersionNumber) {
+        currentVersionNumberRef.current = activeVersionNumber;
+      }
       cameraUpload.mediaKeyPersisted = true;
       if (screenUpload) {
         screenUpload.mediaKeyPersisted = true;
       }
       onAnswerMetaUpdated?.({
-        ...progressResponse,
+        versionCount: progressResponse.versionCount,
+        selectedVersionNumber: activeVersionNumber,
+        status: progressResponse.status,
         recordingSessionId:
           recordingSessionIdRef.current ?? cameraUpload.recordingSessionId,
       });

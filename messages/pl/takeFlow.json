@@ -19,6 +19,7 @@
     "lobbyInterviewStartBlocked": "Nie można rozpocząć rozmowy kwalifikacyjnej. Pozostaw mikrofon, kamerę i udostępnianie całego ekranu aktywne, a następnie spróbuj ponownie.",
     "lobbyEyebrow": "Pokój przygotowawczy",
     "lobbyLead": "Włącz mikrofon i kamerę, udostępnij swój pełny ekran, a następnie wybierz opcję Rozpocznij rozmowę kwalifikacyjną, gdy wszystkie kontrole będą gotowe.",
+    "lobbyLeadReviewContinue": "Wykorzystano wszystkie próby na to pytanie. Podłącz kamerę i ekran, aby wysłać odpowiedź i przejść do następnego pytania.",
     "lobbyJoin": "Rozpocznij rozmowę kwalifikacyjną",
     "lobbyJoinBusy": "Jedna chwila…",
     "lobbyDevicesHelp": "Aktualizacje stanu w miarę nawiązywania połączenia. W oknie dialogowym udostępniania systemowego wybierz opcję Cały ekran.",

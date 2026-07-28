@@ -53,6 +53,8 @@ interface UseTakeBeginRecordingParams {
   resetInterviewSetup: (message: string) => void;
   onAnswerMetaUpdated: (meta: AnswerMetaUpdate) => void;
   getAnswerMaxAttempts?: () => number;
+  /** Double-guard: exhausted / non-recording phases must not reserve or progress. */
+  canStartRecordingAttempt?: () => boolean;
   startMultipartUploadSession: (
     questionIndex: number,
     mediaType: CaptureTarget,
@@ -107,6 +109,7 @@ export function useTakeBeginRecording({
   resetInterviewSetup,
   onAnswerMetaUpdated,
   getAnswerMaxAttempts,
+  canStartRecordingAttempt,
   startMultipartUploadSession,
   flushAnswerProgress,
   startProgressHeartbeat,
@@ -132,6 +135,14 @@ export function useTakeBeginRecording({
     versionCount,
     maxAttempts,
   }: BeginRecordingInput) {
+    if (
+      !reuseReservedAttempt &&
+      canStartRecordingAttempt &&
+      !canStartRecordingAttempt()
+    ) {
+      return;
+    }
+
     if (!cameraStreamRef.current || !screenStreamRef.current) {
       resetInterviewSetup(takeMessage('lobbyInterviewStartBlocked'));
       return;

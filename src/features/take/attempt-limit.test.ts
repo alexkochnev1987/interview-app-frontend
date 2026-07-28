@@ -80,24 +80,42 @@ describe('take attempt UX', () => {
     const recording = interviewFixture({
       currentAnswerMeta: answerMetaFixture({ versionCount: 1 }),
     });
-    const review = interviewFixture({
+    const reviewMid = interviewFixture({
       currentAnswerMeta: answerMetaFixture({
         versionCount: 3,
         hasSubmittableMedia: true,
         latestSubmittableVersionNumber: 2,
       }),
     });
-    const blocked = interviewFixture({
+    const reviewLast = interviewFixture({
+      currentQuestionIndex: 1,
+      totalQuestions: 2,
+      currentAnswerMeta: answerMetaFixture({
+        versionCount: 3,
+        hasSubmittableMedia: true,
+        latestSubmittableVersionNumber: 3,
+      }),
+    });
+    const blockedMid = interviewFixture({
+      currentAnswerMeta: answerMetaFixture({ versionCount: 3 }),
+    });
+    const blockedLast = interviewFixture({
+      currentQuestionIndex: 1,
+      totalQuestions: 2,
       currentAnswerMeta: answerMetaFixture({ versionCount: 3 }),
     });
 
     expect(resolveQuestionAnswerPhase(recording)).toBe('recording');
-    expect(resolveQuestionAnswerPhase(review)).toBe('review');
-    expect(resolveQuestionAnswerPhase(blocked)).toBe('blocked');
+    expect(resolveQuestionAnswerPhase(reviewMid)).toBe('review');
+    expect(resolveQuestionAnswerPhase(blockedMid)).toBe('blocked');
 
     expect(stageAfterInterviewLoad(interviewFixture(), 'initial')).toBe('consent');
     expect(stageAfterInterviewLoad(recording, 'returning')).toBe('lobby');
-    expect(stageAfterInterviewLoad(review, 'returning')).toBe('interview');
-    expect(stageAfterInterviewLoad(blocked, 'returning')).toBe('interview');
+    // Exhausted mid-interview: lobby so devices are ready after Submit → next question.
+    expect(stageAfterInterviewLoad(reviewMid, 'returning')).toBe('lobby');
+    expect(stageAfterInterviewLoad(blockedMid, 'returning')).toBe('lobby');
+    // Exhausted on last question: Submit finishes — skip lobby.
+    expect(stageAfterInterviewLoad(reviewLast, 'returning')).toBe('interview');
+    expect(stageAfterInterviewLoad(blockedLast, 'returning')).toBe('interview');
   });
 });

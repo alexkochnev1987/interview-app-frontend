@@ -27,6 +27,7 @@ import {
   TakeFlowLocaleProvider,
   useTakeFlowLocale,
 } from '@/features/take/take-flow-locale-provider'
+import { resolveQuestionAnswerPhase } from '@/features/take/session-machine'
 import type { TakeInterviewData } from '@/lib/api'
 import type { Locale } from '@/i18n/locales'
 
@@ -247,6 +248,7 @@ function TakeInterviewClientInner({
         lobbyMicOn={lobbyMicOn}
         lobbyCameraOn={lobbyCameraOn}
         lobbyJoinReady={lobbyJoinReady}
+        reviewContinueHint={resolveQuestionAnswerPhase(interview) === 'review'}
         onToggleMic={() => void toggleLobbyMic()}
         onToggleCamera={() => void toggleLobbyCamera()}
         onScreenShare={() => void attachLobbyScreenShare()}

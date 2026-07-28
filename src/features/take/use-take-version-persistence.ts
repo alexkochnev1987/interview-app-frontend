@@ -50,6 +50,7 @@ export interface UseTakeVersionPersistenceParams {
   setVersionPersistKind: (value: VersionPersistKind | null) => void;
   setCurrentVersionNumber: (value: number) => void;
   setRetakeCount: (value: number) => void;
+  setRecordingStartBusy: (value: boolean) => void;
   enqueueProgressFlush: (forceAllEvents: boolean) => Promise<void>;
   waitForProgressFlush: () => Promise<void>;
   queueBufferedUpload: (target: 'camera' | 'screen', forceAll: boolean) => Promise<void>;
@@ -91,6 +92,7 @@ export function useTakeVersionPersistence({
   setVersionPersistKind,
   setCurrentVersionNumber,
   setRetakeCount,
+  setRecordingStartBusy,
   enqueueProgressFlush,
   waitForProgressFlush,
   queueBufferedUpload,
@@ -180,14 +182,19 @@ export function useTakeVersionPersistence({
             maxAttempts?: number;
           },
         ) => {
-          setCurrentVersionNumber(nextVersionNumber);
-          currentVersionNumberRef.current = nextVersionNumber;
-          setRetakeCount(Math.max(nextVersionNumber - 1, 0));
-          await invokeBeginRecording(
-            nextVersionNumber,
-            interview.currentQuestionIndex,
-            options,
-          );
+          setRecordingStartBusy(true);
+          try {
+            setCurrentVersionNumber(nextVersionNumber);
+            currentVersionNumberRef.current = nextVersionNumber;
+            setRetakeCount(Math.max(nextVersionNumber - 1, 0));
+            await invokeBeginRecording(
+              nextVersionNumber,
+              interview.currentQuestionIndex,
+              options,
+            );
+          } finally {
+            setRecordingStartBusy(false);
+          }
         };
 
         const handleRerecord = async () => {
@@ -346,6 +353,7 @@ export function useTakeVersionPersistence({
 
           clearRecordingArtifacts();
           pendingVersionActionRef.current = null;
+          autoStartedQuestionKeyRef.current = '';
           setCurrentVersionNumber(1);
           currentVersionNumberRef.current = 1;
           setRetakeCount(0);
@@ -417,6 +425,7 @@ export function useTakeVersionPersistence({
       setVersionPersistKind,
       setCurrentVersionNumber,
       setRetakeCount,
+      setRecordingStartBusy,
       enqueueProgressFlush,
       waitForProgressFlush,
       queueBufferedUpload,

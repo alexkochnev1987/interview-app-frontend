@@ -42,7 +42,8 @@ function getDefaultLanguage(): string {
 }
 
 export function useBrowserTranscript() {
-  const [isSupported] = useState(() => Boolean(getRecognitionConstructor()));
+  // false on SSR and first client paint to avoid hydration mismatch; detect after mount.
+  const [isSupported, setIsSupported] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [interimTranscript, setInterimTranscript] = useState('');
   const [finalTranscript, setFinalTranscript] = useState('');
@@ -61,6 +62,7 @@ export function useBrowserTranscript() {
   const afterSynthResumeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
+    setIsSupported(Boolean(getRecognitionConstructor()));
     languageRef.current = getDefaultLanguage();
   }, []);
 

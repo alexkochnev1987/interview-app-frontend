@@ -19,6 +19,7 @@
     "lobbyInterviewStartBlocked": "Could not start the interview. Keep microphone, camera, and entire-screen sharing active, then try again.",
     "lobbyEyebrow": "Prep room",
     "lobbyLead": "Enable mic and camera, share your full screen, then select Start Interview when all checks are ready.",
+    "lobbyLeadReviewContinue": "Attempts for this question are used up. Reconnect camera and screen so you can Submit, then continue to the next question.",
     "lobbyJoin": "Start Interview",
     "lobbyJoinBusy": "One moment…",
     "lobbyDevicesHelp": "Status updates as you connect. In the system share dialog, choose Entire screen.",

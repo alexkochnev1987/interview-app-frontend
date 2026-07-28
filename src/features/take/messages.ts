@@ -31,6 +31,8 @@ export const TAKE_MESSAGES = {
   lobbyEyebrow: 'Prep room',
   lobbyLead:
     'Enable mic and camera, share your full screen, then select Start Interview when all checks are ready.',
+  lobbyLeadReviewContinue:
+    'Attempts for this question are used up. Reconnect camera and screen so you can Submit, then continue to the next question.',
   lobbyJoin: 'Start Interview',
   lobbyJoinBusy: 'One moment…',
   lobbyDevicesHelp:

@@ -4,6 +4,7 @@ import {
   canStartNewAttempt,
   type AnswerAttemptMeta,
 } from './attempt-limit';
+import { isLastInterviewQuestion } from './messages';
 
 export type ClientInterviewLoadMode = 'initial' | 'resume' | 'locale';
 
@@ -43,9 +44,14 @@ export function stageAfterInterviewLoad(
     return 'consent';
   }
   if (mode === 'returning') {
-    // Devices/MediaRecorder cannot resume after F5 — re-check capture in lobby
-    // unless attempts are exhausted (review/blocked go straight to interview).
-    if (!canStartNewAttempt(answerAttemptMetaFromInterview(interview))) {
+    // Devices/MediaRecorder cannot resume after F5 — go through lobby when more
+    // recording may follow (attempts left, or exhausted mid-interview before next Q).
+    // Exhausted on the last question: Submit finishes — skip lobby.
+    const exhausted = isAttemptsExhausted(answerAttemptMetaFromInterview(interview));
+    if (
+      exhausted &&
+      isLastInterviewQuestion(interview.currentQuestionIndex, interview.totalQuestions)
+    ) {
       return 'interview';
     }
     return 'lobby';
