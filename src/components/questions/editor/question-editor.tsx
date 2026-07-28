@@ -1,7 +1,7 @@
 'use client'
 
 import { useLocale, useTranslations } from 'next-intl'
-import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
+import { type FormEvent, useEffect, useMemo, useRef, useState } from 'react'
 
 import { AiAgreesPill } from '@/components/questions/editor/ai-agrees-pill'
 import { AiDraftPanel } from '@/components/questions/editor/ai-draft-panel'
@@ -23,7 +23,7 @@ import {
   emitOnboardingEvent,
   ONBOARDING_EVENT_NAMES,
 } from '@/features/onboarding/onboarding-events'
-import { LOCALES, type Locale } from '@/i18n/locales'
+import { type Locale, LOCALES } from '@/i18n/locales'
 import { useQuestionEditorLabels } from '@/i18n/use-question-editor-labels'
 import {
   ApiError,
@@ -36,15 +36,15 @@ import { clearFieldError, type FieldErrors } from '@/lib/clear-field-error'
 import { FEEDBACK_POLICY } from '@/lib/feedback-policy'
 import { buildAiDraftQuestionInput } from '@/lib/question-editor/ai-draft-request'
 import {
+  type EditorPhase,
   isPrimaryContentComplete,
   resolveInitialEditorPhase,
   shouldUnlockPhase2AfterSave,
-  type EditorPhase,
 } from '@/lib/question-editor/editor-phase'
 import {
+  type DraftFieldKey,
   GENERATE_DRAFT_FIELD_KEYS,
   TRANSLATE_DRAFT_FIELD_KEYS,
-  type DraftFieldKey,
   type TranslateDraftFieldKey,
 } from '@/lib/question-editor/field-keys'
 import {
@@ -55,18 +55,18 @@ import {
   editorStateToQuestionInput,
   editorStateToUpdatePayload,
   formatMetadata,
+  hasPersistedLocaleTranslation,
   type LocaleQuestionDraft,
   normalizeInitialValue,
   normalizeLocaleDraft,
-  hasPersistedLocaleTranslation,
   pickInitialEditingLocale,
   seedLocaleDraftsFromQuestion,
 } from '@/lib/question-editor/parsers'
 import {
   arePrimarySnapshotsEqual,
+  type PrimaryContentSnapshot,
   primaryContentSnapshotFromDraft,
   primaryContentSnapshotFromQuestion,
-  type PrimaryContentSnapshot,
 } from '@/lib/question-editor/stale-translation'
 import {
   draftToLocaleDraft,
@@ -1204,9 +1204,8 @@ export function QuestionEditor({
     const payload: QuestionInput = questionId
       ? (editorStateToUpdatePayload(editorState, { translationsMode }) as QuestionInput)
       : (editorStateToCreatePayload(editorState) as QuestionInput)
-    const preSaveSnapshot = savedPrimarySnapshot
     const primaryContentChanged = !arePrimarySnapshotsEqual(
-      preSaveSnapshot,
+      savedPrimarySnapshot,
       primaryContentSnapshotFromDraft(primaryDraftForSave),
     )
 
