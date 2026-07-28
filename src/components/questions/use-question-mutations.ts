@@ -1,10 +1,7 @@
 'use client'
 
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useCallback } from 'react'
-import {
-  useMutation,
-  useQueryClient,
-} from '@tanstack/react-query'
 
 import { questionsRootQueryKey } from '@/components/questions/picker/query-keys'
 import {
@@ -17,12 +14,9 @@ import {
   type UpdateQuestionInput,
 } from '@/lib/api'
 import { getErrorMessage } from '@/lib/api-error'
+import { BULK_DELETE_TOAST_IDS, notifyBulkDeleteOutcome } from '@/lib/notify-bulk-delete'
 import { notifyError, notifySuccess } from '@/lib/toast'
 import { useToastMessages } from '@/lib/use-toast-messages'
-import {
-  BULK_DELETE_TOAST_IDS,
-  notifyBulkDeleteOutcome,
-} from '@/lib/notify-bulk-delete'
 
 type QuestionMutationErrorTitle = string | ((error: unknown) => string)
 
@@ -34,23 +28,19 @@ function useInvalidateQuestions() {
   }, [queryClient])
 }
 
-function useQuestionMutationResources() {
-  const invalidateQuestions =useInvalidateQuestions()
-  const toastMessages=useToastMessages()
+function notifyMutationSuccess(message: string) {
+  notifySuccess(message)
+}
 
-  const notifyMutationError= (
-      title: string,
-      error:unknown,
-      options?:{id?:string}
-  )=>{
+function useQuestionMutationResources() {
+  const invalidateQuestions = useInvalidateQuestions()
+  const toastMessages = useToastMessages()
+
+  const notifyMutationError = (title: string, error: unknown, options?: { id?: string }) => {
     notifyError(title, {
       id: options?.id,
       description: getErrorMessage(error, toastMessages.defaults.error),
     })
-  }
-
-  const notifyMutationSuccess= (message:string)=>{
-    notifySuccess(message)
   }
 
   return {
@@ -62,7 +52,7 @@ function useQuestionMutationResources() {
 }
 
 type BuildQuestionMutationOptionsConfig<TData, TVariables> = {
-  mutationFn:(variables:TVariables)=> Promise<TData>
+  mutationFn: (variables: TVariables) => Promise<TData>
   successMessage?: string
   errorTitle: QuestionMutationErrorTitle
   notifyOnSuccess?: boolean
@@ -70,30 +60,28 @@ type BuildQuestionMutationOptionsConfig<TData, TVariables> = {
 }
 
 export function buildQuestionMutationOptions<TData, TVariables>(
-    resources: ReturnType<typeof useQuestionMutationResources>,
-    config: BuildQuestionMutationOptionsConfig<TData, TVariables>,
-){
+  resources: ReturnType<typeof useQuestionMutationResources>,
+  config: BuildQuestionMutationOptionsConfig<TData, TVariables>,
+) {
   const {
     invalidateQuestions,
     notifyMutationError,
-    notifyMutationSuccess,
+    notifyMutationSuccess: notifySuccessFn,
   } = resources
 
   return {
     mutationFn: config.mutationFn,
-    onSuccess: ()=>{
+    onSuccess: () => {
       invalidateQuestions()
       if (config.notifyOnSuccess !== false && config.successMessage) {
-        notifyMutationSuccess(config.successMessage)
+        notifySuccessFn(config.successMessage)
       }
     },
     onError: (error: unknown) => {
       if (config.notifyOnError === false) return
 
       const title =
-        typeof config.errorTitle === 'function'
-          ? config.errorTitle(error)
-          : config.errorTitle
+        typeof config.errorTitle === 'function' ? config.errorTitle(error) : config.errorTitle
 
       notifyMutationError(title, error)
     },
@@ -124,30 +112,28 @@ export function useUpdateQuestion() {
 }
 
 export function useDeleteQuestion() {
-
   const resources = useQuestionMutationResources()
 
   return useMutation(
-      buildQuestionMutationOptions(resources,{
-        mutationFn: deleteQuestion,
-        errorTitle: resources.toastMessages.question.deleteError,
-        notifyOnSuccess: false,
-        notifyOnError: false,
-      })
+    buildQuestionMutationOptions(resources, {
+      mutationFn: deleteQuestion,
+      errorTitle: resources.toastMessages.question.deleteError,
+      notifyOnSuccess: false,
+      notifyOnError: false,
+    }),
   )
 }
 
 export function useRestoreQuestion() {
-
   const resources = useQuestionMutationResources()
 
   return useMutation(
-      buildQuestionMutationOptions( resources , {
-        mutationFn:restoreQuestion,
-        errorTitle: resources.toastMessages.question.restoreError,
-        notifyOnSuccess: false,
-        notifyOnError: false,
-      })
+    buildQuestionMutationOptions(resources, {
+      mutationFn: restoreQuestion,
+      errorTitle: resources.toastMessages.question.restoreError,
+      notifyOnSuccess: false,
+      notifyOnError: false,
+    }),
   )
 }
 
