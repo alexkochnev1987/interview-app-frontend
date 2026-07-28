@@ -48,6 +48,7 @@ async function waitForDriverSettle(driver: Driver, expectedIndex: number): Promi
   let stableFrames = 0
 
   for (let frame = 0; frame < maxFrames; frame += 1) {
+    // oxlint-disable-next-line no-await-in-loop
     await new Promise<void>((resolve) => {
       window.requestAnimationFrame(() => resolve())
     })

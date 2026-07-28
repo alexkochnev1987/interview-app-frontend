@@ -1,3 +1,4 @@
+// oxlint-disable no-await-in-loop
 import type { MultipartUploadPartResponse } from '@/lib/api'
 
 import type { CaptureTarget, MultipartUploadSession, MultipartUploadState } from './runtime'
