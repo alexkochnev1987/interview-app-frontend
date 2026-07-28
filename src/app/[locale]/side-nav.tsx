@@ -24,18 +24,21 @@ import {
   canReadQuestions,
   canReviewAssessments,
 } from '@/lib/auth-roles'
+import { getCandidateInitials } from '@/lib/interview-formatters'
+import { cn } from '@/lib/utils'
 
 import { AppSidebar } from '@/components/ui/app-sidebar'
 import { BrandMark } from '@/components/ui/brand-mark'
 import { Button } from '@/components/ui/button'
+import { IconBadge } from '@/components/ui/icon-badge'
 import { IdentityBadge } from '@/components/ui/identity-badge'
 import { Stack } from '@/components/ui/layout/stack'
 import {
   SideNavButton,
   SideNavLink,
+  sideNavProfileLinkClass,
   sideNavRevealClass,
 } from '@/components/ui/side-nav-item'
-import { SurfaceTile } from '@/components/ui/surface-tile'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
 
 export function SideNav() {
@@ -141,22 +144,24 @@ export function SideNav() {
       actions={
         user ? (
           <Stack gap={2} width="full">
-            <Stack gap={2} className={sideNavRevealClass}>
-              <UnstyledLink
-                href={routes.profile.me}
-                aria-label={tNav('profile')}
-                aria-current={profileActive ? 'page' : undefined}
-              >
-                <SurfaceTile tone="soft" rounded="lg" padding="sm" active={profileActive}>
-                  <IdentityBadge
-                    layout="stacked"
-                    nameMaxWidth="none"
-                    name={user.name}
-                    role={labels.role(user.role)}
-                  />
-                </SurfaceTile>
-              </UnstyledLink>
-            </Stack>
+            <UnstyledLink
+              href={routes.profile.me}
+              aria-label={tNav('profile')}
+              aria-current={profileActive ? 'page' : undefined}
+              className={sideNavProfileLinkClass}
+            >
+              <IconBadge tone="surface" size="sm" shape="circle" textSize="sm">
+                {getCandidateInitials(user.name)}
+              </IconBadge>
+              <Stack gap={0} className={cn('min-w-0', sideNavRevealClass)}>
+                <IdentityBadge
+                  layout="stacked"
+                  nameMaxWidth="none"
+                  name={user.name}
+                  role={labels.role(user.role)}
+                />
+              </Stack>
+            </UnstyledLink>
             <SideNavButton
               tone="danger"
               onClick={logout}

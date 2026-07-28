@@ -54,7 +54,7 @@ export function IdentityBadge({
         >
           {name}
         </BodyText>
-        <EyebrowLabel size="xs" weight="normal" className="w-fit leading-none">
+        <EyebrowLabel size="xs" weight="normal" className="w-fit whitespace-nowrap leading-none">
           {role}
         </EyebrowLabel>
       </Stack>
