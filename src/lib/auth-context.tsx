@@ -1,12 +1,12 @@
 'use client'
 
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
+import { createContext, useContext, useState, type ReactNode } from 'react'
 
 import { useRouter } from '@/i18n/navigation'
 import {
   completeOnboarding as apiCompleteOnboarding,
   logout as apiLogout,
-  type AuthUserResponseDto as User,
+  type MeResponse as User,
   type CompleteOnboardingStatus,
 } from '@/lib/api'
 
@@ -50,29 +50,31 @@ export function AuthProvider({
     // the first RSC refresh picks up the new cookie (post login/demo sign-in).
   }
 
-  const establishSession = useCallback((sessionUser: User) => {
+  const establishSession = (sessionUser: User) => {
     setUser(sessionUser)
-  }, [])
+  }
 
-  const completeOnboarding = useCallback(async (_status?: CompleteOnboardingStatus) => {
-    const updatedUser = await apiCompleteOnboarding()
+  const completeOnboarding = async (status: CompleteOnboardingStatus = 'completed') => {
+    const updatedUser = await apiCompleteOnboarding(status)
     setUser(updatedUser)
     return updatedUser
-  }, [])
+  }
 
-  const logout = useCallback(async () => {
+  const logout = async () => {
     await apiLogout()
     setUser(null)
     router.push('/login')
     router.refresh()
-  }, [router])
+  }
 
-  const value = useMemo(
-    () => ({ user, establishSession, completeOnboarding, logout }),
-    [user, establishSession, completeOnboarding, logout],
+  return (
+    <AuthContext.Provider
+      // oxlint-disable-next-line react/jsx-no-constructed-context-values
+      value={{ user, establishSession, completeOnboarding, logout }}
+    >
+      {children}
+    </AuthContext.Provider>
   )
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
 export function useAuth() {
