@@ -12,6 +12,14 @@ export function getSelectedQuestionIdsInEditOrder(
   return [...keptInOrder, ...addedInPickerOrder]
 }
 
+export function isInterviewHrAssignmentDirty(
+  interview: Pick<Interview, 'assignedHrId' | 'assignedHr'>,
+  assignedHrId?: string,
+): boolean {
+  const initialAssignedHrId = interview.assignedHrId ?? interview.assignedHr?.id
+  return (assignedHrId ?? undefined) !== (initialAssignedHrId ?? undefined)
+}
+
 export function isInterviewEditDirty(
   interview: Pick<
     Interview,

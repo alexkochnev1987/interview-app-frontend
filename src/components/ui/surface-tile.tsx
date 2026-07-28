@@ -43,6 +43,10 @@ const surfaceTileVariants = cva('ring-1 ring-hairline', {
       full: 'w-full',
       'full-lg-auto': 'w-full max-w-full lg:w-auto',
     },
+    active: {
+      true: 'bg-accent ring-[hsl(var(--primary)/0.15)]',
+      false: '',
+    },
   },
   defaultVariants: {
     tone: 'soft',
@@ -52,6 +56,7 @@ const surfaceTileVariants = cva('ring-1 ring-hairline', {
     visibility: 'always',
     textAlign: 'start',
     width: 'auto',
+    active: false,
   },
 })
 
@@ -70,6 +75,7 @@ export function SurfaceTile({
   visibility,
   textAlign,
   width,
+  active,
   onDismiss,
   dismissLabel = 'Dismiss',
   children,
@@ -87,6 +93,7 @@ export function SurfaceTile({
           visibility,
           textAlign,
           width,
+          active,
         }),
         dismissible && 'relative',
         className,

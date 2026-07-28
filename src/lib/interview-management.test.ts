@@ -4,6 +4,7 @@ import {
   canDeleteInterview,
   canEditInterview,
   canManageInterview,
+  canOpenInterviewEdit,
   hasInterviewAnswers,
   isPendingInterview,
 } from '@/lib/interview-management'
@@ -34,6 +35,29 @@ describe('interview-management', () => {
       ),
     ).toBe(false)
     expect(canEditInterview(interviewFixture({ status: 'in_progress' }))).toBe(false)
+  })
+
+  it('opens edit for full edit or HR reassignment when allowed', () => {
+    expect(canOpenInterviewEdit(interviewFixture({ status: 'pending' }))).toBe(true)
+    expect(
+      canOpenInterviewEdit(interviewFixture({ status: 'in_progress' }), {
+        canAssignHr: false,
+      }),
+    ).toBe(false)
+    expect(
+      canOpenInterviewEdit(interviewFixture({ status: 'completed' }), {
+        canAssignHr: true,
+      }),
+    ).toBe(true)
+    expect(
+      canOpenInterviewEdit(
+        interviewFixture({
+          status: 'pending',
+          answers: [submittedAnswerFixture()],
+        }),
+        { canAssignHr: true },
+      ),
+    ).toBe(true)
   })
 
   it('allows management only for pending interviews', () => {

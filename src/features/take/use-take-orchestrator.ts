@@ -1,3 +1,4 @@
+// oxlint-disable unicorn/prefer-add-event-listener
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 
 import type { PermissionStatus, TakeStage } from '@/components/take/types'
@@ -158,6 +159,7 @@ export function useTakeOrchestrator({
   const progressFlushTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const cameraStreamRef = useRef<MediaStream | null>(null)
   const screenStreamRef = useRef<MediaStream | null>(null)
+  const [cameraStream, setCameraStream] = useState<MediaStream | null>(null)
   const discardRecordingRef = useRef(false)
   const answerStartedAtRef = useRef<string | null>(null)
   const answerStartedAtMsRef = useRef<number | null>(null)
@@ -209,11 +211,13 @@ export function useTakeOrchestrator({
 
   function attachCameraPreview(stream: MediaStream) {
     cameraStreamRef.current = stream
+    setCameraStream(stream)
     syncVideoPreview(videoRef.current, stream)
   }
 
   function releaseAllCaptures() {
     releaseAllInterviewCaptures(cameraStreamRef, screenStreamRef, videoRef, screenVideoRef)
+    setCameraStream(null)
   }
 
   function resetLobbyControls() {
@@ -544,12 +548,10 @@ export function useTakeOrchestrator({
       setStage('interview')
     }
 
-    // eslint-disable-next-line unicorn/prefer-add-event-listener
     screenTrack.onended = onEnded
 
     return () => {
       if (screenTrack.onended === onEnded) {
-        // eslint-disable-next-line unicorn/prefer-add-event-listener
         screenTrack.onended = null
       }
     }
@@ -762,6 +764,7 @@ export function useTakeOrchestrator({
     submitError,
     versionPersistKind,
     videoRef,
+    cameraStream,
     screenVideoRef,
     isBrowserTranscriptSupported,
     finalTranscript,

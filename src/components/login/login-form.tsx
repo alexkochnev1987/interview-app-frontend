@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input'
 import { Stack } from '@/components/ui/layout/stack'
 import { useRouter } from '@/i18n/navigation'
 import { stripLocalePrefix } from '@/i18n/pathname'
-import { demoLogin, login } from '@/lib/api'
+import { demoLogin, getAuthMe, login, logout as apiLogout } from '@/lib/api'
 import { ApiError } from '@/lib/api-error'
 import { useAuth } from '@/lib/auth-context'
 import { safeRedirectPath } from '@/lib/safe-redirect-path'
@@ -35,18 +35,26 @@ export function LoginForm() {
 
   const redirectPath = stripLocalePrefix(safeRedirectPath(searchParams.get('from')))
 
-  async function runAuth(
-    action: 'login' | 'demo',
-    authCall: () => Promise<Awaited<ReturnType<typeof login>>>,
-  ) {
+  async function runAuth(action: 'login' | 'demo', authCall: () => Promise<void>) {
     setError('')
     setPendingAction(action)
 
+    let sessionCookieSet = false
+
     try {
-      const sessionUser = await authCall()
+      await authCall()
+      sessionCookieSet = true
+      const sessionUser = await getAuthMe()
       establishSession(sessionUser)
       router.replace(redirectPath)
     } catch (err) {
+      if (sessionCookieSet) {
+        try {
+          await apiLogout()
+        } catch {
+          /* best-effort: avoid a valid cookie with no established client session */
+        }
+      }
       if (err instanceof ApiError && err.code === 'VALIDATION_ERROR') {
         setError(toastMessages.pageGate.login.failedFallback)
         return
@@ -59,11 +67,15 @@ export function LoginForm() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    await runAuth('login', () => login({ email, password }))
+    await runAuth('login', async () => {
+      await login({ email, password })
+    })
   }
 
   async function handleDemo() {
-    await runAuth('demo', () => demoLogin())
+    await runAuth('demo', async () => {
+      await demoLogin()
+    })
   }
 
   return (

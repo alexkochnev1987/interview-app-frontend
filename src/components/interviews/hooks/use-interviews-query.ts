@@ -199,7 +199,7 @@ export function useInterviewsQuery(
     lastWrittenUrlRef.current = stateUrl
     router.replace(url, { scroll: false })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stateUrl, pathname, router, syncUrl, capturedInitial, searchParams])
+  }, [stateUrl, pathname, router, syncUrl, capturedInitial, searchParams, allowAssignedHrFilter])
 
   const fetchParams = useMemo(
     () => buildInterviewsFetchParams(state, debouncedQ),

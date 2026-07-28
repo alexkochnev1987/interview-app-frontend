@@ -27,7 +27,6 @@ import { SideNavButton, SideNavLink, sideNavRevealClass } from '@/components/ui/
 import { SurfaceTile } from '@/components/ui/surface-tile'
 import { BodyText } from '@/components/ui/text'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
-import { useOnboardingReplay } from '@/features/onboarding/onboarding-provider'
 import { isCandidateFlowPath } from '@/i18n/html-lang'
 import { LOCALES, type Locale } from '@/i18n/locales'
 import { usePathname } from '@/i18n/navigation'
@@ -46,12 +45,10 @@ import { cn } from '@/lib/utils'
 export function SideNav() {
   const { user, logout } = useAuth()
   const isDemo = useIsDemo()
-  const { replayTour, canReplayTour } = useOnboardingReplay()
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const locale = useLocale() as Locale
   const tNav = useTranslations('nav')
-  const tOnboarding = useTranslations('onboarding')
   const tCommon = useTranslations('common')
   const tLanguage = useTranslations('languageSwitcher')
   const labels = useSharedLabels()
@@ -91,10 +88,7 @@ export function SideNav() {
         ]
       : []),
     ...(canConfigureInterview(user?.role)
-      ? [
-          // Templates are read-only for demo accounts, so this entry is not gated on !isDemo.
-          { href: routes.templates.list, label: tNav('templates'), icon: LayoutTemplate },
-        ]
+      ? [{ href: routes.templates.list, label: tNav('templates'), icon: LayoutTemplate }]
       : []),
     ...(canConfigureInterview(user?.role) && !isDemo
       ? [
@@ -114,6 +108,14 @@ export function SideNav() {
     }
     return pathname === href || pathname.startsWith(`${href}/`)
   }
+
+  function isProfileActive() {
+    if (!user) return false
+    if (pathname === routes.profile.me) return true
+    return pathname === routes.profile.detail(user.id)
+  }
+
+  const profileActive = isProfileActive()
 
   const languageSwitcher = (
     <LanguageSwitcher
@@ -173,29 +175,21 @@ export function SideNav() {
         user ? (
           <Stack gap={2} width="full">
             <Stack gap={2} className={sideNavRevealClass}>
-              {canAccessDashboard(user.role) ? (
-                <Button
-                  type="button"
-                  variant="outline-pill"
-                  shape="pill"
-                  size="sm"
-                  effects="blur"
-                  width="full"
-                  disabled={!canReplayTour}
-                  onClick={() => void replayTour()}
-                >
-                  {tOnboarding('tour.replay')}
-                </Button>
-              ) : null}
               {languageSwitcher}
-              <SurfaceTile tone="soft" rounded="lg" padding="sm">
-                <IdentityBadge
-                  layout="stacked"
-                  nameMaxWidth="none"
-                  name={user.name}
-                  role={labels.role(user.role)}
-                />
-              </SurfaceTile>
+              <UnstyledLink
+                href={routes.profile.me}
+                aria-label={tNav('profile')}
+                aria-current={profileActive ? 'page' : undefined}
+              >
+                <SurfaceTile tone="soft" rounded="lg" padding="sm" active={profileActive}>
+                  <IdentityBadge
+                    layout="stacked"
+                    nameMaxWidth="none"
+                    name={user.name}
+                    role={labels.role(user.role)}
+                  />
+                </SurfaceTile>
+              </UnstyledLink>
             </Stack>
             <SideNavButton
               tone="danger"
