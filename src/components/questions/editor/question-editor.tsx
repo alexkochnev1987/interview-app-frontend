@@ -97,6 +97,59 @@ const PRIMARY_DRAFT_FIELDS = new Set<PrimaryDraftFieldKey>([
   'sampleGoodAnswer',
 ])
 
+function formatLocaleCodes(locales: Locale[]): string {
+  return locales.map((locale) => locale.toUpperCase()).join(', ')
+}
+
+function getNonPrimaryLocalesWithPersistedTranslation(
+  question: QuestionInput,
+  primaryLoc: Locale,
+): Locale[] {
+  return LOCALES.filter(
+    (locale) => locale !== primaryLoc && hasPersistedLocaleTranslation(question, locale),
+  )
+}
+
+function emptyLocaleDraft(): LocaleQuestionDraft {
+  return {
+    questionText: '',
+    followUpQuestions: [],
+    expectedConcepts: [],
+    redFlags: [],
+    sampleGoodAnswer: '',
+  }
+}
+
+function setPrimaryDraftField(
+  patch: Partial<LocaleQuestionDraft>,
+  field: PrimaryDraftFieldKey,
+  value: QuestionInput[DraftFieldKey],
+) {
+  switch (field) {
+    case 'questionText':
+      patch.questionText = typeof value === 'string' ? value : ''
+      return
+    case 'followUpQuestions':
+      patch.followUpQuestions = Array.isArray(value) ? (value as string[]) : []
+      return
+    case 'expectedConcepts':
+      patch.expectedConcepts = Array.isArray(value)
+        ? (value as LocaleQuestionDraft['expectedConcepts'])
+        : []
+      return
+    case 'redFlags':
+      patch.redFlags = Array.isArray(value) ? (value as LocaleQuestionDraft['redFlags']) : []
+      return
+    case 'sampleGoodAnswer':
+      patch.sampleGoodAnswer = typeof value === 'string' ? value : ''
+      return
+  }
+}
+
+function handlePrimaryLocaleChange(_nextLocale: Locale) {
+  // Primary locale is fixed at creation and cannot be changed.
+}
+
 interface QuestionEditorProps {
   questionId?: string
   title: string
@@ -232,19 +285,6 @@ export function QuestionEditor({
     [primaryLocale, visibleLocales, localeDrafts],
   )
 
-  function formatLocaleCodes(locales: Locale[]): string {
-    return locales.map((locale) => locale.toUpperCase()).join(', ')
-  }
-
-  function getNonPrimaryLocalesWithPersistedTranslation(
-    question: QuestionInput,
-    primaryLoc: Locale,
-  ): Locale[] {
-    return LOCALES.filter(
-      (locale) => locale !== primaryLoc && hasPersistedLocaleTranslation(question, locale),
-    )
-  }
-
   function resolveRefreshTranslationLocales(args: {
     primaryContentChanged: boolean
     editorPhase: EditorPhase
@@ -377,16 +417,6 @@ export function QuestionEditor({
         [locale]: getLocaleTranslateErrorMessage(error),
       }))
       return { success: false }
-    }
-  }
-
-  function emptyLocaleDraft(): LocaleQuestionDraft {
-    return {
-      questionText: '',
-      followUpQuestions: [],
-      expectedConcepts: [],
-      redFlags: [],
-      sampleGoodAnswer: '',
     }
   }
 
@@ -556,32 +586,6 @@ export function QuestionEditor({
     return getLocaleDraft(primaryLocale).questionText
   }
 
-  function setPrimaryDraftField(
-    patch: Partial<LocaleQuestionDraft>,
-    field: PrimaryDraftFieldKey,
-    value: QuestionInput[DraftFieldKey],
-  ) {
-    switch (field) {
-      case 'questionText':
-        patch.questionText = typeof value === 'string' ? value : ''
-        return
-      case 'followUpQuestions':
-        patch.followUpQuestions = Array.isArray(value) ? (value as string[]) : []
-        return
-      case 'expectedConcepts':
-        patch.expectedConcepts = Array.isArray(value)
-          ? (value as LocaleQuestionDraft['expectedConcepts'])
-          : []
-        return
-      case 'redFlags':
-        patch.redFlags = Array.isArray(value) ? (value as LocaleQuestionDraft['redFlags']) : []
-        return
-      case 'sampleGoodAnswer':
-        patch.sampleGoodAnswer = typeof value === 'string' ? value : ''
-        return
-    }
-  }
-
   function getLocaleContentDraft(locale: Locale): LocaleQuestionDraft {
     return getLocaleDraft(locale)
   }
@@ -615,10 +619,6 @@ export function QuestionEditor({
       return getLocaleDraft(primaryLocale)[field] as QuestionInput[DraftFieldKey]
     }
     return metadataValue[field]
-  }
-
-  function handlePrimaryLocaleChange(_nextLocale: Locale) {
-    // Primary locale is fixed at creation and cannot be changed.
   }
 
   function switchLocale(nextLocale: Locale) {
