@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "npm run openapi:refresh && npm run dev:server",
-    "dev:server": "next dev -p 3001 --webpack",
-    "build": "npm run openapi:generate && next build --webpack",
+    "dev:server": "next dev -p 3001",
+    "build": "npm run openapi:generate && next build",
     "start": "next start",
     "lint": "oxlint -f unix",
     "fmt": "oxfmt --write",
