@@ -89,13 +89,13 @@ type QuestionFormField = 'questionText' | 'metadata'
 type LocaleMap<T> = Partial<Record<Locale, T>>
 type PrimaryDraftFieldKey = keyof LocaleQuestionDraft & DraftFieldKey
 
-const PRIMARY_DRAFT_FIELDS: PrimaryDraftFieldKey[] = [
+const PRIMARY_DRAFT_FIELDS = new Set<PrimaryDraftFieldKey>([
   'questionText',
   'followUpQuestions',
   'expectedConcepts',
   'redFlags',
   'sampleGoodAnswer',
-]
+])
 
 interface QuestionEditorProps {
   questionId?: string
@@ -275,6 +275,7 @@ export function QuestionEditor({
       if (options.generation !== translateGenerationRef.current) {
         break
       }
+      // oxlint-disable-next-line no-await-in-loop
       const result = await translateLocaleFromPrimary(locale, {
         autoApply: true,
         source: options.source,
@@ -548,7 +549,7 @@ export function QuestionEditor({
   }
 
   function isPrimaryDraftField(field: DraftFieldKey): field is PrimaryDraftFieldKey {
-    return PRIMARY_DRAFT_FIELDS.includes(field as PrimaryDraftFieldKey)
+    return PRIMARY_DRAFT_FIELDS.has(field as PrimaryDraftFieldKey)
   }
 
   function getPrimaryQuestionTextFromState(): string {
@@ -853,7 +854,7 @@ export function QuestionEditor({
     const contentPatch: Partial<LocaleQuestionDraft> = {}
     const metadataPatch: Partial<QuestionInput> = {}
     for (const [key, fieldValue] of Object.entries(patch)) {
-      if (PRIMARY_DRAFT_FIELDS.includes(key as PrimaryDraftFieldKey)) {
+      if (PRIMARY_DRAFT_FIELDS.has(key as PrimaryDraftFieldKey)) {
         ;(contentPatch as Record<string, unknown>)[key] = fieldValue
       } else {
         ;(metadataPatch as Record<string, unknown>)[key] = fieldValue
