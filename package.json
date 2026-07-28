@@ -69,10 +69,10 @@
     }
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx,json,css,md}": [
+    "!(src/lib/api-types.ts|*.md|**/*.md)*.{js,jsx,ts,tsx,json,css}": [
       "oxfmt --write"
     ],
-    "*.{js,jsx,ts,tsx}": [
+    "!(src/lib/api-types.ts)*.{js,jsx,ts,tsx}": [
       "oxlint"
     ]
   }
