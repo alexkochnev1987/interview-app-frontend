@@ -61,6 +61,7 @@ export function useBrowserTranscript() {
   const afterSynthResumeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- post-mount SSR-safe SpeechRecognition detection
     setIsSupported(Boolean(getRecognitionConstructor()));
     languageRef.current = getDefaultLanguage();
   }, []);

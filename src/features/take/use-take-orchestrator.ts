@@ -436,7 +436,10 @@ export function useTakeOrchestrator({
     setStage,
     clearRecordingArtifacts,
     releaseCaptureStreams: releaseAllCaptures,
-    releaseLobbyCameraOnly: () => releaseCameraCapture(cameraStreamRef, videoRef),
+    releaseLobbyCameraOnly: () => {
+      releaseCameraCapture(cameraStreamRef, videoRef);
+      setCameraStream(null);
+    },
     attachCameraPreview,
     stopMediaStream,
     getPermissionErrorMessage: (error, requiresEntireScreen) =>
@@ -767,6 +770,7 @@ export function useTakeOrchestrator({
     if (submittableVersion === null || submittableVersion === undefined) {
       return;
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- pin UI version to latest submittable media in review
     setCurrentVersionNumber(submittableVersion);
     currentVersionNumberRef.current = submittableVersion;
   }, [
@@ -825,7 +829,7 @@ export function useTakeOrchestrator({
       cameraStatus === 'granted' &&
       screenStatus === 'granted' &&
       screenSurface === 'monitor' &&
-      hasLiveCaptureStreams(),
+      Boolean(cameraStream?.getTracks().some((track) => track.readyState === 'live')),
   );
 
   useEffect(() => {
