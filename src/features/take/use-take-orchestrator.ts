@@ -1,10 +1,17 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 
-import { useBrowserTranscript } from '@/lib/use-browser-transcript';
-import { type TakeInterviewData } from '@/lib/api';
-import type { PermissionStatus, TakeStage } from '@/components/take/types';
-import type { TakeMessageGetter } from './messages';
-import { progressValueForStage, stageAfterInterviewLoad, type VersionPersistKind } from './session-machine';
+import type { PermissionStatus, TakeStage } from '@/components/take/types'
+import type { Locale } from '@/i18n/locales'
+import { type TakeInterviewData } from '@/lib/api'
+import { useBrowserTranscript } from '@/lib/use-browser-transcript'
+
+import {
+  canStartNewAttempt,
+  canRequestRetake,
+  getDisplayedAttemptNumber,
+  resolveInitialVersionNumber,
+} from './attempt-limit'
+import type { TakeMessageGetter } from './messages'
 import {
   clearProgressTimers,
   releaseAllInterviewCaptures,
@@ -14,7 +21,21 @@ import {
   stopMediaStream,
   type AnswerBehaviorEvent,
   type MultipartUploadState,
-} from './runtime';
+} from './runtime'
+import {
+  progressValueForStage,
+  stageAfterInterviewLoad,
+  type VersionPersistKind,
+} from './session-machine'
+import { useTakeAnswerPersistence } from './use-take-answer-persistence'
+import { useTakeBeginRecording } from './use-take-begin-recording'
+import { useTakeBehaviorTracking } from './use-take-behavior-tracking'
+import { useTakeCandidateSession } from './use-take-candidate-session'
+import { useTakeInterviewLoader } from './use-take-interview-loader'
+import { useTakePermissions } from './use-take-permissions'
+import { useTakeQuestionTts, type QuestionSpeechSynthCapture } from './use-take-question-tts'
+import { useTakeRecordingControls } from './use-take-recording-controls'
+import { useTakeVersionPersistence } from './use-take-version-persistence'
 import {
   createEmptyBehaviorSignals,
   formatTime,
@@ -23,60 +44,41 @@ import {
   permissionTone,
   TAKE_RECORDING_LIMIT_SECONDS,
   type TakeBehaviorSignals,
-} from './utils';
-import { useTakeAnswerPersistence } from './use-take-answer-persistence';
-import { useTakeBehaviorTracking } from './use-take-behavior-tracking';
-import { useTakeBeginRecording } from './use-take-begin-recording';
-import { useTakeCandidateSession } from './use-take-candidate-session';
-import { useTakeInterviewLoader } from './use-take-interview-loader';
-import { useTakePermissions } from './use-take-permissions';
-import { useTakeRecordingControls } from './use-take-recording-controls';
-import { useTakeVersionPersistence } from './use-take-version-persistence';
-import {
-  useTakeQuestionTts,
-  type QuestionSpeechSynthCapture,
-} from './use-take-question-tts';
-import type { Locale } from '@/i18n/locales';
-import {
-  canStartNewAttempt,
-  canRequestRetake,
-  getDisplayedAttemptNumber,
-  resolveInitialVersionNumber,
-} from './attempt-limit';
+} from './utils'
 
-type PendingVersionAction = 'submit' | 'rerecord' | null;
+type PendingVersionAction = 'submit' | 'rerecord' | null
 
-const PROGRESS_HEARTBEAT_MS = 3000;
-const PROGRESS_DEBOUNCE_MS = 400;
-const PROGRESS_EVENT_DEBOUNCE_MS = 2000;
+const PROGRESS_HEARTBEAT_MS = 3000
+const PROGRESS_DEBOUNCE_MS = 400
+const PROGRESS_EVENT_DEBOUNCE_MS = 2000
 
-const PREVIEW_STAGES = new Set<TakeStage>(['interview', 'recording', 'lobby']);
+const PREVIEW_STAGES = new Set<TakeStage>(['interview', 'recording', 'lobby'])
 
 interface UseTakeOrchestratorParams {
-  id: string;
-  candidateToken: string;
-  initialInterview?: TakeInterviewData;
-  contentLocale: Locale;
-  takeMessage: TakeMessageGetter;
+  id: string
+  candidateToken: string
+  initialInterview?: TakeInterviewData
+  contentLocale: Locale
+  takeMessage: TakeMessageGetter
 }
 
 function syncVideoPreview(node: HTMLVideoElement | null, stream: MediaStream | null) {
   if (!node || !stream) {
-    return;
+    return
   }
 
   if (node.srcObject !== stream) {
-    node.srcObject = stream;
+    node.srcObject = stream
   }
 
-  void node.play().catch(() => undefined);
+  void node.play().catch(() => undefined)
 }
 
 function setStreamTracksEnabled(stream: MediaStream, kind: 'audio' | 'video', enabled: boolean) {
-  const tracks = kind === 'audio' ? stream.getAudioTracks() : stream.getVideoTracks();
+  const tracks = kind === 'audio' ? stream.getAudioTracks() : stream.getVideoTracks()
   tracks.forEach((track) => {
-    track.enabled = enabled;
-  });
+    track.enabled = enabled
+  })
 }
 
 export function useTakeOrchestrator({
@@ -98,7 +100,7 @@ export function useTakeOrchestrator({
     stop: stopBrowserTranscript,
     reset: resetBrowserTranscript,
     getSnapshot: getBrowserTranscriptSnapshot,
-  } = useBrowserTranscript();
+  } = useBrowserTranscript()
 
   const questionSpeechSynthCapture = useMemo<QuestionSpeechSynthCapture>(
     () => ({
@@ -111,98 +113,90 @@ export function useTakeOrchestrator({
       scheduleRecognitionResumeAfterSynthUtterance,
       discardOutboundSynthGuards,
     ],
-  );
+  )
 
   const [stage, setStage] = useState<TakeStage>(() =>
-    initialInterview
-      ? stageAfterInterviewLoad(initialInterview, 'initial')
-      : 'loading',
-  );
-  const [interview, setInterview] = useState<TakeInterviewData | null>(
-    initialInterview ?? null,
-  );
-  const [error, setError] = useState('');
-  const [consent, setConsent] = useState(false);
-  const [recording, setRecording] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(TAKE_RECORDING_LIMIT_SECONDS);
-  const [retakeCount, setRetakeCount] = useState(0);
-  const [currentVersionNumber, setCurrentVersionNumber] = useState(1);
-  const [uploading, setUploading] = useState(false);
-  const [cameraStatus, setCameraStatus] = useState<PermissionStatus>('idle');
-  const [screenStatus, setScreenStatus] = useState<PermissionStatus>('idle');
-  const [screenSurface, setScreenSurface] = useState('');
-  const [setupBusy, setSetupBusy] = useState(false);
-  const [setupError, setSetupError] = useState('');
-  const [submitError, setSubmitError] = useState('');
-  const [versionPersistKind, setVersionPersistKind] = useState<VersionPersistKind | null>(null);
-  const [recordingStartBusy, setRecordingStartBusy] = useState(false);
-  const [lobbyMicOn, setLobbyMicOn] = useState(false);
-  const [lobbyCameraOn, setLobbyCameraOn] = useState(false);
-  const {
-    candidateSessionReady,
-    sessionSyncError,
-    retrySessionSync,
-  } = useTakeCandidateSession({
+    initialInterview ? stageAfterInterviewLoad(initialInterview, 'initial') : 'loading',
+  )
+  const [interview, setInterview] = useState<TakeInterviewData | null>(initialInterview ?? null)
+  const [error, setError] = useState('')
+  const [consent, setConsent] = useState(false)
+  const [recording, setRecording] = useState(false)
+  const [timeLeft, setTimeLeft] = useState(TAKE_RECORDING_LIMIT_SECONDS)
+  const [retakeCount, setRetakeCount] = useState(0)
+  const [currentVersionNumber, setCurrentVersionNumber] = useState(1)
+  const [uploading, setUploading] = useState(false)
+  const [cameraStatus, setCameraStatus] = useState<PermissionStatus>('idle')
+  const [screenStatus, setScreenStatus] = useState<PermissionStatus>('idle')
+  const [screenSurface, setScreenSurface] = useState('')
+  const [setupBusy, setSetupBusy] = useState(false)
+  const [setupError, setSetupError] = useState('')
+  const [submitError, setSubmitError] = useState('')
+  const [versionPersistKind, setVersionPersistKind] = useState<VersionPersistKind | null>(null)
+  const [recordingStartBusy, setRecordingStartBusy] = useState(false)
+  const [lobbyMicOn, setLobbyMicOn] = useState(false)
+  const [lobbyCameraOn, setLobbyCameraOn] = useState(false)
+  const { candidateSessionReady, sessionSyncError, retrySessionSync } = useTakeCandidateSession({
     interviewId: id,
     candidateToken,
     sessionReady: !candidateToken || Boolean(initialInterview),
     takeMessage,
-  });
+  })
 
   const [interviewerPresence, questionSpeechRecordingAllowedRef] = useTakeQuestionTts(
     interview,
     stage,
     questionSpeechSynthCapture,
-  );
+  )
 
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const screenVideoRef = useRef<HTMLVideoElement>(null);
-  const cameraRecorderRef = useRef<MediaRecorder | null>(null);
-  const screenRecorderRef = useRef<MediaRecorder | null>(null);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const progressHeartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const progressFlushTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const cameraStreamRef = useRef<MediaStream | null>(null);
-  const screenStreamRef = useRef<MediaStream | null>(null);
-  const discardRecordingRef = useRef(false);
-  const answerStartedAtRef = useRef<string | null>(null);
-  const answerStartedAtMsRef = useRef<number | null>(null);
-  const answerStoppedAtMsRef = useRef<number | null>(null);
-  const answerDurationSecondsRef = useRef<number>(0);
-  const stoppedRecordersRef = useRef(0);
-  const expectedRecorderStopsRef = useRef(0);
-  const currentVersionNumberRef = useRef(1);
-  const behaviorSignalsRef = useRef<TakeBehaviorSignals>(createEmptyBehaviorSignals());
-  const behaviorEventsRef = useRef<AnswerBehaviorEvent[]>([]);
-  const flushedBehaviorEventCountRef = useRef(0);
-  const progressRequestChainRef = useRef(Promise.resolve());
-  const pendingVersionActionRef = useRef<PendingVersionAction>(null);
-  const multipartUploadsRef = useRef<MultipartUploadState>({ camera: null, screen: null });
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const screenVideoRef = useRef<HTMLVideoElement>(null)
+  const cameraRecorderRef = useRef<MediaRecorder | null>(null)
+  const screenRecorderRef = useRef<MediaRecorder | null>(null)
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const progressHeartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const progressFlushTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const cameraStreamRef = useRef<MediaStream | null>(null)
+  const screenStreamRef = useRef<MediaStream | null>(null)
+  const discardRecordingRef = useRef(false)
+  const answerStartedAtRef = useRef<string | null>(null)
+  const answerStartedAtMsRef = useRef<number | null>(null)
+  const answerStoppedAtMsRef = useRef<number | null>(null)
+  const answerDurationSecondsRef = useRef<number>(0)
+  const stoppedRecordersRef = useRef(0)
+  const expectedRecorderStopsRef = useRef(0)
+  const currentVersionNumberRef = useRef(1)
+  const behaviorSignalsRef = useRef<TakeBehaviorSignals>(createEmptyBehaviorSignals())
+  const behaviorEventsRef = useRef<AnswerBehaviorEvent[]>([])
+  const flushedBehaviorEventCountRef = useRef(0)
+  const progressRequestChainRef = useRef(Promise.resolve())
+  const pendingVersionActionRef = useRef<PendingVersionAction>(null)
+  const multipartUploadsRef = useRef<MultipartUploadState>({ camera: null, screen: null })
   const beginRecordingRef = useRef<
     (nextVersionNumber: number, currentQuestionIndex: number) => Promise<void>
-  >(async () => undefined);
-  const requestVersionActionRef = useRef<(action: PendingVersionAction) => void>(() => undefined);
-  const autoStartedQuestionKeyRef = useRef('');
-  const recordingRef = useRef(recording);
-  const uploadingRef = useRef(uploading);
-  const recordingStartBusyRef = useRef(recordingStartBusy);
-  const stageRef = useRef(stage);
+  >(async () => undefined)
+  const requestVersionActionRef = useRef<(action: PendingVersionAction) => void>(() => undefined)
+  const autoStartedQuestionKeyRef = useRef('')
+  const recordingRef = useRef(recording)
+  const uploadingRef = useRef(uploading)
+  const recordingStartBusyRef = useRef(recordingStartBusy)
+  const stageRef = useRef(stage)
 
   useEffect(() => {
-    recordingRef.current = recording;
-  }, [recording]);
+    recordingRef.current = recording
+  }, [recording])
 
   useEffect(() => {
-    uploadingRef.current = uploading;
-  }, [uploading]);
+    uploadingRef.current = uploading
+  }, [uploading])
 
   useEffect(() => {
-    recordingStartBusyRef.current = recordingStartBusy;
-  }, [recordingStartBusy]);
+    recordingStartBusyRef.current = recordingStartBusy
+  }, [recordingStartBusy])
 
   useEffect(() => {
-    stageRef.current = stage;
-  }, [stage]);
+    stageRef.current = stage
+  }, [stage])
 
   function isLocaleQuestionMutationBlocked(): boolean {
     return (
@@ -210,57 +204,57 @@ export function useTakeOrchestrator({
       recordingRef.current ||
       recordingStartBusyRef.current ||
       stageRef.current === 'transition'
-    );
+    )
   }
 
   function attachCameraPreview(stream: MediaStream) {
-    cameraStreamRef.current = stream;
-    syncVideoPreview(videoRef.current, stream);
+    cameraStreamRef.current = stream
+    syncVideoPreview(videoRef.current, stream)
   }
 
   function releaseAllCaptures() {
-    releaseAllInterviewCaptures(cameraStreamRef, screenStreamRef, videoRef, screenVideoRef);
+    releaseAllInterviewCaptures(cameraStreamRef, screenStreamRef, videoRef, screenVideoRef)
   }
 
   function resetLobbyControls() {
-    setLobbyMicOn(false);
-    setLobbyCameraOn(false);
+    setLobbyMicOn(false)
+    setLobbyCameraOn(false)
   }
 
   const clearRecordingArtifacts = useCallback(() => {
-    clearProgressTimers(timerRef, progressHeartbeatRef, progressFlushTimeoutRef);
-    answerStartedAtRef.current = null;
-    answerStartedAtMsRef.current = null;
-    answerStoppedAtMsRef.current = null;
-    answerDurationSecondsRef.current = 0;
-    stoppedRecordersRef.current = 0;
-    expectedRecorderStopsRef.current = 0;
-    behaviorSignalsRef.current = createEmptyBehaviorSignals();
-    behaviorEventsRef.current = [];
-    flushedBehaviorEventCountRef.current = 0;
-    progressRequestChainRef.current = Promise.resolve();
-    multipartUploadsRef.current = { camera: null, screen: null };
-    resetBrowserTranscript();
-  }, [resetBrowserTranscript]);
+    clearProgressTimers(timerRef, progressHeartbeatRef, progressFlushTimeoutRef)
+    answerStartedAtRef.current = null
+    answerStartedAtMsRef.current = null
+    answerStoppedAtMsRef.current = null
+    answerDurationSecondsRef.current = 0
+    stoppedRecordersRef.current = 0
+    expectedRecorderStopsRef.current = 0
+    behaviorSignalsRef.current = createEmptyBehaviorSignals()
+    behaviorEventsRef.current = []
+    flushedBehaviorEventCountRef.current = 0
+    progressRequestChainRef.current = Promise.resolve()
+    multipartUploadsRef.current = { camera: null, screen: null }
+    resetBrowserTranscript()
+  }, [resetBrowserTranscript])
 
   useEffect(() => {
     if (!PREVIEW_STAGES.has(stage)) {
-      return;
+      return
     }
 
-    syncVideoPreview(videoRef.current, cameraStreamRef.current);
-    syncVideoPreview(screenVideoRef.current, screenStreamRef.current);
-  }, [stage, recording]);
+    syncVideoPreview(videoRef.current, cameraStreamRef.current)
+    syncVideoPreview(screenVideoRef.current, screenStreamRef.current)
+  }, [stage, recording])
 
   const syncAnswerMetaFromProgress = useCallback(
     (meta: {
-      versionCount: number;
-      selectedVersionNumber: number;
-      status?: 'recording' | 'submitted';
+      versionCount: number
+      selectedVersionNumber: number
+      status?: 'recording' | 'submitted'
     }) => {
       setInterview((previous) => {
         if (!previous) {
-          return previous;
+          return previous
         }
 
         return {
@@ -270,13 +264,13 @@ export function useTakeOrchestrator({
             versionCount: meta.versionCount,
             selectedVersionNumber: meta.selectedVersionNumber,
           },
-        };
-      });
-      setCurrentVersionNumber(meta.selectedVersionNumber);
-      currentVersionNumberRef.current = meta.selectedVersionNumber;
+        }
+      })
+      setCurrentVersionNumber(meta.selectedVersionNumber)
+      currentVersionNumberRef.current = meta.selectedVersionNumber
     },
     [],
-  );
+  )
 
   const {
     startMultipartUploadSession,
@@ -307,7 +301,7 @@ export function useTakeOrchestrator({
     progressDebounceMs: PROGRESS_DEBOUNCE_MS,
     progressEventDebounceMs: PROGRESS_EVENT_DEBOUNCE_MS,
     getBrowserTranscriptSnapshot,
-  });
+  })
 
   const { loadInterview } = useTakeInterviewLoader({
     id,
@@ -315,44 +309,44 @@ export function useTakeOrchestrator({
     skipInitialLoad: Boolean(initialInterview),
     contentLocale,
     onData: (data, mode) => {
-      setError('');
+      setError('')
       if (mode === 'locale') {
         if (isLocaleQuestionMutationBlocked()) {
-          return;
+          return
         }
         setInterview((previous) =>
           previous ? { ...previous, currentQuestion: data.currentQuestion } : data,
-        );
-        return;
+        )
+        return
       }
 
-      setInterview(data);
+      setInterview(data)
       if (data.completed) {
-        releaseAllCaptures();
+        releaseAllCaptures()
       }
-      setStage(stageAfterInterviewLoad(data, mode));
+      setStage(stageAfterInterviewLoad(data, mode))
     },
     onError: setError,
     onCleanup: () => {
-      clearProgressTimers(timerRef, progressHeartbeatRef, progressFlushTimeoutRef);
-      void abortMultipartUploads();
-      releaseAllCaptures();
+      clearProgressTimers(timerRef, progressHeartbeatRef, progressFlushTimeoutRef)
+      void abortMultipartUploads()
+      releaseAllCaptures()
     },
     takeMessage,
-  });
+  })
 
-  const prevContentLocaleRef = useRef<Locale | null>(null);
+  const prevContentLocaleRef = useRef<Locale | null>(null)
   useEffect(() => {
-    const previousLocale = prevContentLocaleRef.current;
-    prevContentLocaleRef.current = contentLocale;
+    const previousLocale = prevContentLocaleRef.current
+    prevContentLocaleRef.current = contentLocale
 
     if (previousLocale !== null && previousLocale !== contentLocale) {
       if (isLocaleQuestionMutationBlocked()) {
-        return;
+        return
       }
-      void loadInterview('locale', undefined, contentLocale);
+      void loadInterview('locale', undefined, contentLocale)
     }
-  }, [contentLocale, loadInterview]);
+  }, [contentLocale, loadInterview])
 
   const {
     restartFullInterviewCapture,
@@ -371,61 +365,61 @@ export function useTakeOrchestrator({
     releaseLobbyCameraOnly: () => releaseCameraCapture(cameraStreamRef, videoRef),
     attachCameraPreview,
     stopMediaStream,
-    getPermissionErrorMessage: (error, requiresEntireScreen) =>
-      getPermissionErrorMessage(error, requiresEntireScreen, takeMessage),
+    getPermissionErrorMessage: (err, requiresEntireScreen) =>
+      getPermissionErrorMessage(err, requiresEntireScreen, takeMessage),
     screenStreamRef,
     cameraStreamRef,
     screenVideoRef,
     takeMessage,
-  });
+  })
 
   async function bootstrapLobbyMedia(openedVia: 'mic' | 'camera') {
-    await prepareLobbyDevices();
-    const stream = cameraStreamRef.current;
+    await prepareLobbyDevices()
+    const stream = cameraStreamRef.current
     if (!stream) {
-      return;
+      return
     }
 
-    const micOn = openedVia === 'mic';
-    const camOn = openedVia === 'camera';
-    setStreamTracksEnabled(stream, 'audio', micOn);
-    setStreamTracksEnabled(stream, 'video', camOn);
-    setLobbyMicOn(micOn);
-    setLobbyCameraOn(camOn);
+    const micOn = openedVia === 'mic'
+    const camOn = openedVia === 'camera'
+    setStreamTracksEnabled(stream, 'audio', micOn)
+    setStreamTracksEnabled(stream, 'video', camOn)
+    setLobbyMicOn(micOn)
+    setLobbyCameraOn(camOn)
   }
 
   async function toggleLobbyMic() {
     if (setupBusy) {
-      return;
+      return
     }
 
-    const stream = cameraStreamRef.current;
-    const hasLiveStream = stream?.getTracks().some((track) => track.readyState === 'live');
+    const stream = cameraStreamRef.current
+    const hasLiveStream = stream?.getTracks().some((track) => track.readyState === 'live')
     if (!stream || !hasLiveStream) {
-      await bootstrapLobbyMedia('mic');
-      return;
+      await bootstrapLobbyMedia('mic')
+      return
     }
 
-    const nextMicOn = !lobbyMicOn;
-    setStreamTracksEnabled(stream, 'audio', nextMicOn);
-    setLobbyMicOn(nextMicOn);
+    const nextMicOn = !lobbyMicOn
+    setStreamTracksEnabled(stream, 'audio', nextMicOn)
+    setLobbyMicOn(nextMicOn)
   }
 
   async function toggleLobbyCamera() {
     if (setupBusy) {
-      return;
+      return
     }
 
-    const stream = cameraStreamRef.current;
-    const hasLiveStream = stream?.getTracks().some((track) => track.readyState === 'live');
+    const stream = cameraStreamRef.current
+    const hasLiveStream = stream?.getTracks().some((track) => track.readyState === 'live')
     if (!stream || !hasLiveStream) {
-      await bootstrapLobbyMedia('camera');
-      return;
+      await bootstrapLobbyMedia('camera')
+      return
     }
 
-    const nextCameraOn = !lobbyCameraOn;
-    setStreamTracksEnabled(stream, 'video', nextCameraOn);
-    setLobbyCameraOn(nextCameraOn);
+    const nextCameraOn = !lobbyCameraOn
+    setStreamTracksEnabled(stream, 'video', nextCameraOn)
+    setLobbyCameraOn(nextCameraOn)
   }
 
   const lobbyJoinReady =
@@ -435,7 +429,7 @@ export function useTakeOrchestrator({
     lobbyCameraOn &&
     screenStatus === 'granted' &&
     screenSurface === 'monitor' &&
-    !setupError;
+    !setupError
 
   const { persistCurrentVersion } = useTakeVersionPersistence({
     id,
@@ -460,105 +454,104 @@ export function useTakeOrchestrator({
     behaviorSignalsRef,
     behaviorEventsRef,
     autoStartedQuestionKeyRef,
-    finalizeTranscriptForSubmit: () =>
-      stopBrowserTranscript({ finalize: true, timeoutMs: 700 }),
+    finalizeTranscriptForSubmit: () => stopBrowserTranscript({ finalize: true, timeoutMs: 700 }),
     loadInterview,
     clearRecordingArtifacts,
     invokeBeginRecording: (nextVersionNumber, currentQuestionIndex) =>
       beginRecordingRef.current(nextVersionNumber, currentQuestionIndex),
     onAnswerMetaUpdated: syncAnswerMetaFromProgress,
     takeMessage,
-  });
+  })
 
   const onRecordersStopped = useCallback(() => {
-    const shouldDiscard = discardRecordingRef.current;
-    discardRecordingRef.current = false;
+    const shouldDiscard = discardRecordingRef.current
+    discardRecordingRef.current = false
     if (shouldDiscard) {
-      clearRecordingArtifacts();
-      return;
+      clearRecordingArtifacts()
+      return
     }
 
-    const pendingAction = pendingVersionActionRef.current;
+    const pendingAction = pendingVersionActionRef.current
     if (!pendingAction) {
-      clearRecordingArtifacts();
-      setSetupError(takeMessage('recordingStoppedWithoutAction'));
-      setStage('interview');
-      return;
+      clearRecordingArtifacts()
+      setSetupError(takeMessage('recordingStoppedWithoutAction'))
+      setStage('interview')
+      return
     }
 
-    void persistCurrentVersion(pendingAction);
-  }, [clearRecordingArtifacts, persistCurrentVersion, takeMessage]);
+    void persistCurrentVersion(pendingAction)
+  }, [clearRecordingArtifacts, persistCurrentVersion, takeMessage])
 
   const stopActiveRecorders = useCallback(() => {
-    clearProgressTimers(timerRef, progressHeartbeatRef, progressFlushTimeoutRef);
-    stoppedRecordersRef.current = 0;
+    clearProgressTimers(timerRef, progressHeartbeatRef, progressFlushTimeoutRef)
+    stoppedRecordersRef.current = 0
     expectedRecorderStopsRef.current = stopActiveTakeMediaRecorders(
       cameraRecorderRef,
       screenRecorderRef,
-    );
+    )
     if (expectedRecorderStopsRef.current === 0) {
-      onRecordersStopped();
+      onRecordersStopped()
     }
-    setRecording(false);
-  }, [onRecordersStopped]);
+    setRecording(false)
+  }, [onRecordersStopped])
 
   function resetInterviewSetup(message: string) {
-    discardRecordingRef.current = true;
-    pendingVersionActionRef.current = null;
-    stopActiveRecorders();
-    void abortMultipartUploads();
-    clearRecordingArtifacts();
-    setCameraStatus('idle');
-    setScreenStatus('denied');
-    setScreenSurface('');
-    setSetupBusy(false);
-    setSetupError(message);
-    setVersionPersistKind(null);
-    autoStartedQuestionKeyRef.current = '';
-    releaseAllCaptures();
-    resetLobbyControls();
-    setStage('consent');
+    discardRecordingRef.current = true
+    pendingVersionActionRef.current = null
+    stopActiveRecorders()
+    void abortMultipartUploads()
+    clearRecordingArtifacts()
+    setCameraStatus('idle')
+    setScreenStatus('denied')
+    setScreenSurface('')
+    setSetupBusy(false)
+    setSetupError(message)
+    setVersionPersistKind(null)
+    autoStartedQuestionKeyRef.current = ''
+    releaseAllCaptures()
+    resetLobbyControls()
+    setStage('consent')
   }
 
   useLayoutEffect(() => {
-    const stream = screenStreamRef.current;
-    const screenTrack = stream?.getVideoTracks()[0];
+    const stream = screenStreamRef.current
+    const screenTrack = stream?.getVideoTracks()[0]
     if (!screenTrack || screenTrack.readyState !== 'live') {
-      return undefined;
+      return undefined
     }
 
     const onEnded = () => {
       if (stage === 'lobby') {
-        releaseScreenCapture(screenStreamRef, screenVideoRef);
-        setScreenStatus('denied');
-        setScreenSurface('');
-        setSetupError(takeMessage('screenShareStopped'));
-        return;
+        releaseScreenCapture(screenStreamRef, screenVideoRef)
+        setScreenStatus('denied')
+        setScreenSurface('')
+        setSetupError(takeMessage('screenShareStopped'))
+        return
       }
 
-      discardRecordingRef.current = true;
-      pendingVersionActionRef.current = null;
-      stopActiveRecorders();
-      void abortMultipartUploads();
-      clearRecordingArtifacts();
-      setScreenStatus('denied');
-      setScreenSurface('');
-      setSetupBusy(false);
-      setSetupError(takeMessage('screenShareStopped'));
-      setVersionPersistKind(null);
-      autoStartedQuestionKeyRef.current = '';
-      releaseScreenCapture(screenStreamRef, screenVideoRef);
-      setStage('interview');
-    };
+      discardRecordingRef.current = true
+      pendingVersionActionRef.current = null
+      stopActiveRecorders()
+      void abortMultipartUploads()
+      clearRecordingArtifacts()
+      setScreenStatus('denied')
+      setScreenSurface('')
+      setSetupBusy(false)
+      setSetupError(takeMessage('screenShareStopped'))
+      setVersionPersistKind(null)
+      autoStartedQuestionKeyRef.current = ''
+      releaseScreenCapture(screenStreamRef, screenVideoRef)
+      setStage('interview')
+    }
 
-    screenTrack.onended = onEnded;
+    screenTrack.onended = onEnded
 
     return () => {
       if (screenTrack.onended === onEnded) {
-        screenTrack.onended = null;
+        screenTrack.onended = null
       }
-    };
-  }, [stage, abortMultipartUploads, clearRecordingArtifacts, stopActiveRecorders, takeMessage]);
+    }
+  }, [stage, abortMultipartUploads, clearRecordingArtifacts, stopActiveRecorders, takeMessage])
 
   useTakeBehaviorTracking({
     recording,
@@ -566,7 +559,7 @@ export function useTakeOrchestrator({
     behaviorSignalsRef,
     behaviorEventsRef,
     scheduleProgressFlush: () => scheduleProgressFlush('event'),
-  });
+  })
 
   const { requestVersionAction: baseRequestVersionAction } = useTakeRecordingControls({
     uploading,
@@ -579,35 +572,35 @@ export function useTakeOrchestrator({
     setStage,
     scheduleProgressFlush,
     stopActiveRecorders,
-  });
+  })
 
   function requestSubmitAction() {
-    setSubmitError('');
-    const activeCameraUpload = multipartUploadsRef.current.camera;
-    const activeScreenUpload = multipartUploadsRef.current.screen;
-    const currentQuestionIndex = interview?.currentQuestionIndex;
+    setSubmitError('')
+    const activeCameraUpload = multipartUploadsRef.current.camera
+    const activeScreenUpload = multipartUploadsRef.current.screen
+    const currentQuestionIndex = interview?.currentQuestionIndex
 
     const isUploadSessionSynced =
       currentQuestionIndex !== undefined &&
       activeCameraUpload?.questionIndex === currentQuestionIndex &&
-      activeScreenUpload?.questionIndex === currentQuestionIndex;
+      activeScreenUpload?.questionIndex === currentQuestionIndex
 
     if (!isUploadSessionSynced) {
-      setSubmitError(takeMessage('syncingInProgress'));
-      return;
+      setSubmitError(takeMessage('syncingInProgress'))
+      return
     }
 
-    baseRequestVersionAction('submit');
+    baseRequestVersionAction('submit')
   }
 
   function requestVersionAction(action: PendingVersionAction) {
     if (action === 'submit') {
-      requestSubmitAction();
-      return;
+      requestSubmitAction()
+      return
     }
 
-    setSubmitError('');
-    baseRequestVersionAction(action);
+    setSubmitError('')
+    baseRequestVersionAction(action)
   }
 
   const { beginRecording } = useTakeBeginRecording({
@@ -644,11 +637,11 @@ export function useTakeOrchestrator({
     onRecordersStopped,
     primeBrowserTranscriptForRecordingSession: primeRecordingSession,
     takeMessage,
-  });
+  })
 
   useEffect(() => {
-    requestVersionActionRef.current = requestVersionAction;
-  });
+    requestVersionActionRef.current = requestVersionAction
+  })
 
   useEffect(() => {
     beginRecordingRef.current = async (nextVersionNumber, currentQuestionIndex) => {
@@ -656,68 +649,65 @@ export function useTakeOrchestrator({
         nextVersionNumber,
         hasCurrentQuestion: true,
         currentQuestionIndex,
-      });
-    };
-  }, [beginRecording]);
+      })
+    }
+  }, [beginRecording])
 
   function proceedToLobby() {
-    autoStartedQuestionKeyRef.current = '';
-    setSetupError('');
-    resetLobbyControls();
-    setStage('lobby');
+    autoStartedQuestionKeyRef.current = ''
+    setSetupError('')
+    resetLobbyControls()
+    setStage('lobby')
   }
 
   const capturePipelineReady = Boolean(
     interview &&
-      candidateSessionReady &&
-      !setupError &&
-      cameraStatus === 'granted' &&
-      screenStatus === 'granted' &&
-      screenSurface === 'monitor',
-  );
+    candidateSessionReady &&
+    !setupError &&
+    cameraStatus === 'granted' &&
+    screenStatus === 'granted' &&
+    screenSurface === 'monitor',
+  )
 
   useEffect(() => {
     if (stage !== 'interview') {
-      return;
+      return
     }
     if (!interview?.currentQuestion) {
-      return;
+      return
     }
     if (recording || uploading || recordingStartBusy) {
-      return;
+      return
     }
     if (!capturePipelineReady || setupError) {
-      return;
+      return
     }
     if (!candidateSessionReady) {
-      return;
+      return
     }
     if (!questionSpeechRecordingAllowedRef.current) {
-      return;
+      return
     }
     if (!canStartNewAttempt(interview.currentAnswerMeta)) {
-      return;
+      return
     }
 
-    const questionKey = `${interview.currentQuestionIndex}:${interview.currentAnswerMeta?.versionCount ?? 0}`;
+    const questionKey = `${interview.currentQuestionIndex}:${interview.currentAnswerMeta?.versionCount ?? 0}`
     if (autoStartedQuestionKeyRef.current === questionKey) {
-      return;
+      return
     }
 
-    autoStartedQuestionKeyRef.current = questionKey;
-    const nextVersionNumber = resolveInitialVersionNumber(interview.currentAnswerMeta);
+    autoStartedQuestionKeyRef.current = questionKey
+    const nextVersionNumber = resolveInitialVersionNumber(interview.currentAnswerMeta)
 
-    setRecordingStartBusy(true);
+    setRecordingStartBusy(true)
     void (async () => {
       try {
-        await beginRecordingRef.current(
-          nextVersionNumber,
-          interview.currentQuestionIndex,
-        );
+        await beginRecordingRef.current(nextVersionNumber, interview.currentQuestionIndex)
       } finally {
-        setRecordingStartBusy(false);
+        setRecordingStartBusy(false)
       }
-    })();
+    })()
   }, [
     stage,
     setupError,
@@ -732,21 +722,21 @@ export function useTakeOrchestrator({
     interviewerPresence,
     questionSpeechRecordingAllowedRef,
     takeMessage,
-  ]);
+  ])
 
   const localeSwitchDisabled =
     uploading ||
     recording ||
     recordingStartBusy ||
     stage === 'transition' ||
-    interviewerPresence === 'speaking';
+    interviewerPresence === 'speaking'
 
-  const retakeDisabled = !canRequestRetake(currentVersionNumber);
+  const retakeDisabled = !canRequestRetake(currentVersionNumber)
   const displayedAttemptNumber = getDisplayedAttemptNumber(
     interview?.currentAnswerMeta,
     currentVersionNumber,
     recording,
-  );
+  )
 
   return {
     stage,
@@ -797,5 +787,5 @@ export function useTakeOrchestrator({
     loadInterview,
     displayedAttemptNumber,
     retakeDisabled,
-  };
+  }
 }

@@ -13,18 +13,14 @@ function firstForwardedValue(value: string | null): string | null {
   return first || null
 }
 
-
 function resolveRequestOrigin(headerStore: Headers): string {
-  const forwardedProto = firstForwardedValue(
-    headerStore.get('x-forwarded-proto'),
-  )
+  const forwardedProto = firstForwardedValue(headerStore.get('x-forwarded-proto'))
   const forwardedHost = firstForwardedValue(headerStore.get('x-forwarded-host'))
   const host = forwardedHost ?? headerStore.get('host')
   if (!host) {
     throw new Error('Unable to resolve request host for server-side API fetch.')
   }
-  const protocol =
-    forwardedProto ?? (host.includes('localhost') ? 'http' : 'https')
+  const protocol = forwardedProto ?? (host.includes('localhost') ? 'http' : 'https')
   return `${protocol}://${host}`
 }
 
@@ -124,18 +120,18 @@ export async function requestServer<T>(
 ): Promise<T | undefined> {
   const locale = resolveApiLocale(options?.locale ?? ctx.locale)
   const withLocaleHeader = options?.withLocaleHeader ?? true
-  const headers: HeadersInit = {
+  const reqHeaders: HeadersInit = {
     'Content-Type': 'application/json',
     cookie: ctx.cookieHeader,
   }
 
   if (withLocaleHeader) {
-    headers['X-Locale'] = locale
+    reqHeaders['X-Locale'] = locale
   }
 
   const res = await fetch(buildServerApiUrl(path, ctx.origin, options?.query), {
     method: options?.method ?? 'GET',
-    headers,
+    headers: reqHeaders,
     cache: 'no-store',
     signal: AbortSignal.timeout(SERVER_REQUEST_TIMEOUT_MS),
   })
@@ -143,11 +139,7 @@ export async function requestServer<T>(
   return parseServerResponse<T>(res, path)
 }
 
-function buildServerApiUrl(
-  path: string,
-  origin: string,
-  query?: Record<string, unknown>,
-): string {
+function buildServerApiUrl(path: string, origin: string, query?: Record<string, unknown>): string {
   const base = `${origin}/api${path}`
   if (!query) return base
 
