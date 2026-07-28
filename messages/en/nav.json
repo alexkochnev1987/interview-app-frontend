@@ -8,6 +8,8 @@
     "profile": "Profile",
     "logout": "Logout",
     "signIn": "Sign In",
-    "templates": "Templates"
+    "templates": "Templates",
+    "expandSidebar": "Expand sidebar",
+    "collapseSidebar": "Collapse sidebar"
   }
 }
