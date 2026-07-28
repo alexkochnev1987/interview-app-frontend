@@ -150,7 +150,6 @@ export function TakeRecordingSidebarColumn({
               recording={recording}
               recordingStartBusy={recordingStartBusy}
               interviewerPresence={interviewerPresence}
-              attemptsExhausted={attemptsExhausted}
               exhaustedHint={exhaustedHint}
             />
 

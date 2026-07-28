@@ -483,8 +483,7 @@ export function useTakeVersionPersistence({
     setCurrentVersionNumber(latestSubmittableVersionNumber);
     currentVersionNumberRef.current = latestSubmittableVersionNumber;
 
-    const maxAttempts =
-      meta.maxAttempts ?? interview.maxAttempts ?? MAX_ANSWER_ATTEMPTS_PER_QUESTION;
+    const maxAttempts = interview.maxAttempts ?? MAX_ANSWER_ATTEMPTS_PER_QUESTION;
 
     try {
       const showSubmitSuccessToast = isLastInterviewQuestion(

@@ -30,7 +30,6 @@ interface TakeRecordingActionsProps {
 }
 
 const EXHAUSTED_HINT_KEY = {
-  submit: 'reviewSubmitBanner',
   'no-media': 'attemptsExhaustedNoMedia',
 } as const;
 
@@ -113,11 +112,6 @@ export function TakeRecordingActions({
       {versionActionsEnabled && retakeDisabled ? (
         <BodyText size="xs" tone="muted">
           {tTake('retakeDisabledAtLimitHint')}
-        </BodyText>
-      ) : null}
-      {exhaustedHint === 'submit' ? (
-        <BodyText size="sm" tone="foreground" weight="medium">
-          {tTake(EXHAUSTED_HINT_KEY.submit)}
         </BodyText>
       ) : null}
       {exhaustedHint === 'no-media' ? (

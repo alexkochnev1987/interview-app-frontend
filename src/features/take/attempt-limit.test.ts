@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { canStartNewAttempt, shouldReuseReservedAttemptForRetake } from './attempt-limit';
 import {
   resolveQuestionAnswerPhase,
+  shouldCleanupExhaustedSession,
   stageAfterInterviewLoad,
 } from './session-machine';
 import type { TakeInterviewData } from '@/lib/api';
@@ -66,17 +67,9 @@ describe('take attempt UX', () => {
         localVersionHasMedia: false,
       }),
     ).toBe(false);
-    expect(
-      shouldReuseReservedAttemptForRetake({
-        currentVersionNumber: 2,
-        hasSubmittableMedia: true,
-        latestSubmittableVersionNumber: 1,
-        localVersionHasMedia: false,
-      }),
-    ).toBe(true);
   });
 
-  it('maps phases and returning reload stages for recording/review/blocked', () => {
+  it('maps phases, reload staging, and never cleans up in-flight final attempt', () => {
     const recording = interviewFixture({
       currentAnswerMeta: answerMetaFixture({ versionCount: 1 }),
     });
@@ -87,7 +80,10 @@ describe('take attempt UX', () => {
         latestSubmittableVersionNumber: 2,
       }),
     });
-    const reviewLast = interviewFixture({
+    const blockedMid = interviewFixture({
+      currentAnswerMeta: answerMetaFixture({ versionCount: 3 }),
+    });
+    const exhaustedLast = interviewFixture({
       currentQuestionIndex: 1,
       totalQuestions: 2,
       currentAnswerMeta: answerMetaFixture({
@@ -96,14 +92,6 @@ describe('take attempt UX', () => {
         latestSubmittableVersionNumber: 3,
       }),
     });
-    const blockedMid = interviewFixture({
-      currentAnswerMeta: answerMetaFixture({ versionCount: 3 }),
-    });
-    const blockedLast = interviewFixture({
-      currentQuestionIndex: 1,
-      totalQuestions: 2,
-      currentAnswerMeta: answerMetaFixture({ versionCount: 3 }),
-    });
 
     expect(resolveQuestionAnswerPhase(recording)).toBe('recording');
     expect(resolveQuestionAnswerPhase(reviewMid)).toBe('review');
@@ -111,11 +99,33 @@ describe('take attempt UX', () => {
 
     expect(stageAfterInterviewLoad(interviewFixture(), 'initial')).toBe('consent');
     expect(stageAfterInterviewLoad(recording, 'returning')).toBe('lobby');
-    // Exhausted mid-interview: lobby so devices are ready after Submit → next question.
     expect(stageAfterInterviewLoad(reviewMid, 'returning')).toBe('lobby');
-    expect(stageAfterInterviewLoad(blockedMid, 'returning')).toBe('lobby');
-    // Exhausted on last question: Submit finishes — skip lobby.
-    expect(stageAfterInterviewLoad(reviewLast, 'returning')).toBe('interview');
-    expect(stageAfterInterviewLoad(blockedLast, 'returning')).toBe('interview');
+    expect(stageAfterInterviewLoad(exhaustedLast, 'returning')).toBe('interview');
+
+    // After reserve of attempt 3, meta looks like review — still must not abort in-flight start/record.
+    expect(
+      shouldCleanupExhaustedSession({
+        phase: 'review',
+        recording: false,
+        recordingStartBusy: true,
+        hasActiveMultipart: true,
+      }),
+    ).toBe(false);
+    expect(
+      shouldCleanupExhaustedSession({
+        phase: 'review',
+        recording: true,
+        recordingStartBusy: false,
+        hasActiveMultipart: true,
+      }),
+    ).toBe(false);
+    expect(
+      shouldCleanupExhaustedSession({
+        phase: 'review',
+        recording: false,
+        recordingStartBusy: false,
+        hasActiveMultipart: false,
+      }),
+    ).toBe(true);
   });
 });

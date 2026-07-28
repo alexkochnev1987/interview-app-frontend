@@ -55,6 +55,17 @@ interface UseTakeBeginRecordingParams {
   getAnswerMaxAttempts?: () => number;
   /** Double-guard: exhausted / non-recording phases must not reserve or progress. */
   canStartRecordingAttempt?: () => boolean;
+  /**
+   * After reserve succeeds but start fails, stash slot so immediate autostart can
+   * retry with reuseReservedAttempt (no second reserve).
+   */
+  pendingReuseReservedRef: MutableRefObject<{
+    versionNumber: number;
+    versionCount: number;
+    maxAttempts: number;
+    /** How many start failures already happened for this reserved slot. */
+    failCount: number;
+  } | null>;
   startMultipartUploadSession: (
     questionIndex: number,
     mediaType: CaptureTarget,
@@ -110,6 +121,7 @@ export function useTakeBeginRecording({
   onAnswerMetaUpdated,
   getAnswerMaxAttempts,
   canStartRecordingAttempt,
+  pendingReuseReservedRef,
   startMultipartUploadSession,
   flushAnswerProgress,
   startProgressHeartbeat,
@@ -163,6 +175,12 @@ export function useTakeBeginRecording({
     answerStoppedAtMsRef.current = null;
     stoppedRecordersRef.current = 0;
 
+    let reservedSlot: {
+      versionNumber: number;
+      versionCount: number;
+      maxAttempts: number;
+    } | null = null;
+
     try {
       const recordingSessionId = resolveRecordingSessionId(recordingSessionIdRef.current);
       recordingSessionIdRef.current = recordingSessionId;
@@ -184,6 +202,12 @@ export function useTakeBeginRecording({
         resolvedMaxAttempts = reserved.maxAttempts;
         resolvedStatus = reserved.status;
       }
+
+      reservedSlot = {
+        versionNumber,
+        versionCount: resolvedVersionCount,
+        maxAttempts: resolvedMaxAttempts,
+      };
 
       currentVersionNumberRef.current = versionNumber;
       setCurrentVersionNumber(versionNumber);
@@ -212,17 +236,29 @@ export function useTakeBeginRecording({
 
       await flushAnswerProgress(true);
       startProgressHeartbeat();
+      pendingReuseReservedRef.current = null;
     } catch (err) {
       await abortMultipartUploads();
       clearRecordingArtifacts();
+      const priorFails = pendingReuseReservedRef.current?.failCount ?? 0;
+      const nextFailCount = priorFails + 1;
+      // Keep reserved slot for immediate autostart retry — do not burn another attempt.
+      pendingReuseReservedRef.current = reservedSlot
+        ? { ...reservedSlot, failCount: nextFailCount }
+        : null;
       if (isAnswerAttemptLimitError(err)) {
+        pendingReuseReservedRef.current = null;
         setSetupError(
           takeMessage('answerAttemptLimitReached', {
             max: getAnswerMaxAttempts?.() ?? MAX_ANSWER_ATTEMPTS_PER_QUESTION,
           }),
         );
       } else if (isRecordingSessionMismatchError(err)) {
+        pendingReuseReservedRef.current = null;
         setSetupError(takeMessage('recordingSessionMismatch'));
+      } else if (reservedSlot && nextFailCount <= 1) {
+        // One immediate reuse autostart while devices are still live.
+        setSetupError('');
       } else {
         setSetupError(
           err instanceof Error ? err.message : takeMessage('uploadFailedFallback'),

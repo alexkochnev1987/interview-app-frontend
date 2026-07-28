@@ -80,12 +80,28 @@ export function answerAttemptMetaFromInterview(
   return {
     versionCount: meta?.versionCount,
     selectedVersionNumber: meta?.selectedVersionNumber,
-    maxAttempts: meta?.maxAttempts ?? interview.maxAttempts,
+    maxAttempts: interview.maxAttempts,
   };
 }
 
 export function isAttemptsExhausted(meta?: AnswerAttemptMeta): boolean {
   return !canStartNewAttempt(meta);
+}
+
+/** True when review/blocked idle — never while a reserve/recording is in flight. */
+export function shouldCleanupExhaustedSession(params: {
+  phase: QuestionAnswerPhase;
+  recording: boolean;
+  recordingStartBusy: boolean;
+  hasActiveMultipart: boolean;
+}): boolean {
+  if (params.phase === 'recording') {
+    return false;
+  }
+  if (params.recording || params.recordingStartBusy || params.hasActiveMultipart) {
+    return false;
+  }
+  return true;
 }
 
 export function canRequestVersionAction(params: {

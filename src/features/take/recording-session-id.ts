@@ -30,13 +30,6 @@ export function getOrCreateRecordingSessionId(): string {
   return next;
 }
 
-export function readRecordingSessionId(): string | null {
-  if (typeof window === 'undefined') {
-    return null;
-  }
-  return window.sessionStorage.getItem(RECORDING_SESSION_STORAGE_KEY)?.trim() || null;
-}
-
 /**
  * Prefer a server-locked / in-memory session id when present so reload/reconnect
  * does not mint a conflicting id for the same answer lock.

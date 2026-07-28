@@ -134,12 +134,8 @@ export const TAKE_MESSAGES = {
     'Each time recording starts it uses one attempt. Reloading the page during a recording also uses that attempt.',
   reloadUsesCurrentAttemptHint:
     'Reloading the page uses up the current recording attempt. You cannot continue or re-record that same attempt after reload.',
-  attemptsExhaustedGuidance:
-    'All recording attempts for this question are used. You cannot start another recording.',
   attemptsExhaustedNoMedia:
     'There is no usable recording left to submit for this question.',
-  attemptsExhaustedSubmitHint:
-    'A saved recording is ready. Press Submit to keep it and continue.',
   reviewSubmitBanner:
     'Recording will not restart. Press Submit to save this answer and continue to the next question, or finish the interview if this is the last question.',
 } as const;

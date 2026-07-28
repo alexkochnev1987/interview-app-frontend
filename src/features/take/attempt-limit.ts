@@ -9,7 +9,7 @@ export const ANSWER_VERSION_OVERWRITE_FORBIDDEN_CODE = 'ANSWER_VERSION_OVERWRITE
 export interface AnswerAttemptMeta {
   versionCount?: number;
   selectedVersionNumber?: number;
-  /** Optional until BE exposes it; falls back to MAX_ANSWER_ATTEMPTS_PER_QUESTION. */
+  /** Interview-level max (or reserve response); falls back to MAX_ANSWER_ATTEMPTS_PER_QUESTION. */
   maxAttempts?: number;
 }
 

@@ -8,6 +8,7 @@ import {
   progressValueForStage,
   resolveInterviewLoadMode,
   resolveQuestionAnswerPhase,
+  shouldCleanupExhaustedSession,
   stageAfterInterviewLoad,
   type ExhaustedHint,
   type VersionPersistKind,
@@ -209,6 +210,12 @@ export function useTakeOrchestrator({
   >(async () => undefined);
   const requestVersionActionRef = useRef<(action: PendingVersionAction) => void>(() => undefined);
   const autoStartedQuestionKeyRef = useRef('');
+  const pendingReuseReservedRef = useRef<{
+    versionNumber: number;
+    versionCount: number;
+    maxAttempts: number;
+    failCount: number;
+  } | null>(null);
   const recordingRef = useRef(recording);
   const uploadingRef = useRef(uploading);
   const recordingStartBusyRef = useRef(recordingStartBusy);
@@ -737,6 +744,7 @@ export function useTakeOrchestrator({
         canStartNewAttempt(answerAttemptMetaFromInterview(current))
       );
     },
+    pendingReuseReservedRef,
     startMultipartUploadSession,
     flushAnswerProgress,
     startProgressHeartbeat,
@@ -790,13 +798,26 @@ export function useTakeOrchestrator({
   ]);
 
   useEffect(() => {
+    pendingReuseReservedRef.current = null;
+  }, [interview?.currentQuestionIndex]);
+
+  useEffect(() => {
     if (!interview) {
       return;
     }
-    if (resolveQuestionAnswerPhase(interview) === 'recording') {
+    if (
+      !shouldCleanupExhaustedSession({
+        phase: resolveQuestionAnswerPhase(interview),
+        recording: recordingRef.current,
+        recordingStartBusy: recordingStartBusyRef.current,
+        hasActiveMultipart: Boolean(
+          multipartUploadsRef.current.camera || multipartUploadsRef.current.screen,
+        ),
+      })
+    ) {
       return;
     }
-    // Exhausted review/blocked: stop any leftover progress/multipart from prior attempt.
+    // Idle review/blocked only — never abort an in-flight final attempt after reserve.
     clearProgressTimers(timerRef, progressHeartbeatRef, progressFlushTimeoutRef);
     void abortMultipartUploads();
     setRecording(false);
@@ -806,11 +827,14 @@ export function useTakeOrchestrator({
     interview?.currentAnswerMeta?.versionCount,
     interview?.currentAnswerMeta?.hasSubmittableMedia,
     interview?.maxAttempts,
+    recording,
+    recordingStartBusy,
     abortMultipartUploads,
   ]);
 
   function proceedToLobby() {
     autoStartedQuestionKeyRef.current = '';
+    pendingReuseReservedRef.current = null;
     setSetupError('');
     resetLobbyControls();
     setStage('lobby');
@@ -845,11 +869,15 @@ export function useTakeOrchestrator({
     if (!questionSpeechRecordingAllowedRef.current) {
       return;
     }
-    if (resolveQuestionAnswerPhase(interview) !== 'recording') {
-      return;
-    }
-    if (!canStartNewAttempt(answerAttemptMetaFromInterview(interview))) {
-      return;
+
+    const reusePending = pendingReuseReservedRef.current;
+    if (!reusePending) {
+      if (resolveQuestionAnswerPhase(interview) !== 'recording') {
+        return;
+      }
+      if (!canStartNewAttempt(answerAttemptMetaFromInterview(interview))) {
+        return;
+      }
     }
 
     // One autostart per question — do not re-fire when versionCount changes after reserve.
@@ -859,9 +887,16 @@ export function useTakeOrchestrator({
     }
 
     autoStartedQuestionKeyRef.current = questionKey;
-    const nextVersionNumber = resolveInitialVersionNumber(
-      answerAttemptMetaFromInterview(interview),
-    );
+    const nextVersionNumber =
+      reusePending?.versionNumber ??
+      resolveInitialVersionNumber(answerAttemptMetaFromInterview(interview));
+    const beginOptions = reusePending
+      ? {
+          reuseReservedAttempt: true as const,
+          versionCount: reusePending.versionCount,
+          maxAttempts: reusePending.maxAttempts,
+        }
+      : undefined;
 
     setRecordingStartBusy(true);
     void (async () => {
@@ -869,6 +904,7 @@ export function useTakeOrchestrator({
         await beginRecordingRef.current(
           nextVersionNumber,
           interview.currentQuestionIndex,
+          beginOptions,
         );
       } finally {
         setRecordingStartBusy(false);
@@ -900,15 +936,19 @@ export function useTakeOrchestrator({
 
   const attemptMeta = answerAttemptMetaFromInterview(interview);
   const questionAnswerPhase = resolveQuestionAnswerPhase(interview);
-  const attemptsExhausted = questionAnswerPhase !== 'recording';
-  const submitAllowed = recording || questionAnswerPhase === 'review';
+  // Meta may already be exhausted after reserve of the last slot while still recording.
+  const inFlightAttempt = recording || recordingStartBusy;
+  const attemptsExhausted = !inFlightAttempt && questionAnswerPhase !== 'recording';
+  const submitAllowed =
+    recording || (!inFlightAttempt && questionAnswerPhase === 'review');
   const exhaustedHint: ExhaustedHint | null =
-    recording || questionAnswerPhase === 'recording'
+    inFlightAttempt || questionAnswerPhase === 'recording'
       ? null
       : questionAnswerPhase === 'review'
         ? 'submit'
         : 'no-media';
-  const showDeviceReconnect = questionAnswerPhase === 'recording';
+  const showDeviceReconnect =
+    Boolean(setupError) || questionAnswerPhase === 'recording' || inFlightAttempt;
   const retakeDisabled =
     attemptsExhausted ||
     !canRequestRetake(currentVersionNumber, {

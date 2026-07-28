@@ -11,7 +11,6 @@ interface TakeRecordingGuidanceProps {
   recording: boolean;
   recordingStartBusy: boolean;
   interviewerPresence: InterviewerPresence;
-  attemptsExhausted: boolean;
   exhaustedHint: ExhaustedHint | null;
 }
 
@@ -20,7 +19,6 @@ export function TakeRecordingGuidance({
   recording,
   recordingStartBusy,
   interviewerPresence,
-  attemptsExhausted,
   exhaustedHint,
 }: TakeRecordingGuidanceProps) {
   const tTake = useTranslations('takeFlow');
@@ -30,8 +28,6 @@ export function TakeRecordingGuidance({
     guidance = tTake('reviewSubmitBanner');
   } else if (!recording && exhaustedHint === 'no-media') {
     guidance = tTake('attemptsExhaustedNoMedia');
-  } else if (attemptsExhausted && !recording) {
-    guidance = tTake('attemptsExhaustedGuidance');
   } else if (stage === 'transition') {
     guidance = tTake('guidanceInterview');
   } else if (stage === 'interview' && !recording) {
