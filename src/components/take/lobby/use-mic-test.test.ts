@@ -1,4 +1,4 @@
-import React from 'react'
+import { useRef, useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
 import { useMicTest } from './use-mic-test'
@@ -16,13 +16,13 @@ vi.mock('react', () => {
 describe('useMicTest', () => {
   it('initializes with default state', () => {
     // Return values for our state: [value, setter]
-    vi.mocked(React.useState)
+    vi.mocked(useState)
       .mockReturnValueOnce([false, vi.fn()]) // isRecording
       .mockReturnValueOnce([null, vi.fn()]) // audioUrl
       .mockReturnValueOnce([false, vi.fn()]) // isPlaying
       .mockReturnValueOnce([null, vi.fn()]) // error
 
-    vi.mocked(React.useRef).mockReturnValue({ current: null })
+    vi.mocked(useRef).mockReturnValue({ current: null })
 
     const result = useMicTest(null, true, true)
 
@@ -38,13 +38,13 @@ describe('useMicTest', () => {
   it('sets error when trying to start recording without a stream', () => {
     const setError = vi.fn()
 
-    vi.mocked(React.useState)
+    vi.mocked(useState)
       .mockReturnValueOnce([false, vi.fn()])
       .mockReturnValueOnce([null, vi.fn()])
       .mockReturnValueOnce([false, vi.fn()])
       .mockReturnValueOnce([null, setError]) // error
 
-    vi.mocked(React.useRef).mockReturnValue({ current: null })
+    vi.mocked(useRef).mockReturnValue({ current: null })
 
     const { startRecording } = useMicTest(null, true, true)
 
