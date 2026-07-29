@@ -22,7 +22,7 @@
     "verify:ci": "node scripts/verify-ci.mjs",
     "openapi:backend:generate": "node scripts/generate-backend-openapi.mjs",
     "openapi:sync": "node scripts/sync-openapi.mjs",
-    "openapi:generate": "npx --yes openapi-typescript openapi/openapi.json -o src/lib/api-types.ts",
+    "openapi:generate": "openapi-typescript openapi/openapi.json -o src/lib/api-types.ts",
     "openapi:refresh": "npm run openapi:backend:generate && npm run openapi:sync && npm run openapi:generate",
     "prepare": "husky"
   },
