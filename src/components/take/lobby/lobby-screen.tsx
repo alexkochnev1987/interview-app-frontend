@@ -36,6 +36,7 @@ interface TakeLobbyScreenProps {
   lobbyMicOn: boolean
   lobbyCameraOn: boolean
   lobbyJoinReady: boolean
+  reviewContinueHint?: boolean
   onToggleMic: () => void
   onToggleCamera: () => void
   onScreenShare: () => void
@@ -55,6 +56,7 @@ export function TakeLobbyScreen({
   lobbyMicOn,
   lobbyCameraOn,
   lobbyJoinReady,
+  reviewContinueHint = false,
   onToggleMic,
   onToggleCamera,
   onScreenShare,
@@ -65,6 +67,7 @@ export function TakeLobbyScreen({
   const screenShareReady = screenStatus === 'granted' && screenSurface === 'monitor'
   const showScreenShareHint = !screenShareReady
   const joinLabel = setupBusy ? tTake('lobbyJoinBusy') : tTake('lobbyJoin')
+  const lobbyLead = reviewContinueHint ? tTake('lobbyLeadReviewContinue') : tTake('lobbyLead')
 
   let previewOverlay: ReactNode = null
   if (!permissionGranted) {
@@ -89,7 +92,7 @@ export function TakeLobbyScreen({
         <EyebrowBadge icon={<Video size={14} />}>{tTake('lobbyEyebrow')}</EyebrowBadge>
         <Grid columns="lobby-shell" gap={10} grow="fill">
           <Stack gap={5} width="full" height="full">
-            <Text variant="heroDescription">{tTake('lobbyLead')}</Text>
+            <Text variant="heroDescription">{lobbyLead}</Text>
             <Stack grow="fill" width="full">
               <LobbyPreviewFrame>
                 <LobbyScreenVideo videoRef={videoRef} />

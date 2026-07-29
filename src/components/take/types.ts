@@ -18,6 +18,7 @@ export type InterviewDataView = Pick<
   | 'currentQuestion'
   | 'currentQuestionIndex'
   | 'currentAnswerMeta'
+  | 'maxAttempts'
 >
 
 export type PermissionStatus = 'idle' | 'pending' | 'granted' | 'denied'

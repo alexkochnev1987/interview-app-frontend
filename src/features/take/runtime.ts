@@ -14,16 +14,17 @@ export interface MultipartUploadSession {
   questionIndex: number
   mediaKey: string
   uploadId: string
+  versionNumber: number
   partBlobType?: string
   nextPartNumber: number
   uploadedPartCount: number
   bufferedChunks: Blob[]
   bufferedBytes: number
   recordedBytes: number
+  mediaKeyPersisted: boolean
   uploadChain: Promise<void>
   completed: boolean
   aborted: boolean
-  uploadError?: string | null
 }
 
 export interface MultipartUploadState {
@@ -35,6 +36,7 @@ export interface MultipartSessionSeed {
   questionIndex: number
   mediaKey: string
   uploadId: string
+  versionNumber: number
 }
 
 export function stopMediaStream(stream: MediaStream | null) {
@@ -43,7 +45,6 @@ export function stopMediaStream(stream: MediaStream | null) {
   }
 
   stream.getTracks().forEach((track) => {
-    // eslint-disable-next-line unicorn/prefer-add-event-listener
     track.onended = null
     track.stop()
   })
@@ -146,15 +147,16 @@ export function createMultipartUploadSession(
     questionIndex: session.questionIndex,
     mediaKey: session.mediaKey,
     uploadId: session.uploadId,
+    versionNumber: session.versionNumber,
     nextPartNumber: 1,
     uploadedPartCount: 0,
     bufferedChunks: [],
     bufferedBytes: 0,
     recordedBytes: 0,
+    mediaKeyPersisted: false,
     uploadChain: Promise.resolve(),
     completed: false,
     aborted: false,
-    uploadError: null,
   }
 }
 
@@ -165,10 +167,6 @@ export function getMultipartSession(
   const session = multipartUploads[target]
   if (!session) {
     throw new Error(`${target} upload session is not initialized.`)
-  }
-
-  if (session.uploadError) {
-    throw new Error(session.uploadError)
   }
 
   return session

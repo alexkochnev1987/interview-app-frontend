@@ -187,8 +187,12 @@ export type MultipartUploadPartResponse = Schemas['MultipartUploadPartResponseDt
 
 export type TakeProgressPayload = Schemas['SaveAnswerProgressDto']
 export type TakeProgressResponse = Schemas['SaveTakeAnswerProgressResponseDto']
+export type ReserveAnswerAttemptPayload = Schemas['ReserveAnswerAttemptDto']
+export type ReserveTakeAnswerResponse = Schemas['ReserveTakeAnswerResponseDto']
 
 export type SubmitTakeAnswerPayload = Schemas['SubmitAnswerDto']
+export type FinalizeTakeAnswerPayload = Schemas['FinalizeAnswerAttemptDto']
+export type FinalizeTakeAnswerResponse = Schemas['FinalizeTakeAnswerResponseDto']
 
 export type CaptureTarget = 'camera' | 'screen'
 
@@ -1006,15 +1010,28 @@ export async function syncCandidateSession(id: string, token: string): Promise<v
   await res.text()
 }
 
+export async function reserveTakeAnswerAttempt(
+  id: string,
+  payload: ReserveAnswerAttemptPayload,
+): Promise<ReserveTakeAnswerResponse> {
+  return handle(
+    client.POST('/take/{id}/answer/reserve', {
+      ...LOCALIZED_HEADERS,
+      params: { path: { id } },
+      body: payload,
+    }),
+  )
+}
+
 export async function startMultipartUpload(
   questionIndex: number,
   mediaType: CaptureTarget,
-  options?: {
+  options: {
     contentType?: 'video/webm'
-    versionNumber?: number
+    versionNumber: number
   },
 ): Promise<MultipartUploadSessionResponse> {
-  const contentType = options?.contentType ?? 'video/webm'
+  const contentType = options.contentType ?? 'video/webm'
   return handle(
     client.POST('/upload/multipart/start', {
       ...LOCALIZED_HEADERS,
@@ -1022,8 +1039,8 @@ export async function startMultipartUpload(
         questionIndex,
         contentType,
         mediaType,
-        ...(options?.versionNumber !== undefined ? { versionNumber: options.versionNumber } : {}),
-      } as Schemas['StartMultipartUploadDto'] & { versionNumber?: number },
+        versionNumber: options.versionNumber,
+      },
     }),
   )
 }
@@ -1046,6 +1063,9 @@ export async function presignMultipartPart(
   mediaKey: string,
   uploadId: string,
   partNumber: number,
+  options: {
+    versionNumber: number
+  },
 ): Promise<MultipartUploadPartResponse> {
   return handle(
     client.POST('/upload/multipart/part', {
@@ -1055,6 +1075,7 @@ export async function presignMultipartPart(
         mediaKey,
         uploadId,
         partNumber,
+        versionNumber: options.versionNumber,
       },
     }),
   )
@@ -1075,6 +1096,9 @@ export async function completeMultipartUpload(
   questionIndex: number,
   mediaKey: string,
   uploadId: string,
+  options: {
+    versionNumber: number
+  },
 ): Promise<void> {
   await handle(
     client.POST('/upload/multipart/complete', {
@@ -1083,6 +1107,7 @@ export async function completeMultipartUpload(
         questionIndex,
         mediaKey,
         uploadId,
+        versionNumber: options.versionNumber,
       },
     }),
   )
@@ -1092,6 +1117,9 @@ export async function abortMultipartUpload(
   questionIndex: number,
   mediaKey: string,
   uploadId: string,
+  options: {
+    versionNumber: number
+  },
 ): Promise<void> {
   await handle(
     client.POST('/upload/multipart/abort', {
@@ -1100,6 +1128,7 @@ export async function abortMultipartUpload(
         questionIndex,
         mediaKey,
         uploadId,
+        versionNumber: options.versionNumber,
       },
     }),
   )
@@ -1111,6 +1140,19 @@ export async function submitTakeAnswer(
 ): Promise<void> {
   await handle(
     client.POST('/take/{id}/answer', {
+      ...LOCALIZED_HEADERS,
+      params: { path: { id } },
+      body: payload,
+    }),
+  )
+}
+
+export async function finalizeTakeAnswer(
+  id: string,
+  payload: FinalizeTakeAnswerPayload,
+): Promise<FinalizeTakeAnswerResponse> {
+  return handle(
+    client.POST('/take/{id}/answer/finalize', {
       ...LOCALIZED_HEADERS,
       params: { path: { id } },
       body: payload,

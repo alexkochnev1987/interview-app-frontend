@@ -3,7 +3,7 @@ import type { Dispatch, MutableRefObject, SetStateAction } from 'react'
 
 import type { TakeStage } from '@/components/take/types'
 import type { TakeInterviewData } from '@/lib/api'
-import { submitTakeAnswer } from '@/lib/api'
+import { finalizeTakeAnswer, submitTakeAnswer } from '@/lib/api'
 import { runMutation } from '@/lib/run-mutation'
 import { notifyError } from '@/lib/toast'
 import { useToastMessages } from '@/lib/use-toast-messages'
@@ -14,10 +14,16 @@ import {
   isAnswerAttemptLimitError,
   canRequestRetake,
   resolveNextVersionAfterSave,
+  shouldReuseReservedAttemptForRetake,
 } from './attempt-limit'
-import { isLastInterviewQuestion, type TakeMessageGetter } from './messages'
+import {
+  isLastInterviewQuestion,
+  mapTakeSubmitErrorMessage,
+  type TakeMessageGetter,
+} from './messages'
 import { getMultipartSession, type AnswerBehaviorEvent, type MultipartUploadState } from './runtime'
 import type { PendingVersionAction, VersionPersistKind } from './session-machine'
+import type { AnswerMetaUpdate } from './use-take-begin-recording'
 import type { TakeBehaviorSignals } from './utils'
 
 interface TranscriptFinalizeSnapshot {
@@ -33,10 +39,12 @@ export interface UseTakeVersionPersistenceParams {
   interview: TakeInterviewData | null
   setUploading: (value: boolean) => void
   setSubmitError: (value: string) => void
+  setActionErrorKind: (value: VersionPersistKind | null) => void
   setStage: Dispatch<SetStateAction<TakeStage>>
   setVersionPersistKind: (value: VersionPersistKind | null) => void
   setCurrentVersionNumber: (value: number) => void
   setRetakeCount: (value: number) => void
+  setRecordingStartBusy: (value: boolean) => void
   enqueueProgressFlush: (forceAllEvents: boolean) => Promise<void>
   waitForProgressFlush: () => Promise<void>
   queueBufferedUpload: (target: 'camera' | 'screen', forceAll: boolean) => Promise<void>
@@ -54,12 +62,16 @@ export interface UseTakeVersionPersistenceParams {
   finalizeTranscriptForSubmit: () => Promise<TranscriptFinalizeSnapshot>
   loadInterview: (mode?: 'initial' | 'resume', tokenOverride?: string) => Promise<void>
   clearRecordingArtifacts: () => void
-  invokeBeginRecording: (nextVersionNumber: number, currentQuestionIndex: number) => Promise<void>
-  onAnswerMetaUpdated: (meta: {
-    versionCount: number
-    selectedVersionNumber: number
-    status?: 'recording' | 'submitted'
-  }) => void
+  invokeBeginRecording: (
+    nextVersionNumber: number,
+    currentQuestionIndex: number,
+    options?: {
+      reuseReservedAttempt?: boolean
+      versionCount?: number
+      maxAttempts?: number
+    },
+  ) => Promise<void>
+  onAnswerMetaUpdated: (meta: AnswerMetaUpdate) => void
   takeMessage: TakeMessageGetter
 }
 
@@ -68,10 +80,12 @@ export function useTakeVersionPersistence({
   interview,
   setUploading,
   setSubmitError,
+  setActionErrorKind,
   setStage,
   setVersionPersistKind,
   setCurrentVersionNumber,
   setRetakeCount,
+  setRecordingStartBusy,
   enqueueProgressFlush,
   waitForProgressFlush,
   queueBufferedUpload,
@@ -94,17 +108,18 @@ export function useTakeVersionPersistence({
   takeMessage,
 }: UseTakeVersionPersistenceParams) {
   const toastMessages = useToastMessages()
-  const submitFallbackDetail = takeMessage('submitFallbackDetail')
   const persistInFlightRef = useRef(false)
 
   const notifyAttemptLimitReached = useCallback(
     (message?: string) => {
       notifyError(
-        takeMessage('answerAttemptLimitReached', { max: MAX_ANSWER_ATTEMPTS_PER_QUESTION }),
+        takeMessage('answerAttemptLimitReached', {
+          max: interview?.maxAttempts ?? MAX_ANSWER_ATTEMPTS_PER_QUESTION,
+        }),
         { description: message },
       )
     },
-    [takeMessage],
+    [interview?.maxAttempts, takeMessage],
   )
 
   const handleAttemptLimitApiError = useCallback(
@@ -127,6 +142,7 @@ export function useTakeVersionPersistence({
 
       try {
         setSubmitError('')
+        setActionErrorKind(null)
         if (action === 'submit') {
           await waitForProgressFlush()
         } else {
@@ -142,34 +158,104 @@ export function useTakeVersionPersistence({
 
         const hasUploadedCameraParts = cameraUpload.uploadedPartCount > 0
         const hasUploadedScreenParts = screenUpload.uploadedPartCount > 0
-        const hasUploadedAllParts = hasUploadedCameraParts && hasUploadedScreenParts
 
         if (action === 'submit' && (!hasUploadedCameraParts || !hasUploadedScreenParts)) {
           throw new Error(takeMessage('shortRecordingSubmit'))
         }
 
-        const startNextRecording = async (nextVersionNumber: number) => {
-          setCurrentVersionNumber(nextVersionNumber)
-          currentVersionNumberRef.current = nextVersionNumber
-          setRetakeCount(Math.max(nextVersionNumber - 1, 0))
-          await invokeBeginRecording(nextVersionNumber, interview.currentQuestionIndex)
+        const startNextRecording = async (
+          nextVersionNumber: number,
+          options?: {
+            reuseReservedAttempt?: boolean
+            versionCount?: number
+            maxAttempts?: number
+          },
+        ) => {
+          setRecordingStartBusy(true)
+          try {
+            setCurrentVersionNumber(nextVersionNumber)
+            currentVersionNumberRef.current = nextVersionNumber
+            setRetakeCount(Math.max(nextVersionNumber - 1, 0))
+            await invokeBeginRecording(nextVersionNumber, interview.currentQuestionIndex, options)
+          } finally {
+            setRecordingStartBusy(false)
+          }
         }
 
         const handleRerecord = async () => {
           const savedVersionCount = getUsedAttempts(interview.currentAnswerMeta)
           const currentVersion = currentVersionNumberRef.current
+          const answerMeta = interview.currentAnswerMeta
 
-          if (!canRequestRetake(currentVersion)) {
+          if (
+            !canRequestRetake(currentVersion, {
+              maxAttempts: interview.maxAttempts,
+            })
+          ) {
             notifyAttemptLimitReached()
             setStage('interview')
             return
           }
 
-          if (!hasUploadedAllParts) {
+          const hasCameraMedia =
+            cameraUpload.mediaKeyPersisted ||
+            cameraUpload.recordedBytes > 0 ||
+            hasUploadedCameraParts
+
+          const hasScreenMedia =
+            screenUpload.mediaKeyPersisted ||
+            screenUpload.recordedBytes > 0 ||
+            hasUploadedScreenParts
+
+          // Treat media as present only when both camera + screen have something.
+          // Partial recordings (e.g. screen-share dropped mid-recording) should not
+          // be considered a usable saved version for retake/advance decisions.
+          const localVersionHasMedia = hasCameraMedia && hasScreenMedia
+
+          const isEmptyPersistedStub =
+            (cameraUpload.mediaKeyPersisted || screenUpload.mediaKeyPersisted) &&
+            cameraUpload.uploadedPartCount === 0 &&
+            screenUpload.uploadedPartCount === 0 &&
+            cameraUpload.recordedBytes < 1 &&
+            screenUpload.recordedBytes < 1
+
+          const reuseReservedAttempt =
+            !isEmptyPersistedStub &&
+            shouldReuseReservedAttemptForRetake({
+              currentVersionNumber: currentVersion,
+              hasSubmittableMedia: answerMeta?.hasSubmittableMedia,
+              latestSubmittableVersionNumber: answerMeta?.latestSubmittableVersionNumber,
+              localVersionHasMedia,
+            })
+
+          if (reuseReservedAttempt) {
             await abortMultipartUploads()
             clearRecordingArtifacts()
             pendingVersionActionRef.current = null
-            await startNextRecording(currentVersion)
+            await startNextRecording(currentVersion, {
+              reuseReservedAttempt: true,
+              versionCount: answerMeta?.versionCount ?? currentVersion,
+              maxAttempts: interview.maxAttempts,
+            })
+            return
+          }
+
+          if (isEmptyPersistedStub) {
+            await abortMultipartUploads()
+            clearRecordingArtifacts()
+            pendingVersionActionRef.current = null
+            const nextVersionNumber = resolveNextVersionAfterSave(currentVersion, {
+              versionCount: Math.max(savedVersionCount, currentVersion),
+              maxAttempts: interview.maxAttempts,
+            })
+            if (nextVersionNumber === null) {
+              notifyAttemptLimitReached()
+              setStage('interview')
+              return
+            }
+            await startNextRecording(nextVersionNumber, {
+              maxAttempts: interview.maxAttempts,
+            })
             return
           }
 
@@ -183,8 +269,8 @@ export function useTakeVersionPersistence({
             durationSeconds: answerDurationSecondsRef.current || 1,
             startedAt: answerStartedAtRef.current ?? new Date().toISOString(),
             submittedAt: new Date().toISOString(),
-            cameraFileSizeBytes: cameraUpload.recordedBytes,
-            screenFileSizeBytes: screenUpload.recordedBytes,
+            cameraFileSizeBytes: cameraUpload.recordedBytes || undefined,
+            screenFileSizeBytes: screenUpload.recordedBytes || undefined,
             behaviorSignals: behaviorSignalsRef.current,
             behaviorEvents: behaviorEventsRef.current,
           })
@@ -195,6 +281,8 @@ export function useTakeVersionPersistence({
             versionCount: usedAfterSave,
             selectedVersionNumber: savedVersion,
             status: 'recording',
+            hasSubmittableMedia: true,
+            latestSubmittableVersionNumber: savedVersion,
           })
 
           clearRecordingArtifacts()
@@ -202,6 +290,7 @@ export function useTakeVersionPersistence({
 
           const nextVersionNumber = resolveNextVersionAfterSave(savedVersion, {
             versionCount: usedAfterSave,
+            maxAttempts: interview.maxAttempts,
           })
           if (nextVersionNumber === null) {
             notifyAttemptLimitReached()
@@ -209,7 +298,9 @@ export function useTakeVersionPersistence({
             return
           }
 
-          await startNextRecording(nextVersionNumber)
+          await startNextRecording(nextVersionNumber, {
+            maxAttempts: interview.maxAttempts,
+          })
         }
 
         const handleSubmit = async () => {
@@ -231,8 +322,8 @@ export function useTakeVersionPersistence({
             durationSeconds: answerDurationSecondsRef.current || 1,
             startedAt: answerStartedAtRef.current ?? fallbackStartedAt,
             submittedAt,
-            cameraFileSizeBytes: cameraUpload.recordedBytes,
-            screenFileSizeBytes: screenUpload.recordedBytes,
+            cameraFileSizeBytes: cameraUpload.recordedBytes || undefined,
+            screenFileSizeBytes: screenUpload.recordedBytes || undefined,
             behaviorSignals: behaviorSignalsRef.current,
             behaviorEvents: behaviorEventsRef.current,
             ...(transcriptSnapshot.text.trim()
@@ -250,6 +341,7 @@ export function useTakeVersionPersistence({
 
           clearRecordingArtifacts()
           pendingVersionActionRef.current = null
+          autoStartedQuestionKeyRef.current = ''
           setCurrentVersionNumber(1)
           currentVersionNumberRef.current = 1
           setRetakeCount(0)
@@ -267,7 +359,9 @@ export function useTakeVersionPersistence({
             errorMessage: toastMessages.take.submitError,
             showErrorToast: false,
             getErrorMessage: (error) =>
-              error instanceof Error && error.message.trim() ? error.message : submitFallbackDetail,
+              mapTakeSubmitErrorMessage(error, takeMessage, {
+                maxAttempts: interview.maxAttempts,
+              }),
           })
         } else {
           await handleRerecord()
@@ -278,13 +372,21 @@ export function useTakeVersionPersistence({
           autoStartedQuestionKeyRef.current = ''
           setStage('interview')
         } else if (action === 'submit') {
+          setActionErrorKind('submit')
           setSubmitError(
-            err instanceof Error && err.message.trim() ? err.message : submitFallbackDetail,
+            mapTakeSubmitErrorMessage(err, takeMessage, {
+              maxAttempts: interview.maxAttempts,
+            }),
           )
           autoStartedQuestionKeyRef.current = ''
           setStage('interview')
         } else {
-          setSubmitError(err instanceof Error ? err.message : takeMessage('uploadFailedFallback'))
+          setActionErrorKind('rerecord')
+          setSubmitError(
+            mapTakeSubmitErrorMessage(err, takeMessage, {
+              maxAttempts: interview.maxAttempts,
+            }),
+          )
           autoStartedQuestionKeyRef.current = ''
           setStage('interview')
         }
@@ -303,6 +405,7 @@ export function useTakeVersionPersistence({
       setVersionPersistKind,
       setCurrentVersionNumber,
       setRetakeCount,
+      setRecordingStartBusy,
       enqueueProgressFlush,
       waitForProgressFlush,
       queueBufferedUpload,
@@ -326,10 +429,94 @@ export function useTakeVersionPersistence({
       handleAttemptLimitApiError,
       toastMessages.take.submitError,
       toastMessages.take.submitSuccess,
-      submitFallbackDetail,
       takeMessage,
     ],
   )
 
-  return { persistCurrentVersion }
+  const submitReviewAnswer = useCallback(async () => {
+    if (!interview) return
+    if (persistInFlightRef.current) return
+
+    const meta = interview.currentAnswerMeta
+    const latestSubmittableVersionNumber = meta?.latestSubmittableVersionNumber ?? null
+    if (!meta?.hasSubmittableMedia || latestSubmittableVersionNumber === null) {
+      setSubmitError(takeMessage('attemptsExhaustedNoMedia'))
+      return
+    }
+
+    persistInFlightRef.current = true
+    setUploading(true)
+    setVersionPersistKind('submit')
+    setSubmitError('')
+    setActionErrorKind(null)
+    setCurrentVersionNumber(latestSubmittableVersionNumber)
+    currentVersionNumberRef.current = latestSubmittableVersionNumber
+
+    const maxAttempts = interview.maxAttempts ?? MAX_ANSWER_ATTEMPTS_PER_QUESTION
+
+    try {
+      const showSubmitSuccessToast = isLastInterviewQuestion(
+        interview.currentQuestionIndex,
+        interview.totalQuestions,
+      )
+
+      await runMutation(
+        async () => {
+          await finalizeTakeAnswer(id, {
+            questionIndex: interview.currentQuestionIndex,
+          })
+
+          clearRecordingArtifacts()
+          pendingVersionActionRef.current = null
+          setCurrentVersionNumber(1)
+          currentVersionNumberRef.current = 1
+          setRetakeCount(0)
+          await loadInterview('resume')
+        },
+        {
+          successMessage: toastMessages.take.submitSuccess,
+          showSuccessToast: showSubmitSuccessToast,
+          errorMessage: toastMessages.take.submitError,
+          showErrorToast: false,
+          getErrorMessage: (error) =>
+            mapTakeSubmitErrorMessage(error, takeMessage, { maxAttempts }),
+        },
+      )
+    } catch (err) {
+      if (handleAttemptLimitApiError(err)) {
+        autoStartedQuestionKeyRef.current = ''
+        setStage('interview')
+      } else {
+        setActionErrorKind('submit')
+        setSubmitError(mapTakeSubmitErrorMessage(err, takeMessage, { maxAttempts }))
+        autoStartedQuestionKeyRef.current = ''
+        setStage('interview')
+      }
+    } finally {
+      setVersionPersistKind(null)
+      setUploading(false)
+      persistInFlightRef.current = false
+    }
+  }, [
+    id,
+    interview,
+    setUploading,
+    setVersionPersistKind,
+    setSubmitError,
+    setActionErrorKind,
+    setStage,
+    setCurrentVersionNumber,
+    setRetakeCount,
+    autoStartedQuestionKeyRef,
+    currentVersionNumberRef,
+    pendingVersionActionRef,
+    clearRecordingArtifacts,
+    loadInterview,
+    handleAttemptLimitApiError,
+    toastMessages.take.submitError,
+    toastMessages.take.submitSuccess,
+    takeMessage,
+  ])
+
+  return { persistCurrentVersion, submitReviewAnswer }
 }

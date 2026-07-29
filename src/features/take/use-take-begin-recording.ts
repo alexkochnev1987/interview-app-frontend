@@ -1,8 +1,8 @@
 import { type MutableRefObject } from 'react'
 
-import type { TakeProgressResponse } from '@/lib/api'
+import { reserveTakeAnswerAttempt, type TakeProgressResponse } from '@/lib/api'
 
-import { isAnswerAttemptLimitError, shouldSendAnswerProgressDuringRecording } from './attempt-limit'
+import { MAX_ANSWER_ATTEMPTS_PER_QUESTION, isAnswerAttemptLimitError } from './attempt-limit'
 import type { TakeMessageGetter } from './messages'
 import type { CaptureTarget, MultipartUploadSession, MultipartUploadState } from './runtime'
 import {
@@ -13,7 +13,17 @@ import {
 
 type PendingVersionAction = 'submit' | 'rerecord' | null
 
+export interface AnswerMetaUpdate {
+  versionCount: number
+  selectedVersionNumber: number
+  status?: 'recording' | 'submitted'
+  maxAttempts?: number
+  hasSubmittableMedia?: boolean
+  latestSubmittableVersionNumber?: number | null
+}
+
 interface UseTakeBeginRecordingParams {
+  interviewId: string
   cameraStreamRef: MutableRefObject<MediaStream | null>
   screenStreamRef: MutableRefObject<MediaStream | null>
   cameraRecorderRef: MutableRefObject<MediaRecorder | null>
@@ -39,10 +49,19 @@ interface UseTakeBeginRecordingParams {
   clearVersionPersistKind: () => void
   clearRecordingArtifacts: () => void
   resetInterviewSetup: (message: string) => void
+  onAnswerMetaUpdated: (meta: AnswerMetaUpdate) => void
+  getAnswerMaxAttempts?: () => number
+  canStartRecordingAttempt?: () => boolean
+  pendingReuseReservedRef: MutableRefObject<{
+    versionNumber: number
+    versionCount: number
+    maxAttempts: number
+    failCount: number
+  } | null>
   startMultipartUploadSession: (
     questionIndex: number,
     mediaType: CaptureTarget,
-    options?: { versionNumber?: number },
+    options: { versionNumber: number },
   ) => Promise<MultipartUploadSession>
   flushAnswerProgress: (forceAllEvents: boolean) => Promise<TakeProgressResponse | undefined>
   startProgressHeartbeat: () => void
@@ -53,13 +72,17 @@ interface UseTakeBeginRecordingParams {
   takeMessage: TakeMessageGetter
 }
 
-interface BeginRecordingInput {
+export interface BeginRecordingInput {
   nextVersionNumber: number
   hasCurrentQuestion: boolean
   currentQuestionIndex: number
+  reuseReservedAttempt?: boolean
+  versionCount?: number
+  maxAttempts?: number
 }
 
 export function useTakeBeginRecording({
+  interviewId,
   cameraStreamRef,
   screenStreamRef,
   cameraRecorderRef,
@@ -85,6 +108,10 @@ export function useTakeBeginRecording({
   clearVersionPersistKind,
   clearRecordingArtifacts,
   resetInterviewSetup,
+  onAnswerMetaUpdated,
+  getAnswerMaxAttempts,
+  canStartRecordingAttempt,
+  pendingReuseReservedRef,
   startMultipartUploadSession,
   flushAnswerProgress,
   startProgressHeartbeat,
@@ -106,7 +133,14 @@ export function useTakeBeginRecording({
     nextVersionNumber,
     hasCurrentQuestion,
     currentQuestionIndex,
+    reuseReservedAttempt = false,
+    versionCount,
+    maxAttempts,
   }: BeginRecordingInput) {
+    if (!reuseReservedAttempt && canStartRecordingAttempt && !canStartRecordingAttempt()) {
+      return
+    }
+
     if (!cameraStreamRef.current || !screenStreamRef.current) {
       resetInterviewSetup(takeMessage('lobbyInterviewStartBlocked'))
       return
@@ -127,8 +161,49 @@ export function useTakeBeginRecording({
     answerStoppedAtMsRef.current = null
     stoppedRecordersRef.current = 0
 
+    let reservedSlot: {
+      versionNumber: number
+      versionCount: number
+      maxAttempts: number
+    } | null = null
+
     try {
-      const uploadOptions = { versionNumber: nextVersionNumber }
+      let versionNumber = nextVersionNumber
+      let resolvedVersionCount = versionCount ?? Math.max(nextVersionNumber, 0)
+      let resolvedMaxAttempts =
+        maxAttempts ?? getAnswerMaxAttempts?.() ?? MAX_ANSWER_ATTEMPTS_PER_QUESTION
+      let resolvedStatus: 'recording' | 'submitted' = 'recording'
+
+      if (!reuseReservedAttempt) {
+        const reserved = await reserveTakeAnswerAttempt(interviewId, {
+          questionIndex: currentQuestionIndex,
+        })
+
+        versionNumber = reserved.versionNumber
+        resolvedVersionCount = reserved.versionCount
+        resolvedMaxAttempts = reserved.maxAttempts
+        resolvedStatus = reserved.status
+      }
+
+      reservedSlot = {
+        versionNumber,
+        versionCount: resolvedVersionCount,
+        maxAttempts: resolvedMaxAttempts,
+      }
+
+      currentVersionNumberRef.current = versionNumber
+      setCurrentVersionNumber(versionNumber)
+      setRetakeCount(Math.max(versionNumber - 1, 0))
+      onAnswerMetaUpdated({
+        versionCount: resolvedVersionCount,
+        selectedVersionNumber: versionNumber,
+        status: resolvedStatus,
+        maxAttempts: resolvedMaxAttempts,
+      })
+
+      const uploadOptions = {
+        versionNumber,
+      }
       const [cameraUpload, screenUpload] = await Promise.all([
         startMultipartUploadSession(currentQuestionIndex, 'camera', uploadOptions),
         startMultipartUploadSession(currentQuestionIndex, 'screen', uploadOptions),
@@ -139,52 +214,26 @@ export function useTakeBeginRecording({
         screen: screenUpload,
       }
 
-      if (shouldSendAnswerProgressDuringRecording(nextVersionNumber)) {
-        await flushAnswerProgress(true)
-        startProgressHeartbeat()
-      }
-
-      const recorderOptions = buildMediaRecorderOptions()
-
-      const cameraRecorder = new MediaRecorder(cameraStreamRef.current, recorderOptions)
-      cameraRecorder.ondataavailable = (event) => {
-        handleRecordedChunk('camera', event.data)
-      }
-      cameraRecorder.onstop = () => {
-        handleRecorderStopped()
-      }
-
-      const screenRecorder = new MediaRecorder(screenStreamRef.current, recorderOptions)
-      screenRecorder.ondataavailable = (event) => {
-        handleRecordedChunk('screen', event.data)
-      }
-      screenRecorder.onstop = () => {
-        handleRecorderStopped()
-      }
-
-      const cameraSession = multipartUploadsRef.current.camera
-      const screenSession = multipartUploadsRef.current.screen
-      const mimeForParts =
-        cameraRecorder.mimeType.trim() ||
-        screenRecorder.mimeType.trim() ||
-        pickSupportedMediaRecorderMimeType() ||
-        ''
-      if (cameraSession && screenSession && mimeForParts) {
-        cameraSession.partBlobType = mimeForParts
-        screenSession.partBlobType = mimeForParts
-      }
-
-      cameraRecorderRef.current = cameraRecorder
-      screenRecorderRef.current = screenRecorder
-
-      cameraRecorder.start(1000)
-      screenRecorder.start(1000)
-      expectedRecorderStopsRef.current = 2
+      await flushAnswerProgress(true)
+      startProgressHeartbeat()
+      pendingReuseReservedRef.current = null
     } catch (err) {
       await abortMultipartUploads()
       clearRecordingArtifacts()
+      const priorFails = pendingReuseReservedRef.current?.failCount ?? 0
+      const nextFailCount = priorFails + 1
+      pendingReuseReservedRef.current = reservedSlot
+        ? { ...reservedSlot, failCount: nextFailCount }
+        : null
       if (isAnswerAttemptLimitError(err)) {
-        setSetupError(takeMessage('answerAttemptLimitReached'))
+        pendingReuseReservedRef.current = null
+        setSetupError(
+          takeMessage('answerAttemptLimitReached', {
+            max: getAnswerMaxAttempts?.() ?? MAX_ANSWER_ATTEMPTS_PER_QUESTION,
+          }),
+        )
+      } else if (reservedSlot && nextFailCount <= 1) {
+        setSetupError('')
       } else {
         setSetupError(err instanceof Error ? err.message : takeMessage('uploadFailedFallback'))
       }
@@ -192,6 +241,43 @@ export function useTakeBeginRecording({
       setStage('interview')
       return
     }
+
+    const recorderOptions = buildMediaRecorderOptions()
+
+    const cameraRecorder = new MediaRecorder(cameraStreamRef.current, recorderOptions)
+    cameraRecorder.ondataavailable = (event) => {
+      handleRecordedChunk('camera', event.data)
+    }
+    cameraRecorder.onstop = () => {
+      handleRecorderStopped()
+    }
+
+    const screenRecorder = new MediaRecorder(screenStreamRef.current, recorderOptions)
+    screenRecorder.ondataavailable = (event) => {
+      handleRecordedChunk('screen', event.data)
+    }
+    screenRecorder.onstop = () => {
+      handleRecorderStopped()
+    }
+
+    const cameraSession = multipartUploadsRef.current.camera
+    const screenSession = multipartUploadsRef.current.screen
+    const mimeForParts =
+      cameraRecorder.mimeType.trim() ||
+      screenRecorder.mimeType.trim() ||
+      pickSupportedMediaRecorderMimeType() ||
+      ''
+    if (cameraSession && screenSession && mimeForParts) {
+      cameraSession.partBlobType = mimeForParts
+      screenSession.partBlobType = mimeForParts
+    }
+
+    cameraRecorderRef.current = cameraRecorder
+    screenRecorderRef.current = screenRecorder
+
+    cameraRecorder.start(1000)
+    screenRecorder.start(1000)
+    expectedRecorderStopsRef.current = 2
 
     primeBrowserTranscriptForRecordingSession()
 
@@ -201,7 +287,7 @@ export function useTakeBeginRecording({
     setStage('recording')
     clearVersionPersistKind()
 
-    timerRef.current = setInterval(() => {
+    const countdownInterval = setInterval(() => {
       setTimeLeft((current) => {
         if (current <= 1) {
           const intervalId = timerRef.current
@@ -215,6 +301,7 @@ export function useTakeBeginRecording({
         return current - 1
       })
     }, 1000)
+    timerRef.current = countdownInterval
   }
 
   return { beginRecording }

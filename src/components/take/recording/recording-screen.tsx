@@ -4,7 +4,7 @@ import type { RefObject } from 'react'
 import type { InterviewDataView, TakeStage } from '@/components/take/types'
 import { Grid, Stack } from '@/components/ui/layout'
 import { submitAnswerActionLabel } from '@/features/take'
-import type { VersionPersistKind } from '@/features/take/session-machine'
+import type { ExhaustedHint, VersionPersistKind } from '@/features/take/session-machine'
 import type { InterviewerPresence } from '@/features/take/use-take-question-tts'
 
 import { TakeRecordingHeroColumn, TakeRecordingSidebarColumn } from './recording-columns'
@@ -20,6 +20,7 @@ interface TakeRecordingScreenProps {
   setupError: string
   capturePipelineReady: boolean
   submitError: string
+  actionErrorKind: 'submit' | 'rerecord' | null
   timeLeft: number
   versionPersistKind: VersionPersistKind | null
   uploading: boolean
@@ -34,6 +35,11 @@ interface TakeRecordingScreenProps {
   recordingStartBusy: boolean
   retakeDisabled: boolean
   displayedAttemptNumber: number
+  maxAttempts: number
+  attemptsExhausted: boolean
+  submitAllowed: boolean
+  exhaustedHint: ExhaustedHint | null
+  showDeviceReconnect: boolean
   onReconnect: () => void
   onRerecord: () => void
   onSubmit: () => void
@@ -49,6 +55,7 @@ export function TakeRecordingScreen({
   setupError,
   capturePipelineReady,
   submitError,
+  actionErrorKind,
   timeLeft,
   versionPersistKind,
   uploading,
@@ -63,6 +70,11 @@ export function TakeRecordingScreen({
   recordingStartBusy,
   retakeDisabled,
   displayedAttemptNumber,
+  maxAttempts,
+  attemptsExhausted,
+  submitAllowed,
+  exhaustedHint,
+  showDeviceReconnect,
   onReconnect,
   onRerecord,
   onSubmit,
@@ -103,9 +115,15 @@ export function TakeRecordingScreen({
           recording={recording}
           progressValue={progressValue}
           submitError={submitError}
+          actionErrorKind={actionErrorKind}
           recordingStartBusy={recordingStartBusy}
           retakeDisabled={retakeDisabled}
           displayedAttemptNumber={displayedAttemptNumber}
+          maxAttempts={maxAttempts}
+          attemptsExhausted={attemptsExhausted}
+          submitAllowed={submitAllowed}
+          exhaustedHint={exhaustedHint}
+          showDeviceReconnect={showDeviceReconnect}
           isBrowserTranscriptSupported={isBrowserTranscriptSupported}
           finalTranscript={finalTranscript}
           interimTranscript={interimTranscript}

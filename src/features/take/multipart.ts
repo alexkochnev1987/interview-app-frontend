@@ -1,5 +1,5 @@
-// oxlint-disable no-await-in-loop
 import type { MultipartUploadPartResponse } from '@/lib/api'
+import { ApiError } from '@/lib/api-error'
 
 import type { CaptureTarget, MultipartUploadSession, MultipartUploadState } from './runtime'
 
@@ -29,24 +29,16 @@ export function queueBufferedUpload({
     return Promise.resolve()
   }
 
-  if (session.uploadError) {
-    return Promise.reject(new Error(session.uploadError))
-  }
-
-  // oxlint-disable-next-line promise/always-return
   session.uploadChain = session.uploadChain.then(async () => {
     let activeSession = multipartUploadsRef.current[target]
 
-    while (activeSession && !activeSession.aborted && !activeSession.completed) {
-      if (activeSession.uploadError) {
-        throw new Error(activeSession.uploadError)
-      }
-
-      const hasEnoughBytes = activeSession.bufferedBytes >= MULTIPART_PART_SIZE_BYTES
-      const hasFinalBytes = forceFinal && activeSession.bufferedBytes > 0
-      if (!hasEnoughBytes && !hasFinalBytes) {
-        break
-      }
+    while (
+      activeSession &&
+      !activeSession.aborted &&
+      !activeSession.completed &&
+      (activeSession.bufferedBytes >= MULTIPART_PART_SIZE_BYTES ||
+        (forceFinal && activeSession.bufferedBytes > 0))
+    ) {
       const inferredType =
         activeSession.partBlobType?.trim() ||
         activeSession.bufferedChunks[0]?.type?.trim() ||
@@ -58,29 +50,15 @@ export function queueBufferedUpload({
       const partNumber = activeSession.nextPartNumber
       activeSession.nextPartNumber += 1
 
-      let partUpload: MultipartUploadPartResponse
-      try {
-        partUpload = await preSignMultipartPartUpload(target, activeSession, partNumber)
-      } catch (err) {
-        const message =
-          err instanceof Error
-            ? err.message
-            : `Chunk upload pre-sign failed for ${target} recording.`
-        if (activeSession) {
-          activeSession.uploadError = message
-        }
-        throw new Error(message, { cause: err })
-      }
+      const partUpload = await preSignMultipartPartUpload(target, activeSession, partNumber)
 
       try {
         await uploadMultipartPart(partUpload.uploadUrl, partBlob)
-      } catch (err) {
-        const message =
-          err instanceof Error ? err.message : `Chunk upload failed for ${target} recording.`
-        if (activeSession) {
-          activeSession.uploadError = message
+      } catch (error) {
+        if (error instanceof ApiError) {
+          throw error
         }
-        throw new Error(message, { cause: err })
+        throw new Error(`Chunk upload failed for ${target} recording.`)
       }
 
       activeSession = multipartUploadsRef.current[target]
@@ -104,14 +82,14 @@ export function handleRecordedChunk({
   target,
   blob,
   multipartUploadsRef,
-  queueBufferedUpload: queueUpload,
+  queueBufferedUpload,
 }: HandleRecordedChunkParams) {
   if (blob.size < 1) {
     return
   }
 
   const session = multipartUploadsRef.current[target]
-  if (!session || session.aborted || session.completed || session.uploadError) {
+  if (!session || session.aborted || session.completed) {
     return
   }
 
@@ -120,12 +98,6 @@ export function handleRecordedChunk({
   session.recordedBytes += blob.size
 
   if (session.bufferedBytes >= MULTIPART_PART_SIZE_BYTES) {
-    void queueUpload(target).catch((err) => {
-      const activeSession = multipartUploadsRef.current[target]
-      if (activeSession) {
-        activeSession.uploadError =
-          err instanceof Error ? err.message : `Chunk upload failed for ${target} recording.`
-      }
-    })
+    void queueBufferedUpload(target).catch(() => undefined)
   }
 }

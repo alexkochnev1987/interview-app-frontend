@@ -1,3 +1,5 @@
+import { ApiError } from '@/lib/api-error'
+
 import type { CaptureTarget, MultipartUploadState } from './runtime'
 
 interface CompleteMultipartUploadParams {
@@ -7,6 +9,9 @@ interface CompleteMultipartUploadParams {
     questionIndex: number,
     mediaKey: string,
     uploadId: string,
+    options: {
+      versionNumber: number
+    },
   ) => Promise<void>
 }
 
@@ -29,8 +34,18 @@ export async function completeMultipartUpload({
   }
 
   try {
-    await completeMultipartUploadRequest(session.questionIndex, session.mediaKey, session.uploadId)
-  } catch {
+    await completeMultipartUploadRequest(
+      session.questionIndex,
+      session.mediaKey,
+      session.uploadId,
+      {
+        versionNumber: session.versionNumber,
+      },
+    )
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error
+    }
     throw new Error(`Failed to finalize ${target} upload.`)
   }
 
@@ -43,6 +58,9 @@ interface AbortMultipartUploadsParams {
     questionIndex: number,
     mediaKey: string,
     uploadId: string,
+    options: {
+      versionNumber: number
+    },
   ) => Promise<void>
 }
 
@@ -68,7 +86,14 @@ export async function abortMultipartUploads({
 
       try {
         await session.uploadChain.catch(() => undefined)
-        await abortMultipartUploadRequest(session.questionIndex, session.mediaKey, session.uploadId)
+        await abortMultipartUploadRequest(
+          session.questionIndex,
+          session.mediaKey,
+          session.uploadId,
+          {
+            versionNumber: session.versionNumber,
+          },
+        )
       } catch {
         console.error(`Failed to abort ${target} multipart upload.`)
       }

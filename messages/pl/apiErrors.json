@@ -5,5 +5,8 @@
   "COMMON_VALIDATION_FAILED": "Część pól jest nieprawidłowa. Sprawdź dane wejściowe.",
   "QUESTION_IN_USE": "To pytanie jest używane w aktywnych interview i nie może zostać usunięte.",
   "INTERVIEW_VALIDATION_RUNNING": "Walidacja interview już trwa.",
-  "UPLOAD_FAILED": "Upload nie powiódł się. Spróbuj ponownie."
+  "UPLOAD_FAILED": "Upload nie powiódł się. Spróbuj ponownie.",
+  "ANSWER_ATTEMPT_LIMIT_REACHED": "Osiągnięto limit prób nagrywania",
+  "ANSWER_VERSION_NOT_RESERVED": "Przed przesłaniem trzeba zarezerwować próbę nagrywania",
+  "ANSWER_VERSION_OVERWRITE_FORBIDDEN": "Ta próba nagrywania ma już przesłane media. Rozpocznij nową próbę zamiast nadpisywać istniejącą."
 }
