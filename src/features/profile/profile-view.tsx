@@ -110,7 +110,9 @@ export function ProfileView({ user, mode = 'self' }: ProfileViewProps) {
               <BodyText weight="medium">{t('preferences.productTour')}</BodyText>
               <Button
                 type="button"
-                variant="outline"
+                variant="outline-pill"
+                shape="pill"
+                size="sm"
                 disabled={!canReplayTour}
                 onClick={() => void replayTour()}
               >

@@ -8,6 +8,8 @@
     "profile": "Профіль",
     "logout": "Выйсці",
     "signIn": "Увайсці",
-    "templates": "Шаблоны"
+    "templates": "Шаблоны",
+    "expandSidebar": "Разгарнуць бакавую панэль",
+    "collapseSidebar": "Згарнуць бакавую панэль"
   }
 }

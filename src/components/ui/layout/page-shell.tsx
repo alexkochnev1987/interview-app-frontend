@@ -21,6 +21,7 @@ const pageShellVariants = cva('container flex flex-col', {
     align: {
       stretch: '',
       center: 'min-h-[calc(100vh-6rem)] justify-center',
+      top: 'min-h-[calc(100vh-6rem)]',
     },
   },
   defaultVariants: {

@@ -8,6 +8,8 @@
     "profile": "Profil",
     "logout": "Wyloguj",
     "signIn": "Zaloguj się",
-    "templates": "Szablony"
+    "templates": "Szablony",
+    "expandSidebar": "Rozwiń pasek boczny",
+    "collapseSidebar": "Zwiń pasek boczny"
   }
 }
