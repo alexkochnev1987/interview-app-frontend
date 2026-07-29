@@ -23,6 +23,7 @@ export interface MultipartUploadSession {
   uploadChain: Promise<void>
   completed: boolean
   aborted: boolean
+  uploadError?: string | null
 }
 
 export interface MultipartUploadState {
@@ -153,6 +154,7 @@ export function createMultipartUploadSession(
     uploadChain: Promise.resolve(),
     completed: false,
     aborted: false,
+    uploadError: null,
   }
 }
 
@@ -163,6 +165,10 @@ export function getMultipartSession(
   const session = multipartUploads[target]
   if (!session) {
     throw new Error(`${target} upload session is not initialized.`)
+  }
+
+  if (session.uploadError) {
+    throw new Error(session.uploadError)
   }
 
   return session

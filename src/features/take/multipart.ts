@@ -29,11 +29,19 @@ export function queueBufferedUpload({
     return Promise.resolve()
   }
 
+  if (session.uploadError) {
+    return Promise.reject(new Error(session.uploadError))
+  }
+
   // oxlint-disable-next-line promise/always-return
   session.uploadChain = session.uploadChain.then(async () => {
     let activeSession = multipartUploadsRef.current[target]
 
     while (activeSession && !activeSession.aborted && !activeSession.completed) {
+      if (activeSession.uploadError) {
+        throw new Error(activeSession.uploadError)
+      }
+
       const hasEnoughBytes = activeSession.bufferedBytes >= MULTIPART_PART_SIZE_BYTES
       const hasFinalBytes = forceFinal && activeSession.bufferedBytes > 0
       if (!hasEnoughBytes && !hasFinalBytes) {
@@ -50,12 +58,29 @@ export function queueBufferedUpload({
       const partNumber = activeSession.nextPartNumber
       activeSession.nextPartNumber += 1
 
-      const partUpload = await preSignMultipartPartUpload(target, activeSession, partNumber)
+      let partUpload: MultipartUploadPartResponse
+      try {
+        partUpload = await preSignMultipartPartUpload(target, activeSession, partNumber)
+      } catch (err) {
+        const message =
+          err instanceof Error
+            ? err.message
+            : `Chunk upload pre-sign failed for ${target} recording.`
+        if (activeSession) {
+          activeSession.uploadError = message
+        }
+        throw new Error(message, { cause: err })
+      }
 
       try {
         await uploadMultipartPart(partUpload.uploadUrl, partBlob)
-      } catch {
-        throw new Error(`Chunk upload failed for ${target} recording.`)
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : `Chunk upload failed for ${target} recording.`
+        if (activeSession) {
+          activeSession.uploadError = message
+        }
+        throw new Error(message, { cause: err })
       }
 
       activeSession = multipartUploadsRef.current[target]
@@ -86,7 +111,7 @@ export function handleRecordedChunk({
   }
 
   const session = multipartUploadsRef.current[target]
-  if (!session || session.aborted || session.completed) {
+  if (!session || session.aborted || session.completed || session.uploadError) {
     return
   }
 
@@ -95,6 +120,12 @@ export function handleRecordedChunk({
   session.recordedBytes += blob.size
 
   if (session.bufferedBytes >= MULTIPART_PART_SIZE_BYTES) {
-    void queueUpload(target).catch(() => undefined)
+    void queueUpload(target).catch((err) => {
+      const activeSession = multipartUploadsRef.current[target]
+      if (activeSession) {
+        activeSession.uploadError =
+          err instanceof Error ? err.message : `Chunk upload failed for ${target} recording.`
+      }
+    })
   }
 }
