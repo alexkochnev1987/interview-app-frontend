@@ -12,11 +12,11 @@ interface AppSidebarProps extends ComponentProps<'aside'> {
   brand: ReactNode
   nav: ReactNode
   actions: ReactNode
-  toggleOpen: boolean
-  onToggle: () => void
-  onClose: () => void
-  expandLabel: string
-  collapseLabel: string
+  toggleOpen?: boolean
+  onToggle?: () => void
+  onClose?: () => void
+  expandLabel?: string
+  collapseLabel?: string
   expanded?: boolean
 }
 
@@ -24,19 +24,19 @@ export function AppSidebar({
   brand,
   nav,
   actions,
-  toggleOpen,
+  toggleOpen = false,
   onToggle,
   onClose,
-  expandLabel,
-  collapseLabel,
+  expandLabel = '',
+  collapseLabel = '',
   expanded,
   className,
   ...props
 }: AppSidebarProps) {
   useEffect(() => {
-    if (!toggleOpen) return
+    if (!toggleOpen || !onClose) return
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') onClose()
+      if (event.key === 'Escape') onClose?.()
     }
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)

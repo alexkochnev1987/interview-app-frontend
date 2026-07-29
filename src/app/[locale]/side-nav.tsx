@@ -40,7 +40,6 @@ import {
   canReadQuestions,
   canReviewAssessments,
 } from '@/lib/auth-roles'
-import { cn } from '@/lib/utils'
 
 export function SideNav() {
   const { user, logout } = useAuth()
@@ -53,6 +52,7 @@ export function SideNav() {
   const tLanguage = useTranslations('languageSwitcher')
   const labels = useSharedLabels()
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   const queryString = searchParams.toString()
   const languageHref = queryString ? `${pathname}?${queryString}` : pathname
@@ -132,7 +132,12 @@ export function SideNav() {
   return (
     <AppSidebar
       aria-label={tCommon('appName')}
-      expanded={languageMenuOpen}
+      toggleOpen={mobileOpen}
+      onToggle={() => setMobileOpen((prev) => !prev)}
+      onClose={() => setMobileOpen(false)}
+      expandLabel={tNav('expandSidebar')}
+      collapseLabel={tNav('collapseSidebar')}
+      expanded={languageMenuOpen || mobileOpen}
       brand={
         <UnstyledLink href="/">
           <Inline gap={2} align="center" wrap="nowrap">
@@ -141,17 +146,9 @@ export function SideNav() {
                 <Sparkles />
               </Icon>
             </IconBadge>
-            <Stack gap={0} className={cn('min-w-0', sideNavRevealClass)}>
-              <EyebrowLabel size="sm" className="whitespace-nowrap">
-                {tCommon('brandEyebrow')}
-              </EyebrowLabel>
-              <BodyText
-                as="span"
-                size="sm"
-                weight="semibold"
-                tone="foreground"
-                className="whitespace-nowrap"
-              >
+            <Stack gap={0} className={sideNavRevealClass}>
+              <EyebrowLabel size="sm">{tCommon('brandEyebrow')}</EyebrowLabel>
+              <BodyText as="span" size="sm" weight="semibold" tone="foreground">
                 {tCommon('appName')}
               </BodyText>
             </Stack>
