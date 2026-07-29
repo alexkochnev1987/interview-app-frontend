@@ -1,7 +1,7 @@
 'use client'
 
 import { cva, type VariantProps } from 'class-variance-authority'
-import * as React from 'react'
+import type { ReactNode } from 'react'
 
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
@@ -22,7 +22,7 @@ interface DisabledHintTooltipProps extends VariantProps<typeof disabledHintTrigg
   hint: string
   /** When false the children render as-is, with no tooltip wrapper. */
   active: boolean
-  children: React.ReactNode
+  children: ReactNode
 }
 
 // A disabled button emits no pointer events, so the wrapping span is the tooltip trigger.

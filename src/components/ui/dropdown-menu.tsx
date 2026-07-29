@@ -2,19 +2,19 @@
 
 import { cva, type VariantProps } from 'class-variance-authority'
 import { DropdownMenu as DM } from 'radix-ui'
-import * as React from 'react'
+import type { ComponentProps } from 'react'
 
 import { cn } from '@/lib/utils'
 
-function DropdownMenu({ modal = false, ...props }: React.ComponentProps<typeof DM.Root>) {
+function DropdownMenu({ modal = false, ...props }: ComponentProps<typeof DM.Root>) {
   return <DM.Root data-slot="dropdown-menu" modal={modal} {...props} />
 }
 
-function DropdownMenuTrigger(props: React.ComponentProps<typeof DM.Trigger>) {
+function DropdownMenuTrigger(props: ComponentProps<typeof DM.Trigger>) {
   return <DM.Trigger data-slot="dropdown-menu-trigger" {...props} />
 }
 
-function DropdownMenuPortal(props: React.ComponentProps<typeof DM.Portal>) {
+function DropdownMenuPortal(props: ComponentProps<typeof DM.Portal>) {
   return <DM.Portal {...props} />
 }
 
@@ -29,7 +29,7 @@ function DropdownMenuContent({
   sideOffset = 4,
   align = 'end',
   ...props
-}: React.ComponentProps<typeof DM.Content>) {
+}: ComponentProps<typeof DM.Content>) {
   return (
     <DropdownMenuPortal>
       <DM.Content
@@ -60,7 +60,7 @@ const dropdownMenuItemVariants = cva(
   },
 )
 
-type DropdownMenuItemProps = React.ComponentProps<typeof DM.Item> &
+type DropdownMenuItemProps = ComponentProps<typeof DM.Item> &
   VariantProps<typeof dropdownMenuItemVariants>
 
 function DropdownMenuItem({ className, tone, ...props }: DropdownMenuItemProps) {

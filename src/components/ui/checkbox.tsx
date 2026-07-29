@@ -3,7 +3,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 import { CheckIcon } from 'lucide-react'
 import { Checkbox as CheckboxPrimitive } from 'radix-ui'
-import * as React from 'react'
+import type { ComponentProps } from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -33,9 +33,7 @@ const checkboxVariants = cva(
 )
 
 interface CheckboxProps
-  extends
-    React.ComponentProps<typeof CheckboxPrimitive.Root>,
-    VariantProps<typeof checkboxVariants> {}
+  extends ComponentProps<typeof CheckboxPrimitive.Root>, VariantProps<typeof checkboxVariants> {}
 
 function Checkbox({ className, size, surface, align, ...props }: CheckboxProps) {
   return (

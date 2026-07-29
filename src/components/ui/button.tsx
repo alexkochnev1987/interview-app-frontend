@@ -1,7 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 import { Loader2 } from 'lucide-react'
 import { Slot } from 'radix-ui'
-import * as React from 'react'
+import type { ComponentProps, KeyboardEvent, MouseEvent } from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -130,7 +130,7 @@ function Button({
   disabled,
   children,
   ...props
-}: React.ComponentProps<'button'> &
+}: ComponentProps<'button'> &
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean
     loading?: boolean
@@ -142,11 +142,11 @@ function Button({
     const disabledOverrides = isDisabled
       ? {
           tabIndex: -1,
-          onClick: (event: React.MouseEvent<HTMLElement>) => {
+          onClick: (event: MouseEvent<HTMLElement>) => {
             event.preventDefault()
             event.stopPropagation()
           },
-          onKeyDown: (event: React.KeyboardEvent<HTMLElement>) => {
+          onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
             if (event.key === 'Enter' || event.key === ' ') {
               event.preventDefault()
               event.stopPropagation()

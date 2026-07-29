@@ -2,7 +2,7 @@
 
 import { cva, type VariantProps } from 'class-variance-authority'
 import { Progress as ProgressPrimitive } from 'radix-ui'
-import * as React from 'react'
+import type { ComponentProps } from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -19,9 +19,7 @@ const progressVariants = cva('relative flex w-full items-center overflow-x-hidde
 })
 
 interface ProgressProps
-  extends
-    React.ComponentProps<typeof ProgressPrimitive.Root>,
-    VariantProps<typeof progressVariants> {}
+  extends ComponentProps<typeof ProgressPrimitive.Root>, VariantProps<typeof progressVariants> {}
 
 function Progress({ className, value, density, ...props }: ProgressProps) {
   return (

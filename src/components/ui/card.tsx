@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from 'class-variance-authority'
-import * as React from 'react'
+import type { ComponentProps } from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -98,7 +98,7 @@ function Card({
   flexChild,
   grow,
   ...props
-}: React.ComponentProps<'div'> & VariantProps<typeof cardVariants>) {
+}: ComponentProps<'div'> & VariantProps<typeof cardVariants>) {
   return (
     <div
       data-slot="card"
@@ -198,7 +198,7 @@ function CardHeader({
   spacing,
   inset,
   ...props
-}: React.ComponentProps<'div'> &
+}: ComponentProps<'div'> &
   VariantProps<typeof cardHeaderSpacingVariants> &
   VariantProps<typeof cardHeaderInsetVariants>) {
   return (
@@ -245,7 +245,7 @@ function CardTitle({
   size,
   width,
   ...props
-}: React.ComponentProps<'div'> & VariantProps<typeof cardTitleVariants>) {
+}: ComponentProps<'div'> & VariantProps<typeof cardTitleVariants>) {
   return (
     <div
       data-slot="card-title"
@@ -273,7 +273,7 @@ function CardDescription({
   className,
   width,
   ...props
-}: React.ComponentProps<'div'> & VariantProps<typeof cardDescriptionVariants>) {
+}: ComponentProps<'div'> & VariantProps<typeof cardDescriptionVariants>) {
   return (
     <div
       data-slot="card-description"
@@ -301,7 +301,7 @@ function CardContent({
   layout,
   inset,
   ...props
-}: React.ComponentProps<'div'> &
+}: ComponentProps<'div'> &
   VariantProps<typeof cardContentVariants> &
   VariantProps<typeof cardContentInsetVariants>) {
   return (

@@ -8,7 +8,8 @@
   },
   "rules": {
     "react/react-in-jsx-scope": "off",
-    "react/exhaustive-deps": "warn"
+    "react/exhaustive-deps": "warn",
+    "import/no-namespace": "warn"
   },
   "settings": {
     "react": { "version": "19" },

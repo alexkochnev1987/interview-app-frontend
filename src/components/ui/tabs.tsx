@@ -1,7 +1,7 @@
 'use client'
 
 import { cva } from 'class-variance-authority'
-import * as React from 'react'
+import { useMemo, useRef, type ComponentProps, type KeyboardEvent, type ReactNode } from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
@@ -32,7 +32,7 @@ const tabTriggerVariants = cva(
   },
 )
 
-export type TabsProps = Omit<React.ComponentProps<'div'>, 'onChange'> & {
+export type TabsProps = Omit<ComponentProps<'div'>, 'onChange'> & {
   items: TabItem[]
   activeId: string
   onChange: (id: string) => void
@@ -53,9 +53,9 @@ export function Tabs({
   className,
   ...props
 }: TabsProps) {
-  const tabRefs = React.useRef(new Map<string, HTMLButtonElement>())
+  const tabRefs = useRef(new Map<string, HTMLButtonElement>())
 
-  const enabledItems = React.useMemo(
+  const enabledItems = useMemo(
     () => items.filter((item) => isTabItemEnabled(item, disabled)),
     [items, disabled],
   )
@@ -74,7 +74,7 @@ export function Tabs({
     focusTab(id)
   }
 
-  function handleTabListKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+  function handleTabListKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     if (enabledItems.length === 0) {
       return
     }
@@ -159,7 +159,7 @@ export function Tabs({
 export type TabPanelProps = {
   id: string
   activeId: string
-  children: React.ReactNode
+  children: ReactNode
   className?: string
 }
 

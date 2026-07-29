@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from 'class-variance-authority'
-import * as React from 'react'
+import type { ComponentProps } from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -31,7 +31,7 @@ function Textarea({
   size,
   tone,
   ...props
-}: React.ComponentProps<'textarea'> & VariantProps<typeof textareaVariants>) {
+}: ComponentProps<'textarea'> & VariantProps<typeof textareaVariants>) {
   return (
     <textarea
       data-slot="textarea"

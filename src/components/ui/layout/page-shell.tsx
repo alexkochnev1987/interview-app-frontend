@@ -1,6 +1,5 @@
 import { cva, type VariantProps } from 'class-variance-authority'
-import * as React from 'react'
-import { type HTMLAttributes } from 'react'
+import type { ElementType, HTMLAttributes } from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -37,7 +36,7 @@ interface PageShellProps
 }
 
 export function PageShell({ as, className, spacing, padding, align, ...props }: PageShellProps) {
-  const Comp = (as ?? 'main') as React.ElementType
+  const Comp = (as ?? 'main') as ElementType
 
   return (
     <Comp className={cn(pageShellVariants({ spacing, padding, align }), className)} {...props} />

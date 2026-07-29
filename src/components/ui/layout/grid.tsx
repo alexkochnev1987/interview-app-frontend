@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from 'class-variance-authority'
-import * as React from 'react'
+import type { ComponentProps, ElementType, JSX } from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -75,9 +75,9 @@ const gridVariants = cva('grid', {
   },
 })
 
-type GridProps = Omit<React.ComponentProps<'div'>, 'color'> &
+type GridProps = Omit<ComponentProps<'div'>, 'color'> &
   VariantProps<typeof gridVariants> & {
-    as?: keyof React.JSX.IntrinsicElements
+    as?: keyof JSX.IntrinsicElements
   }
 
 export function Grid({
@@ -90,7 +90,7 @@ export function Grid({
   visibility,
   ...props
 }: GridProps) {
-  const Comp = (as ?? 'div') as React.ElementType
+  const Comp = (as ?? 'div') as ElementType
 
   return (
     <Comp

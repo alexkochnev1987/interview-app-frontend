@@ -1,9 +1,9 @@
 import { cva, type VariantProps } from 'class-variance-authority'
-import * as React from 'react'
+import type { ComponentProps, KeyboardEvent, MouseEvent } from 'react'
 
 import { cn } from '@/lib/utils'
 
-type TableProps = React.ComponentProps<'table'> & {
+type TableProps = ComponentProps<'table'> & {
   minRows?: number
   tabularWidth?: 'default' | 'wide'
   scrollbar?: 'bottom' | 'top'
@@ -64,7 +64,7 @@ function Table({
   )
 }
 
-function TableHeader({ className, ...props }: React.ComponentProps<'thead'>) {
+function TableHeader({ className, ...props }: ComponentProps<'thead'>) {
   return (
     <thead
       data-slot="table-header"
@@ -74,7 +74,7 @@ function TableHeader({ className, ...props }: React.ComponentProps<'thead'>) {
   )
 }
 
-function TableBody({ className, ...props }: React.ComponentProps<'tbody'>) {
+function TableBody({ className, ...props }: ComponentProps<'tbody'>) {
   return (
     <tbody
       data-slot="table-body"
@@ -105,7 +105,7 @@ const tableRowVariants = cva('transition-colors', {
   },
 })
 
-type TableRowProps = React.ComponentProps<'tr'> & VariantProps<typeof tableRowVariants>
+type TableRowProps = ComponentProps<'tr'> & VariantProps<typeof tableRowVariants>
 
 function TableRow({
   className,
@@ -119,13 +119,13 @@ function TableRow({
 }: TableRowProps) {
   const isInteractive = interactive === true
 
-  function handleKeyDown(event: React.KeyboardEvent<HTMLTableRowElement>) {
+  function handleKeyDown(event: KeyboardEvent<HTMLTableRowElement>) {
     onKeyDown?.(event)
     if (event.defaultPrevented) return
     if (!isInteractive || !onClick) return
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault()
-      onClick(event as unknown as React.MouseEvent<HTMLTableRowElement>)
+      onClick(event as unknown as MouseEvent<HTMLTableRowElement>)
     }
   }
 
@@ -177,7 +177,7 @@ const tableCellShared = cva('', {
   },
 })
 
-type TableHeadProps = React.ComponentProps<'th'> & VariantProps<typeof tableCellShared>
+type TableHeadProps = ComponentProps<'th'> & VariantProps<typeof tableCellShared>
 
 function TableHead({
   className,
@@ -202,7 +202,7 @@ function TableHead({
   )
 }
 
-type TableCellProps = React.ComponentProps<'td'> & VariantProps<typeof tableCellShared>
+type TableCellProps = ComponentProps<'td'> & VariantProps<typeof tableCellShared>
 
 function TableCell({
   className,

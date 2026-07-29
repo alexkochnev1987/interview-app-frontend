@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from 'class-variance-authority'
-import * as React from 'react'
+import type { ComponentProps } from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -18,7 +18,7 @@ const segmentedGroupVariants = cva(
   },
 )
 
-type SegmentedGroupProps = React.ComponentProps<'div'> &
+type SegmentedGroupProps = ComponentProps<'div'> &
   VariantProps<typeof segmentedGroupVariants> & {
     ariaLabel: string
   }

@@ -2,7 +2,7 @@
 
 import { cva, type VariantProps } from 'class-variance-authority'
 import { Dialog as DialogPrimitive } from 'radix-ui'
-import * as React from 'react'
+import type { ReactNode } from 'react'
 
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
@@ -41,7 +41,7 @@ const modalContentVariants = cva(
 )
 
 interface ModalShellProps extends VariantProps<typeof modalContentVariants> {
-  children: React.ReactNode
+  children: ReactNode
   /** When true, escape and outside clicks do not close the dialog. */
   dismissDisabled?: boolean
   onDismiss?: () => void

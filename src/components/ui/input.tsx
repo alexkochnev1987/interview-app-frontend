@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from 'class-variance-authority'
-import * as React from 'react'
+import type { ComponentProps } from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -36,7 +36,7 @@ function Input({
   shape,
   iconAffix,
   ...props
-}: Omit<React.ComponentProps<'input'>, 'size'> & VariantProps<typeof inputVariants>) {
+}: Omit<ComponentProps<'input'>, 'size'> & VariantProps<typeof inputVariants>) {
   return (
     <input
       type={type}

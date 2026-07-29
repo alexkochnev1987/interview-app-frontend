@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from 'class-variance-authority'
-import * as React from 'react'
+import type { ComponentProps, ElementType } from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -28,13 +28,13 @@ const sectionVariants = cva('flex flex-col', {
   },
 })
 
-type SectionProps = Omit<React.ComponentProps<'section'>, 'color'> &
+type SectionProps = Omit<ComponentProps<'section'>, 'color'> &
   VariantProps<typeof sectionVariants> & {
     as?: 'section' | 'div' | 'article' | 'aside' | 'main'
   }
 
 export function Section({ as, className, gap, width, ...props }: SectionProps) {
-  const Comp = (as ?? 'section') as React.ElementType
+  const Comp = (as ?? 'section') as ElementType
 
   return <Comp className={cn(sectionVariants({ gap, width }), className)} {...props} />
 }
