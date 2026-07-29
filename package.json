@@ -67,9 +67,8 @@
       "oxfmt --write --no-error-on-unmatched-pattern",
       "oxlint --no-error-on-unmatched-pattern"
     ],
-    "*.config.{js,ts,mjs}": [
+    "*.{json,js,ts,mjs}": [
       "oxfmt --write --no-error-on-unmatched-pattern"
     ]
   }
-
 }
