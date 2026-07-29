@@ -80,20 +80,15 @@ function groupByPosition(
     if (sort === 'name') return 0
     return g.templates.reduce((sum, t) => sum + t.usageCount, 0)
   }
-  return (
-    Array.from(groups.values())
-      .map((group) => ({
-        ...group,
-        // eslint-disable-next-line unicorn/no-array-sort
-        templates: [...group.templates].sort(cardComparator(sort)),
-      }))
-      // eslint-disable-next-line unicorn/no-array-sort
-      .sort((a, b) => {
-        if (isOther(a) !== isOther(b)) return isOther(a) ? 1 : -1
-        if (sort === 'name') return a.header.localeCompare(b.header)
-        return rank(b) - rank(a) || a.header.localeCompare(b.header)
-      })
-  )
+  for (const group of groups.values()) {
+    group.templates.sort(cardComparator(sort))
+  }
+  // oxlint-disable-next-line unicorn/no-array-sort
+  return Array.from(groups.values()).sort((a, b) => {
+    if (isOther(a) !== isOther(b)) return isOther(a) ? 1 : -1
+    if (sort === 'name') return a.header.localeCompare(b.header)
+    return rank(b) - rank(a) || a.header.localeCompare(b.header)
+  })
 }
 
 export function TemplatesListClient() {
