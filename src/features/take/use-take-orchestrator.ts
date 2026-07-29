@@ -366,7 +366,10 @@ export function useTakeOrchestrator({
     setStage,
     clearRecordingArtifacts,
     releaseCaptureStreams: releaseAllCaptures,
-    releaseLobbyCameraOnly: () => releaseCameraCapture(cameraStreamRef, videoRef),
+    releaseLobbyCameraOnly: () => {
+      releaseCameraCapture(cameraStreamRef, videoRef)
+      setCameraStream(null)
+    },
     attachCameraPreview,
     stopMediaStream,
     getPermissionErrorMessage: (err, requiresEntireScreen) =>
