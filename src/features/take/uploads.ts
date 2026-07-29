@@ -46,7 +46,7 @@ export async function completeMultipartUpload({
     if (error instanceof ApiError) {
       throw error
     }
-    throw new Error(`Failed to finalize ${target} upload.`)
+    throw new Error(`Failed to finalize ${target} upload.`, { cause: error })
   }
 
   session.completed = true

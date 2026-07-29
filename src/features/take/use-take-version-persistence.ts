@@ -401,6 +401,7 @@ export function useTakeVersionPersistence({
       interview,
       setUploading,
       setSubmitError,
+      setActionErrorKind,
       setStage,
       setVersionPersistKind,
       setCurrentVersionNumber,

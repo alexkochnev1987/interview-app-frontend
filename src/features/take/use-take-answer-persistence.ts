@@ -253,6 +253,7 @@ export function useTakeAnswerPersistence({
           error instanceof Error
             ? error.message.replace('upload', target)
             : `Failed to prepare ${target} upload chunk ${partNumber}.`,
+          { cause: error },
         )
       }
     },

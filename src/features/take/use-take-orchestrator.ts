@@ -435,8 +435,8 @@ export function useTakeOrchestrator({
     },
     attachCameraPreview,
     stopMediaStream,
-    getPermissionErrorMessage: (error, requiresEntireScreen) =>
-      getPermissionErrorMessage(error, requiresEntireScreen, takeMessage),
+    getPermissionErrorMessage: (permErr, requiresEntireScreen) =>
+      getPermissionErrorMessage(permErr, requiresEntireScreen, takeMessage),
     screenStreamRef,
     cameraStreamRef,
     screenVideoRef,
@@ -616,10 +616,12 @@ export function useTakeOrchestrator({
       setStage('interview')
     }
 
+    // oxlint-disable-next-line unicorn/prefer-add-event-listener
     screenTrack.onended = onEnded
 
     return () => {
       if (screenTrack.onended === onEnded) {
+        // oxlint-disable-next-line unicorn/prefer-add-event-listener
         screenTrack.onended = null
       }
     }
@@ -762,9 +764,9 @@ export function useTakeOrchestrator({
     if (submittableVersion === null || submittableVersion === undefined) {
       return
     }
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- pin UI version to latest submittable media in review
     setCurrentVersionNumber(submittableVersion)
     currentVersionNumberRef.current = submittableVersion
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, [
     interview?.currentQuestionIndex,
     interview?.currentAnswerMeta?.versionCount,
@@ -804,6 +806,7 @@ export function useTakeOrchestrator({
     clearRecordingArtifacts()
     setRecording(false)
     setRecordingStartBusy(false)
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, [
     interview?.currentQuestionIndex,
     interview?.currentAnswerMeta?.versionCount,
@@ -892,6 +895,7 @@ export function useTakeOrchestrator({
         setRecordingStartBusy(false)
       }
     })()
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, [
     stage,
     setupError,

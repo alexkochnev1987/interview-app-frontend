@@ -45,6 +45,7 @@ export function stopMediaStream(stream: MediaStream | null) {
   }
 
   stream.getTracks().forEach((track) => {
+    // oxlint-disable-next-line unicorn/prefer-add-event-listener
     track.onended = null
     track.stop()
   })

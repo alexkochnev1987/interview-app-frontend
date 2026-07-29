@@ -29,6 +29,7 @@ export function queueBufferedUpload({
     return Promise.resolve()
   }
 
+  // oxlint-disable-next-line promise/always-return
   session.uploadChain = session.uploadChain.then(async () => {
     let activeSession = multipartUploadsRef.current[target]
 
@@ -37,6 +38,7 @@ export function queueBufferedUpload({
       !activeSession.aborted &&
       !activeSession.completed &&
       (activeSession.bufferedBytes >= MULTIPART_PART_SIZE_BYTES ||
+        // oxlint-disable-next-line no-unmodified-loop-condition
         (forceFinal && activeSession.bufferedBytes > 0))
     ) {
       const inferredType =
@@ -50,15 +52,17 @@ export function queueBufferedUpload({
       const partNumber = activeSession.nextPartNumber
       activeSession.nextPartNumber += 1
 
+      // oxlint-disable-next-line no-await-in-loop
       const partUpload = await preSignMultipartPartUpload(target, activeSession, partNumber)
 
       try {
+        // oxlint-disable-next-line no-await-in-loop
         await uploadMultipartPart(partUpload.uploadUrl, partBlob)
       } catch (error) {
         if (error instanceof ApiError) {
           throw error
         }
-        throw new Error(`Chunk upload failed for ${target} recording.`)
+        throw new Error(`Chunk upload failed for ${target} recording.`, { cause: error })
       }
 
       activeSession = multipartUploadsRef.current[target]
@@ -82,7 +86,7 @@ export function handleRecordedChunk({
   target,
   blob,
   multipartUploadsRef,
-  queueBufferedUpload,
+  queueBufferedUpload: queueUpload,
 }: HandleRecordedChunkParams) {
   if (blob.size < 1) {
     return
@@ -98,6 +102,6 @@ export function handleRecordedChunk({
   session.recordedBytes += blob.size
 
   if (session.bufferedBytes >= MULTIPART_PART_SIZE_BYTES) {
-    void queueBufferedUpload(target).catch(() => undefined)
+    void queueUpload(target).catch(() => undefined)
   }
 }
