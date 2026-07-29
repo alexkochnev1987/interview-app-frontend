@@ -2,7 +2,7 @@
 
 import { ArrowLeft, ArrowRight, MessageSquareText } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { Fragment } from 'react'
+import { Fragment, type ReactNode } from 'react'
 
 import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { Button } from '@/components/ui/button'
@@ -51,9 +51,7 @@ interface InterviewSummaryCardProps {
   onOpenDeleteConfirm: () => void
 }
 
-function renderActionButtons<T extends { id: string; node: React.ReactNode }>(
-  buttons: readonly T[],
-) {
+function renderActionButtons(buttons: ReadonlyArray<{ id: string; node: ReactNode }>) {
   return buttons.map(({ id, node }) => <Fragment key={id}>{node}</Fragment>)
 }
 

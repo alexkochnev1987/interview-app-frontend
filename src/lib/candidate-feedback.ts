@@ -634,7 +634,7 @@ export function buildGenerateAllQuestionSkipEntries(
   return (
     skippedQuestions
       .slice()
-      // eslint-disable-next-line unicorn/no-array-sort
+      // oxlint-disable-next-line unicorn/no-array-sort
       .sort((left, right) => left.questionIndex - right.questionIndex)
       .map((question) => ({
         questionIndex: question.questionIndex,

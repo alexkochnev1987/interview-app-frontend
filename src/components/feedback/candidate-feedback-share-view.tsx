@@ -2,6 +2,9 @@
 
 import { BadgeCheck, Sparkles, Target } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
+import type { ReactNode } from 'react'
+
+const renderStrong = (chunks: ReactNode) => <strong>{chunks}</strong>
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
@@ -29,8 +32,6 @@ type CandidateFeedbackShareViewProps = {
   /** Already resolved in interviewLocale for presets; custom text as published. */
   outcomeMessage: string
 }
-
-const renderStrong = (chunks: React.ReactNode) => <strong>{chunks}</strong>
 
 function hasText(value?: string): boolean {
   return Boolean(value?.trim())
