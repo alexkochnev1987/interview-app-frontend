@@ -200,13 +200,20 @@ export function useTakeVersionPersistence({
             return;
           }
 
-          const localVersionHasMedia =
+          const hasCameraMedia =
             cameraUpload.mediaKeyPersisted ||
-            screenUpload.mediaKeyPersisted ||
             cameraUpload.recordedBytes > 0 ||
+            hasUploadedCameraParts;
+
+          const hasScreenMedia =
+            screenUpload.mediaKeyPersisted ||
             screenUpload.recordedBytes > 0 ||
-            hasUploadedCameraParts ||
             hasUploadedScreenParts;
+
+          // Treat media as present only when both camera + screen have something.
+          // Partial recordings (e.g. screen-share dropped mid-recording) should not
+          // be considered a usable saved version for retake/advance decisions.
+          const localVersionHasMedia = hasCameraMedia && hasScreenMedia;
 
           const isEmptyPersistedStub =
             (cameraUpload.mediaKeyPersisted || screenUpload.mediaKeyPersisted) &&

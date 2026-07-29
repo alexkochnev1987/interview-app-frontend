@@ -793,8 +793,15 @@ export function useTakeOrchestrator({
         phase: resolveQuestionAnswerPhase(interview),
         recording: recordingRef.current,
         recordingStartBusy: recordingStartBusyRef.current,
+        // multipart ref objects can remain after abort; only treat non-aborted and
+        // non-completed sessions as active.
         hasActiveMultipart: Boolean(
-          multipartUploadsRef.current.camera || multipartUploadsRef.current.screen,
+          (multipartUploadsRef.current.camera &&
+            !multipartUploadsRef.current.camera.aborted &&
+            !multipartUploadsRef.current.camera.completed) ||
+            (multipartUploadsRef.current.screen &&
+              !multipartUploadsRef.current.screen.aborted &&
+              !multipartUploadsRef.current.screen.completed),
         ),
       })
     ) {
@@ -802,6 +809,7 @@ export function useTakeOrchestrator({
     }
     clearProgressTimers(timerRef, progressHeartbeatRef, progressFlushTimeoutRef);
     void abortMultipartUploads();
+    clearRecordingArtifacts();
     setRecording(false);
     setRecordingStartBusy(false);
   }, [
@@ -812,6 +820,7 @@ export function useTakeOrchestrator({
     recording,
     recordingStartBusy,
     abortMultipartUploads,
+    clearRecordingArtifacts,
   ]);
 
   function proceedToLobby() {
