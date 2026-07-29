@@ -20,7 +20,6 @@
     "out/**",
     "build/**",
     "next-env.d.ts",
-    "src/components/ui/**",
     "scripts/**"
   ]
 }

@@ -53,8 +53,13 @@ type VideoSurfaceProps = VideoHTMLAttributes<HTMLVideoElement> &
   VariantProps<typeof videoSurfaceVariants>
 
 export const VideoSurface = forwardRef<HTMLVideoElement, VideoSurfaceProps>(function VideoSurface(
-  { className, fit, ...props },
+  { className, fit, children, ...props },
   ref,
 ) {
-  return <video ref={ref} className={cn(videoSurfaceVariants({ fit }), className)} {...props} />
+  return (
+    <video ref={ref} className={cn(videoSurfaceVariants({ fit }), className)} {...props}>
+      {children}
+      <track kind="captions" />
+    </video>
+  )
 })

@@ -170,6 +170,7 @@ function RecordingAiInterviewerSessionLayout({
       </Inline>
 
       <Panel
+        as="section"
         padding="none"
         radius="md"
         className={cn(
@@ -179,7 +180,6 @@ function RecordingAiInterviewerSessionLayout({
           'lg:h-[136px] lg:w-[208px]',
           'xl:h-[142px] xl:w-[224px]',
         )}
-        role="region"
         aria-label="Your camera"
       >
         <CameraPreviewVideo videoRef={cameraVideoRef} objectFit="cover" />

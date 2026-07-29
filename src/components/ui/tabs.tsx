@@ -109,6 +109,7 @@ export function Tabs({
   return (
     <div
       role="tablist"
+      tabIndex={-1}
       aria-label={ariaLabel}
       aria-orientation="horizontal"
       data-slot="tabs"

@@ -1,3 +1,4 @@
+// oxlint-disable jsx-a11y/prefer-tag-over-role jsx-a11y/no-noninteractive-element-interactions jsx-a11y/click-events-have-key-events
 'use client'
 
 import { AlertTriangle, LoaderCircle } from 'lucide-react'

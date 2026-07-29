@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from 'class-variance-authority'
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ElementType } from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -33,11 +33,22 @@ const panelVariants = cva('ring-1 ring-border/45', {
   },
 })
 
-type PanelProps = ComponentProps<'div'> & VariantProps<typeof panelVariants>
+type PanelProps = ComponentProps<'div'> &
+  VariantProps<typeof panelVariants> & {
+    as?: ElementType
+  }
 
-function Panel({ tone, radius, padding, minHeight, className, ...props }: PanelProps) {
+function Panel({
+  as: Component = 'div',
+  tone,
+  radius,
+  padding,
+  minHeight,
+  className,
+  ...props
+}: PanelProps) {
   return (
-    <div
+    <Component
       className={cn(panelVariants({ tone, radius, padding, minHeight }), className)}
       {...props}
     />
