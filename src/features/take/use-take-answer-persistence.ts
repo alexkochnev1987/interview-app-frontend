@@ -11,6 +11,7 @@ import {
   type ClientTranscriptPayload,
   type TakeProgressResponse,
 } from '@/lib/api';
+import { ApiError } from '@/lib/api-error';
 
 import {
   createMultipartUploadSession,
@@ -29,11 +30,11 @@ import {
   startProgressHeartbeat as startProgressHeartbeatData,
 } from './progress';
 import { abortMultipartUploads as abortMultipartUploadsData, completeMultipartUpload as completeMultipartUploadData } from './uploads';
-import { shouldSendAnswerProgressDuringRecording } from './attempt-limit';
+import type { AnswerMetaUpdate } from './use-take-begin-recording';
 
 interface UseTakeAnswerPersistenceParams {
   id: string;
-  onAnswerMetaUpdated?: (meta: TakeProgressResponse) => void;
+  onAnswerMetaUpdated?: (meta: AnswerMetaUpdate) => void;
   currentVersionNumberRef: React.MutableRefObject<number>;
   answerStartedAtRef: React.MutableRefObject<string | null>;
   answerStoppedAtMsRef: React.MutableRefObject<number | null>;
@@ -82,14 +83,16 @@ export function useTakeAnswerPersistence({
     async (
       questionIndex: number,
       mediaType: CaptureTarget,
-      options?: { versionNumber?: number },
+      options: { versionNumber: number },
     ): Promise<MultipartUploadSession> => {
       const session = await startMultipartUpload(questionIndex, mediaType, {
-        ...(options?.versionNumber !== undefined
-          ? { versionNumber: options.versionNumber }
-          : {}),
+        versionNumber: options.versionNumber,
       });
-      return createMultipartUploadSession({ ...session, questionIndex });
+      return createMultipartUploadSession({
+        ...session,
+        questionIndex,
+        versionNumber: options.versionNumber,
+      });
     },
     [],
   );
@@ -98,10 +101,6 @@ export function useTakeAnswerPersistence({
     async (forceAllEvents = false): Promise<TakeProgressResponse | undefined> => {
       const cameraUpload = multipartUploadsRef.current.camera;
       if (!cameraUpload) {
-        return undefined;
-      }
-
-      if (!shouldSendAnswerProgressDuringRecording(currentVersionNumberRef.current)) {
         return undefined;
       }
 
@@ -117,7 +116,7 @@ export function useTakeAnswerPersistence({
         id,
         buildProgressPayload({
           questionIndex: cameraUpload.questionIndex,
-          versionNumber: currentVersionNumberRef.current,
+          versionNumber: cameraUpload.versionNumber,
           mediaKey: cameraUpload.mediaKey,
           screenMediaKey: screenUpload?.mediaKey,
           durationSeconds: answerDurationSecondsRef.current,
@@ -141,8 +140,21 @@ export function useTakeAnswerPersistence({
       );
 
       flushedBehaviorEventCountRef.current = behaviorEventsRef.current.length;
-      currentVersionNumberRef.current = progressResponse.selectedVersionNumber;
-      onAnswerMetaUpdated?.(progressResponse);
+      const activeVersionNumber = cameraUpload.versionNumber;
+      if (progressResponse.selectedVersionNumber === activeVersionNumber) {
+        currentVersionNumberRef.current = progressResponse.selectedVersionNumber;
+      } else if (currentVersionNumberRef.current !== activeVersionNumber) {
+        currentVersionNumberRef.current = activeVersionNumber;
+      }
+      cameraUpload.mediaKeyPersisted = true;
+      if (screenUpload) {
+        screenUpload.mediaKeyPersisted = true;
+      }
+      onAnswerMetaUpdated?.({
+        versionCount: progressResponse.versionCount,
+        selectedVersionNumber: activeVersionNumber,
+        status: progressResponse.status,
+      });
       return progressResponse;
     },
     [
@@ -224,8 +236,14 @@ export function useTakeAnswerPersistence({
           session.mediaKey,
           session.uploadId,
           partNumber,
+          {
+            versionNumber: session.versionNumber,
+          },
         );
       } catch (error) {
+        if (error instanceof ApiError) {
+          throw error;
+        }
         throw new Error(
           error instanceof Error
             ? error.message.replace('upload', target)

@@ -4,7 +4,16 @@ import { useBrowserTranscript } from '@/lib/use-browser-transcript';
 import { type TakeInterviewData } from '@/lib/api';
 import type { PermissionStatus, TakeStage } from '@/components/take/types';
 import type { TakeMessageGetter } from './messages';
-import { progressValueForStage, stageAfterInterviewLoad, type VersionPersistKind } from './session-machine';
+import {
+  progressValueForStage,
+  resolveInterviewLoadMode,
+  resolveQuestionAnswerPhase,
+  shouldCleanupExhaustedSession,
+  stageAfterInterviewLoad,
+  type ExhaustedHint,
+  type VersionPersistKind,
+  answerAttemptMetaFromInterview,
+} from './session-machine';
 import {
   clearProgressTimers,
   releaseAllInterviewCaptures,
@@ -38,11 +47,13 @@ import {
 } from './use-take-question-tts';
 import type { Locale } from '@/i18n/locales';
 import {
+  MAX_ANSWER_ATTEMPTS_PER_QUESTION,
   canStartNewAttempt,
   canRequestRetake,
   getDisplayedAttemptNumber,
   resolveInitialVersionNumber,
 } from './attempt-limit';
+import type { BeginRecordingInput, AnswerMetaUpdate } from './use-take-begin-recording';
 
 type PendingVersionAction = 'submit' | 'rerecord' | null;
 
@@ -115,18 +126,21 @@ export function useTakeOrchestrator({
 
   const [stage, setStage] = useState<TakeStage>(() =>
     initialInterview
-      ? stageAfterInterviewLoad(initialInterview, 'initial')
+      ? stageAfterInterviewLoad(initialInterview, 'returning')
       : 'loading',
   );
   const [interview, setInterview] = useState<TakeInterviewData | null>(
     initialInterview ?? null,
   );
+  const interviewRef = useRef<TakeInterviewData | null>(initialInterview ?? null);
   const [error, setError] = useState('');
-  const [consent, setConsent] = useState(false);
+  const [consent, setConsent] = useState(() => Boolean(initialInterview));
   const [recording, setRecording] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TAKE_RECORDING_LIMIT_SECONDS);
   const [retakeCount, setRetakeCount] = useState(0);
-  const [currentVersionNumber, setCurrentVersionNumber] = useState(1);
+  const [currentVersionNumber, setCurrentVersionNumber] = useState(() =>
+    initialInterview?.currentAnswerMeta?.selectedVersionNumber ?? 1,
+  );
   const [uploading, setUploading] = useState(false);
   const [cameraStatus, setCameraStatus] = useState<PermissionStatus>('idle');
   const [screenStatus, setScreenStatus] = useState<PermissionStatus>('idle');
@@ -134,6 +148,7 @@ export function useTakeOrchestrator({
   const [setupBusy, setSetupBusy] = useState(false);
   const [setupError, setSetupError] = useState('');
   const [submitError, setSubmitError] = useState('');
+  const [actionErrorKind, setActionErrorKind] = useState<VersionPersistKind | null>(null);
   const [versionPersistKind, setVersionPersistKind] = useState<VersionPersistKind | null>(null);
   const [recordingStartBusy, setRecordingStartBusy] = useState(false);
   const [lobbyMicOn, setLobbyMicOn] = useState(false);
@@ -172,7 +187,9 @@ export function useTakeOrchestrator({
   const answerDurationSecondsRef = useRef<number>(0);
   const stoppedRecordersRef = useRef(0);
   const expectedRecorderStopsRef = useRef(0);
-  const currentVersionNumberRef = useRef(1);
+  const currentVersionNumberRef = useRef(
+    initialInterview?.currentAnswerMeta?.selectedVersionNumber ?? 1,
+  );
   const behaviorSignalsRef = useRef<TakeBehaviorSignals>(createEmptyBehaviorSignals());
   const behaviorEventsRef = useRef<AnswerBehaviorEvent[]>([]);
   const flushedBehaviorEventCountRef = useRef(0);
@@ -180,10 +197,20 @@ export function useTakeOrchestrator({
   const pendingVersionActionRef = useRef<PendingVersionAction>(null);
   const multipartUploadsRef = useRef<MultipartUploadState>({ camera: null, screen: null });
   const beginRecordingRef = useRef<
-    (nextVersionNumber: number, currentQuestionIndex: number) => Promise<void>
+    (
+      nextVersionNumber: number,
+      currentQuestionIndex: number,
+      options?: Omit<BeginRecordingInput, 'nextVersionNumber' | 'hasCurrentQuestion' | 'currentQuestionIndex'>,
+    ) => Promise<void>
   >(async () => undefined);
   const requestVersionActionRef = useRef<(action: PendingVersionAction) => void>(() => undefined);
   const autoStartedQuestionKeyRef = useRef('');
+  const pendingReuseReservedRef = useRef<{
+    versionNumber: number;
+    versionCount: number;
+    maxAttempts: number;
+    failCount: number;
+  } | null>(null);
   const recordingRef = useRef(recording);
   const uploadingRef = useRef(uploading);
   const recordingStartBusyRef = useRef(recordingStartBusy);
@@ -192,6 +219,10 @@ export function useTakeOrchestrator({
   useEffect(() => {
     recordingRef.current = recording;
   }, [recording]);
+
+  useEffect(() => {
+    interviewRef.current = interview;
+  }, [interview]);
 
   useEffect(() => {
     uploadingRef.current = uploading;
@@ -218,6 +249,16 @@ export function useTakeOrchestrator({
     cameraStreamRef.current = stream;
     setCameraStream(stream);
     syncVideoPreview(videoRef.current, stream);
+  }
+
+  function hasLiveCaptureStreams(): boolean {
+    const cameraLive = Boolean(
+      cameraStreamRef.current?.getTracks().some((track) => track.readyState === 'live'),
+    );
+    const screenLive = Boolean(
+      screenStreamRef.current?.getTracks().some((track) => track.readyState === 'live'),
+    );
+    return cameraLive && screenLive;
   }
 
   function releaseAllCaptures() {
@@ -255,31 +296,32 @@ export function useTakeOrchestrator({
     syncVideoPreview(screenVideoRef.current, screenStreamRef.current);
   }, [stage, recording]);
 
-  const syncAnswerMetaFromProgress = useCallback(
-    (meta: {
-      versionCount: number;
-      selectedVersionNumber: number;
-      status?: 'recording' | 'submitted';
-    }) => {
-      setInterview((previous) => {
-        if (!previous) {
-          return previous;
-        }
+  const syncAnswerMetaFromProgress = useCallback((meta: AnswerMetaUpdate) => {
+    setInterview((previous) => {
+      if (!previous) {
+        return previous;
+      }
 
-        return {
-          ...previous,
-          currentAnswerMeta: {
-            status: meta.status ?? previous.currentAnswerMeta?.status ?? 'recording',
-            versionCount: meta.versionCount,
-            selectedVersionNumber: meta.selectedVersionNumber,
-          },
-        };
-      });
-      setCurrentVersionNumber(meta.selectedVersionNumber);
-      currentVersionNumberRef.current = meta.selectedVersionNumber;
-    },
-    [],
-  );
+      const previousMeta = previous.currentAnswerMeta;
+      return {
+        ...previous,
+        ...(typeof meta.maxAttempts === 'number' ? { maxAttempts: meta.maxAttempts } : {}),
+        currentAnswerMeta: {
+          status: meta.status ?? previousMeta?.status ?? 'recording',
+          versionCount: meta.versionCount,
+          selectedVersionNumber: meta.selectedVersionNumber,
+          hasSubmittableMedia:
+            meta.hasSubmittableMedia ?? previousMeta?.hasSubmittableMedia ?? false,
+          latestSubmittableVersionNumber:
+            meta.latestSubmittableVersionNumber !== undefined
+              ? meta.latestSubmittableVersionNumber
+              : (previousMeta?.latestSubmittableVersionNumber ?? null),
+        },
+      };
+    });
+    setCurrentVersionNumber(meta.selectedVersionNumber);
+    currentVersionNumberRef.current = meta.selectedVersionNumber;
+  }, []);
 
   const {
     startMultipartUploadSession,
@@ -330,10 +372,33 @@ export function useTakeOrchestrator({
       }
 
       setInterview(data);
+      interviewRef.current = data;
       if (data.completed) {
         releaseAllCaptures();
+        setStage('complete');
+        return;
       }
-      setStage(stageAfterInterviewLoad(data, mode));
+
+      const loadMode = resolveInterviewLoadMode(mode, {
+        serverPrefetched: Boolean(initialInterview),
+      });
+
+      if (mode === 'resume' && resolveQuestionAnswerPhase(data) === 'recording') {
+        if (hasLiveCaptureStreams()) {
+          setStage('interview');
+        } else {
+          autoStartedQuestionKeyRef.current = '';
+          resetLobbyControls();
+          setCameraStatus('idle');
+          setScreenStatus('idle');
+          setScreenSurface('');
+          setSetupError('');
+          setStage('lobby');
+        }
+        return;
+      }
+
+      setStage(stageAfterInterviewLoad(data, loadMode));
     },
     onError: setError,
     onCleanup: () => {
@@ -371,7 +436,10 @@ export function useTakeOrchestrator({
     setStage,
     clearRecordingArtifacts,
     releaseCaptureStreams: releaseAllCaptures,
-    releaseLobbyCameraOnly: () => releaseCameraCapture(cameraStreamRef, videoRef),
+    releaseLobbyCameraOnly: () => {
+      releaseCameraCapture(cameraStreamRef, videoRef);
+      setCameraStream(null);
+    },
     attachCameraPreview,
     stopMediaStream,
     getPermissionErrorMessage: (error, requiresEntireScreen) =>
@@ -440,15 +508,17 @@ export function useTakeOrchestrator({
     screenSurface === 'monitor' &&
     !setupError;
 
-  const { persistCurrentVersion } = useTakeVersionPersistence({
+  const { persistCurrentVersion, submitReviewAnswer } = useTakeVersionPersistence({
     id,
     interview,
     setUploading,
     setSubmitError,
+    setActionErrorKind,
     setStage,
     setVersionPersistKind,
     setCurrentVersionNumber,
     setRetakeCount,
+    setRecordingStartBusy,
     enqueueProgressFlush,
     waitForProgressFlush,
     queueBufferedUpload,
@@ -467,8 +537,8 @@ export function useTakeOrchestrator({
       stopBrowserTranscript({ finalize: true, timeoutMs: 700 }),
     loadInterview,
     clearRecordingArtifacts,
-    invokeBeginRecording: (nextVersionNumber, currentQuestionIndex) =>
-      beginRecordingRef.current(nextVersionNumber, currentQuestionIndex),
+    invokeBeginRecording: (nextVersionNumber, currentQuestionIndex, options) =>
+      beginRecordingRef.current(nextVersionNumber, currentQuestionIndex, options),
     onAnswerMetaUpdated: syncAnswerMetaFromProgress,
     takeMessage,
   });
@@ -584,8 +654,9 @@ export function useTakeOrchestrator({
     stopActiveRecorders,
   });
 
-  function requestSubmitAction() {
+  function requestInSessionSubmit() {
     setSubmitError('');
+    setActionErrorKind(null);
     const activeCameraUpload = multipartUploadsRef.current.camera;
     const activeScreenUpload = multipartUploadsRef.current.screen;
     const currentQuestionIndex = interview?.currentQuestionIndex;
@@ -596,6 +667,7 @@ export function useTakeOrchestrator({
       activeScreenUpload?.questionIndex === currentQuestionIndex;
 
     if (!isUploadSessionSynced) {
+      setActionErrorKind('submit');
       setSubmitError(takeMessage('syncingInProgress'));
       return;
     }
@@ -605,15 +677,27 @@ export function useTakeOrchestrator({
 
   function requestVersionAction(action: PendingVersionAction) {
     if (action === 'submit') {
-      requestSubmitAction();
+      requestInSessionSubmit();
       return;
     }
 
     setSubmitError('');
+    setActionErrorKind(null);
     baseRequestVersionAction(action);
   }
 
+  function requestSubmitAction() {
+    if (recording) {
+      requestVersionAction('submit');
+      return;
+    }
+    if (resolveQuestionAnswerPhase(interview) === 'review') {
+      void submitReviewAnswer();
+    }
+  }
+
   const { beginRecording } = useTakeBeginRecording({
+    interviewId: id,
     cameraStreamRef,
     screenStreamRef,
     cameraRecorderRef,
@@ -639,6 +723,16 @@ export function useTakeOrchestrator({
     clearVersionPersistKind: () => setVersionPersistKind(null),
     clearRecordingArtifacts,
     resetInterviewSetup,
+    onAnswerMetaUpdated: syncAnswerMetaFromProgress,
+    getAnswerMaxAttempts: () => interviewRef.current?.maxAttempts ?? MAX_ANSWER_ATTEMPTS_PER_QUESTION,
+    canStartRecordingAttempt: () => {
+      const current = interviewRef.current;
+      return (
+        resolveQuestionAnswerPhase(current) === 'recording' &&
+        canStartNewAttempt(answerAttemptMetaFromInterview(current))
+      );
+    },
+    pendingReuseReservedRef,
     startMultipartUploadSession,
     flushAnswerProgress,
     startProgressHeartbeat,
@@ -654,17 +748,84 @@ export function useTakeOrchestrator({
   });
 
   useEffect(() => {
-    beginRecordingRef.current = async (nextVersionNumber, currentQuestionIndex) => {
+    beginRecordingRef.current = async (nextVersionNumber, currentQuestionIndex, options) => {
       await beginRecording({
         nextVersionNumber,
         hasCurrentQuestion: true,
         currentQuestionIndex,
+        ...options,
       });
     };
   }, [beginRecording]);
 
+  useEffect(() => {
+    if (!interview?.currentAnswerMeta) {
+      return;
+    }
+    if (resolveQuestionAnswerPhase(interview) !== 'review') {
+      return;
+    }
+    const submittableVersion =
+      interview.currentAnswerMeta.latestSubmittableVersionNumber;
+    if (submittableVersion === null || submittableVersion === undefined) {
+      return;
+    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- pin UI version to latest submittable media in review
+    setCurrentVersionNumber(submittableVersion);
+    currentVersionNumberRef.current = submittableVersion;
+  }, [
+    interview?.currentQuestionIndex,
+    interview?.currentAnswerMeta?.versionCount,
+    interview?.currentAnswerMeta?.hasSubmittableMedia,
+    interview?.currentAnswerMeta?.latestSubmittableVersionNumber,
+  ]);
+
+  useEffect(() => {
+    pendingReuseReservedRef.current = null;
+  }, [interview?.currentQuestionIndex]);
+
+  useEffect(() => {
+    if (!interview) {
+      return;
+    }
+    if (
+      !shouldCleanupExhaustedSession({
+        phase: resolveQuestionAnswerPhase(interview),
+        recording: recordingRef.current,
+        recordingStartBusy: recordingStartBusyRef.current,
+        // multipart ref objects can remain after abort; only treat non-aborted and
+        // non-completed sessions as active.
+        hasActiveMultipart: Boolean(
+          (multipartUploadsRef.current.camera &&
+            !multipartUploadsRef.current.camera.aborted &&
+            !multipartUploadsRef.current.camera.completed) ||
+            (multipartUploadsRef.current.screen &&
+              !multipartUploadsRef.current.screen.aborted &&
+              !multipartUploadsRef.current.screen.completed),
+        ),
+      })
+    ) {
+      return;
+    }
+    clearProgressTimers(timerRef, progressHeartbeatRef, progressFlushTimeoutRef);
+    void abortMultipartUploads();
+    clearRecordingArtifacts();
+    setRecording(false);
+    setRecordingStartBusy(false);
+  }, [
+    interview?.currentQuestionIndex,
+    interview?.currentAnswerMeta?.versionCount,
+    interview?.currentAnswerMeta?.hasSubmittableMedia,
+    interview?.maxAttempts,
+    recording,
+    recordingStartBusy,
+    abortMultipartUploads,
+    clearRecordingArtifacts,
+  ]);
+
   function proceedToLobby() {
     autoStartedQuestionKeyRef.current = '';
+    pendingReuseReservedRef.current = null;
     setSetupError('');
     resetLobbyControls();
     setStage('lobby');
@@ -676,7 +837,8 @@ export function useTakeOrchestrator({
       !setupError &&
       cameraStatus === 'granted' &&
       screenStatus === 'granted' &&
-      screenSurface === 'monitor',
+      screenSurface === 'monitor' &&
+      Boolean(cameraStream?.getTracks().some((track) => track.readyState === 'live')),
   );
 
   useEffect(() => {
@@ -698,17 +860,33 @@ export function useTakeOrchestrator({
     if (!questionSpeechRecordingAllowedRef.current) {
       return;
     }
-    if (!canStartNewAttempt(interview.currentAnswerMeta)) {
-      return;
+
+    const reusePending = pendingReuseReservedRef.current;
+    if (!reusePending) {
+      if (resolveQuestionAnswerPhase(interview) !== 'recording') {
+        return;
+      }
+      if (!canStartNewAttempt(answerAttemptMetaFromInterview(interview))) {
+        return;
+      }
     }
 
-    const questionKey = `${interview.currentQuestionIndex}:${interview.currentAnswerMeta?.versionCount ?? 0}`;
+    const questionKey = String(interview.currentQuestionIndex);
     if (autoStartedQuestionKeyRef.current === questionKey) {
       return;
     }
 
     autoStartedQuestionKeyRef.current = questionKey;
-    const nextVersionNumber = resolveInitialVersionNumber(interview.currentAnswerMeta);
+    const nextVersionNumber =
+      reusePending?.versionNumber ??
+      resolveInitialVersionNumber(answerAttemptMetaFromInterview(interview));
+    const beginOptions = reusePending
+      ? {
+          reuseReservedAttempt: true as const,
+          versionCount: reusePending.versionCount,
+          maxAttempts: reusePending.maxAttempts,
+        }
+      : undefined;
 
     setRecordingStartBusy(true);
     void (async () => {
@@ -716,6 +894,7 @@ export function useTakeOrchestrator({
         await beginRecordingRef.current(
           nextVersionNumber,
           interview.currentQuestionIndex,
+          beginOptions,
         );
       } finally {
         setRecordingStartBusy(false);
@@ -727,6 +906,7 @@ export function useTakeOrchestrator({
     interview?.currentQuestion,
     interview?.currentQuestionIndex,
     interview?.currentAnswerMeta,
+    interview?.maxAttempts,
     recording,
     uploading,
     recordingStartBusy,
@@ -744,12 +924,31 @@ export function useTakeOrchestrator({
     stage === 'transition' ||
     interviewerPresence === 'speaking';
 
-  const retakeDisabled = !canRequestRetake(currentVersionNumber);
+  const attemptMeta = answerAttemptMetaFromInterview(interview);
+  const questionAnswerPhase = resolveQuestionAnswerPhase(interview);
+  const inFlightAttempt = recording || recordingStartBusy;
+  const attemptsExhausted = !inFlightAttempt && questionAnswerPhase !== 'recording';
+  const submitAllowed =
+    recording || (!inFlightAttempt && questionAnswerPhase === 'review');
+  const exhaustedHint: ExhaustedHint | null =
+    inFlightAttempt || questionAnswerPhase === 'recording'
+      ? null
+      : questionAnswerPhase === 'review'
+        ? 'submit'
+        : 'no-media';
+  const showDeviceReconnect =
+    Boolean(setupError) || questionAnswerPhase === 'recording' || inFlightAttempt;
+  const retakeDisabled =
+    attemptsExhausted ||
+    !canRequestRetake(currentVersionNumber, {
+      maxAttempts: interview?.maxAttempts,
+    });
   const displayedAttemptNumber = getDisplayedAttemptNumber(
-    interview?.currentAnswerMeta,
+    attemptMeta,
     currentVersionNumber,
     recording,
   );
+  const maxAttempts = interview?.maxAttempts ?? MAX_ANSWER_ATTEMPTS_PER_QUESTION;
 
   return {
     stage,
@@ -771,6 +970,7 @@ export function useTakeOrchestrator({
     setupBusy,
     setupError,
     submitError,
+    actionErrorKind,
     versionPersistKind,
     videoRef,
     cameraStream,
@@ -800,6 +1000,13 @@ export function useTakeOrchestrator({
     progressValue: interview ? progressValueForStage({ interview, stage }) : 0,
     loadInterview,
     displayedAttemptNumber,
+    maxAttempts,
     retakeDisabled,
+    attemptsExhausted,
+    questionAnswerPhase,
+    submitAllowed,
+    exhaustedHint,
+    showDeviceReconnect,
+    requestSubmitAction,
   };
 }

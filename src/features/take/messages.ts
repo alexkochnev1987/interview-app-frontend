@@ -1,3 +1,10 @@
+import { ApiError } from '@/lib/api-error';
+import {
+  MAX_ANSWER_ATTEMPTS_PER_QUESTION,
+  isAnswerAttemptLimitError,
+  isAnswerVersionOverwriteError,
+} from './attempt-limit';
+
 export const TAKE_MESSAGES = {
   questionCountOne: '{count} question',
   questionCountOther: '{count} questions',
@@ -10,6 +17,9 @@ export const TAKE_MESSAGES = {
     'Recording stopped without a follow-up action. Start a new version for this answer.',
   uploadFailedFallback: 'Upload failed',
   submitFailedTitle: 'Submit failed',
+  retakeFailedTitle: 'Retake failed',
+  answerVersionOverwriteForbidden:
+    'This recording attempt already has uploaded media. Start a new attempt instead of overwriting it.',
   reconnectCameraAndScreen: 'Reconnect camera + screen',
   rerecordAsNewVersion: 'Retake',
   submitAndNext: 'Submit & Next',
@@ -20,6 +30,8 @@ export const TAKE_MESSAGES = {
   lobbyEyebrow: 'Prep room',
   lobbyLead:
     'Enable mic and camera, share your full screen, then select Start Interview when all checks are ready.',
+  lobbyLeadReviewContinue:
+    'Attempts for this question are used up. Reconnect camera and screen so you can Submit, then continue to the next question.',
   lobbyJoin: 'Start Interview',
   lobbyJoinBusy: 'One moment…',
   lobbyDevicesHelp:
@@ -113,8 +125,14 @@ export const TAKE_MESSAGES = {
   beforeUnloadLeaveInterview:
     'If you reload or leave now, you will exit this interview and may lose your progress. Are you sure?',
   attemptsMetricLabel: 'Attempts:',
-  retakeDisabledAtLimitHint: 'Retake is available only for attempts 1 and 2.',
-  answerAttemptLimitReached: 'Recording attempt limit reached',
+  retakeDisabledAtLimitHint: 'No retakes left for this question.',
+  answerAttemptLimitReached: 'Recording attempt limit reached ({max})',
+  attemptBurnsOnRecordStart:
+    'Each time recording starts it uses one attempt. Reloading the page during a recording also uses that attempt.',
+  reloadUsesCurrentAttemptHint: 'Reloading uses up the current attempt.',
+  attemptsExhaustedNoMedia:
+    'There is no usable recording left to submit for this question.',
+  reviewSubmitBanner: 'All attempts used. Press Submit to continue.',
 } as const;
 
 export type TakeMessageKey = keyof typeof TAKE_MESSAGES;
@@ -124,6 +142,33 @@ export type TakeMessageGetter = (
   key: TakeMessageKey,
   values?: TakeMessageValues,
 ) => string;
+
+export function mapTakeSubmitErrorMessage(
+  error: unknown,
+  takeMessage: TakeMessageGetter,
+  options?: { maxAttempts?: number },
+): string {
+  if (isAnswerAttemptLimitError(error)) {
+    return takeMessage('answerAttemptLimitReached', {
+      max: options?.maxAttempts ?? MAX_ANSWER_ATTEMPTS_PER_QUESTION,
+    });
+  }
+  if (isAnswerVersionOverwriteError(error)) {
+    return takeMessage('answerVersionOverwriteForbidden');
+  }
+  if (error instanceof ApiError) {
+    if (error.code === 'ANSWER_VERSION_NOT_RESERVED') {
+      return takeMessage('attemptsExhaustedNoMedia');
+    }
+    if (error.message.trim()) {
+      return error.message;
+    }
+  }
+  if (error instanceof Error && error.message.trim()) {
+    return error.message;
+  }
+  return takeMessage('submitFallbackDetail');
+}
 
 export function formatTakeQuestionCountLabel(
   count: number,
