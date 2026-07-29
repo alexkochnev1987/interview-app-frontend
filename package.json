@@ -63,11 +63,13 @@
     "vitest": "^4.1.8"
   },
   "lint-staged": {
-    "!(openapi/**|src/lib/api-types.ts|*.md|**/*.md)*.{js,jsx,ts,tsx,json,css}": [
-      "npx oxfmt --write"
+    "{src,scripts,e2e,messages}/**/*.{js,jsx,ts,tsx,css,json}": [
+      "oxfmt --write --no-error-on-unmatched-pattern",
+      "oxlint --no-error-on-unmatched-pattern"
     ],
-    "!(openapi/**|src/lib/api-types.ts)*.{js,jsx,ts,tsx}": [
-      "npx oxlint"
+    "*.config.{js,ts,mjs}": [
+      "oxfmt --write --no-error-on-unmatched-pattern"
     ]
   }
+
 }
