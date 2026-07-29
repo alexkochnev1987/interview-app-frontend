@@ -27,6 +27,7 @@ import {
   TakeFlowLocaleProvider,
   useTakeFlowLocale,
 } from '@/features/take/take-flow-locale-provider'
+import { resolveQuestionAnswerPhase } from '@/features/take/session-machine'
 import type { TakeInterviewData } from '@/lib/api'
 import type { Locale } from '@/i18n/locales'
 
@@ -89,6 +90,7 @@ function TakeInterviewClientInner({
     setupBusy,
     setupError,
     submitError,
+    actionErrorKind,
     timeLeft,
     versionPersistKind,
     uploading,
@@ -122,6 +124,12 @@ function TakeInterviewClientInner({
     interviewerPresence,
     displayedAttemptNumber,
     retakeDisabled,
+    maxAttempts,
+    attemptsExhausted,
+    submitAllowed,
+    exhaustedHint,
+    showDeviceReconnect,
+    requestSubmitAction,
   } = useTakeOrchestrator({
     id,
     candidateToken,
@@ -242,6 +250,7 @@ function TakeInterviewClientInner({
         lobbyMicOn={lobbyMicOn}
         lobbyCameraOn={lobbyCameraOn}
         lobbyJoinReady={lobbyJoinReady}
+        reviewContinueHint={resolveQuestionAnswerPhase(interview) === 'review'}
         onToggleMic={() => void toggleLobbyMic()}
         onToggleCamera={() => void toggleLobbyCamera()}
         onScreenShare={() => void attachLobbyScreenShare()}
@@ -261,6 +270,7 @@ function TakeInterviewClientInner({
       setupError={setupError}
       capturePipelineReady={capturePipelineReady}
       submitError={submitError}
+      actionErrorKind={actionErrorKind}
       timeLeft={timeLeft}
       versionPersistKind={versionPersistKind}
       uploading={uploading}
@@ -275,9 +285,14 @@ function TakeInterviewClientInner({
       recordingStartBusy={recordingStartBusy}
       retakeDisabled={retakeDisabled}
       displayedAttemptNumber={displayedAttemptNumber}
+      maxAttempts={maxAttempts}
+      attemptsExhausted={attemptsExhausted}
+      submitAllowed={submitAllowed}
+      exhaustedHint={exhaustedHint}
+      showDeviceReconnect={showDeviceReconnect}
       onReconnect={restartFullInterviewCapture}
       onRerecord={() => requestVersionAction('rerecord')}
-      onSubmit={() => requestVersionAction('submit')}
+      onSubmit={requestSubmitAction}
     />,
   )
 }

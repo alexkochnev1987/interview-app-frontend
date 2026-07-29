@@ -1,4 +1,5 @@
 import type { MultipartUploadPartResponse } from '@/lib/api';
+import { ApiError } from '@/lib/api-error';
 
 import type { CaptureTarget, MultipartUploadSession, MultipartUploadState } from './runtime';
 
@@ -57,7 +58,10 @@ export function queueBufferedUpload({
 
       try {
         await uploadMultipartPart(partUpload.uploadUrl, partBlob);
-      } catch {
+      } catch (error) {
+        if (error instanceof ApiError) {
+          throw error;
+        }
         throw new Error(`Chunk upload failed for ${target} recording.`);
       }
 

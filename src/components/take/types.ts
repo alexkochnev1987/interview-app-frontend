@@ -11,7 +11,14 @@ export type TakeStage =
 
 export type InterviewDataView = Pick<
   TakeInterviewData,
-  'id' | 'position' | 'candidateName' | 'totalQuestions' | 'currentQuestion' | 'currentQuestionIndex' | 'currentAnswerMeta'
+  | 'id'
+  | 'position'
+  | 'candidateName'
+  | 'totalQuestions'
+  | 'currentQuestion'
+  | 'currentQuestionIndex'
+  | 'currentAnswerMeta'
+  | 'maxAttempts'
 >;
 
 export type PermissionStatus = 'idle' | 'pending' | 'granted' | 'denied';

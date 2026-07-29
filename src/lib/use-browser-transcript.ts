@@ -42,7 +42,7 @@ function getDefaultLanguage(): string {
 }
 
 export function useBrowserTranscript() {
-  const [isSupported] = useState(() => Boolean(getRecognitionConstructor()));
+  const [isSupported, setIsSupported] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [interimTranscript, setInterimTranscript] = useState('');
   const [finalTranscript, setFinalTranscript] = useState('');
@@ -61,6 +61,8 @@ export function useBrowserTranscript() {
   const afterSynthResumeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- post-mount SSR-safe SpeechRecognition detection
+    setIsSupported(Boolean(getRecognitionConstructor()));
     languageRef.current = getDefaultLanguage();
   }, []);
 

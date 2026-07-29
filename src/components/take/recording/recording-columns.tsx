@@ -15,6 +15,7 @@ import { LiveTranscriptPanel } from './recording-live-transcript-panel';
 import { TakeRecordingActions } from './recording-actions';
 import { TakeRecordingGuidance } from './recording-guidance';
 import type { InterviewDataView, TakeStage } from '@/components/take/types';
+import type { ExhaustedHint } from '@/features/take/session-machine';
 import type { InterviewerPresence } from '@/features/take/use-take-question-tts';
 
 interface TakeRecordingHeroColumnProps {
@@ -62,9 +63,15 @@ interface TakeRecordingSidebarColumnProps {
   recording: boolean;
   progressValue: number;
   submitError: string;
+  actionErrorKind: 'submit' | 'rerecord' | null;
   recordingStartBusy: boolean;
   retakeDisabled: boolean;
   displayedAttemptNumber: number;
+  maxAttempts: number;
+  attemptsExhausted: boolean;
+  submitAllowed: boolean;
+  exhaustedHint: ExhaustedHint | null;
+  showDeviceReconnect: boolean;
   isBrowserTranscriptSupported: boolean;
   finalTranscript: string;
   interimTranscript: string;
@@ -85,9 +92,15 @@ export function TakeRecordingSidebarColumn({
   recording,
   progressValue,
   submitError,
+  actionErrorKind,
   recordingStartBusy,
   retakeDisabled,
   displayedAttemptNumber,
+  maxAttempts,
+  attemptsExhausted,
+  submitAllowed,
+  exhaustedHint,
+  showDeviceReconnect,
   isBrowserTranscriptSupported,
   finalTranscript,
   interimTranscript,
@@ -137,6 +150,7 @@ export function TakeRecordingSidebarColumn({
               recording={recording}
               recordingStartBusy={recordingStartBusy}
               interviewerPresence={interviewerPresence}
+              exhaustedHint={exhaustedHint}
             />
 
             <TakeRecordingActions
@@ -149,6 +163,11 @@ export function TakeRecordingSidebarColumn({
               interviewerPresence={interviewerPresence}
               retakeDisabled={retakeDisabled}
               displayedAttemptNumber={displayedAttemptNumber}
+              maxAttempts={maxAttempts}
+              attemptsExhausted={attemptsExhausted}
+              submitAllowed={submitAllowed}
+              exhaustedHint={exhaustedHint}
+              showDeviceReconnect={showDeviceReconnect}
               onReconnect={onReconnect}
               onRerecord={onRerecord}
               onSubmit={onSubmit}
@@ -157,7 +176,11 @@ export function TakeRecordingSidebarColumn({
 
             {submitError ? (
               <Alert variant="destructive">
-                <AlertTitle>{tTake('submitFailedTitle')}</AlertTitle>
+                <AlertTitle>
+                  {tTake(
+                    actionErrorKind === 'rerecord' ? 'retakeFailedTitle' : 'submitFailedTitle',
+                  )}
+                </AlertTitle>
                 <AlertDescription>{submitError}</AlertDescription>
               </Alert>
             ) : null}

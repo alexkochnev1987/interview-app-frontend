@@ -13,12 +13,14 @@ export interface MultipartUploadSession {
   questionIndex: number;
   mediaKey: string;
   uploadId: string;
+  versionNumber: number;
   partBlobType?: string;
   nextPartNumber: number;
   uploadedPartCount: number;
   bufferedChunks: Blob[];
   bufferedBytes: number;
   recordedBytes: number;
+  mediaKeyPersisted: boolean;
   uploadChain: Promise<void>;
   completed: boolean;
   aborted: boolean;
@@ -33,6 +35,7 @@ export interface MultipartSessionSeed {
   questionIndex: number;
   mediaKey: string;
   uploadId: string;
+  versionNumber: number;
 }
 
 export function stopMediaStream(stream: MediaStream | null) {
@@ -144,11 +147,13 @@ export function createMultipartUploadSession(session: MultipartSessionSeed): Mul
     questionIndex: session.questionIndex,
     mediaKey: session.mediaKey,
     uploadId: session.uploadId,
+    versionNumber: session.versionNumber,
     nextPartNumber: 1,
     uploadedPartCount: 0,
     bufferedChunks: [],
     bufferedBytes: 0,
     recordedBytes: 0,
+    mediaKeyPersisted: false,
     uploadChain: Promise.resolve(),
     completed: false,
     aborted: false,
