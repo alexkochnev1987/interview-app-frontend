@@ -143,6 +143,43 @@ export function useTakeBeginRecording({
         await flushAnswerProgress(true)
         startProgressHeartbeat()
       }
+
+      const recorderOptions = buildMediaRecorderOptions()
+
+      const cameraRecorder = new MediaRecorder(cameraStreamRef.current, recorderOptions)
+      cameraRecorder.ondataavailable = (event) => {
+        handleRecordedChunk('camera', event.data)
+      }
+      cameraRecorder.onstop = () => {
+        handleRecorderStopped()
+      }
+
+      const screenRecorder = new MediaRecorder(screenStreamRef.current, recorderOptions)
+      screenRecorder.ondataavailable = (event) => {
+        handleRecordedChunk('screen', event.data)
+      }
+      screenRecorder.onstop = () => {
+        handleRecorderStopped()
+      }
+
+      const cameraSession = multipartUploadsRef.current.camera
+      const screenSession = multipartUploadsRef.current.screen
+      const mimeForParts =
+        cameraRecorder.mimeType.trim() ||
+        screenRecorder.mimeType.trim() ||
+        pickSupportedMediaRecorderMimeType() ||
+        ''
+      if (cameraSession && screenSession && mimeForParts) {
+        cameraSession.partBlobType = mimeForParts
+        screenSession.partBlobType = mimeForParts
+      }
+
+      cameraRecorderRef.current = cameraRecorder
+      screenRecorderRef.current = screenRecorder
+
+      cameraRecorder.start(1000)
+      screenRecorder.start(1000)
+      expectedRecorderStopsRef.current = 2
     } catch (err) {
       await abortMultipartUploads()
       clearRecordingArtifacts()
@@ -155,43 +192,6 @@ export function useTakeBeginRecording({
       setStage('interview')
       return
     }
-
-    const recorderOptions = buildMediaRecorderOptions()
-
-    const cameraRecorder = new MediaRecorder(cameraStreamRef.current, recorderOptions)
-    cameraRecorder.ondataavailable = (event) => {
-      handleRecordedChunk('camera', event.data)
-    }
-    cameraRecorder.onstop = () => {
-      handleRecorderStopped()
-    }
-
-    const screenRecorder = new MediaRecorder(screenStreamRef.current, recorderOptions)
-    screenRecorder.ondataavailable = (event) => {
-      handleRecordedChunk('screen', event.data)
-    }
-    screenRecorder.onstop = () => {
-      handleRecorderStopped()
-    }
-
-    const cameraSession = multipartUploadsRef.current.camera
-    const screenSession = multipartUploadsRef.current.screen
-    const mimeForParts =
-      cameraRecorder.mimeType.trim() ||
-      screenRecorder.mimeType.trim() ||
-      pickSupportedMediaRecorderMimeType() ||
-      ''
-    if (cameraSession && screenSession && mimeForParts) {
-      cameraSession.partBlobType = mimeForParts
-      screenSession.partBlobType = mimeForParts
-    }
-
-    cameraRecorderRef.current = cameraRecorder
-    screenRecorderRef.current = screenRecorder
-
-    cameraRecorder.start(1000)
-    screenRecorder.start(1000)
-    expectedRecorderStopsRef.current = 2
 
     primeBrowserTranscriptForRecordingSession()
 
