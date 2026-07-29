@@ -8,20 +8,15 @@ import {
   LibraryBig,
   LogOut,
   Plus,
-  Sparkles,
   Users,
 } from 'lucide-react'
-import { useLocale, useTranslations } from 'next-intl'
-import { useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 
-import { LanguageSwitcher } from '@/components/ui/language-switcher'
 import { isCandidateFlowPath } from '@/i18n/html-lang'
-import { LOCALES, type Locale } from '@/i18n/locales'
 import { usePathname } from '@/i18n/navigation'
 import { routes } from '@/i18n/routes'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
 import { useAuth, useIsDemo } from '@/lib/auth-context'
-import { cn } from '@/lib/utils'
 import {
   canAccessDashboard,
   canConfigureInterview,
@@ -29,44 +24,41 @@ import {
   canReadQuestions,
   canReviewAssessments,
 } from '@/lib/auth-roles'
+import { getCandidateInitials } from '@/lib/interview-formatters'
+import { cn } from '@/lib/utils'
 
 import { AppSidebar } from '@/components/ui/app-sidebar'
+import { BrandMark } from '@/components/ui/brand-mark'
 import { Button } from '@/components/ui/button'
-import { EyebrowLabel } from '@/components/ui/eyebrow-label'
-import { Icon } from '@/components/ui/icon'
 import { IconBadge } from '@/components/ui/icon-badge'
 import { IdentityBadge } from '@/components/ui/identity-badge'
-import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import {
   SideNavButton,
   SideNavLink,
+  sideNavProfileLinkClass,
   sideNavRevealClass,
 } from '@/components/ui/side-nav-item'
-import { SurfaceTile } from '@/components/ui/surface-tile'
-import { BodyText } from '@/components/ui/text'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
 
 export function SideNav() {
   const { user, logout } = useAuth()
   const isDemo = useIsDemo()
   const pathname = usePathname()
-  const searchParams = useSearchParams()
-  const locale = useLocale() as Locale
   const tNav = useTranslations('nav')
   const tCommon = useTranslations('common')
-  const tLanguage = useTranslations('languageSwitcher')
   const labels = useSharedLabels()
-  const [languageMenuOpen, setLanguageMenuOpen] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  const queryString = searchParams.toString()
-  const languageHref = queryString ? `${pathname}?${queryString}` : pathname
-  const languageOptions = LOCALES.map((optionLocale) => ({
-    locale: optionLocale,
-    label: tLanguage(`locales.${optionLocale}`),
-  }))
+  function toggleSidebar() {
+    setSidebarOpen((prev) => !prev)
+  }
 
-  if (isCandidateFlowPath(pathname)) {
+  function closeSidebar() {
+    setSidebarOpen(false)
+  }
+
+  if (isCandidateFlowPath(pathname) || pathname === '/login') {
     return null
   }
 
@@ -126,45 +118,16 @@ export function SideNav() {
 
   const profileActive = isProfileActive()
 
-  const languageSwitcher = (
-    <LanguageSwitcher
-      ariaLabel={tLanguage('label')}
-      currentLocale={locale}
-      href={languageHref}
-      options={languageOptions}
-      side="right"
-      align="end"
-      onOpenChange={setLanguageMenuOpen}
-    />
-  )
-
   return (
     <AppSidebar
       aria-label={tCommon('appName')}
-      expanded={languageMenuOpen}
-      brand={
-        <UnstyledLink href="/">
-          <Inline gap={2} align="center" wrap="nowrap">
-            <IconBadge tone="gradient" size="sm">
-              <Icon size="md"><Sparkles /></Icon>
-            </IconBadge>
-            <Stack gap={0} className={cn('min-w-0', sideNavRevealClass)}>
-              <EyebrowLabel size="sm" className="whitespace-nowrap">
-                {tCommon('brandEyebrow')}
-              </EyebrowLabel>
-              <BodyText
-                as="span"
-                size="sm"
-                weight="semibold"
-                tone="foreground"
-                className="whitespace-nowrap"
-              >
-                {tCommon('appName')}
-              </BodyText>
-            </Stack>
-          </Inline>
-        </UnstyledLink>
-      }
+      expanded={sidebarOpen}
+      toggleOpen={sidebarOpen}
+      onToggle={toggleSidebar}
+      onClose={closeSidebar}
+      expandLabel={tNav('expandSidebar')}
+      collapseLabel={tNav('collapseSidebar')}
+      brand={<BrandMark className={sideNavRevealClass} />}
       nav={
         user
           ? links.map(({ href, label, icon: LinkIcon }) => (
@@ -181,23 +144,24 @@ export function SideNav() {
       actions={
         user ? (
           <Stack gap={2} width="full">
-            <Stack gap={2} className={sideNavRevealClass}>
-              {languageSwitcher}
-              <UnstyledLink
-                href={routes.profile.me}
-                aria-label={tNav('profile')}
-                aria-current={profileActive ? 'page' : undefined}
-              >
-                <SurfaceTile tone="soft" rounded="lg" padding="sm" active={profileActive}>
-                  <IdentityBadge
-                    layout="stacked"
-                    nameMaxWidth="none"
-                    name={user.name}
-                    role={labels.role(user.role)}
-                  />
-                </SurfaceTile>
-              </UnstyledLink>
-            </Stack>
+            <UnstyledLink
+              href={routes.profile.me}
+              aria-label={tNav('profile')}
+              aria-current={profileActive ? 'page' : undefined}
+              className={sideNavProfileLinkClass}
+            >
+              <IconBadge tone="surface" size="sm" shape="circle" textSize="sm">
+                {getCandidateInitials(user.name)}
+              </IconBadge>
+              <Stack gap={0} className={cn('min-w-0', sideNavRevealClass)}>
+                <IdentityBadge
+                  layout="stacked"
+                  nameMaxWidth="none"
+                  name={user.name}
+                  role={labels.role(user.role)}
+                />
+              </Stack>
+            </UnstyledLink>
             <SideNavButton
               tone="danger"
               onClick={logout}
@@ -207,7 +171,6 @@ export function SideNav() {
           </Stack>
         ) : (
           <Stack gap={2} width="full" className={sideNavRevealClass}>
-            {languageSwitcher}
             <Button asChild variant="gradient" size="sm" width="full">
               <UnstyledLink href="/login">{tNav('signIn')}</UnstyledLink>
             </Button>
