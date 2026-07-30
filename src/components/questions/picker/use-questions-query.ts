@@ -29,6 +29,7 @@ import {
   DEFAULT_QUESTIONS_QUERY,
   QUESTIONS_SEARCH_DEBOUNCE_MS,
   readQuestionsFromSearchParams,
+  type QuestionPageLimit,
   type QuestionView,
   type QuestionsQueryState,
 } from '@/lib/questions-query-state'
@@ -96,6 +97,7 @@ export type UseQuestionsQueryResult = {
   setStatus: (value: QuestionStatusFilter) => void
   setSort: (sortBy: QuestionSortField, sortOrder: QuestionSortOrder) => void
   setPage: (value: number) => void
+  setLimit: (value: QuestionPageLimit) => void
   setView: (value: QuestionView) => void
   reset: () => void
   refetch: () => void
@@ -286,6 +288,10 @@ export function useQuestionsQuery(options: UseQuestionsQueryOptions = {}): UseQu
     (value: number) => setState((prev) => ({ ...prev, page: Math.max(1, Math.floor(value)) })),
     [],
   )
+  const setLimit = useCallback(
+    (value: QuestionPageLimit) => resetToPageOne({ limit: value }),
+    [resetToPageOne],
+  )
   const setView = useCallback((value: QuestionView) => {
     setState((prev) => {
       if (prev.view === value) return prev
@@ -339,6 +345,7 @@ export function useQuestionsQuery(options: UseQuestionsQueryOptions = {}): UseQu
     setStatus,
     setSort,
     setPage,
+    setLimit,
     setView,
     reset,
     refetch,

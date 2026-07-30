@@ -41,6 +41,17 @@
       "pl": "in Polish"
     }
   },
+  "pagination": {
+    "ariaLabel": "Pagination",
+    "showing": "Showing <strong>{from}</strong>–<strong>{to}</strong> of <strong>{total}</strong>",
+    "pageOf": "Page <strong>{page}</strong> of <strong>{totalPages}</strong>",
+    "firstPage": "First page",
+    "previousPage": "Previous page",
+    "nextPage": "Next page",
+    "lastPage": "Last page",
+    "pageSizeLabel": "Rows per page",
+    "pageSizeOption": "{count} per page"
+  },
   "shared": {
     "fallback": {
       "backToDashboard": "Back to dashboard",

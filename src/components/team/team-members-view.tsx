@@ -2,19 +2,16 @@
 
 import { Card, CardContent } from '@/components/ui/card'
 import { Stack } from '@/components/ui/layout/stack'
+import { Pagination } from '@/components/ui/pagination'
 import { Separator } from '@/components/ui/separator'
-import type {
-  TeamPaginationItem,
-  TeamRoleFilter,
-  TeamStatCard,
-} from '@/features/team/team-member-list'
+import { TEAM_PAGE_LIMIT_OPTIONS, type TeamPageLimit } from '@/features/team/hooks/use-team-members'
+import type { TeamRoleFilter, TeamStatCard } from '@/features/team/team-member-list'
 import type { TeamRowActorRole } from '@/features/team/team-row-policy'
 import type { TeamMember } from '@/lib/api'
 
 import { TeamMemberStats } from './team-member-stats'
 import { TeamMembersFilters } from './team-members-filters'
 import { TeamMembersHeading } from './team-members-heading'
-import { TeamMembersPagination } from './team-members-pagination'
 import { TeamMembersTableSection } from './team-members-table-section'
 
 interface TeamMembersViewProps {
@@ -28,14 +25,12 @@ interface TeamMembersViewProps {
   actorId: string
   actorRole: TeamRowActorRole
   onRequestChangeRole: (member: TeamMember) => void
-  showingFrom: number
-  showingTo: number
-  totalFiltered: number
+  total: number
   page: number
   totalPages: number
-  paginationItems: TeamPaginationItem[]
+  limit: TeamPageLimit
   onPageChange: (page: number) => void
-  onStepPage: (delta: number) => void
+  onLimitChange: (limit: TeamPageLimit) => void
 }
 
 export function TeamMembersView({
@@ -49,14 +44,12 @@ export function TeamMembersView({
   actorId,
   actorRole,
   onRequestChangeRole,
-  showingFrom,
-  showingTo,
-  totalFiltered,
+  total,
   page,
   totalPages,
-  paginationItems,
+  limit,
   onPageChange,
-  onStepPage,
+  onLimitChange,
 }: TeamMembersViewProps) {
   return (
     <>
@@ -84,23 +77,19 @@ export function TeamMembersView({
             onRequestChangeRole={onRequestChangeRole}
           />
         </Stack>
-
-        {hasResults && (
-          <>
-            <Separator />
-            <TeamMembersPagination
-              showingFrom={showingFrom}
-              showingTo={showingTo}
-              totalFiltered={totalFiltered}
-              page={page}
-              totalPages={totalPages}
-              paginationItems={paginationItems}
-              onPageChange={onPageChange}
-              onStepPage={onStepPage}
-            />
-          </>
-        )}
       </Card>
+
+      {hasResults && (
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          total={total}
+          limit={limit}
+          onPageChange={onPageChange}
+          limitOptions={TEAM_PAGE_LIMIT_OPTIONS}
+          onLimitChange={(value) => onLimitChange(value as TeamPageLimit)}
+        />
+      )}
     </>
   )
 }
