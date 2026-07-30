@@ -13,6 +13,7 @@ interface AuthContextType {
   user: User | null;
   establishSession: (sessionUser: User) => void;
   completeOnboarding: (status?: CompleteOnboardingStatus) => Promise<User>;
+  updatePictureUrl: (pictureUrl: string | null) => void;
   logout: () => Promise<void>;
 }
 
@@ -22,6 +23,7 @@ const AuthContext = createContext<AuthContextType>({
   completeOnboarding: async () => {
     throw new Error('AuthProvider is not mounted');
   },
+  updatePictureUrl: () => {},
   logout: async () => {},
 });
 
@@ -59,6 +61,10 @@ export function AuthProvider({
     return updatedUser;
   };
 
+  const updatePictureUrl = (pictureUrl: string | null) => {
+    setUser((current) => (current ? { ...current, pictureUrl: pictureUrl ?? undefined } : current));
+  };
+
   const logout = async () => {
     await apiLogout();
     setUser(null);
@@ -68,7 +74,7 @@ export function AuthProvider({
 
   return (
     <AuthContext.Provider
-      value={{ user, establishSession, completeOnboarding, logout }}
+      value={{ user, establishSession, completeOnboarding, updatePictureUrl, logout }}
     >
       {children}
     </AuthContext.Provider>
