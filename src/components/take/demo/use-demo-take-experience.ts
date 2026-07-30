@@ -26,6 +26,7 @@ export interface DemoTakeExperience {
   screenStatus: PermissionStatus
   lobbyMicOn: boolean
   lobbyCameraOn: boolean
+  cameraStream: MediaStream | null
   videoRef: React.RefObject<HTMLVideoElement | null>
   screenVideoRef: React.RefObject<HTMLVideoElement | null>
   versionNumber: number
@@ -78,10 +79,12 @@ export function useDemoTakeExperience({
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const screenVideoRef = useRef<HTMLVideoElement | null>(null)
   const cameraStreamRef = useRef<MediaStream | null>(null)
+  const [cameraStream, setCameraStream] = useState<MediaStream | null>(null)
 
   const stopCamera = useCallback(() => {
     cameraStreamRef.current?.getTracks().forEach((track) => track.stop())
     cameraStreamRef.current = null
+    setCameraStream(null)
   }, [])
 
   useEffect(() => {
@@ -149,6 +152,7 @@ export function useDemoTakeExperience({
         audio: true,
       })
       cameraStreamRef.current = stream
+      setCameraStream(stream)
       if (videoRef.current) {
         videoRef.current.srcObject = stream
         void videoRef.current.play().catch(() => undefined)
@@ -211,6 +215,7 @@ export function useDemoTakeExperience({
     screenStatus,
     lobbyMicOn,
     lobbyCameraOn,
+    cameraStream,
     videoRef,
     screenVideoRef,
     versionNumber,

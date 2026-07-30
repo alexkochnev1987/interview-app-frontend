@@ -6,9 +6,11 @@ import type { ReactNode, RefObject } from 'react'
 import { Inline, Stack } from '@/components/ui/layout'
 import { Panel } from '@/components/ui/panel'
 import { BodyText, Text } from '@/components/ui/text'
+import { useTakeMedia } from '@/features/take/take-media-context'
 import { cn } from '@/lib/utils'
 
 import { CameraPreviewVideo, type CameraPreviewVideoRefProps } from './camera-preview'
+import { MicActivityBadge } from './mic-activity-badge'
 
 type RecordingAiPresence = 'speaking' | 'listening'
 
@@ -140,6 +142,8 @@ function RecordingAiInterviewerSessionLayout({
   timerOverlay,
   interviewerPresence,
 }: RecordingAiInterviewerSessionLayoutProps) {
+  const { cameraStream } = useTakeMedia()
+
   return (
     <Stack
       gap={0}
@@ -168,6 +172,12 @@ function RecordingAiInterviewerSessionLayout({
         <AiInterviewerLabelBadge />
         {timerOverlay}
       </Inline>
+
+      <MicActivityBadge
+        stream={cameraStream}
+        muted={false}
+        className="absolute bottom-3 left-3 z-10 sm:bottom-4 sm:left-4"
+      />
 
       <Panel
         as="section"

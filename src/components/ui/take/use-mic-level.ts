@@ -26,12 +26,14 @@ export function useMicLevel(stream: MediaStream | null): number {
 
   useEffect(() => {
     if (!stream || !AudioCtx) {
+      setLevel(0)
       return
     }
 
     const liveTracks = stream.getAudioTracks().filter((t) => t.readyState === 'live' && t.enabled)
 
     if (liveTracks.length === 0) {
+      setLevel(0)
       return
     }
 
