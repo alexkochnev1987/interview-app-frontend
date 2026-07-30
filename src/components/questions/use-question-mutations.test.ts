@@ -4,10 +4,7 @@ import {
   buildBulkDeleteMutationOptions,
   buildQuestionMutationOptions,
 } from '@/components/questions/use-question-mutations'
-import {
-  BULK_DELETE_TOAST_IDS,
-  notifyBulkDeleteOutcome,
-} from '@/lib/notify-bulk-delete'
+import { BULK_DELETE_TOAST_IDS, notifyBulkDeleteOutcome } from '@/lib/notify-bulk-delete'
 import type { useToastMessages } from '@/lib/use-toast-messages'
 
 vi.mock('@/lib/notify-bulk-delete', async () => {
@@ -225,10 +222,7 @@ describe('buildBulkDeleteMutationOptions', () => {
     options.onSuccess(result)
 
     expect(resources.invalidateQuestions).toHaveBeenCalledOnce()
-    expect(notifyBulkDeleteOutcome).toHaveBeenCalledWith(
-      result,
-      resources.toastMessages.bulkDelete,
-    )
+    expect(notifyBulkDeleteOutcome).toHaveBeenCalledWith(result, resources.toastMessages.bulkDelete)
   })
 
   it('error uses stable toast id for retries', () => {
@@ -237,10 +231,8 @@ describe('buildBulkDeleteMutationOptions', () => {
 
     options.onError(error)
 
-    expect(resources.notifyMutationError).toHaveBeenCalledWith(
-      'Bulk delete failed',
-      error,
-      { id: BULK_DELETE_TOAST_IDS.error },
-    )
+    expect(resources.notifyMutationError).toHaveBeenCalledWith('Bulk delete failed', error, {
+      id: BULK_DELETE_TOAST_IDS.error,
+    })
   })
 })

@@ -3,11 +3,11 @@
 import { X } from 'lucide-react'
 import { type ReactNode } from 'react'
 
-import type { Locale } from '@/i18n/locales'
 import { Button } from '@/components/ui/button'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { TabPanel, Tabs } from '@/components/ui/tabs'
+import type { Locale } from '@/i18n/locales'
 
 type QuestionLocaleTabsProps = {
   locales: Locale[]
@@ -35,10 +35,7 @@ export function QuestionLocaleTabs({
   tabsAriaLabel,
 }: QuestionLocaleTabsProps) {
   const activeIsPrimary = activeLocale === primaryLocale
-  const orderedLocales = [
-    primaryLocale,
-    ...locales.filter((locale) => locale !== primaryLocale),
-  ]
+  const orderedLocales = [primaryLocale, ...locales.filter((locale) => locale !== primaryLocale)]
 
   return (
     <Stack gap={3}>

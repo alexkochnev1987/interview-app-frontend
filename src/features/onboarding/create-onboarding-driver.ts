@@ -1,29 +1,30 @@
-import type { DriveStep, Driver } from 'driver.js';
+import type { DriveStep, Driver } from 'driver.js'
 
-import type { OnboardingTourLabels } from '@/features/onboarding/types';
+import type { OnboardingTourLabels } from '@/features/onboarding/types'
 
-import '@/components/ui/onboarding/onboarding-tour.css';
+// eslint-disable-next-line import/no-unassigned-import
+import '@/components/ui/onboarding/onboarding-tour.css'
 
-export const DEFAULT_STAGE_RADIUS = 14;
+export const DEFAULT_STAGE_RADIUS = 14
 
 export type CreateOnboardingDriverParams = {
-  steps: DriveStep[];
-  labels: OnboardingTourLabels;
-  isComplete: () => boolean;
-  onSkip: () => void;
-};
+  steps: DriveStep[]
+  labels: OnboardingTourLabels
+  isComplete: () => boolean
+  onSkip: () => void
+}
 
 export async function createOnboardingDriver(
   params: CreateOnboardingDriverParams,
 ): Promise<Driver> {
-  const { driver } = await import('driver.js');
+  const { driver } = await import('driver.js')
 
   // Only a deliberate dismissal (close button or Esc) counts as skipping the
   // tour. A programmatic teardown via destroyOnboardingDriver (component
   // unmount, locale switch, restart) also fires onDestroyed, and must not be
   // treated as a skip or it would persist onboarding as done and never offer
   // it again.
-  let userDismissed = false;
+  let userDismissed = false
 
   const instance = driver({
     steps: params.steps,
@@ -42,27 +43,25 @@ export async function createOnboardingDriver(
     allowClose: true,
     overlayClickBehavior: () => {},
     onCloseClick: () => {
-      userDismissed = true;
-      instance.destroy();
+      userDismissed = true
+      instance.destroy()
     },
     onDestroyStarted: () => {
-      userDismissed = true;
-      instance.destroy();
+      userDismissed = true
+      instance.destroy()
     },
     onDestroyed: () => {
       if (params.isComplete() || !userDismissed) {
-        return;
+        return
       }
 
-      params.onSkip();
+      params.onSkip()
     },
-  });
+  })
 
-  return instance;
+  return instance
 }
 
-export async function destroyOnboardingDriver(
-  instance: Driver | null | undefined,
-): Promise<void> {
-  instance?.destroy();
+export async function destroyOnboardingDriver(instance: Driver | null | undefined): Promise<void> {
+  instance?.destroy()
 }

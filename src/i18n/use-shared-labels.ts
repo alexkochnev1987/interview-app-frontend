@@ -1,17 +1,10 @@
-import { useMemo } from 'react'
 import { useTranslations } from 'next-intl'
+import { useMemo } from 'react'
 
 import type { Interview } from '@/lib/api'
 import type { ReviewStatus } from '@/lib/assessment-status'
 
-type RoleKey =
-  | 'super_admin'
-  | 'admin'
-  | 'hr'
-  | 'candidate'
-  | 'interviewer'
-  | 'system'
-  | 'assistant'
+type RoleKey = 'super_admin' | 'admin' | 'hr' | 'candidate' | 'interviewer' | 'system' | 'assistant'
 
 type DifficultyKey = 'easy' | 'medium' | 'hard'
 type DecisionKey = 'proceed' | 'review' | 'reject'

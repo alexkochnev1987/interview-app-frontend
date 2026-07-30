@@ -3,13 +3,7 @@
 import { useTranslations } from 'next-intl'
 
 import { StartEvaluationButton } from '@/components/assessments/actions/start-evaluation-button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Grid } from '@/components/ui/layout/grid'
 import { Stack } from '@/components/ui/layout/stack'
 import { MetricPanel } from '@/components/ui/metric-panel'
@@ -75,9 +69,7 @@ export function AssessmentCard({ interview, tourTarget }: AssessmentCardProps) {
             <MetricPanel
               tone="compact"
               label={t('overallScore')}
-              value={
-                overallScore !== undefined ? Math.round(overallScore) : '—'
-              }
+              value={overallScore !== undefined ? Math.round(overallScore) : '—'}
               valueSize="md"
             />
             <MetricPanel

@@ -1,13 +1,13 @@
-import { useCallback } from 'react'
 import { useTranslations } from 'next-intl'
+import { useCallback } from 'react'
 
-import type { ActiveInterviewFilterChipDescriptor } from '@/components/interviews/picker/build-active-chips'
 import { useHrUsers } from '@/components/interviews/hooks/use-hr-users'
+import type { ActiveInterviewFilterChipDescriptor } from '@/components/interviews/picker/build-active-chips'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
-import { useAuth } from '@/lib/auth-context'
-import { canAssignInterviewHr } from '@/lib/auth-roles'
 import type { InterviewStatusFilter } from '@/lib/api'
 import { isAssignedHrFilterUnassigned } from '@/lib/assigned-hr-filter'
+import { useAuth } from '@/lib/auth-context'
+import { canAssignInterviewHr } from '@/lib/auth-roles'
 
 export function useInterviewChipLabels(options?: { needsHrUserLookup?: boolean }) {
   const t = useTranslations('interviews.chips')
@@ -26,9 +26,7 @@ export function useInterviewChipLabels(options?: { needsHrUserLookup?: boolean }
           return t('position', { value: descriptor.value })
         case 'status':
           return t('status', {
-            value: sharedLabels.interviewStatus(
-              descriptor.value as InterviewStatusFilter,
-            ),
+            value: sharedLabels.interviewStatus(descriptor.value as InterviewStatusFilter),
           })
         case 'assignedHr': {
           if (isAssignedHrFilterUnassigned(descriptor.value)) {

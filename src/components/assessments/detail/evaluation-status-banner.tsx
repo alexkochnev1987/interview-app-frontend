@@ -52,9 +52,7 @@ function countAnswers(interview: Interview): Counts {
  * submitted-but-none-scored). It deliberately renders nothing for the happy and
  * in-flight cases, which are communicated elsewhere (status pill, live loop).
  */
-export function EvaluationStatusBanner({
-  interview,
-}: EvaluationStatusBannerProps) {
+export function EvaluationStatusBanner({ interview }: EvaluationStatusBannerProps) {
   const t = useTranslations('assessments.banner')
   const counts = countAnswers(interview)
 
@@ -69,9 +67,7 @@ export function EvaluationStatusBanner({
           <ShieldAlert />
         </Icon>
         <AlertTitle>{t('allFailedTitle')}</AlertTitle>
-        <AlertDescription>
-          {t('allFailedDescription', { total: counts.total })}
-        </AlertDescription>
+        <AlertDescription>{t('allFailedDescription', { total: counts.total })}</AlertDescription>
       </Alert>
     )
   }
@@ -101,9 +97,7 @@ export function EvaluationStatusBanner({
           <Sparkles />
         </Icon>
         <AlertTitle>{t('noneYetTitle')}</AlertTitle>
-        <AlertDescription>
-          {t('noneYetDescription', { total: counts.total })}
-        </AlertDescription>
+        <AlertDescription>{t('noneYetDescription', { total: counts.total })}</AlertDescription>
       </Alert>
     )
   }

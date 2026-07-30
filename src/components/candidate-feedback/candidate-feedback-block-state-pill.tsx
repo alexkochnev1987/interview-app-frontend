@@ -37,9 +37,7 @@ interface CandidateFeedbackBlockStatePillProps {
   block: Pick<CandidateFeedbackBlock, 'state' | 'errorMessage'>
 }
 
-export function CandidateFeedbackBlockStatePill({
-  block,
-}: CandidateFeedbackBlockStatePillProps) {
+export function CandidateFeedbackBlockStatePill({ block }: CandidateFeedbackBlockStatePillProps) {
   const t = useTranslations('interviews.candidateFeedback')
   const skippedFailure = isCandidateFeedbackSkippedFailureBlock(block)
   const labelKey = skippedFailure ? 'skipped' : block.state

@@ -1,5 +1,5 @@
-import type { HTMLAttributes } from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
+import type { HTMLAttributes } from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -33,20 +33,8 @@ const eyebrowLabelVariants = cva('uppercase', {
 })
 
 interface EyebrowLabelProps
-  extends HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof eyebrowLabelVariants> {}
+  extends HTMLAttributes<HTMLDivElement>, VariantProps<typeof eyebrowLabelVariants> {}
 
-export function EyebrowLabel({
-  className,
-  size,
-  tone,
-  weight,
-  ...props
-}: EyebrowLabelProps) {
-  return (
-    <div
-      className={cn(eyebrowLabelVariants({ size, tone, weight }), className)}
-      {...props}
-    />
-  )
+export function EyebrowLabel({ className, size, tone, weight, ...props }: EyebrowLabelProps) {
+  return <div className={cn(eyebrowLabelVariants({ size, tone, weight }), className)} {...props} />
 }

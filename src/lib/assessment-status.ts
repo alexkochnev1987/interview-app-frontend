@@ -34,12 +34,7 @@ export type DecisionTone = 'completed' | 'pending' | 'failed'
  */
 export type AnswerState = 'none' | 'awaiting' | 'scoring' | 'scored' | 'failed'
 
-export type AnswerStateTone =
-  | 'pending'
-  | 'in_progress'
-  | 'processing'
-  | 'completed'
-  | 'failed'
+export type AnswerStateTone = 'pending' | 'in_progress' | 'processing' | 'completed' | 'failed'
 
 function assertNever(value: never): never {
   throw new Error(`Unhandled interview status: ${String(value)}`)
@@ -82,9 +77,7 @@ export function isValidationInFlight(interview: Interview): boolean {
 function allAnswersSubmitted(interview: Interview): boolean {
   if (interview.questions.length === 0) return false
   return interview.questions.every((_question, index) =>
-    interview.answers.some(
-      (a) => a.questionIndex === index && a.status === 'submitted',
-    ),
+    interview.answers.some((a) => a.questionIndex === index && a.status === 'submitted'),
   )
 }
 
@@ -102,11 +95,7 @@ export function deriveReviewStatus(interview: Interview): ReviewStatus {
     case 'pending':
       return 'pending'
     case 'in_progress':
-      if (
-        allAnswersSubmitted(interview) &&
-        !isValidationInFlight(interview) &&
-        !interview.result
-      ) {
+      if (allAnswersSubmitted(interview) && !isValidationInFlight(interview) && !interview.result) {
         return 'ready_to_score'
       }
       return 'in_progress'
@@ -209,9 +198,7 @@ export function decisionTone(decision: InterviewDecision): DecisionTone {
 
 export type BehaviorRiskTone = 'completed' | 'pending' | 'failed' | 'neutral'
 
-export function behaviorRiskTone(
-  risk: InterviewBehaviorRisk | null | undefined,
-): BehaviorRiskTone {
+export function behaviorRiskTone(risk: InterviewBehaviorRisk | null | undefined): BehaviorRiskTone {
   switch (risk) {
     case 'high':
       return 'failed'
@@ -230,17 +217,18 @@ export function getCompletionDate(interview: Interview): string | null {
   return null
 }
 
-export const HR_VISIBLE_REVIEW_STATUSES: ReadonlySet<ReviewStatus> =
-  new Set<ReviewStatus>(['ready_to_score', 'scoring', 'ready', 'failed'])
+export const HR_VISIBLE_REVIEW_STATUSES: ReadonlySet<ReviewStatus> = new Set<ReviewStatus>([
+  'ready_to_score',
+  'scoring',
+  'ready',
+  'failed',
+])
 
 export function isHrVisibleAssessment(interview: Interview): boolean {
   return HR_VISIBLE_REVIEW_STATUSES.has(deriveReviewStatus(interview))
 }
 
-export function compareAssessmentsByCompletion(
-  a: Interview,
-  b: Interview,
-): number {
+export function compareAssessmentsByCompletion(a: Interview, b: Interview): number {
   const ca = getCompletionDate(a)
   const cb = getCompletionDate(b)
 
@@ -257,28 +245,24 @@ export function compareAssessmentsByCompletion(
  * assessments, most recently completed first. Shared by the server page and the
  * client polling fetcher so the two never drift.
  */
-export function selectHrVisibleAssessments(
-  interviews: Interview[],
-): Interview[] {
-  return interviews
-    .filter(isHrVisibleAssessment)
-    .sort(compareAssessmentsByCompletion)
+export function selectHrVisibleAssessments(interviews: Interview[]): Interview[] {
+  return (
+    interviews
+      .filter(isHrVisibleAssessment)
+      // eslint-disable-next-line unicorn/no-array-sort
+      .sort(compareAssessmentsByCompletion)
+  )
 }
 
 /** Approximate review status from list DTO until assessments loads full Interview. */
-export function deriveReviewStatusFromListItem(
-  item: InterviewListItem,
-): ReviewStatus {
+export function deriveReviewStatusFromListItem(item: InterviewListItem): ReviewStatus {
   switch (item.status) {
     case 'failed':
       return 'failed'
     case 'pending':
       return 'pending'
     case 'in_progress':
-      if (
-        item.questionCount > 0 &&
-        item.submittedAnswerCount === item.questionCount
-      ) {
+      if (item.questionCount > 0 && item.submittedAnswerCount === item.questionCount) {
         return 'ready_to_score'
       }
       return 'in_progress'
@@ -292,9 +276,7 @@ export function deriveReviewStatusFromListItem(
   }
 }
 
-export function getCompletionDateFromListItem(
-  item: InterviewListItem,
-): string | null {
+export function getCompletionDateFromListItem(item: InterviewListItem): string | null {
   if (item.status === 'completed') return item.updatedAt
   return null
 }
@@ -303,30 +285,27 @@ export function isHrVisibleListItem(item: InterviewListItem): boolean {
   return HR_VISIBLE_REVIEW_STATUSES.has(deriveReviewStatusFromListItem(item))
 }
 
-export function hasScoringInProgressListItems(
-  items: InterviewListItem[],
-): boolean {
-  return items.some(
-    (item) => deriveReviewStatusFromListItem(item) === 'scoring',
-  )
+export function hasScoringInProgressListItems(items: InterviewListItem[]): boolean {
+  return items.some((item) => deriveReviewStatusFromListItem(item) === 'scoring')
 }
 
-export function selectHrVisibleListItems(
-  items: InterviewListItem[],
-): InterviewListItem[] {
-  return items
-    .filter(isHrVisibleListItem)
-    .sort((a, b) => {
-      const ca = getCompletionDateFromListItem(a)
-      const cb = getCompletionDateFromListItem(b)
+export function selectHrVisibleListItems(items: InterviewListItem[]): InterviewListItem[] {
+  return (
+    items
+      .filter(isHrVisibleListItem)
+      // eslint-disable-next-line unicorn/no-array-sort
+      .sort((a, b) => {
+        const ca = getCompletionDateFromListItem(a)
+        const cb = getCompletionDateFromListItem(b)
 
-      if (ca && !cb) return -1
-      if (!ca && cb) return 1
+        if (ca && !cb) return -1
+        if (!ca && cb) return 1
 
-      const da = ca ?? a.updatedAt
-      const db = cb ?? b.updatedAt
-      return new Date(db).getTime() - new Date(da).getTime()
-    })
+        const da = ca ?? a.updatedAt
+        const db = cb ?? b.updatedAt
+        return new Date(db).getTime() - new Date(da).getTime()
+      })
+  )
 }
 
 const PLACEHOLDER_RESULT_SUMMARY = 'Simulated evaluation result'

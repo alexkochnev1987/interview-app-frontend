@@ -23,7 +23,7 @@ jobs:
       - run: npm run lint:ci
       - run: npm run test
       - name: Production build for E2E
-        run: npx next build --webpack
+        run: npx next build
         env:
           BACKEND_URL: http://127.0.0.1:3000
       - name: Upload production build for E2E

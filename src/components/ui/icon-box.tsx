@@ -1,30 +1,30 @@
-import type { ReactNode } from "react"
-import { cva, type VariantProps } from "class-variance-authority"
+import { cva, type VariantProps } from 'class-variance-authority'
+import type { ReactNode } from 'react'
 
-import { cn } from "@/lib/utils"
+import { cn } from '@/lib/utils'
 
-const iconBoxVariants = cva("flex items-center justify-center", {
+const iconBoxVariants = cva('flex items-center justify-center', {
   variants: {
     tone: {
-      primarySoft: "bg-[hsl(var(--primary-fixed)/0.85)] text-[hsl(var(--primary))]",
+      primarySoft: 'bg-[hsl(var(--primary-fixed)/0.85)] text-[hsl(var(--primary))]',
     },
     size: {
-      sm: "size-12",
-      md: "size-16",
+      sm: 'size-12',
+      md: 'size-16',
     },
     shape: {
-      soft: "rounded-[1.4rem]",
-      pill: "rounded-full",
+      soft: 'rounded-[1.4rem]',
+      pill: 'rounded-full',
     },
     centered: {
-      false: "",
-      true: "mx-auto",
+      false: '',
+      true: 'mx-auto',
     },
   },
   defaultVariants: {
-    tone: "primarySoft",
-    size: "md",
-    shape: "soft",
+    tone: 'primarySoft',
+    size: 'md',
+    shape: 'soft',
     centered: false,
   },
 })

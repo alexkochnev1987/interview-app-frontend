@@ -64,12 +64,7 @@ function walkParity(source, target, keyPath, issues) {
       issues.missing.push(keyPath ? `${keyPath}.${key}` : key)
       continue
     }
-    walkParity(
-      source[key],
-      target[key],
-      keyPath ? `${keyPath}.${key}` : key,
-      issues,
-    )
+    walkParity(source[key], target[key], keyPath ? `${keyPath}.${key}` : key, issues)
   }
 
   for (const key of targetKeys) {
@@ -80,8 +75,7 @@ function walkParity(source, target, keyPath, issues) {
 }
 
 function printIssues(locale, issues) {
-  const total =
-    issues.missing.length + issues.extra.length + issues.typeMismatches.length
+  const total = issues.missing.length + issues.extra.length + issues.typeMismatches.length
 
   if (total === 0) {
     console.log(`✅ ${locale}: parity OK`)

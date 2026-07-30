@@ -13,10 +13,7 @@ interface TimestampRowProps {
   fallbackLabel?: string
 }
 
-export function TimestampRow({
-  items,
-  fallbackLabel = '—',
-}: TimestampRowProps) {
+export function TimestampRow({ items, fallbackLabel = '—' }: TimestampRowProps) {
   return (
     <Inline gap={6} wrap="wrap">
       {items.map(({ label, value }) => (

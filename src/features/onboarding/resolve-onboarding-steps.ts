@@ -1,20 +1,16 @@
-import { isOnboardingRoute } from '@/features/onboarding/onboarding-routes';
-import { applyOnboardingStepViewport } from '@/features/onboarding/onboarding-viewport';
-import { isOnboardingStepVisible } from '@/features/onboarding/evaluate-visibility';
-import {
-  queryTourTarget,
-} from '@/features/onboarding/wait-for-target';
+import { isOnboardingStepVisible } from '@/features/onboarding/evaluate-visibility'
+import { isOnboardingRoute } from '@/features/onboarding/onboarding-routes'
+import { applyOnboardingStepViewport } from '@/features/onboarding/onboarding-viewport'
 import type {
   OnboardingFlowConfig,
   OnboardingRuntimeContext,
   OnboardingStepConfig,
   ResolvedOnboardingStep,
-} from '@/features/onboarding/types';
+} from '@/features/onboarding/types'
+import { queryTourTarget } from '@/features/onboarding/wait-for-target'
 
-async function resolveStepTarget(
-  step: OnboardingStepConfig,
-): Promise<Element | null> {
-  return queryTourTarget(step.target);
+async function resolveStepTarget(step: OnboardingStepConfig): Promise<Element | null> {
+  return queryTourTarget(step.target)
 }
 
 export async function resolveOnboardingSteps(
@@ -22,32 +18,31 @@ export async function resolveOnboardingSteps(
   context: OnboardingRuntimeContext,
   pathname: string,
 ): Promise<ResolvedOnboardingStep[]> {
-  const visibleSteps = flow.steps.filter((step) =>
-    isOnboardingStepVisible(step, context),
-  );
+  const visibleSteps = flow.steps.filter((step) => isOnboardingStepVisible(step, context))
 
-  const resolved: ResolvedOnboardingStep[] = [];
+  const resolved: ResolvedOnboardingStep[] = []
 
   for (const step of visibleSteps) {
-    const resolvedStep = applyOnboardingStepViewport(step);
+    const resolvedStep = applyOnboardingStepViewport(step)
     const isDeferred =
       resolvedStep.route != null &&
-      !isOnboardingRoute(pathname, resolvedStep.route, resolvedStep.routeMatch);
+      !isOnboardingRoute(pathname, resolvedStep.route, resolvedStep.routeMatch)
 
     if (isDeferred) {
-      resolved.push(resolvedStep);
-      continue;
+      resolved.push(resolvedStep)
+      continue
     }
 
-    const element = await resolveStepTarget(resolvedStep);
-    const missingTargetBehavior = resolvedStep.missingTarget ?? 'wait';
+    // oxlint-disable-next-line no-await-in-loop
+    const element = await resolveStepTarget(resolvedStep)
+    const missingTargetBehavior = resolvedStep.missingTarget ?? 'wait'
 
     if (!element && missingTargetBehavior === 'skip') {
-      continue;
+      continue
     }
 
-    resolved.push(resolvedStep);
+    resolved.push(resolvedStep)
   }
 
-  return resolved;
+  return resolved
 }

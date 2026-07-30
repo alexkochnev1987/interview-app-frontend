@@ -5,14 +5,11 @@ import type { Interview, Template, TemplateSummary } from '@/lib/api'
 import { getQueryClient } from '@/lib/get-query-client'
 import { requestServer, type ServerRequestContext } from '@/lib/server-fetch'
 
-export async function prefetchTemplatesList(
-  ctx: ServerRequestContext,
-): Promise<DehydratedState> {
+export async function prefetchTemplatesList(ctx: ServerRequestContext): Promise<DehydratedState> {
   const queryClient = getQueryClient()
   await queryClient.prefetchQuery({
     queryKey: templatesListQueryKey(ctx.locale),
-    queryFn: async () =>
-      (await requestServer<TemplateSummary[]>('/templates', ctx)) ?? [],
+    queryFn: async () => (await requestServer<TemplateSummary[]>('/templates', ctx)) ?? [],
   })
   return dehydrate(queryClient)
 }

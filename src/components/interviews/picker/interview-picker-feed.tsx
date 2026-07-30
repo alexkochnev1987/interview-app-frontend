@@ -1,8 +1,8 @@
 'use client'
 
 import { AlertCircle } from 'lucide-react'
-import type { ReactNode } from 'react'
 import { useTranslations } from 'next-intl'
+import type { ReactNode } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
@@ -72,9 +72,7 @@ export function InterviewPickerFeed({
     return (
       <EmptyStateCard
         title={isEmptyBank ? tEmpty('title') : tEmpty('filteredTitle')}
-        description={
-          isEmptyBank ? tEmpty('description') : tEmpty('filteredDescription')
-        }
+        description={isEmptyBank ? tEmpty('description') : tEmpty('filteredDescription')}
         action={
           isEmptyBank ? (
             <Button asChild variant="gradient">

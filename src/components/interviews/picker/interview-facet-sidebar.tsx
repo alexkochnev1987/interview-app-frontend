@@ -1,16 +1,16 @@
 'use client'
 
 import { RotateCcw } from 'lucide-react'
-import { useState, type ReactNode } from 'react'
 import { useTranslations } from 'next-intl'
+import { useState, type ReactNode } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { EyebrowLabel } from '@/components/ui/eyebrow-label'
 import { FacetRowButton } from '@/components/ui/facet-row-button'
 import { Icon } from '@/components/ui/icon'
-import { Inline } from '@/components/ui/layout/inline'
 import { DividedStack, DividedStackItem } from '@/components/ui/layout/divided-stack'
+import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { ShowMoreToggle } from '@/components/ui/show-more-toggle'
 import { StatusPill } from '@/components/ui/status-pill'
@@ -59,9 +59,7 @@ export function InterviewFacetSidebar(props: InterviewFacetSidebarProps) {
   const t = useTranslations('interviews.library.facet')
 
   const activeFilterCount =
-    (selected.position ? 1 : 0) +
-    (selected.status ? 1 : 0) +
-    (selected.assignedHrId ? 1 : 0)
+    (selected.position ? 1 : 0) + (selected.status ? 1 : 0) + (selected.assignedHrId ? 1 : 0)
 
   return (
     <Card variant="surface" size="sm">
@@ -104,13 +102,7 @@ export function InterviewFacetSidebar(props: InterviewFacetSidebarProps) {
               <BodyText size="sm" tone="muted">
                 {error}
               </BodyText>
-              <Button
-                type="button"
-                variant="outline-pill"
-                shape="pill"
-                size="sm"
-                onClick={onRetry}
-              >
+              <Button type="button" variant="outline-pill" shape="pill" size="sm" onClick={onRetry}>
                 {t('retry')}
               </Button>
             </Stack>
@@ -262,11 +254,7 @@ function StatusFacetSection(props: {
   )
 }
 
-function FacetSection(props: {
-  title: string
-  activeCount: number
-  children: ReactNode
-}) {
+function FacetSection(props: { title: string; activeCount: number; children: ReactNode }) {
   const { title, activeCount, children } = props
 
   return (

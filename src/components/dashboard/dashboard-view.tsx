@@ -12,24 +12,18 @@ import {
 import { useTranslations } from 'next-intl'
 
 import { InterviewsLibraryClient } from '@/components/interviews/library/interviews-library-client'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
 import { EyebrowLabel } from '@/components/ui/eyebrow-label'
 import { HeroLead, HeroTitle } from '@/components/ui/hero-text'
-import { MetricPanel } from '@/components/ui/metric-panel'
-import { StatusPill } from '@/components/ui/status-pill'
-import { PageShell } from '@/components/ui/layout/page-shell'
-import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
 import { Grid } from '@/components/ui/layout/grid'
 import { Inline } from '@/components/ui/layout/inline'
+import { PageShell } from '@/components/ui/layout/page-shell'
 import { Section } from '@/components/ui/layout/section'
 import { Stack } from '@/components/ui/layout/stack'
+import { MetricPanel } from '@/components/ui/metric-panel'
+import { StatusPill } from '@/components/ui/status-pill'
 import { BodyText, SectionHeading } from '@/components/ui/text'
 import { Link } from '@/i18n/navigation'
 import { routes } from '@/i18n/routes'
@@ -42,11 +36,7 @@ type DashboardViewProps = {
   initialPrefetch: InterviewsLibraryPrefetch
 }
 
-export function DashboardView({
-  metrics,
-  isDemo,
-  initialPrefetch,
-}: DashboardViewProps) {
+export function DashboardView({ metrics, isDemo, initialPrefetch }: DashboardViewProps) {
   const t = useTranslations('dashboard')
   const { activeCount, completedCount, totalCount, questionVolume } = metrics
 
@@ -111,9 +101,7 @@ export function DashboardView({
                 {t('snapshot.eyebrow')}
               </EyebrowBadge>
               <CardTitle size="lg">{t('snapshot.title')}</CardTitle>
-              <CardDescription width="sm">
-                {t('snapshot.description')}
-              </CardDescription>
+              <CardDescription width="sm">{t('snapshot.description')}</CardDescription>
             </CardHeader>
             <CardContent spacing="lg">
               <MetricPanel

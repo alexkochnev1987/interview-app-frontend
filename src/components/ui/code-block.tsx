@@ -1,5 +1,5 @@
-import type { HTMLAttributes } from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
+import type { HTMLAttributes } from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -21,11 +21,8 @@ const codeBlockVariants = cva('whitespace-pre-wrap font-mono text-foreground', {
 })
 
 interface CodeBlockProps
-  extends HTMLAttributes<HTMLPreElement>,
-    VariantProps<typeof codeBlockVariants> {}
+  extends HTMLAttributes<HTMLPreElement>, VariantProps<typeof codeBlockVariants> {}
 
 export function CodeBlock({ className, size, inset, ...props }: CodeBlockProps) {
-  return (
-    <pre className={cn(codeBlockVariants({ size, inset }), className)} {...props} />
-  )
+  return <pre className={cn(codeBlockVariants({ size, inset }), className)} {...props} />
 }

@@ -1,3 +1,4 @@
+// oxlint-disable unicorn/prefer-add-event-listener
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 export function useMicTest(stream: MediaStream | null, micOn: boolean, isOpen: boolean) {
@@ -71,7 +72,7 @@ export function useMicTest(stream: MediaStream | null, micOn: boolean, isOpen: b
 
     try {
       const mimeType = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4'].find(
-          (type) => typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported(type),
+        (type) => typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported(type),
       )
 
       const recorder = new MediaRecorder(audioOnlyStream, mimeType ? { mimeType } : undefined)
@@ -118,13 +119,14 @@ export function useMicTest(stream: MediaStream | null, micOn: boolean, isOpen: b
     } else {
       audioElementRef.current.currentTime = 0
       void audioElementRef.current
-          .play()
-          .then(() => {
-            setIsPlaying(true)
-          })
-          .catch(() => {
-            setIsPlaying(false)
-          })
+        .play()
+        // oxlint-disable-next-line promise/always-return
+        .then(() => {
+          setIsPlaying(true)
+        })
+        .catch(() => {
+          setIsPlaying(false)
+        })
     }
   }, [isPlaying])
 

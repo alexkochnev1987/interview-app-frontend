@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import type { MeResponse } from '@/lib/api'
 import { ApiError } from '@/lib/api-error'
 import { loadAuthGate } from '@/lib/auth-gate'
-import type { MeResponse } from '@/lib/api'
 import { fetchCachedServerAuthMe } from '@/lib/auth-server'
 import { getServerRequestContext } from '@/lib/server-fetch'
 
@@ -78,23 +78,17 @@ describe('auth-gate', () => {
   })
 
   it('maps auth API failures to gate states', async () => {
-    vi.mocked(fetchCachedServerAuthMe).mockRejectedValue(
-      new ApiError(401, 'Unauthorized'),
-    )
+    vi.mocked(fetchCachedServerAuthMe).mockRejectedValue(new ApiError(401, 'Unauthorized'))
     await expect(loadAuthGate(() => true, 'en')).resolves.toEqual({
       kind: 'unauthenticated',
     })
 
-    vi.mocked(fetchCachedServerAuthMe).mockRejectedValue(
-      new ApiError(403, 'Forbidden'),
-    )
+    vi.mocked(fetchCachedServerAuthMe).mockRejectedValue(new ApiError(403, 'Forbidden'))
     await expect(loadAuthGate(() => true, 'en')).resolves.toEqual({
       kind: 'forbidden',
     })
 
-    vi.mocked(fetchCachedServerAuthMe).mockRejectedValue(
-      new Error('network down'),
-    )
+    vi.mocked(fetchCachedServerAuthMe).mockRejectedValue(new Error('network down'))
     await expect(loadAuthGate(() => true, 'en')).resolves.toEqual({
       kind: 'error',
       message: 'network down',

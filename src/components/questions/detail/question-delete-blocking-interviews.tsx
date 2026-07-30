@@ -1,8 +1,8 @@
 'use client'
 
 import { BulletList } from '@/components/ui/bullet-list'
-import { UnstyledLink } from '@/components/ui/unstyled-link'
 import { BodyText } from '@/components/ui/text'
+import { UnstyledLink } from '@/components/ui/unstyled-link'
 import { type QuestionDeleteBlockingInterview } from '@/lib/api'
 
 interface QuestionDeleteBlockingInterviewsProps {

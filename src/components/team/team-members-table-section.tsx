@@ -4,17 +4,10 @@ import { Users } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 import { CardContent } from '@/components/ui/card'
-import {
-  Table,
-  TableBody,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
 import { EmptyStateCard } from '@/components/ui/state-card'
-import type { TeamMember } from '@/lib/api'
-
+import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import type { TeamRowActorRole } from '@/features/team/team-row-policy'
+import type { TeamMember } from '@/lib/api'
 
 import { TeamMemberRow } from './team-member-row'
 

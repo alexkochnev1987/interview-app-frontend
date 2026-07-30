@@ -1,21 +1,17 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { similarQuestionsQueryKey } from '@/components/questions/picker/query-keys'
-import {
-  findSimilarQuestions,
-  type QuestionInput,
-  type SimilarQuestionMatch,
-} from '@/lib/api'
+import { findSimilarQuestions, type QuestionInput, type SimilarQuestionMatch } from '@/lib/api'
+import { getErrorMessage } from '@/lib/api-error'
 import {
   normalizeComparable,
   tokenize,
   type SimilaritySignalSummary,
   type SimilarStatus,
 } from '@/lib/question-editor/parsers'
-import { getErrorMessage } from '@/lib/api-error'
 import { useToastMessages } from '@/lib/use-toast-messages'
 
 interface UseSimilaritySearchOptions {
@@ -41,10 +37,7 @@ export const SIMILARITY_MIN_QUESTION_TEXT_LENGTH = 20
 const DEFAULT_DEBOUNCE_MS = 1000
 const DEFAULT_MIN_TEXT_LENGTH = SIMILARITY_MIN_QUESTION_TEXT_LENGTH
 
-function questionTextTooShort(
-  questionText: string,
-  minQuestionTextLength: number,
-): boolean {
+function questionTextTooShort(questionText: string, minQuestionTextLength: number): boolean {
   return questionText.trim().length < minQuestionTextLength
 }
 
@@ -117,8 +110,8 @@ export function useSimilaritySearch({
         return Boolean(item.label?.trim() || item.id?.trim())
       }).length,
       tagCount: (value.tags || []).filter((item) => item.trim()).length,
-      taxonomyCount: [value.category, value.subcategory, value.role, value.focus].filter(
-        (item) => item?.trim(),
+      taxonomyCount: [value.category, value.subcategory, value.role, value.focus].filter((item) =>
+        item?.trim(),
       ).length,
       textTokenCount: textTokens.length,
     }
@@ -145,8 +138,7 @@ export function useSimilaritySearch({
 
   const query = useQuery({
     queryKey: similarQuestionsQueryKey(request.signature, questionId),
-    queryFn: ({ signal }) =>
-      findSimilarQuestions(request.value, questionId, 5, { signal }),
+    queryFn: ({ signal }) => findSimilarQuestions(request.value, questionId, 5, { signal }),
     enabled: canSearch,
     staleTime: Infinity,
     placeholderData: keepPreviousData,

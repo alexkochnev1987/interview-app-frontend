@@ -1,9 +1,4 @@
-export type ApiErrorParamValue =
-  | string
-  | number
-  | boolean
-  | null
-  | string[]
+export type ApiErrorParamValue = string | number | boolean | null | string[]
 export type ApiErrorParams = Record<string, ApiErrorParamValue>
 
 type ApiErrorPayload = { code?: unknown; params?: unknown }
@@ -25,8 +20,7 @@ export function extractApiErrorFields(source: unknown): {
 
   const params: ApiErrorParams = {}
   for (const [key, value] of Object.entries(rawParams)) {
-    const isStringArray =
-      Array.isArray(value) && value.every((item) => typeof item === 'string')
+    const isStringArray = Array.isArray(value) && value.every((item) => typeof item === 'string')
     if (
       value === null ||
       typeof value === 'string' ||

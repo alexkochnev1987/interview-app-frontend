@@ -27,10 +27,8 @@ function asArray(value: unknown): unknown[] {
 }
 
 function warnMalformedInterviewsPayload(payload: unknown, source: string): void {
-  const payloadType =
-    payload === null ? 'null' : Array.isArray(payload) ? 'array' : typeof payload
-  const hasItems =
-    Boolean(payload) && typeof payload === 'object' && 'items' in (payload as object)
+  const payloadType = payload === null ? 'null' : Array.isArray(payload) ? 'array' : typeof payload
+  const hasItems = Boolean(payload) && typeof payload === 'object' && 'items' in (payload as object)
   const itemsType = hasItems
     ? Array.isArray((payload as InterviewListEnvelope).items)
       ? 'array'
@@ -52,9 +50,7 @@ function warnMalformedInterviewsPayload(payload: unknown, source: string): void 
   console.warn('[normalizeInterviewsResponse] Unexpected interviews payload shape', details)
 }
 
-function normalizeInterview<T extends InterviewLike>(
-  interview: unknown,
-): T | null {
+function normalizeInterview<T extends InterviewLike>(interview: unknown): T | null {
   if (!interview || typeof interview !== 'object') {
     return null
   }

@@ -1,31 +1,23 @@
 'use client'
 
-import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { useFormatter, useLocale, useTranslations } from 'next-intl'
 import { ArrowRight, LayoutTemplate, Pencil, Plus, RefreshCw, Trash2 } from 'lucide-react'
+import { useFormatter, useLocale, useTranslations } from 'next-intl'
+import { useMemo, useState } from 'react'
 
+import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { templatesListQueryKey } from '@/components/templates/query-keys'
 import { useDeleteTemplate } from '@/components/templates/use-template-mutations'
-import { getTemplates, type TemplateSummary } from '@/lib/api'
-import { routes } from '@/i18n/routes'
-import { useRouter } from '@/i18n/navigation'
-import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import { CardGrid } from '@/components/ui/layout/card-grid'
-import { Grid } from '@/components/ui/layout/grid'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Icon } from '@/components/ui/icon'
 import { IconBadge } from '@/components/ui/icon-badge'
+import { CardGrid } from '@/components/ui/layout/card-grid'
+import { Grid } from '@/components/ui/layout/grid'
 import { Inline } from '@/components/ui/layout/inline'
+import { Stack } from '@/components/ui/layout/stack'
 import { MetricPanel } from '@/components/ui/metric-panel'
 import { SearchInput } from '@/components/ui/search-input'
 import {
@@ -36,8 +28,10 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { StatusPill } from '@/components/ui/status-pill'
-import { Stack } from '@/components/ui/layout/stack'
 import { BodyText } from '@/components/ui/text'
+import { useRouter } from '@/i18n/navigation'
+import { routes } from '@/i18n/routes'
+import { getTemplates, type TemplateSummary } from '@/lib/api'
 
 type TemplateSort = 'popular' | 'recent' | 'name'
 
@@ -50,9 +44,7 @@ interface TemplateGroup {
 const updatedMs = (t: TemplateSummary) => new Date(t.updatedAt).getTime()
 
 // Comparator for templates within a group, driven by the active sort.
-function cardComparator(
-  sort: TemplateSort,
-): (a: TemplateSummary, b: TemplateSummary) => number {
+function cardComparator(sort: TemplateSort): (a: TemplateSummary, b: TemplateSummary) => number {
   if (sort === 'recent') {
     return (a, b) => updatedMs(b) - updatedMs(a) || a.name.localeCompare(b.name)
   }
@@ -88,16 +80,15 @@ function groupByPosition(
     if (sort === 'name') return 0
     return g.templates.reduce((sum, t) => sum + t.usageCount, 0)
   }
-  return Array.from(groups.values())
-    .map((group) => ({
-      ...group,
-      templates: [...group.templates].sort(cardComparator(sort)),
-    }))
-    .sort((a, b) => {
-      if (isOther(a) !== isOther(b)) return isOther(a) ? 1 : -1
-      if (sort === 'name') return a.header.localeCompare(b.header)
-      return rank(b) - rank(a) || a.header.localeCompare(b.header)
-    })
+  for (const group of groups.values()) {
+    group.templates.sort(cardComparator(sort))
+  }
+  // oxlint-disable-next-line unicorn/no-array-sort
+  return Array.from(groups.values()).sort((a, b) => {
+    if (isOther(a) !== isOther(b)) return isOther(a) ? 1 : -1
+    if (sort === 'name') return a.header.localeCompare(b.header)
+    return rank(b) - rank(a) || a.header.localeCompare(b.header)
+  })
 }
 
 export function TemplatesListClient() {
@@ -110,7 +101,12 @@ export function TemplatesListClient() {
   const [search, setSearch] = useState('')
   const [sort, setSort] = useState<TemplateSort>('popular')
 
-  const { data: templates = [], isLoading, isError, refetch } = useQuery({
+  const {
+    data: templates = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
     queryKey: templatesListQueryKey(locale),
     queryFn: getTemplates,
   })
@@ -137,7 +133,9 @@ export function TemplatesListClient() {
         </Stack>
         <DemoWriteGuard>
           <Button variant="gradient" onClick={() => router.push(routes.templates.new)}>
-            <Icon size="md"><Plus /></Icon>
+            <Icon size="md">
+              <Plus />
+            </Icon>
             {t('newButton')}
           </Button>
         </DemoWriteGuard>
@@ -148,7 +146,9 @@ export function TemplatesListClient() {
           <AlertTitle>{t('list.loadError')}</AlertTitle>
           <AlertDescription>
             <Button variant="outline" onClick={() => refetch()}>
-              <Icon size="md"><RefreshCw /></Icon>
+              <Icon size="md">
+                <RefreshCw />
+              </Icon>
               {t('list.retry')}
             </Button>
           </AlertDescription>
@@ -161,7 +161,9 @@ export function TemplatesListClient() {
         <Card variant="surface">
           <CardHeader spacing="sm">
             <IconBadge tone="surface" size="md">
-              <Icon size="lg"><LayoutTemplate /></Icon>
+              <Icon size="lg">
+                <LayoutTemplate />
+              </Icon>
             </IconBadge>
             <CardTitle size="lg">{t('empty.title')}</CardTitle>
             <CardDescription>{t('empty.description')}</CardDescription>
@@ -169,7 +171,9 @@ export function TemplatesListClient() {
           <CardContent>
             <DemoWriteGuard>
               <Button variant="gradient" onClick={() => router.push(routes.templates.new)}>
-                <Icon size="md"><Plus /></Icon>
+                <Icon size="md">
+                  <Plus />
+                </Icon>
                 {t('empty.cta')}
               </Button>
             </DemoWriteGuard>
@@ -186,7 +190,9 @@ export function TemplatesListClient() {
               />
             </Inline>
             <Inline gap={2} align="center">
-              <BodyText size="sm" tone="muted">{t('toolbar.sortLabel')}</BodyText>
+              <BodyText size="sm" tone="muted">
+                {t('toolbar.sortLabel')}
+              </BodyText>
               <Select value={sort} onValueChange={(value) => setSort(value as TemplateSort)}>
                 <SelectTrigger variant="surface" size="md" shape="rounded">
                   <SelectValue />
@@ -200,9 +206,7 @@ export function TemplatesListClient() {
             </Inline>
           </Inline>
 
-          {groups.length === 0 ? (
-            <BodyText tone="muted">{t('list.noResults')}</BodyText>
-          ) : null}
+          {groups.length === 0 ? <BodyText tone="muted">{t('list.noResults')}</BodyText> : null}
 
           {groups.map((group) => (
             <Stack key={group.key} gap={4}>
@@ -255,7 +259,9 @@ export function TemplatesListClient() {
                             }
                           >
                             {t('list.useButton')}
-                            <Icon size="md"><ArrowRight /></Icon>
+                            <Icon size="md">
+                              <ArrowRight />
+                            </Icon>
                           </Button>
                         </DemoWriteGuard>
                         <DemoWriteGuard>
@@ -263,16 +269,17 @@ export function TemplatesListClient() {
                             variant="outline"
                             onClick={() => router.push(routes.templates.detail(template.id))}
                           >
-                            <Icon size="md"><Pencil /></Icon>
+                            <Icon size="md">
+                              <Pencil />
+                            </Icon>
                             {t('list.editButton')}
                           </Button>
                         </DemoWriteGuard>
                         <DemoWriteGuard>
-                          <Button
-                            variant="outline"
-                            onClick={() => setPendingDelete(template)}
-                          >
-                            <Icon size="md"><Trash2 /></Icon>
+                          <Button variant="outline" onClick={() => setPendingDelete(template)}>
+                            <Icon size="md">
+                              <Trash2 />
+                            </Icon>
                             {t('list.deleteButton')}
                           </Button>
                         </DemoWriteGuard>

@@ -1,14 +1,11 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
 import { LoaderCircle, PanelLeftClose, PanelLeftOpen, Trash2 } from 'lucide-react'
 import { useLocale } from 'next-intl'
+import { useTranslations } from 'next-intl'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
-import { ConfirmDialog } from '@/components/ui/confirm-dialog'
-import { CardGrid } from '@/components/ui/layout/card-grid'
-import { Grid } from '@/components/ui/layout/grid'
-import { Inline } from '@/components/ui/layout/inline'
-import { Stack } from '@/components/ui/layout/stack'
+import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { BulkDeleteResultAlerts } from '@/components/questions/library/bulk-delete-result-alerts'
 import { InfiniteCardsLoader } from '@/components/questions/library/infinite-cards-loader'
 import { QuestionCard } from '@/components/questions/library/question-card'
@@ -28,15 +25,18 @@ import {
 } from '@/components/questions/picker'
 import { useBulkDeleteQuestions } from '@/components/questions/use-question-mutations'
 import { Button } from '@/components/ui/button'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Icon } from '@/components/ui/icon'
+import { CardGrid } from '@/components/ui/layout/card-grid'
+import { Grid } from '@/components/ui/layout/grid'
+import { Inline } from '@/components/ui/layout/inline'
+import { Stack } from '@/components/ui/layout/stack'
 import { Pagination } from '@/components/ui/pagination'
 import { SearchInput } from '@/components/ui/search-input'
-import { useTranslations } from 'next-intl'
 import { useRouter } from '@/i18n/navigation'
 import { routes } from '@/i18n/routes'
 import { useQuestionChipLabels } from '@/i18n/use-question-chip-labels'
 import { type BulkDeleteResult, type Question } from '@/lib/api'
-import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
 import { buildQuestionsInfiniteParams } from '@/lib/questions-query-state'
 
@@ -54,8 +54,7 @@ export function QuestionsLibraryClient({
   const t = useTranslations('questions.library.client')
   const tToolbar = useTranslations('questions.picker.toolbar')
   const getChipLabel = useQuestionChipLabels()
-  const { mutate: bulkDeleteQuestions, isPending: bulkDeleting } =
-    useBulkDeleteQuestions()
+  const { mutate: bulkDeleteQuestions, isPending: bulkDeleting } = useBulkDeleteQuestions()
 
   const query = useQuestionsQuery({
     initial: initialPrefetch?.queryState,
@@ -127,10 +126,7 @@ export function QuestionsLibraryClient({
     if (!hydratedSidebarRef.current) return
     if (typeof window === 'undefined') return
     try {
-      window.localStorage.setItem(
-        'questions:sidebarHidden',
-        sidebarHidden ? 'true' : 'false',
-      )
+      window.localStorage.setItem('questions:sidebarHidden', sidebarHidden ? 'true' : 'false')
     } catch {}
   }, [sidebarHidden])
   function toggleSidebar() {
@@ -164,25 +160,20 @@ export function QuestionsLibraryClient({
     if (ids.length === 0) return
 
     bulkDeleteQuestions(ids, {
-      onSuccess: result=>{
+      onSuccess: (result) => {
         setSelectedIds(new Set())
         setBulkConfirmOpen(false)
         setBulkResult(result)
       },
-      onError: ()=>{
+      onError: () => {
         setBulkResult(null)
         setBulkConfirmOpen(false)
-      }
+      },
     })
   }
 
   const selectedCount = selectedIds.size
-  const view = pickQuestionsViewSource(
-    isCardsView,
-    query,
-    infinite,
-    query.isSearchPending,
-  )
+  const view = pickQuestionsViewSource(isCardsView, query, infinite, query.isSearchPending)
 
   const sidebar = (
     <QuestionFacetSidebar
@@ -238,17 +229,12 @@ export function QuestionsLibraryClient({
               shape="pill"
               size="icon-sm"
               onClick={toggleSidebar}
-              aria-label={
-                sidebarHidden ? t('showFiltersSidebar') : t('hideFiltersSidebar')
-              }
+              aria-label={sidebarHidden ? t('showFiltersSidebar') : t('hideFiltersSidebar')}
               aria-pressed={sidebarHidden}
             >
               {sidebarHidden ? <PanelLeftOpen /> : <PanelLeftClose />}
             </Button>
-            <QuestionViewToggle
-              view={query.state.view}
-              onViewChange={query.setView}
-            />
+            <QuestionViewToggle view={query.state.view} onViewChange={query.setView} />
           </Inline>
         }
         bulkActions={
@@ -265,9 +251,13 @@ export function QuestionsLibraryClient({
                 }}
               >
                 {bulkDeleting ? (
-                  <Icon size="md" spinning><LoaderCircle /></Icon>
+                  <Icon size="md" spinning>
+                    <LoaderCircle />
+                  </Icon>
                 ) : (
-                  <Icon size="md"><Trash2 /></Icon>
+                  <Icon size="md">
+                    <Trash2 />
+                  </Icon>
                 )}
                 {bulkDeleting
                   ? t('deleting')
@@ -280,9 +270,7 @@ export function QuestionsLibraryClient({
         }
       />
 
-      {isSuperAdmin && (
-        <BulkDeleteResultAlerts result={bulkResult} />
-      )}
+      {isSuperAdmin && <BulkDeleteResultAlerts result={bulkResult} />}
 
       <QuestionPickerFeed
         items={view.items}
@@ -329,10 +317,7 @@ export function QuestionsLibraryClient({
       />
 
       {!isCardsView ? (
-        <QuestionPickerRefetchAlert
-          error={query.paginationError}
-          onRetry={query.refetch}
-        />
+        <QuestionPickerRefetchAlert error={query.paginationError} onRetry={query.refetch} />
       ) : null}
 
       {isCardsView && view.items.length > 0 ? (

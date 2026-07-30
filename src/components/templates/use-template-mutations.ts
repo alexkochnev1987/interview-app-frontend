@@ -1,7 +1,7 @@
 'use client'
 
-import { useCallback } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useCallback } from 'react'
 
 import { templatesRootQueryKey } from '@/components/templates/query-keys'
 import {

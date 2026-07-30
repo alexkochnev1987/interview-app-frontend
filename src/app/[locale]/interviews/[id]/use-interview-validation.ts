@@ -53,8 +53,7 @@ export function useInterviewValidation({
 
         const hasActiveValidation = refreshedInterview.answers.some(
           (answer) =>
-            answer.validation?.status === 'queued' ||
-            answer.validation?.status === 'processing',
+            answer.validation?.status === 'queued' || answer.validation?.status === 'processing',
         )
 
         if (refreshedInterview.status === 'completed') {

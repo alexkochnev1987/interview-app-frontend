@@ -1,29 +1,25 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { Progress as ProgressPrimitive } from "radix-ui"
-import { cva, type VariantProps } from "class-variance-authority"
+import { cva, type VariantProps } from 'class-variance-authority'
+import { Progress as ProgressPrimitive } from 'radix-ui'
+import type { ComponentProps } from 'react'
 
-import { cn } from "@/lib/utils"
+import { cn } from '@/lib/utils'
 
-const progressVariants = cva(
-  "relative flex w-full items-center overflow-x-hidden rounded-full",
-  {
-    variants: {
-      density: {
-        thin: "h-1 bg-muted",
-        thick: "h-2.5 bg-card",
-      },
-    },
-    defaultVariants: {
-      density: "thin",
+const progressVariants = cva('relative flex w-full items-center overflow-x-hidden rounded-full', {
+  variants: {
+    density: {
+      thin: 'h-1 bg-muted',
+      thick: 'h-2.5 bg-card',
     },
   },
-)
+  defaultVariants: {
+    density: 'thin',
+  },
+})
 
 interface ProgressProps
-  extends React.ComponentProps<typeof ProgressPrimitive.Root>,
-    VariantProps<typeof progressVariants> {}
+  extends ComponentProps<typeof ProgressPrimitive.Root>, VariantProps<typeof progressVariants> {}
 
 function Progress({ className, value, density, ...props }: ProgressProps) {
   return (

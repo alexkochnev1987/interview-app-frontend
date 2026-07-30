@@ -1,0 +1,26 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "nextjs", "import", "jsx-a11y", "typescript", "unicorn", "promise", "oxc"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn",
+    "perf": "warn"
+  },
+  "rules": {
+    "react/react-in-jsx-scope": "off",
+    "react/exhaustive-deps": "warn",
+    "import/no-namespace": "warn"
+  },
+  "settings": {
+    "react": { "version": "19" },
+    "next": { "rootDir": ["."] }
+  },
+  "ignorePatterns": [
+    ".next/**",
+    ".next-dev/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+    "scripts/**"
+  ]
+}

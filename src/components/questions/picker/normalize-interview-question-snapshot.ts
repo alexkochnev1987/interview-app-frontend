@@ -1,9 +1,7 @@
 import { type InterviewQuestion, type Question } from '@/lib/api'
 
 /** Ensures interview question snapshots have library fields the picker UI expects. */
-export function normalizeInterviewQuestionSnapshot(
-  question: InterviewQuestion,
-): Question {
+export function normalizeInterviewQuestionSnapshot(question: InterviewQuestion): Question {
   return {
     ...question,
     followUpQuestions: question.followUpQuestions ?? [],
@@ -17,8 +15,6 @@ export function normalizeInterviewQuestionSnapshot(
   }
 }
 
-export function normalizeInterviewQuestionSnapshots(
-  questions: InterviewQuestion[],
-): Question[] {
+export function normalizeInterviewQuestionSnapshots(questions: InterviewQuestion[]): Question[] {
   return questions.map(normalizeInterviewQuestionSnapshot)
 }

@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl'
 
-import { LOCALES, type Locale } from '@/i18n/locales'
+import { LOCALES } from '@/i18n/locales'
 
 import { useTakeFlowLocale } from './take-flow-locale-provider'
 

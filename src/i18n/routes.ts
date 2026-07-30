@@ -15,8 +15,7 @@ export const routes = {
     list: '/interviews',
     new: '/interviews/new',
     detail: (id: string) => `/interviews/${encodeURIComponent(id)}`,
-    candidateFeedback: (id: string) =>
-      `/interviews/${encodeURIComponent(id)}/candidate-feedback`,
+    candidateFeedback: (id: string) => `/interviews/${encodeURIComponent(id)}/candidate-feedback`,
     newFromTemplate: (templateId: string) =>
       `/interviews/new?templateId=${encodeURIComponent(templateId)}`,
     newFromInterview: (interviewId: string) =>
@@ -31,7 +30,6 @@ export const routes = {
     detail: (id: string) => `/users/${encodeURIComponent(id)}`,
   },
   feedback: {
-    share: (token: string) =>
-      `/feedback/share/${encodeURIComponent(token)}`,
+    share: (token: string) => `/feedback/share/${encodeURIComponent(token)}`,
   },
 } as const

@@ -13,9 +13,7 @@ type OnboardingProgressListener = () => void
 
 const listeners = new Set<OnboardingProgressListener>()
 
-export function subscribeOnboardingProgress(
-  listener: OnboardingProgressListener,
-): () => void {
+export function subscribeOnboardingProgress(listener: OnboardingProgressListener): () => void {
   listeners.add(listener)
 
   return () => {
@@ -51,9 +49,7 @@ function writeStoredProgress(progress: StoredOnboardingProgress) {
   notifyOnboardingProgressListeners()
 }
 
-export function getStoredOnboardingStep(
-  flowId: OnboardingFlowId,
-): string | null {
+export function getStoredOnboardingStep(flowId: OnboardingFlowId): string | null {
   const progress = readStoredProgress()
   if (!progress || progress.flowId !== flowId) return null
 
@@ -77,8 +73,7 @@ export function storeOnboardingStep(flowId: OnboardingFlowId, stepId: string) {
     flowId,
     stepId,
     stepRoutes: existing?.flowId === flowId ? existing.stepRoutes : undefined,
-    createdQuestionId:
-      existing?.flowId === flowId ? existing.createdQuestionId : undefined,
+    createdQuestionId: existing?.flowId === flowId ? existing.createdQuestionId : undefined,
   })
 }
 

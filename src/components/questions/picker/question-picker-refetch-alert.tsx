@@ -13,10 +13,7 @@ export type QuestionPickerRefetchAlertProps = {
   onRetry: () => void
 }
 
-export function QuestionPickerRefetchAlert({
-  error,
-  onRetry,
-}: QuestionPickerRefetchAlertProps) {
+export function QuestionPickerRefetchAlert({ error, onRetry }: QuestionPickerRefetchAlertProps) {
   const t = useTranslations('questions.picker')
   const tFeed = useTranslations('questions.picker.feed')
 
@@ -28,13 +25,7 @@ export function QuestionPickerRefetchAlert({
       <AlertDescription>
         <Inline gap={3} align="center" wrap="wrap">
           <span>{error}</span>
-          <Button
-            type="button"
-            variant="outline-pill"
-            shape="pill"
-            size="sm"
-            onClick={onRetry}
-          >
+          <Button type="button" variant="outline-pill" shape="pill" size="sm" onClick={onRetry}>
             <Icon size="sm">
               <RefreshCw />
             </Icon>

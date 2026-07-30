@@ -19,13 +19,9 @@ export type CandidateFeedbackEligibilitySkipReason =
   | 'missing_transcript'
   | 'unusable_transcript'
 
-const CANDIDATE_FEEDBACK_ELIGIBILITY_SKIP_REASONS =
-  new Set<CandidateFeedbackEligibilitySkipReason>([
-    'not_submitted',
-    'missing_answer',
-    'missing_transcript',
-    'unusable_transcript',
-  ])
+const CANDIDATE_FEEDBACK_ELIGIBILITY_SKIP_REASONS = new Set<CandidateFeedbackEligibilitySkipReason>(
+  ['not_submitted', 'missing_answer', 'missing_transcript', 'unusable_transcript'],
+)
 
 const CANDIDATE_FEEDBACK_SKIP_REASONS = new Set<CandidateFeedbackSkipReason>([
   'locked',
@@ -66,10 +62,7 @@ export type GenerateAllCandidateFeedbackOutcome = {
 
 export type CandidateFeedbackEditableState = 'accepted' | 'edited'
 
-export type CandidateFeedbackOutcome =
-  | 'next_stage'
-  | 'keep_in_touch'
-  | 'custom'
+export type CandidateFeedbackOutcome = 'next_stage' | 'keep_in_touch' | 'custom'
 
 export const CANDIDATE_FEEDBACK_OUTCOMES = [
   'next_stage',
@@ -170,22 +163,14 @@ function normalizeBlockState(state: unknown): CandidateFeedbackBlockState {
   return 'not_generated'
 }
 
-function normalizeOutcome(
-  outcome: unknown,
-): CandidateFeedbackOutcome | undefined {
-  if (
-    outcome === 'next_stage' ||
-    outcome === 'keep_in_touch' ||
-    outcome === 'custom'
-  ) {
+function normalizeOutcome(outcome: unknown): CandidateFeedbackOutcome | undefined {
+  if (outcome === 'next_stage' || outcome === 'keep_in_touch' || outcome === 'custom') {
     return outcome
   }
   return undefined
 }
 
-function mapBlock(
-  dto?: ApiCandidateFeedbackBlockDto | null,
-): CandidateFeedbackBlock {
+function mapBlock(dto?: ApiCandidateFeedbackBlockDto | null): CandidateFeedbackBlock {
   if (!dto) {
     return { ...DEFAULT_BLOCK }
   }
@@ -198,9 +183,7 @@ function mapBlock(
   }
 }
 
-function mapQuestionBlock(
-  dto: ApiCandidateFeedbackQuestionDto,
-): CandidateFeedbackQuestionBlock {
+function mapQuestionBlock(dto: ApiCandidateFeedbackQuestionDto): CandidateFeedbackQuestionBlock {
   return {
     ...mapBlock(dto),
     questionIndex: dto.questionIndex,
@@ -208,9 +191,7 @@ function mapQuestionBlock(
   }
 }
 
-export function unwrapCandidateFeedbackPayload(
-  parsed: unknown,
-): ApiCandidateFeedbackDto {
+export function unwrapCandidateFeedbackPayload(parsed: unknown): ApiCandidateFeedbackDto {
   if (
     parsed &&
     typeof parsed === 'object' &&
@@ -311,9 +292,7 @@ export function buildQuestionBlocksView(
   questionCount: number,
   feedback: CandidateFeedbackResponse,
 ): CandidateFeedbackQuestionBlock[] {
-  const byIndex = new Map(
-    feedback.questionBlocks.map((block) => [block.questionIndex, block]),
-  )
+  const byIndex = new Map(feedback.questionBlocks.map((block) => [block.questionIndex, block]))
 
   return Array.from({ length: questionCount }, (_, questionIndex) => {
     return (
@@ -328,9 +307,7 @@ export function buildQuestionBlocksView(
   })
 }
 
-export function isCandidateFeedbackGenerating(
-  feedback: CandidateFeedbackResponse,
-): boolean {
+export function isCandidateFeedbackGenerating(feedback: CandidateFeedbackResponse): boolean {
   if (feedback.overall.state === 'generating') {
     return true
   }
@@ -338,12 +315,8 @@ export function isCandidateFeedbackGenerating(
   return feedback.questionBlocks.some((block) => block.state === 'generating')
 }
 
-export function canGenerateQuestionBlock(
-  state: CandidateFeedbackBlockState,
-): boolean {
-  return (
-    state === 'not_generated' || state === 'generated' || state === 'failed'
-  )
+export function canGenerateQuestionBlock(state: CandidateFeedbackBlockState): boolean {
+  return state === 'not_generated' || state === 'generated' || state === 'failed'
 }
 
 export function canRegenerateAnyCandidateFeedbackBlock(
@@ -359,18 +332,14 @@ export function canRegenerateAnyCandidateFeedbackBlock(
   )
 }
 
-export function shouldShowQuestionGenerateButton(
-  state: CandidateFeedbackBlockState,
-): boolean {
+export function shouldShowQuestionGenerateButton(state: CandidateFeedbackBlockState): boolean {
   return canGenerateQuestionBlock(state) || state === 'generating'
 }
 
 export function getQuestionGenerateLabelKey(
   state: CandidateFeedbackBlockState,
 ): 'generateQuestion' | 'regenerateQuestion' {
-  return state === 'generated' || state === 'failed'
-    ? 'regenerateQuestion'
-    : 'generateQuestion'
+  return state === 'generated' || state === 'failed' ? 'regenerateQuestion' : 'generateQuestion'
 }
 
 export type CandidateFeedbackErrorDisplay =
@@ -427,18 +396,13 @@ export function isSystemPrefilledCandidateFeedbackBlock(
     return false
   }
 
-  return Boolean(
-    block.recommendationText?.trim() || block.improvementText?.trim(),
-  )
+  return Boolean(block.recommendationText?.trim() || block.improvementText?.trim())
 }
 
 export function isCandidateFeedbackSkippedFailureBlock(
   block: Pick<CandidateFeedbackBlock, 'state' | 'errorMessage'>,
 ): boolean {
-  return (
-    block.state === 'failed' &&
-    Boolean(getCandidateFeedbackBlockSkipReason(block))
-  )
+  return block.state === 'failed' && Boolean(getCandidateFeedbackBlockSkipReason(block))
 }
 
 export function parseCandidateFeedbackErrorMessage(
@@ -455,8 +419,7 @@ export function parseCandidateFeedbackErrorMessage(
   }
 
   const geminiJsonMatch = trimmed.match(/Gemini error \d+:\s*(\{[\s\S]*\})/i)
-  const jsonCandidate =
-    geminiJsonMatch?.[1] ?? (trimmed.startsWith('{') ? trimmed : null)
+  const jsonCandidate = geminiJsonMatch?.[1] ?? (trimmed.startsWith('{') ? trimmed : null)
 
   if (jsonCandidate) {
     try {
@@ -535,18 +498,13 @@ export function hasGeneratedCandidateFeedbackBlocks(
 }
 
 export function isPublishableCandidateFeedbackBlock(
-  block: Pick<
-    CandidateFeedbackBlock,
-    'state' | 'recommendationText' | 'improvementText'
-  >,
+  block: Pick<CandidateFeedbackBlock, 'state' | 'recommendationText' | 'improvementText'>,
 ): boolean {
   if (block.state !== 'accepted' && block.state !== 'edited') {
     return false
   }
 
-  return Boolean(
-    block.recommendationText?.trim() || block.improvementText?.trim(),
-  )
+  return Boolean(block.recommendationText?.trim() || block.improvementText?.trim())
 }
 
 /** True when at least one accepted/edited block has publishable text (share-link gate). */
@@ -558,17 +516,13 @@ export function hasPublishableCandidateFeedback(
     return true
   }
 
-  return buildQuestionBlocksView(questionCount, feedback).some(
-    isPublishableCandidateFeedbackBlock,
-  )
+  return buildQuestionBlocksView(questionCount, feedback).some(isPublishableCandidateFeedbackBlock)
 }
 
 function hasCandidateFeedbackBlockText(
   block: Pick<CandidateFeedbackBlock, 'recommendationText' | 'improvementText'>,
 ): boolean {
-  return Boolean(
-    block.recommendationText?.trim() || block.improvementText?.trim(),
-  )
+  return Boolean(block.recommendationText?.trim() || block.improvementText?.trim())
 }
 
 /**
@@ -578,16 +532,12 @@ function hasCandidateFeedbackBlockText(
  * draft field is enough; the other may stay empty.
  */
 export function resolveCandidateFeedbackSavePayload(
-  block: Pick<
-    CandidateFeedbackBlock,
-    'state' | 'recommendationText' | 'improvementText'
-  >,
+  block: Pick<CandidateFeedbackBlock, 'state' | 'recommendationText' | 'improvementText'>,
   drafts: { recommendationText: string; improvementText: string },
 ): { recommendationText: string; improvementText: string } | null {
   const draftRecommendation = drafts.recommendationText
   const draftImprovement = drafts.improvementText
-  const bothDraftsEmpty =
-    !draftRecommendation.trim() && !draftImprovement.trim()
+  const bothDraftsEmpty = !draftRecommendation.trim() && !draftImprovement.trim()
 
   if (bothDraftsEmpty && block.state === 'generated') {
     const recommendationText = block.recommendationText ?? ''
@@ -619,10 +569,7 @@ export function buildAcceptAllCandidateFeedbackPayload(
 ): UpdateCandidateFeedbackPayload {
   const payload: UpdateCandidateFeedbackPayload = {}
 
-  if (
-    feedback.overall.state === 'generated' &&
-    hasCandidateFeedbackBlockText(feedback.overall)
-  ) {
+  if (feedback.overall.state === 'generated' && hasCandidateFeedbackBlockText(feedback.overall)) {
     payload.overall = {
       recommendationText: feedback.overall.recommendationText ?? '',
       improvementText: feedback.overall.improvementText ?? '',
@@ -631,10 +578,7 @@ export function buildAcceptAllCandidateFeedbackPayload(
   }
 
   const generatedQuestions = buildQuestionBlocksView(questionCount, feedback)
-    .filter(
-      (block) =>
-        block.state === 'generated' && hasCandidateFeedbackBlockText(block),
-    )
+    .filter((block) => block.state === 'generated' && hasCandidateFeedbackBlockText(block))
     .map((block) => ({
       questionIndex: block.questionIndex,
       recommendationText: block.recommendationText ?? '',
@@ -654,9 +598,7 @@ export function isBlockUsingSharedCandidateFeedbackError(
   sharedError: string | null,
 ): boolean {
   return (
-    Boolean(sharedError) &&
-    block.state === 'failed' &&
-    block.errorMessage?.trim() === sharedError
+    Boolean(sharedError) && block.state === 'failed' && block.errorMessage?.trim() === sharedError
   )
 }
 
@@ -667,10 +609,7 @@ export function isAcceptAllCandidateFeedbackPayloadEmpty(
 }
 
 function resolveGenerateAllSkipReason(
-  result: Pick<
-    GenerateAllCandidateFeedbackQuestionResult,
-    'reason' | 'errorMessage'
-  >,
+  result: Pick<GenerateAllCandidateFeedbackQuestionResult, 'reason' | 'errorMessage'>,
 ): CandidateFeedbackSkipReason | null {
   return (
     parseCandidateFeedbackSkipReason(result.reason) ??
@@ -692,13 +631,16 @@ export type GenerateAllQuestionSkipEntry = {
 export function buildGenerateAllQuestionSkipEntries(
   skippedQuestions: GenerateAllCandidateFeedbackQuestionResult[],
 ): GenerateAllQuestionSkipEntry[] {
-  return skippedQuestions
-    .slice()
-    .sort((left, right) => left.questionIndex - right.questionIndex)
-    .map((question) => ({
-      questionIndex: question.questionIndex,
-      reason: resolveGenerateAllSkipReason(question),
-    }))
+  return (
+    skippedQuestions
+      .slice()
+      // oxlint-disable-next-line unicorn/no-array-sort
+      .sort((left, right) => left.questionIndex - right.questionIndex)
+      .map((question) => ({
+        questionIndex: question.questionIndex,
+        reason: resolveGenerateAllSkipReason(question),
+      }))
+  )
 }
 
 export function resolveGenerateAllOverallSkipReason(
@@ -742,9 +684,7 @@ export function resolveGenerateAllStartToastKind(
   }
 
   const skipReasons = [
-    ...getSkippedGenerateAllQuestionResults(plan?.questions).map(
-      resolveGenerateAllSkipReason,
-    ),
+    ...getSkippedGenerateAllQuestionResults(plan?.questions).map(resolveGenerateAllSkipReason),
     resolveGenerateAllOverallSkipReason(plan?.overall),
   ].filter((reason): reason is CandidateFeedbackSkipReason => reason != null)
 

@@ -1,13 +1,11 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest'
 
-import { ApiError } from '@/lib/api-error';
+import { ApiError } from '@/lib/api-error'
 
-import { completeMultipartUpload } from './uploads';
-import type { MultipartUploadSession } from './runtime';
+import type { MultipartUploadSession } from './runtime'
+import { completeMultipartUpload } from './uploads'
 
-function sessionFixture(
-  overrides: Partial<MultipartUploadSession> = {},
-): MultipartUploadSession {
+function sessionFixture(overrides: Partial<MultipartUploadSession> = {}): MultipartUploadSession {
   return {
     questionIndex: 0,
     mediaKey: 'uploads/interviews/x/answers/q0-camera-1.webm',
@@ -23,14 +21,20 @@ function sessionFixture(
     aborted: false,
     mediaKeyPersisted: true,
     ...overrides,
-  };
+  }
 }
 
 describe('completeMultipartUpload', () => {
   it('rethrows ApiError without wrapping', async () => {
-    const apiError = new ApiError(409, 'overwrite forbidden', '/uploads', undefined, 'ANSWER_VERSION_OVERWRITE_FORBIDDEN');
-    const multipartUploadsRef = { current: { camera: sessionFixture(), screen: null } };
-    const completeMultipartUploadRequest = vi.fn().mockRejectedValue(apiError);
+    const apiError = new ApiError(
+      409,
+      'overwrite forbidden',
+      '/uploads',
+      undefined,
+      'ANSWER_VERSION_OVERWRITE_FORBIDDEN',
+    )
+    const multipartUploadsRef = { current: { camera: sessionFixture(), screen: null } }
+    const completeMultipartUploadRequest = vi.fn().mockRejectedValue(apiError)
 
     await expect(
       completeMultipartUpload({
@@ -38,6 +42,6 @@ describe('completeMultipartUpload', () => {
         multipartUploadsRef,
         completeMultipartUploadRequest,
       }),
-    ).rejects.toBe(apiError);
-  });
-});
+    ).rejects.toBe(apiError)
+  })
+})

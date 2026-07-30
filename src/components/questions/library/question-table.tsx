@@ -1,17 +1,14 @@
 'use client'
 
-import { useEffect, useMemo, useRef, type MouseEvent, type ReactNode } from 'react'
 import { useTranslations } from 'next-intl'
+import { useEffect, useMemo, useRef, type MouseEvent, type ReactNode } from 'react'
 
 import { Card } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Inline } from '@/components/ui/layout/inline'
 import { LoadingBar } from '@/components/ui/loading-bar'
 import { PillRow } from '@/components/ui/pill-row'
-import {
-  SortableTableHead,
-  type SortDirection,
-} from '@/components/ui/sortable-table-head'
+import { SortableTableHead, type SortDirection } from '@/components/ui/sortable-table-head'
 import { StatusPill } from '@/components/ui/status-pill'
 import {
   Table,
@@ -23,12 +20,8 @@ import {
 } from '@/components/ui/table'
 import { BodyText } from '@/components/ui/text'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
+import type { Question, QuestionSortField, QuestionSortOrder } from '@/lib/api'
 import { formatInterviewDate } from '@/lib/interview-formatters'
-import type {
-  Question,
-  QuestionSortField,
-  QuestionSortOrder,
-} from '@/lib/api'
 
 const EMPTY = '—'
 const TAGS_VISIBLE = 3
@@ -61,8 +54,7 @@ function nextSort(
   clicked: QuestionSortField,
 ): { field: QuestionSortField; order: QuestionSortOrder } {
   if (active !== clicked) {
-    const defaultOrder: QuestionSortOrder =
-      clicked === 'questionText' ? 'asc' : 'desc'
+    const defaultOrder: QuestionSortOrder = clicked === 'questionText' ? 'asc' : 'desc'
     return { field: clicked, order: defaultOrder }
   }
   return {
@@ -94,6 +86,7 @@ function TagsCell({ tags }: { tags: string[] }) {
   return (
     <PillRow>
       {visible.map((tag, index) => (
+        // eslint-disable-next-line react/no-array-index-key
         <StatusPill key={`${tag}-${index}`} tone="neutral" casing="chip" size="compact">
           {tag}
         </StatusPill>
@@ -169,10 +162,8 @@ export function QuestionTable({
   }, [page])
 
   const selectedVisibleCount = items.filter((q) => selectedIds.has(q.id)).length
-  const allVisibleSelected =
-    items.length > 0 && selectedVisibleCount === items.length
-  const someVisibleSelected =
-    selectedVisibleCount > 0 && !allVisibleSelected
+  const allVisibleSelected = items.length > 0 && selectedVisibleCount === items.length
+  const someVisibleSelected = selectedVisibleCount > 0 && !allVisibleSelected
 
   function handleSortClick(field: QuestionSortField) {
     const next = nextSort(sortBy, sortOrder, field)
@@ -191,15 +182,9 @@ export function QuestionTable({
                   size="sm"
                   disabled={disabled}
                   checked={
-                    allVisibleSelected
-                      ? true
-                      : someVisibleSelected
-                        ? 'indeterminate'
-                        : false
+                    allVisibleSelected ? true : someVisibleSelected ? 'indeterminate' : false
                   }
-                  onCheckedChange={(checked) =>
-                    onToggleSelectAll(items, checked === true)
-                  }
+                  onCheckedChange={(checked) => onToggleSelectAll(items, checked === true)}
                   aria-label={t('selectAllVisible')}
                 />
               </TableHead>
@@ -253,10 +238,10 @@ export function QuestionTable({
             const rowState = question.deleted
               ? 'deleted'
               : question.pendingDeletion
-                    ? 'scheduled'
-                    : selected
-                        ? 'selected'
-                        : 'default'
+                ? 'scheduled'
+                : selected
+                  ? 'selected'
+                  : 'default'
             const updatedAtFormatted = formatInterviewDate(question.updatedAt)
             return (
               <TableRow
@@ -284,7 +269,7 @@ export function QuestionTable({
                       </StatusPill>
                     ) : null}
                     {question.pendingDeletion && !question.deleted ? (
-                        <StatusPill tone="scheduled">{t('scheduled')}</StatusPill>
+                      <StatusPill tone="scheduled">{t('scheduled')}</StatusPill>
                     ) : null}
                     <BodyText
                       size="sm"
@@ -297,7 +282,9 @@ export function QuestionTable({
                     </BodyText>
                     {question.resolvedLocale && question.resolvedLocale !== listLocale ? (
                       <StatusPill tone="neutral_meta" size="compact" casing="chip">
-                        {tCard('resolvedLocaleBadge', { locale: question.resolvedLocale.toUpperCase() })}
+                        {tCard('resolvedLocaleBadge', {
+                          locale: question.resolvedLocale.toUpperCase(),
+                        })}
                       </StatusPill>
                     ) : null}
                   </Inline>
@@ -313,11 +300,7 @@ export function QuestionTable({
                 <TableCell truncate title={question.subcategory || undefined}>
                   {dashIfEmpty(question.subcategory)}
                 </TableCell>
-                <TableCell
-                  visibility="md-up"
-                  truncate
-                  title={question.role || undefined}
-                >
+                <TableCell visibility="md-up" truncate title={question.role || undefined}>
                   {dashIfEmpty(question.role)}
                 </TableCell>
                 <TableCell visibility="md-up">
@@ -330,12 +313,7 @@ export function QuestionTable({
                   {question.usageCount}
                 </TableCell>
                 <TableCell visibility="md-up" nowrap>
-                  <BodyText
-                    as="span"
-                    size="sm"
-                    tone="muted"
-                    title={updatedAtFormatted}
-                  >
+                  <BodyText as="span" size="sm" tone="muted" title={updatedAtFormatted}>
                     {updatedAtFormatted}
                   </BodyText>
                 </TableCell>

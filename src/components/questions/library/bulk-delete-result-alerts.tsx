@@ -32,9 +32,7 @@ export function BulkDeleteResultAlerts({ result }: BulkDeleteResultAlertsProps) 
                   <BodyText size="sm" weight="medium" tone="foreground">
                     {truncateText(item.questionText, 80)}
                   </BodyText>
-                  <QuestionDeleteBlockingInterviews
-                    interviews={item.blockingInterviews}
-                  />
+                  <QuestionDeleteBlockingInterviews interviews={item.blockingInterviews} />
                 </Stack>
               ))}
             </Stack>

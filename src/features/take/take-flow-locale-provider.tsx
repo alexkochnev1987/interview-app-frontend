@@ -1,5 +1,7 @@
 'use client'
 
+import { NextIntlClientProvider, useLocale, useMessages } from 'next-intl'
+import { useSearchParams } from 'next/navigation'
 import {
   createContext,
   useCallback,
@@ -10,13 +12,11 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import { NextIntlClientProvider, useLocale, useMessages } from 'next-intl'
-import { useSearchParams } from 'next/navigation'
 
 import { resolveHtmlLang } from '@/i18n/html-lang'
+import { LOCALES, type Locale } from '@/i18n/locales'
 import { mergeLocaleModules } from '@/i18n/module-loader-core.mjs'
 import { localizedPath, pathLocale } from '@/i18n/pathname'
-import { LOCALES, type Locale } from '@/i18n/locales'
 import { setClientApiLocale } from '@/lib/api'
 
 const LOCALE_COOKIE_NAME = 'NEXT_LOCALE'
@@ -191,6 +191,7 @@ function TakeFlowLocaleProviderInner({ children }: TakeFlowLocaleProviderProps) 
         return
       }
 
+      // eslint-disable-next-line promise/always-return
       void loadTakeFlowLocaleMessages(nextLocale).then((nextMessages) => {
         if (generation !== localeSwitchGenerationRef.current) {
           return

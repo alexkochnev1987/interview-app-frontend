@@ -1,8 +1,8 @@
 'use client'
 
-import { useCallback } from 'react'
 import { MessageSquareText, Sparkles } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { useCallback } from 'react'
 
 import { EvaluationActionsProvider } from '@/components/assessments/actions/evaluation-actions-context'
 import { RerunAllButton } from '@/components/assessments/actions/rerun-all-button'
@@ -38,19 +38,18 @@ interface AssessmentDetailContentProps {
   initialInterview: Interview
 }
 
-export function AssessmentDetailContent({
-  initialInterview,
-}: AssessmentDetailContentProps) {
+export function AssessmentDetailContent({ initialInterview }: AssessmentDetailContentProps) {
   const tAssessments = useTranslations('assessments')
   const tInterviewsDetail = useTranslations('interviews.detail')
   const interviewId = initialInterview.id
 
   const fetcher = useCallback(() => getInterview(interviewId), [interviewId])
-  const { data: interview, refresh, kick, paused } = useLivePolling(
-    initialInterview,
-    fetcher,
-    isScoring,
-  )
+  const {
+    data: interview,
+    refresh,
+    kick,
+    paused,
+  } = useLivePolling(initialInterview, fetcher, isScoring)
 
   const onEvaluationStarted = useCallback(() => {
     kick()
@@ -63,9 +62,7 @@ export function AssessmentDetailContent({
   const isReadyToScore = reviewStatus === 'ready_to_score'
   const canRerun = canRerunReview(reviewStatus)
 
-  const answersByIndex = new Map(
-    interview.answers.map((a) => [a.questionIndex, a]),
-  )
+  const answersByIndex = new Map(interview.answers.map((a) => [a.questionIndex, a]))
   const questionsWithAnswers = interview.questions.map((question, index) => ({
     question,
     questionIndex: index,
@@ -105,12 +102,8 @@ export function AssessmentDetailContent({
                   <Sparkles />
                 </Icon>
                 <Stack gap={1.5}>
-                  <SectionHeading>
-                    {tAssessments('detail.readyTitle')}
-                  </SectionHeading>
-                  <BodyText size="sm">
-                    {tAssessments('detail.readyDescription')}
-                  </BodyText>
+                  <SectionHeading>{tAssessments('detail.readyTitle')}</SectionHeading>
+                  <BodyText size="sm">{tAssessments('detail.readyDescription')}</BodyText>
                 </Stack>
               </Inline>
               <StartEvaluationButton interviewId={interviewId} size="lg" />
@@ -122,21 +115,15 @@ export function AssessmentDetailContent({
       {isFailed ? (
         <Alert variant="danger">
           <AlertTitle>{tAssessments('detail.failedTitle')}</AlertTitle>
-          <AlertDescription>
-            {tAssessments('detail.failedDescription')}
-          </AlertDescription>
+          <AlertDescription>{tAssessments('detail.failedDescription')}</AlertDescription>
         </Alert>
       ) : null}
 
       {interview.result ? (
         <Section gap={4}>
           <Stack gap={2}>
-            <EyebrowLabel size="lg">
-              {tAssessments('detail.scorecardEyebrow')}
-            </EyebrowLabel>
-            <SectionHeading>
-              {tAssessments('detail.scorecardHeading')}
-            </SectionHeading>
+            <EyebrowLabel size="lg">{tAssessments('detail.scorecardEyebrow')}</EyebrowLabel>
+            <SectionHeading>{tAssessments('detail.scorecardHeading')}</SectionHeading>
           </Stack>
           <OverallPanel result={interview.result} />
         </Section>
@@ -145,19 +132,11 @@ export function AssessmentDetailContent({
       <Section gap={4}>
         <Inline gap={4} align="end" justify="between" wrap="wrap">
           <Stack gap={2}>
-            <EyebrowLabel size="lg">
-              {tAssessments('detail.perQuestionEyebrow')}
-            </EyebrowLabel>
-            <SectionHeading>
-              {tAssessments('detail.perQuestionHeading')}
-            </SectionHeading>
+            <EyebrowLabel size="lg">{tAssessments('detail.perQuestionEyebrow')}</EyebrowLabel>
+            <SectionHeading>{tAssessments('detail.perQuestionHeading')}</SectionHeading>
           </Stack>
           {canRerun ? (
-            <RerunAllButton
-              interviewId={interviewId}
-              size="sm"
-              disabled={validationInFlight}
-            />
+            <RerunAllButton interviewId={interviewId} size="sm" disabled={validationInFlight} />
           ) : null}
         </Inline>
 

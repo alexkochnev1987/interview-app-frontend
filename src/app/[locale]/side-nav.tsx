@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import {
   ClipboardList,
   LayoutDashboard,
@@ -11,21 +10,7 @@ import {
   Users,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-
-import { isCandidateFlowPath } from '@/i18n/html-lang'
-import { usePathname } from '@/i18n/navigation'
-import { routes } from '@/i18n/routes'
-import { useSharedLabels } from '@/i18n/use-shared-labels'
-import { useAuth, useIsDemo } from '@/lib/auth-context'
-import {
-  canAccessDashboard,
-  canConfigureInterview,
-  canManageTeam,
-  canReadQuestions,
-  canReviewAssessments,
-} from '@/lib/auth-roles'
-import { getCandidateInitials } from '@/lib/interview-formatters'
-import { cn } from '@/lib/utils'
+import { useState } from 'react'
 
 import { AppSidebar } from '@/components/ui/app-sidebar'
 import { BrandMark } from '@/components/ui/brand-mark'
@@ -40,6 +25,20 @@ import {
   sideNavRevealClass,
 } from '@/components/ui/side-nav-item'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
+import { isCandidateFlowPath } from '@/i18n/html-lang'
+import { usePathname } from '@/i18n/navigation'
+import { routes } from '@/i18n/routes'
+import { useSharedLabels } from '@/i18n/use-shared-labels'
+import { useAuth, useIsDemo } from '@/lib/auth-context'
+import {
+  canAccessDashboard,
+  canConfigureInterview,
+  canManageTeam,
+  canReadQuestions,
+  canReviewAssessments,
+} from '@/lib/auth-roles'
+import { getCandidateInitials } from '@/lib/interview-formatters'
+import { cn } from '@/lib/utils'
 
 export function SideNav() {
   const { user, logout } = useAuth()
@@ -85,9 +84,7 @@ export function SideNav() {
         ]
       : []),
     ...(canConfigureInterview(user?.role)
-      ? [
-          { href: routes.templates.list, label: tNav('templates'), icon: LayoutTemplate },
-        ]
+      ? [{ href: routes.templates.list, label: tNav('templates'), icon: LayoutTemplate }]
       : []),
     ...(canConfigureInterview(user?.role) && !isDemo
       ? [
@@ -98,9 +95,7 @@ export function SideNav() {
           },
         ]
       : []),
-    ...(canManageTeam(user?.role)
-      ? [{ href: '/team', label: tNav('team'), icon: Users }]
-      : []),
+    ...(canManageTeam(user?.role) ? [{ href: '/team', label: tNav('team'), icon: Users }] : []),
   ]
 
   function isActive(href: string) {

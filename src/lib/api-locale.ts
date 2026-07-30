@@ -7,10 +7,7 @@ export function resolveApiLocale(locale?: string | null): ApiLocale {
   return LOCALES.includes(locale as Locale) ? (locale as Locale) : DEFAULT_LOCALE
 }
 
-export function buildApiLocaleHeaders(
-  locale?: string | null,
-  headers?: HeadersInit,
-): Headers {
+export function buildApiLocaleHeaders(locale?: string | null, headers?: HeadersInit): Headers {
   const merged = new Headers(headers)
   merged.set('X-Locale', resolveApiLocale(locale))
   return merged

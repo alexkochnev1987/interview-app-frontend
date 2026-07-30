@@ -1,12 +1,12 @@
-import type { OnboardingFlowConfig, OnboardingStepConfig } from '@/features/onboarding/types';
-import { ONBOARDING_EVENT_NAMES } from '@/features/onboarding/onboarding-events';
+import { ONBOARDING_EVENT_NAMES } from '@/features/onboarding/onboarding-events'
+import type { OnboardingFlowConfig, OnboardingStepConfig } from '@/features/onboarding/types'
 
 const pageTourStepDefaults = {
   missingTarget: 'wait',
   waitTimeoutMs: 5000,
   popoverSide: 'bottom',
   popoverAlign: 'start',
-} as const satisfies Partial<OnboardingStepConfig>;
+} as const satisfies Partial<OnboardingStepConfig>
 
 export const staffFirstLoginFlow: OnboardingFlowConfig = {
   id: 'staff-first-login',
@@ -168,4 +168,4 @@ export const staffFirstLoginFlow: OnboardingFlowConfig = {
       popoverAlign: 'start',
     },
   ],
-};
+}

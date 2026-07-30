@@ -14,12 +14,7 @@ import {
 } from '@/components/ui/select'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
 
-export type StatusFilter =
-  | 'all'
-  | 'ready_to_score'
-  | 'ready'
-  | 'scoring'
-  | 'failed'
+export type StatusFilter = 'all' | 'ready_to_score' | 'ready' | 'scoring' | 'failed'
 
 interface AssessmentsListToolbarProps {
   query: string
@@ -46,10 +41,7 @@ export function AssessmentsListToolbar({
             onChange={(event) => onQueryChange(event.target.value)}
             placeholder={t('searchPlaceholder')}
           />
-          <Select
-            value={status}
-            onValueChange={(value) => onStatusChange(value as StatusFilter)}
-          >
+          <Select value={status} onValueChange={(value) => onStatusChange(value as StatusFilter)}>
             <SelectTrigger variant="surface" size="lg" shape="pill">
               <SelectValue placeholder={t('allStatuses')} />
             </SelectTrigger>
@@ -58,13 +50,9 @@ export function AssessmentsListToolbar({
               <SelectItem value="ready_to_score">
                 {sharedLabels.reviewStatus('ready_to_score')}
               </SelectItem>
-              <SelectItem value="ready">
-                {sharedLabels.reviewStatus('ready')}
-              </SelectItem>
+              <SelectItem value="ready">{sharedLabels.reviewStatus('ready')}</SelectItem>
               <SelectItem value="scoring">{t('statusScoring')}</SelectItem>
-              <SelectItem value="failed">
-                {sharedLabels.reviewStatus('failed')}
-              </SelectItem>
+              <SelectItem value="failed">{sharedLabels.reviewStatus('failed')}</SelectItem>
             </SelectContent>
           </Select>
         </Grid>

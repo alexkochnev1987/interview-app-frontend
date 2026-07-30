@@ -1,19 +1,20 @@
-import { StatusPill } from '@/components/ui/status-pill';
-import { Inline } from '@/components/ui/layout';
-import type { TakeStage } from '@/components/take/types';
+import { useTranslations } from 'next-intl'
+
+import type { TakeStage } from '@/components/take/types'
+import { Inline } from '@/components/ui/layout'
+import { StatusPill } from '@/components/ui/status-pill'
 import {
   resolveTakeScreenShareStatus,
   resolveTakeSessionStatus,
-} from '@/features/take/recording-header-status';
-import type { VersionPersistKind } from '@/features/take/session-machine';
-import { useTranslations } from 'next-intl';
+} from '@/features/take/recording-header-status'
+import type { VersionPersistKind } from '@/features/take/session-machine'
 
 interface TakeRecordingHeaderStatusProps {
-  screenSurface: string;
-  stage: TakeStage;
-  recording: boolean;
-  recordingStartBusy: boolean;
-  versionPersistKind: VersionPersistKind | null;
+  screenSurface: string
+  stage: TakeStage
+  recording: boolean
+  recordingStartBusy: boolean
+  versionPersistKind: VersionPersistKind | null
 }
 
 export function TakeRecordingHeaderStatus({
@@ -23,15 +24,15 @@ export function TakeRecordingHeaderStatus({
   recordingStartBusy,
   versionPersistKind,
 }: TakeRecordingHeaderStatusProps) {
-  const tTake = useTranslations('takeFlow');
-  const screen = resolveTakeScreenShareStatus(screenSurface, tTake);
+  const tTake = useTranslations('takeFlow')
+  const screen = resolveTakeScreenShareStatus(screenSurface, tTake)
   const session = resolveTakeSessionStatus({
     stage,
     recording,
     recordingStartBusy,
     versionPersistKind,
     takeMessage: tTake,
-  });
+  })
 
   return (
     <Inline wrap="nowrap" align="center" gap={2}>
@@ -42,5 +43,5 @@ export function TakeRecordingHeaderStatus({
         {session.label}
       </StatusPill>
     </Inline>
-  );
+  )
 }

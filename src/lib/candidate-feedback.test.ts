@@ -198,9 +198,7 @@ describe('resolveGenerateAllStartToastKind', () => {
   it('returns started when overall is queued', () => {
     expect(
       resolveGenerateAllStartToastKind({
-        questions: [
-          { status: 'skipped', questionIndex: 0, reason: 'locked' },
-        ],
+        questions: [{ status: 'skipped', questionIndex: 0, reason: 'locked' }],
         overall: { status: 'queued' },
       }),
     ).toBe('started')
@@ -498,12 +496,8 @@ describe('isBlockUsingSharedCandidateFeedbackError', () => {
       improvementText: null,
     }
 
-    expect(isBlockUsingSharedCandidateFeedbackError(block, 'Shared outage')).toBe(
-      true,
-    )
-    expect(isBlockUsingSharedCandidateFeedbackError(block, 'Other outage')).toBe(
-      false,
-    )
+    expect(isBlockUsingSharedCandidateFeedbackError(block, 'Shared outage')).toBe(true)
+    expect(isBlockUsingSharedCandidateFeedbackError(block, 'Other outage')).toBe(false)
   })
 })
 
@@ -520,9 +514,7 @@ describe('system-prefilled eligibility skip blocks', () => {
 
     expect(isSystemPrefilledCandidateFeedbackBlock(block)).toBe(true)
     expect(getCandidateFeedbackBlockSkipReason(block)).toBe('unusable_transcript')
-    expect(isCandidateFeedbackEligibilitySkipReason('unusable_transcript')).toBe(
-      true,
-    )
+    expect(isCandidateFeedbackEligibilitySkipReason('unusable_transcript')).toBe(true)
     expect(isCandidateFeedbackEligibilitySkipReason('off_topic')).toBe(false)
   })
 

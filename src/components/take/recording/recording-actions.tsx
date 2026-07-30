@@ -1,38 +1,38 @@
-import { ArrowRight, RotateCcw } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { ArrowRight, RotateCcw } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
-import { Button } from '@/components/ui/button';
-import { Inline, Stack } from '@/components/ui/layout';
-import { BodyText } from '@/components/ui/text';
-import type { TakeStage } from '@/components/take/types';
-import type { ExhaustedHint } from '@/features/take/session-machine';
-import type { InterviewerPresence } from '@/features/take/use-take-question-tts';
+import type { TakeStage } from '@/components/take/types'
+import { Button } from '@/components/ui/button'
+import { Inline, Stack } from '@/components/ui/layout'
+import { BodyText } from '@/components/ui/text'
+import type { ExhaustedHint } from '@/features/take/session-machine'
+import type { InterviewerPresence } from '@/features/take/use-take-question-tts'
 
 interface TakeRecordingActionsProps {
-  stage: TakeStage;
-  uploading: boolean;
-  setupError: string;
-  capturePipelineReady: boolean;
-  recording: boolean;
-  recordingStartBusy: boolean;
-  interviewerPresence: InterviewerPresence;
-  retakeDisabled: boolean;
-  displayedAttemptNumber: number;
-  maxAttempts: number;
-  attemptsExhausted: boolean;
-  submitAllowed: boolean;
-  exhaustedHint: ExhaustedHint | null;
-  showDeviceReconnect: boolean;
-  onReconnect: () => void;
-  onRerecord: () => void;
-  onSubmit: () => void;
-  submitAnswerLabel: string;
+  stage: TakeStage
+  uploading: boolean
+  setupError: string
+  capturePipelineReady: boolean
+  recording: boolean
+  recordingStartBusy: boolean
+  interviewerPresence: InterviewerPresence
+  retakeDisabled: boolean
+  displayedAttemptNumber: number
+  maxAttempts: number
+  attemptsExhausted: boolean
+  submitAllowed: boolean
+  exhaustedHint: ExhaustedHint | null
+  showDeviceReconnect: boolean
+  onReconnect: () => void
+  onRerecord: () => void
+  onSubmit: () => void
+  submitAnswerLabel: string
 }
 
 const EXHAUSTED_HINT_KEY = {
   submit: 'reviewSubmitBanner',
   'no-media': 'attemptsExhaustedNoMedia',
-} as const;
+} as const
 
 export function TakeRecordingActions({
   stage,
@@ -54,19 +54,19 @@ export function TakeRecordingActions({
   onSubmit,
   submitAnswerLabel,
 }: TakeRecordingActionsProps) {
-  const tTake = useTranslations('takeFlow');
+  const tTake = useTranslations('takeFlow')
   const versionActionsEnabled =
     recording &&
     !uploading &&
     stage !== 'transition' &&
     !recordingStartBusy &&
-    interviewerPresence === 'listening';
-  const retakeEnabled = versionActionsEnabled && !retakeDisabled;
+    interviewerPresence === 'listening'
+  const retakeEnabled = versionActionsEnabled && !retakeDisabled
   const submitEnabled =
     !uploading &&
     stage !== 'transition' &&
     submitAllowed &&
-    (versionActionsEnabled || (attemptsExhausted && !recording));
+    (versionActionsEnabled || (attemptsExhausted && !recording))
 
   return (
     <Stack align="stretch" gap={3} width="full">
@@ -137,5 +137,5 @@ export function TakeRecordingActions({
         <ArrowRight size={18} strokeWidth={2} aria-hidden />
       </Button>
     </Stack>
-  );
+  )
 }

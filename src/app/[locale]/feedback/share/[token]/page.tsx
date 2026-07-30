@@ -3,10 +3,7 @@ import { getTranslations } from 'next-intl/server'
 import { CandidateFeedbackShareView } from '@/components/feedback/candidate-feedback-share-view'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import type { Locale } from '@/i18n/locales'
-import {
-  getSharedCandidateFeedback,
-  type PublicCandidateFeedbackResponse,
-} from '@/lib/api'
+import { getSharedCandidateFeedback, type PublicCandidateFeedbackResponse } from '@/lib/api'
 import { getServerRequestContext } from '@/lib/server-fetch'
 
 interface CandidateFeedbackSharePageProps {
@@ -55,10 +52,5 @@ export default async function CandidateFeedbackSharePage({
         ? tShareOutcome(`outcome.${feedback.outcome}`)
         : ''
 
-  return (
-    <CandidateFeedbackShareView
-      feedback={feedback}
-      outcomeMessage={outcomeMessage}
-    />
-  )
+  return <CandidateFeedbackShareView feedback={feedback} outcomeMessage={outcomeMessage} />
 }

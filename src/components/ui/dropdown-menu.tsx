@@ -1,23 +1,20 @@
 'use client'
 
-import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { DropdownMenu as DM } from 'radix-ui'
+import type { ComponentProps } from 'react'
 
 import { cn } from '@/lib/utils'
 
-function DropdownMenu({
-  modal = false,
-  ...props
-}: React.ComponentProps<typeof DM.Root>) {
+function DropdownMenu({ modal = false, ...props }: ComponentProps<typeof DM.Root>) {
   return <DM.Root data-slot="dropdown-menu" modal={modal} {...props} />
 }
 
-function DropdownMenuTrigger(props: React.ComponentProps<typeof DM.Trigger>) {
+function DropdownMenuTrigger(props: ComponentProps<typeof DM.Trigger>) {
   return <DM.Trigger data-slot="dropdown-menu-trigger" {...props} />
 }
 
-function DropdownMenuPortal(props: React.ComponentProps<typeof DM.Portal>) {
+function DropdownMenuPortal(props: ComponentProps<typeof DM.Portal>) {
   return <DM.Portal {...props} />
 }
 
@@ -32,7 +29,7 @@ function DropdownMenuContent({
   sideOffset = 4,
   align = 'end',
   ...props
-}: React.ComponentProps<typeof DM.Content>) {
+}: ComponentProps<typeof DM.Content>) {
   return (
     <DropdownMenuPortal>
       <DM.Content
@@ -48,7 +45,7 @@ function DropdownMenuContent({
 }
 
 const dropdownMenuItemVariants = cva(
-  'relative flex w-full cursor-pointer select-none items-center gap-2 rounded-lg border-0 bg-transparent px-3 py-2.5 text-left text-sm font-semibold outline-none transition-colors [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*=\'size-\'])]:size-4 data-[disabled]:pointer-events-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-45 data-[highlighted]:bg-muted/75',
+  "relative flex w-full cursor-pointer select-none items-center gap-2 rounded-lg border-0 bg-transparent px-3 py-2.5 text-left text-sm font-semibold outline-none transition-colors [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 data-[disabled]:pointer-events-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-45 data-[highlighted]:bg-muted/75",
   {
     variants: {
       tone: {
@@ -63,7 +60,7 @@ const dropdownMenuItemVariants = cva(
   },
 )
 
-type DropdownMenuItemProps = React.ComponentProps<typeof DM.Item> &
+type DropdownMenuItemProps = ComponentProps<typeof DM.Item> &
   VariantProps<typeof dropdownMenuItemVariants>
 
 function DropdownMenuItem({ className, tone, ...props }: DropdownMenuItemProps) {
@@ -80,9 +77,4 @@ export type DropdownMenuItemTone = NonNullable<
   VariantProps<typeof dropdownMenuItemVariants>['tone']
 >
 
-export {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-}
+export { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem }

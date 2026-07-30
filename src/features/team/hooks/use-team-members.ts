@@ -1,7 +1,7 @@
 'use client'
 
-import { useCallback, useDeferredValue, useMemo, useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { useCallback, useDeferredValue, useMemo, useState } from 'react'
 
 import type { TeamMember } from '@/lib/api'
 import { useAuth } from '@/lib/auth-context'
@@ -85,17 +85,13 @@ export function useTeamMembers(initialMembers: TeamMember[]) {
     return filterAndSortTeamMembers(members, roleFilter, normalizedQuery)
   }, [members, roleFilter, deferredQuery])
 
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filteredMembers.length / TEAM_TABLE_PAGE_SIZE),
-  )
+  const totalPages = Math.max(1, Math.ceil(filteredMembers.length / TEAM_TABLE_PAGE_SIZE))
 
   const setPageClamped = useCallback(
     (update: number | ((previousPage: number) => number)) => {
       setPage((previousPage) => {
         const current = Math.min(Math.max(1, previousPage), totalPages)
-        const next =
-          typeof update === 'function' ? update(current) : update
+        const next = typeof update === 'function' ? update(current) : update
         return Math.min(Math.max(1, next), totalPages)
       })
     },
@@ -107,12 +103,8 @@ export function useTeamMembers(initialMembers: TeamMember[]) {
     (safePage - 1) * TEAM_TABLE_PAGE_SIZE,
     safePage * TEAM_TABLE_PAGE_SIZE,
   )
-  const showingFrom =
-    filteredMembers.length === 0 ? 0 : (safePage - 1) * TEAM_TABLE_PAGE_SIZE + 1
-  const showingTo = Math.min(
-    safePage * TEAM_TABLE_PAGE_SIZE,
-    filteredMembers.length,
-  )
+  const showingFrom = filteredMembers.length === 0 ? 0 : (safePage - 1) * TEAM_TABLE_PAGE_SIZE + 1
+  const showingTo = Math.min(safePage * TEAM_TABLE_PAGE_SIZE, filteredMembers.length)
   const paginationItems = getTeamPaginationItems(safePage, totalPages)
 
   function setRoleFilterAndResetPage(value: TeamRoleFilter) {

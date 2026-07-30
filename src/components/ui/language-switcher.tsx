@@ -1,15 +1,15 @@
 import { cva } from 'class-variance-authority'
 import { Check, ChevronDown } from 'lucide-react'
 
-import type { Locale } from '@/i18n/locales'
-import { Link } from '@/i18n/navigation'
-import { cn } from '@/lib/utils'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import type { Locale } from '@/i18n/locales'
+import { Link } from '@/i18n/navigation'
+import { cn } from '@/lib/utils'
 
 const languageSwitcherTriggerVariants = cva(
   'flex items-center justify-between gap-1.5 rounded-full border border-border/60 bg-background/70 px-3 py-1.5 text-xs font-semibold text-foreground shadow-sm transition-colors hover:bg-surface-low-soft',
@@ -71,8 +71,7 @@ export function LanguageSwitcher({
   onOpenChange,
 }: LanguageSwitcherProps) {
   const activeLabel =
-    options.find((option) => option.locale === currentLocale)?.label ??
-    currentLocale.toUpperCase()
+    options.find((option) => option.locale === currentLocale)?.label ?? currentLocale.toUpperCase()
 
   const fitWidthSizer =
     width === 'fit' ? (
@@ -119,10 +118,7 @@ export function LanguageSwitcher({
               >
                 <span>{label}</span>
                 <Check
-                  className={cn(
-                    'size-4 text-primary',
-                    active ? 'opacity-100' : 'opacity-0',
-                  )}
+                  className={cn('size-4 text-primary', active ? 'opacity-100' : 'opacity-0')}
                 />
               </DropdownMenuItem>
             )
@@ -139,10 +135,7 @@ export function LanguageSwitcher({
               >
                 <span>{label}</span>
                 <Check
-                  className={cn(
-                    'size-4 text-primary',
-                    active ? 'opacity-100' : 'opacity-0',
-                  )}
+                  className={cn('size-4 text-primary', active ? 'opacity-100' : 'opacity-0')}
                 />
               </Link>
             </DropdownMenuItem>

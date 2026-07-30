@@ -3,18 +3,13 @@
 import { WandSparkles } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
-import { useQuestionEditorLabels } from '@/i18n/use-question-editor-labels'
-import { StatusPill } from '@/components/ui/status-pill'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
+import { StatusPill } from '@/components/ui/status-pill'
 import { BodyText } from '@/components/ui/text'
+import { useQuestionEditorLabels } from '@/i18n/use-question-editor-labels'
 
 interface AiDraftPanelProps {
   hasPendingDraft: boolean
@@ -48,9 +43,7 @@ export function AiDraftPanel({
               <StatusPill tone="neutral">{t('pending', { count: pendingCount })}</StatusPill>
             ) : null}
           </Inline>
-          <CardDescription>
-            {t('description')}
-          </CardDescription>
+          <CardDescription>{t('description')}</CardDescription>
         </Stack>
 
         <Stack gap={2}>
@@ -61,12 +54,7 @@ export function AiDraftPanel({
           ) : null}
           <Inline gap={2} align="center" justify="end" wrap="wrap">
             {hasPendingDraft ? (
-              <Button
-                type="button"
-                variant="outline-pill"
-                shape="pill"
-                onClick={onApplyAll}
-              >
+              <Button type="button" variant="outline-pill" shape="pill" onClick={onApplyAll}>
                 {labels.applyAll}
               </Button>
             ) : null}

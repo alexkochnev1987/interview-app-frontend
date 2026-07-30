@@ -1,6 +1,6 @@
+import { spawn } from 'node:child_process'
 import { cpSync, existsSync, mkdirSync } from 'node:fs'
 import path from 'node:path'
-import { spawn } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -9,9 +9,7 @@ const serverPath = path.join(standaloneDir, 'server.js')
 
 function prepareStandalone() {
   if (!existsSync(serverPath)) {
-    console.error(
-      `[e2e-frontend] Missing ${serverPath}. Run "next build" before E2E.`,
-    )
+    console.error(`[e2e-frontend] Missing ${serverPath}. Run "next build" before E2E.`)
     process.exit(1)
   }
 

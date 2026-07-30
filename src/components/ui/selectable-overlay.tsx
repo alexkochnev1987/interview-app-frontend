@@ -1,3 +1,4 @@
+// oxlint-disable jsx-a11y/no-static-element-interactions jsx-a11y/click-events-have-key-events
 import type { HTMLAttributes, ReactNode } from 'react'
 
 import { cn } from '@/lib/utils'

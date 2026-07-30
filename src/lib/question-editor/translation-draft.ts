@@ -1,7 +1,10 @@
-import type { QuestionDraft } from '@/lib/api'
 import type { Locale } from '@/i18n/locales'
 import { LOCALES } from '@/i18n/locales'
-import { TRANSLATE_DRAFT_FIELD_KEYS, type TranslateDraftFieldKey } from '@/lib/question-editor/field-keys'
+import type { QuestionDraft } from '@/lib/api'
+import {
+  TRANSLATE_DRAFT_FIELD_KEYS,
+  type TranslateDraftFieldKey,
+} from '@/lib/question-editor/field-keys'
 import {
   areEqual,
   hasLocaleDraftContent,

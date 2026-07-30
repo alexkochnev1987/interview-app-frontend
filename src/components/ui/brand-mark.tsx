@@ -24,19 +24,15 @@ export function BrandMark({ className, href = '/' }: BrandMarkProps) {
     <UnstyledLink href={href}>
       <Inline gap={2} align="center" wrap="nowrap">
         <IconBadge tone="gradient" size="sm">
-          <Icon size="md"><Sparkles /></Icon>
+          <Icon size="md">
+            <Sparkles />
+          </Icon>
         </IconBadge>
         <Stack gap={0} className={cn('min-w-0', className)}>
           <EyebrowLabel size="sm" className="truncate">
             {tCommon('brandEyebrow')}
           </EyebrowLabel>
-          <BodyText
-            as="span"
-            size="sm"
-            weight="semibold"
-            tone="foreground"
-            className="truncate"
-          >
+          <BodyText as="span" size="sm" weight="semibold" tone="foreground" className="truncate">
             {tCommon('appName')}
           </BodyText>
         </Stack>
