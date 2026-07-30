@@ -1,8 +1,8 @@
-import { useState, type ReactNode } from 'react'
 import type { VariantProps } from 'class-variance-authority'
+import { useState, type ReactNode } from 'react'
 
-import { cn } from '@/lib/utils'
 import { getCandidateInitials } from '@/lib/interview-formatters'
+import { cn } from '@/lib/utils'
 
 import { iconBadgeVariants, IconBadge } from './icon-badge'
 
@@ -22,7 +22,15 @@ function resolveAvatarSrc(pictureUrl?: string | null): string | undefined {
   return pictureUrl
 }
 
-export function Avatar({ name, pictureUrl, size, textSize, tone = 'surface', className, action }: AvatarProps) {
+export function Avatar({
+  name,
+  pictureUrl,
+  size,
+  textSize,
+  tone = 'surface',
+  className,
+  action,
+}: AvatarProps) {
   const [failedUrl, setFailedUrl] = useState<string | null>(null)
   const src = pictureUrl && pictureUrl === failedUrl ? undefined : resolveAvatarSrc(pictureUrl)
 

@@ -1,21 +1,20 @@
 'use client'
 
-import { useRef, useState } from 'react'
 import { Pencil, Trash2, Upload } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { useRef, useState } from 'react'
 
 import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
+import { DisabledHintTooltip } from '@/components/ui/disabled-hint-tooltip'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { DisabledHintTooltip } from '@/components/ui/disabled-hint-tooltip'
 import { HiddenFileInput } from '@/components/ui/hidden-file-input'
 import { Inline } from '@/components/ui/layout/inline'
-import { useAuth, useIsDemo } from '@/lib/auth-context'
 import {
   completeAvatarUpload,
   deleteAvatar as apiDeleteAvatar,
@@ -23,8 +22,9 @@ import {
   uploadAvatarFile,
   type AvatarContentType,
 } from '@/lib/api'
-import { notifyError } from '@/lib/toast'
+import { useAuth, useIsDemo } from '@/lib/auth-context'
 import { runMutation } from '@/lib/run-mutation'
+import { notifyError } from '@/lib/toast'
 import { useAvatarToastMessages } from '@/lib/toast-messages/use-avatar-toast-messages'
 
 const SUPPORTED_AVATAR_CONTENT_TYPES: readonly AvatarContentType[] = [
