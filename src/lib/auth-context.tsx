@@ -1,90 +1,92 @@
-'use client';
+'use client'
 
-import { useRouter } from '@/i18n/navigation';
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useState, type ReactNode } from 'react'
+
+import { useRouter } from '@/i18n/navigation'
 import {
   completeOnboarding as apiCompleteOnboarding,
   logout as apiLogout,
   type MeResponse as User,
   type CompleteOnboardingStatus,
-} from '@/lib/api';
+} from '@/lib/api'
 
 interface AuthContextType {
-  user: User | null;
-  establishSession: (sessionUser: User) => void;
-  completeOnboarding: (status?: CompleteOnboardingStatus) => Promise<User>;
-  updatePictureUrl: (pictureUrl: string | null) => void;
-  logout: () => Promise<void>;
+  user: User | null
+  establishSession: (sessionUser: User) => void
+  completeOnboarding: (status?: CompleteOnboardingStatus) => Promise<User>
+  updatePictureUrl: (pictureUrl: string | null) => void
+  logout: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   establishSession: () => {},
   completeOnboarding: async () => {
-    throw new Error('AuthProvider is not mounted');
+    throw new Error('AuthProvider is not mounted')
   },
   updatePictureUrl: () => {},
   logout: async () => {},
-});
+})
 
 export function AuthProvider({
   children,
   initialUser,
 }: {
-  children: ReactNode;
-  initialUser: User | null;
+  children: ReactNode
+  initialUser: User | null
 }) {
-  const router = useRouter();
-  const [user, setUser] = useState<User | null>(initialUser);
-  const [prevInitialUser, setPrevInitialUser] = useState(initialUser);
+  const router = useRouter()
+  const [user, setUser] = useState<User | null>(initialUser)
+  const [prevInitialUser, setPrevInitialUser] = useState(initialUser)
 
   if (initialUser !== prevInitialUser) {
-    const previousSnapshot = prevInitialUser;
-    setPrevInitialUser(initialUser);
+    const previousSnapshot = prevInitialUser
+    setPrevInitialUser(initialUser)
     if (initialUser != null) {
-      setUser(initialUser);
+      setUser(initialUser)
     } else if (previousSnapshot != null) {
       // Server cleared the session (expired or signed out elsewhere).
-      setUser(null);
+      setUser(null)
     }
     // When both snapshots are null, keep a client-established session until
     // the first RSC refresh picks up the new cookie (post login/demo sign-in).
   }
 
   const establishSession = (sessionUser: User) => {
-    setUser(sessionUser);
-  };
+    setUser(sessionUser)
+  }
 
   const completeOnboarding = async (status: CompleteOnboardingStatus = 'completed') => {
-    const updatedUser = await apiCompleteOnboarding(status);
-    setUser(updatedUser);
-    return updatedUser;
-  };
+    const updatedUser = await apiCompleteOnboarding(status)
+    setUser(updatedUser)
+    return updatedUser
+  }
 
   const updatePictureUrl = (pictureUrl: string | null) => {
-    setUser((current) => (current ? { ...current, pictureUrl: pictureUrl ?? undefined } : current));
-  };
+    setUser((current) => (current ? { ...current, pictureUrl: pictureUrl ?? undefined } : current))
+  }
 
   const logout = async () => {
-    await apiLogout();
-    setUser(null);
-    router.push('/login');
-    router.refresh();
-  };
+    await apiLogout()
+    setUser(null)
+    router.push('/login')
+    router.refresh()
+  }
 
   return (
     <AuthContext.Provider
+      // oxlint-disable-next-line react/jsx-no-constructed-context-values
       value={{ user, establishSession, completeOnboarding, updatePictureUrl, logout }}
     >
       {children}
     </AuthContext.Provider>
-  );
+  )
 }
 
 export function useAuth() {
-  return useContext(AuthContext);
+  return useContext(AuthContext)
 }
 
 export function useIsDemo() {
-  return useContext(AuthContext).user?.demo === true;
+  return useContext(AuthContext).user?.demo === true
 }

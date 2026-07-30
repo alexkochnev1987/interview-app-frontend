@@ -2,17 +2,14 @@
 
 import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
-import {
-  fetchQuestions,
-  type FetchQuestionsParams,
-  type Question,
-} from '@/lib/api'
 
-import { questionsInfiniteQueryKey } from './query-keys'
-import { useVoidCallback } from './query-hook-helpers'
-import { splitInfiniteQueryErrors } from './split-questions-query-errors'
-import {getErrorMessage} from '@/lib/api-error';
+import { fetchQuestions, type FetchQuestionsParams, type Question } from '@/lib/api'
+import { getErrorMessage } from '@/lib/api-error'
 import { useToastMessages } from '@/lib/use-toast-messages'
+
+import { useVoidCallback } from './query-hook-helpers'
+import { questionsInfiniteQueryKey } from './query-keys'
+import { splitInfiniteQueryErrors } from './split-questions-query-errors'
 
 export type UseQuestionsInfiniteOptions = {
   params: Omit<FetchQuestionsParams, 'page'>
@@ -41,8 +38,7 @@ export function useQuestionsInfinite({
   const toastMessages = useToastMessages()
   const query = useInfiniteQuery({
     queryKey: questionsInfiniteQueryKey(params),
-    queryFn: ({ pageParam, signal }) =>
-      fetchQuestions({ ...params, page: pageParam }, { signal }),
+    queryFn: ({ pageParam, signal }) => fetchQuestions({ ...params, page: pageParam }, { signal }),
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {
       const loaded = allPages.reduce((sum, p) => sum + p.items.length, 0)
@@ -53,16 +49,14 @@ export function useQuestionsInfinite({
     placeholderData: keepPreviousData,
   })
 
-  const items = useMemo(
-    () => query.data?.pages.flatMap((p) => p.items) ?? [],
-    [query.data],
-  )
+  const items = useMemo(() => query.data?.pages.flatMap((p) => p.items) ?? [], [query.data])
   const total = query.data?.pages[0]?.total ?? 0
 
   const fetchNextPage = useVoidCallback(query.fetchNextPage)
   const refetch = useVoidCallback(query.refetch)
 
-  const errorMessage = getErrorMessage(query.error, toastMessages.questions.loadFailedFallback) ?? null
+  const errorMessage =
+    getErrorMessage(query.error, toastMessages.questions.loadFailedFallback) ?? null
   const { blockingError, paginationError } = splitInfiniteQueryErrors(
     errorMessage,
     items.length,

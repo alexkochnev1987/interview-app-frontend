@@ -34,11 +34,13 @@ export function FlashErrorPageFallback({
         }
         title={title}
         description={description}
-        action={showAction ? (
-          <Button variant="outline" shape="pill" asChild>
-            <Link href={backHref}>{backLabel ?? t('backToHome')}</Link>
-          </Button>
-        ) : undefined}
+        action={
+          showAction ? (
+            <Button variant="outline" shape="pill" asChild>
+              <Link href={backHref}>{backLabel ?? t('backToHome')}</Link>
+            </Button>
+          ) : undefined
+        }
       />
     </PageShell>
   )

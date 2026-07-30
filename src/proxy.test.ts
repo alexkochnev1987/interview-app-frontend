@@ -12,10 +12,7 @@ vi.mock('next-intl/middleware', () => ({
 
 import { proxy } from '@/proxy'
 
-function createRequest(
-  pathname: string,
-  options?: { session?: string; search?: string },
-) {
+function createRequest(pathname: string, options?: { session?: string; search?: string }) {
   const url = new URL(pathname, 'http://localhost:3001')
   if (options?.search) {
     url.search = options.search
@@ -49,17 +46,11 @@ describe('proxy', () => {
     const response = proxy(createRequest('/questions?tab=open'))
 
     expect(response.status).toBe(307)
-    expect(redirectLocation(response)).toBe(
-      '/login?from=%2Fquestions%3Ftab%3Dopen',
-    )
+    expect(redirectLocation(response)).toBe('/login?from=%2Fquestions%3Ftab%3Dopen')
   })
 
   it('allows public routes without a session', () => {
-    for (const path of [
-      '/login',
-      '/take/abc',
-      '/feedback/xyz',
-    ] as const) {
+    for (const path of ['/login', '/take/abc', '/feedback/xyz'] as const) {
       const response = proxy(createRequest(path))
       expect(response.status).not.toBe(307)
     }

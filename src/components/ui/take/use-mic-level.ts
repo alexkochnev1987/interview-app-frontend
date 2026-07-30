@@ -2,8 +2,23 @@ import { useEffect, useRef, useState } from 'react'
 
 const AudioCtx =
   typeof window !== 'undefined'
-    ? window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+    ? window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
     : null
+
+let sharedAudioContext: AudioContext | null = null
+
+function getSharedAudioContext(): AudioContext | null {
+  if (!AudioCtx) return null
+  if (!sharedAudioContext || sharedAudioContext.state === 'closed') {
+    try {
+      sharedAudioContext = new AudioCtx()
+    } catch {
+      sharedAudioContext = null
+    }
+  }
+  return sharedAudioContext
+}
 
 export function useMicLevel(stream: MediaStream | null): number {
   const [level, setLevel] = useState<number>(0)
@@ -14,20 +29,18 @@ export function useMicLevel(stream: MediaStream | null): number {
       return
     }
 
-    const liveTracks = stream.getAudioTracks().filter(
-      (t) => t.readyState === 'live' && t.enabled,
-    )
+    const liveTracks = stream.getAudioTracks().filter((t) => t.readyState === 'live' && t.enabled)
 
     if (liveTracks.length === 0) {
       return
     }
 
     let cancelled = false
-    let audioContext: AudioContext | null = null
     let source: MediaStreamAudioSourceNode | null = null
 
     try {
-      audioContext = new AudioCtx()
+      const audioContext = getSharedAudioContext()
+      if (!audioContext) return
 
       const analyser = audioContext.createAnalyser()
       analyser.fftSize = 512
@@ -37,8 +50,11 @@ export function useMicLevel(stream: MediaStream | null): number {
       source.connect(analyser)
 
       const data = new Uint8Array(analyser.fftSize)
+      let lastUpdateMs = 0
+      let lastLevel = 0
+      const THROTTLE_MS = 60
 
-      const tick = () => {
+      const tick = (timestamp: number) => {
         if (cancelled) return
 
         analyser.getByteTimeDomainData(data)
@@ -50,15 +66,19 @@ export function useMicLevel(stream: MediaStream | null): number {
         }
         const rms = Math.sqrt(sumSq / data.length)
         const normalized = Math.min(1, rms * 6)
-        setLevel(normalized)
+
+        if (timestamp - lastUpdateMs >= THROTTLE_MS || Math.abs(normalized - lastLevel) >= 0.05) {
+          lastUpdateMs = timestamp
+          lastLevel = normalized
+          setLevel(normalized)
+        }
 
         animFrameRef.current = requestAnimationFrame(tick)
       }
 
-      tick()
+      tick(performance.now())
       void audioContext.resume()
-    } catch {
-    }
+    } catch {}
 
     return () => {
       cancelled = true
@@ -67,9 +87,6 @@ export function useMicLevel(stream: MediaStream | null): number {
         animFrameRef.current = null
       }
       source?.disconnect()
-      if (audioContext && audioContext.state !== 'closed') {
-        void audioContext.close()
-      }
       setLevel(0)
     }
   }, [stream])

@@ -1,24 +1,25 @@
-import type { PermissionStatus } from '@/components/take/types';
-import { StatusPill, type StatusTone } from '@/components/ui/status-pill';
-import { Panel } from '@/components/ui/panel';
-import { Inline, Stack } from '@/components/ui/layout';
-import { Text } from '@/components/ui/text';
-import { useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl'
+
+import type { PermissionStatus } from '@/components/take/types'
+import { Inline, Stack } from '@/components/ui/layout'
+import { Panel } from '@/components/ui/panel'
+import { StatusPill, type StatusTone } from '@/components/ui/status-pill'
+import { Text } from '@/components/ui/text'
 
 interface TakePermissionStatusListProps {
-  cameraStatus: PermissionStatus;
-  screenStatus: PermissionStatus;
-  screenSurface: string;
-  permissionLabel: (status: PermissionStatus) => string;
-  permissionTone: (status: PermissionStatus) => StatusTone;
+  cameraStatus: PermissionStatus
+  screenStatus: PermissionStatus
+  screenSurface: string
+  permissionLabel: (status: PermissionStatus) => string
+  permissionTone: (status: PermissionStatus) => StatusTone
 }
 
 interface PermissionRowProps {
-  title: string;
-  description: string;
-  status: PermissionStatus;
-  permissionLabel: (status: PermissionStatus) => string;
-  permissionTone: (status: PermissionStatus) => StatusTone;
+  title: string
+  description: string
+  status: PermissionStatus
+  permissionLabel: (status: PermissionStatus) => string
+  permissionTone: (status: PermissionStatus) => StatusTone
 }
 
 function PermissionRow({
@@ -37,12 +38,10 @@ function PermissionRow({
           </Text>
           <Text variant="captionMutedXs">{description}</Text>
         </Stack>
-        <StatusPill tone={permissionTone(status)}>
-          {permissionLabel(status)}
-        </StatusPill>
+        <StatusPill tone={permissionTone(status)}>{permissionLabel(status)}</StatusPill>
       </Inline>
     </Panel>
-  );
+  )
 }
 
 export function TakePermissionStatusList({
@@ -52,7 +51,7 @@ export function TakePermissionStatusList({
   permissionLabel,
   permissionTone,
 }: TakePermissionStatusListProps) {
-  const tTake = useTranslations('takeFlow');
+  const tTake = useTranslations('takeFlow')
   return (
     <Stack gap={4} width="full">
       <PermissionRow
@@ -65,14 +64,12 @@ export function TakePermissionStatusList({
       <PermissionRow
         title={tTake('permissionScreenTitle')}
         description={
-          screenSurface === 'monitor'
-            ? tTake('permissionScreenReady')
-            : tTake('chooseEntireScreen')
+          screenSurface === 'monitor' ? tTake('permissionScreenReady') : tTake('chooseEntireScreen')
         }
         status={screenStatus}
         permissionLabel={permissionLabel}
         permissionTone={permissionTone}
       />
     </Stack>
-  );
+  )
 }

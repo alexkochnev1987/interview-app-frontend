@@ -3,10 +3,10 @@
 import { CirclePlus, Sparkles } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
-import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
-import { HeroLead, HeroTitle } from '@/components/ui/hero-text'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
+import { HeroLead, HeroTitle } from '@/components/ui/hero-text'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { Link } from '@/i18n/navigation'
@@ -18,9 +18,7 @@ export function InterviewCreateIntro() {
   return (
     <Card variant="floating" size="lg">
       <CardContent spacing="xl">
-        <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
-          {t('eyebrow')}
-        </EyebrowBadge>
+        <EyebrowBadge icon={<Sparkles className="size-3.5" />}>{t('eyebrow')}</EyebrowBadge>
         <Stack gap={3}>
           <HeroTitle>{t('title')}</HeroTitle>
           <HeroLead width="prose">{t('lead')}</HeroLead>

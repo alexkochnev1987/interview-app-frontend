@@ -1,41 +1,34 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Driver } from 'driver.js'
 import { useLocale, useTranslations } from 'next-intl'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { buildDriverSteps } from '@/features/onboarding/build-driver-steps'
 import {
   createOnboardingDriver,
   destroyOnboardingDriver,
 } from '@/features/onboarding/create-onboarding-driver'
-import {
-  DEFAULT_ONBOARDING_FLOW_ID,
-  getOnboardingFlow,
-} from '@/features/onboarding/flows/registry'
-import { prepareOnboardingStep } from '@/features/onboarding/prepare-onboarding-step'
-import { resolveOnboardingSteps } from '@/features/onboarding/resolve-onboarding-steps'
-import { getDriverProgressTemplate } from '@/features/onboarding/tour-progress-template'
+import { DEFAULT_ONBOARDING_FLOW_ID, getOnboardingFlow } from '@/features/onboarding/flows/registry'
+import type { OnboardingEventDetail } from '@/features/onboarding/onboarding-events'
 import {
   clearStoredOnboardingStep,
   getStoredOnboardingStep,
   storeOnboardingStep,
 } from '@/features/onboarding/onboarding-progress'
-import { usePathname, useRouter } from '@/i18n/navigation'
-import type { Locale } from '@/i18n/locales'
+import { prepareOnboardingStep } from '@/features/onboarding/prepare-onboarding-step'
+import { resolveOnboardingSteps } from '@/features/onboarding/resolve-onboarding-steps'
+import { getDriverProgressTemplate } from '@/features/onboarding/tour-progress-template'
 import type {
   OnboardingFlowId,
   OnboardingRuntimeContext,
   OnboardingStepContent,
   ResolvedOnboardingStep,
 } from '@/features/onboarding/types'
-import type { OnboardingEventDetail } from '@/features/onboarding/onboarding-events'
+import type { Locale } from '@/i18n/locales'
+import { usePathname, useRouter } from '@/i18n/navigation'
 
-export type OnboardingPhase =
-  | 'idle'
-  | 'welcome'
-  | 'touring'
-  | 'complete'
+export type OnboardingPhase = 'idle' | 'welcome' | 'touring' | 'complete'
 
 type UseOnboardingTourOptions = {
   flowId?: OnboardingFlowId
@@ -156,7 +149,18 @@ export function useOnboardingTour({
 
       return true
     },
-    [context, flowId, locale, onTourComplete, onTourSkip, pathname, prepareStep, stopTour, t, translateStep],
+    [
+      context,
+      flowId,
+      locale,
+      onTourComplete,
+      onTourSkip,
+      pathname,
+      prepareStep,
+      stopTour,
+      t,
+      translateStep,
+    ],
   )
 
   useEffect(() => {

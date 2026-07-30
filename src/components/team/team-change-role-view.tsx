@@ -3,19 +3,18 @@
 import { X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
+import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { Button } from '@/components/ui/button'
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { EyebrowLabel } from '@/components/ui/eyebrow-label'
+import { Inline } from '@/components/ui/layout/inline'
+import { Stack } from '@/components/ui/layout/stack'
 import { ModalShell } from '@/components/ui/modal-shell'
 import { RadioGroup, RadioItem } from '@/components/ui/radio-group'
 import { Separator } from '@/components/ui/separator'
-import { Inline } from '@/components/ui/layout/inline'
-import { Stack } from '@/components/ui/layout/stack'
 import { BodyText } from '@/components/ui/text'
-import type { TeamMember } from '@/lib/api'
-import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
-
 import type { TeamMemberRole } from '@/features/team/team-roles'
+import type { TeamMember } from '@/lib/api'
 
 import { TeamRoleBadge } from './team-role-badge'
 
@@ -103,18 +102,14 @@ export function TeamChangeRoleView({
               type="button"
               variant="gradient"
               shape="pill"
-              onClick={() => { void onApply() }}
+              onClick={() => {
+                void onApply()
+              }}
             >
               {loading ? t('applying') : t('apply')}
             </Button>
           </DemoWriteGuard>
-          <Button
-            type="button"
-            variant="ghost"
-            shape="pill"
-            disabled={loading}
-            onClick={onDismiss}
-          >
+          <Button type="button" variant="ghost" shape="pill" disabled={loading} onClick={onDismiss}>
             {t('cancel')}
           </Button>
         </Stack>

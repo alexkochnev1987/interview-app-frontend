@@ -1,20 +1,20 @@
-import type { MultipartUploadPartResponse } from '@/lib/api';
-import { ApiError } from '@/lib/api-error';
+import type { MultipartUploadPartResponse } from '@/lib/api'
+import { ApiError } from '@/lib/api-error'
 
-import type { CaptureTarget, MultipartUploadSession, MultipartUploadState } from './runtime';
+import type { CaptureTarget, MultipartUploadSession, MultipartUploadState } from './runtime'
 
-const MULTIPART_PART_SIZE_BYTES = 6 * 1024 * 1024;
+const MULTIPART_PART_SIZE_BYTES = 6 * 1024 * 1024
 
 interface QueueBufferedUploadParams {
-  target: CaptureTarget;
-  multipartUploadsRef: { current: MultipartUploadState };
-  forceFinal?: boolean;
+  target: CaptureTarget
+  multipartUploadsRef: { current: MultipartUploadState }
+  forceFinal?: boolean
   preSignMultipartPartUpload: (
     target: CaptureTarget,
     session: MultipartUploadSession,
     partNumber: number,
-  ) => Promise<MultipartUploadPartResponse>;
-  uploadMultipartPart: (uploadUrl: string, partBlob: Blob) => Promise<void>;
+  ) => Promise<MultipartUploadPartResponse>
+  uploadMultipartPart: (uploadUrl: string, partBlob: Blob) => Promise<void>
 }
 
 export function queueBufferedUpload({
@@ -24,85 +24,84 @@ export function queueBufferedUpload({
   preSignMultipartPartUpload,
   uploadMultipartPart,
 }: QueueBufferedUploadParams) {
-  const session = multipartUploadsRef.current[target];
+  const session = multipartUploadsRef.current[target]
   if (!session) {
-    return Promise.resolve();
+    return Promise.resolve()
   }
 
+  // oxlint-disable-next-line promise/always-return
   session.uploadChain = session.uploadChain.then(async () => {
-    let activeSession = multipartUploadsRef.current[target];
+    let activeSession = multipartUploadsRef.current[target]
 
     while (
       activeSession &&
       !activeSession.aborted &&
       !activeSession.completed &&
       (activeSession.bufferedBytes >= MULTIPART_PART_SIZE_BYTES ||
+        // oxlint-disable-next-line no-unmodified-loop-condition
         (forceFinal && activeSession.bufferedBytes > 0))
     ) {
       const inferredType =
         activeSession.partBlobType?.trim() ||
         activeSession.bufferedChunks[0]?.type?.trim() ||
-        'video/webm';
-      const partBlob = new Blob(activeSession.bufferedChunks, { type: inferredType });
-      activeSession.bufferedChunks = [];
-      activeSession.bufferedBytes = 0;
+        'video/webm'
+      const partBlob = new Blob(activeSession.bufferedChunks, { type: inferredType })
+      activeSession.bufferedChunks = []
+      activeSession.bufferedBytes = 0
 
-      const partNumber = activeSession.nextPartNumber;
-      activeSession.nextPartNumber += 1;
+      const partNumber = activeSession.nextPartNumber
+      activeSession.nextPartNumber += 1
 
-      const partUpload = await preSignMultipartPartUpload(
-        target,
-        activeSession,
-        partNumber,
-      );
+      // oxlint-disable-next-line no-await-in-loop
+      const partUpload = await preSignMultipartPartUpload(target, activeSession, partNumber)
 
       try {
-        await uploadMultipartPart(partUpload.uploadUrl, partBlob);
+        // oxlint-disable-next-line no-await-in-loop
+        await uploadMultipartPart(partUpload.uploadUrl, partBlob)
       } catch (error) {
         if (error instanceof ApiError) {
-          throw error;
+          throw error
         }
-        throw new Error(`Chunk upload failed for ${target} recording.`);
+        throw new Error(`Chunk upload failed for ${target} recording.`, { cause: error })
       }
 
-      activeSession = multipartUploadsRef.current[target];
+      activeSession = multipartUploadsRef.current[target]
       if (activeSession) {
-        activeSession.uploadedPartCount += 1;
+        activeSession.uploadedPartCount += 1
       }
     }
-  });
+  })
 
-  return session.uploadChain;
+  return session.uploadChain
 }
 
 interface HandleRecordedChunkParams {
-  target: CaptureTarget;
-  blob: Blob;
-  multipartUploadsRef: { current: MultipartUploadState };
-  queueBufferedUpload: (target: CaptureTarget, forceFinal?: boolean) => Promise<void>;
+  target: CaptureTarget
+  blob: Blob
+  multipartUploadsRef: { current: MultipartUploadState }
+  queueBufferedUpload: (target: CaptureTarget, forceFinal?: boolean) => Promise<void>
 }
 
 export function handleRecordedChunk({
   target,
   blob,
   multipartUploadsRef,
-  queueBufferedUpload,
+  queueBufferedUpload: queueUpload,
 }: HandleRecordedChunkParams) {
   if (blob.size < 1) {
-    return;
+    return
   }
 
-  const session = multipartUploadsRef.current[target];
+  const session = multipartUploadsRef.current[target]
   if (!session || session.aborted || session.completed) {
-    return;
+    return
   }
 
-  session.bufferedChunks.push(blob);
-  session.bufferedBytes += blob.size;
-  session.recordedBytes += blob.size;
+  session.bufferedChunks.push(blob)
+  session.bufferedBytes += blob.size
+  session.recordedBytes += blob.size
 
   if (session.bufferedBytes >= MULTIPART_PART_SIZE_BYTES) {
-    void queueBufferedUpload(target).catch(() => undefined);
+    void queueUpload(target).catch(() => undefined)
   }
-
 }

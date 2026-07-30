@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
+import type { ReactNode } from 'react'
 
 const metricPanelVariants = cva('', {
   variants: {
@@ -46,10 +46,8 @@ const valueVariants = cva('', {
 const labelVariants = cva('', {
   variants: {
     variant: {
-      eyebrow:
-        'text-[0.68rem] font-semibold uppercase tracking-eyebrow-wide text-muted-foreground',
-      'eyebrow-icon':
-        'text-[0.72rem] font-semibold uppercase tracking-eyebrow-wider',
+      eyebrow: 'text-[0.68rem] font-semibold uppercase tracking-eyebrow-wide text-muted-foreground',
+      'eyebrow-icon': 'text-[0.72rem] font-semibold uppercase tracking-eyebrow-wider',
       raw: '',
     },
   },
@@ -58,8 +56,7 @@ const labelVariants = cva('', {
   },
 })
 
-interface MetricPanelProps
-  extends VariantProps<typeof metricPanelVariants> {
+interface MetricPanelProps extends VariantProps<typeof metricPanelVariants> {
   description?: ReactNode
   icon?: ReactNode
   label: ReactNode
@@ -81,29 +78,20 @@ export function MetricPanel({
 }: MetricPanelProps) {
   const hasIcon = icon !== undefined
   const hasValue = value !== null && value !== undefined && value !== false
-  const resolvedLabelVariant =
-    labelVariant === 'raw' ? 'raw' : hasIcon ? 'eyebrow-icon' : 'eyebrow'
+  const resolvedLabelVariant = labelVariant === 'raw' ? 'raw' : hasIcon ? 'eyebrow-icon' : 'eyebrow'
   const resolvedValueSize = valueSize ?? (hasIcon ? 'lg' : 'default')
   const resolvedValueSpacing =
-    resolvedValueSize === 'md'
-      ? 'compact-offset'
-      : hasIcon
-        ? 'icon-offset'
-        : 'label-offset'
+    resolvedValueSize === 'md' ? 'compact-offset' : hasIcon ? 'icon-offset' : 'label-offset'
 
   return (
     <div className={metricPanelVariants({ tone })}>
       {hasIcon ? (
         <div className="flex items-center gap-3 text-muted-foreground">
           <span className="shrink-0 [&_svg]:size-4">{icon}</span>
-          <span className={labelVariants({ variant: resolvedLabelVariant })}>
-            {label}
-          </span>
+          <span className={labelVariants({ variant: resolvedLabelVariant })}>{label}</span>
         </div>
       ) : (
-        <div className={labelVariants({ variant: resolvedLabelVariant })}>
-          {label}
-        </div>
+        <div className={labelVariants({ variant: resolvedLabelVariant })}>{label}</div>
       )}
 
       {hasValue ? (

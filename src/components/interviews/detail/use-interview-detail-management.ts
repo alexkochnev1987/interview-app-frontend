@@ -1,7 +1,7 @@
 'use client'
 
-import { useCallback, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
+import { useCallback, useState } from 'react'
 
 import { interviewsRootQueryKey } from '@/components/interviews/library/query-keys'
 import { useRouter } from '@/i18n/navigation'
@@ -106,7 +106,6 @@ export function useInterviewDetailManagement({
     toastMessages.interview.deleteError,
     toastMessages.interview.deleteSuccess,
   ])
-
 
   return {
     isEditing,

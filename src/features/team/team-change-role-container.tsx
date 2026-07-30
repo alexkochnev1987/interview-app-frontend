@@ -18,14 +18,8 @@ export function TeamChangeRoleContainer({
   onClose,
   onRoleChanged,
 }: TeamChangeRoleContainerProps) {
-  const {
-    roleOptions,
-    selectedRole,
-    setSelectedRole,
-    loading,
-    hasChange,
-    handleApply,
-  } = useTeamChangeRole(member, actorSessionRole, onClose, onRoleChanged)
+  const { roleOptions, selectedRole, setSelectedRole, loading, hasChange, handleApply } =
+    useTeamChangeRole(member, actorSessionRole, onClose, onRoleChanged)
 
   return (
     <TeamChangeRoleView

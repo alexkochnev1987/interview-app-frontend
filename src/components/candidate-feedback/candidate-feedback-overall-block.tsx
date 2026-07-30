@@ -26,14 +26,8 @@ interface CandidateFeedbackOverallBlockProps {
   retryDisabled: boolean
   sharedGenerationError?: string | null
   onRetry: () => Promise<void>
-  onAcceptAll: (payload: {
-    recommendationText: string
-    improvementText: string
-  }) => Promise<void>
-  onSave: (payload: {
-    recommendationText: string
-    improvementText: string
-  }) => Promise<void>
+  onAcceptAll: (payload: { recommendationText: string; improvementText: string }) => Promise<void>
+  onSave: (payload: { recommendationText: string; improvementText: string }) => Promise<void>
   onOutcomeChange: (next: {
     outcome: CandidateFeedbackOutcome | null
     outcomeMessage?: string | null

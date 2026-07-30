@@ -7,10 +7,7 @@ function storageKey(interviewId: string): string {
   return `candidate-feedback-share-link:${interviewId}`
 }
 
-export function candidateFeedbackShareExpiresAtMatches(
-  left: string,
-  right: string,
-): boolean {
+export function candidateFeedbackShareExpiresAtMatches(left: string, right: string): boolean {
   if (left === right) {
     return true
   }
@@ -64,9 +61,7 @@ export function writeStoredCandidateFeedbackShareLink(
   }
 }
 
-export function clearStoredCandidateFeedbackShareLink(
-  interviewId: string,
-): void {
+export function clearStoredCandidateFeedbackShareLink(interviewId: string): void {
   if (typeof window === 'undefined') {
     return
   }

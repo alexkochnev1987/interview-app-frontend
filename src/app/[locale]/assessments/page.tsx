@@ -6,18 +6,19 @@ import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallbac
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import type { Locale } from '@/i18n/locales'
-import { type InterviewListItem, type PaginatedInterviews, emptyPaginatedInterviews } from '@/lib/api'
-import { selectHrVisibleListItems } from '@/lib/assessment-status'
 import {
-  ASSESSMENTS_INTERVIEW_PAGE_SIZE,
-  fetchAllInterviewPages,
-} from '@/lib/fetch-all-interviews'
+  type InterviewListItem,
+  type PaginatedInterviews,
+  emptyPaginatedInterviews,
+} from '@/lib/api'
+import { selectHrVisibleListItems } from '@/lib/assessment-status'
 import {
   loadAuthGate,
   redirectIfUnauthenticated,
   redirectIfUnauthorizedError,
 } from '@/lib/auth-gate'
 import { canReviewAssessments } from '@/lib/auth-roles'
+import { ASSESSMENTS_INTERVIEW_PAGE_SIZE, fetchAllInterviewPages } from '@/lib/fetch-all-interviews'
 import { isForbiddenError, requestServer } from '@/lib/server-fetch'
 
 const ERROR_BACK_HREF = '/'
@@ -26,9 +27,7 @@ interface AssessmentsPageProps {
   params: Promise<{ locale: Locale }>
 }
 
-export default async function AssessmentsPage({
-  params,
-}: AssessmentsPageProps) {
+export default async function AssessmentsPage({ params }: AssessmentsPageProps) {
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'toast.pageGate.assessments' })
   const tCommon = await getTranslations({ locale, namespace: 'common' })
@@ -37,10 +36,7 @@ export default async function AssessmentsPage({
   redirectIfUnauthenticated(auth, '/assessments', locale)
   if (auth.kind === 'forbidden') {
     return (
-      <ForbiddenAccessPage
-        title={t('forbiddenTitle')}
-        description={t('forbiddenDescription')}
-      />
+      <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
     )
   }
   if (auth.kind === 'error') {
@@ -59,13 +55,13 @@ export default async function AssessmentsPage({
 
   try {
     const items = await fetchAllInterviewPages(
-      (params) =>
+      (queryParams) =>
         requestServer<PaginatedInterviews>('/interviews', auth.ctx, {
-          query: params,
+          query: queryParams,
         }).then(
           (response) =>
             response ??
-            emptyPaginatedInterviews(params.limit ?? ASSESSMENTS_INTERVIEW_PAGE_SIZE),
+            emptyPaginatedInterviews(queryParams.limit ?? ASSESSMENTS_INTERVIEW_PAGE_SIZE),
         ),
       {
         limit: ASSESSMENTS_INTERVIEW_PAGE_SIZE,
@@ -79,16 +75,10 @@ export default async function AssessmentsPage({
     redirectIfUnauthorizedError(err, '/assessments', locale)
     if (isForbiddenError(err)) {
       return (
-        <ForbiddenAccessPage
-          title={t('forbiddenTitle')}
-          description={t('forbiddenDescription')}
-        />
+        <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
       )
     }
-    error =
-      err instanceof Error
-        ? err.message
-        : t('loadFailedFallback')
+    error = err instanceof Error ? err.message : t('loadFailedFallback')
   }
 
   if (error) {

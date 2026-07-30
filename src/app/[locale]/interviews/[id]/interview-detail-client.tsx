@@ -1,28 +1,29 @@
 'use client'
 
-import { useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { useState } from 'react'
 
-import { PageShell } from '@/components/ui/layout/page-shell'
+import { AnswerPacketList } from '@/components/interviews/detail/answer-packet-list'
+import { CandidateAccessPanel } from '@/components/interviews/detail/candidate-access-panel'
+import { InterviewDetailCancelDialog } from '@/components/interviews/detail/interview-detail-cancel-dialog'
+import { InterviewDetailDeleteDialog } from '@/components/interviews/detail/interview-detail-delete-dialog'
+import { InterviewDetailEditSection } from '@/components/interviews/detail/interview-detail-edit-section'
+import { InterviewScorecard } from '@/components/interviews/detail/interview-scorecard'
+import { InterviewSummaryCard } from '@/components/interviews/detail/interview-summary-card'
+import { useInterviewDetailManagement } from '@/components/interviews/detail/use-interview-detail-management'
+import { DemoTakeExperience } from '@/components/take/demo/demo-take-experience'
 import { Grid } from '@/components/ui/layout/grid'
+import { PageShell } from '@/components/ui/layout/page-shell'
 import type { Interview, InterviewResult } from '@/lib/api'
+import { useAuth, useIsDemo } from '@/lib/auth-context'
 import { formatCandidateLinkPreview } from '@/lib/interview-detail-format'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
 import { useToastMessages } from '@/lib/use-toast-messages'
-import { useAuth, useIsDemo } from '@/lib/auth-context'
-import { DemoTakeExperience } from '@/components/take/demo/demo-take-experience'
-import { CandidateAccessPanel } from '@/components/interviews/detail/candidate-access-panel'
-import { InterviewSummaryCard } from '@/components/interviews/detail/interview-summary-card'
-import { AnswerPacketList } from '@/components/interviews/detail/answer-packet-list'
-import { InterviewScorecard } from '@/components/interviews/detail/interview-scorecard'
-import { InterviewDetailCancelDialog } from '@/components/interviews/detail/interview-detail-cancel-dialog'
-import { InterviewDetailEditSection } from '@/components/interviews/detail/interview-detail-edit-section'
-import { useInterviewDetailManagement } from '@/components/interviews/detail/use-interview-detail-management'
-import { InterviewDetailDeleteDialog } from '@/components/interviews/detail/interview-detail-delete-dialog'
+
+import { useAnswerMedia } from './use-answer-media'
+import { useAnswerUploads } from './use-answer-uploads'
 import { useCandidateLink } from './use-candidate-link'
 import { useInterviewValidation } from './use-interview-validation'
-import { useAnswerUploads } from './use-answer-uploads'
-import { useAnswerMedia } from './use-answer-media'
 
 interface InterviewDetailClientProps {
   id: string
@@ -117,43 +118,31 @@ export default function InterviewDetailClient({
         <DemoTakeExperience
           candidateName={interview.candidateName}
           position={interview.position}
-          questionTexts={interview.questions.map(
-            (question) => question.questionText,
-          )}
+          questionTexts={interview.questions.map((question) => question.questionText)}
           onExit={() => setShowDemoTake(false)}
         />
       </PageShell>
     )
   }
 
-  const answeredCount = interview.answers.filter(
-    (answer) => answer.status === 'submitted',
-  ).length
+  const answeredCount = interview.answers.filter((answer) => answer.status === 'submitted').length
   const validatedCount = interview.answers.filter(
     (answer) => answer.validation?.status === 'completed',
   ).length
   const hasActiveValidation = interview.answers.some(
     (answer) =>
-      answer.validation?.status === 'queued' ||
-      answer.validation?.status === 'processing',
+      answer.validation?.status === 'queued' || answer.validation?.status === 'processing',
   )
   const totalQuestions = interview.questions.length
-  const answersByIndex = new Map(
-    interview.answers.map((a) => [a.questionIndex, a]),
-  )
-  const progressValue =
-    answeredCount === 0
-      ? 0
-      : Math.round((validatedCount / answeredCount) * 100)
+  const answersByIndex = new Map(interview.answers.map((a) => [a.questionIndex, a]))
+  const progressValue = answeredCount === 0 ? 0 : Math.round((validatedCount / answeredCount) * 100)
   const allAnswered = interview.questions.every((_, qi) =>
     interview.answers.some(
       (answer) => answer.questionIndex === qi && answer.status === 'submitted',
     ),
   )
-  const isTerminal =
-    interview.status === 'completed' || interview.status === 'failed'
-  const canValidate =
-    allAnswered && !hasActiveValidation && interview.status !== 'completed'
+  const isTerminal = interview.status === 'completed' || interview.status === 'failed'
+  const canValidate = allAnswered && !hasActiveValidation && interview.status !== 'completed'
   const candidateLinkPreview = formatCandidateLinkPreview(candidateLink)
 
   return (

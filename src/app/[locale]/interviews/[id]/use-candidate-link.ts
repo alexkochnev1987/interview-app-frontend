@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
-import { generateCandidateLink } from '@/lib/api'
-import { localizedPath } from '@/i18n/pathname'
 import type { Locale } from '@/i18n/locales'
+import { localizedPath } from '@/i18n/pathname'
+import { generateCandidateLink } from '@/lib/api'
 import { runMutation } from '@/lib/run-mutation'
 import type { useToastMessages } from '@/lib/use-toast-messages'
 
@@ -27,8 +27,7 @@ export function useCandidateLink({
   toastMessages,
 }: UseCandidateLinkParams) {
   const [candidateLink, setCandidateLink] = useState('')
-  const [candidateLinkStatus, setCandidateLinkStatus] =
-    useState<CandidateLinkStatus>('idle')
+  const [candidateLinkStatus, setCandidateLinkStatus] = useState<CandidateLinkStatus>('idle')
   const [candidateLinkError, setCandidateLinkError] = useState('')
   const [copyStatus, setCopyStatus] = useState<CopyStatus>('idle')
 
@@ -79,9 +78,7 @@ export function useCandidateLink({
         setCandidateLink('')
         setCandidateLinkStatus('error')
         setCandidateLinkError(
-          err instanceof Error
-            ? err.message
-            : toastMessages.interview.refreshLinkError,
+          err instanceof Error ? err.message : toastMessages.interview.refreshLinkError,
         )
       }
     },

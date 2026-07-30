@@ -8,6 +8,7 @@ import type { Locale } from '@/i18n/locales'
 import { type TakeInterviewData } from '@/lib/api'
 import { getServerRequestContext, requestServer } from '@/lib/server-fetch'
 import { readSearchParamToken } from '@/lib/text'
+
 import { TakeInterviewClient } from './take-interview-client'
 
 interface TakeInterviewPageProps {
@@ -15,10 +16,7 @@ interface TakeInterviewPageProps {
   searchParams: Promise<{ token?: string | string[] }>
 }
 
-export default async function TakeInterviewPage({
-  params,
-  searchParams,
-}: TakeInterviewPageProps) {
+export default async function TakeInterviewPage({ params, searchParams }: TakeInterviewPageProps) {
   const { id, locale } = await params
   const t = await getTranslations({ locale, namespace: 'toast.pageGate.take' })
   const token = readSearchParamToken((await searchParams).token)
@@ -40,10 +38,7 @@ export default async function TakeInterviewPage({
         query: { contentLocale: locale },
       })) ?? null
   } catch (err) {
-    error =
-      err instanceof Error
-        ? err.message
-        : t('loadFailedFallback')
+    error = err instanceof Error ? err.message : t('loadFailedFallback')
   }
 
   if (error || !interview) {

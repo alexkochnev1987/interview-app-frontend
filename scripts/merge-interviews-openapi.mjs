@@ -1,5 +1,5 @@
-import fs from 'node:fs'
 import { execSync } from 'node:child_process'
+import fs from 'node:fs'
 
 const develop = JSON.parse(fs.readFileSync('openapi/openapi.json', 'utf8'))
 const feature = JSON.parse(

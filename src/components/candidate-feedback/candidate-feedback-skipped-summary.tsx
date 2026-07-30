@@ -45,9 +45,7 @@ export function CandidateFeedbackSkippedSummary({
           <BodyText key={questionIndex} size="sm" tone="muted">
             {t('skippedQuestionItem', {
               index: questionIndex + 1,
-              reason: reason
-                ? formatSkipReason(reason)
-                : t('skippedQuestionUnknownReason'),
+              reason: reason ? formatSkipReason(reason) : t('skippedQuestionUnknownReason'),
             })}
           </BodyText>
         ))}

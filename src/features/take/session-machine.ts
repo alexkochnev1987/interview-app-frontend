@@ -1,33 +1,31 @@
-import type { TakeInterviewData } from '@/lib/api';
-import type { TakeStage } from '@/components/take/types';
-import {
-  canStartNewAttempt,
-  type AnswerAttemptMeta,
-} from './attempt-limit';
-import { isLastInterviewQuestion } from './messages';
+import type { TakeStage } from '@/components/take/types'
+import type { TakeInterviewData } from '@/lib/api'
 
-export type ClientInterviewLoadMode = 'initial' | 'resume' | 'locale';
+import { canStartNewAttempt, type AnswerAttemptMeta } from './attempt-limit'
+import { isLastInterviewQuestion } from './messages'
 
-export type PendingVersionAction = 'submit' | 'rerecord' | null;
-export type VersionPersistKind = Exclude<PendingVersionAction, null>;
+export type ClientInterviewLoadMode = 'initial' | 'resume' | 'locale'
 
-export type InterviewLoadMode = 'initial' | 'resume' | 'returning';
+export type PendingVersionAction = 'submit' | 'rerecord' | null
+export type VersionPersistKind = Exclude<PendingVersionAction, null>
 
-export type QuestionAnswerPhase = 'recording' | 'review' | 'blocked';
+export type InterviewLoadMode = 'initial' | 'resume' | 'returning'
 
-export type ExhaustedHint = 'submit' | 'no-media';
+export type QuestionAnswerPhase = 'recording' | 'review' | 'blocked'
+
+export type ExhaustedHint = 'submit' | 'no-media'
 
 export function resolveQuestionAnswerPhase(
   interview: TakeInterviewData | null | undefined,
 ): QuestionAnswerPhase {
-  const meta = answerAttemptMetaFromInterview(interview);
+  const meta = answerAttemptMetaFromInterview(interview)
   if (!isAttemptsExhausted(meta)) {
-    return 'recording';
+    return 'recording'
   }
   if (interview?.currentAnswerMeta?.hasSubmittableMedia) {
-    return 'review';
+    return 'review'
   }
-  return 'blocked';
+  return 'blocked'
 }
 
 export function stageAfterInterviewLoad(
@@ -35,22 +33,22 @@ export function stageAfterInterviewLoad(
   mode: InterviewLoadMode,
 ): TakeStage {
   if (interview.completed) {
-    return 'complete';
+    return 'complete'
   }
   if (mode === 'initial') {
-    return 'consent';
+    return 'consent'
   }
   if (mode === 'returning') {
-    const exhausted = isAttemptsExhausted(answerAttemptMetaFromInterview(interview));
+    const exhausted = isAttemptsExhausted(answerAttemptMetaFromInterview(interview))
     if (
       exhausted &&
       isLastInterviewQuestion(interview.currentQuestionIndex, interview.totalQuestions)
     ) {
-      return 'interview';
+      return 'interview'
     }
-    return 'lobby';
+    return 'lobby'
   }
-  return 'interview';
+  return 'interview'
 }
 
 export function resolveInterviewLoadMode(
@@ -58,61 +56,58 @@ export function resolveInterviewLoadMode(
   options: { serverPrefetched?: boolean },
 ): InterviewLoadMode {
   if (mode === 'resume' || mode === 'locale') {
-    return 'resume';
+    return 'resume'
   }
-  return options.serverPrefetched ? 'returning' : 'initial';
+  return options.serverPrefetched ? 'returning' : 'initial'
 }
 
 export function answerAttemptMetaFromInterview(
   interview: TakeInterviewData | null | undefined,
 ): AnswerAttemptMeta | undefined {
   if (!interview) {
-    return undefined;
+    return undefined
   }
-  const meta = interview.currentAnswerMeta;
+  const meta = interview.currentAnswerMeta
   return {
     versionCount: meta?.versionCount,
     selectedVersionNumber: meta?.selectedVersionNumber,
     maxAttempts: interview.maxAttempts,
-  };
+  }
 }
 
 export function isAttemptsExhausted(meta?: AnswerAttemptMeta): boolean {
-  return !canStartNewAttempt(meta);
+  return !canStartNewAttempt(meta)
 }
 
 export function shouldCleanupExhaustedSession(params: {
-  phase: QuestionAnswerPhase;
-  recording: boolean;
-  recordingStartBusy: boolean;
-  hasActiveMultipart: boolean;
+  phase: QuestionAnswerPhase
+  recording: boolean
+  recordingStartBusy: boolean
+  hasActiveMultipart: boolean
 }): boolean {
   if (params.phase === 'recording') {
-    return false;
+    return false
   }
   if (params.recording || params.recordingStartBusy || params.hasActiveMultipart) {
-    return false;
+    return false
   }
-  return true;
+  return true
 }
 
 export function canRequestVersionAction(params: {
-  action: PendingVersionAction;
-  uploading: boolean;
-  recording: boolean;
+  action: PendingVersionAction
+  uploading: boolean
+  recording: boolean
 }) {
-  const { action, uploading, recording } = params;
-  return Boolean(action && !uploading && recording);
+  const { action, uploading, recording } = params
+  return Boolean(action && !uploading && recording)
 }
 
-export function progressValueForStage(params: {
-  interview: TakeInterviewData;
-  stage: TakeStage;
-}) {
-  const { interview, stage } = params;
-  if (interview.totalQuestions === 0) return 0;
+export function progressValueForStage(params: { interview: TakeInterviewData; stage: TakeStage }) {
+  const { interview, stage } = params
+  if (interview.totalQuestions === 0) return 0
   return Math.round(
     ((interview.currentQuestionIndex + (stage === 'complete' ? 1 : 0)) / interview.totalQuestions) *
       100,
-  );
+  )
 }

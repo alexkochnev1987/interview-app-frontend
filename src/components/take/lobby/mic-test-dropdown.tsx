@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
 import { ChevronUp, CircleDot, Pause, Square, Volume2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Inline, Stack } from '@/components/ui/layout'
 import { MicLevelMeter } from '@/components/ui/take'
+
 import { useMicTest } from './use-mic-test'
 
 interface MicTestDropdownProps {
@@ -94,14 +95,8 @@ export function MicTestDropdown({
               disabled={!audioUrl || isRecording}
               onClick={togglePlayback}
             >
-              {isPlaying ? (
-                <Pause className="size-3.5" />
-              ) : (
-                <Volume2 className="size-3.5" />
-              )}
-              {isPlaying
-                ? tTake('lobbyMicPause')
-                : tTake('lobbyMicPlay')}
+              {isPlaying ? <Pause className="size-3.5" /> : <Volume2 className="size-3.5" />}
+              {isPlaying ? tTake('lobbyMicPause') : tTake('lobbyMicPlay')}
             </Button>
           </Stack>
         </Inline>

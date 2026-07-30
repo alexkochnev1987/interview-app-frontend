@@ -1,5 +1,5 @@
-import { useCallback } from 'react'
 import { useTranslations } from 'next-intl'
+import { useCallback } from 'react'
 
 import type { ActiveFilterChipDescriptor } from '@/components/questions/picker/build-active-chips'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
@@ -26,9 +26,9 @@ export function useQuestionChipLabels() {
         case 'status':
           return descriptor.value === 'inactive'
             ? t('statusDeletedOnly')
-              : descriptor.value == 'scheduled'
-                  ? t('scheduledOnly')
-                    : t('statusActiveDeleted')
+            : descriptor.value == 'scheduled'
+              ? t('scheduledOnly')
+              : t('statusActiveDeleted')
         default:
           return ''
       }

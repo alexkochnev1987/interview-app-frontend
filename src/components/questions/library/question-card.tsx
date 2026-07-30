@@ -1,23 +1,17 @@
 'use client'
 
-import { type ComponentProps } from 'react'
 import { useTranslations } from 'next-intl'
+import { type ComponentProps } from 'react'
 
-import { EyebrowLabel } from '@/components/ui/eyebrow-label'
-import { MetricPanel } from '@/components/ui/metric-panel'
-import { StatusPill } from '@/components/ui/status-pill'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
+import { EyebrowLabel } from '@/components/ui/eyebrow-label'
 import { Grid } from '@/components/ui/layout/grid'
 import { Stack } from '@/components/ui/layout/stack'
+import { MetricPanel } from '@/components/ui/metric-panel'
 import { PillRow } from '@/components/ui/pill-row'
 import { SelectableOverlay } from '@/components/ui/selectable-overlay'
+import { StatusPill } from '@/components/ui/status-pill'
 import { BodyText } from '@/components/ui/text'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
 import { routes } from '@/i18n/routes'
@@ -49,11 +43,9 @@ function getCardAppearance(
   selected: boolean,
 ): { variant: CardVariant; state: CardState } {
   if (question.deleted) return { variant: 'danger-soft', state: 'deleted' }
-  if (question.pendingDeletion)
-    return { variant: 'scheduled-soft', state: 'scheduled' }
+  if (question.pendingDeletion) return { variant: 'scheduled-soft', state: 'scheduled' }
   if (selected && mode === 'pick') return { variant: 'surface', state: 'picked' }
-  if (selected && mode === 'select')
-    return { variant: 'surface', state: 'selected' }
+  if (selected && mode === 'select') return { variant: 'surface', state: 'selected' }
   return { variant: 'surface', state: 'default' }
 }
 
@@ -76,18 +68,10 @@ function CardSurface({
   const sharedLabels = useSharedLabels()
 
   return (
-    <Card
-      variant={variant}
-      height="full"
-      interaction="hover"
-      state={state}
-      data-tour={tourTarget}
-    >
+    <Card variant={variant} height="full" interaction="hover" state={state} data-tour={tourTarget}>
       <CardHeader spacing="md">
         <PillRow reserveCorner={reserveCorner}>
-          {question.deleted ? (
-            <StatusPill tone="failed">{t('deleted')}</StatusPill>
-          ) : null}
+          {question.deleted ? <StatusPill tone="failed">{t('deleted')}</StatusPill> : null}
           {question.pendingDeletion && !question.deleted ? (
             <StatusPill tone="scheduled">{t('scheduled')}</StatusPill>
           ) : null}
@@ -108,9 +92,7 @@ function CardSurface({
           ) : null}
         </PillRow>
         <Stack gap={2}>
-          <CardTitle size="list-clamp">
-            {truncateText(question.questionText)}
-          </CardTitle>
+          <CardTitle size="list-clamp">{truncateText(question.questionText)}</CardTitle>
           <CardDescription>
             {question.role ? `${question.role} · ` : ''}
             {t('weightLabel', { weight: question.weight })}
@@ -175,11 +157,7 @@ export function QuestionCard({
   )
 
   if (mode === 'navigate') {
-    return (
-      <UnstyledLink href={routes.questions.detail(question.id)}>
-        {surface}
-      </UnstyledLink>
-    )
+    return <UnstyledLink href={routes.questions.detail(question.id)}>{surface}</UnstyledLink>
   }
 
   const marker = (
@@ -207,9 +185,7 @@ export function QuestionCard({
 
   return (
     <SelectableOverlay marker={marker}>
-      <UnstyledLink href={routes.questions.detail(question.id)}>
-        {surface}
-      </UnstyledLink>
+      <UnstyledLink href={routes.questions.detail(question.id)}>{surface}</UnstyledLink>
     </SelectableOverlay>
   )
 }

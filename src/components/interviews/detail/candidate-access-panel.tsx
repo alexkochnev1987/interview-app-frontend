@@ -1,37 +1,24 @@
 'use client'
 
-import {
-  CheckCircle2,
-  CircleDashed,
-  Copy,
-  FileVideo2,
-  Sparkles,
-  Workflow,
-} from 'lucide-react'
+import { CheckCircle2, CircleDashed, Copy, FileVideo2, Sparkles, Workflow } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
-import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
 import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
+import { InterviewReuseActions } from '@/components/templates/interview-reuse-actions'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
 import { Icon } from '@/components/ui/icon'
 import { IconLabel } from '@/components/ui/icon-label'
 import { Inline } from '@/components/ui/layout/inline'
-import { Progress } from '@/components/ui/progress'
 import { Stack } from '@/components/ui/layout/stack'
+import { Progress } from '@/components/ui/progress'
 import { StatusPill } from '@/components/ui/status-pill'
 import { SurfaceTile } from '@/components/ui/surface-tile'
 import { BodyText } from '@/components/ui/text'
-import { InterviewReuseActions } from '@/components/templates/interview-reuse-actions'
 import type { Interview } from '@/lib/api'
-import { formatInterviewDateTime } from '@/lib/interview-formatters'
 import { formatWorkflowStage } from '@/lib/interview-detail-format'
+import { formatInterviewDateTime } from '@/lib/interview-formatters'
 
 interface CandidateAccessPanelProps {
   interview: Interview
@@ -99,9 +86,7 @@ export function CandidateAccessPanel({
                     size="sm"
                     onClick={onRefreshLink}
                   >
-                    {candidateLinkStatus === 'loading'
-                      ? t('generating')
-                      : t('refreshLink')}
+                    {candidateLinkStatus === 'loading' ? t('generating') : t('refreshLink')}
                   </Button>
                 </DemoWriteGuard>
                 <Button
@@ -201,8 +186,7 @@ export function CandidateAccessPanel({
                 {t('workflowLabel')}
               </IconLabel>
               <BodyText size="sm">
-                {t('workflowStatus')}{' '}
-                <strong>{interview.workflow.status.replace('_', ' ')}</strong>
+                {t('workflowStatus')} <strong>{interview.workflow.status.replace('_', ' ')}</strong>
                 {interview.workflow.currentStage
                   ? ` • ${t('workflowStage')} ${formatWorkflowStage(interview.workflow.currentStage, t('idle'))}`
                   : ''}

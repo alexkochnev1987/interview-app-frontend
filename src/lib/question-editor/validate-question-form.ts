@@ -1,10 +1,13 @@
-import { parseMetadata, hasLocaleDraftContent, type LocaleQuestionDraft } from '@/lib/question-editor/parsers'
 import type { Locale } from '@/i18n/locales'
 import type { QuestionInput } from '@/lib/api'
-import { type ContentFieldKey } from '@/lib/question-editor/field-keys'
-import { getMissingPrimaryContentFields } from '@/lib/question-editor/editor-phase'
-
 import type { FieldErrors } from '@/lib/clear-field-error'
+import { getMissingPrimaryContentFields } from '@/lib/question-editor/editor-phase'
+import { type ContentFieldKey } from '@/lib/question-editor/field-keys'
+import {
+  parseMetadata,
+  hasLocaleDraftContent,
+  type LocaleQuestionDraft,
+} from '@/lib/question-editor/parsers'
 
 export type QuestionFormFieldErrors = FieldErrors<'questionText' | 'metadata'>
 
@@ -91,9 +94,7 @@ function shouldValidateLocale(args: {
   block?: Partial<LocaleQuestionDraft>
 }): boolean {
   if (args.locale === args.primaryLocale) return true
-  return (
-    args.locale === args.activeLocale || hasLocaleDraftContent(args.block)
-  )
+  return args.locale === args.activeLocale || hasLocaleDraftContent(args.block)
 }
 
 export function validateLocaleBlocks(args: {
@@ -124,9 +125,7 @@ export function validateLocaleBlocks(args: {
     [activeLocale]: activeDraft,
   }
 
-  const localesToValidate = Array.from(
-    new Set<Locale>([primaryLocale, ...requiredLocales]),
-  )
+  const localesToValidate = Array.from(new Set<Locale>([primaryLocale, ...requiredLocales]))
 
   for (const locale of localesToValidate) {
     const block = drafts[locale]

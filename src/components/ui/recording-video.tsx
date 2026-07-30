@@ -1,18 +1,11 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
 import { LoaderCircle } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 
 import { Icon } from '@/components/ui/icon'
-import {
-  VideoFrame,
-  VideoSurface,
-  type VideoFrameVariants,
-} from '@/components/ui/video-frame'
-import {
-  isDurationKnown,
-  primeVideoDuration,
-} from '@/lib/video-duration-priming'
+import { VideoFrame, VideoSurface, type VideoFrameVariants } from '@/components/ui/video-frame'
+import { isDurationKnown, primeVideoDuration } from '@/lib/video-duration-priming'
 
 interface RecordingVideoProps {
   src: string

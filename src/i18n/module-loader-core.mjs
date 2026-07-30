@@ -1,9 +1,6 @@
 export async function mergeLocaleModules({ locale, moduleOrder, loadModule }) {
   const moduleEntries = await Promise.all(
-    moduleOrder.map(async (moduleName) => [
-      moduleName,
-      await loadModule(moduleName),
-    ]),
+    moduleOrder.map(async (moduleName) => [moduleName, await loadModule(moduleName)]),
   )
 
   const modulesByName = new Map(moduleEntries)
@@ -13,9 +10,7 @@ export async function mergeLocaleModules({ locale, moduleOrder, loadModule }) {
   for (const moduleName of moduleOrder) {
     const moduleMessages = modulesByName.get(moduleName)
     if (!moduleMessages) {
-      throw new Error(
-        `Missing i18n module file: messages/${locale}/${moduleName}.json`,
-      )
+      throw new Error(`Missing i18n module file: messages/${locale}/${moduleName}.json`)
     }
 
     for (const key of Object.keys(moduleMessages)) {

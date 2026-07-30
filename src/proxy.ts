@@ -2,12 +2,9 @@ import createMiddleware from 'next-intl/middleware'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-import {
-  loginReturnPath,
-  safeRedirectPath,
-} from '@/lib/safe-redirect-path'
 import { localizedPath, pathLocale } from '@/i18n/pathname'
 import { routing } from '@/i18n/routing'
+import { loginReturnPath, safeRedirectPath } from '@/lib/safe-redirect-path'
 
 const handleI18nRouting = createMiddleware(routing)
 
@@ -20,10 +17,7 @@ export function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname
   const { locale, pathnameWithoutLocale } = pathLocale(path)
 
-  if (
-    pathnameWithoutLocale.startsWith('/api') ||
-    pathnameWithoutLocale.startsWith('/_next')
-  ) {
+  if (pathnameWithoutLocale.startsWith('/api') || pathnameWithoutLocale.startsWith('/_next')) {
     return NextResponse.next()
   }
 

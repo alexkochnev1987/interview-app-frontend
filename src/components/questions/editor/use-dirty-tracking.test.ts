@@ -25,10 +25,7 @@ describe('question editor dirty translations', () => {
     }
 
     const topLevelUnchanged = saved.questionText === current.questionText
-    const translationsChanged = !areEqual(
-      current.translations ?? {},
-      saved.translations ?? {},
-    )
+    const translationsChanged = !areEqual(current.translations ?? {}, saved.translations ?? {})
 
     expect(topLevelUnchanged).toBe(true)
     expect(translationsChanged).toBe(true)

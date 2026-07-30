@@ -12,14 +12,8 @@ interface UseAnswerMediaParams {
   failedLoadMediaLabel: string
 }
 
-export function useAnswerMedia({
-  id,
-  interview,
-  failedLoadMediaLabel,
-}: UseAnswerMediaParams) {
-  const [mediaByQuestion, setMediaByQuestion] = useState<
-    Record<number, AnswerMediaState>
-  >({})
+export function useAnswerMedia({ id, interview, failedLoadMediaLabel }: UseAnswerMediaParams) {
+  const [mediaByQuestion, setMediaByQuestion] = useState<Record<number, AnswerMediaState>>({})
   const requestedMediaRef = useRef<Map<number, string>>(new Map())
   const mediaFetchInterviewIdRef = useRef(id)
 
@@ -42,9 +36,7 @@ export function useAnswerMedia({
 
     answersWithMedia.forEach((answer) => {
       const mediaFingerprint = `${answer.mediaKey ?? ''}|${answer.screenMediaKey ?? ''}`
-      if (
-        requestedMediaRef.current.get(answer.questionIndex) === mediaFingerprint
-      ) {
+      if (requestedMediaRef.current.get(answer.questionIndex) === mediaFingerprint) {
         return
       }
 
@@ -60,6 +52,7 @@ export function useAnswerMedia({
       }))
 
       void getInterviewAnswerMedia(id, answer.questionIndex)
+        // eslint-disable-next-line promise/always-return
         .then((media) => {
           setMediaByQuestion((current) => ({
             ...current,
@@ -75,10 +68,7 @@ export function useAnswerMedia({
             ...current,
             [answer.questionIndex]: {
               loading: false,
-              errorMessage:
-                mediaError instanceof Error
-                  ? mediaError.message
-                  : failedLoadMediaLabel,
+              errorMessage: mediaError instanceof Error ? mediaError.message : failedLoadMediaLabel,
             },
           }))
         })

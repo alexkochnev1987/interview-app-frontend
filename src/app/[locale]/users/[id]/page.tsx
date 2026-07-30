@@ -30,10 +30,7 @@ export default async function UserProfilePage({ params }: UserProfilePageProps) 
 
   if (auth.kind === 'error') {
     return (
-      <FlashErrorPageFallback
-        title={tCommon('profileLoadFailed')}
-        description={auth.message}
-      />
+      <FlashErrorPageFallback title={tCommon('profileLoadFailed')} description={auth.message} />
     )
   }
 
@@ -50,17 +47,12 @@ export default async function UserProfilePage({ params }: UserProfilePageProps) 
   let error: string | null = null
 
   try {
-    user =
-      (await requestServer<TeamMember>(`/users/${encodeURIComponent(id)}`, auth.ctx)) ??
-      null
+    user = (await requestServer<TeamMember>(`/users/${encodeURIComponent(id)}`, auth.ctx)) ?? null
   } catch (err) {
     redirectIfUnauthorizedError(err, returnPath, locale)
     if (isApiError(err) && err.status === 404) {
       return (
-        <FlashErrorPageFallback
-          title={t('loadFailedTitle')}
-          description={t('notFoundFallback')}
-        />
+        <FlashErrorPageFallback title={t('loadFailedTitle')} description={t('notFoundFallback')} />
       )
     }
     error = err instanceof Error ? err.message : t('loadFailedFallback')
@@ -76,16 +68,10 @@ export default async function UserProfilePage({ params }: UserProfilePageProps) 
   }
 
   if (
-    !canViewUserProfile(
-      { id: user.id, role: user.role },
-      { id: auth.me.id, role: auth.me.role },
-    )
+    !canViewUserProfile({ id: user.id, role: user.role }, { id: auth.me.id, role: auth.me.role })
   ) {
     return (
-      <ForbiddenAccessPage
-        title={t('forbiddenTitle')}
-        description={t('forbiddenDescription')}
-      />
+      <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
     )
   }
 

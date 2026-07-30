@@ -1,5 +1,5 @@
-import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
+import type { ComponentProps, ElementType, JSX } from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -27,25 +27,13 @@ const containerVariants = cva('container', {
   },
 })
 
-type ContainerProps = Omit<React.ComponentProps<'div'>, 'color'> &
+type ContainerProps = Omit<ComponentProps<'div'>, 'color'> &
   VariantProps<typeof containerVariants> & {
-    as?: keyof React.JSX.IntrinsicElements
+    as?: keyof JSX.IntrinsicElements
   }
 
-export function Container({
-  as,
-  className,
-  width,
-  align,
-  layout,
-  ...props
-}: ContainerProps) {
-  const Comp = (as ?? 'div') as React.ElementType
+export function Container({ as, className, width, align, layout, ...props }: ContainerProps) {
+  const Comp = (as ?? 'div') as ElementType
 
-  return (
-    <Comp
-      className={cn(containerVariants({ width, align, layout }), className)}
-      {...props}
-    />
-  )
+  return <Comp className={cn(containerVariants({ width, align, layout }), className)} {...props} />
 }

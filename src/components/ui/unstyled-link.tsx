@@ -1,5 +1,5 @@
-import type { ComponentProps, ReactNode } from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
+import type { ComponentProps, ReactNode } from 'react'
 
 import { Link } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
@@ -20,22 +20,13 @@ const unstyledLinkVariants = cva('no-underline', {
 })
 
 interface UnstyledLinkProps
-  extends ComponentProps<typeof Link>,
-    VariantProps<typeof unstyledLinkVariants> {
+  extends ComponentProps<typeof Link>, VariantProps<typeof unstyledLinkVariants> {
   children?: ReactNode
 }
 
-export function UnstyledLink({
-  className,
-  children,
-  display,
-  ...props
-}: UnstyledLinkProps) {
+export function UnstyledLink({ className, children, display, ...props }: UnstyledLinkProps) {
   return (
-    <Link
-      className={cn(unstyledLinkVariants({ display }), className)}
-      {...props}
-    >
+    <Link className={cn(unstyledLinkVariants({ display }), className)} {...props}>
       {children}
     </Link>
   )

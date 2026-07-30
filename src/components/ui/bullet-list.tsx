@@ -1,5 +1,5 @@
-import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
+import { HTMLAttributes } from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -18,8 +18,7 @@ const bulletListVariants = cva('list-disc pl-5', {
 })
 
 interface BulletListProps
-  extends React.HTMLAttributes<HTMLUListElement>,
-    VariantProps<typeof bulletListVariants> {}
+  extends HTMLAttributes<HTMLUListElement>, VariantProps<typeof bulletListVariants> {}
 
 export function BulletList({ className, gap, ...props }: BulletListProps) {
   return <ul className={cn(bulletListVariants({ gap }), className)} {...props} />

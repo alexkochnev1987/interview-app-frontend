@@ -1,5 +1,6 @@
-import { defineConfig, devices } from '@playwright/test'
 import path from 'node:path'
+
+import { defineConfig, devices } from '@playwright/test'
 
 const frontendPort = process.env.E2E_FRONTEND_PORT ?? '3001'
 const baseURL = process.env.E2E_BASE_URL ?? `http://127.0.0.1:${frontendPort}`

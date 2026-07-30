@@ -1,16 +1,19 @@
-import { ApiError } from '@/lib/api-error';
+import { ApiError } from '@/lib/api-error'
+
 import {
   MAX_ANSWER_ATTEMPTS_PER_QUESTION,
   isAnswerAttemptLimitError,
   isAnswerVersionOverwriteError,
-} from './attempt-limit';
+} from './attempt-limit'
 
 export const TAKE_MESSAGES = {
   questionCountOne: '{count} question',
   questionCountOther: '{count} questions',
   browserUnsupported: 'This browser must support camera, microphone, and full-screen sharing.',
-  shortRecordingSubmit: 'Recording is too short to submit yet. Please record a bit longer and try again.',
-  syncingInProgress: 'Recording is still syncing for this question. Try submitting again in a moment.',
+  shortRecordingSubmit:
+    'Recording is too short to submit yet. Please record a bit longer and try again.',
+  syncingInProgress:
+    'Recording is still syncing for this question. Try submitting again in a moment.',
   screenShareStopped:
     'Screen sharing stopped. Reconnect camera and entire-screen sharing to continue this question.',
   recordingStoppedWithoutAction:
@@ -24,7 +27,8 @@ export const TAKE_MESSAGES = {
   rerecordAsNewVersion: 'Retake',
   submitAndNext: 'Submit & Next',
   submitCompleteInterview: 'Submit & Finish',
-  lobbyEnableCameraMicFirst: 'Enable your microphone and camera first, then share your entire screen.',
+  lobbyEnableCameraMicFirst:
+    'Enable your microphone and camera first, then share your entire screen.',
   lobbyInterviewStartBlocked:
     'Could not start the interview. Keep microphone, camera, and entire-screen sharing active, then try again.',
   lobbyEyebrow: 'Prep room',
@@ -45,7 +49,8 @@ export const TAKE_MESSAGES = {
   lobbyPreviewCameraOffTitle: 'Camera is off',
   lobbyPreviewCameraOffLead: 'Tap the camera icon in the controls to turn your preview back on.',
   lobbyPreviewMutedTitle: 'Camera preview paused',
-  lobbyPreviewMutedLead: 'Tap the microphone or camera icon in the controls to allow access and show your preview.',
+  lobbyPreviewMutedLead:
+    'Tap the microphone or camera icon in the controls to allow access and show your preview.',
   sessionSyncFailedTitle: 'Session could not start',
   sessionSyncFailed:
     'Could not establish your interview session. Refresh the invite link or open it again in this browser.',
@@ -108,8 +113,7 @@ export const TAKE_MESSAGES = {
   capabilityMicTitle: 'Microphone',
   capabilityMicDescription: 'Captured together with your camera feed.',
   capabilityScreenTitle: 'Entire screen',
-  capabilityScreenDescription:
-    'Must be shared as Entire screen, not a tab or app window.',
+  capabilityScreenDescription: 'Must be shared as Entire screen, not a tab or app window.',
   capabilityFairnessTitle: 'Fairness checks',
   capabilityFairnessDescription:
     'Session and browser activity may be stored for evaluation integrity.',
@@ -130,18 +134,14 @@ export const TAKE_MESSAGES = {
   attemptBurnsOnRecordStart:
     'Each time recording starts it uses one attempt. Reloading the page during a recording also uses that attempt.',
   reloadUsesCurrentAttemptHint: 'Reloading uses up the current attempt.',
-  attemptsExhaustedNoMedia:
-    'There is no usable recording left to submit for this question.',
+  attemptsExhaustedNoMedia: 'There is no usable recording left to submit for this question.',
   reviewSubmitBanner: 'All attempts used. Press Submit to continue.',
-} as const;
+} as const
 
-export type TakeMessageKey = keyof typeof TAKE_MESSAGES;
-export type TakeMessages = Record<TakeMessageKey, string>;
-export type TakeMessageValues = Record<string, string | number | Date>;
-export type TakeMessageGetter = (
-  key: TakeMessageKey,
-  values?: TakeMessageValues,
-) => string;
+export type TakeMessageKey = keyof typeof TAKE_MESSAGES
+export type TakeMessages = Record<TakeMessageKey, string>
+export type TakeMessageValues = Record<string, string | number | Date>
+export type TakeMessageGetter = (key: TakeMessageKey, values?: TakeMessageValues) => string
 
 export function mapTakeSubmitErrorMessage(
   error: unknown,
@@ -151,42 +151,40 @@ export function mapTakeSubmitErrorMessage(
   if (isAnswerAttemptLimitError(error)) {
     return takeMessage('answerAttemptLimitReached', {
       max: options?.maxAttempts ?? MAX_ANSWER_ATTEMPTS_PER_QUESTION,
-    });
+    })
   }
   if (isAnswerVersionOverwriteError(error)) {
-    return takeMessage('answerVersionOverwriteForbidden');
+    return takeMessage('answerVersionOverwriteForbidden')
   }
   if (error instanceof ApiError) {
     if (error.code === 'ANSWER_VERSION_NOT_RESERVED') {
-      return takeMessage('attemptsExhaustedNoMedia');
+      return takeMessage('attemptsExhaustedNoMedia')
     }
     if (error.message.trim()) {
-      return error.message;
+      return error.message
     }
   }
   if (error instanceof Error && error.message.trim()) {
-    return error.message;
+    return error.message
   }
-  return takeMessage('submitFallbackDetail');
+  return takeMessage('submitFallbackDetail')
 }
 
 export function formatTakeQuestionCountLabel(
   count: number,
   takeMessage: TakeMessageGetter,
 ): string {
-  const template =
-    count === 1
-      ? takeMessage('questionCountOne', { count })
-      : takeMessage('questionCountOther', { count });
-  return template;
+  return count === 1
+    ? takeMessage('questionCountOne', { count })
+    : takeMessage('questionCountOther', { count })
 }
 
 export function isLastInterviewQuestion(
   currentQuestionIndex: number,
   totalQuestions: number,
 ): boolean {
-  if (totalQuestions <= 0) return false;
-  return currentQuestionIndex + 1 >= totalQuestions;
+  if (totalQuestions <= 0) return false
+  return currentQuestionIndex + 1 >= totalQuestions
 }
 
 export function submitAnswerActionLabel(
@@ -194,8 +192,8 @@ export function submitAnswerActionLabel(
   totalQuestions: number,
   takeMessage: TakeMessageGetter,
 ): string {
-  if (totalQuestions <= 0) return takeMessage('submitAndNext');
+  if (totalQuestions <= 0) return takeMessage('submitAndNext')
   return isLastInterviewQuestion(currentQuestionIndex, totalQuestions)
     ? takeMessage('submitCompleteInterview')
-    : takeMessage('submitAndNext');
+    : takeMessage('submitAndNext')
 }

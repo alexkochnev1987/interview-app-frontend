@@ -5,19 +5,13 @@ import { useTranslations } from 'next-intl'
 import { InfiniteCardsLoader } from '@/components/questions/library/infinite-cards-loader'
 import { QuestionCard } from '@/components/questions/library/question-card'
 import { QuestionTable } from '@/components/questions/library/question-table'
-import { StatusPill } from '@/components/ui/status-pill'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { CardGrid } from '@/components/ui/layout/card-grid'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { Pagination } from '@/components/ui/pagination'
 import { SearchInput } from '@/components/ui/search-input'
+import { StatusPill } from '@/components/ui/status-pill'
 
 import { QuestionFacetSidebar } from './question-facet-sidebar'
 import { QuestionPickerFeed } from './question-picker-feed'
@@ -33,9 +27,7 @@ type InterviewQuestionPickerAsideProps = {
   picker: InterviewQuestionPicker
 }
 
-export function InterviewQuestionPickerAside({
-  picker,
-}: InterviewQuestionPickerAsideProps) {
+export function InterviewQuestionPickerAside({ picker }: InterviewQuestionPickerAsideProps) {
   const { facetsResult, facets, query, selectedQuestions, removeSelected } = picker
 
   return (
@@ -70,10 +62,7 @@ export function InterviewQuestionPickerAside({
         onRetry={facetsResult.refetch}
       />
 
-      <QuestionSelectedPanel
-        selected={selectedQuestions}
-        onRemove={removeSelected}
-      />
+      <QuestionSelectedPanel selected={selectedQuestions} onRemove={removeSelected} />
     </>
   )
 }
@@ -119,9 +108,7 @@ export function InterviewQuestionPickerMain({
               <CardTitle size="lg">{title}</CardTitle>
               <CardDescription>{description}</CardDescription>
             </Stack>
-            <StatusPill tone="neutral">
-              {t('selectedCount', { count: selectedCount })}
-            </StatusPill>
+            <StatusPill tone="neutral">{t('selectedCount', { count: selectedCount })}</StatusPill>
           </Inline>
         </CardHeader>
         <CardContent>
@@ -140,12 +127,7 @@ export function InterviewQuestionPickerMain({
         activeChips={activeChips}
         resultCount={view.total}
         loading={view.toolbarLoading}
-        viewToggle={
-          <QuestionViewToggle
-            view={query.state.view}
-            onViewChange={query.setView}
-          />
-        }
+        viewToggle={<QuestionViewToggle view={query.state.view} onViewChange={query.setView} />}
       />
 
       <Stack gap={4}>
@@ -179,9 +161,7 @@ export function InterviewQuestionPickerMain({
             />
           )}
           renderCards={() => {
-            const rest = view.items.filter(
-              (question) => !selectedById.has(question.id),
-            )
+            const rest = view.items.filter((question) => !selectedById.has(question.id))
             return (
               <CardGrid>
                 {selectedQuestions.map((question) => (
@@ -194,9 +174,7 @@ export function InterviewQuestionPickerMain({
                     onToggleSelected={() => toggleQuestion(question)}
                     disabled={disabled}
                     tourTarget={
-                      highlightQuestionId === question.id
-                        ? 'interview-question'
-                        : undefined
+                      highlightQuestionId === question.id ? 'interview-question' : undefined
                     }
                   />
                 ))}
@@ -210,9 +188,7 @@ export function InterviewQuestionPickerMain({
                     onToggleSelected={() => toggleQuestion(question)}
                     disabled={disabled}
                     tourTarget={
-                      highlightQuestionId === question.id
-                        ? 'interview-question'
-                        : undefined
+                      highlightQuestionId === question.id ? 'interview-question' : undefined
                     }
                   />
                 ))}
@@ -222,10 +198,7 @@ export function InterviewQuestionPickerMain({
         />
 
         {!isCardsView ? (
-          <QuestionPickerRefetchAlert
-            error={query.paginationError}
-            onRetry={query.refetch}
-          />
+          <QuestionPickerRefetchAlert error={query.paginationError} onRetry={query.refetch} />
         ) : null}
 
         {isCardsView && view.items.length > 0 ? (

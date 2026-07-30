@@ -1,11 +1,6 @@
 'use client'
 
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-} from 'lucide-react'
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Inline } from '@/components/ui/layout/inline'
@@ -19,13 +14,7 @@ export type PaginationProps = {
   onPageChange: (page: number) => void
 }
 
-export function Pagination({
-  page,
-  totalPages,
-  total,
-  limit,
-  onPageChange,
-}: PaginationProps) {
+export function Pagination({ page, totalPages, total, limit, onPageChange }: PaginationProps) {
   if (total === 0) return null
 
   const firstShown = (page - 1) * limit + 1
@@ -36,14 +25,7 @@ export function Pagination({
   const atEnd = page >= totalPages
 
   return (
-    <Inline
-      as="nav"
-      gap={3}
-      align="center"
-      justify="between"
-      wrap="wrap"
-      aria-label="Pagination"
-    >
+    <Inline as="nav" gap={3} align="center" justify="between" wrap="wrap" aria-label="Pagination">
       <BodyText size="sm" tone="muted">
         Showing <strong>{firstShown}</strong>–<strong>{lastShown}</strong> of{' '}
         <strong>{total}</strong>

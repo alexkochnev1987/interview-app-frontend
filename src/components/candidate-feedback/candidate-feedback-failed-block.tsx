@@ -10,7 +10,10 @@ import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
-import { isCandidateFeedbackSkipReason, parseCandidateFeedbackErrorMessage } from '@/lib/candidate-feedback'
+import {
+  isCandidateFeedbackSkipReason,
+  parseCandidateFeedbackErrorMessage,
+} from '@/lib/candidate-feedback'
 
 interface CandidateFeedbackFailedBlockProps {
   errorMessage?: string | null
@@ -42,9 +45,7 @@ export function CandidateFeedbackFailedBlock({
     <Stack gap={4}>
       {showAlert ? (
         <Alert variant={isSkipReason ? 'warning' : 'danger'}>
-          <AlertTitle>
-            {isSkipReason ? t('skippedBlockTitle') : t('failedTitle')}
-          </AlertTitle>
+          <AlertTitle>{isSkipReason ? t('skippedBlockTitle') : t('failedTitle')}</AlertTitle>
           <AlertDescription>{formatErrorMessage(errorMessage)}</AlertDescription>
         </Alert>
       ) : null}

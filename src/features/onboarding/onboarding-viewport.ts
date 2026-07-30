@@ -10,9 +10,7 @@ export function isOnboardingMobileViewport(): boolean {
   return window.matchMedia(ONBOARDING_MOBILE_MEDIA).matches
 }
 
-export function applyOnboardingStepViewport(
-  step: OnboardingStepConfig,
-): ResolvedOnboardingStep {
+export function applyOnboardingStepViewport(step: OnboardingStepConfig): ResolvedOnboardingStep {
   if (!step.mobile || !isOnboardingMobileViewport()) {
     const { mobile: _mobile, ...resolved } = step
     return resolved

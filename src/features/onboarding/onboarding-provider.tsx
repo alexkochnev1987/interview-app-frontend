@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import {
   createContext,
   useCallback,
@@ -14,13 +15,12 @@ import { OnboardingCompleteDialog } from '@/components/ui/onboarding/onboarding-
 import { OnboardingWelcomeDialog } from '@/components/ui/onboarding/onboarding-welcome-dialog'
 import { DEFAULT_ONBOARDING_FLOW_ID } from '@/features/onboarding/flows/registry'
 import { getStoredOnboardingStep } from '@/features/onboarding/onboarding-progress'
-import { useOnboardingTour } from '@/features/onboarding/use-onboarding-tour'
 import { shouldOfferOnboarding } from '@/features/onboarding/onboarding-state'
+import { useOnboardingTour } from '@/features/onboarding/use-onboarding-tour'
 import { isCandidateFlowPath } from '@/i18n/html-lang'
 import { usePathname, useRouter } from '@/i18n/navigation'
 import { useAuth } from '@/lib/auth-context'
 import { notifyError } from '@/lib/toast'
-import { useTranslations } from 'next-intl'
 
 type OnboardingContextValue = {
   replayTour: () => Promise<void>
@@ -102,9 +102,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
   } = tour
 
   const shouldAutoStart =
-    isStaffAppPath(pathname) &&
-    shouldOfferOnboarding(user) &&
-    !onboardingOfferDismissed
+    isStaffAppPath(pathname) && shouldOfferOnboarding(user) && !onboardingOfferDismissed
 
   useEffect(() => {
     if (!shouldAutoStart || phase !== 'idle') {

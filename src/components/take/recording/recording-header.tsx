@@ -1,29 +1,30 @@
-import { StatusPill } from '@/components/ui/status-pill';
-import { BodyText } from '@/components/ui/text';
-import { Inline } from '@/components/ui/layout';
+import { useTranslations } from 'next-intl'
+
+import { TakeRecordingHeaderStatus } from '@/components/take/recording/recording-header-status'
+import type { InterviewDataView, TakeStage } from '@/components/take/types'
+import { Heading } from '@/components/ui/heading'
+import { Inline } from '@/components/ui/layout'
+import { StatusPill } from '@/components/ui/status-pill'
 import {
   RecordingHeaderCluster,
   RecordingHeaderInlineMetrics,
   RecordingHeaderRow,
   RecordingHeaderShell,
   RecordingHeaderTitleCluster,
-} from '@/components/ui/take';
-import { TakeRecordingHeaderStatus } from '@/components/take/recording/recording-header-status';
-import type { InterviewDataView, TakeStage } from '@/components/take/types';
-import type { VersionPersistKind } from '@/features/take/session-machine';
-import { TAKE_RECORDING_LIMIT_SECONDS, formatRecordingLimitLabel } from '@/features/take';
-import { Heading } from '@/components/ui/heading';
-import { useTranslations } from 'next-intl';
+} from '@/components/ui/take'
+import { BodyText } from '@/components/ui/text'
+import { TAKE_RECORDING_LIMIT_SECONDS, formatRecordingLimitLabel } from '@/features/take'
+import type { VersionPersistKind } from '@/features/take/session-machine'
 
 interface TakeRecordingHeaderProps {
-  interview: InterviewDataView;
-  currentVersionNumber: number;
-  screenSurface: string;
-  setupError: string;
-  stage: TakeStage;
-  recording: boolean;
-  recordingStartBusy: boolean;
-  versionPersistKind: VersionPersistKind | null;
+  interview: InterviewDataView
+  currentVersionNumber: number
+  screenSurface: string
+  setupError: string
+  stage: TakeStage
+  recording: boolean
+  recordingStartBusy: boolean
+  versionPersistKind: VersionPersistKind | null
 }
 
 export function TakeRecordingHeader({
@@ -36,9 +37,9 @@ export function TakeRecordingHeader({
   recordingStartBusy,
   versionPersistKind,
 }: TakeRecordingHeaderProps) {
-  const tTake = useTranslations('takeFlow');
-  const recordingLimitLabel = formatRecordingLimitLabel(TAKE_RECORDING_LIMIT_SECONDS);
-  const previousVersionsKept = interview.currentAnswerMeta?.versionCount ?? 0;
+  const tTake = useTranslations('takeFlow')
+  const recordingLimitLabel = formatRecordingLimitLabel(TAKE_RECORDING_LIMIT_SECONDS)
+  const previousVersionsKept = interview.currentAnswerMeta?.versionCount ?? 0
 
   return (
     <>
@@ -82,5 +83,5 @@ export function TakeRecordingHeader({
         </BodyText>
       ) : null}
     </>
-  );
+  )
 }

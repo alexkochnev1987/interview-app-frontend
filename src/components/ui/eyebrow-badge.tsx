@@ -7,8 +7,7 @@ type EyebrowSize = 'default' | 'sm'
 type EyebrowCasing = 'uppercase' | 'normal'
 
 const toneClasses: Record<EyebrowTone, string> = {
-  default:
-    'bg-surface-low-glass text-muted-foreground ring-1 ring-hairline',
+  default: 'bg-surface-low-glass text-muted-foreground ring-1 ring-hairline',
   muted: 'bg-surface-glass-soft text-muted-foreground ring-1 ring-hairline',
   primary: 'bg-[hsl(var(--primary-fixed)/0.8)] text-[hsl(var(--primary))]',
 }

@@ -4,10 +4,7 @@ import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallbac
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { ProfileView } from '@/features/profile/profile-view'
 import type { Locale } from '@/i18n/locales'
-import {
-  loadAuthGate,
-  redirectIfUnauthenticated,
-} from '@/lib/auth-gate'
+import { loadAuthGate, redirectIfUnauthenticated } from '@/lib/auth-gate'
 
 interface ProfilePageProps {
   params: Promise<{ locale: Locale }>
@@ -22,10 +19,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
   if (auth.kind === 'error') {
     return (
-      <FlashErrorPageFallback
-        title={tCommon('profileLoadFailed')}
-        description={auth.message}
-      />
+      <FlashErrorPageFallback title={tCommon('profileLoadFailed')} description={auth.message} />
     )
   }
 

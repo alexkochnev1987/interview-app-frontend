@@ -1,3 +1,4 @@
+import { HelpCircle } from 'lucide-react'
 import {
   Children,
   cloneElement,
@@ -6,17 +7,12 @@ import {
   type ReactElement,
   type ReactNode,
 } from 'react'
-import { HelpCircle } from 'lucide-react'
 
 import { Label } from '@/components/ui/label'
-import { Stack } from '@/components/ui/layout/stack'
 import { Inline } from '@/components/ui/layout/inline'
+import { Stack } from '@/components/ui/layout/stack'
 import { BodyText } from '@/components/ui/text'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
 interface FormFieldProps {
   htmlFor?: string
@@ -76,8 +72,7 @@ export function FormField({
     ? { 'aria-describedby': errorId, 'aria-invalid': true as const }
     : undefined
 
-  const singleChild =
-    Children.count(children) === 1 ? (Children.only(children) as ReactNode) : null
+  const singleChild = Children.count(children) === 1 ? (Children.only(children) as ReactNode) : null
 
   return (
     <Stack gap={2} data-tour={dataTour}>
@@ -101,9 +96,7 @@ export function FormField({
         )}
         {hint ? <BodyText size="sm">{hint}</BodyText> : null}
       </Stack>
-      {controlAria && singleChild
-        ? withControlAria(singleChild, controlAria)
-        : children}
+      {controlAria && singleChild ? withControlAria(singleChild, controlAria) : children}
       {error ? (
         <BodyText id={errorId} size="sm" tone="danger">
           {error}

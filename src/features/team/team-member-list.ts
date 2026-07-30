@@ -26,12 +26,12 @@ export function filterAndSortTeamMembers(
   roleFilter: TeamRoleFilter,
   queryNormalized: string,
 ): TeamMember[] {
-  const list =
-    roleFilter === 'all' ? members : members.filter((m) => m.role === roleFilter)
+  const list = roleFilter === 'all' ? members : members.filter((m) => m.role === roleFilter)
   const filtered = list.filter((member) => {
     if (!queryNormalized) return true
     return `${member.name} ${member.email}`.toLowerCase().includes(queryNormalized)
   })
+  // eslint-disable-next-line unicorn/no-array-sort
   return [...filtered].sort(byTeamTableOrder)
 }
 
@@ -101,11 +101,5 @@ export function getTeamPaginationItems(
       ...Array.from({ length: totalPages - start + 1 }, (_, i) => start + i),
     ]
   }
-  return [
-    'ellipsis-start',
-    currentPage - 1,
-    currentPage,
-    currentPage + 1,
-    'ellipsis-end',
-  ]
+  return ['ellipsis-start', currentPage - 1, currentPage, currentPage + 1, 'ellipsis-end']
 }

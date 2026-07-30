@@ -5,9 +5,7 @@ export type TeamRowActorRole = 'super_admin' | 'admin'
 
 export type TeamRowActionId = 'change-role' | 'edit-account' | 'delete-user'
 
-export function normalizeTeamActorRole(
-  role: string | null | undefined,
-): TeamRowActorRole {
+export function normalizeTeamActorRole(role: string | null | undefined): TeamRowActorRole {
   return role === 'super_admin' ? 'super_admin' : 'admin'
 }
 
@@ -16,10 +14,7 @@ export function isTeamRowActionVisible(
   actorId: string,
   member: TeamMember,
 ): boolean {
-  if (actionId === 'delete-user' && actorId !== '' && member.id === actorId) {
-    return false
-  }
-  return true
+  return !(actionId === 'delete-user' && actorId !== '' && member.id === actorId)
 }
 
 export function isTeamRowActionEnabled(

@@ -2,16 +2,17 @@
 
 import { useTranslations } from 'next-intl'
 
-import { Button } from '@/components/ui/button'
-import { Inline } from '@/components/ui/layout/inline'
-import { Stack } from '@/components/ui/layout/stack'
 import {
   TakeCompleteScreen,
   TakeConsentScreen,
   TakeLobbyScreen,
   TakeRecordingScreen,
 } from '@/components/take'
+import { Button } from '@/components/ui/button'
+import { Inline } from '@/components/ui/layout/inline'
+import { Stack } from '@/components/ui/layout/stack'
 import { formatTime, permissionTone } from '@/features/take/utils'
+
 import { useDemoTakeExperience } from './use-demo-take-experience'
 
 interface DemoTakeExperienceProps {

@@ -36,12 +36,7 @@ interface IdentityBadgeProps extends VariantProps<typeof nameVariants> {
   layout?: 'inline' | 'stacked'
 }
 
-export function IdentityBadge({
-  name,
-  role,
-  nameMaxWidth,
-  layout = 'inline',
-}: IdentityBadgeProps) {
+export function IdentityBadge({ name, role, nameMaxWidth, layout = 'inline' }: IdentityBadgeProps) {
   if (layout === 'stacked') {
     return (
       <Stack gap={1}>

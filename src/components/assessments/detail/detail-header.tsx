@@ -1,8 +1,8 @@
 'use client'
 
-import { type ReactNode } from 'react'
 import { ArrowLeft, ClipboardList } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { type ReactNode } from 'react'
 
 import { Card, CardContent } from '@/components/ui/card'
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
@@ -16,15 +16,8 @@ import { TimestampRow } from '@/components/ui/timestamp-row'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
 import { type Interview } from '@/lib/api'
-import {
-  decisionTone,
-  deriveReviewStatus,
-  reviewStatusTone,
-} from '@/lib/assessment-status'
-import {
-  formatInterviewDate,
-  getCandidateInitials,
-} from '@/lib/interview-formatters'
+import { decisionTone, deriveReviewStatus, reviewStatusTone } from '@/lib/assessment-status'
+import { formatInterviewDate, getCandidateInitials } from '@/lib/interview-formatters'
 
 interface DetailHeaderProps {
   interview: Interview

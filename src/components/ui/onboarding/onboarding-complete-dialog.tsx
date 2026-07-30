@@ -1,6 +1,7 @@
 'use client'
 
 import { CheckCircle2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { CardContent } from '@/components/ui/card'
@@ -12,7 +13,6 @@ import { Stack } from '@/components/ui/layout/stack'
 import { ModalShell } from '@/components/ui/modal-shell'
 import { OnboardingCompleteJourney } from '@/components/ui/onboarding/onboarding-complete-journey'
 import { BodyText, SectionHeading } from '@/components/ui/text'
-import { useTranslations } from 'next-intl'
 
 type OnboardingCompleteDialogProps = {
   title: string

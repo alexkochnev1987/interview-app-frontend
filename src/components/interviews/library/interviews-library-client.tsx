@@ -1,49 +1,47 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
 import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
+import { InterviewFacetSidebar } from '@/components/interviews/picker'
+import { InterviewPickerFeed } from '@/components/interviews/picker'
+import { InterviewPickerRefetchAlert } from '@/components/interviews/picker'
+import { InterviewPickerToolbar } from '@/components/interviews/picker'
+import { InterviewViewToggle } from '@/components/interviews/picker'
+import { pickInterviewsViewSource } from '@/components/interviews/picker'
 import { Button } from '@/components/ui/button'
+import { Icon } from '@/components/ui/icon'
 import { CardGrid } from '@/components/ui/layout/card-grid'
 import { Grid } from '@/components/ui/layout/grid'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
-import { Icon } from '@/components/ui/icon'
 import { Pagination } from '@/components/ui/pagination'
 import { useRouter } from '@/i18n/navigation'
 import { routes } from '@/i18n/routes'
 import { useInterviewChipLabels } from '@/i18n/use-interview-chip-labels'
-import type { InterviewsLibraryPrefetch } from '@/lib/interviews-library-prefetch'
+import { isAssignedHrFilterUnassigned } from '@/lib/assigned-hr-filter'
 import { useAuth } from '@/lib/auth-context'
 import { canAssignInterviewHr } from '@/lib/auth-roles'
-import { isAssignedHrFilterUnassigned } from '@/lib/assigned-hr-filter'
+import type { InterviewsLibraryPrefetch } from '@/lib/interviews-library-prefetch'
 import {
   buildInterviewsInfiniteParams,
   DEFAULT_INTERVIEWS_LIMIT,
 } from '@/lib/interviews-query-state'
 
-import { buildActiveInterviewFilterChips } from '../picker/build-active-chips'
-import { InfiniteCardsLoader } from './infinite-cards-loader'
-import { InterviewCard } from './interview-card'
-import { InterviewFacetSidebar } from '../picker/interview-facet-sidebar'
-import { InterviewPickerFeed } from '../picker/interview-picker-feed'
-import { InterviewPickerRefetchAlert } from '../picker/interview-picker-refetch-alert'
-import { InterviewPickerToolbar } from '../picker/interview-picker-toolbar'
 import { useInterviewFacets } from '../hooks/use-interview-facets'
 import { useInterviewsInfinite } from '../hooks/use-interviews-infinite'
 import { useInterviewsQuery } from '../hooks/use-interviews-query'
-import { pickInterviewsViewSource } from '../picker/pick-interviews-view-source'
-import { InterviewViewToggle } from '../picker/interview-view-toggle'
+import { buildActiveInterviewFilterChips } from '../picker/build-active-chips'
+import { InfiniteCardsLoader } from './infinite-cards-loader'
+import { InterviewCard } from './interview-card'
 import { InterviewTable } from './interview-table'
 
 type InterviewsLibraryClientProps = {
   initialPrefetch?: InterviewsLibraryPrefetch
 }
 
-export function InterviewsLibraryClient({
-  initialPrefetch,
-}: InterviewsLibraryClientProps) {
+export function InterviewsLibraryClient({ initialPrefetch }: InterviewsLibraryClientProps) {
   const router = useRouter()
   const t = useTranslations('interviews.library.client')
   const { user } = useAuth()
@@ -59,8 +57,8 @@ export function InterviewsLibraryClient({
 
   const needsHrUserLookup = Boolean(
     showAssignedHrFilter &&
-      query.state.assignedHrId &&
-      !isAssignedHrFilterUnassigned(query.state.assignedHrId),
+    query.state.assignedHrId &&
+    !isAssignedHrFilterUnassigned(query.state.assignedHrId),
   )
   const getChipLabel = useInterviewChipLabels({ needsHrUserLookup })
 
@@ -71,10 +69,7 @@ export function InterviewsLibraryClient({
         { ...query.state, limit: DEFAULT_INTERVIEWS_LIMIT },
         query.debouncedQ,
       ),
-    [
-      query.debouncedQ,
-      query.state,
-    ],
+    [query.debouncedQ, query.state],
   )
 
   const infinite = useInterviewsInfinite({
@@ -103,18 +98,10 @@ export function InterviewsLibraryClient({
   )
 
   const hasActiveFilters = Boolean(
-    query.debouncedQ ||
-      query.state.position ||
-      query.state.status ||
-      query.state.assignedHrId,
+    query.debouncedQ || query.state.position || query.state.status || query.state.assignedHrId,
   )
 
-  const view = pickInterviewsViewSource(
-    isCardsView,
-    query,
-    infinite,
-    query.isSearchPending,
-  )
+  const view = pickInterviewsViewSource(isCardsView, query, infinite, query.isSearchPending)
 
   const [sidebarHidden, setSidebarHidden] = useState(false)
   const hydratedSidebarRef = useRef(false)
@@ -136,10 +123,7 @@ export function InterviewsLibraryClient({
     if (!hydratedSidebarRef.current) return
     if (typeof window === 'undefined') return
     try {
-      window.localStorage.setItem(
-        'interviews:sidebarHidden',
-        sidebarHidden ? 'true' : 'false',
-      )
+      window.localStorage.setItem('interviews:sidebarHidden', sidebarHidden ? 'true' : 'false')
     } catch {}
   }, [sidebarHidden])
 
@@ -190,9 +174,7 @@ export function InterviewsLibraryClient({
               shape="pill"
               size="icon-sm"
               onClick={toggleSidebar}
-              aria-label={
-                sidebarHidden ? t('showFiltersSidebar') : t('hideFiltersSidebar')
-              }
+              aria-label={sidebarHidden ? t('showFiltersSidebar') : t('hideFiltersSidebar')}
               aria-pressed={sidebarHidden}
             >
               {sidebarHidden ? (
@@ -205,10 +187,7 @@ export function InterviewsLibraryClient({
                 </Icon>
               )}
             </Button>
-            <InterviewViewToggle
-              view={query.state.view}
-              onViewChange={query.setView}
-            />
+            <InterviewViewToggle view={query.state.view} onViewChange={query.setView} />
           </Inline>
         }
       />
@@ -229,9 +208,7 @@ export function InterviewsLibraryClient({
             sortBy={query.state.sortBy}
             sortOrder={query.state.sortOrder}
             onSortChange={query.setSort}
-            onRowClick={(interview) =>
-              router.push(routes.interviews.detail(interview.id))
-            }
+            onRowClick={(interview) => router.push(routes.interviews.detail(interview.id))}
             page={query.state.page}
             loading={query.loading}
           />
@@ -246,10 +223,7 @@ export function InterviewsLibraryClient({
       />
 
       {!isCardsView ? (
-        <InterviewPickerRefetchAlert
-          error={query.paginationError}
-          onRetry={query.refetch}
-        />
+        <InterviewPickerRefetchAlert error={query.paginationError} onRetry={query.refetch} />
       ) : null}
 
       {isCardsView && view.items.length > 0 ? (

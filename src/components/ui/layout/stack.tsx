@@ -1,5 +1,5 @@
-import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
+import { ComponentProps, ElementType, JSX } from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -81,9 +81,9 @@ const stackVariants = cva('flex flex-col', {
   },
 })
 
-type StackProps = Omit<React.ComponentProps<'div'>, 'color'> &
+type StackProps = Omit<ComponentProps<'div'>, 'color'> &
   VariantProps<typeof stackVariants> & {
-    as?: keyof React.JSX.IntrinsicElements
+    as?: keyof JSX.IntrinsicElements
   }
 
 export function Stack({
@@ -101,7 +101,7 @@ export function Stack({
   flexChild,
   ...props
 }: StackProps) {
-  const Comp = (as ?? 'div') as React.ElementType
+  const Comp = (as ?? 'div') as ElementType
 
   return (
     <Comp

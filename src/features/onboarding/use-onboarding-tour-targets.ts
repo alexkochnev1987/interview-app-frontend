@@ -15,16 +15,13 @@ export function useOnboardingCreatedQuestionId(): string | null {
   return useSyncExternalStore(subscribeOnboardingProgress, getSnapshot, () => null)
 }
 
-function readAssessmentsCardHighlight(
-  interviewId: string | undefined,
-): string | null {
+function readAssessmentsCardHighlight(interviewId: string | undefined): string | null {
   if (!interviewId) {
     return null
   }
 
   const stepId = getStoredOnboardingStep(DEFAULT_ONBOARDING_FLOW_ID)
-  const isTourOnAssessments =
-    stepId === 'candidate-link' || stepId === 'assessments-evaluation'
+  const isTourOnAssessments = stepId === 'candidate-link' || stepId === 'assessments-evaluation'
 
   return isTourOnAssessments ? interviewId : null
 }
@@ -32,10 +29,7 @@ function readAssessmentsCardHighlight(
 export function useOnboardingAssessmentsCardHighlight(
   interviewId: string | undefined,
 ): string | null {
-  const getSnapshot = useCallback(
-    () => readAssessmentsCardHighlight(interviewId),
-    [interviewId],
-  )
+  const getSnapshot = useCallback(() => readAssessmentsCardHighlight(interviewId), [interviewId])
 
   return useSyncExternalStore(subscribeOnboardingProgress, getSnapshot, () => null)
 }

@@ -13,10 +13,7 @@ export type InterviewPickerRefetchAlertProps = {
   onRetry: () => void
 }
 
-export function InterviewPickerRefetchAlert({
-  error,
-  onRetry,
-}: InterviewPickerRefetchAlertProps) {
+export function InterviewPickerRefetchAlert({ error, onRetry }: InterviewPickerRefetchAlertProps) {
   const t = useTranslations('interviews.library.refetch')
   const tFeed = useTranslations('interviews.library.feed')
 
@@ -28,13 +25,7 @@ export function InterviewPickerRefetchAlert({
       <AlertDescription>
         <Inline gap={3} align="center" wrap="wrap">
           <span>{error}</span>
-          <Button
-            type="button"
-            variant="outline-pill"
-            shape="pill"
-            size="sm"
-            onClick={onRetry}
-          >
+          <Button type="button" variant="outline-pill" shape="pill" size="sm" onClick={onRetry}>
             <Icon size="sm">
               <RefreshCw />
             </Icon>

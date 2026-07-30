@@ -4,11 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 
 import { type QuestionInput } from '@/lib/api'
 import { EDITABLE_FIELD_KEYS } from '@/lib/question-editor/field-keys'
-import {
-  areEqual,
-  formatMetadata,
-  normalizeInitialValue,
-} from '@/lib/question-editor/parsers'
+import { areEqual, formatMetadata, normalizeInitialValue } from '@/lib/question-editor/parsers'
 
 interface UseDirtyTrackingOptions {
   value: QuestionInput

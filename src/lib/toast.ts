@@ -1,13 +1,13 @@
-import { toast } from "sonner"
+import { toast } from 'sonner'
 
 type NotifyOptions = {
   description?: string
   id?: string
 }
 
-const DEFAULT_SUCCESS_TITLE = "Done"
-const DEFAULT_ERROR_TITLE = "Something went wrong"
-const DEFAULT_INFO_TITLE = "Notice"
+const DEFAULT_SUCCESS_TITLE = 'Done'
+const DEFAULT_ERROR_TITLE = 'Something went wrong'
+const DEFAULT_INFO_TITLE = 'Notice'
 
 const TERMINAL_PUNCTUATION = /[.!?:]$/
 
@@ -28,26 +28,20 @@ function trimDescription(value: string) {
 export function notifySuccess(message = DEFAULT_SUCCESS_TITLE, options?: NotifyOptions) {
   toast.success(toSentence(message), {
     id: options?.id,
-    description: options?.description
-      ? trimDescription(options.description)
-      : undefined,
+    description: options?.description ? trimDescription(options.description) : undefined,
   })
 }
 
 export function notifyInfo(message = DEFAULT_INFO_TITLE, options?: NotifyOptions) {
   toast.info(toSentence(message), {
     id: options?.id,
-    description: options?.description
-      ? trimDescription(options.description)
-      : undefined,
+    description: options?.description ? trimDescription(options.description) : undefined,
   })
 }
 
 export function notifyError(message = DEFAULT_ERROR_TITLE, options?: NotifyOptions) {
   toast.error(toSentence(message), {
     id: options?.id,
-    description: options?.description
-      ? trimDescription(options.description)
-      : undefined,
+    description: options?.description ? trimDescription(options.description) : undefined,
   })
 }

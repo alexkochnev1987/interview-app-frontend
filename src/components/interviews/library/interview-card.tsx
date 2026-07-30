@@ -2,29 +2,20 @@
 
 import { useTranslations } from 'next-intl'
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { IconBadge } from '@/components/ui/icon-badge'
 import { Grid } from '@/components/ui/layout/grid'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
-import { IconBadge } from '@/components/ui/icon-badge'
 import { MetricPanel } from '@/components/ui/metric-panel'
 import { PillRow } from '@/components/ui/pill-row'
 import { StatusPill } from '@/components/ui/status-pill'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
 import { routes } from '@/i18n/routes'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
-import { decisionTone } from '@/lib/assessment-status'
 import type { InterviewListItem } from '@/lib/api'
-import {
-  formatInterviewDate,
-  getCandidateInitials,
-} from '@/lib/interview-formatters'
+import { decisionTone } from '@/lib/assessment-status'
+import { formatInterviewDate, getCandidateInitials } from '@/lib/interview-formatters'
 
 import { AssignedHrListPill } from './assigned-hr-list-pill'
 
@@ -74,9 +65,7 @@ export function InterviewCard({ interview }: InterviewCardProps) {
               tone="compact"
               label={t('score')}
               value={
-                interview.overallScore !== undefined
-                  ? Math.round(interview.overallScore)
-                  : '—'
+                interview.overallScore !== undefined ? Math.round(interview.overallScore) : '—'
               }
               valueSize="md"
             />

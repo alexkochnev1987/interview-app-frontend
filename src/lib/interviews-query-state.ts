@@ -82,20 +82,12 @@ export function readInterviewsFromSearchParams(
   }
 
   const assignedHrId = params.get('assignedHrId')
-  if (
-    allowAssignedHrFilter &&
-    assignedHrId &&
-    isValidAssignedHrFilterId(assignedHrId)
-  ) {
+  if (allowAssignedHrFilter && assignedHrId && isValidAssignedHrFilterId(assignedHrId)) {
     next.assignedHrId = assignedHrId
   }
 
   const sortBy = params.get('sortBy')
-  if (
-    sortBy === 'candidateName' ||
-    sortBy === 'updatedAt' ||
-    sortBy === 'createdAt'
-  ) {
+  if (sortBy === 'candidateName' || sortBy === 'updatedAt' || sortBy === 'createdAt') {
     next.sortBy = sortBy
   }
 
@@ -166,10 +158,7 @@ export function buildInterviewsInfiniteParams(
   state: InterviewsQueryState,
   debouncedQ: string,
 ): Omit<FetchInterviewsParams, 'page'> {
-  const { page: _page, ...infiniteParams } = buildInterviewsFetchParams(
-    state,
-    debouncedQ,
-  )
+  const { page: _page, ...infiniteParams } = buildInterviewsFetchParams(state, debouncedQ)
   return infiniteParams
 }
 

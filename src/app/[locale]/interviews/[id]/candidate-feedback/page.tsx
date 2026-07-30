@@ -3,8 +3,8 @@ import { getTranslations } from 'next-intl/server'
 import { CandidateFeedbackEditor } from '@/components/candidate-feedback/candidate-feedback-editor'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
-import { routes } from '@/i18n/routes'
 import type { Locale } from '@/i18n/locales'
+import { routes } from '@/i18n/routes'
 import { type Interview } from '@/lib/api'
 import { isApiError } from '@/lib/api-error'
 import {
@@ -27,9 +27,7 @@ interface CandidateFeedbackPageProps {
   params: Promise<{ id: string; locale: Locale }>
 }
 
-export default async function CandidateFeedbackPage({
-  params,
-}: CandidateFeedbackPageProps) {
+export default async function CandidateFeedbackPage({ params }: CandidateFeedbackPageProps) {
   const { id, locale } = await params
   const t = await getTranslations({
     locale,
@@ -45,10 +43,7 @@ export default async function CandidateFeedbackPage({
 
   if (auth.kind === 'forbidden') {
     return (
-      <ForbiddenAccessPage
-        title={t('forbiddenTitle')}
-        description={t('forbiddenDescription')}
-      />
+      <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
     )
   }
 
@@ -85,19 +80,13 @@ export default async function CandidateFeedbackPage({
     redirectIfUnauthorizedError(err, returnPath, locale)
     if (isForbiddenError(err)) {
       return (
-        <ForbiddenAccessPage
-          title={t('forbiddenTitle')}
-          description={t('forbiddenDescription')}
-        />
+        <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
       )
     }
     if (isApiError(err) && err.status === 404) {
       notFound = true
     } else {
-      error =
-        err instanceof Error
-          ? err.message
-          : t('loadFailedFallback')
+      error = err instanceof Error ? err.message : t('loadFailedFallback')
     }
   } else {
     interview = interviewResult.value ?? null
@@ -120,10 +109,7 @@ export default async function CandidateFeedbackPage({
       if (isApiError(err) && err.status === 404) {
         feedback = createEmptyCandidateFeedback(interview.id, interviewLocale)
       } else {
-        error =
-          err instanceof Error
-            ? err.message
-            : t('loadFailedFallback')
+        error = err instanceof Error ? err.message : t('loadFailedFallback')
       }
     } else if (feedbackResult.value) {
       feedback = mapCandidateFeedbackFromApi(

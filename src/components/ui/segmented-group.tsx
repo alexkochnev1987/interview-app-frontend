@@ -1,5 +1,5 @@
-import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
+import type { ComponentProps } from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -18,17 +18,12 @@ const segmentedGroupVariants = cva(
   },
 )
 
-type SegmentedGroupProps = React.ComponentProps<'div'> &
+type SegmentedGroupProps = ComponentProps<'div'> &
   VariantProps<typeof segmentedGroupVariants> & {
     ariaLabel: string
   }
 
-export function SegmentedGroup({
-  className,
-  gap,
-  ariaLabel,
-  ...props
-}: SegmentedGroupProps) {
+export function SegmentedGroup({ className, gap, ariaLabel, ...props }: SegmentedGroupProps) {
   return (
     <div
       role="radiogroup"

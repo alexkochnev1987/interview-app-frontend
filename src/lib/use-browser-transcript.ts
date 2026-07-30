@@ -1,146 +1,147 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+
 import type {
   BrowserSpeechRecognitionConstructor,
   BrowserSpeechRecognitionInstance,
   BrowserWindowWithSpeechRecognition,
-} from './browser-speech-types';
+} from './browser-speech-types'
 
-const PROVIDER = 'browser-web-speech' as const;
-const DEFAULT_LANGUAGE = 'en-US';
-const MAX_AUTO_RESTARTS = 3;
-const DEFAULT_STOP_TIMEOUT_MS = 700;
-const RESTART_RECOGNITION_AFTER_SYNTH_MS = 275;
+const PROVIDER = 'browser-web-speech' as const
+const DEFAULT_LANGUAGE = 'en-US'
+const MAX_AUTO_RESTARTS = 3
+const DEFAULT_STOP_TIMEOUT_MS = 700
+const RESTART_RECOGNITION_AFTER_SYNTH_MS = 275
 
 type StopOptions = {
-  finalize?: boolean;
-  timeoutMs?: number;
-};
+  finalize?: boolean
+  timeoutMs?: number
+}
 
 export type BrowserTranscriptSnapshot = {
-  text: string;
-  language: string;
-  provider: typeof PROVIDER;
-  generatedAt: string;
-  isFinal: boolean;
-};
+  text: string
+  language: string
+  provider: typeof PROVIDER
+  generatedAt: string
+  isFinal: boolean
+}
 
 function getRecognitionConstructor(): BrowserSpeechRecognitionConstructor | undefined {
   if (typeof window === 'undefined') {
-    return undefined;
+    return undefined
   }
 
-  const typedWindow = window as BrowserWindowWithSpeechRecognition;
-  return typedWindow.SpeechRecognition ?? typedWindow.webkitSpeechRecognition;
+  const typedWindow = window as BrowserWindowWithSpeechRecognition
+  return typedWindow.SpeechRecognition ?? typedWindow.webkitSpeechRecognition
 }
 
 function getDefaultLanguage(): string {
   if (typeof navigator === 'undefined') {
-    return DEFAULT_LANGUAGE;
+    return DEFAULT_LANGUAGE
   }
 
-  return navigator.language || DEFAULT_LANGUAGE;
+  return navigator.language || DEFAULT_LANGUAGE
 }
 
 export function useBrowserTranscript() {
-  const [isSupported, setIsSupported] = useState(false);
-  const [isListening, setIsListening] = useState(false);
-  const [interimTranscript, setInterimTranscript] = useState('');
-  const [finalTranscript, setFinalTranscript] = useState('');
-  const [warning, setWarning] = useState<string | undefined>(undefined);
+  const [isSupported, setIsSupported] = useState(false)
+  const [isListening, setIsListening] = useState(false)
+  const [interimTranscript, setInterimTranscript] = useState('')
+  const [finalTranscript, setFinalTranscript] = useState('')
+  const [warning, setWarning] = useState<string | undefined>(undefined)
 
-  const recognitionRef = useRef<BrowserSpeechRecognitionInstance | null>(null);
-  const stopTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const pendingStopResolveRef = useRef<((snapshot: BrowserTranscriptSnapshot) => void) | null>(null);
-  const languageRef = useRef(getDefaultLanguage());
-  const interimTranscriptRef = useRef('');
-  const finalTranscriptRef = useRef('');
-  const isSessionActiveRef = useRef(false);
-  const restartAttemptsRef = useRef(0);
-  const outboundSynthHoldRef = useRef(false);
-  const pendingResumeAfterSynthRef = useRef(false);
-  const afterSynthResumeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const recognitionRef = useRef<BrowserSpeechRecognitionInstance | null>(null)
+  const stopTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const pendingStopResolveRef = useRef<((snapshot: BrowserTranscriptSnapshot) => void) | null>(null)
+  const languageRef = useRef(getDefaultLanguage())
+  const interimTranscriptRef = useRef('')
+  const finalTranscriptRef = useRef('')
+  const isSessionActiveRef = useRef(false)
+  const restartAttemptsRef = useRef(0)
+  const outboundSynthHoldRef = useRef(false)
+  const pendingResumeAfterSynthRef = useRef(false)
+  const afterSynthResumeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- post-mount SSR-safe SpeechRecognition detection
-    setIsSupported(Boolean(getRecognitionConstructor()));
-    languageRef.current = getDefaultLanguage();
-  }, []);
+    setIsSupported(Boolean(getRecognitionConstructor()))
+    languageRef.current = getDefaultLanguage()
+  }, [])
 
   const clearStopTimeout = useCallback(() => {
     if (!stopTimeoutRef.current) {
-      return;
+      return
     }
 
-    clearTimeout(stopTimeoutRef.current);
-    stopTimeoutRef.current = null;
-  }, []);
+    clearTimeout(stopTimeoutRef.current)
+    stopTimeoutRef.current = null
+  }, [])
 
   const clearAfterSynthResumeTimeout = useCallback(() => {
     if (!afterSynthResumeTimeoutRef.current) {
-      return;
+      return
     }
 
-    clearTimeout(afterSynthResumeTimeoutRef.current);
-    afterSynthResumeTimeoutRef.current = null;
-  }, []);
+    clearTimeout(afterSynthResumeTimeoutRef.current)
+    afterSynthResumeTimeoutRef.current = null
+  }, [])
 
   const tryStartRecognitionListening = useCallback(() => {
-    const recognition = recognitionRef.current;
+    const recognition = recognitionRef.current
     if (!recognition || !isSessionActiveRef.current) {
-      return;
+      return
     }
 
     try {
-      recognition.start();
+      recognition.start()
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Unable to start speech recognition';
-      setWarning(message);
+      const message = error instanceof Error ? error.message : 'Unable to start speech recognition'
+      setWarning(message)
     }
-  }, []);
+  }, [])
 
   const armRecognitionResumeAfterSynthGap = useCallback(() => {
-    clearAfterSynthResumeTimeout();
+    clearAfterSynthResumeTimeout()
     afterSynthResumeTimeoutRef.current = setTimeout(() => {
-      afterSynthResumeTimeoutRef.current = null;
-      outboundSynthHoldRef.current = false;
+      afterSynthResumeTimeoutRef.current = null
+      outboundSynthHoldRef.current = false
 
       if (!isSessionActiveRef.current) {
-        pendingResumeAfterSynthRef.current = true;
-        return;
+        pendingResumeAfterSynthRef.current = true
+        return
       }
 
-      pendingResumeAfterSynthRef.current = false;
-      tryStartRecognitionListening();
-    }, RESTART_RECOGNITION_AFTER_SYNTH_MS);
-  }, [clearAfterSynthResumeTimeout, tryStartRecognitionListening]);
+      pendingResumeAfterSynthRef.current = false
+      tryStartRecognitionListening()
+    }, RESTART_RECOGNITION_AFTER_SYNTH_MS)
+  }, [clearAfterSynthResumeTimeout, tryStartRecognitionListening])
 
   const appendFinalText = useCallback((base: string, chunk: string) => {
-    const trimmedChunk = chunk.trim();
+    const trimmedChunk = chunk.trim()
     if (!trimmedChunk) {
-      return base;
+      return base
     }
 
     if (!base) {
-      return trimmedChunk;
+      return trimmedChunk
     }
 
-    return `${base} ${trimmedChunk}`;
-  }, []);
+    return `${base} ${trimmedChunk}`
+  }, [])
 
   const setInterimTranscriptValue = useCallback((value: string) => {
-    interimTranscriptRef.current = value;
-    setInterimTranscript(value);
-  }, []);
+    interimTranscriptRef.current = value
+    setInterimTranscript(value)
+  }, [])
 
   const setFinalTranscriptValue = useCallback((value: string) => {
-    finalTranscriptRef.current = value;
-    setFinalTranscript(value);
-  }, []);
+    finalTranscriptRef.current = value
+    setFinalTranscript(value)
+  }, [])
 
   const buildSnapshot = useCallback((): BrowserTranscriptSnapshot => {
-    const interim = interimTranscriptRef.current;
-    const final = finalTranscriptRef.current;
-    const text = [final, interim].filter(Boolean).join(' ').trim();
+    const interim = interimTranscriptRef.current
+    const final = finalTranscriptRef.current
+    const text = [final, interim].filter(Boolean).join(' ').trim()
 
     return {
       text,
@@ -148,227 +149,230 @@ export function useBrowserTranscript() {
       provider: PROVIDER,
       generatedAt: new Date().toISOString(),
       isFinal: !interim.trim(),
-    };
-  }, []);
+    }
+  }, [])
 
   const ensureRecognition = useCallback(() => {
     if (recognitionRef.current) {
-      return recognitionRef.current;
+      return recognitionRef.current
     }
 
-    const Recognition = getRecognitionConstructor();
+    const Recognition = getRecognitionConstructor()
     if (!Recognition) {
-      return null;
+      return null
     }
 
-    const recognition = new Recognition();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = languageRef.current;
+    const recognition = new Recognition()
+    recognition.continuous = true
+    recognition.interimResults = true
+    recognition.lang = languageRef.current
 
     recognition.onstart = () => {
-      setIsListening(true);
-      restartAttemptsRef.current = 0;
-      setWarning(undefined);
-    };
+      setIsListening(true)
+      restartAttemptsRef.current = 0
+      setWarning(undefined)
+    }
 
     recognition.onend = () => {
-      setIsListening(false);
-      const pendingStopResolve = pendingStopResolveRef.current;
+      setIsListening(false)
+      const pendingStopResolve = pendingStopResolveRef.current
       if (pendingStopResolve) {
-        pendingStopResolveRef.current = null;
-        clearStopTimeout();
-        pendingStopResolve(buildSnapshot());
+        pendingStopResolveRef.current = null
+        clearStopTimeout()
+        pendingStopResolve(buildSnapshot())
       }
 
       if (outboundSynthHoldRef.current) {
-        restartAttemptsRef.current = 0;
-        return;
+        restartAttemptsRef.current = 0
+        return
       }
 
       if (!isSessionActiveRef.current) {
-        return;
+        return
       }
 
       if (restartAttemptsRef.current >= MAX_AUTO_RESTARTS) {
-        setWarning('Speech recognition stopped unexpectedly after multiple retries');
-        isSessionActiveRef.current = false;
-        return;
+        setWarning('Speech recognition stopped unexpectedly after multiple retries')
+        isSessionActiveRef.current = false
+        return
       }
 
-      restartAttemptsRef.current += 1;
+      restartAttemptsRef.current += 1
       try {
-        recognition.start();
+        recognition.start()
       } catch (error) {
-        const message = error instanceof Error ? error.message : 'Unable to restart speech recognition';
-        setWarning(message);
+        const message =
+          error instanceof Error ? error.message : 'Unable to restart speech recognition'
+        setWarning(message)
       }
-    };
+    }
 
     recognition.onresult = (event) => {
       if (!isSessionActiveRef.current) {
-        return;
+        return
       }
 
-      let interim = '';
-      let finalChunk = '';
+      let interim = ''
+      let finalChunk = ''
 
       for (let i = event.resultIndex; i < event.results.length; i += 1) {
-        const result = event.results[i];
-        const transcript = result[0]?.transcript ?? '';
+        const result = event.results[i]
+        const transcript = result[0]?.transcript ?? ''
         if (result.isFinal) {
-          finalChunk = appendFinalText(finalChunk, transcript);
+          finalChunk = appendFinalText(finalChunk, transcript)
         } else {
-          interim = appendFinalText(interim, transcript);
+          interim = appendFinalText(interim, transcript)
         }
       }
 
       if (finalChunk) {
-        const nextFinalTranscript = appendFinalText(finalTranscriptRef.current, finalChunk);
-        setFinalTranscriptValue(nextFinalTranscript);
+        const nextFinalTranscript = appendFinalText(finalTranscriptRef.current, finalChunk)
+        setFinalTranscriptValue(nextFinalTranscript)
       }
-      setInterimTranscriptValue(interim);
-    };
+      setInterimTranscriptValue(interim)
+    }
 
+    // eslint-disable-next-line unicorn/prefer-add-event-listener
     recognition.onerror = (event) => {
-      setWarning(event.message || event.error || 'Speech recognition error');
-    };
+      setWarning(event.message || event.error || 'Speech recognition error')
+    }
 
-    recognitionRef.current = recognition;
-    return recognition;
+    recognitionRef.current = recognition
+    return recognition
   }, [
     appendFinalText,
     buildSnapshot,
     clearStopTimeout,
     setFinalTranscriptValue,
     setInterimTranscriptValue,
-  ]);
+  ])
 
   const primeRecordingSession = useCallback(() => {
-    setWarning(undefined);
-    restartAttemptsRef.current = 0;
-    isSessionActiveRef.current = true;
-    setInterimTranscriptValue('');
-    setFinalTranscriptValue('');
+    setWarning(undefined)
+    restartAttemptsRef.current = 0
+    isSessionActiveRef.current = true
+    setInterimTranscriptValue('')
+    setFinalTranscriptValue('')
 
-    const recognition = ensureRecognition();
+    const recognition = ensureRecognition()
     if (!recognition) {
-      setIsListening(false);
-      isSessionActiveRef.current = false;
-      pendingResumeAfterSynthRef.current = false;
-      setWarning('Web Speech API is not supported in this browser');
-      return;
+      setIsListening(false)
+      isSessionActiveRef.current = false
+      pendingResumeAfterSynthRef.current = false
+      setWarning('Web Speech API is not supported in this browser')
+      return
     }
 
-    languageRef.current = getDefaultLanguage();
-    recognition.lang = languageRef.current;
+    languageRef.current = getDefaultLanguage()
+    recognition.lang = languageRef.current
 
     if (pendingResumeAfterSynthRef.current && !outboundSynthHoldRef.current) {
-      pendingResumeAfterSynthRef.current = false;
+      pendingResumeAfterSynthRef.current = false
       queueMicrotask(() => {
-        tryStartRecognitionListening();
-      });
-      return;
+        tryStartRecognitionListening()
+      })
+      return
     }
 
-    armRecognitionResumeAfterSynthGap();
+    armRecognitionResumeAfterSynthGap()
   }, [
     armRecognitionResumeAfterSynthGap,
     ensureRecognition,
     setFinalTranscriptValue,
     setInterimTranscriptValue,
     tryStartRecognitionListening,
-  ]);
+  ])
 
   const pauseRecognitionForOutboundSynth = useCallback(() => {
-    clearAfterSynthResumeTimeout();
-    outboundSynthHoldRef.current = true;
-    const recognition = recognitionRef.current;
+    clearAfterSynthResumeTimeout()
+    outboundSynthHoldRef.current = true
+    const recognition = recognitionRef.current
     if (!recognition) {
-      return;
+      return
     }
 
     try {
-      recognition.stop();
+      recognition.stop()
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Unable to pause speech recognition';
-      setWarning(message);
+      const message = error instanceof Error ? error.message : 'Unable to pause speech recognition'
+      setWarning(message)
     }
-  }, [clearAfterSynthResumeTimeout]);
+  }, [clearAfterSynthResumeTimeout])
 
   const discardOutboundSynthGuards = useCallback(() => {
-    clearAfterSynthResumeTimeout();
-    outboundSynthHoldRef.current = false;
-    pendingResumeAfterSynthRef.current = false;
-  }, [clearAfterSynthResumeTimeout]);
+    clearAfterSynthResumeTimeout()
+    outboundSynthHoldRef.current = false
+    pendingResumeAfterSynthRef.current = false
+  }, [clearAfterSynthResumeTimeout])
 
   const stop = useCallback(
     async (options?: StopOptions): Promise<BrowserTranscriptSnapshot> => {
-      const recognition = recognitionRef.current;
-      isSessionActiveRef.current = false;
-      restartAttemptsRef.current = 0;
-      outboundSynthHoldRef.current = false;
-      pendingResumeAfterSynthRef.current = false;
-      clearAfterSynthResumeTimeout();
+      const recognition = recognitionRef.current
+      isSessionActiveRef.current = false
+      restartAttemptsRef.current = 0
+      outboundSynthHoldRef.current = false
+      pendingResumeAfterSynthRef.current = false
+      clearAfterSynthResumeTimeout()
 
-      const finalize = Boolean(options?.finalize);
-      const timeoutMs = Math.max(0, options?.timeoutMs ?? DEFAULT_STOP_TIMEOUT_MS);
+      const finalize = Boolean(options?.finalize)
+      const timeoutMs = Math.max(0, options?.timeoutMs ?? DEFAULT_STOP_TIMEOUT_MS)
 
       const finalizeTranscript = () => {
         if (!finalize) {
-          return;
+          return
         }
 
         const nextFinalTranscript = appendFinalText(
           finalTranscriptRef.current,
           interimTranscriptRef.current,
-        );
-        setFinalTranscriptValue(nextFinalTranscript);
-        setInterimTranscriptValue('');
-      };
+        )
+        setFinalTranscriptValue(nextFinalTranscript)
+        setInterimTranscriptValue('')
+      }
 
       if (pendingStopResolveRef.current) {
-        const pendingStopResolve = pendingStopResolveRef.current;
-        pendingStopResolveRef.current = null;
-        pendingStopResolve(buildSnapshot());
+        const pendingStopResolve = pendingStopResolveRef.current
+        pendingStopResolveRef.current = null
+        pendingStopResolve(buildSnapshot())
       }
-      clearStopTimeout();
-      finalizeTranscript();
+      clearStopTimeout()
+      finalizeTranscript()
 
       if (!recognition) {
-        return buildSnapshot();
+        return buildSnapshot()
       }
 
       return new Promise<BrowserTranscriptSnapshot>((resolve) => {
-        pendingStopResolveRef.current = resolve;
+        pendingStopResolveRef.current = resolve
         if (timeoutMs > 0) {
           stopTimeoutRef.current = setTimeout(() => {
-            const pendingStopResolve = pendingStopResolveRef.current;
+            const pendingStopResolve = pendingStopResolveRef.current
             if (!pendingStopResolve) {
-              return;
+              return
             }
 
-            pendingStopResolveRef.current = null;
-            pendingStopResolve(buildSnapshot());
-          }, timeoutMs);
+            pendingStopResolveRef.current = null
+            pendingStopResolve(buildSnapshot())
+          }, timeoutMs)
         }
 
         try {
-          recognition.stop();
+          recognition.stop()
         } catch (error) {
-          const message = error instanceof Error ? error.message : 'Unable to stop speech recognition';
-          setWarning(message);
-          setIsListening(false);
-          const pendingStopResolve = pendingStopResolveRef.current;
+          const message =
+            error instanceof Error ? error.message : 'Unable to stop speech recognition'
+          setWarning(message)
+          setIsListening(false)
+          const pendingStopResolve = pendingStopResolveRef.current
           if (!pendingStopResolve) {
-            return;
+            return
           }
 
-          pendingStopResolveRef.current = null;
-          clearStopTimeout();
-          pendingStopResolve(buildSnapshot());
+          pendingStopResolveRef.current = null
+          clearStopTimeout()
+          pendingStopResolve(buildSnapshot())
         }
-      });
+      })
     },
     [
       appendFinalText,
@@ -378,59 +382,64 @@ export function useBrowserTranscript() {
       setFinalTranscriptValue,
       setInterimTranscriptValue,
     ],
-  );
+  )
 
   const reset = useCallback(() => {
-    clearStopTimeout();
-    clearAfterSynthResumeTimeout();
-    isSessionActiveRef.current = false;
-    restartAttemptsRef.current = 0;
-    outboundSynthHoldRef.current = false;
-    pendingResumeAfterSynthRef.current = false;
-    const recognition = recognitionRef.current;
+    clearStopTimeout()
+    clearAfterSynthResumeTimeout()
+    isSessionActiveRef.current = false
+    restartAttemptsRef.current = 0
+    outboundSynthHoldRef.current = false
+    pendingResumeAfterSynthRef.current = false
+    const recognition = recognitionRef.current
 
     if (recognition) {
       try {
-        recognition.abort?.();
+        recognition.abort?.()
       } catch (error) {
         const message =
-          error instanceof Error ? error.message : 'Unable to abort speech recognition';
-        setWarning(message);
+          error instanceof Error ? error.message : 'Unable to abort speech recognition'
+        setWarning(message)
       }
     }
 
-    setIsListening(false);
-    setInterimTranscriptValue('');
-    setFinalTranscriptValue('');
-    setWarning(undefined);
-  }, [clearStopTimeout, clearAfterSynthResumeTimeout, setFinalTranscriptValue, setInterimTranscriptValue]);
+    setIsListening(false)
+    setInterimTranscriptValue('')
+    setFinalTranscriptValue('')
+    setWarning(undefined)
+  }, [
+    clearStopTimeout,
+    clearAfterSynthResumeTimeout,
+    setFinalTranscriptValue,
+    setInterimTranscriptValue,
+  ])
 
   const getSnapshot = useCallback((): BrowserTranscriptSnapshot => {
-    return buildSnapshot();
-  }, [buildSnapshot]);
+    return buildSnapshot()
+  }, [buildSnapshot])
 
   useEffect(() => {
     return () => {
-      clearStopTimeout();
-      clearAfterSynthResumeTimeout();
-      isSessionActiveRef.current = false;
-      restartAttemptsRef.current = 0;
-      outboundSynthHoldRef.current = false;
-      pendingResumeAfterSynthRef.current = false;
-      const recognition = recognitionRef.current;
+      clearStopTimeout()
+      clearAfterSynthResumeTimeout()
+      isSessionActiveRef.current = false
+      restartAttemptsRef.current = 0
+      outboundSynthHoldRef.current = false
+      pendingResumeAfterSynthRef.current = false
+      const recognition = recognitionRef.current
       if (!recognition) {
-        return;
+        return
       }
 
       try {
-        recognition.abort?.();
+        recognition.abort?.()
       } catch (error) {
         const message =
-          error instanceof Error ? error.message : 'Unable to abort speech recognition';
-        setWarning(message);
+          error instanceof Error ? error.message : 'Unable to abort speech recognition'
+        setWarning(message)
       }
-    };
-  }, [clearStopTimeout, clearAfterSynthResumeTimeout]);
+    }
+  }, [clearStopTimeout, clearAfterSynthResumeTimeout])
 
   return useMemo(
     () => ({
@@ -461,5 +470,5 @@ export function useBrowserTranscript() {
       reset,
       getSnapshot,
     ],
-  );
+  )
 }

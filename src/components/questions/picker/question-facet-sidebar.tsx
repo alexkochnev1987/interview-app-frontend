@@ -1,8 +1,8 @@
 'use client'
 
 import { RotateCcw, Search } from 'lucide-react'
-import { useMemo, useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -10,18 +10,13 @@ import { EyebrowLabel } from '@/components/ui/eyebrow-label'
 import { FacetRowButton } from '@/components/ui/facet-row-button'
 import { IconAffix } from '@/components/ui/icon-affix'
 import { Input } from '@/components/ui/input'
-import { Inline } from '@/components/ui/layout/inline'
 import { DividedStack, DividedStackItem } from '@/components/ui/layout/divided-stack'
+import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { ShowMoreToggle } from '@/components/ui/show-more-toggle'
 import { StatusPill } from '@/components/ui/status-pill'
 import { BodyText } from '@/components/ui/text'
-import type {
-  FacetCount,
-  LocaleCode,
-  QuestionDifficulty,
-  QuestionStatusFilter,
-} from '@/lib/api'
+import type { FacetCount, LocaleCode, QuestionDifficulty, QuestionStatusFilter } from '@/lib/api'
 import { useToastMessages } from '@/lib/use-toast-messages'
 
 const COLLAPSED_LIMIT = 6
@@ -96,12 +91,7 @@ export function QuestionFacetSidebar(props: QuestionFacetSidebarProps) {
       <CardContent spacing="md">
         <Stack gap={3}>
           <Inline gap={2} align="center" justify="between">
-            <BodyText
-              as="span"
-              size="base"
-              tone="foreground"
-              weight="semibold"
-            >
+            <BodyText as="span" size="base" tone="foreground" weight="semibold">
               {t('filtersTitle')}
             </BodyText>
             {activeFilterCount > 0 ? (
@@ -135,13 +125,7 @@ export function QuestionFacetSidebar(props: QuestionFacetSidebarProps) {
               <BodyText size="sm" tone="muted">
                 {error}
               </BodyText>
-              <Button
-                type="button"
-                variant="outline-pill"
-                shape="pill"
-                size="sm"
-                onClick={onRetry}
-              >
+              <Button type="button" variant="outline-pill" shape="pill" size="sm" onClick={onRetry}>
                 {t('retry')}
               </Button>
             </Stack>
@@ -150,10 +134,7 @@ export function QuestionFacetSidebar(props: QuestionFacetSidebarProps) {
 
         <DividedStack>
           {showStatusFilter ? (
-            <StatusFacetSection
-              selected={selected.status}
-              onChange={onStatusChange}
-            />
+            <StatusFacetSection selected={selected.status} onChange={onStatusChange} />
           ) : null}
           <ScalarFacetSection
             title={t('localeTitle')}
@@ -172,9 +153,7 @@ export function QuestionFacetSidebar(props: QuestionFacetSidebarProps) {
             title={t('difficultyTitle')}
             values={difficulties}
             selected={selected.difficulty}
-            onChange={(value) =>
-              onDifficultyChange(value as QuestionDifficulty | undefined)
-            }
+            onChange={(value) => onDifficultyChange(value as QuestionDifficulty | undefined)}
             loading={loading && difficulties.length === 0}
           />
           <ScalarFacetSection
@@ -286,15 +265,12 @@ function TagsFacetSection(props: {
     [values, trimmed],
   )
 
-  const visible =
-    expanded || trimmed.length > 0
-      ? filtered
-      : filtered.slice(0, TAG_COLLAPSED_LIMIT)
+  const visible = expanded || trimmed.length > 0 ? filtered : filtered.slice(0, TAG_COLLAPSED_LIMIT)
   const hidden = Math.max(0, filtered.length - visible.length)
 
   function toggleTag(tag: string) {
     if (selected.includes(tag)) {
-      onChange(selected.filter((t) => t !== tag))
+      onChange(selected.filter((item) => item !== tag))
     } else {
       onChange([...selected, tag])
     }
@@ -341,9 +317,7 @@ function TagsFacetSection(props: {
                 {t('showAll', { count: filtered.length })}
               </ShowMoreToggle>
             ) : null}
-            {expanded &&
-            filtered.length > TAG_COLLAPSED_LIMIT &&
-            trimmed.length === 0 ? (
+            {expanded && filtered.length > TAG_COLLAPSED_LIMIT && trimmed.length === 0 ? (
               <ShowMoreToggle expanded onClick={() => setExpanded(false)}>
                 {t('showFewer')}
               </ShowMoreToggle>
@@ -384,11 +358,7 @@ function StatusFacetSection(props: {
   )
 }
 
-function FacetSection(props: {
-  title: string
-  activeCount: number
-  children: React.ReactNode
-}) {
+function FacetSection(props: { title: string; activeCount: number; children: React.ReactNode }) {
   const { title, activeCount, children } = props
   return (
     <DividedStackItem>

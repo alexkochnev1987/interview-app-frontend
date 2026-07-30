@@ -1,19 +1,15 @@
-import type { Answer } from '@/lib/api'
+import type { QuestionUploadState } from '@/app/[locale]/interviews/[id]/interview-detail-types'
 import type { Locale } from '@/i18n/locales'
 import { localizedPath } from '@/i18n/pathname'
 import { routes } from '@/i18n/routes'
-
-import type { QuestionUploadState } from '@/app/[locale]/interviews/[id]/interview-detail-types'
+import type { Answer } from '@/lib/api'
 
 export interface AnswerStatusPill {
   tone: 'completed' | 'processing' | 'failed' | 'pending'
   labelKey: string
 }
 
-export function formatAnswerDuration(
-  seconds: number | undefined,
-  emptyLabel: string,
-) {
+export function formatAnswerDuration(seconds: number | undefined, emptyLabel: string) {
   if (!seconds || seconds < 1) {
     return emptyLabel
   }
@@ -35,10 +31,7 @@ export function formatFileSize(bytes: number | undefined, emptyLabel: string) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
-export function formatWorkflowStage(
-  stage: string | undefined,
-  idleLabel: string,
-) {
+export function formatWorkflowStage(stage: string | undefined, idleLabel: string) {
   if (!stage) {
     return idleLabel
   }
@@ -69,9 +62,7 @@ export function formatCandidateLinkPreview(candidateLink: string) {
   try {
     const url = new URL(candidateLink)
     const token = url.searchParams.get('token')
-    const shortToken = token
-      ? `${token.slice(0, 12)}...${token.slice(-8)}`
-      : null
+    const shortToken = token ? `${token.slice(0, 12)}...${token.slice(-8)}` : null
 
     return `${url.origin}${url.pathname}${shortToken ? `?token=${shortToken}` : ''}`
   } catch {
@@ -116,8 +107,7 @@ export function extractFeedbackShareToken(shareUrl: string): string | null {
     const url = new URL(shareUrl, 'http://localhost')
     const segments = url.pathname.split('/').filter(Boolean)
     const shareIdx = segments.findIndex(
-      (segment, index) =>
-        segment === 'feedback' && segments[index + 1] === 'share',
+      (segment, index) => segment === 'feedback' && segments[index + 1] === 'share',
     )
     if (shareIdx < 0) {
       return null

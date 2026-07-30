@@ -4,13 +4,12 @@ import { type ReactNode } from 'react'
 
 import { Stack } from '@/components/ui/layout/stack'
 import { QuestionLocaleTabs } from '@/components/ui/question-locale-tabs'
-import { type QuestionInput } from '@/lib/api'
 import { type Locale } from '@/i18n/locales'
-import {
-  type LocaleQuestionDraft,
-} from '@/lib/question-editor/parsers'
-import { CONTENT_FIELD_KEYS, type DraftFieldKey } from '@/lib/question-editor/field-keys'
+import { type QuestionInput } from '@/lib/api'
 import { type EditorPhase } from '@/lib/question-editor/editor-phase'
+import { CONTENT_FIELD_KEYS, type DraftFieldKey } from '@/lib/question-editor/field-keys'
+import { type LocaleQuestionDraft } from '@/lib/question-editor/parsers'
+
 import { EditorMetadataSection } from './editor-metadata-section'
 import { EditorPromptSection } from './editor-prompt-section'
 import { EditorReferenceSection } from './editor-reference-section'
@@ -67,10 +66,7 @@ export function EditorContentSection({
   onLocaleContentUpdate,
   questionTextError,
 }: EditorContentSectionProps) {
-  function applyContentPatch(
-    locale: Locale,
-    patch: Partial<QuestionInput>,
-  ) {
+  function applyContentPatch(locale: Locale, patch: Partial<QuestionInput>) {
     const contentPatch: Partial<LocaleQuestionDraft> = {}
     for (const key of CONTENT_FIELD_KEYS) {
       if (key in patch) {
@@ -109,9 +105,7 @@ export function EditorContentSection({
           questionTextError={showQuestionTextError}
           translateLocalesPanel={isPrimaryLocale ? translateLocalesPanel : undefined}
           translationTabPanel={
-            editorPhase === 2 && !isPrimaryLocale
-              ? renderTranslationTabPanel(locale)
-              : undefined
+            editorPhase === 2 && !isPrimaryLocale ? renderTranslationTabPanel(locale) : undefined
           }
         />
         <EditorMetadataSection

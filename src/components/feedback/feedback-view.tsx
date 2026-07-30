@@ -2,17 +2,18 @@
 
 import { BadgeCheck, ChartColumnBig, Clock3, Sparkles, Target } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
+import { type ReactNode } from 'react'
 
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
 import { HeroLead, HeroTitle } from '@/components/ui/hero-text'
-import { MetricPanel } from '@/components/ui/metric-panel'
-import { StatusPill } from '@/components/ui/status-pill'
-import { PageShell } from '@/components/ui/layout/page-shell'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Grid } from '@/components/ui/layout/grid'
 import { Inline } from '@/components/ui/layout/inline'
+import { PageShell } from '@/components/ui/layout/page-shell'
 import { Section } from '@/components/ui/layout/section'
 import { Stack } from '@/components/ui/layout/stack'
+import { MetricPanel } from '@/components/ui/metric-panel'
+import { StatusPill } from '@/components/ui/status-pill'
 import { BodyText } from '@/components/ui/text'
 import type { Locale } from '@/i18n/locales'
 import { type FeedbackResponse as Feedback } from '@/lib/api'
@@ -36,6 +37,8 @@ function resultTone(result?: string) {
   }
 }
 
+const renderStrong = (chunks: ReactNode) => <strong>{chunks}</strong>
+
 type FeedbackViewProps = {
   feedback: Feedback
 }
@@ -52,16 +55,14 @@ export function FeedbackView({ feedback }: FeedbackViewProps) {
         <Grid columns="split-105-95" gap={6}>
           <Card variant="floating" size="lg">
             <CardContent spacing="xl">
-              <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
-                {t('eyebrow')}
-              </EyebrowBadge>
+              <EyebrowBadge icon={<Sparkles className="size-3.5" />}>{t('eyebrow')}</EyebrowBadge>
 
               <Stack gap={3}>
                 <HeroTitle>{t('title')}</HeroTitle>
                 <HeroLead>
                   {t.rich('lead', {
                     position: feedback.position,
-                    strong: (chunks) => <strong>{chunks}</strong>,
+                    strong: renderStrong,
                   })}
                 </HeroLead>
               </Stack>

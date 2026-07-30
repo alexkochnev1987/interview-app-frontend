@@ -1,19 +1,19 @@
-import { Mic, MicOff, SquareArrowUp, Video, VideoOff } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { Mic, MicOff, SquareArrowUp, Video, VideoOff } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
-import { Button } from '@/components/ui/button';
-import { Inline } from '@/components/ui/layout';
-import { MicTestDropdown } from '@/components/take/lobby/mic-test-dropdown';
+import { MicTestDropdown } from '@/components/take/lobby/mic-test-dropdown'
+import { Button } from '@/components/ui/button'
+import { Inline } from '@/components/ui/layout'
 
 interface TakeLobbyMediaToolbarProps {
-  setupBusy: boolean;
-  micOn: boolean;
-  cameraOn: boolean;
-  screenShareReady: boolean;
-  cameraStream?: MediaStream | null;
-  onToggleMic: () => void;
-  onToggleCamera: () => void;
-  onScreenShare: () => void;
+  setupBusy: boolean
+  micOn: boolean
+  cameraOn: boolean
+  screenShareReady: boolean
+  cameraStream?: MediaStream | null
+  onToggleMic: () => void
+  onToggleCamera: () => void
+  onScreenShare: () => void
 }
 
 export function TakeLobbyMediaToolbar({
@@ -26,14 +26,10 @@ export function TakeLobbyMediaToolbar({
   onToggleCamera,
   onScreenShare,
 }: TakeLobbyMediaToolbarProps) {
-  const tTake = useTranslations('takeFlow');
+  const tTake = useTranslations('takeFlow')
   return (
     <Inline justify="center" gap={3}>
-      <MicTestDropdown
-        stream={cameraStream}
-        micOn={micOn}
-        disabled={setupBusy}
-      >
+      <MicTestDropdown stream={cameraStream} micOn={micOn} disabled={setupBusy}>
         <Button
           type="button"
           variant={micOn ? 'secondary' : 'outline'}
@@ -72,6 +68,5 @@ export function TakeLobbyMediaToolbar({
         <SquareArrowUp />
       </Button>
     </Inline>
-  );
+  )
 }
-

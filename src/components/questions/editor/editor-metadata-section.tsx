@@ -1,10 +1,9 @@
 'use client'
 
-import { type ReactNode } from 'react'
 import { BrainCircuit } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { type ReactNode } from 'react'
 
-import { BodyText } from '@/components/ui/text'
 import { Input } from '@/components/ui/input'
 import { Grid } from '@/components/ui/layout/grid'
 import { Spacer } from '@/components/ui/layout/spacer'
@@ -16,14 +15,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import {
-  type QuestionDifficulty,
-  type QuestionInput,
-} from '@/lib/api'
+import { BodyText } from '@/components/ui/text'
 import { LOCALES, type Locale } from '@/i18n/locales'
 import { useQuestionEditorLabels } from '@/i18n/use-question-editor-labels'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
+import { type QuestionDifficulty, type QuestionInput } from '@/lib/api'
 import { type DraftFieldKey } from '@/lib/question-editor/field-keys'
+
 import { EditorSectionCard } from './editor-section-card'
 import { QuestionEditorField } from './question-editor-field'
 
@@ -162,9 +160,7 @@ export function EditorMetadataSection({
             <QuestionEditorField htmlFor="difficulty" label={tFields('difficulty')}>
               <Select
                 value={value.difficulty}
-                onValueChange={(next) =>
-                  onUpdate({ difficulty: next as QuestionDifficulty })
-                }
+                onValueChange={(next) => onUpdate({ difficulty: next as QuestionDifficulty })}
                 disabled={submitting}
               >
                 <SelectTrigger variant="surface" size="md" shape="rounded">
@@ -209,10 +205,7 @@ export function EditorMetadataSection({
                 value={value.minimumPassScore}
                 onChange={(event) =>
                   onUpdate({
-                    minimumPassScore: Math.max(
-                      0,
-                      Math.min(5, Number(event.target.value) || 0),
-                    ),
+                    minimumPassScore: Math.max(0, Math.min(5, Number(event.target.value) || 0)),
                   })
                 }
                 disabled={submitting}

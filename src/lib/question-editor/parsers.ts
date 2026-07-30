@@ -1,15 +1,12 @@
+import { DEFAULT_LOCALE, LOCALES, type Locale } from '@/i18n/locales'
 import {
   type Question,
   type QuestionExpectedConcept,
   type QuestionInput,
   type QuestionRedFlag,
 } from '@/lib/api'
-import { DEFAULT_LOCALE, LOCALES, type Locale } from '@/i18n/locales'
 import type { components } from '@/lib/api-types'
-import {
-  METADATA_FIELD_KEYS,
-  type MetadataFieldKey,
-} from '@/lib/question-editor/field-keys'
+import { type MetadataFieldKey } from '@/lib/question-editor/field-keys'
 
 export { CONTENT_FIELD_KEYS, METADATA_FIELD_KEYS } from '@/lib/question-editor/field-keys'
 
@@ -133,9 +130,7 @@ export function joinStringList(items: string[]): string {
 
 export function formatExpectedConcepts(items: QuestionExpectedConcept[]): string {
   return items
-    .map((item) =>
-      [item.id, item.label, item.weight.toFixed(4), item.description].join(' | '),
-    )
+    .map((item) => [item.id, item.label, item.weight.toFixed(4), item.description].join(' | '))
     .join('\n')
 }
 
@@ -148,9 +143,7 @@ export function parseExpectedConcepts(
     .map((line) => line.trim())
     .filter(Boolean)
     .map((line, index) => {
-      const [id, label, weight, ...descriptionParts] = line
-        .split('|')
-        .map((part) => part.trim())
+      const [id, label, weight, ...descriptionParts] = line.split('|').map((part) => part.trim())
       const safeLabel = label || id || `concept_${index + 1}`
       const safeId = id || safeLabel.toLowerCase().replace(/[^a-z0-9]+/g, '_')
       const numericWeight = Number(weight)
@@ -158,8 +151,7 @@ export function parseExpectedConcepts(
         id: safeId,
         label: safeLabel,
         weight: Number.isFinite(numericWeight) && numericWeight > 0 ? numericWeight : 1,
-        description:
-          descriptionParts.join(' | ') || defaultDescriptionForLabel(safeLabel),
+        description: descriptionParts.join(' | ') || defaultDescriptionForLabel(safeLabel),
       }
     })
 }
@@ -181,9 +173,7 @@ export function parseRedFlags(value: string): QuestionRedFlag[] {
         id: safeId,
         label: safeLabel,
         severity:
-          severity === 'low' || severity === 'medium' || severity === 'high'
-            ? severity
-            : 'medium',
+          severity === 'low' || severity === 'medium' || severity === 'high' ? severity : 'medium',
       }
     })
 }
@@ -212,7 +202,8 @@ export function normalizeInitialValue(initialValue?: QuestionInput): QuestionInp
   return {
     ...DEFAULT_VALUE,
     ...initialValue,
-    primaryLocale: (initialValue?.primaryLocale as Locale | undefined) ?? DEFAULT_VALUE.primaryLocale,
+    primaryLocale:
+      (initialValue?.primaryLocale as Locale | undefined) ?? DEFAULT_VALUE.primaryLocale,
     translations: initialValue?.translations ?? {},
     externalId: initialValue?.externalId ?? '',
     role: initialValue?.role ?? DEFAULT_VALUE.role,
@@ -267,8 +258,7 @@ export function coerceTranslationExpectedConcepts(
         const concept = item as Partial<QuestionExpectedConcept>
         const id = typeof concept.id === 'string' ? concept.id : `concept_${index + 1}`
         const label = typeof concept.label === 'string' ? concept.label : id
-        const weight =
-          typeof concept.weight === 'number' && concept.weight > 0 ? concept.weight : 1
+        const weight = typeof concept.weight === 'number' && concept.weight > 0 ? concept.weight : 1
         const description = typeof concept.description === 'string' ? concept.description : label
         return { id, label, weight, description }
       }
@@ -284,9 +274,7 @@ export function coerceTranslationExpectedConcepts(
     .filter((item): item is QuestionExpectedConcept => item !== null)
 }
 
-export function coerceTranslationRedFlags(
-  value: TranslationValue['redFlags'],
-): QuestionRedFlag[] {
+export function coerceTranslationRedFlags(value: TranslationValue['redFlags']): QuestionRedFlag[] {
   if (!Array.isArray(value)) return []
   return value
     .map((item, index) => {
@@ -333,32 +321,18 @@ export function coerceLocaleTranslation(
   }
 }
 
-export function hasLocaleDraftContent(
-  block?: Partial<LocaleQuestionDraft>,
-): boolean {
+export function hasLocaleDraftContent(block?: Partial<LocaleQuestionDraft>): boolean {
   if (!block) return false
   return Boolean(
     block.questionText?.trim() ||
-      (block.followUpQuestions?.length ?? 0) > 0 ||
-      (block.expectedConcepts?.length ?? 0) > 0 ||
-      (block.redFlags?.length ?? 0) > 0 ||
-      block.sampleGoodAnswer?.trim(),
+    (block.followUpQuestions?.length ?? 0) > 0 ||
+    (block.expectedConcepts?.length ?? 0) > 0 ||
+    (block.redFlags?.length ?? 0) > 0 ||
+    block.sampleGoodAnswer?.trim(),
   )
 }
 
-function translationFromLocaleDraft(draft: LocaleQuestionDraft): TranslationValue {
-  return {
-    questionText: draft.questionText,
-    followUpQuestions: draft.followUpQuestions,
-    expectedConcepts: toTranslationExpectedConcepts(draft.expectedConcepts),
-    redFlags: toTranslationRedFlags(draft.redFlags),
-    sampleGoodAnswer: draft.sampleGoodAnswer?.trim() || undefined,
-  }
-}
-
-function normalizeLocaleDraft(
-  partial?: Partial<LocaleQuestionDraft>,
-): LocaleQuestionDraft {
+function normalizeLocaleDraft(partial?: Partial<LocaleQuestionDraft>): LocaleQuestionDraft {
   return {
     questionText: partial?.questionText ?? '',
     followUpQuestions: partial?.followUpQuestions ?? [],
@@ -430,9 +404,14 @@ export function buildTranslationsPayload(
       followUpQuestions: (primaryDraft?.followUpQuestions ?? currentValue.followUpQuestions ?? [])
         .map((item) => item.trim())
         .filter(Boolean),
-      expectedConcepts: toTranslationExpectedConcepts(primaryDraft?.expectedConcepts ?? currentValue.expectedConcepts ?? []),
+      expectedConcepts: toTranslationExpectedConcepts(
+        primaryDraft?.expectedConcepts ?? currentValue.expectedConcepts ?? [],
+      ),
       redFlags: toTranslationRedFlags(primaryDraft?.redFlags ?? currentValue.redFlags ?? []),
-      sampleGoodAnswer: primaryDraft?.sampleGoodAnswer?.trim() || currentValue.sampleGoodAnswer?.trim() || undefined,
+      sampleGoodAnswer:
+        primaryDraft?.sampleGoodAnswer?.trim() ||
+        currentValue.sampleGoodAnswer?.trim() ||
+        undefined,
     }
   }
 
@@ -450,9 +429,7 @@ function contentBlockToTranslation(
 
   return {
     questionText: content.questionText.trim(),
-    followUpQuestions: (content.followUpQuestions ?? [])
-      .map((item) => item.trim())
-      .filter(Boolean),
+    followUpQuestions: (content.followUpQuestions ?? []).map((item) => item.trim()).filter(Boolean),
     expectedConcepts: toTranslationExpectedConcepts(content.expectedConcepts ?? []),
     redFlags: toTranslationRedFlags(content.redFlags ?? []),
     sampleGoodAnswer: content.sampleGoodAnswer?.trim() || undefined,
@@ -503,15 +480,13 @@ export function buildEditorStateForSave(args: {
   localeDrafts: Partial<Record<Locale, Partial<LocaleQuestionDraft> | undefined>>
   addedLocales: Locale[]
 }): QuestionEditorState {
-  const primaryDraft =
-    args.localeDrafts[args.primaryLocale] ?? localeDraftFromInput(args.value)
+  const primaryDraft = args.localeDrafts[args.primaryLocale] ?? localeDraftFromInput(args.value)
   const translations: Partial<Record<Locale, Partial<QuestionContentBlock>>> = {}
 
   for (const locale of args.visibleLocales) {
     if (locale === args.primaryLocale) continue
     const block =
-      args.localeDrafts[locale] ??
-      coerceLocaleTranslation(args.value.translations?.[locale])
+      args.localeDrafts[locale] ?? coerceLocaleTranslation(args.value.translations?.[locale])
     if (hasLocaleDraftContent(block)) {
       translations[locale] = block
     }
@@ -547,9 +522,7 @@ export function questionToEditorState(question: Question): QuestionEditorState {
   const primaryFromTranslation = coerceLocaleTranslation(question.translations?.[primaryLocale])
   const resolvedFlatContent = contentFromResolvedQuestion(question)
   const primary = normalizeLocaleDraft(
-    hasLocaleDraftContent(primaryFromTranslation)
-      ? primaryFromTranslation
-      : resolvedFlatContent,
+    hasLocaleDraftContent(primaryFromTranslation) ? primaryFromTranslation : resolvedFlatContent,
   )
 
   const translations: Partial<Record<Locale, Partial<QuestionContentBlock>>> = {}
@@ -587,9 +560,7 @@ export function editorStateToQuestionInput(state: QuestionEditorState): Question
   }
 }
 
-export function editorStateToCreatePayload(
-  state: QuestionEditorState,
-): CreateQuestionPayload {
+export function editorStateToCreatePayload(state: QuestionEditorState): CreateQuestionPayload {
   return {
     primaryLocale: state.primaryLocale,
     translations: buildTranslationsRecordFromState(state),
@@ -632,10 +603,7 @@ export function resolveEditorLocaleDraft(
   return localeDraftFromInput(input)
 }
 
-export function hasPersistedLocaleTranslation(
-  input: QuestionInput,
-  locale: Locale,
-): boolean {
+export function hasPersistedLocaleTranslation(input: QuestionInput, locale: Locale): boolean {
   return hasLocaleDraftContent(coerceLocaleTranslation(input.translations?.[locale]))
 }
 
@@ -675,9 +643,7 @@ export function seedLocaleDraftsFromQuestion(
   )
   for (const locale of extraLocales) {
     if (locale === primaryLocale) continue
-    drafts[locale] = normalizeLocaleDraft(
-      resolveEditorLocaleDraft(input, locale, primaryLocale),
-    )
+    drafts[locale] = normalizeLocaleDraft(resolveEditorLocaleDraft(input, locale, primaryLocale))
   }
   return drafts
 }

@@ -1,9 +1,8 @@
 'use client'
 
 import { StatusPill } from '@/components/ui/status-pill'
-import { useSharedLabels } from '@/i18n/use-shared-labels'
-
 import { badgeToneForRole } from '@/features/team/team-roles'
+import { useSharedLabels } from '@/i18n/use-shared-labels'
 
 interface TeamRoleBadgeProps {
   role: string

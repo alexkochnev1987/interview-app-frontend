@@ -3,20 +3,15 @@
 import { Filter, Plus, Sparkles } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card'
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
 import { HeroLead, HeroTitle } from '@/components/ui/hero-text'
-import { MetricPanel } from '@/components/ui/metric-panel'
-import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardTitle,
-} from '@/components/ui/card'
 import { Grid } from '@/components/ui/layout/grid'
 import { HeroGrid } from '@/components/ui/layout/hero-grid'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
+import { MetricPanel } from '@/components/ui/metric-panel'
 import { Link } from '@/i18n/navigation'
 import { routes } from '@/i18n/routes'
 import { useIsDemo } from '@/lib/auth-context'
@@ -40,9 +35,7 @@ export function QuestionsLibraryHeader({
       primary={
         <Card variant="floating" size="lg" data-tour="questions-library">
           <CardContent layout="fill-column" spacing="xl">
-            <EyebrowBadge icon={<Sparkles className="size-3.5" />}>
-              {t('eyebrow')}
-            </EyebrowBadge>
+            <EyebrowBadge icon={<Sparkles className="size-3.5" />}>{t('eyebrow')}</EyebrowBadge>
             <Stack gap={3}>
               <HeroTitle>{t('title')}</HeroTitle>
               <HeroLead width="prose">{t('lead')}</HeroLead>

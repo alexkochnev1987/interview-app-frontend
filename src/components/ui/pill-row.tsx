@@ -1,5 +1,5 @@
-import type { HTMLAttributes } from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
+import type { HTMLAttributes } from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -16,14 +16,8 @@ const pillRowVariants = cva('flex flex-wrap items-center gap-2', {
 })
 
 interface PillRowProps
-  extends HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof pillRowVariants> {}
+  extends HTMLAttributes<HTMLDivElement>, VariantProps<typeof pillRowVariants> {}
 
 export function PillRow({ className, reserveCorner, ...props }: PillRowProps) {
-  return (
-    <div
-      className={cn(pillRowVariants({ reserveCorner }), className)}
-      {...props}
-    />
-  )
+  return <div className={cn(pillRowVariants({ reserveCorner }), className)} {...props} />
 }

@@ -13,14 +13,13 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Inline } from '@/components/ui/layout/inline'
-import type { TeamMember } from '@/lib/api'
-
 import {
   type TeamRowActionId,
   isTeamRowActionEnabled,
   isTeamRowActionVisible,
   type TeamRowActorRole,
 } from '@/features/team/team-row-policy'
+import type { TeamMember } from '@/lib/api'
 
 type RowActionConfig = {
   id: TeamRowActionId
@@ -79,32 +78,27 @@ export function TeamMemberRowActions({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" sideOffset={6}>
-        {ROW_ACTIONS.filter(({ id }) =>
-          isTeamRowActionVisible(id, actorId, member),
-        ).map(({ id, labelKey, Icon, tone }) => {
-          const enabled = isTeamRowActionEnabled(
-            id,
-            actorId,
-            actorRole,
-            member,
-          )
-          return (
-            <DropdownMenuItem
-              key={id}
-              tone={tone}
-              disabled={!enabled}
-              onSelect={() => {
-                if (!enabled) return
-                if (id === 'change-role') onChangeRole()
-              }}
-            >
-              <Inline gap={3} align="center">
-                <Icon aria-hidden />
-                {t(labelKey)}
-              </Inline>
-            </DropdownMenuItem>
-          )
-        })}
+        {ROW_ACTIONS.filter(({ id }) => isTeamRowActionVisible(id, actorId, member)).map(
+          ({ id, labelKey, Icon, tone }) => {
+            const enabled = isTeamRowActionEnabled(id, actorId, actorRole, member)
+            return (
+              <DropdownMenuItem
+                key={id}
+                tone={tone}
+                disabled={!enabled}
+                onSelect={() => {
+                  if (!enabled) return
+                  if (id === 'change-role') onChangeRole()
+                }}
+              >
+                <Inline gap={3} align="center">
+                  <Icon aria-hidden />
+                  {t(labelKey)}
+                </Inline>
+              </DropdownMenuItem>
+            )
+          },
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   )

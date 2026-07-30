@@ -2,12 +2,15 @@
 
 import { BadgeCheck, Sparkles, Target } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
+import type { ReactNode } from 'react'
 
+const renderStrong = (chunks: ReactNode) => <strong>{chunks}</strong>
+
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
 import { EyebrowLabel } from '@/components/ui/eyebrow-label'
 import { HeroLead, HeroTitle } from '@/components/ui/hero-text'
 import { Icon } from '@/components/ui/icon'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Inline } from '@/components/ui/layout/inline'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { Section } from '@/components/ui/layout/section'
@@ -52,11 +55,7 @@ function FeedbackTextField({
   const isRecommendation = tone === 'recommendation'
 
   return (
-    <SurfaceTile
-      tone={isRecommendation ? 'primary-soft' : 'soft'}
-      padding="md"
-      rounded="xl"
-    >
+    <SurfaceTile tone={isRecommendation ? 'primary-soft' : 'soft'} padding="md" rounded="xl">
       <Stack gap={2}>
         <Inline gap={2} align="center">
           <Icon size="sm" tone={isRecommendation ? 'primary' : 'inherit'}>
@@ -151,11 +150,7 @@ function OutcomeCard({
   const isPositive = outcome === 'next_stage'
 
   return (
-    <SurfaceTile
-      tone={isPositive ? 'primary-soft' : 'soft'}
-      padding="md"
-      rounded="xl"
-    >
+    <SurfaceTile tone={isPositive ? 'primary-soft' : 'soft'} padding="md" rounded="xl">
       <Stack gap={2}>
         <Inline gap={2} align="center">
           <Icon size="sm" tone={isPositive ? 'primary' : 'inherit'}>
@@ -182,9 +177,7 @@ export function CandidateFeedbackShareView({
   const interviewLocale = feedback.interviewLocale
   const showLanguageMismatchBadge = interviewLocale !== uiLocale
 
-  const overall = hasPublishableText(feedback.overall)
-    ? feedback.overall
-    : undefined
+  const overall = hasPublishableText(feedback.overall) ? feedback.overall : undefined
   const questions = (feedback.questions ?? []).filter(hasPublishableText)
   const hasContent = Boolean(overall) || questions.length > 0
   const hasOutcome =
@@ -212,7 +205,7 @@ export function CandidateFeedbackShareView({
               <HeroLead>
                 {t.rich('lead', {
                   position: feedback.position,
-                  strong: (chunks) => <strong>{chunks}</strong>,
+                  strong: renderStrong,
                 })}
               </HeroLead>
 
@@ -263,10 +256,7 @@ export function CandidateFeedbackShareView({
         ) : null}
 
         {!hasContent ? (
-          <EmptyStateCard
-            title={t('emptyTitle')}
-            description={t('emptyDescription')}
-          />
+          <EmptyStateCard title={t('emptyTitle')} description={t('emptyDescription')} />
         ) : (
           <Stack gap={4}>
             {overall ? (

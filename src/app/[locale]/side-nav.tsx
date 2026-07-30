@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import {
   ClipboardList,
   LayoutDashboard,
@@ -11,19 +10,7 @@ import {
   Users,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-
-import { isCandidateFlowPath } from '@/i18n/html-lang'
-import { usePathname } from '@/i18n/navigation'
-import { routes } from '@/i18n/routes'
-import { useSharedLabels } from '@/i18n/use-shared-labels'
-import { useAuth, useIsDemo } from '@/lib/auth-context'
-import {
-  canAccessDashboard,
-  canConfigureInterview,
-  canManageTeam,
-  canReadQuestions,
-  canReviewAssessments,
-} from '@/lib/auth-roles'
+import { useState } from 'react'
 
 import { AppSidebar } from '@/components/ui/app-sidebar'
 import { Avatar } from '@/components/ui/avatar'
@@ -38,6 +25,18 @@ import {
   sideNavRevealClass,
 } from '@/components/ui/side-nav-item'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
+import { isCandidateFlowPath } from '@/i18n/html-lang'
+import { usePathname } from '@/i18n/navigation'
+import { routes } from '@/i18n/routes'
+import { useSharedLabels } from '@/i18n/use-shared-labels'
+import { useAuth, useIsDemo } from '@/lib/auth-context'
+import {
+  canAccessDashboard,
+  canConfigureInterview,
+  canManageTeam,
+  canReadQuestions,
+  canReviewAssessments,
+} from '@/lib/auth-roles'
 
 export function SideNav() {
   const { user, logout } = useAuth()
@@ -83,9 +82,7 @@ export function SideNav() {
         ]
       : []),
     ...(canConfigureInterview(user?.role)
-      ? [
-          { href: routes.templates.list, label: tNav('templates'), icon: LayoutTemplate },
-        ]
+      ? [{ href: routes.templates.list, label: tNav('templates'), icon: LayoutTemplate }]
       : []),
     ...(canConfigureInterview(user?.role) && !isDemo
       ? [
@@ -96,9 +93,7 @@ export function SideNav() {
           },
         ]
       : []),
-    ...(canManageTeam(user?.role)
-      ? [{ href: '/team', label: tNav('team'), icon: Users }]
-      : []),
+    ...(canManageTeam(user?.role) ? [{ href: '/team', label: tNav('team'), icon: Users }] : []),
   ]
 
   function isActive(href: string) {
@@ -148,7 +143,13 @@ export function SideNav() {
               aria-current={profileActive ? 'page' : undefined}
               className={sideNavProfileLinkClass}
             >
-              <Avatar name={user.name} pictureUrl={user.pictureUrl} size="sm" textSize="sm" tone="surface" />
+              <Avatar
+                name={user.name}
+                pictureUrl={user.pictureUrl}
+                size="sm"
+                textSize="sm"
+                tone="surface"
+              />
               <Stack gap={0} flexChild="contain" className={sideNavRevealClass}>
                 <IdentityBadge
                   layout="stacked"

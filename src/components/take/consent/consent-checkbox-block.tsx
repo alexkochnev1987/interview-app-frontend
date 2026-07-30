@@ -1,20 +1,21 @@
-import { Checkbox } from '@/components/ui/checkbox';
-import { Inline, Stack } from '@/components/ui/layout';
-import { Label } from '@/components/ui/label';
-import { Panel } from '@/components/ui/panel';
-import { Text } from '@/components/ui/text';
-import { useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl'
+
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
+import { Inline, Stack } from '@/components/ui/layout'
+import { Panel } from '@/components/ui/panel'
+import { Text } from '@/components/ui/text'
 
 interface TakeConsentCheckboxBlockProps {
-  consent: boolean;
-  onConsentChange: (checked: boolean) => void;
+  consent: boolean
+  onConsentChange: (checked: boolean) => void
 }
 
 export function TakeConsentCheckboxBlock({
   consent,
   onConsentChange,
 }: TakeConsentCheckboxBlockProps) {
-  const tTake = useTranslations('takeFlow');
+  const tTake = useTranslations('takeFlow')
   return (
     <Panel radius="lg" padding="lg">
       <Inline align="start" gap={3}>
@@ -34,5 +35,5 @@ export function TakeConsentCheckboxBlock({
         </Stack>
       </Inline>
     </Panel>
-  );
+  )
 }

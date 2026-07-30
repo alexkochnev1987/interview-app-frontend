@@ -1,9 +1,8 @@
 'use client'
 
-import * as React from 'react'
-
-import { Dialog as DialogPrimitive } from 'radix-ui'
 import { cva, type VariantProps } from 'class-variance-authority'
+import { Dialog as DialogPrimitive } from 'radix-ui'
+import type { ReactNode } from 'react'
 
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
@@ -42,7 +41,7 @@ const modalContentVariants = cva(
 )
 
 interface ModalShellProps extends VariantProps<typeof modalContentVariants> {
-  children: React.ReactNode
+  children: ReactNode
   /** When true, escape and outside clicks do not close the dialog. */
   dismissDisabled?: boolean
   onDismiss?: () => void
@@ -87,9 +86,7 @@ export function ModalShell({
             if (dismissDisabled) event.preventDefault()
           }}
         >
-          <DialogPrimitive.Title className="sr-only">
-            {accessibilityTitle}
-          </DialogPrimitive.Title>
+          <DialogPrimitive.Title className="sr-only">{accessibilityTitle}</DialogPrimitive.Title>
           {accessibilityDescription ? (
             <DialogPrimitive.Description className="sr-only">
               {accessibilityDescription}
