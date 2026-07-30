@@ -1,11 +1,13 @@
 'use client'
 
+import type { MouseEvent } from 'react'
+
 import { Avatar } from '@/components/ui/avatar'
 import { Inline } from '@/components/ui/layout/inline'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { BodyText } from '@/components/ui/text'
-import { UnstyledLink } from '@/components/ui/unstyled-link'
 import type { TeamRowActorRole } from '@/features/team/team-row-policy'
+import { useRouter } from '@/i18n/navigation'
 import { routes } from '@/i18n/routes'
 import type { TeamMember } from '@/lib/api'
 import { formatInterviewDate } from '@/lib/interview-formatters'
@@ -21,20 +23,22 @@ interface TeamMemberRowProps {
   onChangeRole: () => void
 }
 
+function stopRowClick(event: MouseEvent<HTMLElement>) {
+  event.stopPropagation()
+}
+
 export function TeamMemberRow({ member, actorId, actorRole, onChangeRole }: TeamMemberRowProps) {
+  const router = useRouter()
   const actor = { id: actorId, role: actorRole }
   const target = { id: member.id, role: member.role }
   const canOpenProfile = canViewUserProfile(target, actor)
   const profileHref = member.id === actorId ? routes.profile.me : routes.profile.detail(member.id)
 
-  const memberName = (
-    <BodyText weight="medium" tone="foreground">
-      {member.name}
-    </BodyText>
-  )
-
   return (
-    <TableRow>
+    <TableRow
+      interactive={canOpenProfile}
+      onClick={canOpenProfile ? () => router.push(profileHref) : undefined}
+    >
       <TableCell>
         <Inline gap={4} align="center">
           <Avatar
@@ -44,11 +48,9 @@ export function TeamMemberRow({ member, actorId, actorRole, onChangeRole }: Team
             textSize="sm"
             tone="surface"
           />
-          {canOpenProfile ? (
-            <UnstyledLink href={profileHref}>{memberName}</UnstyledLink>
-          ) : (
-            memberName
-          )}
+          <BodyText weight="medium" tone="foreground">
+            {member.name}
+          </BodyText>
         </Inline>
       </TableCell>
       <TableCell>
@@ -60,7 +62,7 @@ export function TeamMemberRow({ member, actorId, actorRole, onChangeRole }: Team
       <TableCell>
         <BodyText size="sm">{formatInterviewDate(member.createdAt)}</BodyText>
       </TableCell>
-      <TableCell>
+      <TableCell onClick={stopRowClick}>
         <TeamMemberRowActions
           member={member}
           actorId={actorId}
