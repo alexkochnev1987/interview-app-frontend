@@ -1,6 +1,6 @@
 'use client'
 
-import { IconBadge } from '@/components/ui/icon-badge'
+import { Avatar } from '@/components/ui/avatar'
 import { Inline } from '@/components/ui/layout/inline'
 import {
   TableCell,
@@ -13,7 +13,6 @@ import type { TeamMember } from '@/lib/api'
 import { formatInterviewDate } from '@/lib/interview-formatters'
 import { canViewUserProfile } from '@/lib/user-profile-access'
 
-import { getMemberInitials } from '@/features/team/team-member-list'
 import type { TeamRowActorRole } from '@/features/team/team-row-policy'
 
 import { TeamMemberRowActions } from './team-member-row-actions'
@@ -48,9 +47,7 @@ export function TeamMemberRow({
     <TableRow>
       <TableCell>
         <Inline gap={4} align="center">
-          <IconBadge tone="surface" size="sm" shape="circle" textSize="sm">
-            {getMemberInitials(member.name)}
-          </IconBadge>
+          <Avatar name={member.name} pictureUrl={member.pictureUrl} size="sm" textSize="sm" tone="surface" />
           {canOpenProfile ? (
             <UnstyledLink href={profileHref}>
               {memberName}
