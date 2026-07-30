@@ -446,6 +446,46 @@ export async function logout(): Promise<LogoutResponse> {
   return handle(client.POST('/auth/logout', LOCALIZED_HEADERS));
 }
 
+export type AvatarPresignResponse = Schemas['AvatarPresignResponseDto'];
+export type AvatarUpdateResponse = Schemas['AvatarUpdateResponseDto'];
+export type AvatarContentType = Schemas['AvatarPresignRequestDto']['contentType'];
+
+export async function getAvatarPresignedUrl(
+  contentType: AvatarContentType,
+  fileSizeBytes: number,
+): Promise<AvatarPresignResponse> {
+  return handle(
+    client.POST('/users/me/avatar/presign', {
+      ...LOCALIZED_HEADERS,
+      body: { contentType, fileSizeBytes },
+    }),
+  );
+}
+
+export async function uploadAvatarFile(uploadUrl: string, file: File): Promise<void> {
+  const uploadResponse = await fetch(uploadUrl, {
+    method: 'PUT',
+    body: file,
+    headers: { 'Content-Type': file.type },
+  });
+  if (!uploadResponse.ok) {
+    throw new Error('Avatar upload failed.');
+  }
+}
+
+export async function completeAvatarUpload(avatarKey: string): Promise<AvatarUpdateResponse> {
+  return handle(
+    client.POST('/users/me/avatar/complete', {
+      ...LOCALIZED_HEADERS,
+      body: { avatarKey },
+    }),
+  );
+}
+
+export async function deleteAvatar(): Promise<AvatarUpdateResponse> {
+  return handle(client.DELETE('/users/me/avatar', LOCALIZED_HEADERS));
+}
+
 export async function completeOnboarding(
   status: CompleteOnboardingStatus = 'completed',
 ): Promise<AuthUserResponseDto> {

@@ -138,7 +138,7 @@ export interface paths {
         head?: never;
         /**
          * Mark the staff onboarding tour as completed or skipped
-         * @description Sets onboardingCompletedAt and onboardingStatus. Response matches GET /auth/me.
+         * @description Sets onboardingCompletedAt on the first call (never cleared). onboardingStatus reflects the latest dismissal choice and may be updated on subsequent calls. Response matches GET /auth/me.
          */
         patch: operations["AuthController_completeOnboarding"];
         trace?: never;
@@ -208,6 +208,74 @@ export interface paths {
          * @description Idempotent admin-only setup for environments without direct database access. Refused on production unless ALLOW_DEMO_SEED=true is set, so it can never seed demo data into production by accident.
          */
         post: operations["UserController_provisionDemo"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/me/avatar/presign": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Get a presigned URL to upload a new avatar */
+        post: operations["AvatarController_presign"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/me/avatar/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Confirm an uploaded avatar and activate it */
+        post: operations["AvatarController_complete"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/me/avatar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove the current avatar, reverting to initials */
+        delete: operations["AvatarController_remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/{id}/avatar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Redirect to a presigned URL for a user's avatar */
+        get: operations["AvatarController_proxy"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1130,6 +1198,11 @@ export interface components {
              * @example 2026-05-05T12:00:00.000Z
              */
             createdAt: string;
+            /**
+             * @description Absolute Google photo URL, a relative /users/{id}/avatar proxy path for a custom upload, or absent when no picture is set.
+             * @example https://lh3.googleusercontent.com/a/photo.jpg
+             */
+            pictureUrl?: string;
         };
         RegisterDto: {
             email: string;
@@ -1145,10 +1218,10 @@ export interface components {
              * @example completed
              * @enum {string}
              */
-            status: "completed" | "skipped";
+            status?: "completed" | "skipped";
         };
         /** @enum {string} */
-        ApiErrorCode: "BAD_REQUEST" | "VALIDATION_ERROR" | "INVALID_LOCALE" | "REGISTRATION_FAILED" | "UPLOAD_FAILED" | "UPLOAD_NOT_ALLOWED" | "ANSWER_ATTEMPT_LIMIT_REACHED" | "ANSWER_VERSION_NOT_RESERVED" | "ANSWER_VERSION_OVERWRITE_FORBIDDEN" | "UNAUTHORIZED" | "INVALID_CREDENTIALS" | "AUTHENTICATION_REQUIRED" | "CANDIDATE_SESSION_REQUIRED" | "INVALID_CANDIDATE_SESSION" | "INTERVIEW_TOKEN_REQUIRED" | "INVALID_INTERVIEW_TOKEN" | "FORBIDDEN" | "INSUFFICIENT_PERMISSIONS" | "ACCESS_DENIED" | "NOT_FOUND" | "QUESTION_NOT_FOUND" | "INTERVIEW_NOT_FOUND" | "USER_NOT_FOUND" | "FEEDBACK_NOT_FOUND" | "CONFLICT" | "QUESTION_IN_USE" | "VALIDATION_RUNNING" | "QUESTION_DUPLICATE" | "SERVICE_UNAVAILABLE" | "AI_PROVIDER_NOT_CONFIGURED" | "EMBEDDING_PROVIDER_NOT_CONFIGURED" | "INTERNAL_SERVER_ERROR";
+        ApiErrorCode: "BAD_REQUEST" | "VALIDATION_ERROR" | "INVALID_LOCALE" | "REGISTRATION_FAILED" | "UPLOAD_FAILED" | "UPLOAD_NOT_ALLOWED" | "ANSWER_ATTEMPT_LIMIT_REACHED" | "ANSWER_VERSION_NOT_RESERVED" | "ANSWER_VERSION_OVERWRITE_FORBIDDEN" | "AVATAR_UNSUPPORTED_TYPE" | "AVATAR_TOO_LARGE" | "UNAUTHORIZED" | "INVALID_CREDENTIALS" | "AUTHENTICATION_REQUIRED" | "CANDIDATE_SESSION_REQUIRED" | "INVALID_CANDIDATE_SESSION" | "INTERVIEW_TOKEN_REQUIRED" | "INVALID_INTERVIEW_TOKEN" | "FORBIDDEN" | "INSUFFICIENT_PERMISSIONS" | "ACCESS_DENIED" | "NOT_FOUND" | "QUESTION_NOT_FOUND" | "INTERVIEW_NOT_FOUND" | "USER_NOT_FOUND" | "FEEDBACK_NOT_FOUND" | "CONFLICT" | "QUESTION_IN_USE" | "VALIDATION_RUNNING" | "QUESTION_DUPLICATE" | "SERVICE_UNAVAILABLE" | "AI_PROVIDER_NOT_CONFIGURED" | "EMBEDDING_PROVIDER_NOT_CONFIGURED" | "INTERNAL_SERVER_ERROR";
         ApiErrorResponseDto: {
             /** @example 400 */
             statusCode: number;
@@ -1168,6 +1241,24 @@ export interface components {
             /** @example /questions/invalid-id */
             path?: string;
         };
+        UserProfileResponseDto: {
+            /** @example 8d2a6457-7f4b-4cef-9f10-8cff885f7e15 */
+            id: string;
+            /** @example Jane Doe */
+            name: string;
+            /** @example hr */
+            role: string;
+            /**
+             * @description Present when viewing your own profile or when the actor has a privileged role.
+             * @example jane@interview-app.com
+             */
+            email?: string;
+            /**
+             * @description Absolute Google photo URL, a relative /users/{id}/avatar proxy path for a custom upload, or absent when no picture is set.
+             * @example https://lh3.googleusercontent.com/a/photo.jpg
+             */
+            pictureUrl?: string;
+        };
         AssignRoleDto: {
             /** @enum {string} */
             role: "super_admin" | "admin" | "hr" | "candidate";
@@ -1183,6 +1274,23 @@ export interface components {
         DemoProvisionResponseDto: {
             user: components["schemas"]["AuthUserResponseDto"];
             counts: components["schemas"]["DemoProvisionCountsDto"];
+        };
+        AvatarPresignRequestDto: {
+            /** @enum {string} */
+            contentType: "image/jpeg" | "image/png" | "image/webp";
+            /** @example 204800 */
+            fileSizeBytes: number;
+        };
+        AvatarPresignResponseDto: {
+            uploadUrl: string;
+            avatarKey: string;
+        };
+        AvatarCompleteUploadDto: {
+            avatarKey: string;
+        };
+        AvatarUpdateResponseDto: {
+            /** @example /users/8d2a6457-7f4b-4cef-9f10-8cff885f7e15/avatar */
+            pictureUrl?: string | null;
         };
         QuestionExpectedConceptDto: {
             id: string;
@@ -1686,13 +1794,9 @@ export interface components {
         };
         AnswerVersionDto: {
             versionNumber: number;
-            /** @description Empty until media is uploaded for a reserved attempt. */
             mediaKey?: string;
             screenMediaKey?: string;
-            /**
-             * Format: date-time
-             * @description Set when the attempt slot is reserved before media upload.
-             */
+            /** Format: date-time */
             reservedAt?: string;
             /** Format: date-time */
             uploadedAt?: string;
@@ -2676,7 +2780,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AuthUserResponseDto"];
+                    "application/json": components["schemas"]["UserProfileResponseDto"];
                 };
             };
             401: {
@@ -2762,6 +2866,135 @@ export interface operations {
                 };
             };
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    AvatarController_presign: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AvatarPresignRequestDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AvatarPresignResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    AvatarController_complete: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AvatarCompleteUploadDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AvatarUpdateResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    AvatarController_remove: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AvatarUpdateResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    AvatarController_proxy: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Redirects to a short-lived S3 URL */
+            302: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
