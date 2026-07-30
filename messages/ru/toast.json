@@ -197,6 +197,12 @@
       "updateError": "Не удалось обновить роль",
       "updateSuccessDescription": "{name} теперь {role}."
     },
+    "avatar": {
+      "uploadSuccess": "Фото профиля обновлено",
+      "uploadError": "Не удалось обновить фото профиля",
+      "removeSuccess": "Фото профиля удалено",
+      "removeError": "Не удалось удалить фото профиля"
+    },
     "template": {
       "createSuccess": "Шаблон создан",
       "createError": "Не удалось создать шаблон",

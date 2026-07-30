@@ -17,6 +17,14 @@
       "changePassword": "Изменить пароль",
       "comingSoon": "Скоро"
     },
+    "avatar": {
+      "edit": "Изменить фото профиля",
+      "change": "Изменить фото",
+      "uploading": "Загрузка...",
+      "remove": "Удалить фото",
+      "unsupportedType": "Выберите изображение в формате JPEG, PNG или WEBP.",
+      "tooLarge": "Размер изображения должен быть меньше 5 МБ."
+    },
     "preferences": {
       "language": "Язык",
       "productTour": "Обзор продукта"
