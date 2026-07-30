@@ -3,7 +3,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '@/lib/utils'
 
-const iconBadgeVariants = cva(
+export const iconBadgeVariants = cva(
   'flex shrink-0 items-center justify-center',
   {
     variants: {
