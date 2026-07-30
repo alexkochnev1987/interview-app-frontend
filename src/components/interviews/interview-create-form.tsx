@@ -1,23 +1,25 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { ArrowRight, BriefcaseBusiness, UserRound } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 
+import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
+import { AssignedHrSelect } from '@/components/interviews/assigned-hr-select'
 import {
   InterviewQuestionPickerAside,
   InterviewQuestionPickerMain,
 } from '@/components/questions/picker/interview-question-picker-section'
 import { useInterviewQuestionPicker } from '@/components/questions/picker/use-interview-question-picker'
-import { FormField } from '@/components/ui/form-field'
-import { IconAffix } from '@/components/ui/icon-affix'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { Icon } from '@/components/ui/icon'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { FormField } from '@/components/ui/form-field'
+import { Icon } from '@/components/ui/icon'
+import { IconAffix } from '@/components/ui/icon-affix'
+import { Input } from '@/components/ui/input'
 import { Grid } from '@/components/ui/layout/grid'
 import { Stack } from '@/components/ui/layout/stack'
-import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
@@ -25,22 +27,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { useRouter } from '@/i18n/navigation'
-import { LOCALES, type Locale } from '@/i18n/locales'
-import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
-import { useIsDemo } from '@/lib/auth-context'
-import { AssignedHrSelect } from '@/components/interviews/assigned-hr-select'
-import { useAuth } from '@/lib/auth-context'
-import { canAssignInterviewHr } from '@/lib/auth-roles'
-import { createInterview, type Question } from '@/lib/api'
-import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
-import { runMutation } from '@/lib/run-mutation'
-import { useToastMessages } from '@/lib/use-toast-messages'
 import {
   emitOnboardingEvent,
   ONBOARDING_EVENT_NAMES,
 } from '@/features/onboarding/onboarding-events'
 import { useOnboardingCreatedQuestionId } from '@/features/onboarding/use-onboarding-tour-targets'
+import { LOCALES, type Locale } from '@/i18n/locales'
+import { useRouter } from '@/i18n/navigation'
+import { createInterview, type Question } from '@/lib/api'
+import { useIsDemo } from '@/lib/auth-context'
+import { useAuth } from '@/lib/auth-context'
+import { canAssignInterviewHr } from '@/lib/auth-roles'
+import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
+import { runMutation } from '@/lib/run-mutation'
+import { useToastMessages } from '@/lib/use-toast-messages'
 
 type InterviewCreateFormProps = {
   initialPrefetch: QuestionsLibraryPrefetch
@@ -145,8 +145,8 @@ export function InterviewCreateForm({
         {
           successMessage: toastMessages.interview.createSuccess,
           errorMessage: toastMessages.interview.createError,
-          getErrorMessage: (error) =>
-            toastMessages.apiError.message(error) ?? toastMessages.interview.createError,
+          getErrorMessage: (err) =>
+            toastMessages.apiError.message(err) ?? toastMessages.interview.createError,
         },
       )
       const nextRoute = `/interviews/${interview.id}`
@@ -183,7 +183,13 @@ export function InterviewCreateForm({
               </CardHeader>
               <CardContent spacing="lg">
                 <FormField htmlFor="candidateName" label={t('candidateNameLabel')}>
-                  <IconAffix icon={<Icon size="md"><UserRound /></Icon>}>
+                  <IconAffix
+                    icon={
+                      <Icon size="md">
+                        <UserRound />
+                      </Icon>
+                    }
+                  >
                     <Input
                       id="candidateName"
                       iconAffix="leading"
@@ -197,7 +203,13 @@ export function InterviewCreateForm({
                 </FormField>
 
                 <FormField htmlFor="position" label={t('positionLabel')}>
-                  <IconAffix icon={<Icon size="md"><BriefcaseBusiness /></Icon>}>
+                  <IconAffix
+                    icon={
+                      <Icon size="md">
+                        <BriefcaseBusiness />
+                      </Icon>
+                    }
+                  >
                     <Input
                       id="position"
                       iconAffix="leading"
@@ -210,19 +222,19 @@ export function InterviewCreateForm({
                 </FormField>
 
                 {canAssign ? (
-                    <FormField htmlFor="assignedHr" label={t('assignedHrLabel')}>
-                      <DemoWriteGuard width="full" disabled={submitting}>
-                        <AssignedHrSelect
-                            id="assignedHr"
-                            value={assignedHrId}
-                            onValueChange={setAssignedHrId}
-                            allowUnassigned
-                            enabled={canAssign}
-                            disabled={submitting}
-                        />
-                      </DemoWriteGuard>
-                    </FormField>
-                ): null}
+                  <FormField htmlFor="assignedHr" label={t('assignedHrLabel')}>
+                    <DemoWriteGuard width="full" disabled={submitting}>
+                      <AssignedHrSelect
+                        id="assignedHr"
+                        value={assignedHrId}
+                        onValueChange={setAssignedHrId}
+                        allowUnassigned
+                        enabled={canAssign}
+                        disabled={submitting}
+                      />
+                    </DemoWriteGuard>
+                  </FormField>
+                ) : null}
 
                 <FormField htmlFor="interviewLocale" label={t('interviewLocaleLabel')}>
                   <Select
@@ -275,9 +287,7 @@ export function InterviewCreateForm({
                     {submitting
                       ? toastMessages.pageGate.interview.creatingLabel
                       : t(
-                          selectedCount > 0
-                            ? 'createInterviewCtaWithCount'
-                            : 'createInterviewCta',
+                          selectedCount > 0 ? 'createInterviewCtaWithCount' : 'createInterviewCta',
                           { count: selectedCount },
                         )}
                     <Icon size="md">

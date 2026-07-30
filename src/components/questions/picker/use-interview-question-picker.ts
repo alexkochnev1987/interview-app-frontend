@@ -4,13 +4,11 @@ import { useCallback, useMemo, useState } from 'react'
 
 import { useQuestionChipLabels } from '@/i18n/use-question-chip-labels'
 import { type InterviewQuestion, type Question } from '@/lib/api'
-import { buildQuestionsInfiniteParams } from '@/lib/questions-query-state'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
+import { buildQuestionsInfiniteParams } from '@/lib/questions-query-state'
 
 import { buildActiveFilterChips } from './build-active-chips'
-import {
-  normalizeInterviewQuestionSnapshots,
-} from './normalize-interview-question-snapshot'
+import { normalizeInterviewQuestionSnapshots } from './normalize-interview-question-snapshot'
 import { pickQuestionsViewSource } from './pick-questions-view-source'
 import { useQuestionFacets } from './use-question-facets'
 import { useQuestionsInfinite } from './use-questions-infinite'
@@ -31,13 +29,14 @@ export function useInterviewQuestionPicker({
 }: UseInterviewQuestionPickerOptions = {}) {
   const getChipLabel = useQuestionChipLabels()
 
-  const [selectedById, setSelectedById] = useState(() =>
-    new Map(
-      normalizeInterviewQuestionSnapshots(initialSelected).map((question) => [
-        question.id,
-        question,
-      ]),
-    ),
+  const [selectedById, setSelectedById] = useState(
+    () =>
+      new Map(
+        normalizeInterviewQuestionSnapshots(initialSelected).map((question) => [
+          question.id,
+          question,
+        ]),
+      ),
   )
 
   const query = useQuestionsQuery({
@@ -52,11 +51,7 @@ export function useInterviewQuestionPicker({
   const isCardsView = query.state.view === 'cards'
   const cardsInfiniteParams = useMemo(
     () =>
-      buildQuestionsInfiniteParams(
-        query.state,
-        query.debouncedQ,
-        INTERVIEW_PICKER_FETCH_OPTIONS,
-      ),
+      buildQuestionsInfiniteParams(query.state, query.debouncedQ, INTERVIEW_PICKER_FETCH_OPTIONS),
     [query.state, query.debouncedQ],
   )
 
@@ -66,12 +61,7 @@ export function useInterviewQuestionPicker({
     serverHydrated,
   })
 
-  const view = pickQuestionsViewSource(
-    isCardsView,
-    query,
-    infinite,
-    query.isSearchPending,
-  )
+  const view = pickQuestionsViewSource(isCardsView, query, infinite, query.isSearchPending)
   const facetsResult = useQuestionFacets(
     query.state,
     query.debouncedQ,
@@ -96,10 +86,7 @@ export function useInterviewQuestionPicker({
 
   const selectedCount = selectedById.size
   const selectedQuestions = Array.from(selectedById.values())
-  const selectedIds = useMemo(
-    () => new Set(selectedById.keys()),
-    [selectedById],
-  )
+  const selectedIds = useMemo(() => new Set(selectedById.keys()), [selectedById])
 
   function toggleQuestion(question: Question) {
     setSelectedById((prev) => {
@@ -135,9 +122,7 @@ export function useInterviewQuestionPicker({
   }
 
   const replaceSelected = useCallback((questions: InterviewQuestion[] | Question[]) => {
-    setSelectedById(
-      new Map(normalizeInterviewQuestionSnapshots(questions).map((q) => [q.id, q])),
-    )
+    setSelectedById(new Map(normalizeInterviewQuestionSnapshots(questions).map((q) => [q.id, q])))
   }, [])
 
   return {

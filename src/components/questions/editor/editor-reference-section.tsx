@@ -1,19 +1,20 @@
 'use client'
 
 import { Save } from 'lucide-react'
-import { type ReactNode } from 'react'
 import { useTranslations } from 'next-intl'
+import { type ReactNode } from 'react'
 
 import { Stack } from '@/components/ui/layout/stack'
 import { Textarea } from '@/components/ui/textarea'
-import { type QuestionInput } from '@/lib/api'
 import { type Locale } from '@/i18n/locales'
+import { type QuestionInput } from '@/lib/api'
+import { type DraftFieldKey } from '@/lib/question-editor/field-keys'
 import {
   joinStringList,
   parseStringList,
   type LocaleQuestionDraft,
 } from '@/lib/question-editor/parsers'
-import { type DraftFieldKey } from '@/lib/question-editor/field-keys'
+
 import { EditorSectionCard } from './editor-section-card'
 import { QuestionEditorField } from './question-editor-field'
 
@@ -65,9 +66,7 @@ export function EditorReferenceSection({
               id={`sampleGoodAnswer-${locale}`}
               size="md"
               value={contentDraft.sampleGoodAnswer ?? ''}
-              onChange={(event) =>
-                onContentUpdate({ sampleGoodAnswer: event.target.value })
-              }
+              onChange={(event) => onContentUpdate({ sampleGoodAnswer: event.target.value })}
               placeholder={t('sampleGoodAnswerPlaceholder')}
               disabled={submitting}
             />
@@ -76,11 +75,7 @@ export function EditorReferenceSection({
         </Stack>
 
         <Stack gap={2}>
-          <QuestionEditorField
-            htmlFor="tags"
-            label={tFields('tags')}
-            hint={t('tagsHint')}
-          >
+          <QuestionEditorField htmlFor="tags" label={tFields('tags')} hint={t('tagsHint')}>
             <Textarea
               id="tags"
               size="sm"

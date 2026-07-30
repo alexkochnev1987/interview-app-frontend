@@ -1,21 +1,17 @@
 'use client'
 
+import { cva } from 'class-variance-authority'
 import { Check } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { cva } from 'class-variance-authority'
 
 import { Icon } from '@/components/ui/icon'
 import { Text } from '@/components/ui/text'
 
 const journeyTrackVariants = cva('relative w-full')
 
-const journeyRowVariants = cva(
-  'relative z-10 grid w-full grid-cols-4 items-start gap-3',
-)
+const journeyRowVariants = cva('relative z-10 grid w-full grid-cols-4 items-start gap-3')
 
-const journeyNodeVariants = cva(
-  'flex min-w-0 flex-col items-center gap-2 px-1',
-)
+const journeyNodeVariants = cva('flex min-w-0 flex-col items-center gap-2 px-1')
 
 const journeyMarkerVariants = cva(
   'flex size-8 shrink-0 items-center justify-center rounded-full shadow-soft ring-1 bg-primary-gradient text-primary-foreground ring-[hsl(var(--primary)/0.2)]',

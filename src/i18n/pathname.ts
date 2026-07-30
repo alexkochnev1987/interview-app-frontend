@@ -27,9 +27,7 @@ export function pathLocale(pathname: string): {
   const [, segment] = normalized.split('/')
   const prefixed = LOCALES.includes(segment as Locale)
   const locale = prefixed ? (segment as Locale) : DEFAULT_LOCALE
-  const pathnameWithoutLocale = prefixed
-    ? normalized.slice(segment.length + 1) || '/'
-    : normalized
+  const pathnameWithoutLocale = prefixed ? normalized.slice(segment.length + 1) || '/' : normalized
 
   return { locale, pathnameWithoutLocale }
 }

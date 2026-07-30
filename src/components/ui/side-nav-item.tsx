@@ -1,11 +1,11 @@
 'use client'
 
-import type { ComponentProps, ReactElement, ReactNode } from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
+import type { ComponentProps, ReactElement, ReactNode } from 'react'
 
+import { Icon } from '@/components/ui/icon'
 import { Link } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
-import { Icon } from '@/components/ui/icon'
 
 export const sideNavItemBase =
   'relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium no-underline transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50'
@@ -24,8 +24,7 @@ const sideNavLinkVariants = cva(sideNavItemBase, {
   variants: {
     active: {
       true: 'bg-accent text-foreground',
-      false:
-        'text-muted-foreground hover:bg-surface-low-soft hover:text-foreground',
+      false: 'text-muted-foreground hover:bg-surface-low-soft hover:text-foreground',
     },
   },
   defaultVariants: { active: false },
@@ -34,8 +33,7 @@ const sideNavLinkVariants = cva(sideNavItemBase, {
 const sideNavButtonVariants = cva(sideNavItemBase, {
   variants: {
     tone: {
-      default:
-        'text-muted-foreground hover:bg-surface-low-soft hover:text-foreground',
+      default: 'text-muted-foreground hover:bg-surface-low-soft hover:text-foreground',
       danger: 'text-destructive hover:bg-destructive/10 hover:text-destructive',
     },
   },
@@ -43,11 +41,7 @@ const sideNavButtonVariants = cva(sideNavItemBase, {
 })
 
 export function SideNavLabel({ children }: { children: ReactNode }) {
-  return (
-    <span className={cn('truncate whitespace-nowrap', revealBase)}>
-      {children}
-    </span>
-  )
+  return <span className={cn('truncate whitespace-nowrap', revealBase)}>{children}</span>
 }
 
 interface SideNavLinkProps extends VariantProps<typeof sideNavLinkVariants> {
@@ -72,8 +66,7 @@ export function SideNavLink({ href, label, icon, active, dataTour }: SideNavLink
 }
 
 interface SideNavButtonProps
-  extends ComponentProps<'button'>,
-    VariantProps<typeof sideNavButtonVariants> {
+  extends ComponentProps<'button'>, VariantProps<typeof sideNavButtonVariants> {
   label: string
   icon: ReactElement<{ className?: string }>
 }
@@ -87,11 +80,7 @@ export function SideNavButton({
   ...props
 }: SideNavButtonProps) {
   return (
-    <button
-      type={type}
-      className={cn(sideNavButtonVariants({ tone }), className)}
-      {...props}
-    >
+    <button type={type} className={cn(sideNavButtonVariants({ tone }), className)} {...props}>
       <Icon size="md">{icon}</Icon>
       <SideNavLabel>{label}</SideNavLabel>
     </button>

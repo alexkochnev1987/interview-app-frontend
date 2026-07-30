@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 
-import { AiSuggestionRow } from '@/components/questions/editor/ai-suggestion-row'
 import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
+import { AiSuggestionRow } from '@/components/questions/editor/ai-suggestion-row'
 import { Button } from '@/components/ui/button'
 import { DisabledHintTooltip } from '@/components/ui/disabled-hint-tooltip'
 import { FormField } from '@/components/ui/form-field'
@@ -17,26 +17,14 @@ import {
 } from '@/lib/candidate-feedback'
 
 interface CandidateFeedbackBlockFieldsProps {
-  block: Pick<
-    CandidateFeedbackBlock,
-    'recommendationText' | 'improvementText' | 'state'
-  >
+  block: Pick<CandidateFeedbackBlock, 'recommendationText' | 'improvementText' | 'state'>
   saving: boolean
-  onSave: (payload: {
-    recommendationText: string
-    improvementText: string
-  }) => Promise<void>
-  onAcceptAll: (payload: {
-    recommendationText: string
-    improvementText: string
-  }) => Promise<void>
+  onSave: (payload: { recommendationText: string; improvementText: string }) => Promise<void>
+  onAcceptAll: (payload: { recommendationText: string; improvementText: string }) => Promise<void>
 }
 
 function getInitialDraftText(
-  block: Pick<
-    CandidateFeedbackBlock,
-    'recommendationText' | 'improvementText' | 'state'
-  >,
+  block: Pick<CandidateFeedbackBlock, 'recommendationText' | 'improvementText' | 'state'>,
   field: 'recommendation' | 'improvement',
 ): string {
   if (block.state !== 'accepted' && block.state !== 'edited') {
@@ -49,10 +37,7 @@ function getInitialDraftText(
 }
 
 function getPersistedSourceKey(
-  block: Pick<
-    CandidateFeedbackBlock,
-    'recommendationText' | 'improvementText' | 'state'
-  >,
+  block: Pick<CandidateFeedbackBlock, 'recommendationText' | 'improvementText' | 'state'>,
 ): string | null {
   if (block.state !== 'accepted' && block.state !== 'edited') {
     return null
@@ -62,10 +47,7 @@ function getPersistedSourceKey(
 }
 
 function getGeneratedSnapshotKey(
-  block: Pick<
-    CandidateFeedbackBlock,
-    'recommendationText' | 'improvementText' | 'state'
-  >,
+  block: Pick<CandidateFeedbackBlock, 'recommendationText' | 'improvementText' | 'state'>,
 ): string | null {
   if (block.state !== 'generated') {
     return null
@@ -122,11 +104,8 @@ export function CandidateFeedbackBlockFields({
     !dismissedRecommendation &&
     Boolean(block.recommendationText?.trim())
   const showImprovementSuggestion =
-    block.state === 'generated' &&
-    !dismissedImprovement &&
-    Boolean(block.improvementText?.trim())
-  const hasPendingSuggestions =
-    showRecommendationSuggestion || showImprovementSuggestion
+    block.state === 'generated' && !dismissedImprovement && Boolean(block.improvementText?.trim())
+  const hasPendingSuggestions = showRecommendationSuggestion || showImprovementSuggestion
 
   const savePayload = useMemo(
     () =>
@@ -230,10 +209,7 @@ export function CandidateFeedbackBlockFields({
 
       {isDirty ? (
         <Inline gap={2} wrap="wrap">
-          <DisabledHintTooltip
-            active={saveLocked}
-            hint={t('saveChangesLockedHint')}
-          >
+          <DisabledHintTooltip active={saveLocked} hint={t('saveChangesLockedHint')}>
             <DemoWriteGuard disabled={saving || saveLocked}>
               <Button
                 type="button"

@@ -21,7 +21,13 @@ export function AssessmentsListHeader() {
   return (
     <Card variant="floating" size="lg">
       <CardContent layout="fill-column" spacing="xl">
-        <EyebrowBadge icon={<Icon size="sm"><ClipboardList /></Icon>}>
+        <EyebrowBadge
+          icon={
+            <Icon size="sm">
+              <ClipboardList />
+            </Icon>
+          }
+        >
           {t('eyebrow')}
         </EyebrowBadge>
         <Stack gap={3}>
@@ -32,7 +38,9 @@ export function AssessmentsListHeader() {
           <Inline>
             <Button asChild variant="gradient" size="hero">
               <Link href="/interviews/new">
-                <Icon size="lg"><Plus /></Icon>
+                <Icon size="lg">
+                  <Plus />
+                </Icon>
                 {tNav('newInterview')}
               </Link>
             </Button>

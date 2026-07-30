@@ -73,11 +73,7 @@ export function OnboardingWelcomeDialog({
             {description}
           </BodyText>
 
-          <Inline
-            justify="center"
-            align="center"
-            width="full"
-          >
+          <Inline justify="center" align="center" width="full">
             <Button type="button" variant="outline" size="lg" onClick={onSkip}>
               {skipLabel}
             </Button>

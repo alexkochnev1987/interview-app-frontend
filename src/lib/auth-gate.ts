@@ -1,14 +1,15 @@
-import { redirect } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
+import { redirect } from 'next/navigation'
 
-import { ApiError } from './api-error'
+import type { Locale } from '@/i18n/locales'
+import { localizedPath } from '@/i18n/pathname'
+
 import type { MeResponse } from './api'
+import { ApiError } from './api-error'
+import { isUnauthorizedError } from './api-error'
 import { fetchCachedServerAuthMe } from './auth-server'
 import { loginReturnPath } from './safe-redirect-path'
 import { getServerRequestContext, type ServerRequestContext } from './server-fetch'
-import { isUnauthorizedError } from './api-error'
-import { localizedPath } from '@/i18n/pathname'
-import type { Locale } from '@/i18n/locales'
 
 export type AuthGate =
   | { kind: 'authorized'; ctx: ServerRequestContext; me: MeResponse }
@@ -19,9 +20,7 @@ export type AuthGate =
 function loginRedirectUrl(returnPath: string, locale: Locale): string {
   const from = loginReturnPath(returnPath)
   const loginPath = localizedPath('/login', locale)
-  return from
-    ? `${loginPath}?from=${encodeURIComponent(localizedPath(from, locale))}`
-    : loginPath
+  return from ? `${loginPath}?from=${encodeURIComponent(localizedPath(from, locale))}` : loginPath
 }
 
 export function redirectIfUnauthenticated(
@@ -73,8 +72,7 @@ export async function loadAuthGate(
         return { kind: 'forbidden' }
       }
     }
-    const message =
-      err instanceof Error ? err.message : t('profileLoadFailed')
+    const message = err instanceof Error ? err.message : t('profileLoadFailed')
     return { kind: 'error', message }
   }
 }

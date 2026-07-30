@@ -1,15 +1,12 @@
 'use client'
 
-import { useEffect, useMemo, useRef, type ReactNode } from 'react'
 import { useTranslations } from 'next-intl'
+import { useEffect, useMemo, useRef, type ReactNode } from 'react'
 
 import { Card } from '@/components/ui/card'
 import { Inline } from '@/components/ui/layout/inline'
 import { LoadingBar } from '@/components/ui/loading-bar'
-import {
-  SortableTableHead,
-  type SortDirection,
-} from '@/components/ui/sortable-table-head'
+import { SortableTableHead, type SortDirection } from '@/components/ui/sortable-table-head'
 import { StatusPill } from '@/components/ui/status-pill'
 import {
   Table,
@@ -21,22 +18,15 @@ import {
 } from '@/components/ui/table'
 import { BodyText } from '@/components/ui/text'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
+import type { InterviewListItem, InterviewSortField, InterviewSortOrder } from '@/lib/api'
 import { decisionTone } from '@/lib/assessment-status'
-import type {
-  InterviewListItem,
-  InterviewSortField,
-  InterviewSortOrder,
-} from '@/lib/api'
 import { formatInterviewDate } from '@/lib/interview-formatters'
 
 import { AssignedHrListPill } from './assigned-hr-list-pill'
 
 const EMPTY = '—'
 
-type SortableField = Extract<
-  InterviewSortField,
-  'candidateName' | 'createdAt' | 'updatedAt'
->
+type SortableField = Extract<InterviewSortField, 'candidateName' | 'createdAt' | 'updatedAt'>
 
 export type InterviewTableProps = {
   items: InterviewListItem[]
@@ -54,8 +44,7 @@ function nextSort(
   clicked: InterviewSortField,
 ): { field: InterviewSortField; order: InterviewSortOrder } {
   if (active !== clicked) {
-    const defaultOrder: InterviewSortOrder =
-      clicked === 'candidateName' ? 'asc' : 'desc'
+    const defaultOrder: InterviewSortOrder = clicked === 'candidateName' ? 'asc' : 'desc'
     return { field: clicked, order: defaultOrder }
   }
   return {
@@ -166,11 +155,7 @@ export function InterviewTable({
             const decision = interview.decision ?? null
 
             return (
-              <TableRow
-                key={interview.id}
-                interactive
-                onClick={() => onRowClick(interview)}
-              >
+              <TableRow key={interview.id} interactive onClick={() => onRowClick(interview)}>
                 <TableCell>
                   <BodyText size="sm" tone="foreground" weight="medium">
                     {interview.candidateName}
@@ -205,12 +190,7 @@ export function InterviewTable({
                   )}
                 </TableCell>
                 <TableCell visibility="md-up" nowrap>
-                  <BodyText
-                    as="span"
-                    size="sm"
-                    tone="muted"
-                    title={updatedAtFormatted}
-                  >
+                  <BodyText as="span" size="sm" tone="muted" title={updatedAtFormatted}>
                     {updatedAtFormatted}
                   </BodyText>
                 </TableCell>

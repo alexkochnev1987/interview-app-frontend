@@ -6,13 +6,13 @@ import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallbac
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import type { Locale } from '@/i18n/locales'
 import { routes } from '@/i18n/routes'
-import { canAccessDashboard } from '@/lib/auth-roles'
+import type { InterviewFacetsResponse } from '@/lib/api'
 import {
   loadAuthGate,
   redirectIfUnauthenticated,
   redirectIfUnauthorizedError,
 } from '@/lib/auth-gate'
-import type { InterviewFacetsResponse } from '@/lib/api'
+import { canAccessDashboard } from '@/lib/auth-roles'
 import { computeDashboardMetrics } from '@/lib/dashboard-metrics'
 import {
   fetchUnfilteredInterviewFacets,
@@ -29,10 +29,7 @@ interface DashboardPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
-export default async function DashboardPage({
-  params,
-  searchParams,
-}: DashboardPageProps) {
+export default async function DashboardPage({ params, searchParams }: DashboardPageProps) {
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'toast.pageGate.dashboard' })
   const tCommon = await getTranslations({ locale, namespace: 'common' })
@@ -40,10 +37,7 @@ export default async function DashboardPage({
   redirectIfUnauthenticated(auth, '/', locale)
   if (auth.kind === 'forbidden') {
     return (
-      <ForbiddenAccessPage
-        title={t('forbiddenTitle')}
-        description={t('forbiddenDescription')}
-      />
+      <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
     )
   }
   if (auth.kind === 'error') {
@@ -73,14 +67,10 @@ export default async function DashboardPage({
     redirectIfUnauthorizedError(err, '/', locale)
     if (isForbiddenError(err)) {
       return (
-        <ForbiddenAccessPage
-          title={t('forbiddenTitle')}
-          description={t('forbiddenDescription')}
-        />
+        <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
       )
     }
-    error =
-      err instanceof Error ? err.message : t('loadFailedFallback')
+    error = err instanceof Error ? err.message : t('loadFailedFallback')
   }
 
   if (error || !initialPrefetch || !metricsFacets) {
@@ -98,11 +88,7 @@ export default async function DashboardPage({
 
   return (
     <QueryHydrationBoundary state={initialPrefetch.dehydratedState}>
-      <DashboardView
-        metrics={metrics}
-        isDemo={auth.me.demo}
-        initialPrefetch={initialPrefetch}
-      />
+      <DashboardView metrics={metrics} isDemo={auth.me.demo} initialPrefetch={initialPrefetch} />
     </QueryHydrationBoundary>
   )
 }

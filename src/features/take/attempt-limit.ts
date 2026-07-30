@@ -1,67 +1,64 @@
-import { ApiError } from '@/lib/api-error';
+import { ApiError } from '@/lib/api-error'
 
-export const MAX_ANSWER_ATTEMPTS_PER_QUESTION = 3;
+export const MAX_ANSWER_ATTEMPTS_PER_QUESTION = 3
 
-export const ANSWER_ATTEMPT_LIMIT_REACHED_CODE = 'ANSWER_ATTEMPT_LIMIT_REACHED';
-export const ANSWER_VERSION_OVERWRITE_FORBIDDEN_CODE = 'ANSWER_VERSION_OVERWRITE_FORBIDDEN';
+export const ANSWER_ATTEMPT_LIMIT_REACHED_CODE = 'ANSWER_ATTEMPT_LIMIT_REACHED'
+export const ANSWER_VERSION_OVERWRITE_FORBIDDEN_CODE = 'ANSWER_VERSION_OVERWRITE_FORBIDDEN'
 
 export interface AnswerAttemptMeta {
-  versionCount?: number;
-  selectedVersionNumber?: number;
-  maxAttempts?: number;
+  versionCount?: number
+  selectedVersionNumber?: number
+  maxAttempts?: number
 }
 
 export function getMaxAttempts(meta?: AnswerAttemptMeta): number {
-  return meta?.maxAttempts ?? MAX_ANSWER_ATTEMPTS_PER_QUESTION;
+  return meta?.maxAttempts ?? MAX_ANSWER_ATTEMPTS_PER_QUESTION
 }
 
 export function getUsedAttempts(meta?: AnswerAttemptMeta): number {
-  return meta?.versionCount ?? 0;
+  return meta?.versionCount ?? 0
 }
 
 export function canStartNewAttempt(meta?: AnswerAttemptMeta): boolean {
-  return getUsedAttempts(meta) < getMaxAttempts(meta);
+  return getUsedAttempts(meta) < getMaxAttempts(meta)
 }
 
 export function resolveInitialVersionNumber(meta?: AnswerAttemptMeta): number {
-  const used = getUsedAttempts(meta);
-  const max = getMaxAttempts(meta);
+  const used = getUsedAttempts(meta)
+  const max = getMaxAttempts(meta)
   if (used >= max) {
-    return meta?.selectedVersionNumber ?? used;
+    return meta?.selectedVersionNumber ?? used
   }
-  return used + 1;
+  return used + 1
 }
 
 export function resolveNextVersionAfterSave(
   savedVersionNumber: number,
   meta?: AnswerAttemptMeta,
 ): number | null {
-  const max = getMaxAttempts(meta);
-  const usedAfterSave = Math.max(getUsedAttempts(meta), savedVersionNumber);
-  const nextVersion = savedVersionNumber + 1;
+  const max = getMaxAttempts(meta)
+  const usedAfterSave = Math.max(getUsedAttempts(meta), savedVersionNumber)
+  const nextVersion = savedVersionNumber + 1
   if (nextVersion > max || usedAfterSave >= max) {
-    return null;
+    return null
   }
-  return nextVersion;
+  return nextVersion
 }
 
-export function canRequestRetake(
-  currentVersionNumber: number,
-  meta?: AnswerAttemptMeta,
-): boolean {
-  return currentVersionNumber < getMaxAttempts(meta);
+export function canRequestRetake(currentVersionNumber: number, meta?: AnswerAttemptMeta): boolean {
+  return currentVersionNumber < getMaxAttempts(meta)
 }
 
 export function shouldReuseReservedAttemptForRetake(params: {
-  currentVersionNumber: number;
-  hasSubmittableMedia?: boolean;
-  latestSubmittableVersionNumber?: number | null;
-  localVersionHasMedia: boolean;
+  currentVersionNumber: number
+  hasSubmittableMedia?: boolean
+  latestSubmittableVersionNumber?: number | null
+  localVersionHasMedia: boolean
 }): boolean {
   const serverHasMediaOnCurrent =
     Boolean(params.hasSubmittableMedia) &&
-    params.latestSubmittableVersionNumber === params.currentVersionNumber;
-  return !serverHasMediaOnCurrent && !params.localVersionHasMedia;
+    params.latestSubmittableVersionNumber === params.currentVersionNumber
+  return !serverHasMediaOnCurrent && !params.localVersionHasMedia
 }
 
 export function getDisplayedAttemptNumber(
@@ -70,16 +67,16 @@ export function getDisplayedAttemptNumber(
   recording: boolean,
 ): number {
   if (recording) {
-    return currentVersionNumber;
+    return currentVersionNumber
   }
-  const usedAttempts = getUsedAttempts(meta);
-  return usedAttempts > 0 ? usedAttempts : 1;
+  const usedAttempts = getUsedAttempts(meta)
+  return usedAttempts > 0 ? usedAttempts : 1
 }
 
 export function isAnswerAttemptLimitError(error: unknown): boolean {
-  return error instanceof ApiError && error.code === ANSWER_ATTEMPT_LIMIT_REACHED_CODE;
+  return error instanceof ApiError && error.code === ANSWER_ATTEMPT_LIMIT_REACHED_CODE
 }
 
 export function isAnswerVersionOverwriteError(error: unknown): boolean {
-  return error instanceof ApiError && error.code === ANSWER_VERSION_OVERWRITE_FORBIDDEN_CODE;
+  return error instanceof ApiError && error.code === ANSWER_VERSION_OVERWRITE_FORBIDDEN_CODE
 }

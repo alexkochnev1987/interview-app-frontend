@@ -7,9 +7,7 @@ export type DashboardMetrics = {
   questionVolume: number
 }
 
-export function computeDashboardMetrics(
-  facets: InterviewFacetsResponse,
-): DashboardMetrics {
+export function computeDashboardMetrics(facets: InterviewFacetsResponse): DashboardMetrics {
   const statusCounts = Object.fromEntries(
     facets.statuses.map((entry) => [entry.value, entry.count]),
   )

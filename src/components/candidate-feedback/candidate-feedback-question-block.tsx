@@ -14,6 +14,7 @@ import { DividerLabel } from '@/components/ui/divider-label'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText, SectionHeading } from '@/components/ui/text'
+import { type Answer, type InterviewQuestion } from '@/lib/api'
 import {
   getCandidateFeedbackBlockSkipReason,
   getQuestionGenerateLabelKey,
@@ -22,7 +23,6 @@ import {
   shouldShowQuestionGenerateButton,
   type CandidateFeedbackQuestionBlock,
 } from '@/lib/candidate-feedback'
-import { type Answer, type InterviewQuestion } from '@/lib/api'
 
 interface CandidateFeedbackQuestionBlockEditorProps {
   block: CandidateFeedbackQuestionBlock
@@ -33,14 +33,8 @@ interface CandidateFeedbackQuestionBlockEditorProps {
   generationDisabled: boolean
   sharedGenerationError?: string | null
   onGenerate: () => Promise<void>
-  onAcceptAll: (payload: {
-    recommendationText: string
-    improvementText: string
-  }) => Promise<void>
-  onSave: (payload: {
-    recommendationText: string
-    improvementText: string
-  }) => Promise<void>
+  onAcceptAll: (payload: { recommendationText: string; improvementText: string }) => Promise<void>
+  onSave: (payload: { recommendationText: string; improvementText: string }) => Promise<void>
 }
 
 export function CandidateFeedbackQuestionBlockEditor({

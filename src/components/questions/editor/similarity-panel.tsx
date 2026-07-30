@@ -3,33 +3,25 @@
 import { Search } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
 import { Icon } from '@/components/ui/icon'
-import { MetricPanel } from '@/components/ui/metric-panel'
-import { StatusPill } from '@/components/ui/status-pill'
-import { SurfaceTile } from '@/components/ui/surface-tile'
-import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
 import { Grid } from '@/components/ui/layout/grid'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
+import { MetricPanel } from '@/components/ui/metric-panel'
+import { StatusPill } from '@/components/ui/status-pill'
+import { SurfaceTile } from '@/components/ui/surface-tile'
 import { BodyText } from '@/components/ui/text'
-import { type SimilarQuestionMatch } from '@/lib/api'
 import { Link } from '@/i18n/navigation'
 import { routes } from '@/i18n/routes'
-import {
-  type SimilarStatus,
-  type SimilaritySignalSummary,
-} from '@/lib/question-editor/parsers'
+import { useSharedLabels } from '@/i18n/use-shared-labels'
+import { type SimilarQuestionMatch } from '@/lib/api'
+import { type SimilarStatus, type SimilaritySignalSummary } from '@/lib/question-editor/parsers'
 import { truncateText } from '@/lib/text'
 import { useToastMessages } from '@/lib/use-toast-messages'
-import { useSharedLabels } from '@/i18n/use-shared-labels'
+
 import { SIMILARITY_MIN_QUESTION_TEXT_LENGTH } from './use-similarity-search'
 
 interface SimilarityPanelProps {
@@ -63,9 +55,7 @@ export function SimilarityPanel({
       <CardHeader spacing="lg">
         <Stack gap={1.5}>
           <CardTitle size="lg">{t('title')}</CardTitle>
-          <CardDescription>
-            {t('description')}
-          </CardDescription>
+          <CardDescription>{t('description')}</CardDescription>
         </Stack>
 
         <Grid columns={3} gap={3}>
@@ -96,16 +86,10 @@ export function SimilarityPanel({
       </CardHeader>
       <CardContent spacing="md">
         {status === 'idle' ? (
-          <PanelMessage>
-            {t('idleHint', { min: SIMILARITY_MIN_QUESTION_TEXT_LENGTH })}
-          </PanelMessage>
+          <PanelMessage>{t('idleHint', { min: SIMILARITY_MIN_QUESTION_TEXT_LENGTH })}</PanelMessage>
         ) : null}
 
-        {status === 'loading' ? (
-          <PanelMessage>
-            {t('loadingHint')}
-          </PanelMessage>
-        ) : null}
+        {status === 'loading' ? <PanelMessage>{t('loadingHint')}</PanelMessage> : null}
 
         {status === 'error' ? (
           <Stack gap={2}>
@@ -134,15 +118,11 @@ export function SimilarityPanel({
         ) : null}
 
         {status === 'success' && matches.length === 0 ? (
-          <PanelMessage>
-            {toastMessages.similarity.noMatches}
-          </PanelMessage>
+          <PanelMessage>{toastMessages.similarity.noMatches}</PanelMessage>
         ) : null}
 
         {status === 'success'
-          ? matches.map((match) => (
-              <SimilarMatchRow key={match.question.id} match={match} />
-            ))
+          ? matches.map((match) => <SimilarMatchRow key={match.question.id} match={match} />)
           : null}
       </CardContent>
     </Card>
@@ -150,9 +130,7 @@ export function SimilarityPanel({
 }
 
 function SignalTile({ label, value }: { label: string; value: number }) {
-  return (
-    <MetricPanel tone="elevated" label={label} value={value} valueSize="default" />
-  )
+  return <MetricPanel tone="elevated" label={label} value={value} valueSize="default" />
 }
 
 function PanelMessage({ children }: { children: React.ReactNode }) {
@@ -166,11 +144,7 @@ function PanelMessage({ children }: { children: React.ReactNode }) {
 function SimilarMatchRow({ match }: { match: SimilarQuestionMatch }) {
   const t = useTranslations('questions.similarity')
   const sharedLabels = useSharedLabels()
-  const taxonomy = [
-    match.question.role,
-    match.question.category,
-    match.question.subcategory,
-  ]
+  const taxonomy = [match.question.role, match.question.category, match.question.subcategory]
     .filter(Boolean)
     .join(' / ')
 
@@ -196,13 +170,7 @@ function SimilarMatchRow({ match }: { match: SimilarQuestionMatch }) {
             </Stack>
           </Stack>
 
-          <Button
-            type="button"
-            variant="outline-pill"
-            shape="pill"
-            size="sm"
-            asChild
-          >
+          <Button type="button" variant="outline-pill" shape="pill" size="sm" asChild>
             <Link href={routes.questions.detail(match.question.id)}>{t('openQuestion')}</Link>
           </Button>
         </Inline>

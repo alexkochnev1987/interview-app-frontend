@@ -1,21 +1,20 @@
 'use client'
 
-import { useMemo } from 'react'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import {
-  fetchQuestionFacets,
-  type QuestionFacetsResponse,
-} from '@/lib/api'
+import { useMemo } from 'react'
+
+import { fetchQuestionFacets, type QuestionFacetsResponse } from '@/lib/api'
+import { getErrorMessage } from '@/lib/api-error'
 import {
   buildQuestionFacetsParams,
   EMPTY_QUESTION_FACETS,
   type QuestionFetchOptions,
   type QuestionsQueryState,
 } from '@/lib/questions-query-state'
-import { questionFacetsQueryKey } from './query-keys'
-import { isPlaceholderLoading, useVoidCallback } from './query-hook-helpers'
-import {getErrorMessage} from '@/lib/api-error';
 import { useToastMessages } from '@/lib/use-toast-messages'
+
+import { isPlaceholderLoading, useVoidCallback } from './query-hook-helpers'
+import { questionFacetsQueryKey } from './query-keys'
 
 export type UseQuestionFacetsResult = {
   facets: QuestionFacetsResponse
@@ -26,14 +25,7 @@ export type UseQuestionFacetsResult = {
 
 type FilterSnapshot = Pick<
   QuestionsQueryState,
-  | 'q'
-  | 'locale'
-  | 'difficulty'
-  | 'category'
-  | 'subcategory'
-  | 'tags'
-  | 'role'
-  | 'status'
+  'q' | 'locale' | 'difficulty' | 'category' | 'subcategory' | 'tags' | 'role' | 'status'
 >
 
 export function useQuestionFacets(

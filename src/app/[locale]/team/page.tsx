@@ -1,9 +1,9 @@
 import { getTranslations } from 'next-intl/server'
 
-import { TeamMembersContainer } from '@/features/team/team-members-container'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
+import { TeamMembersContainer } from '@/features/team/team-members-container'
 import type { Locale } from '@/i18n/locales'
 import { type TeamMember } from '@/lib/api'
 import {
@@ -27,10 +27,7 @@ export default async function TeamPage({ params }: TeamPageProps) {
   redirectIfUnauthenticated(auth, '/team', locale)
   if (auth.kind === 'forbidden') {
     return (
-      <ForbiddenAccessPage
-        title={t('forbiddenTitle')}
-        description={t('forbiddenDescription')}
-      />
+      <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
     )
   }
   if (auth.kind === 'error') {
@@ -51,23 +48,14 @@ export default async function TeamPage({ params }: TeamPageProps) {
     redirectIfUnauthorizedError(err, '/team', locale)
     if (isForbiddenError(err)) {
       return (
-        <ForbiddenAccessPage
-          title={t('forbiddenTitle')}
-          description={t('forbiddenDescription')}
-        />
+        <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
       )
     }
-    error =
-      err instanceof Error ? err.message : t('loadFailedFallback')
+    error = err instanceof Error ? err.message : t('loadFailedFallback')
   }
 
   if (error) {
-    return (
-      <FlashErrorPageFallback
-        title={t('loadFailedTitle')}
-        description={error}
-      />
-    )
+    return <FlashErrorPageFallback title={t('loadFailedTitle')} description={error} />
   }
 
   return (

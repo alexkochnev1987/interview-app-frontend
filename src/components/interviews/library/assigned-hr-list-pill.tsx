@@ -10,10 +10,7 @@ type AssignedHrListPillProps = {
   size?: 'default' | 'compact' | 'header'
 }
 
-export function AssignedHrListPill({
-  assignedHr,
-  size = 'compact',
-}: AssignedHrListPillProps) {
+export function AssignedHrListPill({ assignedHr, size = 'compact' }: AssignedHrListPillProps) {
   const t = useTranslations('interviews.library')
 
   if (assignedHr) {

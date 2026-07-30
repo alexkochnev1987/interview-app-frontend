@@ -1,37 +1,33 @@
-import { CheckCircle2 } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { CheckCircle2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
-import { SurfaceCard } from '@/components/ui/surface-card';
-import { CardContent } from '@/components/ui/card';
-import { Heading } from '@/components/ui/heading';
-import { IconBox } from '@/components/ui/icon-box';
-import { Stack } from '@/components/ui/layout';
-import { Text } from '@/components/ui/text';
+import { CardContent } from '@/components/ui/card'
+import { Heading } from '@/components/ui/heading'
+import { IconBox } from '@/components/ui/icon-box'
+import { Stack } from '@/components/ui/layout'
+import { SurfaceCard } from '@/components/ui/surface-card'
+import { Text } from '@/components/ui/text'
 
 interface TakeCompleteScreenProps {
-  candidateName: string;
-  position: string;
+  candidateName: string
+  position: string
 }
 
 export function TakeCompleteScreen({ candidateName, position }: TakeCompleteScreenProps) {
-  const tTake = useTranslations('takeFlow');
+  const tTake = useTranslations('takeFlow')
   return (
     <SurfaceCard tone="glassFloat" size="lg">
       <CardContent layout="stack-center" spacing="xl">
-          <Stack gap={6} align="center" width="full">
-            <IconBox centered>
-              <CheckCircle2 size={32} />
-            </IconBox>
-            <Stack gap={3} align="center">
-              <Heading variant="heroTitle">
-                {tTake('completeTitle', { candidateName })}
-              </Heading>
-              <Text variant="heroDescription">
-                {tTake('completeDescription', { position })}
-              </Text>
-            </Stack>
+        <Stack gap={6} align="center" width="full">
+          <IconBox centered>
+            <CheckCircle2 size={32} />
+          </IconBox>
+          <Stack gap={3} align="center">
+            <Heading variant="heroTitle">{tTake('completeTitle', { candidateName })}</Heading>
+            <Text variant="heroDescription">{tTake('completeDescription', { position })}</Text>
           </Stack>
-        </CardContent>
+        </Stack>
+      </CardContent>
     </SurfaceCard>
-  );
+  )
 }

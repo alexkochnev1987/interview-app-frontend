@@ -5,10 +5,7 @@ import {
   interviewsInfiniteQueryKey,
   interviewsListQueryKey,
 } from '@/components/interviews/library/query-keys'
-import type {
-  InterviewFacetsResponse,
-  PaginatedInterviews,
-} from '@/lib/api'
+import type { InterviewFacetsResponse, PaginatedInterviews } from '@/lib/api'
 import { getQueryClient } from '@/lib/get-query-client'
 import {
   buildInterviewFacetsParams,
@@ -34,9 +31,7 @@ async function fetchInterviewsPage(
 ): Promise<PaginatedInterviews> {
   return (
     (await requestServer<PaginatedInterviews>('/interviews', ctx, { query: params })) ??
-    emptyPaginatedInterviews(
-      typeof params.limit === 'number' ? params.limit : undefined,
-    )
+    emptyPaginatedInterviews(typeof params.limit === 'number' ? params.limit : undefined)
   )
 }
 
@@ -101,9 +96,8 @@ async function hydrateInterviewsLibrary(
   await Promise.all(prefetches)
 
   const facets =
-    queryClient.getQueryData<InterviewFacetsResponse>(
-      interviewFacetsQueryKey(facetsParams),
-    ) ?? EMPTY_INTERVIEW_FACETS
+    queryClient.getQueryData<InterviewFacetsResponse>(interviewFacetsQueryKey(facetsParams)) ??
+    EMPTY_INTERVIEW_FACETS
 
   return {
     queryState,

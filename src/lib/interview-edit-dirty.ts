@@ -28,7 +28,7 @@ export function isInterviewEditDirty(
   candidateName: string,
   position: string,
   selectedById: ReadonlyMap<string, unknown>,
-  assignedHrId?: string
+  assignedHrId?: string,
 ): boolean {
   const initialAssignedHrId = interview.assignedHrId ?? interview.assignedHr?.id
   if ((assignedHrId ?? undefined) !== (initialAssignedHrId ?? undefined)) {
@@ -42,10 +42,7 @@ export function isInterviewEditDirty(
   }
 
   const initialIds = interview.questions.map((question) => question.id)
-  const currentIds = getSelectedQuestionIdsInEditOrder(
-    interview.questions,
-    selectedById,
-  )
+  const currentIds = getSelectedQuestionIdsInEditOrder(interview.questions, selectedById)
 
   if (initialIds.length !== currentIds.length) {
     return true

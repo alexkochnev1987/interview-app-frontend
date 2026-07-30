@@ -26,13 +26,7 @@ export function CandidateFeedbackLiveRefreshNotice({
       <AlertDescription>
         <Inline gap={3} align="center" wrap="wrap">
           <span>{t('description')}</span>
-          <Button
-            type="button"
-            variant="outline-pill"
-            shape="pill"
-            size="sm"
-            onClick={onRefresh}
-          >
+          <Button type="button" variant="outline-pill" shape="pill" size="sm" onClick={onRefresh}>
             <Icon size="md">
               <RefreshCw />
             </Icon>

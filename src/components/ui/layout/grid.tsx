@@ -1,5 +1,5 @@
-import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
+import type { ComponentProps, ElementType, JSX } from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -49,8 +49,7 @@ const gridVariants = cva('grid', {
         'grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center [&>*:first-child]:min-w-0 [&>*:last-child]:justify-self-center sm:[&>*:last-child]:justify-self-end',
       'page-header-actions':
         'grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start [&>*:first-child]:min-w-0 [&>*:last-child]:justify-self-end',
-      'consent-shell':
-        'grid-cols-1 content-start lg:grid-cols-[1.1fr_0.9fr]',
+      'consent-shell': 'grid-cols-1 content-start lg:grid-cols-[1.1fr_0.9fr]',
       'lobby-shell': cn(
         'grid-cols-1 lg:grid-cols-[1.1fr_0.9fr]',
         'grid-rows-[minmax(min(42vh,280px),auto)_auto] lg:grid-rows-[minmax(0,1fr)]',
@@ -76,9 +75,9 @@ const gridVariants = cva('grid', {
   },
 })
 
-type GridProps = Omit<React.ComponentProps<'div'>, 'color'> &
+type GridProps = Omit<ComponentProps<'div'>, 'color'> &
   VariantProps<typeof gridVariants> & {
-    as?: keyof React.JSX.IntrinsicElements
+    as?: keyof JSX.IntrinsicElements
   }
 
 export function Grid({
@@ -91,7 +90,7 @@ export function Grid({
   visibility,
   ...props
 }: GridProps) {
-  const Comp = (as ?? 'div') as React.ElementType
+  const Comp = (as ?? 'div') as ElementType
 
   return (
     <Comp

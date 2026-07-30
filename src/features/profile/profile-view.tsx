@@ -53,23 +53,15 @@ export function ProfileView({ user, mode = 'self' }: ProfileViewProps) {
       </CardHeader>
       <CardContent spacing="lg">
         <Stack gap={5}>
-          <ProfileField
-            label={t('personalInformation.name')}
-            value={user.name}
-          />
-          <ProfileField
-            label={t('personalInformation.email')}
-            value={user.email}
-          />
+          <ProfileField label={t('personalInformation.name')} value={user.name} />
+          <ProfileField label={t('personalInformation.email')} value={user.email} />
           <ProfileField
             label={t('personalInformation.role')}
             value={<TeamRoleBadge role={user.role} />}
           />
           <ProfileField
             label={t('personalInformation.organizationId')}
-            value={
-              user.organizationId ?? t('personalInformation.organizationUnassigned')
-            }
+            value={user.organizationId ?? t('personalInformation.organizationUnassigned')}
           />
         </Stack>
       </CardContent>
@@ -110,9 +102,7 @@ export function ProfileView({ user, mode = 'self' }: ProfileViewProps) {
               <BodyText weight="medium">{t('preferences.productTour')}</BodyText>
               <Button
                 type="button"
-                variant="outline-pill"
-                shape="pill"
-                size="sm"
+                variant="outline"
                 disabled={!canReplayTour}
                 onClick={() => void replayTour()}
               >
@@ -128,9 +118,7 @@ export function ProfileView({ user, mode = 'self' }: ProfileViewProps) {
   return (
     <Stack gap={8} width="full">
       <Stack gap={2} width="full">
-        <SectionHeading size="xl">
-          {isSelf ? t('heading') : t('memberHeading')}
-        </SectionHeading>
+        <SectionHeading size="xl">{isSelf ? t('heading') : t('memberHeading')}</SectionHeading>
         <BodyText as="p" size="responsive-sm" width="prose">
           {isSelf ? t('lead') : t('memberLead')}
         </BodyText>

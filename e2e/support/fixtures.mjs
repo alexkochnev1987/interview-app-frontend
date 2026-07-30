@@ -124,9 +124,7 @@ export const EMPTY_INTERVIEW_FACETS = {
 }
 
 export function toInterviewListItem(item) {
-  const submittedAnswerCount = item.answers.filter(
-    (answer) => answer.status === 'submitted',
-  ).length
+  const submittedAnswerCount = item.answers.filter((answer) => answer.status === 'submitted').length
 
   return {
     id: item.id,
@@ -152,9 +150,6 @@ export function buildInterviewFacets(items) {
   return {
     positions: [...positions.entries()].map(([value, count]) => ({ value, count })),
     statuses: [...statuses.entries()].map(([value, count]) => ({ value, count })),
-    totalQuestionCount: items.reduce(
-      (sum, item) => sum + (item.questionCount ?? 0),
-      0,
-    ),
+    totalQuestionCount: items.reduce((sum, item) => sum + (item.questionCount ?? 0), 0),
   }
 }

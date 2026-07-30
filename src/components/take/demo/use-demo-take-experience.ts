@@ -1,22 +1,14 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import type {
-  InterviewDataView,
-  PermissionStatus,
-  TakeStage,
-} from '@/components/take/types'
+import type { InterviewDataView, PermissionStatus, TakeStage } from '@/components/take/types'
+import { TAKE_MESSAGES, type TakeMessageKey, type TakeMessageValues } from '@/features/take'
 import type { InterviewerPresence } from '@/features/take/use-take-question-tts'
-import type { TakeInterviewData } from '@/lib/api'
-import type { Locale } from '@/i18n/locales'
-import {
-  TAKE_MESSAGES,
-  type TakeMessageKey,
-  type TakeMessageValues,
-} from '@/features/take'
 import { permissionLabel, TAKE_RECORDING_LIMIT_SECONDS } from '@/features/take/utils'
+import type { Locale } from '@/i18n/locales'
+import type { TakeInterviewData } from '@/lib/api'
 
 interface UseDemoTakeExperienceParams {
   candidateName: string
@@ -130,7 +122,15 @@ export function useDemoTakeExperience({
       maxAttempts: 3,
       completed: false,
     }),
-    [position, interviewLocale, candidateName, totalQuestions, questionTexts, currentIndex, versionNumber],
+    [
+      position,
+      interviewLocale,
+      candidateName,
+      totalQuestions,
+      questionTexts,
+      currentIndex,
+      versionNumber,
+    ],
   )
 
   const beginQuestion = useCallback(() => {
@@ -165,8 +165,7 @@ export function useDemoTakeExperience({
       const stream = cameraStreamRef.current
       if (!stream) return
       const next = !(kind === 'audio' ? lobbyMicOn : lobbyCameraOn)
-      const tracks =
-        kind === 'audio' ? stream.getAudioTracks() : stream.getVideoTracks()
+      const tracks = kind === 'audio' ? stream.getAudioTracks() : stream.getVideoTracks()
       tracks.forEach((track) => {
         track.enabled = next
       })
@@ -200,9 +199,7 @@ export function useDemoTakeExperience({
     void prepareCamera()
   }, [prepareCamera])
 
-  const progressValue = totalQuestions
-    ? Math.round((currentIndex / totalQuestions) * 100)
-    : 0
+  const progressValue = totalQuestions ? Math.round((currentIndex / totalQuestions) * 100) : 0
 
   return {
     stage,
@@ -221,8 +218,7 @@ export function useDemoTakeExperience({
     timeLeft,
     interviewerPresence: 'listening',
     progressValue,
-    permissionLabel: (status: PermissionStatus) =>
-      permissionLabel(status, takeMessage),
+    permissionLabel: (status: PermissionStatus) => permissionLabel(status, takeMessage),
     onContinueToLobby,
     onToggleMic: () => toggleTrack('audio'),
     onToggleCamera: () => toggleTrack('video'),

@@ -1,14 +1,10 @@
 import { expect, test } from '@playwright/test'
 
 import { loginAsAdmin } from './support/auth'
-import {
-  ELIGIBLE_QUESTION_TEXT,
-  SCHEDULED_QUESTION_TEXT,
-} from './support/fixtures.mjs'
+import { ELIGIBLE_QUESTION_TEXT, SCHEDULED_QUESTION_TEXT } from './support/fixtures.mjs'
 
 const MOCK_API_BASE =
-  process.env.BACKEND_URL ??
-  `http://127.0.0.1:${process.env.E2E_MOCK_API_PORT ?? '3000'}`
+  process.env.BACKEND_URL ?? `http://127.0.0.1:${process.env.E2E_MOCK_API_PORT ?? '3000'}`
 
 test.describe('interview management', () => {
   test.beforeEach(async ({ request }) => {
@@ -60,10 +56,7 @@ test.describe('interview management', () => {
     await page.getByRole('button', { name: 'Cancel interview' }).click()
     await expect(page.getByRole('dialog')).toContainText('Cancel this interview?')
 
-    await page
-      .getByRole('dialog')
-      .getByRole('button', { name: 'Cancel interview' })
-      .click()
+    await page.getByRole('dialog').getByRole('button', { name: 'Cancel interview' }).click()
 
     await expect(page).toHaveURL(/\/$/)
     await expect(page.getByText('Recruiter Dashboard')).toBeVisible()
@@ -114,18 +107,13 @@ test.describe('interview management', () => {
     await page.getByRole('button', { name: 'Delete interview' }).click()
     await expect(page.getByRole('dialog')).toContainText('Delete this interview?')
 
-    await page
-      .getByRole('dialog')
-      .getByRole('button', { name: 'Delete interview' })
-      .click()
+    await page.getByRole('dialog').getByRole('button', { name: 'Delete interview' }).click()
 
     await expect(page).toHaveURL(/\/$/)
     await expect(page.getByText('Recruiter Dashboard')).toBeVisible()
   })
 
-  test('demo user sees a disabled delete button on completed interviews', async ({
-    page,
-  }) => {
+  test('demo user sees a disabled delete button on completed interviews', async ({ page }) => {
     await page.goto('/login')
     await page.getByTestId('login-demo').click()
     await expect(page).not.toHaveURL(/\/login(\?|$)/, { timeout: 15_000 })

@@ -1,8 +1,8 @@
 'use client'
 
 import { X } from 'lucide-react'
-import { type ReactNode } from 'react'
 import { useTranslations } from 'next-intl'
+import { type ReactNode } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
@@ -18,10 +18,8 @@ import {
 } from '@/components/ui/select'
 import { StatusPill } from '@/components/ui/status-pill'
 import type { InterviewSortField, InterviewSortOrder } from '@/lib/api'
-import {
-  MAX_INTERVIEWS_Q_LENGTH,
-  type InterviewPageLimit,
-} from '@/lib/interviews-query-state'
+import { MAX_INTERVIEWS_Q_LENGTH, type InterviewPageLimit } from '@/lib/interviews-query-state'
+
 import { InterviewPageSizeSelect } from './interview-page-size-select'
 
 const SORT_OPTIONS: Array<{
@@ -70,7 +68,7 @@ export function InterviewPickerToolbar(props: InterviewPickerToolbarProps) {
     viewToggle,
     limit,
     onLimitChange,
-    pageSizeDisabled
+    pageSizeDisabled,
   } = props
 
   const sortValue = `${sortBy}:${sortOrder}` as `${InterviewSortField}:${InterviewSortOrder}`
@@ -115,9 +113,9 @@ export function InterviewPickerToolbar(props: InterviewPickerToolbarProps) {
         <Inline gap={2} align="center" wrap="wrap">
           {viewToggle}
           <InterviewPageSizeSelect
-              limit={limit}
-              onLimitChange={onLimitChange}
-              disabled={pageSizeDisabled}
+            limit={limit}
+            onLimitChange={onLimitChange}
+            disabled={pageSizeDisabled}
           />
           <Select
             value={sortValue}

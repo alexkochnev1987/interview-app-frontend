@@ -3,22 +3,19 @@
 import { LoaderCircle, RotateCcw } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
+import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText } from '@/components/ui/text'
-import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 
 interface DeletedQuestionBannerProps {
   restoring: boolean
   onRestore: () => void
 }
 
-export function DeletedQuestionBanner({
-  restoring,
-  onRestore,
-}: DeletedQuestionBannerProps) {
+export function DeletedQuestionBanner({ restoring, onRestore }: DeletedQuestionBannerProps) {
   const tBanner = useTranslations('questions.deletedBanner')
   const tEdit = useTranslations('questions.editPage')
 
@@ -35,12 +32,7 @@ export function DeletedQuestionBanner({
             </BodyText>
           </Stack>
           <DemoWriteGuard disabled={restoring}>
-            <Button
-              type="button"
-              variant="destructive"
-              shape="pill"
-              onClick={onRestore}
-            >
+            <Button type="button" variant="destructive" shape="pill" onClick={onRestore}>
               {restoring ? (
                 <LoaderCircle className="size-4 animate-spin" />
               ) : (

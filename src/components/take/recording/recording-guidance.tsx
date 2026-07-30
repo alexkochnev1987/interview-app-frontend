@@ -1,17 +1,18 @@
-import type { TakeStage } from '@/components/take/types';
-import { Panel } from '@/components/ui/panel';
-import { Stack } from '@/components/ui/layout';
-import { Text } from '@/components/ui/text';
-import type { ExhaustedHint } from '@/features/take/session-machine';
-import type { InterviewerPresence } from '@/features/take/use-take-question-tts';
-import { useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl'
+
+import type { TakeStage } from '@/components/take/types'
+import { Stack } from '@/components/ui/layout'
+import { Panel } from '@/components/ui/panel'
+import { Text } from '@/components/ui/text'
+import type { ExhaustedHint } from '@/features/take/session-machine'
+import type { InterviewerPresence } from '@/features/take/use-take-question-tts'
 
 interface TakeRecordingGuidanceProps {
-  stage: TakeStage;
-  recording: boolean;
-  recordingStartBusy: boolean;
-  interviewerPresence: InterviewerPresence;
-  exhaustedHint: ExhaustedHint | null;
+  stage: TakeStage
+  recording: boolean
+  recordingStartBusy: boolean
+  interviewerPresence: InterviewerPresence
+  exhaustedHint: ExhaustedHint | null
 }
 
 export function TakeRecordingGuidance({
@@ -21,26 +22,26 @@ export function TakeRecordingGuidance({
   interviewerPresence,
   exhaustedHint,
 }: TakeRecordingGuidanceProps) {
-  const tTake = useTranslations('takeFlow');
+  const tTake = useTranslations('takeFlow')
 
-  let guidance = tTake('guidanceInterview');
+  let guidance = tTake('guidanceInterview')
   if (!recording && exhaustedHint === 'submit') {
-    guidance = tTake('reviewSubmitBanner');
+    guidance = tTake('reviewSubmitBanner')
   } else if (!recording && exhaustedHint === 'no-media') {
-    guidance = tTake('attemptsExhaustedNoMedia');
+    guidance = tTake('attemptsExhaustedNoMedia')
   } else if (stage === 'transition') {
-    guidance = tTake('guidanceInterview');
+    guidance = tTake('guidanceInterview')
   } else if (stage === 'interview' && !recording) {
     if (recordingStartBusy) {
-      guidance = tTake('recordingStartingBusy');
+      guidance = tTake('recordingStartingBusy')
     } else if (interviewerPresence === 'speaking') {
-      guidance = tTake('guidanceInterviewerSpeaking');
+      guidance = tTake('guidanceInterviewerSpeaking')
     } else {
-      guidance = `${tTake('guidanceBeforeRecording')} ${tTake('attemptBurnsOnRecordStart')}`;
+      guidance = `${tTake('guidanceBeforeRecording')} ${tTake('attemptBurnsOnRecordStart')}`
     }
   }
 
-  const isReviewBanner = !recording && exhaustedHint === 'submit';
+  const isReviewBanner = !recording && exhaustedHint === 'submit'
 
   return (
     <Panel>
@@ -51,5 +52,5 @@ export function TakeRecordingGuidance({
         <Text variant={isReviewBanner ? 'bodySm' : 'bodyMutedSm'}>{guidance}</Text>
       </Stack>
     </Panel>
-  );
+  )
 }

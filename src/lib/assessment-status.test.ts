@@ -33,12 +33,8 @@ function readyToScoreInterview() {
 
 describe('assessment-status', () => {
   it('derives review status across interview lifecycle', () => {
-    expect(deriveReviewStatus(interviewFixture({ status: 'failed' }))).toBe(
-      'failed',
-    )
-    expect(
-      deriveReviewStatus(interviewFixture({ status: 'in_progress' })),
-    ).toBe('in_progress')
+    expect(deriveReviewStatus(interviewFixture({ status: 'failed' }))).toBe('failed')
+    expect(deriveReviewStatus(interviewFixture({ status: 'in_progress' }))).toBe('in_progress')
     expect(
       deriveReviewStatus(
         interviewFixture({
@@ -59,11 +55,9 @@ describe('assessment-status', () => {
         }),
       ),
     ).toBe('ready')
-    expect(
-      deriveReviewStatus(
-        interviewFixture({ status: 'completed', result: undefined }),
-      ),
-    ).toBe('scoring')
+    expect(deriveReviewStatus(interviewFixture({ status: 'completed', result: undefined }))).toBe(
+      'scoring',
+    )
     expect(
       deriveReviewStatus(
         interviewFixture({
@@ -102,26 +96,18 @@ describe('assessment-status', () => {
 
   it('derives answer state from validation and evaluation', () => {
     expect(deriveAnswerState(undefined)).toBe('none')
+    expect(deriveAnswerState(submittedAnswerFixture({ validation: { status: 'failed' } }))).toBe(
+      'failed',
+    )
+    expect(deriveAnswerState(submittedAnswerFixture({ validation: { status: 'queued' } }))).toBe(
+      'scoring',
+    )
     expect(
-      deriveAnswerState(
-        submittedAnswerFixture({ validation: { status: 'failed' } }),
-      ),
-    ).toBe('failed')
-    expect(
-      deriveAnswerState(
-        submittedAnswerFixture({ validation: { status: 'queued' } }),
-      ),
+      deriveAnswerState(submittedAnswerFixture({ validation: { status: 'processing' } })),
     ).toBe('scoring')
-    expect(
-      deriveAnswerState(
-        submittedAnswerFixture({ validation: { status: 'processing' } }),
-      ),
-    ).toBe('scoring')
-    expect(
-      deriveAnswerState(
-        submittedAnswerFixture({ evaluation: { overallScore: 80 } }),
-      ),
-    ).toBe('scored')
+    expect(deriveAnswerState(submittedAnswerFixture({ evaluation: { overallScore: 80 } }))).toBe(
+      'scored',
+    )
     expect(deriveAnswerState(submittedAnswerFixture())).toBe('awaiting')
   })
 
@@ -129,9 +115,7 @@ describe('assessment-status', () => {
     expect(
       isValidationInFlight(
         interviewFixture({
-          answers: [
-            submittedAnswerFixture({ validation: { status: 'processing' } }),
-          ],
+          answers: [submittedAnswerFixture({ validation: { status: 'processing' } })],
         }),
       ),
     ).toBe(true)
@@ -142,11 +126,9 @@ describe('assessment-status', () => {
     expect(deriveReviewStatus(readyToScoreInterview())).toBe('ready_to_score')
 
     // No questions: nothing to score yet.
-    expect(
-      deriveReviewStatus(
-        interviewFixture({ status: 'in_progress', answers: [] }),
-      ),
-    ).toBe('in_progress')
+    expect(deriveReviewStatus(interviewFixture({ status: 'in_progress', answers: [] }))).toBe(
+      'in_progress',
+    )
 
     // A question is still unanswered.
     expect(
@@ -232,22 +214,15 @@ describe('assessment-status', () => {
     expect(isHrVisibleAssessment(pending)).toBe(false)
 
     const selected = selectHrVisibleAssessments([pending, ready, failed])
-    expect(selected.map((interview) => interview.id)).toEqual([
-      'ready',
-      'failed',
-    ])
+    expect(selected.map((interview) => interview.id)).toEqual(['ready', 'failed'])
   })
 
   it('detects placeholder scoring summaries', () => {
     expect(
-      isPlaceholderResult(
-        interviewResultFixture({ summary: 'Simulated evaluation result' }),
-      ),
+      isPlaceholderResult(interviewResultFixture({ summary: 'Simulated evaluation result' })),
     ).toBe(true)
-    expect(
-      isPlaceholderResult(
-        interviewResultFixture({ summary: 'Strong hire signal' }),
-      ),
-    ).toBe(false)
+    expect(isPlaceholderResult(interviewResultFixture({ summary: 'Strong hire signal' }))).toBe(
+      false,
+    )
   })
 })

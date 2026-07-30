@@ -1,13 +1,14 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { useEffect, useRef, useState } from 'react'
 
 import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { Button } from '@/components/ui/button'
 import { DisabledHintTooltip } from '@/components/ui/disabled-hint-tooltip'
 import { FormField } from '@/components/ui/form-field'
 import { Inline } from '@/components/ui/layout/inline'
+import { Stack } from '@/components/ui/layout/stack'
 import {
   Select,
   SelectContent,
@@ -15,9 +16,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Stack } from '@/components/ui/layout/stack'
-import { Textarea } from '@/components/ui/textarea'
 import { BodyText } from '@/components/ui/text'
+import { Textarea } from '@/components/ui/textarea'
 import {
   CANDIDATE_FEEDBACK_OUTCOMES,
   type CandidateFeedbackOutcome,
@@ -53,9 +53,7 @@ export function CandidateFeedbackOutcomeField({
   const t = useTranslations('interviews.candidateFeedback')
   const persistedOutcomeKey = getPersistedOutcomeKey(value, message)
   const lastPersistedOutcomeKeyRef = useRef(persistedOutcomeKey)
-  const [draftOutcome, setDraftOutcome] = useState<CandidateFeedbackOutcome | null>(
-    value ?? null,
-  )
+  const [draftOutcome, setDraftOutcome] = useState<CandidateFeedbackOutcome | null>(value ?? null)
   const [draftMessage, setDraftMessage] = useState(message ?? '')
 
   useEffect(() => {
@@ -74,9 +72,7 @@ export function CandidateFeedbackOutcomeField({
   const showingCustom = draftOutcome === 'custom'
   const trimmedDraft = draftMessage.trim()
   const savedMessage = message?.trim() ?? ''
-  const customDirty =
-    showingCustom &&
-    (value !== 'custom' || trimmedDraft !== savedMessage)
+  const customDirty = showingCustom && (value !== 'custom' || trimmedDraft !== savedMessage)
   const customSaveLocked = !trimmedDraft
 
   function revertDraftFromPersisted() {
@@ -134,11 +130,7 @@ export function CandidateFeedbackOutcomeField({
         label={t('outcomeLabel')}
         labelTooltip={t('outcomeHint')}
       >
-        <Select
-          value={selectValue}
-          onValueChange={handleSelectChange}
-          disabled={disabled}
-        >
+        <Select value={selectValue} onValueChange={handleSelectChange} disabled={disabled}>
           <SelectTrigger
             id="candidate-feedback-outcome"
             variant="surface"
@@ -149,9 +141,7 @@ export function CandidateFeedbackOutcomeField({
             <SelectValue placeholder={t('outcomePlaceholder')} />
           </SelectTrigger>
           <SelectContent position="popper" align="start">
-            <SelectItem value={OUTCOME_CLEAR_VALUE}>
-              {t('outcomeClear')}
-            </SelectItem>
+            <SelectItem value={OUTCOME_CLEAR_VALUE}>{t('outcomeClear')}</SelectItem>
             {CANDIDATE_FEEDBACK_OUTCOMES.map((outcome) => (
               <SelectItem key={outcome} value={outcome}>
                 {t(`outcome.${outcome}`)}
@@ -163,10 +153,7 @@ export function CandidateFeedbackOutcomeField({
 
       {showingCustom ? (
         <Stack gap={2}>
-          <FormField
-            htmlFor="candidate-feedback-outcome-message"
-            label={t('outcomeMessageLabel')}
-          >
+          <FormField htmlFor="candidate-feedback-outcome-message" label={t('outcomeMessageLabel')}>
             <Textarea
               id="candidate-feedback-outcome-message"
               value={draftMessage}

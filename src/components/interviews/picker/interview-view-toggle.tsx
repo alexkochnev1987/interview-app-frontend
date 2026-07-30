@@ -1,8 +1,8 @@
 'use client'
 
-import { type KeyboardEvent } from 'react'
 import { LayoutGrid, Rows3 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { type KeyboardEvent } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
@@ -14,10 +14,7 @@ export type InterviewViewToggleProps = {
   onViewChange: (value: InterviewView) => void
 }
 
-export function InterviewViewToggle({
-  view,
-  onViewChange,
-}: InterviewViewToggleProps) {
+export function InterviewViewToggle({ view, onViewChange }: InterviewViewToggleProps) {
   const t = useTranslations('interviews.library.viewToggle')
 
   function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
@@ -45,6 +42,7 @@ export function InterviewViewToggle({
         variant={view === 'cards' ? 'secondary' : 'ghost'}
         shape="pill"
         size="sm"
+        // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role
         role="radio"
         aria-checked={view === 'cards'}
         aria-label={t('switchToCards')}
@@ -61,6 +59,7 @@ export function InterviewViewToggle({
         variant={view === 'table' ? 'secondary' : 'ghost'}
         shape="pill"
         size="sm"
+        // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role
         role="radio"
         aria-checked={view === 'table'}
         aria-label={t('switchToTable')}

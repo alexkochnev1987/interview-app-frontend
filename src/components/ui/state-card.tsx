@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 
-import { IconBadge } from '@/components/ui/icon-badge'
 import { Card, CardContent } from '@/components/ui/card'
+import { IconBadge } from '@/components/ui/icon-badge'
 
 type StateCardTone = 'default' | 'ghost'
 

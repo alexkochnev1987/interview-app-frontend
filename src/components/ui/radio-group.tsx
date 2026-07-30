@@ -1,15 +1,11 @@
 'use client'
 
-import * as React from 'react'
-
 import { RadioGroup as RadioGroupPrimitive } from 'radix-ui'
+import type { ComponentProps, ReactNode } from 'react'
 
 import { cn } from '@/lib/utils'
 
-function RadioGroup({
-  className,
-  ...props
-}: React.ComponentProps<typeof RadioGroupPrimitive.Root>) {
+function RadioGroup({ className, ...props }: ComponentProps<typeof RadioGroupPrimitive.Root>) {
   return (
     <RadioGroupPrimitive.Root
       {...props}
@@ -20,12 +16,8 @@ function RadioGroup({
   )
 }
 
-interface RadioItemProps
-  extends Omit<
-    React.ComponentProps<typeof RadioGroupPrimitive.Item>,
-    'children'
-  > {
-  children: React.ReactNode
+interface RadioItemProps extends Omit<ComponentProps<typeof RadioGroupPrimitive.Item>, 'children'> {
+  children: ReactNode
 }
 
 function RadioItem({ children, className, disabled, ...props }: RadioItemProps) {

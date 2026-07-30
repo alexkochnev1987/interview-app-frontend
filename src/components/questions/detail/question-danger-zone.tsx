@@ -3,26 +3,17 @@
 import { LoaderCircle, Trash2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
-import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import { PageShell } from '@/components/ui/layout/page-shell'
 import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { PageShell } from '@/components/ui/layout/page-shell'
 
 interface QuestionDangerZoneProps {
   deleting: boolean
   onRequestDelete: () => void
 }
 
-export function QuestionDangerZone({
-  deleting,
-  onRequestDelete,
-}: QuestionDangerZoneProps) {
+export function QuestionDangerZone({ deleting, onRequestDelete }: QuestionDangerZoneProps) {
   const t = useTranslations('questions.dangerZone')
 
   return (
@@ -34,12 +25,7 @@ export function QuestionDangerZone({
         </CardHeader>
         <CardContent spacing="md">
           <DemoWriteGuard disabled={deleting}>
-            <Button
-              type="button"
-              variant="destructive"
-              shape="pill"
-              onClick={onRequestDelete}
-            >
+            <Button type="button" variant="destructive" shape="pill" onClick={onRequestDelete}>
               {deleting ? (
                 <LoaderCircle className="size-4 animate-spin" />
               ) : (

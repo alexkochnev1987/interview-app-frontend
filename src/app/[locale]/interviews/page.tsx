@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server'
 
-import { QueryHydrationBoundary } from '@/components/questions/query-hydration-boundary'
 import { InterviewsLibraryClient } from '@/components/interviews/library/interviews-library-client'
+import { QueryHydrationBoundary } from '@/components/questions/query-hydration-boundary'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
@@ -19,10 +19,7 @@ interface InterviewsPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
-export default async function InterviewsPage({
-  params,
-  searchParams,
-}: InterviewsPageProps) {
+export default async function InterviewsPage({ params, searchParams }: InterviewsPageProps) {
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'toast.pageGate.interviews' })
   const tCommon = await getTranslations({ locale, namespace: 'common' })
@@ -59,8 +56,7 @@ export default async function InterviewsPage({
       allowAssignedHrFilter,
     })
   } catch (err) {
-    const message =
-      err instanceof Error ? err.message : t('libraryLoadFailedFallback')
+    const message = err instanceof Error ? err.message : t('libraryLoadFailedFallback')
 
     return (
       <FlashErrorPageFallback

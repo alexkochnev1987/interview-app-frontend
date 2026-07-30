@@ -24,7 +24,12 @@ function buildMultilingualQuestion(): Question {
     followUpQuestions: ['How do you version APIs?'],
     expectedConcepts: [
       { id: 'concept-http', label: 'HTTP', weight: 1, description: 'Methods and status codes' },
-      { id: 'concept-stateless', label: 'Stateless', weight: 0.8, description: 'No server session' },
+      {
+        id: 'concept-stateless',
+        label: 'Stateless',
+        weight: 0.8,
+        description: 'No server session',
+      },
     ],
     redFlags: [{ id: 'rf-empty', label: 'Empty answer', severity: 'medium' as const }],
     difficulty: 'medium' as const,
@@ -46,7 +51,12 @@ function buildMultilingualQuestion(): Question {
         followUpQuestions: ['How do you version APIs?'],
         expectedConcepts: [
           { id: 'concept-http', label: 'HTTP', weight: 1, description: 'Methods and status codes' },
-          { id: 'concept-stateless', label: 'Stateless', weight: 0.8, description: 'No server session' },
+          {
+            id: 'concept-stateless',
+            label: 'Stateless',
+            weight: 0.8,
+            description: 'No server session',
+          },
         ],
         redFlags: [{ id: 'rf-empty', label: 'Empty answer', severity: 'medium' as const }],
         sampleGoodAnswer: 'Representational state transfer architecture style',
@@ -115,6 +125,7 @@ describe('question-editor parsers round-trip', () => {
 
     expect(state.primaryLocale).toBe('en')
     expect(payload.translationsMode).toBe('replace')
+    // eslint-disable-next-line unicorn/no-array-sort
     expect(Object.keys(payload.translations ?? {}).sort()).toEqual(['en', 'pl', 'ru'])
 
     const primaryConceptIds = payload.translations?.en?.expectedConcepts?.map((item) =>

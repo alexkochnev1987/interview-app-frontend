@@ -2,12 +2,12 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import type { Locale } from '@/i18n/locales'
 import {
   createCandidateFeedbackShareLink,
   getCandidateFeedbackShareLinkStatus,
   revokeCandidateFeedbackShareLink,
 } from '@/lib/api'
-import type { Locale } from '@/i18n/locales'
 import {
   candidateFeedbackShareExpiresAtMatches,
   clearStoredCandidateFeedbackShareLink,
@@ -44,8 +44,7 @@ export function useCandidateFeedbackShareLink({
   const [shareUrl, setShareUrl] = useState<string | null>(null)
   const [expiresAt, setExpiresAt] = useState<string | null>(null)
   const [hasActiveLink, setHasActiveLink] = useState(false)
-  const [statusLoadState, setStatusLoadState] =
-    useState<ShareLinkStatus>('idle')
+  const [statusLoadState, setStatusLoadState] = useState<ShareLinkStatus>('idle')
   const [creating, setCreating] = useState(false)
   const [revoking, setRevoking] = useState(false)
   const [copyStatus, setCopyStatus] = useState<CopyStatus>('idle')
@@ -63,11 +62,7 @@ export function useCandidateFeedbackShareLink({
       if (typeof window === 'undefined') {
         return apiUrl
       }
-      return buildCandidateFeedbackShareUrl(
-        apiUrl,
-        interviewLocale,
-        window.location.origin,
-      )
+      return buildCandidateFeedbackShareUrl(apiUrl, interviewLocale, window.location.origin)
     },
     [interviewLocale],
   )
@@ -97,10 +92,7 @@ export function useCandidateFeedbackShareLink({
           const stored = readStoredCandidateFeedbackShareLink(interviewId)
           if (
             stored &&
-            candidateFeedbackShareExpiresAtMatches(
-              stored.expiresAt,
-              result.expiresAt,
-            )
+            candidateFeedbackShareExpiresAtMatches(stored.expiresAt, result.expiresAt)
           ) {
             return stored.url
           }
@@ -136,13 +128,10 @@ export function useCandidateFeedbackShareLink({
     setCreating(true)
     setCopyStatus('idle')
     try {
-      const data = await runMutation(
-        () => createCandidateFeedbackShareLink(interviewId),
-        {
-          successMessage: toastMessages.createShareLinkSuccess,
-          errorMessage: toastMessages.createShareLinkError,
-        },
-      )
+      const data = await runMutation(() => createCandidateFeedbackShareLink(interviewId), {
+        successMessage: toastMessages.createShareLinkSuccess,
+        errorMessage: toastMessages.createShareLinkError,
+      })
       // Invalidate in-flight status fetches so a stale 404 cannot wipe the new URL.
       statusRequestIdRef.current += 1
       const normalizedUrl = normalizeShareUrl(data.url)

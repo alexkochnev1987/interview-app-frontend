@@ -6,13 +6,13 @@ import { useTranslations } from 'next-intl'
 import { Card, CardContent } from '@/components/ui/card'
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
 import { EyebrowLabel } from '@/components/ui/eyebrow-label'
-import { Grid } from '@/components/ui/layout/grid'
 import { HeroNumber } from '@/components/ui/hero-number'
 import { IconLabel } from '@/components/ui/icon-label'
+import { Grid } from '@/components/ui/layout/grid'
 import { Inline } from '@/components/ui/layout/inline'
-import { MetricPanel } from '@/components/ui/metric-panel'
 import { Section } from '@/components/ui/layout/section'
 import { Stack } from '@/components/ui/layout/stack'
+import { MetricPanel } from '@/components/ui/metric-panel'
 import { StatusPill } from '@/components/ui/status-pill'
 import { SurfaceTile } from '@/components/ui/surface-tile'
 import { BodyText, SectionHeading } from '@/components/ui/text'
@@ -41,10 +41,7 @@ export function InterviewScorecard({ results }: InterviewScorecardProps) {
           <CardContent spacing="lg">
             <Stack gap={5}>
               <Stack gap={3}>
-                <EyebrowBadge
-                  icon={<ChartColumnBig className="size-3.5" />}
-                  tone="primary"
-                >
+                <EyebrowBadge icon={<ChartColumnBig className="size-3.5" />} tone="primary">
                   {t('resultsSummaryEyebrow')}
                 </EyebrowBadge>
                 <BodyText size="lead">{results.summary}</BodyText>
@@ -58,9 +55,7 @@ export function InterviewScorecard({ results }: InterviewScorecardProps) {
                     </StatusPill>
                   ) : null}
                   {results.rubricVersion ? (
-                    <StatusPill tone="neutral">
-                      {results.rubricVersion}
-                    </StatusPill>
+                    <StatusPill tone="neutral">{results.rubricVersion}</StatusPill>
                   ) : null}
                 </Inline>
                 {results.trustFlags?.length ? (
@@ -72,10 +67,7 @@ export function InterviewScorecard({ results }: InterviewScorecardProps) {
 
               {results.questionResults?.length ? (
                 <Stack gap={4}>
-                  <IconLabel
-                    icon={<FileVideo2 className="size-4" />}
-                    tone="primary"
-                  >
+                  <IconLabel icon={<FileVideo2 className="size-4" />} tone="primary">
                     {t('questionBreakdown')}
                   </IconLabel>
                   <Stack gap={3}>
@@ -87,12 +79,7 @@ export function InterviewScorecard({ results }: InterviewScorecardProps) {
                         rounded="xl"
                       >
                         <Stack gap={4}>
-                          <Inline
-                            gap={3}
-                            align="center"
-                            justify="between"
-                            wrap="wrap"
-                          >
+                          <Inline gap={3} align="center" justify="between" wrap="wrap">
                             <Stack gap={1}>
                               <EyebrowLabel>
                                 {t('questionLabel', {
@@ -100,9 +87,7 @@ export function InterviewScorecard({ results }: InterviewScorecardProps) {
                                 })}
                               </EyebrowLabel>
                               {questionResult.summary ? (
-                                <BodyText size="sm">
-                                  {questionResult.summary}
-                                </BodyText>
+                                <BodyText size="sm">{questionResult.summary}</BodyText>
                               ) : null}
                             </Stack>
                             <Inline gap={2} align="center" wrap="wrap">
@@ -120,22 +105,21 @@ export function InterviewScorecard({ results }: InterviewScorecardProps) {
                           </Inline>
 
                           {questionResult.categoryScores &&
-                          Object.keys(questionResult.categoryScores).length >
-                            0 ? (
+                          Object.keys(questionResult.categoryScores).length > 0 ? (
                             <Grid columns={3} gap={3}>
-                              {Object.entries(
-                                questionResult.categoryScores,
-                              ).map(([category, score]) => (
-                                <MetricPanel
-                                  key={`${questionResult.questionId}-${category}`}
-                                  tone="compact"
-                                  label={formatMetricLabel(category)}
-                                  value={score}
-                                  valueSize="md"
-                                  valueTone="primary"
-                                  description={t('outOf100')}
-                                />
-                              ))}
+                              {Object.entries(questionResult.categoryScores).map(
+                                ([category, score]) => (
+                                  <MetricPanel
+                                    key={`${questionResult.questionId}-${category}`}
+                                    tone="compact"
+                                    label={formatMetricLabel(category)}
+                                    value={score}
+                                    valueSize="md"
+                                    valueTone="primary"
+                                    description={t('outOf100')}
+                                  />
+                                ),
+                              )}
                             </Grid>
                           ) : null}
                         </Stack>
@@ -151,10 +135,7 @@ export function InterviewScorecard({ results }: InterviewScorecardProps) {
         <Stack gap={4}>
           <Card variant="surface" size="lg">
             <CardContent spacing="lg">
-              <EyebrowBadge
-                icon={<FileVideo2 className="size-3.5" />}
-                tone="primary"
-              >
+              <EyebrowBadge icon={<FileVideo2 className="size-3.5" />} tone="primary">
                 {t('overallScoreCard')}
               </EyebrowBadge>
               <HeroNumber>{results.overallScore}</HeroNumber>

@@ -1,8 +1,8 @@
 'use client'
 
-import { useCallback, type ReactNode } from 'react'
 import { AlertCircle } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { useCallback, type ReactNode } from 'react'
 
 import { PageContent, PageMainLayout, PageMainViewport } from '@/components/layout/page-shell'
 import {
@@ -11,10 +11,10 @@ import {
   TakeLobbyScreen,
   TakeRecordingScreen,
 } from '@/components/take'
-import { TakeLocaleBar } from '@/components/ui/take'
-import { Stack } from '@/components/ui/layout'
 import { Icon } from '@/components/ui/icon'
+import { Stack } from '@/components/ui/layout'
 import { EmptyStateCard, LoadingStateCard } from '@/components/ui/state-card'
+import { TakeLocaleBar } from '@/components/ui/take'
 import {
   TAKE_MESSAGES,
   type TakeMessageKey,
@@ -23,13 +23,13 @@ import {
   useTakeLocaleSwitch,
   useTakeOrchestrator,
 } from '@/features/take'
+import { resolveQuestionAnswerPhase } from '@/features/take/session-machine'
 import {
   TakeFlowLocaleProvider,
   useTakeFlowLocale,
 } from '@/features/take/take-flow-locale-provider'
-import { resolveQuestionAnswerPhase } from '@/features/take/session-machine'
-import type { TakeInterviewData } from '@/lib/api'
 import type { Locale } from '@/i18n/locales'
+import type { TakeInterviewData } from '@/lib/api'
 
 type TakeInterviewClientProps = {
   id: string
@@ -69,9 +69,8 @@ function TakeInterviewClientInner({
         ? values
           ? tTake(key, values)
           : tTake(key)
-        : TAKE_MESSAGES[key].replace(
-            /\{(\w+)\}/g,
-            (_, token) => String(values?.[token] ?? `{${token}}`),
+        : TAKE_MESSAGES[key].replace(/\{(\w+)\}/g, (_, token) =>
+            String(values?.[token] ?? `{${token}}`),
           ),
     [tTake],
   )
@@ -138,22 +137,17 @@ function TakeInterviewClientInner({
     takeMessage,
   })
 
-  const {
-    locale,
-    switchLocale,
-    languageOptions,
-    languageAriaLabel,
-  } = useTakeLocaleSwitch()
+  const { locale, switchLocale, languageOptions, languageAriaLabel } = useTakeLocaleSwitch()
 
   const handleSelectLocale = useCallback(
     (nextLocale: Locale) => {
       if (localeSwitchDisabled) {
-        return;
+        return
       }
-      switchLocale(nextLocale);
+      switchLocale(nextLocale)
     },
     [localeSwitchDisabled, switchLocale],
-  );
+  )
 
   useTakeInterviewBeforeUnload(stage, takeMessage('beforeUnloadLeaveInterview'))
 
@@ -213,10 +207,7 @@ function TakeInterviewClientInner({
 
   if (stage === 'complete') {
     return wrapTakeStage(
-      <TakeCompleteScreen
-        candidateName={interview.candidateName}
-        position={interview.position}
-      />,
+      <TakeCompleteScreen candidateName={interview.candidateName} position={interview.position} />,
     )
   }
 

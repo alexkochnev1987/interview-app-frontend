@@ -18,11 +18,7 @@ import { StatusPill } from '@/components/ui/status-pill'
 import { BodyText, SectionHeading } from '@/components/ui/text'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
 import { type InterviewResult } from '@/lib/api'
-import {
-  behaviorRiskTone,
-  decisionTone,
-  isPlaceholderResult,
-} from '@/lib/assessment-status'
+import { behaviorRiskTone, decisionTone, isPlaceholderResult } from '@/lib/assessment-status'
 import { formatMetricLabel } from '@/lib/interview-formatters'
 
 interface OverallPanelProps {
@@ -73,6 +69,7 @@ export function OverallPanel({ result }: OverallPanelProps) {
                     {summaryLines.map((line, index) => (
                       <BodyText
                         as="li"
+                        // eslint-disable-next-line react/no-array-index-key
                         key={index}
                         size="lead"
                         tone="foreground"
@@ -125,12 +122,8 @@ export function OverallPanel({ result }: OverallPanelProps) {
                     </Icon>
                     <EyebrowLabel size="sm">{t('behaviorSummary')}</EyebrowLabel>
                     {behaviorSummary.riskLevel ? (
-                      <StatusPill
-                        tone={behaviorRiskTone(behaviorSummary.riskLevel)}
-                        casing="chip"
-                      >
-                        {t('riskPrefix')}{' '}
-                        {sharedLabels.behaviorRisk(behaviorSummary.riskLevel)}
+                      <StatusPill tone={behaviorRiskTone(behaviorSummary.riskLevel)} casing="chip">
+                        {t('riskPrefix')} {sharedLabels.behaviorRisk(behaviorSummary.riskLevel)}
                       </StatusPill>
                     ) : null}
                   </Inline>
@@ -139,6 +132,7 @@ export function OverallPanel({ result }: OverallPanelProps) {
                       {behaviorSummary.notes.map((note, index) => (
                         <BodyText
                           as="li"
+                          // eslint-disable-next-line react/no-array-index-key
                           key={index}
                           size="sm"
                           tone="foreground"
@@ -185,9 +179,7 @@ export function OverallPanel({ result }: OverallPanelProps) {
               value={Math.round(result.trustScore)}
               valueSize="hero"
               valueTone="primary"
-              description={
-                trustFlags.length === 0 ? t('noTrustFlags') : undefined
-              }
+              description={trustFlags.length === 0 ? t('noTrustFlags') : undefined}
             />
           ) : null}
 

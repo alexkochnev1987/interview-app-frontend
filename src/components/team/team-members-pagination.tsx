@@ -8,7 +8,6 @@ import { CardContent } from '@/components/ui/card'
 import { Grid } from '@/components/ui/layout/grid'
 import { Inline } from '@/components/ui/layout/inline'
 import { BodyText } from '@/components/ui/text'
-
 import type { TeamPaginationItem } from '@/features/team/team-member-list'
 
 interface TeamMembersPaginationProps {

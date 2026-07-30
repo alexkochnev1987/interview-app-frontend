@@ -1,18 +1,13 @@
+// oxlint-disable jsx-a11y/prefer-tag-over-role jsx-a11y/no-noninteractive-element-interactions jsx-a11y/click-events-have-key-events
 'use client'
 
+import { AlertTriangle, LoaderCircle } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
-import { AlertTriangle, LoaderCircle } from 'lucide-react'
 
-import { IconBadge } from '@/components/ui/icon-badge'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { IconBadge } from '@/components/ui/icon-badge'
 
 interface ConfirmDialogProps {
   open: boolean
@@ -69,11 +64,7 @@ export function ConfirmDialog({
         if (!loading) onCancel()
       }}
     >
-      <Card
-        variant="floating"
-        className="w-full max-w-md"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <Card variant="floating" className="w-full max-w-md" onClick={(e) => e.stopPropagation()}>
         <CardHeader spacing="sm">
           {destructive && (
             <IconBadge tone="danger" size="md">
@@ -81,11 +72,7 @@ export function ConfirmDialog({
             </IconBadge>
           )}
           <CardTitle size="lg">{title}</CardTitle>
-          {description && (
-            <CardDescription>
-              {description}
-            </CardDescription>
-          )}
+          {description && <CardDescription>{description}</CardDescription>}
         </CardHeader>
         <CardContent layout="row-end" spacing="sm">
           <Button

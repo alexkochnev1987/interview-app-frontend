@@ -35,10 +35,7 @@ function assignableRoleValues(): TeamMemberRole[] {
   return TEAM_ROLE_ROWS.map((r) => r.id)
 }
 
-const TEAM_ROLES_ASSIGNABLE_BY_ACTOR: Record<
-  TeamMemberRole,
-  readonly TeamMemberRole[]
-> = {
+const TEAM_ROLES_ASSIGNABLE_BY_ACTOR: Record<TeamMemberRole, readonly TeamMemberRole[]> = {
   super_admin: ['super_admin', 'admin', 'hr', 'candidate'],
   admin: ['hr', 'candidate'],
   hr: [],

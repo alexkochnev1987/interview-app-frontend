@@ -8,9 +8,7 @@ import type { Locale } from '@/i18n/locales'
 
 import { TakeLanguageControl } from './take-language-control'
 
-const takeLocaleBarVariants = cva(
-  'ml-auto flex w-fit flex-row flex-wrap items-center gap-2',
-)
+const takeLocaleBarVariants = cva('ml-auto flex w-fit flex-row flex-wrap items-center gap-2')
 
 type LanguageOption = {
   locale: Locale
@@ -37,10 +35,8 @@ export function TakeLocaleBar({
   disabled = false,
 }: TakeLocaleBarProps) {
   const tTake = useTranslations('takeFlow')
-  const showInterviewBadge =
-    interviewLocale !== undefined && interviewLocale !== currentLocale
-  const showResolvedBadge =
-    resolvedLocale !== undefined && resolvedLocale !== currentLocale
+  const showInterviewBadge = interviewLocale !== undefined && interviewLocale !== currentLocale
+  const showResolvedBadge = resolvedLocale !== undefined && resolvedLocale !== currentLocale
 
   return (
     <div className={takeLocaleBarVariants()}>

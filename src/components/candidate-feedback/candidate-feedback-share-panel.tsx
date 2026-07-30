@@ -48,11 +48,7 @@ export function CandidateFeedbackSharePanel({
   const revokeBusy = revoking || createBusy
 
   return (
-    <SurfaceTile
-      tone="glass"
-      padding="lg"
-      data-tour="candidate-feedback-share-link"
-    >
+    <SurfaceTile tone="glass" padding="lg" data-tour="candidate-feedback-share-link">
       <Stack gap={3}>
         <Inline gap={3} align="center" justify="between" wrap="wrap">
           <BodyText as="span" size="sm-tight" tone="foreground">
@@ -60,13 +56,7 @@ export function CandidateFeedbackSharePanel({
           </BodyText>
           <Inline gap={2} wrap="wrap">
             {shareUrl ? (
-              <Button
-                type="button"
-                variant="gradient"
-                shape="pill"
-                size="sm"
-                onClick={onCopy}
-              >
+              <Button type="button" variant="gradient" shape="pill" size="sm" onClick={onCopy}>
                 <Icon size="md">
                   <Copy />
                 </Icon>

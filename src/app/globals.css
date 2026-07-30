@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --font-sans: "Inter", "SF Pro Display", "Segoe UI", system-ui, sans-serif;
+    --font-sans: 'Inter', 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
     --background: 210 16.7% 97.6%;
     --foreground: 195 7.4% 10.6%;
     --card: 0 0% 100%;
@@ -117,7 +117,9 @@
         hsl(var(--background)) 100%
       );
     color: hsl(var(--foreground));
-    font-feature-settings: "cv11" 1, "ss01" 1;
+    font-feature-settings:
+      'cv11' 1,
+      'ss01' 1;
     line-height: 1.6;
   }
 

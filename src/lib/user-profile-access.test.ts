@@ -85,10 +85,7 @@ describe('user-profile-access', () => {
 
   it('exposes canViewUserProfile as a boolean helper', () => {
     expect(
-      canViewUserProfile(
-        { id: 'u1', role: APP_ROLE.hr },
-        { id: 'a1', role: APP_ROLE.admin },
-      ),
+      canViewUserProfile({ id: 'u1', role: APP_ROLE.hr }, { id: 'a1', role: APP_ROLE.admin }),
     ).toBe(true)
     expect(
       canViewUserProfile(

@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
 import { Link2, MessageSquareText, Sparkles } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { useEffect, useRef, useState } from 'react'
 
 import { CandidateFeedbackHeader } from '@/components/candidate-feedback/candidate-feedback-header'
 import { CandidateFeedbackLiveRefreshNotice } from '@/components/candidate-feedback/candidate-feedback-live-refresh-notice'
@@ -23,8 +23,8 @@ import { Inline } from '@/components/ui/layout/inline'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { Section } from '@/components/ui/layout/section'
 import { Stack } from '@/components/ui/layout/stack'
-import { BodyText, SectionHeading } from '@/components/ui/text'
 import { EmptyStateCard } from '@/components/ui/state-card'
+import { BodyText, SectionHeading } from '@/components/ui/text'
 import {
   ApiError,
   generateCandidateFeedbackAll,
@@ -32,11 +32,9 @@ import {
   updateCandidateFeedback,
   type Interview,
 } from '@/lib/api'
+import { getErrorMessage as getApiErrorMessage } from '@/lib/api-error'
 import { useAuth } from '@/lib/auth-context'
-import {
-  canCreateFeedbackShareLink,
-  canRevokeFeedbackShareLink,
-} from '@/lib/auth-permissions'
+import { canCreateFeedbackShareLink, canRevokeFeedbackShareLink } from '@/lib/auth-permissions'
 import {
   buildAcceptAllCandidateFeedbackPayload,
   buildQuestionBlocksView,
@@ -60,7 +58,6 @@ import {
   type GenerateAllCandidateFeedbackOutcome,
   type GenerateAllQuestionSkipEntry,
 } from '@/lib/candidate-feedback'
-import { getErrorMessage as getApiErrorMessage } from '@/lib/api-error'
 import { runMutation } from '@/lib/run-mutation'
 import { notifyError, notifySuccess } from '@/lib/toast'
 import { useCandidateFeedbackToastMessages } from '@/lib/toast-messages/use-candidate-feedback-toast-messages'
@@ -70,12 +67,7 @@ interface CandidateFeedbackEditorProps {
   initialFeedback: CandidateFeedbackResponse
 }
 
-type SavingTarget =
-  | 'overall'
-  | 'outcome'
-  | 'accept-all'
-  | `question-${number}`
-  | null
+type SavingTarget = 'overall' | 'outcome' | 'accept-all' | `question-${number}` | null
 type GeneratingTarget = 'all' | `question-${number}` | null
 
 type GenerateAllSkipSummary = {
@@ -98,8 +90,10 @@ export function CandidateFeedbackEditor({
   const { user } = useAuth()
   const canCreateShareLink = canCreateFeedbackShareLink(user)
   const canRevokeShareLink = canRevokeFeedbackShareLink(user)
-  const { feedback, replaceFeedback, kick, refresh, paused } =
-    useCandidateFeedbackData(interview.id, initialFeedback)
+  const { feedback, replaceFeedback, kick, refresh, paused } = useCandidateFeedbackData(
+    interview.id,
+    initialFeedback,
+  )
   const [savingTarget, setSavingTarget] = useState<SavingTarget>(null)
   const [generatingTarget, setGeneratingTarget] = useState<GeneratingTarget>(null)
   const [generateAllSkipSummary, setGenerateAllSkipSummary] =
@@ -108,32 +102,18 @@ export function CandidateFeedbackEditor({
 
   const questionCount = interview.questions.length
   const interviewLocale = interview.interviewLocale ?? feedback.interviewLocale
-  const answersByIndex = new Map(
-    interview.answers.map((answer) => [answer.questionIndex, answer]),
-  )
+  const answersByIndex = new Map(interview.answers.map((answer) => [answer.questionIndex, answer]))
   const questionBlocks = buildQuestionBlocksView(questionCount, feedback)
   const isEmpty = isCandidateFeedbackEmpty(questionCount, feedback)
   const feedbackGenerating = isCandidateFeedbackGenerating(feedback)
-  const canRegenerateAny = canRegenerateAnyCandidateFeedbackBlock(
-    questionCount,
-    feedback,
-  )
+  const canRegenerateAny = canRegenerateAnyCandidateFeedbackBlock(questionCount, feedback)
   const generateAllBusy = generatingTarget !== null || feedbackGenerating
   const isGenerateAllLocked = !canRegenerateAny && !generateAllBusy
   const generateAllDisabled = !canRegenerateAny || generateAllBusy
   const generateAllLoading = generatingTarget === 'all'
-  const sharedGenerationError = getSharedCandidateFeedbackError(
-    feedback,
-    questionCount,
-  )
-  const hasGeneratedBlocks = hasGeneratedCandidateFeedbackBlocks(
-    feedback,
-    questionCount,
-  )
-  const hasPublishable = hasPublishableCandidateFeedback(
-    feedback,
-    questionCount,
-  )
+  const sharedGenerationError = getSharedCandidateFeedbackError(feedback, questionCount)
+  const hasGeneratedBlocks = hasGeneratedCandidateFeedbackBlocks(feedback, questionCount)
+  const hasPublishable = hasPublishableCandidateFeedback(feedback, questionCount)
   const {
     shareUrl,
     expiresAt,
@@ -155,36 +135,25 @@ export function CandidateFeedbackEditor({
   })
   const shareCreateLocked = !hasPublishable
   const shareCreateDisabled =
-    shareCreateLocked ||
-    creatingShareLink ||
-    revokingShareLink ||
-    statusLoadState === 'loading'
+    shareCreateLocked || creatingShareLink || revokingShareLink || statusLoadState === 'loading'
   const acceptAllPageLoading = savingTarget === 'accept-all'
-  const acceptAllPageDisabled =
-    acceptAllPageLoading || savingTarget !== null || generateAllBusy
+  const acceptAllPageDisabled = acceptAllPageLoading || savingTarget !== null || generateAllBusy
 
   useEffect(() => {
     const version = feedback.updatedAt ?? ''
-    if (
-      generateAllSkipSummary &&
-      skipSummaryFeedbackVersionRef.current !== version
-    ) {
+    if (generateAllSkipSummary && skipSummaryFeedbackVersionRef.current !== version) {
       setGenerateAllSkipSummary(null)
     }
   }, [feedback.updatedAt, generateAllSkipSummary])
 
-  async function applyPatchUpdate(
-    mutation: () => Promise<CandidateFeedbackResponse>,
-  ) {
+  async function applyPatchUpdate(mutation: () => Promise<CandidateFeedbackResponse>) {
     const updated = await mutation()
     replaceFeedback(updated)
     return updated
   }
 
   async function applyGenerationUpdate(
-    mutation: () => Promise<
-      CandidateFeedbackResponse | GenerateAllCandidateFeedbackOutcome
-    >,
+    mutation: () => Promise<CandidateFeedbackResponse | GenerateAllCandidateFeedbackOutcome>,
   ): Promise<GenerateAllCandidateFeedbackOutcome> {
     const result = await mutation()
     if ('feedback' in result) {
@@ -215,9 +184,7 @@ export function CandidateFeedbackEditor({
 
   async function runGenerateMutation(
     target: GeneratingTarget,
-    mutation: () => Promise<
-      CandidateFeedbackResponse | GenerateAllCandidateFeedbackOutcome
-    >,
+    mutation: () => Promise<CandidateFeedbackResponse | GenerateAllCandidateFeedbackOutcome>,
     toast: FeedbackMutationToast,
     onSuccess?: (result: GenerateAllCandidateFeedbackOutcome) => void,
     options?: { showSuccessToast?: boolean },
@@ -272,9 +239,7 @@ export function CandidateFeedbackEditor({
         }
 
         const skipped = getSkippedGenerateAllQuestionResults(result.plan?.questions)
-        const overallReason = resolveGenerateAllOverallSkipReason(
-          result.plan?.overall,
-        )
+        const overallReason = resolveGenerateAllOverallSkipReason(result.plan?.overall)
         if (skipped.length === 0 && !overallReason) {
           return
         }
@@ -300,10 +265,7 @@ export function CandidateFeedbackEditor({
   }
 
   function handleAcceptAllPage() {
-    const payload = buildAcceptAllCandidateFeedbackPayload(
-      feedback,
-      questionCount,
-    )
+    const payload = buildAcceptAllCandidateFeedbackPayload(feedback, questionCount)
     if (isAcceptAllCandidateFeedbackPayloadEmpty(payload)) {
       return Promise.resolve()
     }
@@ -351,10 +313,7 @@ export function CandidateFeedbackEditor({
     )
   }
 
-  function handleSaveOverall(payload: {
-    recommendationText: string
-    improvementText: string
-  }) {
+  function handleSaveOverall(payload: { recommendationText: string; improvementText: string }) {
     return runPatchMutation(
       'overall',
       () =>
@@ -398,9 +357,7 @@ export function CandidateFeedbackEditor({
           interview.id,
           {
             outcome: next.outcome,
-            ...(next.outcome === 'custom'
-              ? { outcomeMessage: nextMessage }
-              : {}),
+            ...(next.outcome === 'custom' ? { outcomeMessage: nextMessage } : {}),
           },
           interviewLocale,
         ),
@@ -499,17 +456,12 @@ export function CandidateFeedbackEditor({
           {sharedGenerationError ? (
             <Alert variant="danger">
               <AlertTitle>{t('sharedGenerationErrorTitle')}</AlertTitle>
-              <AlertDescription>
-                {formatErrorMessage(sharedGenerationError)}
-              </AlertDescription>
+              <AlertDescription>{formatErrorMessage(sharedGenerationError)}</AlertDescription>
             </Alert>
           ) : null}
 
           <Inline gap={2} wrap="wrap">
-            <DisabledHintTooltip
-              active={isGenerateAllLocked}
-              hint={t('generateAllLockedHint')}
-            >
+            <DisabledHintTooltip active={isGenerateAllLocked} hint={t('generateAllLockedHint')}>
               <DemoWriteGuard disabled={generateAllDisabled}>
                 <Button
                   type="button"
@@ -539,10 +491,7 @@ export function CandidateFeedbackEditor({
               </DemoWriteGuard>
             ) : null}
             {canCreateShareLink ? (
-              <DisabledHintTooltip
-                active={shareCreateLocked}
-                hint={t('createShareLinkLockedHint')}
-              >
+              <DisabledHintTooltip active={shareCreateLocked} hint={t('createShareLinkLockedHint')}>
                 <DemoWriteGuard disabled={shareCreateDisabled}>
                   <Button
                     type="button"
@@ -554,9 +503,7 @@ export function CandidateFeedbackEditor({
                     <Icon size="sm">
                       <Link2 />
                     </Icon>
-                    {hasActiveLink || shareUrl
-                      ? t('recreateShareLink')
-                      : t('createShareLink')}
+                    {hasActiveLink || shareUrl ? t('recreateShareLink') : t('createShareLink')}
                   </Button>
                 </DemoWriteGuard>
               </DisabledHintTooltip>
@@ -589,15 +536,11 @@ export function CandidateFeedbackEditor({
             saving={
               savingTarget === 'overall' ||
               savingTarget === 'outcome' ||
-              (savingTarget === 'accept-all' &&
-                feedback.overall.state === 'generated')
+              (savingTarget === 'accept-all' && feedback.overall.state === 'generated')
             }
             outcomeSaving={savingTarget === 'outcome'}
             retrying={generateAllLoading}
-            retryDisabled={isOverallBlockGenerationBusy(
-              feedback.overall.state,
-              generatingTarget,
-            )}
+            retryDisabled={isOverallBlockGenerationBusy(feedback.overall.state, generatingTarget)}
             sharedGenerationError={sharedGenerationError}
             onRetry={handleRetryOverall}
             onAcceptAll={handleAcceptAllOverall}
@@ -616,12 +559,9 @@ export function CandidateFeedbackEditor({
                   answer={answersByIndex.get(block.questionIndex)}
                   saving={
                     savingTarget === `question-${block.questionIndex}` ||
-                    (savingTarget === 'accept-all' &&
-                      block.state === 'generated')
+                    (savingTarget === 'accept-all' && block.state === 'generated')
                   }
-                  generating={
-                    generatingTarget === `question-${block.questionIndex}`
-                  }
+                  generating={generatingTarget === `question-${block.questionIndex}`}
                   generationDisabled={isQuestionBlockGenerationBusy(
                     block.state,
                     block.questionIndex,
@@ -629,12 +569,8 @@ export function CandidateFeedbackEditor({
                   )}
                   sharedGenerationError={sharedGenerationError}
                   onGenerate={() => handleGenerateQuestion(block.questionIndex)}
-                  onAcceptAll={(payload) =>
-                    handleAcceptAllQuestion(block.questionIndex, payload)
-                  }
-                  onSave={(payload) =>
-                    handleSaveQuestion(block.questionIndex, payload)
-                  }
+                  onAcceptAll={(payload) => handleAcceptAllQuestion(block.questionIndex, payload)}
+                  onSave={(payload) => handleSaveQuestion(block.questionIndex, payload)}
                 />
               ))}
             </Stack>

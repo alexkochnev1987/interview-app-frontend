@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server'
 
-import { TemplatesListClient } from '@/components/templates/templates-list-client'
 import { QueryHydrationBoundary } from '@/components/questions/query-hydration-boundary'
+import { TemplatesListClient } from '@/components/templates/templates-list-client'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
@@ -27,10 +27,7 @@ export default async function TemplatesPage({ params }: TemplatesPageProps) {
 
   if (auth.kind === 'forbidden') {
     return (
-      <ForbiddenAccessPage
-        title={t('forbiddenTitle')}
-        description={t('forbiddenDescription')}
-      />
+      <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
     )
   }
 

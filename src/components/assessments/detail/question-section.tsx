@@ -2,9 +2,11 @@
 
 import { useTranslations } from 'next-intl'
 
+import { RerunAnswerButton } from '@/components/assessments/actions/rerun-answer-button'
+import { LazyMediaPlayback } from '@/components/assessments/detail/lazy-media-playback'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { BehaviorSignalStat } from '@/components/ui/behavior-signal-stat'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ConceptList } from '@/components/ui/concept-list'
 import { EyebrowLabel } from '@/components/ui/eyebrow-label'
 import { Grid } from '@/components/ui/layout/grid'
@@ -15,14 +17,8 @@ import { PillRow } from '@/components/ui/pill-row'
 import { StatusPill } from '@/components/ui/status-pill'
 import { BodyText, SectionHeading } from '@/components/ui/text'
 import { TranscriptBlock } from '@/components/ui/transcript-block'
-import { RerunAnswerButton } from '@/components/assessments/actions/rerun-answer-button'
-import { LazyMediaPlayback } from '@/components/assessments/detail/lazy-media-playback'
-import {
-  type Answer,
-  type AnswerDecisionHint,
-  type InterviewQuestion,
-} from '@/lib/api'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
+import { type Answer, type AnswerDecisionHint, type InterviewQuestion } from '@/lib/api'
 import {
   answerStateTone,
   behaviorRiskTone,
@@ -80,27 +76,21 @@ export function QuestionSection({
   const evaluation = answer?.evaluation
   const signals = answer?.behaviorSignals
   const hasCamera = Boolean(answer?.mediaKey || answer?.camera?.mediaKey)
-  const hasScreen = Boolean(
-    answer?.screenMediaKey || answer?.screen?.mediaKey,
-  )
+  const hasScreen = Boolean(answer?.screenMediaKey || answer?.screen?.mediaKey)
   const answerState = deriveAnswerState(answer)
   const stateTone = answerStateTone(answerState)
   const stateLabel = answerStateLabel(answerState)
   const conceptIdToLabel = new Map(
     question.expectedConcepts.map((concept) => [concept.id, concept.label]),
   )
-  const redFlagIdToLabel = new Map(
-    question.redFlags.map((flag) => [flag.id, flag.label]),
-  )
+  const redFlagIdToLabel = new Map(question.redFlags.map((flag) => [flag.id, flag.label]))
   const coveredLabels = (evaluation?.coveredConceptIds ?? []).map(
     (id) => conceptIdToLabel.get(id) ?? id,
   )
   const missedLabels = (evaluation?.missedConceptIds ?? []).map(
     (id) => conceptIdToLabel.get(id) ?? id,
   )
-  const redFlagLabels = (evaluation?.redFlagIds ?? []).map(
-    (id) => redFlagIdToLabel.get(id) ?? id,
-  )
+  const redFlagLabels = (evaluation?.redFlagIds ?? []).map((id) => redFlagIdToLabel.get(id) ?? id)
 
   return (
     <Card variant="surface" size="md">
@@ -134,9 +124,7 @@ export function QuestionSection({
             <EyebrowLabel size="sm">{t('transcriptEyebrow')}</EyebrowLabel>
             <TranscriptBlock
               text={answer?.transcript?.text}
-              emptyLabel={
-                answer ? t('transcriptPending') : t('noAnswer')
-              }
+              emptyLabel={answer ? t('transcriptPending') : t('noAnswer')}
             />
           </Stack>
 
@@ -169,10 +157,7 @@ export function QuestionSection({
                   watchAt={1}
                   riskAt={3}
                 />
-                <BehaviorSignalStat
-                  label={t('keydown')}
-                  value={signals.keydownCount}
-                />
+                <BehaviorSignalStat label={t('keydown')} value={signals.keydownCount} />
                 <BehaviorSignalStat
                   label={t('resize')}
                   value={signals.resizeCount}
@@ -188,19 +173,12 @@ export function QuestionSection({
               <Inline gap={3} align="center" justify="between" wrap="wrap">
                 <SectionHeading size="sm">{t('aiEvaluation')}</SectionHeading>
                 <Inline gap={2} wrap="wrap">
-                  <StatusPill
-                    tone={decisionHintTone(evaluation.decisionHint)}
-                    casing="chip"
-                  >
+                  <StatusPill tone={decisionHintTone(evaluation.decisionHint)} casing="chip">
                     {decisionHintLabel(evaluation.decisionHint)}
                   </StatusPill>
                   {evaluation.behaviorRisk ? (
-                    <StatusPill
-                      tone={behaviorRiskTone(evaluation.behaviorRisk)}
-                      casing="chip"
-                    >
-                      {t('behaviorRiskPrefix')}{' '}
-                      {sharedLabels.behaviorRisk(evaluation.behaviorRisk)}
+                    <StatusPill tone={behaviorRiskTone(evaluation.behaviorRisk)} casing="chip">
+                      {t('behaviorRiskPrefix')} {sharedLabels.behaviorRisk(evaluation.behaviorRisk)}
                     </StatusPill>
                   ) : null}
                 </Inline>
@@ -240,24 +218,12 @@ export function QuestionSection({
               ) : null}
 
               <Grid columns={2} gap={4}>
-                <ConceptList
-                  label={t('coveredConcepts')}
-                  tone="covered"
-                  items={coveredLabels}
-                />
-                <ConceptList
-                  label={t('missedConcepts')}
-                  tone="missed"
-                  items={missedLabels}
-                />
+                <ConceptList label={t('coveredConcepts')} tone="covered" items={coveredLabels} />
+                <ConceptList label={t('missedConcepts')} tone="missed" items={missedLabels} />
               </Grid>
 
               {redFlagLabels.length > 0 ? (
-                <ConceptList
-                  label={t('redFlagsRaised')}
-                  tone="flag"
-                  items={redFlagLabels}
-                />
+                <ConceptList label={t('redFlagsRaised')} tone="flag" items={redFlagLabels} />
               ) : null}
             </Stack>
           ) : (
@@ -269,9 +235,7 @@ export function QuestionSection({
           {answer?.validation?.errorMessage ? (
             <Alert variant="danger">
               <AlertTitle>{t('scoringFailedTitle')}</AlertTitle>
-              <AlertDescription>
-                {answer.validation.errorMessage}
-              </AlertDescription>
+              <AlertDescription>{answer.validation.errorMessage}</AlertDescription>
             </Alert>
           ) : null}
 

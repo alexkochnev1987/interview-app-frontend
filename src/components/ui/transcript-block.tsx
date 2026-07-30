@@ -1,8 +1,7 @@
 import { BodyText } from '@/components/ui/text'
 import { cn } from '@/lib/utils'
 
-const baseClasses =
-  'rounded-2xl bg-surface-low-soft p-5 ring-1 ring-hairline whitespace-pre-wrap'
+const baseClasses = 'rounded-2xl bg-surface-low-soft p-5 ring-1 ring-hairline whitespace-pre-wrap'
 
 interface TranscriptBlockProps {
   text: string | null | undefined

@@ -5,11 +5,7 @@ import {
   questionsInfiniteQueryKey,
   questionsListQueryKey,
 } from '@/components/questions/picker/query-keys'
-import type {
-  PaginatedQuestions,
-  QuestionFacetsResponse,
-  QuestionStatusFilter,
-} from '@/lib/api'
+import type { PaginatedQuestions, QuestionFacetsResponse, QuestionStatusFilter } from '@/lib/api'
 import { getQueryClient } from '@/lib/get-query-client'
 import {
   buildQuestionFacetsParams,
@@ -34,9 +30,7 @@ async function fetchQuestionsPage(
 ): Promise<PaginatedQuestions> {
   return (
     (await requestServer<PaginatedQuestions>('/questions', ctx, { query: params })) ??
-    emptyPaginatedQuestions(
-      typeof params.limit === 'number' ? params.limit : undefined,
-    )
+    emptyPaginatedQuestions(typeof params.limit === 'number' ? params.limit : undefined)
   )
 }
 
@@ -83,8 +77,7 @@ async function hydrateQuestionsPicker(
     prefetches.push(
       queryClient.prefetchInfiniteQuery({
         queryKey: questionsInfiniteQueryKey(infiniteParams),
-        queryFn: ({ pageParam }) =>
-          fetchQuestionsPage({ ...infiniteParams, page: pageParam }, ctx),
+        queryFn: ({ pageParam }) => fetchQuestionsPage({ ...infiniteParams, page: pageParam }, ctx),
         initialPageParam: 1,
       }),
     )

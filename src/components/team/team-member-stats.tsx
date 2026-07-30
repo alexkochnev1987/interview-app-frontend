@@ -5,7 +5,6 @@ import { EyebrowLabel } from '@/components/ui/eyebrow-label'
 import { Grid } from '@/components/ui/layout/grid'
 import { Inline } from '@/components/ui/layout/inline'
 import { BodyText } from '@/components/ui/text'
-
 import type { TeamStatCard } from '@/features/team/team-member-list'
 
 interface TeamMemberStatsProps {

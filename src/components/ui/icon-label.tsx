@@ -1,9 +1,9 @@
-import type { ReactNode } from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
+import type { ReactNode } from 'react'
 
 import { Inline } from '@/components/ui/layout/inline'
-import { cn } from '@/lib/utils'
 import { BodyText } from '@/components/ui/text'
+import { cn } from '@/lib/utils'
 
 const iconLabelVariants = cva('', {
   variants: {

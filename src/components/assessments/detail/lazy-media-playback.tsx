@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { Eye, LoaderCircle, RefreshCw } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { useEffect, useState } from 'react'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -11,13 +11,10 @@ import { Icon } from '@/components/ui/icon'
 import { Grid } from '@/components/ui/layout/grid'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
-import { SurfaceTile } from '@/components/ui/surface-tile'
 import { RecordingPlayer } from '@/components/ui/recording-player'
+import { SurfaceTile } from '@/components/ui/surface-tile'
 import { BodyText } from '@/components/ui/text'
-import {
-  getInterviewAnswerMedia,
-  type InterviewAnswerMediaResponse,
-} from '@/lib/api'
+import { getInterviewAnswerMedia, type InterviewAnswerMediaResponse } from '@/lib/api'
 
 interface LazyMediaPlaybackProps {
   interviewId: string
@@ -50,8 +47,7 @@ export function LazyMediaPlayback({
       const handle = setTimeout(() => setIsStale(false), 0)
       return () => clearTimeout(handle)
     }
-    const remaining =
-      state.loadedAt + SIGNED_URL_REFRESH_THRESHOLD_MS - Date.now()
+    const remaining = state.loadedAt + SIGNED_URL_REFRESH_THRESHOLD_MS - Date.now()
     if (remaining <= 0) {
       const handle = setTimeout(() => setIsStale(true), 0)
       return () => clearTimeout(handle)
@@ -72,8 +68,7 @@ export function LazyMediaPlayback({
     } catch (err) {
       setState({
         phase: 'error',
-        message:
-          err instanceof Error ? err.message : t('loadFailed'),
+        message: err instanceof Error ? err.message : t('loadFailed'),
       })
     }
   }
@@ -102,13 +97,7 @@ export function LazyMediaPlayback({
                   : t('screenOnly')}
             </BodyText>
           </Stack>
-          <Button
-            type="button"
-            variant="outline-pill"
-            shape="pill"
-            size="sm"
-            onClick={handleLoad}
-          >
+          <Button type="button" variant="outline-pill" shape="pill" size="sm" onClick={handleLoad}>
             <Icon size="md">
               <Eye />
             </Icon>
@@ -145,9 +134,7 @@ export function LazyMediaPlayback({
 
   const { cameraUrl, screenUrl } = state.media
 
-  const notice = isStale
-    ? { title: t('expiredTitle'), description: t('expiredDescription') }
-    : null
+  const notice = isStale ? { title: t('expiredTitle'), description: t('expiredDescription') } : null
 
   return (
     <Stack gap={3}>

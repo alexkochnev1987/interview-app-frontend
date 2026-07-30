@@ -18,9 +18,7 @@ const completePrimaryBlock = {
 
 describe('editor-phase', () => {
   it('detects missing primary content fields including followUpQuestions', () => {
-    expect(getMissingPrimaryContentFields({ questionText: 'Hello' })).toContain(
-      'followUpQuestions',
-    )
+    expect(getMissingPrimaryContentFields({ questionText: 'Hello' })).toContain('followUpQuestions')
     expect(isPrimaryContentComplete(completePrimaryBlock)).toBe(true)
   })
 

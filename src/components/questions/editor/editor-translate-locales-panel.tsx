@@ -3,7 +3,6 @@
 import { Languages } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
-import { useQuestionEditorLabels } from '@/i18n/use-question-editor-labels'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
@@ -12,6 +11,7 @@ import { Stack } from '@/components/ui/layout/stack'
 import { SurfaceTile } from '@/components/ui/surface-tile'
 import { BodyText } from '@/components/ui/text'
 import type { Locale } from '@/i18n/locales'
+import { useQuestionEditorLabels } from '@/i18n/use-question-editor-labels'
 
 type TranslateLocaleStatus = 'idle' | 'loading' | 'error'
 
@@ -73,9 +73,7 @@ export function EditorTranslateLocalesPanel({
                       id={checkboxId}
                       checked={selectedLocales.includes(locale)}
                       disabled={disabled || isBatchTranslating}
-                      onCheckedChange={(checked) =>
-                        onToggleLocale(locale, checked === true)
-                      }
+                      onCheckedChange={(checked) => onToggleLocale(locale, checked === true)}
                     />
                     <Label htmlFor={checkboxId}>{localeLabel(locale)}</Label>
                     {status === 'loading' ? (

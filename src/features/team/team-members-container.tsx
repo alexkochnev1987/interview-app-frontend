@@ -10,9 +10,7 @@ interface TeamMembersContainerProps {
   initialMembers: TeamMember[]
 }
 
-export function TeamMembersContainer({
-  initialMembers,
-}: TeamMembersContainerProps) {
+export function TeamMembersContainer({ initialMembers }: TeamMembersContainerProps) {
   const {
     actorId,
     actorRole,

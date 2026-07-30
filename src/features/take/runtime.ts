@@ -1,52 +1,54 @@
-import type { TakeBehaviorSignals } from './utils';
-import type { ClientTranscriptPayload } from '@/lib/api';
+import type { ClientTranscriptPayload } from '@/lib/api'
 
-export type CaptureTarget = 'camera' | 'screen';
+import type { TakeBehaviorSignals } from './utils'
+
+export type CaptureTarget = 'camera' | 'screen'
 
 export interface AnswerBehaviorEvent {
-  eventType: 'tab_hidden' | 'window_blur' | 'copy' | 'paste' | 'keydown' | 'resize';
-  occurredAt: string;
-  versionNumber: number;
+  eventType: 'tab_hidden' | 'window_blur' | 'copy' | 'paste' | 'keydown' | 'resize'
+  occurredAt: string
+  versionNumber: number
 }
 
 export interface MultipartUploadSession {
-  questionIndex: number;
-  mediaKey: string;
-  uploadId: string;
-  versionNumber: number;
-  partBlobType?: string;
-  nextPartNumber: number;
-  uploadedPartCount: number;
-  bufferedChunks: Blob[];
-  bufferedBytes: number;
-  recordedBytes: number;
-  mediaKeyPersisted: boolean;
-  uploadChain: Promise<void>;
-  completed: boolean;
-  aborted: boolean;
+  questionIndex: number
+  mediaKey: string
+  uploadId: string
+  versionNumber: number
+  partBlobType?: string
+  nextPartNumber: number
+  uploadedPartCount: number
+  bufferedChunks: Blob[]
+  bufferedBytes: number
+  recordedBytes: number
+  mediaKeyPersisted: boolean
+  uploadChain: Promise<void>
+  completed: boolean
+  aborted: boolean
 }
 
 export interface MultipartUploadState {
-  camera: MultipartUploadSession | null;
-  screen: MultipartUploadSession | null;
+  camera: MultipartUploadSession | null
+  screen: MultipartUploadSession | null
 }
 
 export interface MultipartSessionSeed {
-  questionIndex: number;
-  mediaKey: string;
-  uploadId: string;
-  versionNumber: number;
+  questionIndex: number
+  mediaKey: string
+  uploadId: string
+  versionNumber: number
 }
 
 export function stopMediaStream(stream: MediaStream | null) {
   if (!stream) {
-    return;
+    return
   }
 
   stream.getTracks().forEach((track) => {
-    track.onended = null;
-    track.stop();
-  });
+    // oxlint-disable-next-line unicorn/prefer-add-event-listener
+    track.onended = null
+    track.stop()
+  })
 }
 
 function releaseCaptureStreams(
@@ -54,13 +56,13 @@ function releaseCaptureStreams(
   screenStreamRef: { current: MediaStream | null },
   videoRef: { current: HTMLVideoElement | null },
 ) {
-  stopMediaStream(cameraStreamRef.current);
-  stopMediaStream(screenStreamRef.current);
-  cameraStreamRef.current = null;
-  screenStreamRef.current = null;
+  stopMediaStream(cameraStreamRef.current)
+  stopMediaStream(screenStreamRef.current)
+  cameraStreamRef.current = null
+  screenStreamRef.current = null
 
   if (videoRef.current) {
-    videoRef.current.srcObject = null;
+    videoRef.current.srcObject = null
   }
 }
 
@@ -68,17 +70,17 @@ export function releaseCameraCapture(
   cameraStreamRef: { current: MediaStream | null },
   videoRef: { current: HTMLVideoElement | null },
 ) {
-  stopMediaStream(cameraStreamRef.current);
-  cameraStreamRef.current = null;
+  stopMediaStream(cameraStreamRef.current)
+  cameraStreamRef.current = null
 
   if (videoRef.current) {
-    videoRef.current.srcObject = null;
+    videoRef.current.srcObject = null
   }
 }
 
 function clearVideoPreview(videoRef: { current: HTMLVideoElement | null }) {
   if (videoRef.current) {
-    videoRef.current.srcObject = null;
+    videoRef.current.srcObject = null
   }
 }
 
@@ -86,9 +88,9 @@ export function releaseScreenCapture(
   screenStreamRef: { current: MediaStream | null },
   screenVideoRef: { current: HTMLVideoElement | null },
 ) {
-  stopMediaStream(screenStreamRef.current);
-  screenStreamRef.current = null;
-  clearVideoPreview(screenVideoRef);
+  stopMediaStream(screenStreamRef.current)
+  screenStreamRef.current = null
+  clearVideoPreview(screenVideoRef)
 }
 
 export function releaseAllInterviewCaptures(
@@ -97,28 +99,25 @@ export function releaseAllInterviewCaptures(
   videoRef: { current: HTMLVideoElement | null },
   screenVideoRef: { current: HTMLVideoElement | null },
 ) {
-  releaseCaptureStreams(cameraStreamRef, screenStreamRef, videoRef);
-  clearVideoPreview(screenVideoRef);
+  releaseCaptureStreams(cameraStreamRef, screenStreamRef, videoRef)
+  clearVideoPreview(screenVideoRef)
 }
 
 export function stopActiveTakeMediaRecorders(
   cameraRecorderRef: { current: MediaRecorder | null },
   screenRecorderRef: { current: MediaRecorder | null },
 ): number {
-  let expectedStopEvents = 0;
+  let expectedStopEvents = 0
 
   for (const recorderRef of [cameraRecorderRef, screenRecorderRef] as const) {
-    const recorder = recorderRef.current;
-    if (
-      recorder !== null &&
-      (recorder.state === 'recording' || recorder.state === 'paused')
-    ) {
-      recorder.stop();
-      expectedStopEvents += 1;
+    const recorder = recorderRef.current
+    if (recorder !== null && (recorder.state === 'recording' || recorder.state === 'paused')) {
+      recorder.stop()
+      expectedStopEvents += 1
     }
   }
 
-  return expectedStopEvents;
+  return expectedStopEvents
 }
 
 export function clearProgressTimers(
@@ -127,22 +126,24 @@ export function clearProgressTimers(
   progressFlushTimeoutRef: { current: ReturnType<typeof setTimeout> | null },
 ) {
   if (timerRef.current) {
-    clearInterval(timerRef.current);
-    timerRef.current = null;
+    clearInterval(timerRef.current)
+    timerRef.current = null
   }
 
   if (progressHeartbeatRef.current) {
-    clearInterval(progressHeartbeatRef.current);
-    progressHeartbeatRef.current = null;
+    clearInterval(progressHeartbeatRef.current)
+    progressHeartbeatRef.current = null
   }
 
   if (progressFlushTimeoutRef.current) {
-    clearTimeout(progressFlushTimeoutRef.current);
-    progressFlushTimeoutRef.current = null;
+    clearTimeout(progressFlushTimeoutRef.current)
+    progressFlushTimeoutRef.current = null
   }
 }
 
-export function createMultipartUploadSession(session: MultipartSessionSeed): MultipartUploadSession {
+export function createMultipartUploadSession(
+  session: MultipartSessionSeed,
+): MultipartUploadSession {
   return {
     questionIndex: session.questionIndex,
     mediaKey: session.mediaKey,
@@ -157,34 +158,34 @@ export function createMultipartUploadSession(session: MultipartSessionSeed): Mul
     uploadChain: Promise.resolve(),
     completed: false,
     aborted: false,
-  };
+  }
 }
 
 export function getMultipartSession(
   multipartUploads: MultipartUploadState,
   target: CaptureTarget,
 ): MultipartUploadSession {
-  const session = multipartUploads[target];
+  const session = multipartUploads[target]
   if (!session) {
-    throw new Error(`${target} upload session is not initialized.`);
+    throw new Error(`${target} upload session is not initialized.`)
   }
 
-  return session;
+  return session
 }
 
 export interface ProgressPayloadArgs {
-  questionIndex: number;
-  versionNumber: number;
-  mediaKey: string;
-  screenMediaKey?: string;
-  durationSeconds?: number;
-  startedAt?: string;
-  submittedAtMs?: number | null;
-  cameraFileSizeBytes?: number;
-  screenFileSizeBytes?: number;
-  behaviorSignals: TakeBehaviorSignals;
-  behaviorEvents: AnswerBehaviorEvent[];
-  clientTranscript?: ClientTranscriptPayload;
+  questionIndex: number
+  versionNumber: number
+  mediaKey: string
+  screenMediaKey?: string
+  durationSeconds?: number
+  startedAt?: string
+  submittedAtMs?: number | null
+  cameraFileSizeBytes?: number
+  screenFileSizeBytes?: number
+  behaviorSignals: TakeBehaviorSignals
+  behaviorEvents: AnswerBehaviorEvent[]
+  clientTranscript?: ClientTranscriptPayload
 }
 
 export function buildProgressPayload(args: ProgressPayloadArgs) {
@@ -201,5 +202,5 @@ export function buildProgressPayload(args: ProgressPayloadArgs) {
     behaviorSignals: args.behaviorSignals,
     behaviorEvents: args.behaviorEvents,
     clientTranscript: args.clientTranscript,
-  };
+  }
 }

@@ -1,8 +1,10 @@
 'use client'
 
-import { useMemo } from 'react'
 import { useTranslations } from 'next-intl'
+import { useMemo } from 'react'
 
+import { Button } from '@/components/ui/button'
+import { Stack } from '@/components/ui/layout/stack'
 import {
   Select,
   SelectContent,
@@ -10,8 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Button } from '@/components/ui/button'
-import { Stack } from '@/components/ui/layout/stack'
 import { BodyText } from '@/components/ui/text'
 import type { AssignedHr } from '@/lib/api'
 import {
@@ -38,15 +38,11 @@ type AssignedHrSelectProps = {
   enabled?: boolean
 }
 
-function mergeHrOptions(
-  hrUsers: AssignedHr[],
-  currentAssignee?: AssignedHr,
-): AssignedHr[] {
+function mergeHrOptions(hrUsers: AssignedHr[], currentAssignee?: AssignedHr): AssignedHr[] {
   if (!currentAssignee) return hrUsers
   if (hrUsers.some((user) => user.id === currentAssignee.id)) return hrUsers
-  return [...hrUsers, currentAssignee].sort((a, b) =>
-    a.name.localeCompare(b.name),
-  )
+  // eslint-disable-next-line unicorn/no-array-sort
+  return [...hrUsers, currentAssignee].sort((a, b) => a.name.localeCompare(b.name))
 }
 
 function resolveSelectValue(
@@ -128,21 +124,9 @@ export function AssignedHrSelect({
   }
 
   return (
-    <Select
-      value={selectValue}
-      onValueChange={handleValueChange}
-      disabled={disabled || loading}
-    >
-      <SelectTrigger
-        id={id}
-        variant="surface"
-        size="md"
-        shape="rounded"
-        width="full"
-      >
-        <SelectValue
-          placeholder={loading ? t('assignedHrLoading') : t('assignedHrUnassigned')}
-        />
+    <Select value={selectValue} onValueChange={handleValueChange} disabled={disabled || loading}>
+      <SelectTrigger id={id} variant="surface" size="md" shape="rounded" width="full">
+        <SelectValue placeholder={loading ? t('assignedHrLoading') : t('assignedHrUnassigned')} />
       </SelectTrigger>
       <SelectContent>
         {allowUnassigned ? (
@@ -151,9 +135,7 @@ export function AssignedHrSelect({
           </SelectItem>
         ) : null}
         {filterMode && unassignedOnlyLabel ? (
-          <SelectItem value={ASSIGNED_HR_FILTER_UNASSIGNED}>
-            {unassignedOnlyLabel}
-          </SelectItem>
+          <SelectItem value={ASSIGNED_HR_FILTER_UNASSIGNED}>{unassignedOnlyLabel}</SelectItem>
         ) : null}
         {options.map((user) => (
           <SelectItem key={user.id} value={user.id}>

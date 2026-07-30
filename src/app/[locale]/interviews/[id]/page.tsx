@@ -1,5 +1,3 @@
-import InterviewDetailClient from './interview-detail-client'
-
 import { getTranslations } from 'next-intl/server'
 
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
@@ -17,6 +15,8 @@ import { prefetchInterviewCreatePicker } from '@/lib/questions-library-prefetch'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
 import { isForbiddenError, requestServer } from '@/lib/server-fetch'
 
+import InterviewDetailClient from './interview-detail-client'
+
 interface InterviewDetailPageProps {
   params: Promise<{
     id: string
@@ -24,9 +24,7 @@ interface InterviewDetailPageProps {
   }>
 }
 
-export default async function InterviewDetailPage({
-  params,
-}: InterviewDetailPageProps) {
+export default async function InterviewDetailPage({ params }: InterviewDetailPageProps) {
   const { id, locale } = await params
   const t = await getTranslations({ locale, namespace: 'toast.pageGate.interview' })
   const tCommon = await getTranslations({ locale, namespace: 'common' })
@@ -36,10 +34,7 @@ export default async function InterviewDetailPage({
   redirectIfUnauthenticated(auth, returnPath, locale)
   if (auth.kind === 'forbidden') {
     return (
-      <ForbiddenAccessPage
-        title={t('forbiddenTitle')}
-        description={t('forbiddenDescription')}
-      />
+      <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
     )
   }
   if (auth.kind === 'error') {
@@ -58,11 +53,9 @@ export default async function InterviewDetailPage({
 
   try {
     interview =
-      (await requestServer<Interview>(
-        `/interviews/${encodedId}`,
-        auth.ctx,
-        { withLocaleHeader: false },
-      )) ?? null
+      (await requestServer<Interview>(`/interviews/${encodedId}`, auth.ctx, {
+        withLocaleHeader: false,
+      })) ?? null
 
     if (interview) {
       results = interview.result ?? null
@@ -70,11 +63,11 @@ export default async function InterviewDetailPage({
       if (interview.status === 'completed') {
         try {
           results =
-            (await requestServer<InterviewResult>(
-              `/interviews/${encodedId}/results`,
-              auth.ctx,
-              { withLocaleHeader: false },
-            )) ?? interview.result ?? null
+            (await requestServer<InterviewResult>(`/interviews/${encodedId}/results`, auth.ctx, {
+              withLocaleHeader: false,
+            })) ??
+            interview.result ??
+            null
         } catch {
           results = interview.result ?? null
         }
@@ -84,16 +77,10 @@ export default async function InterviewDetailPage({
     redirectIfUnauthorizedError(err, returnPath, locale)
     if (isForbiddenError(err)) {
       return (
-        <ForbiddenAccessPage
-          title={t('forbiddenTitle')}
-          description={t('forbiddenDescription')}
-        />
+        <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
       )
     }
-    error =
-      err instanceof Error
-        ? err.message
-        : t('loadFailedFallback')
+    error = err instanceof Error ? err.message : t('loadFailedFallback')
   }
 
   if (error || !interview) {

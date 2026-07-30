@@ -1,5 +1,5 @@
-import type { HTMLAttributes, ReactNode } from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
+import type { HTMLAttributes, ReactNode } from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -31,8 +31,7 @@ const affixVariants = cva(
 )
 
 interface IconAffixProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'children'>,
-    VariantProps<typeof wrapperVariants> {
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'children'>, VariantProps<typeof wrapperVariants> {
   icon: ReactNode
   iconSide?: 'left' | 'right'
   children: ReactNode

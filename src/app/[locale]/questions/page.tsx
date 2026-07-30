@@ -19,10 +19,7 @@ interface QuestionsPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
-export default async function QuestionsPage({
-  params,
-  searchParams,
-}: QuestionsPageProps) {
+export default async function QuestionsPage({ params, searchParams }: QuestionsPageProps) {
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'toast.pageGate.questions' })
   const tCommon = await getTranslations({ locale, namespace: 'common' })
@@ -59,8 +56,7 @@ export default async function QuestionsPage({
       lockStatus: superAdmin ? undefined : 'active',
     })
   } catch (err) {
-    const message =
-      err instanceof Error ? err.message : t('loadFailedFallback')
+    const message = err instanceof Error ? err.message : t('loadFailedFallback')
 
     return (
       <FlashErrorPageFallback
@@ -75,10 +71,7 @@ export default async function QuestionsPage({
   return (
     <PageShell>
       <QueryHydrationBoundary state={initialPrefetch.dehydratedState}>
-        <QuestionsLibraryClient
-          isSuperAdmin={superAdmin}
-          initialPrefetch={initialPrefetch}
-        />
+        <QuestionsLibraryClient isSuperAdmin={superAdmin} initialPrefetch={initialPrefetch} />
       </QueryHydrationBoundary>
     </PageShell>
   )
