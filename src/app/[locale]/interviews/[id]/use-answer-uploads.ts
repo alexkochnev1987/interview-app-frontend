@@ -25,7 +25,7 @@ export function useAnswerUploads({
   uploadToStorageFailedLabel,
   uploadFailedLabel,
 }: UseAnswerUploadsParams) {
-  const [uploadStates, setUploadStates] = useState<QuestionUploadState[]>(
+  const [uploadStates, setUploadStates] = useState<QuestionUploadState[]>(() =>
     initialInterview.questions.map((_, qi) => {
       const hasAnswer = initialInterview.answers.some((answer) => answer.questionIndex === qi)
       return {

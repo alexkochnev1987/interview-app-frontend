@@ -219,7 +219,7 @@ export function QuestionEditor({
     const locales = Array.from(new Set<Locale>([primaryLocale, ...addedLocales]))
     return [primaryLocale, ...locales.filter((locale) => locale !== primaryLocale)]
   }, [primaryLocale, addedLocales])
-  const [persistedLocales, setPersistedLocales] = useState<Locale[]>(
+  const [persistedLocales, setPersistedLocales] = useState<Locale[]>(() =>
     Array.from(new Set<Locale>([initialPrimaryLocale, ...initialPersistedLocales])),
   )
   const [localeDrafts, setLocaleDrafts] = useState(initialLocaleDrafts)
