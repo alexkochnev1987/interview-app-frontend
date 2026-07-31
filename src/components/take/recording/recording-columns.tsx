@@ -13,6 +13,7 @@ import { SurfaceCard } from '@/components/ui/surface-card'
 import { RecordingStageHero } from '@/components/ui/take'
 import { Text } from '@/components/ui/text'
 import type { ExhaustedHint } from '@/features/take/session-machine'
+import { useTakeMedia } from '@/features/take/take-media-context'
 import type { InterviewerPresence } from '@/features/take/use-take-question-tts'
 
 import { TakeRecordingActions } from './recording-actions'
@@ -36,6 +37,8 @@ export function TakeRecordingHeroColumn({
   screenVideoRef,
   interviewerPresence,
 }: TakeRecordingHeroColumnProps) {
+  const { cameraStream } = useTakeMedia()
+
   return (
     <SurfaceCard tone="recordingHero" height="full" size="flush" grow="fill" flexChild="contain">
       <CardContent inset="none" layout="fill-column" spacing="none">
@@ -46,6 +49,7 @@ export function TakeRecordingHeroColumn({
           cameraVideoRef={videoRef}
           screenVideoRef={screenVideoRef}
           interviewerPresence={interviewerPresence}
+          cameraStream={cameraStream}
         />
       </CardContent>
     </SurfaceCard>

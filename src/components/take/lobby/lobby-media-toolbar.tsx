@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl'
 import { MicTestDropdown } from '@/components/take/lobby/mic-test-dropdown'
 import { Button } from '@/components/ui/button'
 import { Inline } from '@/components/ui/layout'
+import { MicActivityBadge } from '@/components/ui/take'
 
 interface TakeLobbyMediaToolbarProps {
   setupBusy: boolean
@@ -28,45 +29,48 @@ export function TakeLobbyMediaToolbar({
 }: TakeLobbyMediaToolbarProps) {
   const tTake = useTranslations('takeFlow')
   return (
-    <Inline justify="center" gap={3}>
-      <MicTestDropdown stream={cameraStream} micOn={micOn} disabled={setupBusy}>
+    <>
+      <MicActivityBadge stream={cameraStream} muted={!micOn} placement="toolbar-left" />
+      <Inline justify="center" gap={3}>
+        <MicTestDropdown stream={cameraStream} micOn={micOn} disabled={setupBusy}>
+          <Button
+            type="button"
+            variant={micOn ? 'secondary' : 'outline'}
+            size="icon-prep-room"
+            shape="pill"
+            disabled={setupBusy}
+            aria-pressed={micOn}
+            aria-label={tTake('lobbyToolbarMic')}
+            onClick={() => void onToggleMic()}
+          >
+            {micOn ? <Mic /> : <MicOff />}
+          </Button>
+        </MicTestDropdown>
         <Button
           type="button"
-          variant={micOn ? 'secondary' : 'outline'}
+          variant={cameraOn ? 'secondary' : 'outline'}
           size="icon-prep-room"
           shape="pill"
           disabled={setupBusy}
-          aria-pressed={micOn}
-          aria-label={tTake('lobbyToolbarMic')}
-          onClick={() => void onToggleMic()}
+          aria-pressed={cameraOn}
+          aria-label={tTake('lobbyToolbarCamera')}
+          onClick={() => void onToggleCamera()}
         >
-          {micOn ? <Mic /> : <MicOff />}
+          {cameraOn ? <Video /> : <VideoOff />}
         </Button>
-      </MicTestDropdown>
-      <Button
-        type="button"
-        variant={cameraOn ? 'secondary' : 'outline'}
-        size="icon-prep-room"
-        shape="pill"
-        disabled={setupBusy}
-        aria-pressed={cameraOn}
-        aria-label={tTake('lobbyToolbarCamera')}
-        onClick={() => void onToggleCamera()}
-      >
-        {cameraOn ? <Video /> : <VideoOff />}
-      </Button>
-      <Button
-        type="button"
-        variant={screenShareReady ? 'secondary' : 'outline'}
-        size="icon-prep-room"
-        shape="pill"
-        disabled={setupBusy}
-        aria-pressed={screenShareReady}
-        aria-label={tTake('lobbyToolbarScreen')}
-        onClick={() => void onScreenShare()}
-      >
-        <SquareArrowUp />
-      </Button>
-    </Inline>
+        <Button
+          type="button"
+          variant={screenShareReady ? 'secondary' : 'outline'}
+          size="icon-prep-room"
+          shape="pill"
+          disabled={setupBusy}
+          aria-pressed={screenShareReady}
+          aria-label={tTake('lobbyToolbarScreen')}
+          onClick={() => void onScreenShare()}
+        >
+          <SquareArrowUp />
+        </Button>
+      </Inline>
+    </>
   )
 }
