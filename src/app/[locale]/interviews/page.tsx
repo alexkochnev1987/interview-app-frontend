@@ -1,4 +1,5 @@
 import { getTranslations } from 'next-intl/server'
+import { Suspense } from 'react'
 
 import { InterviewsLibraryClient } from '@/components/interviews/library/interviews-library-client'
 import { QueryHydrationBoundary } from '@/components/questions/query-hydration-boundary'
@@ -71,7 +72,9 @@ export default async function InterviewsPage({ params, searchParams }: Interview
   return (
     <PageShell>
       <QueryHydrationBoundary state={initialPrefetch.dehydratedState}>
-        <InterviewsLibraryClient initialPrefetch={initialPrefetch} />
+        <Suspense fallback={null}>
+          <InterviewsLibraryClient initialPrefetch={initialPrefetch} />
+        </Suspense>
       </QueryHydrationBoundary>
     </PageShell>
   )

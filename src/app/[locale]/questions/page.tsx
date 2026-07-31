@@ -1,4 +1,5 @@
 import { getTranslations } from 'next-intl/server'
+import { Suspense } from 'react'
 
 import { QuestionsLibraryClient } from '@/components/questions/library/questions-library-client'
 import { QueryHydrationBoundary } from '@/components/questions/query-hydration-boundary'
@@ -71,7 +72,9 @@ export default async function QuestionsPage({ params, searchParams }: QuestionsP
   return (
     <PageShell>
       <QueryHydrationBoundary state={initialPrefetch.dehydratedState}>
-        <QuestionsLibraryClient isSuperAdmin={superAdmin} initialPrefetch={initialPrefetch} />
+        <Suspense fallback={null}>
+          <QuestionsLibraryClient isSuperAdmin={superAdmin} initialPrefetch={initialPrefetch} />
+        </Suspense>
       </QueryHydrationBoundary>
     </PageShell>
   )
