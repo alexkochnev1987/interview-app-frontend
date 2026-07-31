@@ -29,9 +29,11 @@ interface AssessmentsPageProps {
 
 export default async function AssessmentsPage({ params }: AssessmentsPageProps) {
   const { locale } = await params
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.assessments' })
-  const tCommon = await getTranslations({ locale, namespace: 'common' })
-  const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
+  const [t, tCommon, tFallback] = await Promise.all([
+    getTranslations({ locale, namespace: 'toast.pageGate.assessments' }),
+    getTranslations({ locale, namespace: 'common' }),
+    getTranslations({ locale, namespace: 'shared.fallback' }),
+  ])
   const auth = await loadAuthGate(canReviewAssessments, locale)
   redirectIfUnauthenticated(auth, '/assessments', locale)
   if (auth.kind === 'forbidden') {

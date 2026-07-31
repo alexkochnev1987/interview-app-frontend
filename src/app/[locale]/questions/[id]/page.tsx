@@ -22,9 +22,11 @@ const ERROR_BACK_HREF = routes.questions.list
 
 export default async function EditQuestionPage({ params }: EditQuestionPageProps) {
   const { id, locale } = await params
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.questions' })
-  const tCommon = await getTranslations({ locale, namespace: 'common' })
-  const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
+  const [t, tCommon, tFallback] = await Promise.all([
+    getTranslations({ locale, namespace: 'toast.pageGate.questions' }),
+    getTranslations({ locale, namespace: 'common' }),
+    getTranslations({ locale, namespace: 'shared.fallback' }),
+  ])
 
   const returnPath = routes.questions.detail(id)
   const auth = await loadAuthGate(canReadQuestions, locale)
