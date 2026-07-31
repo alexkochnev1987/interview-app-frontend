@@ -49,6 +49,7 @@
     "previousPage": "Папярэдняя старонка",
     "nextPage": "Наступная старонка",
     "lastPage": "Апошняя старонка",
+    "goToPage": "Перайсці на старонку {page}",
     "pageSizeLabel": "Радкоў на старонку",
     "pageSizeOption": "{count} на старонку"
   },

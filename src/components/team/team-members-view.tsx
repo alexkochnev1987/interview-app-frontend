@@ -87,7 +87,8 @@ export function TeamMembersView({
           limit={limit}
           onPageChange={onPageChange}
           limitOptions={TEAM_PAGE_LIMIT_OPTIONS}
-          onLimitChange={(value) => onLimitChange(value as TeamPageLimit)}
+          onLimitChange={onLimitChange}
+          numberedPages
         />
       )}
     </>

@@ -6,6 +6,7 @@ import type { ReactNode } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Inline } from '@/components/ui/layout/inline'
+import { buildPaginationItems } from '@/components/ui/pagination-items'
 import {
   Select,
   SelectContent,
@@ -17,19 +18,21 @@ import { BodyText } from '@/components/ui/text'
 
 const renderStrong = (chunks: ReactNode) => <strong>{chunks}</strong>
 
-export type PaginationProps = {
+export type PaginationProps<TLimit extends number = number> = {
   page: number
   totalPages: number
   total: number
   limit: number
   onPageChange: (page: number) => void
   /** Page-size options to render a "rows per page" select; omit to hide it. */
-  limitOptions?: readonly number[]
-  onLimitChange?: (limit: number) => void
+  limitOptions?: readonly TLimit[]
+  onLimitChange?: (limit: TLimit) => void
   limitDisabled?: boolean
+  /** Render numbered page buttons with ellipsis instead of the "page X of Y" text. */
+  numberedPages?: boolean
 }
 
-export function Pagination({
+export function Pagination<TLimit extends number = number>({
   page,
   totalPages,
   total,
@@ -38,7 +41,8 @@ export function Pagination({
   limitOptions,
   onLimitChange,
   limitDisabled = false,
-}: PaginationProps) {
+  numberedPages = false,
+}: PaginationProps<TLimit>) {
   const t = useTranslations('pagination')
 
   if (total === 0) return null
@@ -50,6 +54,7 @@ export function Pagination({
   const atStart = page <= 1
   const atEnd = page >= totalPages
   const showLimitSelect = Boolean(limitOptions && limitOptions.length > 0 && onLimitChange)
+  const paginationItems = numberedPages ? buildPaginationItems(page, totalPages) : null
 
   return (
     <Inline
@@ -68,7 +73,7 @@ export function Pagination({
           <Select
             value={String(limit)}
             disabled={limitDisabled}
-            onValueChange={(value) => onLimitChange?.(Number(value))}
+            onValueChange={(value) => onLimitChange?.(Number(value) as TLimit)}
           >
             <SelectTrigger
               variant="surface"
@@ -114,9 +119,35 @@ export function Pagination({
             <ChevronLeft />
           </Button>
         </Inline>
-        <BodyText size="sm" tone="muted">
-          {t.rich('pageOf', { page, totalPages, strong: renderStrong })}
-        </BodyText>
+        {paginationItems ? (
+          <Inline gap={1} align="center">
+            {paginationItems.map((item) =>
+              typeof item === 'number' ? (
+                <Button
+                  key={item}
+                  type="button"
+                  variant={item === page ? 'default' : 'outline-pill'}
+                  shape="pill"
+                  size="icon-sm"
+                  aria-label={t('goToPage', { page: item })}
+                  aria-current={item === page ? 'page' : undefined}
+                  disabled={item === page}
+                  onClick={() => onPageChange(item)}
+                >
+                  {item}
+                </Button>
+              ) : (
+                <BodyText key={item} as="span" size="sm" tone="muted">
+                  …
+                </BodyText>
+              ),
+            )}
+          </Inline>
+        ) : (
+          <BodyText size="sm" tone="muted">
+            {t.rich('pageOf', { page, totalPages, strong: renderStrong })}
+          </BodyText>
+        )}
         <Inline gap={1} align="center">
           <Button
             type="button"

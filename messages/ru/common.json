@@ -49,6 +49,7 @@
     "previousPage": "Предыдущая страница",
     "nextPage": "Следующая страница",
     "lastPage": "Последняя страница",
+    "goToPage": "Перейти на страницу {page}",
     "pageSizeLabel": "Строк на странице",
     "pageSizeOption": "{count} на странице"
   },

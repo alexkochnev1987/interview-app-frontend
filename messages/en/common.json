@@ -49,6 +49,7 @@
     "previousPage": "Previous page",
     "nextPage": "Next page",
     "lastPage": "Last page",
+    "goToPage": "Go to page {page}",
     "pageSizeLabel": "Rows per page",
     "pageSizeOption": "{count} per page"
   },

@@ -11,7 +11,7 @@ import { normalizeTeamActorRole } from '../team-row-policy'
 
 export const TEAM_PAGE_LIMIT_OPTIONS = [4, 10, 20, 50] as const
 export type TeamPageLimit = (typeof TEAM_PAGE_LIMIT_OPTIONS)[number]
-const DEFAULT_TEAM_PAGE_LIMIT: TeamPageLimit = 4
+const DEFAULT_TEAM_PAGE_LIMIT: TeamPageLimit = 10
 
 export function useTeamMembers(initialMembers: TeamMember[]) {
   const { user } = useAuth()
