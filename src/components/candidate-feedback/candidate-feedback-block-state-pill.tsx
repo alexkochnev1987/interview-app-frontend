@@ -9,10 +9,7 @@ import {
   type CandidateFeedbackBlockState,
 } from '@/lib/candidate-feedback'
 
-export function blockStateTone(
-  state: CandidateFeedbackBlockState,
-  skippedFailure = false,
-): StatusTone {
+function blockStateTone(state: CandidateFeedbackBlockState, skippedFailure = false): StatusTone {
   if (skippedFailure) {
     return 'pending'
   }

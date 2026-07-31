@@ -18,12 +18,8 @@ import { Button } from '@/components/ui/button'
 import { IconBadge } from '@/components/ui/icon-badge'
 import { IdentityBadge } from '@/components/ui/identity-badge'
 import { Stack } from '@/components/ui/layout/stack'
-import {
-  SideNavButton,
-  SideNavLink,
-  sideNavProfileLinkClass,
-  sideNavRevealClass,
-} from '@/components/ui/side-nav-item'
+import { SideNavButton, SideNavLink } from '@/components/ui/side-nav-item'
+import { sideNavProfileLinkClass, sideNavRevealClass } from '@/components/ui/side-nav-variants'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
 import { isCandidateFlowPath } from '@/i18n/html-lang'
 import { usePathname } from '@/i18n/navigation'
