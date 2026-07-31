@@ -42,7 +42,6 @@ import {
   buildQuestionsInfiniteParams,
   DEFAULT_QUESTIONS_LIMIT,
   QUESTION_PAGE_LIMIT_OPTIONS,
-  type QuestionPageLimit,
 } from '@/lib/questions-query-state'
 
 type QuestionsLibraryClientProps = {
@@ -348,7 +347,7 @@ export function QuestionsLibraryClient({
           limit={query.state.limit}
           onPageChange={query.setPage}
           limitOptions={QUESTION_PAGE_LIMIT_OPTIONS}
-          onLimitChange={(value) => query.setLimit(value as QuestionPageLimit)}
+          onLimitChange={query.setLimit}
         />
       ) : null}
     </Stack>

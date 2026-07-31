@@ -28,7 +28,6 @@ import {
   buildInterviewsInfiniteParams,
   DEFAULT_INTERVIEWS_LIMIT,
   INTERVIEW_PAGE_LIMIT_OPTIONS,
-  type InterviewPageLimit,
 } from '@/lib/interviews-query-state'
 
 import { useInterviewFacets } from '../hooks/use-interview-facets'
@@ -244,7 +243,7 @@ export function InterviewsLibraryClient({ initialPrefetch }: InterviewsLibraryCl
           limit={query.state.limit}
           onPageChange={query.setPage}
           limitOptions={INTERVIEW_PAGE_LIMIT_OPTIONS}
-          onLimitChange={(value) => query.setLimit(value as InterviewPageLimit)}
+          onLimitChange={query.setLimit}
         />
       ) : null}
     </Stack>
