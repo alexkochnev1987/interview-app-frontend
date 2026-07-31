@@ -895,6 +895,8 @@ export function useTakeOrchestrator({
         }
       : undefined
 
+    let cancelled = false
+
     setRecordingStartBusy(true)
     void (async () => {
       try {
@@ -904,9 +906,15 @@ export function useTakeOrchestrator({
           beginOptions,
         )
       } finally {
-        setRecordingStartBusy(false)
+        if (!cancelled) {
+          setRecordingStartBusy(false)
+        }
       }
     })()
+
+    return () => {
+      cancelled = true
+    }
     // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, [
     stage,
