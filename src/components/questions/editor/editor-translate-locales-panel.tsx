@@ -42,6 +42,7 @@ export function EditorTranslateLocalesPanel({
 }: EditorTranslateLocalesPanelProps) {
   const t = useTranslations('questions.translatePanel')
   const labels = useQuestionEditorLabels()
+  const selectedSet = new Set(selectedLocales)
 
   return (
     <SurfaceTile tone="soft" rounded="xl" padding="md">
@@ -71,7 +72,7 @@ export function EditorTranslateLocalesPanel({
                   <Inline gap={2} align="center">
                     <Checkbox
                       id={checkboxId}
-                      checked={selectedLocales.includes(locale)}
+                      checked={selectedSet.has(locale)}
                       disabled={disabled || isBatchTranslating}
                       onCheckedChange={(checked) => onToggleLocale(locale, checked === true)}
                     />

@@ -1002,11 +1002,12 @@ export function QuestionEditor({
     dismissDraftField(field)
   }
 
+  const dismissedSet = new Set(dismissedDraftFields)
   const pendingDraftFields = !aiDraft
     ? []
     : editorLabels.generateDraftFields.filter(
         ({ key }) =>
-          !dismissedDraftFields.includes(key) &&
+          !dismissedSet.has(key) &&
           getAiDraftFieldValue(key) !== undefined &&
           !areEqual(getAiCurrentFieldValue(key), getAiDraftFieldValue(key)),
       )
@@ -1197,9 +1198,8 @@ export function QuestionEditor({
       localeDrafts: draftsForSave,
       addedLocales: editorPhase === 1 ? [] : addedLocales,
     })
-    const removedPersistedLocale = persistedLocales.some(
-      (locale) => !visibleLocales.includes(locale),
-    )
+    const visibleLocalesSet = new Set(visibleLocales)
+    const removedPersistedLocale = persistedLocales.some((locale) => !visibleLocalesSet.has(locale))
     const translationsMode = removedPersistedLocale ? 'replace' : undefined
     const payload: QuestionInput = questionId
       ? (editorStateToUpdatePayload(editorState, { translationsMode }) as QuestionInput)

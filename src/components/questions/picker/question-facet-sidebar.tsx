@@ -268,8 +268,10 @@ function TagsFacetSection(props: {
   const visible = expanded || trimmed.length > 0 ? filtered : filtered.slice(0, TAG_COLLAPSED_LIMIT)
   const hidden = Math.max(0, filtered.length - visible.length)
 
+  const selectedSet = new Set(selected)
+
   function toggleTag(tag: string) {
-    if (selected.includes(tag)) {
+    if (selectedSet.has(tag)) {
       onChange(selected.filter((item) => item !== tag))
     } else {
       onChange([...selected, tag])
@@ -301,7 +303,7 @@ function TagsFacetSection(props: {
         ) : (
           <Stack gap={1}>
             {visible.map((item) => {
-              const isSelected = selected.includes(item.value)
+              const isSelected = selectedSet.has(item.value)
               return (
                 <FacetRowButton
                   key={item.value}
