@@ -6,7 +6,6 @@ import type { ReactNode, RefObject } from 'react'
 import { Inline, Stack } from '@/components/ui/layout'
 import { Panel } from '@/components/ui/panel'
 import { BodyText, Text } from '@/components/ui/text'
-import { useTakeMedia } from '@/features/take/take-media-context'
 import { cn } from '@/lib/utils'
 
 import { CameraPreviewVideo, type CameraPreviewVideoRefProps } from './camera-preview'
@@ -134,6 +133,7 @@ interface RecordingAiInterviewerSessionLayoutProps {
   screenVideoRef: RefObject<HTMLVideoElement | null>
   timerOverlay?: ReactNode
   interviewerPresence: RecordingAiPresence
+  cameraStream?: MediaStream | null
 }
 
 function RecordingAiInterviewerSessionLayout({
@@ -141,9 +141,8 @@ function RecordingAiInterviewerSessionLayout({
   screenVideoRef,
   timerOverlay,
   interviewerPresence,
+  cameraStream = null,
 }: RecordingAiInterviewerSessionLayoutProps) {
-  const { cameraStream } = useTakeMedia()
-
   return (
     <Stack
       gap={0}
@@ -173,11 +172,7 @@ function RecordingAiInterviewerSessionLayout({
         {timerOverlay}
       </Inline>
 
-      <MicActivityBadge
-        stream={cameraStream}
-        muted={false}
-        className="absolute bottom-3 left-3 z-10 sm:bottom-4 sm:left-4"
-      />
+      <MicActivityBadge stream={cameraStream} muted={false} placement="hero-bottom-left" />
 
       <Panel
         as="section"
@@ -242,6 +237,7 @@ interface RecordingStageHeroProps {
   cameraVideoRef: RefObject<HTMLVideoElement | null>
   screenVideoRef: RefObject<HTMLVideoElement | null>
   interviewerPresence: RecordingAiPresence
+  cameraStream?: MediaStream | null
 }
 
 export function RecordingStageHero({
@@ -251,6 +247,7 @@ export function RecordingStageHero({
   cameraVideoRef,
   screenVideoRef,
   interviewerPresence,
+  cameraStream = null,
 }: RecordingStageHeroProps) {
   const timerOverlay = showTimer ? <RecordingTimerBadge timeLabel={formatTime(timeLeft)} /> : null
 
@@ -263,6 +260,7 @@ export function RecordingStageHero({
         screenVideoRef={screenVideoRef}
         interviewerPresence={interviewerPresence}
         timerOverlay={timerOverlay}
+        cameraStream={cameraStream}
       />
     </div>
   )

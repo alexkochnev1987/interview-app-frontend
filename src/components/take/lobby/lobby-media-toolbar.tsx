@@ -30,7 +30,7 @@ export function TakeLobbyMediaToolbar({
   const tTake = useTranslations('takeFlow')
   return (
     <>
-      <MicActivityBadge stream={cameraStream} muted={!micOn} className="absolute left-3" />
+      <MicActivityBadge stream={cameraStream} muted={!micOn} placement="toolbar-left" />
       <Inline justify="center" gap={3}>
         <MicTestDropdown stream={cameraStream} micOn={micOn} disabled={setupBusy}>
           <Button

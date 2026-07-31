@@ -59,6 +59,7 @@ export function DemoTakeExperience({
             setupBusy={demo.cameraStatus === 'pending'}
             setupError={demo.setupError}
             videoRef={demo.videoRef}
+            cameraStream={demo.cameraStream}
             permissionLabel={demo.permissionLabel}
             permissionTone={permissionTone}
             lobbyMicOn={demo.lobbyMicOn}
