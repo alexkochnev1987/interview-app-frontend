@@ -118,7 +118,9 @@ function writeToSearchParams(state: QuestionsQueryState): URLSearchParams {
   if (state.view === 'table' && state.page !== 1) {
     params.set('page', String(state.page))
   }
-  if (state.limit !== DEFAULT_QUESTIONS_LIMIT) params.set('limit', String(state.limit))
+  if (state.view === 'table' && state.limit !== DEFAULT_QUESTIONS_LIMIT) {
+    params.set('limit', String(state.limit))
+  }
   if (state.view !== 'cards') params.set('view', state.view)
   return params
 }
