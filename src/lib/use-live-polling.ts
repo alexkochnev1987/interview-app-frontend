@@ -45,11 +45,14 @@ export function useLivePolling<T>(
   // Bumped on replaceData and on authoritative initial resync so an in-flight
   // poll cannot overwrite a newer local mutation response.
   const dataVersionRef = useRef(0)
+
+  useEffect(() => {
+    dataVersionRef.current += 1
+  }, [initial])
+
   const [visible, setVisible] = useState(true)
   if (syncedFrom !== initial) {
     setSyncedFrom(initial)
-    // eslint-disable-next-line react-hooks/refs -- bump poll generation when authoritative initial changes
-    dataVersionRef.current += 1
     setData(initial)
     // Fresh authoritative data clears any prior pause/kick state so a lingering
     // "paused" notice does not survive a navigation or router refresh. The
