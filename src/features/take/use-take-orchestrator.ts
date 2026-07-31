@@ -38,7 +38,7 @@ import { useTakeBeginRecording } from './use-take-begin-recording'
 import type { BeginRecordingInput, AnswerMetaUpdate } from './use-take-begin-recording'
 import { useTakeBehaviorTracking } from './use-take-behavior-tracking'
 import { useTakeCandidateSession } from './use-take-candidate-session'
-import { useTakeInterviewLoader } from './use-take-interview-loader'
+import { useTakeInterviewLoader, type TakeInterviewLoadMode } from './use-take-interview-loader'
 import { useTakePermissions } from './use-take-permissions'
 import { useTakeQuestionTts, type QuestionSpeechSynthCapture } from './use-take-question-tts'
 import { useTakeRecordingControls } from './use-take-recording-controls'
@@ -347,12 +347,8 @@ export function useTakeOrchestrator({
     getBrowserTranscriptSnapshot,
   })
 
-  const { loadInterview } = useTakeInterviewLoader({
-    id,
-    candidateToken,
-    skipInitialLoad: Boolean(initialInterview),
-    contentLocale,
-    onData: (data, mode) => {
+  const handleOnData = useCallback(
+    (data: TakeInterviewData, mode: TakeInterviewLoadMode) => {
       setError('')
       if (mode === 'locale') {
         if (isLocaleQuestionMutationBlocked()) {
@@ -393,12 +389,23 @@ export function useTakeOrchestrator({
 
       setStage(stageAfterInterviewLoad(data, loadMode))
     },
+    [initialInterview],
+  )
+
+  const handleOnCleanup = useCallback(() => {
+    clearProgressTimers(timerRef, progressHeartbeatRef, progressFlushTimeoutRef)
+    void abortMultipartUploads()
+    releaseAllCaptures()
+  }, [abortMultipartUploads])
+
+  const { loadInterview } = useTakeInterviewLoader({
+    id,
+    candidateToken,
+    skipInitialLoad: Boolean(initialInterview),
+    contentLocale,
+    onData: handleOnData,
     onError: setError,
-    onCleanup: () => {
-      clearProgressTimers(timerRef, progressHeartbeatRef, progressFlushTimeoutRef)
-      void abortMultipartUploads()
-      releaseAllCaptures()
-    },
+    onCleanup: handleOnCleanup,
     takeMessage,
   })
 
@@ -627,12 +634,17 @@ export function useTakeOrchestrator({
     }
   }, [stage, abortMultipartUploads, clearRecordingArtifacts, stopActiveRecorders, takeMessage])
 
+  const handleScheduleEventFlush = useCallback(
+    () => scheduleProgressFlush('event'),
+    [scheduleProgressFlush],
+  )
+
   useTakeBehaviorTracking({
     recording,
     currentVersionNumberRef,
     behaviorSignalsRef,
     behaviorEventsRef,
-    scheduleProgressFlush: () => scheduleProgressFlush('event'),
+    scheduleProgressFlush: handleScheduleEventFlush,
   })
 
   const { requestVersionAction: baseRequestVersionAction } = useTakeRecordingControls({
