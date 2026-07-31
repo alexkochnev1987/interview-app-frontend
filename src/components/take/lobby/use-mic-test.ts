@@ -85,6 +85,11 @@ export function useMicTest(stream: MediaStream | null, micOn: boolean, isOpen: b
         setIsRecording(false)
         if (chunks.length === 0) return
 
+        if (audioUrlRef.current) {
+          URL.revokeObjectURL(audioUrlRef.current)
+          audioUrlRef.current = null
+        }
+
         const type = recorder.mimeType || mimeType || 'audio/webm'
         const audioBlob = new Blob(chunks, { type })
         const url = URL.createObjectURL(audioBlob)
