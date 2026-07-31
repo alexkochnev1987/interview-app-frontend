@@ -28,6 +28,7 @@ import {
   TakeFlowLocaleProvider,
   useTakeFlowLocale,
 } from '@/features/take/take-flow-locale-provider'
+import { TakeMediaProvider } from '@/features/take/take-media-context'
 import type { Locale } from '@/i18n/locales'
 import type { TakeInterviewData } from '@/lib/api'
 
@@ -153,22 +154,25 @@ function TakeInterviewClientInner({
 
   const wrapTakeStage = useCallback(
     (content: ReactNode) => (
-      <PageMainViewport spacing="take">
-        <Stack gap={4} grow="fill" width="full">
-          <TakeLocaleBar
-            ariaLabel={languageAriaLabel}
-            currentLocale={locale}
-            options={languageOptions}
-            onSelectLocale={handleSelectLocale}
-            interviewLocale={interview?.interviewLocale}
-            resolvedLocale={interview?.currentQuestion?.resolvedLocale}
-            disabled={localeSwitchDisabled}
-          />
-          {content}
-        </Stack>
-      </PageMainViewport>
+      <TakeMediaProvider cameraStream={cameraStream}>
+        <PageMainViewport spacing="take">
+          <Stack gap={4} grow="fill" width="full">
+            <TakeLocaleBar
+              ariaLabel={languageAriaLabel}
+              currentLocale={locale}
+              options={languageOptions}
+              onSelectLocale={handleSelectLocale}
+              interviewLocale={interview?.interviewLocale}
+              resolvedLocale={interview?.currentQuestion?.resolvedLocale}
+              disabled={localeSwitchDisabled}
+            />
+            {content}
+          </Stack>
+        </PageMainViewport>
+      </TakeMediaProvider>
     ),
     [
+      cameraStream,
       languageAriaLabel,
       locale,
       languageOptions,

@@ -9,6 +9,7 @@ import { BodyText, Text } from '@/components/ui/text'
 import { cn } from '@/lib/utils'
 
 import { CameraPreviewVideo, type CameraPreviewVideoRefProps } from './camera-preview'
+import { MicActivityBadge } from './mic-activity-badge'
 
 type RecordingAiPresence = 'speaking' | 'listening'
 
@@ -132,6 +133,7 @@ interface RecordingAiInterviewerSessionLayoutProps {
   screenVideoRef: RefObject<HTMLVideoElement | null>
   timerOverlay?: ReactNode
   interviewerPresence: RecordingAiPresence
+  cameraStream?: MediaStream | null
 }
 
 function RecordingAiInterviewerSessionLayout({
@@ -139,6 +141,7 @@ function RecordingAiInterviewerSessionLayout({
   screenVideoRef,
   timerOverlay,
   interviewerPresence,
+  cameraStream = null,
 }: RecordingAiInterviewerSessionLayoutProps) {
   return (
     <Stack
@@ -168,6 +171,8 @@ function RecordingAiInterviewerSessionLayout({
         <AiInterviewerLabelBadge />
         {timerOverlay}
       </Inline>
+
+      <MicActivityBadge stream={cameraStream} muted={false} placement="hero-bottom-left" />
 
       <Panel
         as="section"
@@ -232,6 +237,7 @@ interface RecordingStageHeroProps {
   cameraVideoRef: RefObject<HTMLVideoElement | null>
   screenVideoRef: RefObject<HTMLVideoElement | null>
   interviewerPresence: RecordingAiPresence
+  cameraStream?: MediaStream | null
 }
 
 export function RecordingStageHero({
@@ -241,6 +247,7 @@ export function RecordingStageHero({
   cameraVideoRef,
   screenVideoRef,
   interviewerPresence,
+  cameraStream = null,
 }: RecordingStageHeroProps) {
   const timerOverlay = showTimer ? <RecordingTimerBadge timeLabel={formatTime(timeLeft)} /> : null
 
@@ -253,6 +260,7 @@ export function RecordingStageHero({
         screenVideoRef={screenVideoRef}
         interviewerPresence={interviewerPresence}
         timerOverlay={timerOverlay}
+        cameraStream={cameraStream}
       />
     </div>
   )
