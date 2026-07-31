@@ -20,9 +20,9 @@
     "avatar": {
       "edit": "Edit profile picture",
       "change": "Change photo",
-      "uploading": "Uploading...",
       "remove": "Remove photo",
       "unsupportedType": "Please choose a JPEG, PNG, or WEBP image.",
+      "empty": "This file is empty.",
       "tooLarge": "Images must be under 5 MB."
     },
     "preferences": {

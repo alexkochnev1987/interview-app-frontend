@@ -4,9 +4,9 @@ import { Pencil, Trash2, Upload } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useRef, useState } from 'react'
 
+import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { DisabledHintTooltip } from '@/components/ui/disabled-hint-tooltip'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -52,13 +52,13 @@ export function AvatarUploadControls({
   textSize = 'lg',
 }: AvatarUploadControlsProps) {
   const t = useTranslations('profile')
-  const tCommon = useTranslations('common')
   const toastMessages = useAvatarToastMessages()
   const { updatePictureUrl } = useAuth()
   const isDemo = useIsDemo()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isUploading, setIsUploading] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const isBusy = isUploading || isDeleting
 
   async function handleFileSelected(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]
@@ -67,6 +67,10 @@ export function AvatarUploadControls({
 
     if (!isSupportedAvatarContentType(file.type)) {
       notifyError(t('avatar.unsupportedType'))
+      return
+    }
+    if (file.size === 0) {
+      notifyError(t('avatar.empty'))
       return
     }
     if (file.size > MAX_AVATAR_UPLOAD_BYTES) {
@@ -88,12 +92,12 @@ export function AvatarUploadControls({
           errorMessage: toastMessages.uploadError,
         },
       )
-      updatePictureUrl(result.pictureUrl ?? null)
+      updatePictureUrl(result.pictureUrl)
     } catch {
-      setIsUploading(false)
       return
+    } finally {
+      setIsUploading(false)
     }
-    setIsUploading(false)
   }
 
   async function handleDelete() {
@@ -103,12 +107,12 @@ export function AvatarUploadControls({
         successMessage: toastMessages.removeSuccess,
         errorMessage: toastMessages.removeError,
       })
-      updatePictureUrl(result.pictureUrl ?? null)
+      updatePictureUrl(result.pictureUrl)
     } catch {
-      setIsDeleting(false)
       return
+    } finally {
+      setIsDeleting(false)
     }
-    setIsDeleting(false)
   }
 
   return (
@@ -120,8 +124,8 @@ export function AvatarUploadControls({
         textSize={textSize}
         tone="surface"
         action={
-          <DisabledHintTooltip active={isDemo} hint={tCommon('demoMode.readOnlyHint')}>
-            <DropdownMenu modal={false}>
+          <DropdownMenu modal={false}>
+            <DemoWriteGuard disabled={isBusy}>
               <DropdownMenuTrigger asChild>
                 <Button
                   type="button"
@@ -129,34 +133,35 @@ export function AvatarUploadControls({
                   size="icon-sm"
                   shape="pill"
                   aria-label={t('avatar.edit')}
-                  disabled={isDemo || isUploading || isDeleting}
+                  loading={isBusy}
                 >
-                  <Pencil />
+                  {isBusy ? null : <Pencil />}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onSelect={() => fileInputRef.current?.click()}>
+            </DemoWriteGuard>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onSelect={() => fileInputRef.current?.click()}>
+                <Inline gap={3} align="center">
+                  <Upload aria-hidden />
+                  {t('avatar.change')}
+                </Inline>
+              </DropdownMenuItem>
+              {pictureUrl ? (
+                <DropdownMenuItem tone="danger" onSelect={() => void handleDelete()}>
                   <Inline gap={3} align="center">
-                    <Upload aria-hidden />
-                    {isUploading ? t('avatar.uploading') : t('avatar.change')}
+                    <Trash2 aria-hidden />
+                    {t('avatar.remove')}
                   </Inline>
                 </DropdownMenuItem>
-                {pictureUrl ? (
-                  <DropdownMenuItem tone="danger" onSelect={() => void handleDelete()}>
-                    <Inline gap={3} align="center">
-                      <Trash2 aria-hidden />
-                      {t('avatar.remove')}
-                    </Inline>
-                  </DropdownMenuItem>
-                ) : null}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </DisabledHintTooltip>
+              ) : null}
+            </DropdownMenuContent>
+          </DropdownMenu>
         }
       />
       <HiddenFileInput
         ref={fileInputRef}
         accept={SUPPORTED_AVATAR_CONTENT_TYPES.join(',')}
+        disabled={isDemo || isBusy}
         onChange={(event) => void handleFileSelected(event)}
       />
     </>
