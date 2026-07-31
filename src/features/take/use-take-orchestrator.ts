@@ -180,7 +180,10 @@ export function useTakeOrchestrator({
   const currentVersionNumberRef = useRef(
     initialInterview?.currentAnswerMeta?.selectedVersionNumber ?? 1,
   )
-  const behaviorSignalsRef = useRef<TakeBehaviorSignals>(createEmptyBehaviorSignals())
+  const behaviorSignalsRef = useRef<TakeBehaviorSignals>(null as unknown as TakeBehaviorSignals)
+  if (!behaviorSignalsRef.current) {
+    behaviorSignalsRef.current = createEmptyBehaviorSignals()
+  }
   const behaviorEventsRef = useRef<AnswerBehaviorEvent[]>([])
   const flushedBehaviorEventCountRef = useRef(0)
   const progressRequestChainRef = useRef(Promise.resolve())

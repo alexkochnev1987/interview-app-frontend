@@ -52,7 +52,10 @@ export function useBrowserTranscript() {
   const recognitionRef = useRef<BrowserSpeechRecognitionInstance | null>(null)
   const stopTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pendingStopResolveRef = useRef<((snapshot: BrowserTranscriptSnapshot) => void) | null>(null)
-  const languageRef = useRef(getDefaultLanguage())
+  const languageRef = useRef<string>(null as unknown as string)
+  if (languageRef.current === null) {
+    languageRef.current = getDefaultLanguage()
+  }
   const interimTranscriptRef = useRef('')
   const finalTranscriptRef = useRef('')
   const isSessionActiveRef = useRef(false)
