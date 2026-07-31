@@ -2,7 +2,7 @@
 'use client'
 
 import { AlertTriangle, LoaderCircle } from 'lucide-react'
-import { useEffect, useRef } from 'react'
+import { useEffect, useId, useRef } from 'react'
 import { createPortal } from 'react-dom'
 
 import { Button } from '@/components/ui/button'
@@ -32,6 +32,8 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
+  const titleId = useId()
+  const descriptionId = useId()
   const onCancelRef = useRef(onCancel)
   const loadingRef = useRef(loading)
   useEffect(() => {
@@ -60,6 +62,8 @@ export function ConfirmDialog({
       className="fixed inset-0 z-50 flex items-center justify-center bg-scrim/55 p-4 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
+      aria-labelledby={titleId}
+      aria-describedby={description ? descriptionId : undefined}
       onClick={() => {
         if (!loading) onCancel()
       }}
@@ -71,8 +75,10 @@ export function ConfirmDialog({
               <AlertTriangle className="size-5" />
             </IconBadge>
           )}
-          <CardTitle size="lg">{title}</CardTitle>
-          {description && <CardDescription>{description}</CardDescription>}
+          <CardTitle id={titleId} size="lg">
+            {title}
+          </CardTitle>
+          {description && <CardDescription id={descriptionId}>{description}</CardDescription>}
         </CardHeader>
         <CardContent layout="row-end" spacing="sm">
           <Button
