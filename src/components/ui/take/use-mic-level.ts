@@ -67,7 +67,7 @@ export function useMicLevel(stream: MediaStream | null): number {
           sumSq += s * s
         }
         const rms = Math.sqrt(sumSq / data.length)
-        const normalized = Math.min(1, rms * 6)
+        const normalized = Math.min(1, rms * 12)
 
         if (timestamp - lastUpdateMs >= THROTTLE_MS || Math.abs(normalized - lastLevel) >= 0.05) {
           lastUpdateMs = timestamp
