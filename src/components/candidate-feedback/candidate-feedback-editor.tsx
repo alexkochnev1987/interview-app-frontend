@@ -2,7 +2,7 @@
 
 import { Link2, MessageSquareText, Sparkles } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 
 import { CandidateFeedbackHeader } from '@/components/candidate-feedback/candidate-feedback-header'
 import { CandidateFeedbackLiveRefreshNotice } from '@/components/candidate-feedback/candidate-feedback-live-refresh-notice'
@@ -139,12 +139,11 @@ export function CandidateFeedbackEditor({
   const acceptAllPageLoading = savingTarget === 'accept-all'
   const acceptAllPageDisabled = acceptAllPageLoading || savingTarget !== null || generateAllBusy
 
-  useEffect(() => {
-    const version = feedback.updatedAt ?? ''
-    if (generateAllSkipSummary && skipSummaryFeedbackVersionRef.current !== version) {
-      setGenerateAllSkipSummary(null)
-    }
-  }, [feedback.updatedAt, generateAllSkipSummary])
+  const currentFeedbackVersion = feedback.updatedAt ?? ''
+  const effectiveSkipSummary =
+    generateAllSkipSummary && skipSummaryFeedbackVersionRef.current === currentFeedbackVersion
+      ? generateAllSkipSummary
+      : null
 
   async function applyPatchUpdate(mutation: () => Promise<CandidateFeedbackResponse>) {
     const updated = await mutation()
@@ -522,10 +521,10 @@ export function CandidateFeedbackEditor({
             onRevoke={() => void revokeShareLink()}
           />
 
-          {generateAllSkipSummary ? (
+          {effectiveSkipSummary ? (
             <CandidateFeedbackSkippedSummary
-              questionEntries={generateAllSkipSummary.questionEntries}
-              overallReason={generateAllSkipSummary.overallReason}
+              questionEntries={effectiveSkipSummary.questionEntries}
+              overallReason={effectiveSkipSummary.overallReason}
             />
           ) : null}
 

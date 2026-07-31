@@ -160,20 +160,14 @@ export function useSimilaritySearch({
     setRequest({ signature, value })
   }, [minQuestionTextLength, signature, value])
 
-  useEffect(() => {
-    if (manualError && canSearch) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- clear stale manual error once input becomes searchable again
-      setManualError(null)
-    }
-  }, [manualError, canSearch])
-
+  const effectiveManualError = canSearch ? null : manualError
   const matches: SimilarQuestionMatch[] = query.data ?? []
   const queryError =
     getErrorMessage(query.error, toastMessages.similarity.searchFailedTitle) ?? null
-  const error = manualError ?? queryError
+  const error = effectiveManualError ?? queryError
 
   const status = deriveSimilarStatus({
-    manualError,
+    manualError: effectiveManualError,
     canSearch,
     isFetching: query.isFetching,
     queryError,
