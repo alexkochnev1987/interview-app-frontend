@@ -1,6 +1,6 @@
 'use client'
 
-import { Pencil, Trash2, Upload } from 'lucide-react'
+import { Pencil, RotateCcw, Trash2, Upload } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useRef, useState } from 'react'
 
@@ -19,6 +19,7 @@ import {
   completeAvatarUpload,
   deleteAvatar as apiDeleteAvatar,
   getAvatarPresignedUrl,
+  restoreGoogleAvatar as apiRestoreGoogleAvatar,
   uploadAvatarFile,
   type AvatarContentType,
 } from '@/lib/api'
@@ -26,6 +27,8 @@ import { useAuth, useIsDemo } from '@/lib/auth-context'
 import { runMutation } from '@/lib/run-mutation'
 import { notifyError } from '@/lib/toast'
 import { useAvatarToastMessages } from '@/lib/toast-messages/use-avatar-toast-messages'
+
+import { canRestoreGoogleAvatar } from './avatar-restore-rules'
 
 const SUPPORTED_AVATAR_CONTENT_TYPES: readonly AvatarContentType[] = [
   'image/jpeg',
@@ -53,12 +56,17 @@ export function AvatarUploadControls({
 }: AvatarUploadControlsProps) {
   const t = useTranslations('profile')
   const toastMessages = useAvatarToastMessages()
-  const { updatePictureUrl } = useAuth()
+  const { user, updateAvatar } = useAuth()
   const isDemo = useIsDemo()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isUploading, setIsUploading] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
-  const isBusy = isUploading || isDeleting
+  const [isRestoring, setIsRestoring] = useState(false)
+  const isBusy = isUploading || isDeleting || isRestoring
+  const showRestoreGoogle = canRestoreGoogleAvatar({
+    avatarSource: user?.avatarSource,
+    hasGoogleAvatar: user?.hasGoogleAvatar,
+  })
 
   async function handleFileSelected(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]
@@ -92,7 +100,7 @@ export function AvatarUploadControls({
           errorMessage: toastMessages.uploadError,
         },
       )
-      updatePictureUrl(result.pictureUrl)
+      updateAvatar(result)
     } catch {
       return
     } finally {
@@ -107,11 +115,26 @@ export function AvatarUploadControls({
         successMessage: toastMessages.removeSuccess,
         errorMessage: toastMessages.removeError,
       })
-      updatePictureUrl(result.pictureUrl)
+      updateAvatar(result)
     } catch {
       return
     } finally {
       setIsDeleting(false)
+    }
+  }
+
+  async function handleRestoreGoogle() {
+    setIsRestoring(true)
+    try {
+      const result = await runMutation(() => apiRestoreGoogleAvatar(), {
+        successMessage: toastMessages.restoreSuccess,
+        errorMessage: toastMessages.restoreError,
+      })
+      updateAvatar(result)
+    } catch {
+      return
+    } finally {
+      setIsRestoring(false)
     }
   }
 
@@ -146,6 +169,14 @@ export function AvatarUploadControls({
                   {t('avatar.change')}
                 </Inline>
               </DropdownMenuItem>
+              {showRestoreGoogle ? (
+                <DropdownMenuItem onSelect={() => void handleRestoreGoogle()}>
+                  <Inline gap={3} align="center">
+                    <RotateCcw aria-hidden />
+                    {t('avatar.restoreGoogle')}
+                  </Inline>
+                </DropdownMenuItem>
+              ) : null}
               {pictureUrl ? (
                 <DropdownMenuItem tone="danger" onSelect={() => void handleDelete()}>
                   <Inline gap={3} align="center">
