@@ -1029,9 +1029,7 @@ export async function getTakeInterview(
       headers: buildClientBaseHeaders(),
       params: {
         path: { id },
-        query: {
-          ...(token ? { token } : {}),
-        },
+        query: token ? { token } : {},
       },
       signal: init?.signal,
     }),
