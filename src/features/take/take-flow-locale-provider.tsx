@@ -191,12 +191,8 @@ function TakeFlowLocaleProviderInner({
   )
 }
 
-export function TakeFlowLocaleProvider({
-  children,
-  interviewLocale,
-}: TakeFlowLocaleProviderProps) {
-  const lockedLocale =
-    interviewLocale == null ? null : resolveTakeInterviewLocale(interviewLocale)
+export function TakeFlowLocaleProvider({ children, interviewLocale }: TakeFlowLocaleProviderProps) {
+  const lockedLocale = interviewLocale == null ? null : resolveTakeInterviewLocale(interviewLocale)
 
   return (
     <TakeFlowLocaleProviderInner interviewLocale={lockedLocale}>
