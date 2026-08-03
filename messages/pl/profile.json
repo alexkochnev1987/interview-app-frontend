@@ -21,6 +21,7 @@
       "edit": "Edytuj zdjęcie profilowe",
       "change": "Zmień zdjęcie",
       "remove": "Usuń zdjęcie",
+      "restoreGoogle": "Przywróć zdjęcie z Google",
       "unsupportedType": "Wybierz obraz w formacie JPEG, PNG lub WEBP.",
       "empty": "Ten plik jest pusty.",
       "tooLarge": "Obraz musi być mniejszy niż 5 MB."

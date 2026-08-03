@@ -201,7 +201,9 @@
       "uploadSuccess": "Фота профілю абноўлена",
       "uploadError": "Не ўдалося абнавіць фота профілю",
       "removeSuccess": "Фота профілю выдалена",
-      "removeError": "Не ўдалося выдаліць фота профілю"
+      "removeError": "Не ўдалося выдаліць фота профілю",
+      "restoreSuccess": "Фота Google адноўлена",
+      "restoreError": "Не ўдалося аднавіць фота Google"
     },
     "template": {
       "createSuccess": "Шаблон створаны",

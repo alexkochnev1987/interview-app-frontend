@@ -481,6 +481,10 @@ export async function deleteAvatar(): Promise<AvatarUpdateResponse> {
   return handle(client.DELETE('/users/me/avatar', LOCALIZED_HEADERS))
 }
 
+export async function restoreGoogleAvatar(): Promise<AvatarUpdateResponse> {
+  return handle(client.POST('/users/me/avatar/restore-google', LOCALIZED_HEADERS))
+}
+
 export async function completeOnboarding(
   status: CompleteOnboardingStatus = 'completed',
 ): Promise<AuthUserResponseDto> {

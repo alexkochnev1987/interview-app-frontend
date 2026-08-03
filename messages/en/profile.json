@@ -21,6 +21,7 @@
       "edit": "Edit profile picture",
       "change": "Change photo",
       "remove": "Remove photo",
+      "restoreGoogle": "Restore Google picture",
       "unsupportedType": "Please choose a JPEG, PNG, or WEBP image.",
       "empty": "This file is empty.",
       "tooLarge": "Images must be under 5 MB."

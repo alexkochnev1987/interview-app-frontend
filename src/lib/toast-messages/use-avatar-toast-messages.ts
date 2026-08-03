@@ -8,5 +8,7 @@ export function useAvatarToastMessages() {
     uploadError: t('avatar.uploadError'),
     removeSuccess: t('avatar.removeSuccess'),
     removeError: t('avatar.removeError'),
+    restoreSuccess: t('avatar.restoreSuccess'),
+    restoreError: t('avatar.restoreError'),
   }
 }
