@@ -3,8 +3,8 @@ import { hasLocale, NextIntlClientProvider } from 'next-intl'
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 
+import { HtmlLangSync } from '@/components/app/html-lang-sync'
 import { DemoModeBanner } from '@/components/demo/demo-mode-banner'
-import { AppBody } from '@/components/ui/app-shell'
 import { AppMain, AppShellRoot } from '@/components/ui/app-shell'
 import { Toaster } from '@/components/ui/toaster'
 import { TooltipProvider } from '@/components/ui/tooltip'
@@ -54,27 +54,26 @@ export default async function LocaleLayout({
   const htmlLang = resolveHtmlLang(locale as Locale)
 
   return (
-    <html lang={htmlLang}>
-      <AppBody>
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          <AppQueryClientProvider>
-            <AuthProvider initialUser={session.user}>
-              <OnboardingProvider>
-                <TooltipProvider>
-                  <AppShellRoot>
-                    <SideNav />
-                    <AppMain>
-                      <DemoModeBanner />
-                      {children}
-                    </AppMain>
-                  </AppShellRoot>
-                  <Toaster />
-                </TooltipProvider>
-              </OnboardingProvider>
-            </AuthProvider>
-          </AppQueryClientProvider>
-        </NextIntlClientProvider>
-      </AppBody>
-    </html>
+    <>
+      <HtmlLangSync lang={htmlLang} />
+      <NextIntlClientProvider locale={locale} messages={messages}>
+        <AppQueryClientProvider>
+          <AuthProvider initialUser={session.user}>
+            <OnboardingProvider>
+              <TooltipProvider>
+                <AppShellRoot>
+                  <SideNav />
+                  <AppMain>
+                    <DemoModeBanner />
+                    {children}
+                  </AppMain>
+                </AppShellRoot>
+                <Toaster />
+              </TooltipProvider>
+            </OnboardingProvider>
+          </AuthProvider>
+        </AppQueryClientProvider>
+      </NextIntlClientProvider>
+    </>
   )
 }
