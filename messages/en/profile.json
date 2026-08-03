@@ -18,6 +18,10 @@
       "comingSoon": "Coming soon"
     },
     "preferences": {
+      "theme": "Theme",
+      "themeSystem": "System",
+      "themeLight": "Light",
+      "themeDark": "Dark",
       "language": "Language",
       "productTour": "Product tour"
     }

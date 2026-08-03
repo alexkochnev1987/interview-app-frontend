@@ -15,6 +15,7 @@ import { Grid } from '@/components/ui/layout/grid'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText, SectionHeading } from '@/components/ui/text'
+import { ThemeSwitcher } from '@/components/ui/theme-switcher'
 import { useOnboardingReplay } from '@/features/onboarding/onboarding-provider'
 import { LOCALES, type Locale } from '@/i18n/locales'
 import { usePathname } from '@/i18n/navigation'
@@ -85,6 +86,10 @@ export function ProfileView({ user, mode = 'self' }: ProfileViewProps) {
             <BodyText size="xs" tone="muted">
               {t('security.comingSoon')}
             </BodyText>
+          </Inline>
+          <Inline justify="between" align="center" wrap="wrap" width="full">
+            <BodyText weight="medium">{t('preferences.theme')}</BodyText>
+            <ThemeSwitcher ariaLabel={t('preferences.theme')} width="fit" align="end" />
           </Inline>
           <Inline justify="between" align="center" wrap="wrap" width="full">
             <BodyText weight="medium">{t('preferences.language')}</BodyText>

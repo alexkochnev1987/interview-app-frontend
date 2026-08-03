@@ -18,6 +18,10 @@
       "comingSoon": "Скоро"
     },
     "preferences": {
+      "theme": "Тема",
+      "themeSystem": "Системная",
+      "themeLight": "Светлая",
+      "themeDark": "Темная",
       "language": "Язык",
       "productTour": "Обзор продукта"
     }

@@ -18,6 +18,7 @@ const languageSwitcherTriggerVariants = cva(
       width: {
         full: 'w-full',
         fit: 'col-start-1 row-start-1 w-full min-w-0 whitespace-nowrap',
+        fixed: 'w-[140px] min-w-[140px] whitespace-nowrap',
       },
     },
     defaultVariants: {
@@ -52,7 +53,7 @@ type LanguageSwitcherProps = {
   options: LanguageOption[]
   side?: 'top' | 'right' | 'bottom' | 'left'
   align?: 'start' | 'center' | 'end'
-  width?: 'full' | 'fit'
+  width?: 'full' | 'fit' | 'fixed'
   onOpenChange?: (open: boolean) => void
 } & (
   | { href: string; onSelectLocale?: never }

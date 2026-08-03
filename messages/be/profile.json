@@ -18,6 +18,10 @@
       "comingSoon": "Хутка"
     },
     "preferences": {
+      "theme": "Тэма",
+      "themeSystem": "Сістэмная",
+      "themeLight": "Светлая",
+      "themeDark": "Цёмная",
       "language": "Мова",
       "productTour": "Тур па прадукте"
     }
