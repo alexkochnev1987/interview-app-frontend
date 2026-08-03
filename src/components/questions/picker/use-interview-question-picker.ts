@@ -5,7 +5,7 @@ import { useCallback, useMemo, useState } from 'react'
 import { useQuestionChipLabels } from '@/i18n/use-question-chip-labels'
 import { type InterviewQuestion, type Question } from '@/lib/api'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
-import { buildQuestionsInfiniteParams } from '@/lib/questions-query-state'
+import { buildQuestionsInfiniteParams, DEFAULT_QUESTIONS_LIMIT } from '@/lib/questions-query-state'
 
 import { buildActiveFilterChips } from './build-active-chips'
 import { normalizeInterviewQuestionSnapshots } from './normalize-interview-question-snapshot'
@@ -51,7 +51,11 @@ export function useInterviewQuestionPicker({
   const isCardsView = query.state.view === 'cards'
   const cardsInfiniteParams = useMemo(
     () =>
-      buildQuestionsInfiniteParams(query.state, query.debouncedQ, INTERVIEW_PICKER_FETCH_OPTIONS),
+      buildQuestionsInfiniteParams(
+        { ...query.state, limit: DEFAULT_QUESTIONS_LIMIT },
+        query.debouncedQ,
+        INTERVIEW_PICKER_FETCH_OPTIONS,
+      ),
     [query.state, query.debouncedQ],
   )
 

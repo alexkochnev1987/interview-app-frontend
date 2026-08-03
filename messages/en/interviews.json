@@ -43,9 +43,7 @@
         "searchPlaceholder": "Search by candidate name",
         "resultCount": "{count} interviews",
         "removeChipAria": "Remove {label}",
-        "sortLabel": "Sort",
-        "pageSizeLabel": "Rows per page",
-        "pageSizeOption": "{count} per page"
+        "sortLabel": "Sort"
       },
       "sort": {
         "updatedAt_desc": "Recently updated",

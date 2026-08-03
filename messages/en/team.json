@@ -17,9 +17,6 @@
       "title": "No members found",
       "description": "Try changing the role filter to see more results."
     },
-    "pagination": {
-      "showing": "Showing {from} to {to} of {total} members"
-    },
     "stats": {
       "totalMembers": "Total Members",
       "allRoles": "All roles",

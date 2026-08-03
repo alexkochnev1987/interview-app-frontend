@@ -12,6 +12,7 @@ import { Stack } from '@/components/ui/layout/stack'
 import { Pagination } from '@/components/ui/pagination'
 import { SearchInput } from '@/components/ui/search-input'
 import { StatusPill } from '@/components/ui/status-pill'
+import { QUESTION_PAGE_LIMIT_OPTIONS, type QuestionPageLimit } from '@/lib/questions-query-state'
 
 import { QuestionFacetSidebar } from './question-facet-sidebar'
 import { QuestionPickerFeed } from './question-picker-feed'
@@ -219,6 +220,8 @@ export function InterviewQuestionPickerMain({
             total={query.total}
             limit={query.state.limit}
             onPageChange={query.setPage}
+            limitOptions={QUESTION_PAGE_LIMIT_OPTIONS}
+            onLimitChange={(value) => query.setLimit(value as QuestionPageLimit)}
           />
         ) : null}
       </Stack>
