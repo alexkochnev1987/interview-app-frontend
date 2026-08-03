@@ -15,10 +15,6 @@ export type TeamStatCard = {
   accent: 'primary' | 'info' | 'neutral' | 'warning' | 'success'
 }
 
-export function getMemberInitials(name: string): string {
-  return name.trim()[0]?.toUpperCase() ?? ''
-}
-
 function byTeamTableOrder(a: TeamMember, b: TeamMember): number {
   const roleCmp = compareRolesByAuthorityDesc(a.role, b.role)
   if (roleCmp !== 0) return roleCmp

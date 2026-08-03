@@ -1,4 +1,5 @@
 import { useApiErrorToastMessages } from './toast-messages/use-api-error-toast-messages'
+import { useAvatarToastMessages } from './toast-messages/use-avatar-toast-messages'
 import { useBulkDeleteToastMessages } from './toast-messages/use-bulk-delete-toast-messages'
 import { useCandidateFeedbackToastMessages } from './toast-messages/use-candidate-feedback-toast-messages'
 import { useDefaultsToastMessages } from './toast-messages/use-defaults-toast-messages'
@@ -20,6 +21,7 @@ import { useTemplateToastMessages } from './toast-messages/use-template-toast-me
 
 export {
   useApiErrorToastMessages,
+  useAvatarToastMessages,
   useBulkDeleteToastMessages,
   useCandidateFeedbackToastMessages,
   useDefaultsToastMessages,
@@ -41,6 +43,7 @@ export {
 export function useToastMessages() {
   return {
     defaults: useDefaultsToastMessages(),
+    avatar: useAvatarToastMessages(),
     question: useQuestionToastMessages(),
     questions: useQuestionsToastMessages(),
     interviewsLibrary: useInterviewsLibraryToastMessages(),

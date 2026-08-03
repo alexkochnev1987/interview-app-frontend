@@ -71,10 +71,7 @@ export function AppSidebar({
           onClick={onToggle}
           aria-pressed={toggleOpen}
           aria-label={toggleOpen ? collapseLabel : expandLabel}
-          className={cn(
-            'absolute right-1.5 top-12 -translate-y-1/2 shadow-sm lg:hidden',
-            !toggleOpen && 'size-10',
-          )}
+          className={cn('fixed right-4 top-4 z-50 shadow-sm lg:hidden', !toggleOpen && 'size-10')}
         >
           <Icon size="md">{toggleOpen ? <X /> : <Menu />}</Icon>
         </Button>

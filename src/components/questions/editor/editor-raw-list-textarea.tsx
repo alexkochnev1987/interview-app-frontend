@@ -1,13 +1,13 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import type { ComponentProps } from 'react'
 
 import { Textarea } from '@/components/ui/textarea'
-import { type QuestionExpectedConcept, type QuestionRedFlag } from '@/lib/api'
 
-type ListItem = QuestionExpectedConcept | QuestionRedFlag
+type TextareaVariantProps = ComponentProps<typeof Textarea>
 
-export interface RawListTextareaProps<T extends ListItem> {
+export interface RawListTextareaProps<T> {
   id: string
   parsedValue: T[]
   format: (items: T[]) => string
@@ -15,9 +15,11 @@ export interface RawListTextareaProps<T extends ListItem> {
   onParsedChange: (next: T[]) => void
   placeholder: string
   disabled: boolean
+  size?: TextareaVariantProps['size']
+  tone?: TextareaVariantProps['tone']
 }
 
-export function RawListTextarea<T extends ListItem>({
+export function RawListTextarea<T>({
   id,
   parsedValue,
   format,
@@ -25,6 +27,8 @@ export function RawListTextarea<T extends ListItem>({
   onParsedChange,
   placeholder,
   disabled,
+  size = 'xs',
+  tone = 'code',
 }: RawListTextareaProps<T>) {
   const [text, setText] = useState(() => format(parsedValue))
   const lastSyncedRef = useRef(parsedValue)
@@ -45,8 +49,8 @@ export function RawListTextarea<T extends ListItem>({
   return (
     <Textarea
       id={id}
-      size="xs"
-      tone="code"
+      size={size}
+      tone={tone}
       value={text}
       onChange={(event) => handleChange(event.target.value)}
       placeholder={placeholder}

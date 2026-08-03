@@ -5,11 +5,11 @@ import { useLocale, useTranslations } from 'next-intl'
 import { useSearchParams } from 'next/navigation'
 
 import { TeamRoleBadge } from '@/components/team/team-role-badge'
+import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { HeroTitle } from '@/components/ui/hero-text'
 import { Icon } from '@/components/ui/icon'
-import { IconBadge } from '@/components/ui/icon-badge'
 import { LanguageSwitcher } from '@/components/ui/language-switcher'
 import { Grid } from '@/components/ui/layout/grid'
 import { Inline } from '@/components/ui/layout/inline'
@@ -19,9 +19,10 @@ import { useOnboardingReplay } from '@/features/onboarding/onboarding-provider'
 import { LOCALES, type Locale } from '@/i18n/locales'
 import { usePathname } from '@/i18n/navigation'
 import type { MeResponse } from '@/lib/api'
+import { useAuth } from '@/lib/auth-context'
 import { canAccessDashboard } from '@/lib/auth-roles'
-import { getCandidateInitials } from '@/lib/interview-formatters'
 
+import { AvatarUploadControls } from './avatar-upload-controls'
 import { ProfileField } from './profile-field'
 
 interface ProfileViewProps {
@@ -37,7 +38,9 @@ export function ProfileView({ user, mode = 'self' }: ProfileViewProps) {
   const searchParams = useSearchParams()
   const locale = useLocale() as Locale
   const { replayTour, canReplayTour } = useOnboardingReplay()
+  const { user: authUser } = useAuth()
   const isSelf = mode === 'self'
+  const pictureUrl = isSelf ? (authUser?.pictureUrl ?? user.pictureUrl) : user.pictureUrl
 
   const queryString = searchParams.toString()
   const languageHref = queryString ? `${pathname}?${queryString}` : pathname
@@ -129,9 +132,22 @@ export function ProfileView({ user, mode = 'self' }: ProfileViewProps) {
       <Card variant="floating" size="lg">
         <CardContent spacing="xl">
           <Inline gap={4} align="center">
-            <IconBadge tone="surface" size="xl" shape="circle" textSize="lg">
-              {getCandidateInitials(user.name)}
-            </IconBadge>
+            {isSelf ? (
+              <AvatarUploadControls
+                name={user.name}
+                pictureUrl={pictureUrl}
+                size="xl"
+                textSize="lg"
+              />
+            ) : (
+              <Avatar
+                name={user.name}
+                pictureUrl={pictureUrl}
+                size="xl"
+                textSize="lg"
+                tone="surface"
+              />
+            )}
             <HeroTitle>{user.name}</HeroTitle>
           </Inline>
         </CardContent>

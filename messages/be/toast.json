@@ -197,6 +197,12 @@
       "updateError": "Не ўдалося абнавіць ролю",
       "updateSuccessDescription": "{name} цяпер {role}."
     },
+    "avatar": {
+      "uploadSuccess": "Фота профілю абноўлена",
+      "uploadError": "Не ўдалося абнавіць фота профілю",
+      "removeSuccess": "Фота профілю выдалена",
+      "removeError": "Не ўдалося выдаліць фота профілю"
+    },
     "template": {
       "createSuccess": "Шаблон створаны",
       "createError": "Не ўдалося стварыць шаблон",
