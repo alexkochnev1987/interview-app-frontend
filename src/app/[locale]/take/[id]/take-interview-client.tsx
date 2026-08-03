@@ -2,7 +2,7 @@
 
 import { AlertCircle } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useCallback, type ReactNode } from 'react'
+import { useCallback, useEffect, useState, type ReactNode } from 'react'
 
 import { PageContent, PageMainLayout, PageMainViewport } from '@/components/layout/page-shell'
 import {
@@ -14,19 +14,17 @@ import {
 import { Icon } from '@/components/ui/icon'
 import { Stack } from '@/components/ui/layout'
 import { EmptyStateCard, LoadingStateCard } from '@/components/ui/state-card'
-import { TakeLocaleBar } from '@/components/ui/take'
 import {
   TAKE_MESSAGES,
   type TakeMessageKey,
   type TakeMessageValues,
   useTakeInterviewBeforeUnload,
-  useTakeLocaleSwitch,
   useTakeOrchestrator,
 } from '@/features/take'
 import { resolveQuestionAnswerPhase } from '@/features/take/session-machine'
 import {
   TakeFlowLocaleProvider,
-  useTakeFlowLocale,
+  resolveTakeInterviewLocale,
 } from '@/features/take/take-flow-locale-provider'
 import { TakeMediaProvider } from '@/features/take/take-media-context'
 import type { Locale } from '@/i18n/locales'
@@ -43,23 +41,34 @@ export function TakeInterviewClient({
   candidateToken = '',
   initialInterview,
 }: TakeInterviewClientProps) {
+  const [interviewLocale, setInterviewLocale] = useState<Locale | null>(() =>
+    initialInterview?.interviewLocale
+      ? resolveTakeInterviewLocale(initialInterview.interviewLocale)
+      : null,
+  )
+
   return (
-    <TakeFlowLocaleProvider>
+    <TakeFlowLocaleProvider interviewLocale={interviewLocale}>
       <TakeInterviewClientInner
         id={id}
         candidateToken={candidateToken}
         initialInterview={initialInterview}
+        onInterviewLocale={setInterviewLocale}
       />
     </TakeFlowLocaleProvider>
   )
+}
+
+type TakeInterviewClientInnerProps = TakeInterviewClientProps & {
+  onInterviewLocale: (locale: Locale) => void
 }
 
 function TakeInterviewClientInner({
   id,
   candidateToken = '',
   initialInterview,
-}: TakeInterviewClientProps) {
-  const { locale: contentLocale } = useTakeFlowLocale()
+  onInterviewLocale,
+}: TakeInterviewClientInnerProps) {
   const t = useTranslations('toast.pageGate.take')
   const tCommon = useTranslations('common')
   const tTake = useTranslations('takeFlow')
@@ -112,7 +121,6 @@ function TakeInterviewClientInner({
     lobbyCameraOn,
     lobbyJoinReady,
     recording,
-    localeSwitchDisabled,
     startInterviewFromLobby,
     recordingStartBusy,
     capturePipelineReady,
@@ -134,21 +142,15 @@ function TakeInterviewClientInner({
     id,
     candidateToken,
     initialInterview,
-    contentLocale,
     takeMessage,
   })
 
-  const { locale, switchLocale, languageOptions, languageAriaLabel } = useTakeLocaleSwitch()
-
-  const handleSelectLocale = useCallback(
-    (nextLocale: Locale) => {
-      if (localeSwitchDisabled) {
-        return
-      }
-      switchLocale(nextLocale)
-    },
-    [localeSwitchDisabled, switchLocale],
-  )
+  useEffect(() => {
+    if (!interview?.interviewLocale) {
+      return
+    }
+    onInterviewLocale(resolveTakeInterviewLocale(interview.interviewLocale))
+  }, [interview?.interviewLocale, onInterviewLocale])
 
   useTakeInterviewBeforeUnload(stage, takeMessage('beforeUnloadLeaveInterview'))
 
@@ -157,30 +159,12 @@ function TakeInterviewClientInner({
       <TakeMediaProvider cameraStream={cameraStream}>
         <PageMainViewport spacing="take">
           <Stack gap={4} grow="fill" width="full">
-            <TakeLocaleBar
-              ariaLabel={languageAriaLabel}
-              currentLocale={locale}
-              options={languageOptions}
-              onSelectLocale={handleSelectLocale}
-              interviewLocale={interview?.interviewLocale}
-              resolvedLocale={interview?.currentQuestion?.resolvedLocale}
-              disabled={localeSwitchDisabled}
-            />
             {content}
           </Stack>
         </PageMainViewport>
       </TakeMediaProvider>
     ),
-    [
-      cameraStream,
-      languageAriaLabel,
-      locale,
-      languageOptions,
-      handleSelectLocale,
-      interview?.interviewLocale,
-      interview?.currentQuestion?.resolvedLocale,
-      localeSwitchDisabled,
-    ],
+    [cameraStream],
   )
 
   if (error && !interview) {

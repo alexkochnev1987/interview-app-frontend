@@ -95,8 +95,6 @@
     "liveTranscriptDraftSuffix": "(черновик)",
     "liveTranscriptPlaceholder": "Стенограмма будет появляться, пока вы говорите...",
     "questionProgress": "Вопрос {current} из {total}",
-    "languageBadgeResolvedAs": "Показано как {locale}",
-    "languageBadgeInterviewAs": "Язык интервью {locale}",
     "beforeUnloadLeaveInterview": "Если вы перезагрузите компьютер или выйдете сейчас, вы выйдете из этого интервью и можете потерять свой прогресс. Вы уверены?",
     "attemptsMetricLabel": "Попытки:",
     "retakeDisabledAtLimitHint": "Для этого вопроса больше нет повторных записей.",
