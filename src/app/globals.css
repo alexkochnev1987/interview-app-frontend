@@ -65,6 +65,34 @@
   --color-hairline: hsl(var(--border) / 0.25);
   --color-hairline-strong: hsl(var(--border) / 0.5);
 
+  --color-pill-amber: hsl(var(--pill-amber));
+  --color-pill-amber-bg: hsl(var(--pill-amber-bg));
+  --color-pill-amber-border: hsl(var(--pill-amber-border));
+
+  --color-pill-sky: hsl(var(--pill-sky));
+  --color-pill-sky-bg: hsl(var(--pill-sky-bg));
+  --color-pill-sky-border: hsl(var(--pill-sky-border));
+
+  --color-pill-emerald: hsl(var(--pill-emerald));
+  --color-pill-emerald-bg: hsl(var(--pill-emerald-bg));
+  --color-pill-emerald-border: hsl(var(--pill-emerald-border));
+
+  --color-pill-rose: hsl(var(--pill-rose));
+  --color-pill-rose-bg: hsl(var(--pill-rose-bg));
+  --color-pill-rose-border: hsl(var(--pill-rose-border));
+
+  --color-pill-slate: hsl(var(--pill-slate));
+  --color-pill-slate-bg: hsl(var(--pill-slate-bg));
+  --color-pill-slate-border: hsl(var(--pill-slate-border));
+
+  --color-pill-violet: hsl(var(--pill-violet));
+  --color-pill-violet-bg: hsl(var(--pill-violet-bg));
+  --color-pill-violet-border: hsl(var(--pill-violet-border));
+
+  --color-pill-orange: hsl(var(--pill-orange));
+  --color-pill-orange-bg: hsl(var(--pill-orange-bg));
+  --color-pill-orange-border: hsl(var(--pill-orange-border));
+
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
@@ -164,6 +192,34 @@
     --shadow-soft: 0 18px 40px rgba(17, 24, 39, 0.08);
     --shadow-float: 0 26px 60px rgba(17, 24, 39, 0.12);
     --transition: 180ms ease;
+
+    --pill-amber: 23 82% 31%;
+    --pill-amber-bg: 48 97% 89%;
+    --pill-amber-border: 48 97% 77%;
+
+    --pill-sky: 201 90% 27%;
+    --pill-sky-bg: 204 94% 94%;
+    --pill-sky-border: 201 94% 86%;
+
+    --pill-emerald: 163 88% 20%;
+    --pill-emerald-bg: 149 80% 90%;
+    --pill-emerald-border: 152 76% 80%;
+
+    --pill-rose: 343 80% 35%;
+    --pill-rose-bg: 356 100% 95%;
+    --pill-rose-border: 353 96% 90%;
+
+    --pill-slate: 215 25% 27%;
+    --pill-slate-bg: 210 40% 96%;
+    --pill-slate-border: 214 32% 91%;
+
+    --pill-violet: 263 69% 42%;
+    --pill-violet-bg: 251 91% 95%;
+    --pill-violet-border: 251 95% 92%;
+
+    --pill-orange: 15 79% 34%;
+    --pill-orange-bg: 34 100% 92%;
+    --pill-orange-border: 32 98% 83%;
   }
 
   .dark {
@@ -204,6 +260,34 @@
     --surface-low: 0 0% 18%;
     --shadow-soft: 0 20px 50px rgba(0, 0, 0, 0.35);
     --shadow-float: 0 26px 70px rgba(0, 0, 0, 0.45);
+
+    --pill-amber: 23 90% 75%;
+    --pill-amber-bg: 23 35% 20%;
+    --pill-amber-border: 23 40% 30%;
+
+    --pill-sky: 200 90% 75%;
+    --pill-sky-bg: 200 35% 20%;
+    --pill-sky-border: 200 40% 30%;
+
+    --pill-emerald: 155 70% 70%;
+    --pill-emerald-bg: 155 35% 18%;
+    --pill-emerald-border: 155 40% 28%;
+
+    --pill-rose: 350 85% 75%;
+    --pill-rose-bg: 350 35% 20%;
+    --pill-rose-border: 350 40% 30%;
+
+    --pill-slate: 215 20% 75%;
+    --pill-slate-bg: 215 15% 22%;
+    --pill-slate-border: 215 15% 32%;
+
+    --pill-violet: 258 80% 78%;
+    --pill-violet-bg: 258 35% 22%;
+    --pill-violet-border: 258 40% 32%;
+
+    --pill-orange: 25 85% 72%;
+    --pill-orange-bg: 25 35% 20%;
+    --pill-orange-border: 25 40% 30%;
   }
 
   * {

@@ -12,23 +12,22 @@ const statusPillVariants = cva('rounded-full border-0 shadow-none', {
       header: 'px-2 py-0.5 text-[0.66rem] font-bold',
     },
     tone: {
-      neutral:
-        'bg-[hsl(var(--surface-low))] text-[hsl(var(--muted-foreground))] ring-1 ring-[hsl(var(--border)/0.55)]',
+      neutral: 'bg-pill-slate-bg text-pill-slate ring-1 ring-pill-slate-border',
       neutral_meta:
-        'bg-[hsl(var(--surface-low))] text-[hsl(var(--muted-foreground))] ring-1 ring-[hsl(var(--border)/0.55)] normal-case tracking-chip',
+        'bg-pill-slate-bg text-pill-slate ring-1 ring-pill-slate-border normal-case tracking-chip',
       primary:
         'bg-[hsl(var(--primary)/0.15)] text-[hsl(var(--primary))] ring-1 ring-[hsl(var(--primary)/0.3)]',
-      pending: 'bg-amber-100 text-amber-800 ring-1 ring-amber-200',
-      in_progress: 'bg-sky-100 text-sky-800 ring-1 ring-sky-200',
-      processing: 'bg-orange-100 text-orange-800 ring-1 ring-orange-200',
-      completed: 'bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200',
-      failed: 'bg-rose-100 text-rose-800 ring-1 ring-rose-200',
-      canceled: 'bg-slate-100 text-slate-700 ring-1 ring-slate-200',
+      pending: 'bg-pill-amber-bg text-pill-amber ring-1 ring-pill-amber-border',
+      in_progress: 'bg-pill-sky-bg text-pill-sky ring-1 ring-pill-sky-border',
+      processing: 'bg-pill-orange-bg text-pill-orange ring-1 ring-pill-orange-border',
+      completed: 'bg-pill-emerald-bg text-pill-emerald ring-1 ring-pill-emerald-border',
+      failed: 'bg-pill-rose-bg text-pill-rose ring-1 ring-pill-rose-border',
+      canceled: 'bg-pill-slate-bg text-pill-slate ring-1 ring-pill-slate-border',
       scheduled:
         'bg-scheduled-soft text-scheduled-soft-foreground ring-1 ring-scheduled-soft-foreground',
-      easy: 'bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200',
-      medium: 'bg-amber-100 text-amber-800 ring-1 ring-amber-200',
-      hard: 'bg-violet-100 text-violet-800 ring-1 ring-violet-200',
+      easy: 'bg-pill-emerald-bg text-pill-emerald ring-1 ring-pill-emerald-border',
+      medium: 'bg-pill-amber-bg text-pill-amber ring-1 ring-pill-amber-border',
+      hard: 'bg-pill-violet-bg text-pill-violet ring-1 ring-pill-violet-border',
     },
     casing: {
       eyebrow: 'uppercase tracking-eyebrow',

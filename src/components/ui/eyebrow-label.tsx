@@ -14,10 +14,11 @@ const eyebrowLabelVariants = cva('uppercase', {
     tone: {
       muted: 'text-muted-foreground',
       primary: 'text-[hsl(var(--primary))]',
-      info: 'text-sky-700',
-      neutral: 'text-slate-600',
-      warning: 'text-amber-700',
-      success: 'text-emerald-700',
+      info: 'text-pill-sky',
+      neutral: 'text-pill-slate',
+      warning: 'text-pill-amber',
+      success: 'text-pill-emerald',
+      danger: 'text-pill-rose',
     },
     weight: {
       normal: 'font-normal',

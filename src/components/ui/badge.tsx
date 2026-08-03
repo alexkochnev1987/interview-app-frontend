@@ -16,6 +16,11 @@ const badgeVariants = cva(
         outline: 'border-border text-foreground [a]:hover:bg-muted [a]:hover:text-muted-foreground',
         ghost: 'hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50',
         link: 'text-primary underline-offset-4 hover:underline',
+        success: 'bg-pill-emerald-bg text-pill-emerald border-pill-emerald-border',
+        warning: 'bg-pill-amber-bg text-pill-amber border-pill-amber-border',
+        danger: 'bg-pill-rose-bg text-pill-rose border-pill-rose-border',
+        info: 'bg-pill-sky-bg text-pill-sky border-pill-sky-border',
+        neutral: 'bg-pill-slate-bg text-pill-slate border-pill-slate-border',
         capsLabelDefault:
           'rounded-full border-0 bg-[hsl(var(--surface-low)/0.9)] font-semibold uppercase text-muted-foreground ring-1 ring-border/50',
         capsLabelMuted:
