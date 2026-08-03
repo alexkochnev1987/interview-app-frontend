@@ -40,7 +40,7 @@ export function ProfileView({ user, mode = 'self' }: ProfileViewProps) {
   const { replayTour, canReplayTour } = useOnboardingReplay()
   const { user: authUser } = useAuth()
   const isSelf = mode === 'self'
-  const pictureUrl = isSelf ? (authUser?.pictureUrl ?? user.pictureUrl) : user.pictureUrl
+  const pictureUrl = isSelf ? authUser?.pictureUrl : user.pictureUrl
 
   const queryString = searchParams.toString()
   const languageHref = queryString ? `${pathname}?${queryString}` : pathname

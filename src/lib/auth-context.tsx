@@ -7,6 +7,7 @@ import {
   completeOnboarding as apiCompleteOnboarding,
   logout as apiLogout,
   type MeResponse as User,
+  type AvatarUpdateResponse,
   type CompleteOnboardingStatus,
 } from '@/lib/api'
 
@@ -14,7 +15,7 @@ interface AuthContextType {
   user: User | null
   establishSession: (sessionUser: User) => void
   completeOnboarding: (status?: CompleteOnboardingStatus) => Promise<User>
-  updatePictureUrl: (pictureUrl: string | null) => void
+  updateAvatar: (avatar: AvatarUpdateResponse) => void
   logout: () => Promise<void>
 }
 
@@ -24,7 +25,7 @@ const AuthContext = createContext<AuthContextType>({
   completeOnboarding: async () => {
     throw new Error('AuthProvider is not mounted')
   },
-  updatePictureUrl: () => {},
+  updateAvatar: () => {},
   logout: async () => {},
 })
 
@@ -62,8 +63,10 @@ export function AuthProvider({
     return updatedUser
   }
 
-  const updatePictureUrl = (pictureUrl: string | null) => {
-    setUser((current) => (current ? { ...current, pictureUrl: pictureUrl ?? undefined } : current))
+  const updateAvatar = ({ pictureUrl, avatarSource }: AvatarUpdateResponse) => {
+    setUser((current) =>
+      current ? { ...current, pictureUrl: pictureUrl ?? undefined, avatarSource } : current,
+    )
   }
 
   const logout = async () => {
@@ -76,7 +79,7 @@ export function AuthProvider({
   return (
     <AuthContext.Provider
       // oxlint-disable-next-line react/jsx-no-constructed-context-values
-      value={{ user, establishSession, completeOnboarding, updatePictureUrl, logout }}
+      value={{ user, establishSession, completeOnboarding, updateAvatar, logout }}
     >
       {children}
     </AuthContext.Provider>
