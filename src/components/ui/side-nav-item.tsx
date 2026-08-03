@@ -41,7 +41,7 @@ const sideNavButtonVariants = cva(sideNavItemBase, {
 })
 
 export function SideNavLabel({ children }: { children: ReactNode }) {
-  return <span className={cn('truncate whitespace-nowrap', revealBase)}>{children}</span>
+  return <span className={cn('truncate', revealBase)}>{children}</span>
 }
 
 interface SideNavLinkProps extends VariantProps<typeof sideNavLinkVariants> {
