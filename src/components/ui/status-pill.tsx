@@ -15,7 +15,7 @@ const statusPillVariants = cva('rounded-full border-0 shadow-none', {
       neutral:
         'bg-[hsl(var(--surface-low))] text-[hsl(var(--muted-foreground))] ring-1 ring-[hsl(var(--border)/0.55)]',
       neutral_meta:
-        'bg-[hsl(var(--surface-low))] text-[hsl(var(--muted-foreground))] ring-1 ring-[hsl(var(--border)/0.55)] normal-case tracking-[0.08em]',
+        'bg-[hsl(var(--surface-low))] text-[hsl(var(--muted-foreground))] ring-1 ring-[hsl(var(--border)/0.55)] normal-case tracking-chip',
       primary:
         'bg-[hsl(var(--primary)/0.15)] text-[hsl(var(--primary))] ring-1 ring-[hsl(var(--primary)/0.3)]',
       pending: 'bg-amber-100 text-amber-800 ring-1 ring-amber-200',

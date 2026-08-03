@@ -65,7 +65,7 @@ export function TakeLanguageControl({
           {activeLocaleCode}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-max !min-w-0">
+      <DropdownMenuContent align="end" className="w-max min-w-0!">
         {options.map(({ locale, label }) => {
           const active = locale === currentLocale
 

@@ -43,7 +43,7 @@ export function MicTestDropdown({
             variant="outline"
             size="icon-xxs"
             disabled={disabled || !micOn}
-            className="absolute -bottom-0.5 -right-0.5 z-10 size-5 border-border bg-background p-0.5 shadow-sm hover:bg-muted"
+            className="absolute -bottom-0.5 -right-0.5 z-10 size-5 border-border bg-background p-0.5 shadow-xs hover:bg-muted"
             aria-label={tTake('lobbyToolbarMicTest')}
           >
             <ChevronUp className="size-3 text-foreground" />

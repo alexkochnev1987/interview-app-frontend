@@ -49,7 +49,7 @@ export function AppSidebar({
         <div
           aria-hidden
           onClick={onClose}
-          className="fixed inset-0 z-30 bg-scrim/55 backdrop-blur-sm"
+          className="fixed inset-0 z-30 bg-scrim/55 backdrop-blur-xs"
         />
       ) : null}
       <aside
@@ -72,7 +72,7 @@ export function AppSidebar({
           aria-pressed={toggleOpen}
           aria-label={toggleOpen ? collapseLabel : expandLabel}
           className={cn(
-            'absolute right-1.5 top-12 -translate-y-1/2 shadow-sm lg:hidden',
+            'absolute right-1.5 top-12 -translate-y-1/2 shadow-xs lg:hidden',
             !toggleOpen && 'size-10',
           )}
         >

@@ -10,8 +10,8 @@ import { cn } from '@/lib/utils'
 const overlayVariants = cva('fixed inset-0', {
   variants: {
     layer: {
-      default: 'z-50 bg-scrim/55 backdrop-blur-sm',
-      tour: 'z-[1000000001] bg-black/45',
+      default: 'z-50 bg-scrim/55 backdrop-blur-xs',
+      tour: 'z-1000000001 bg-black/45',
     },
   },
   defaultVariants: {
@@ -20,7 +20,7 @@ const overlayVariants = cva('fixed inset-0', {
 })
 
 const modalContentVariants = cva(
-  'fixed left-1/2 top-1/2 w-full max-h-[calc(100vh-2rem)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto p-4 outline-none',
+  'fixed left-1/2 top-1/2 w-full max-h-[calc(100vh-2rem)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto p-4 outline-hidden',
   {
     variants: {
       size: {
@@ -30,7 +30,7 @@ const modalContentVariants = cva(
       },
       layer: {
         default: 'z-50',
-        tour: 'z-[1000000001]',
+        tour: 'z-1000000001',
       },
     },
     defaultVariants: {

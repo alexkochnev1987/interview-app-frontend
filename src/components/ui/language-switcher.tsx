@@ -12,7 +12,7 @@ import { Link } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
 
 const languageSwitcherTriggerVariants = cva(
-  'flex items-center justify-between gap-1.5 rounded-full border border-border/60 bg-background/70 px-3 py-1.5 text-xs font-semibold text-foreground shadow-sm transition-colors hover:bg-surface-low-soft',
+  'flex items-center justify-between gap-1.5 rounded-full border border-border/60 bg-background/70 px-3 py-1.5 text-xs font-semibold text-foreground shadow-xs transition-colors hover:bg-surface-low-soft',
   {
     variants: {
       width: {
@@ -77,7 +77,7 @@ export function LanguageSwitcher({
     width === 'fit' ? (
       <div
         aria-hidden
-        className="invisible col-start-1 row-start-1 grid px-3 py-1.5 text-xs font-semibold [&>*]:col-start-1 [&>*]:row-start-1"
+        className="invisible col-start-1 row-start-1 grid px-3 py-1.5 text-xs font-semibold *:col-start-1 *:row-start-1"
       >
         {options.map(({ locale, label }) => (
           <span key={locale} className="inline-flex items-center gap-1.5 whitespace-nowrap">
@@ -101,8 +101,8 @@ export function LanguageSwitcher({
         side={side}
         align={align}
         className={cn(
-          'w-max !min-w-0',
-          width === 'fit' && 'min-w-[var(--radix-dropdown-menu-trigger-width)]',
+          'w-max min-w-0!',
+          width === 'fit' && 'min-w-(--radix-dropdown-menu-trigger-width)',
         )}
       >
         {options.map(({ locale, label }) => {

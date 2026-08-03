@@ -136,7 +136,7 @@ function BehaviorSignalsGrid({ answer }: BehaviorSignalsGridProps) {
       <Stack gap={3}>
         <EyebrowLabel>{t('validationStatus')}</EyebrowLabel>
         <BodyText size="sm">
-          {t('hiddenTabs')} {answer.behaviorSignals?.tabHiddenCount ?? 0} • {t('blur')}{' '}
+          {t('hiddenTabs')} {answer.behaviorSignals?.tabHiddenCount ?? 0} • {t('blur-sm')}{' '}
           {answer.behaviorSignals?.windowBlurCount ?? 0} • {t('copy')}{' '}
           {answer.behaviorSignals?.copyCount ?? 0} • {t('paste')}{' '}
           {answer.behaviorSignals?.pasteCount ?? 0}

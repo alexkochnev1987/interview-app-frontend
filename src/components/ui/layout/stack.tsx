@@ -49,7 +49,7 @@ const stackVariants = cva('flex flex-col', {
     },
     overflow: {
       none: '',
-      y: 'overflow-y-auto overscroll-contain [scrollbar-gutter:stable]',
+      y: 'overflow-y-auto overscroll-contain scrollbar-gutter-stable',
     },
     placeSelf: {
       auto: '',

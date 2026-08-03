@@ -25,8 +25,8 @@ const badgeVariants = cva(
       },
       size: {
         default: '',
-        capsLabel: 'px-3 py-1 text-[0.72rem] tracking-[0.24em]',
-        capsLabelSm: 'px-3 py-1 text-[0.68rem] tracking-[0.18em]',
+        capsLabel: 'px-3 py-1 text-[0.72rem] tracking-eyebrow-widest',
+        capsLabelSm: 'px-3 py-1 text-[0.68rem] tracking-eyebrow-wide',
       },
     },
     defaultVariants: {
