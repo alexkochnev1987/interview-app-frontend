@@ -43,6 +43,10 @@ const stackVariants = cva('flex flex-col', {
       none: '',
       fill: 'min-h-0 min-w-0 flex-1',
     },
+    flexChild: {
+      default: '',
+      contain: 'min-w-0',
+    },
     height: {
       auto: '',
       full: 'h-full min-h-0',
@@ -73,6 +77,7 @@ const stackVariants = cva('flex flex-col', {
     overflow: 'none',
     placeSelf: 'auto',
     visibility: 'always',
+    flexChild: 'default',
   },
 })
 
@@ -93,6 +98,7 @@ export function Stack({
   overflow,
   placeSelf,
   visibility,
+  flexChild,
   ...props
 }: StackProps) {
   const Comp = (as ?? 'div') as ElementType
@@ -110,6 +116,7 @@ export function Stack({
           overflow,
           placeSelf,
           visibility,
+          flexChild,
         }),
         className,
       )}

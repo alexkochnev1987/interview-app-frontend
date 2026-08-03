@@ -15,6 +15,7 @@ import {
   type LocaleQuestionDraft,
 } from '@/lib/question-editor/parsers'
 
+import { RawListTextarea } from './editor-raw-list-textarea'
 import { EditorSectionCard } from './editor-section-card'
 import { QuestionEditorField } from './question-editor-field'
 
@@ -76,11 +77,14 @@ export function EditorReferenceSection({
 
         <Stack gap={2}>
           <QuestionEditorField htmlFor="tags" label={tFields('tags')} hint={t('tagsHint')}>
-            <Textarea
+            <RawListTextarea
               id="tags"
               size="sm"
-              value={joinStringList(value.tags || [])}
-              onChange={(event) => onUpdate({ tags: parseStringList(event.target.value) })}
+              tone="prose"
+              parsedValue={value.tags || []}
+              format={joinStringList}
+              parse={parseStringList}
+              onParsedChange={(next) => onUpdate({ tags: next })}
               placeholder={t('tagsPlaceholder')}
               disabled={submitting}
             />

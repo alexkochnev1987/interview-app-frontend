@@ -197,6 +197,12 @@
       "updateError": "Nie udało się zaktualizować roli",
       "updateSuccessDescription": "{name} ma teraz rolę {role}."
     },
+    "avatar": {
+      "uploadSuccess": "Zdjęcie profilowe zaktualizowane",
+      "uploadError": "Nie udało się zaktualizować zdjęcia profilowego",
+      "removeSuccess": "Zdjęcie profilowe usunięte",
+      "removeError": "Nie udało się usunąć zdjęcia profilowego"
+    },
     "template": {
       "createSuccess": "Szablon utworzony",
       "createError": "Nie udało się utworzyć szablonu",

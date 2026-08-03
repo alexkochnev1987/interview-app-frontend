@@ -15,6 +15,7 @@ import {
   type LocaleQuestionDraft,
 } from '@/lib/question-editor/parsers'
 
+import { RawListTextarea } from './editor-raw-list-textarea'
 import { EditorSectionCard } from './editor-section-card'
 import { QuestionEditorField } from './question-editor-field'
 
@@ -90,15 +91,14 @@ export function EditorPromptSection({
             label={t('followUpQuestions')}
             hint={t('followUpHint')}
           >
-            <Textarea
+            <RawListTextarea
               id={`followUpQuestions-${locale}`}
               size="xs"
-              value={joinStringList(contentDraft.followUpQuestions || [])}
-              onChange={(event) =>
-                onContentUpdate({
-                  followUpQuestions: parseStringList(event.target.value),
-                })
-              }
+              tone="prose"
+              parsedValue={contentDraft.followUpQuestions || []}
+              format={joinStringList}
+              parse={parseStringList}
+              onParsedChange={(next) => onContentUpdate({ followUpQuestions: next })}
               placeholder={t('followUpPlaceholder')}
               disabled={submitting}
             />
