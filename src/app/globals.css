@@ -195,7 +195,7 @@
     --scrim: 222 47% 11%;
     --border: 249 20.4% 80.8%;
     --input: 249 20.4% 80.8%;
-    --ring: 243 74% 57.8%;
+    --ring: var(--primary);
     --surface-low: 210 9.1% 95.7%;
     --surface-high: 210 4.3% 91%;
     --surface-highest: 200 5.3% 88.8%;

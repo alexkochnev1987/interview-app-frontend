@@ -81,7 +81,7 @@ export function MicTestDropdown({
                 disabled={!micOn || !stream}
                 onClick={startRecording}
               >
-                <CircleDot className="size-3.5 text-red-600 dark:text-red-400" />
+                <CircleDot className="size-3.5 text-primary" />
                 {tTake('lobbyMicStartRecord')}
               </Button>
             )}

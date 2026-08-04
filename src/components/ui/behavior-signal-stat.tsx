@@ -7,8 +7,8 @@ const statVariants = cva('rounded-2xl p-4 ring-1', {
   variants: {
     severity: {
       ok: 'bg-surface-low-soft ring-hairline',
-      watch: 'bg-amber-50 ring-amber-200',
-      risk: 'bg-rose-50 ring-rose-200',
+      watch: 'bg-warning-soft ring-warning-soft-border',
+      risk: 'bg-danger-soft ring-danger-soft-border',
     },
   },
   defaultVariants: {
@@ -20,8 +20,8 @@ const valueVariants = cva('text-2xl font-semibold tracking-display', {
   variants: {
     severity: {
       ok: 'text-foreground',
-      watch: 'text-amber-900',
-      risk: 'text-rose-900',
+      watch: 'text-warning-soft-foreground',
+      risk: 'text-danger-soft-foreground',
     },
   },
   defaultVariants: {
