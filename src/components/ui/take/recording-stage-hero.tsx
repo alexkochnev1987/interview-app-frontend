@@ -34,8 +34,8 @@ function AiInterviewerLabelBadge() {
       wrap="nowrap"
       className={cn(
         RECORDING_TOOLBAR_PILL_ROW,
-        'rounded-full border border-[hsl(var(--primary-container)/0.18)] bg-[hsl(var(--primary-container)/0.1)]',
-        'px-2.5 py-0 text-[hsl(var(--primary-container))]',
+        'rounded-full border border-[hsl(var(--primary-container)/0.18)] bg-[hsl(var(--primary-container)/0.3)]',
+        'px-2.5 py-0 text-primary',
         'shadow-soft ring-1 ring-[hsl(var(--primary-container)/0.06)]',
       )}
     >
@@ -60,7 +60,7 @@ function AiInterviewerOrbRing({
   animationDelayS: number
   presence: RecordingAiPresence
 }) {
-  const isSpeaking = presence === 'speaking'
+  const isAnimating = presence === 'speaking' || presence === 'listening'
 
   return (
     <span
@@ -74,11 +74,11 @@ function AiInterviewerOrbRing({
         className={cn(
           'block size-full rounded-full border-solid border-[hsl(var(--primary-container)/0.42)] shadow-none origin-center',
           'border-[1.5px] lg:border-2',
-          isSpeaking
+          isAnimating
             ? 'will-change-[opacity,transform] animate-ai-orb-ring-speaking'
-            : 'opacity-[0.48] transform-[scale(1)]',
+            : 'opacity-[0.48] scale-100',
         )}
-        style={isSpeaking ? { animationDelay: `${animationDelayS}s` } : undefined}
+        style={isAnimating ? { animationDelay: `${animationDelayS}s` } : undefined}
       />
     </span>
   )
@@ -150,7 +150,7 @@ function RecordingAiInterviewerSessionLayout({
       height="full"
       grow="fill"
       align="stretch"
-      className={cn('relative overflow-hidden bg-white', 'min-h-0 lg:min-h-[min(360px,48vh)]')}
+      className={cn('relative overflow-hidden bg-card', 'min-h-0 lg:min-h-[min(360px,48vh)]')}
     >
       <RecordingHiddenCaptureVideo videoRef={screenVideoRef} />
 
@@ -176,10 +176,10 @@ function RecordingAiInterviewerSessionLayout({
         radius="md"
         className={cn(
           'pointer-events-none absolute z-5 overflow-hidden rounded-2xl border border-background/95 bg-slate-950 shadow-none ring-[1px] ring-border/55',
-          'bottom-3 right-3 h-[104px] w-[156px]',
-          'sm:bottom-4 sm:right-4 sm:h-[118px] sm:w-[176px]',
-          'lg:h-[136px] lg:w-[208px]',
-          'xl:h-[142px] xl:w-[224px]',
+          'bottom-3 right-3 h-26 w-39',
+          'sm:bottom-4 sm:right-4 sm:h-29.5 sm:w-44',
+          'lg:h-34 lg:w-52',
+          'xl:h-35.5 xl:w-56',
         )}
         aria-label="Your camera"
       >

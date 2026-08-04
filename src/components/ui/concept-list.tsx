@@ -9,9 +9,9 @@ import { cn } from '@/lib/utils'
 const chipVariants = cva('rounded-full px-3 py-1 text-xs font-medium ring-1', {
   variants: {
     tone: {
-      covered: 'bg-emerald-50 text-emerald-800 ring-emerald-200',
-      missed: 'bg-amber-50 text-amber-800 ring-amber-200',
-      flag: 'bg-rose-50 text-rose-800 ring-rose-200',
+      covered: 'bg-pill-emerald-bg text-pill-emerald ring-pill-emerald-border',
+      missed: 'bg-pill-amber-bg text-pill-amber ring-pill-amber-border',
+      flag: 'bg-pill-rose-bg text-pill-rose ring-pill-rose-border',
       neutral: 'bg-surface-low-soft text-muted-foreground ring-hairline',
     },
   },
