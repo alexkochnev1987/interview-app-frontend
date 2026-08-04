@@ -40,7 +40,7 @@ export function MicTestDropdown({
         <DropdownMenuTrigger asChild>
           <Button
             type="button"
-            variant="outline"
+            variant="default"
             size="icon-xxs"
             disabled={disabled || !micOn}
             className="absolute -bottom-0.5 -right-0.5 z-10 size-5 border-border bg-background p-0.5 shadow-xs hover:bg-muted"
