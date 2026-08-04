@@ -17,6 +17,8 @@ interface TeamMembersTableSectionProps {
   actorId: string
   actorRole: TeamRowActorRole
   onRequestChangeRole: (member: TeamMember) => void
+  onRequestEditAccount: (member: TeamMember) => void
+  onRequestDeleteUser: (member: TeamMember) => void
 }
 
 export function TeamMembersTableSection({
@@ -25,6 +27,8 @@ export function TeamMembersTableSection({
   actorId,
   actorRole,
   onRequestChangeRole,
+  onRequestEditAccount,
+  onRequestDeleteUser,
 }: TeamMembersTableSectionProps) {
   const t = useTranslations('team')
 
@@ -59,6 +63,8 @@ export function TeamMembersTableSection({
             actorId={actorId}
             actorRole={actorRole}
             onChangeRole={() => onRequestChangeRole(member)}
+            onEditAccount={() => onRequestEditAccount(member)}
+            onDeleteUser={() => onRequestDeleteUser(member)}
           />
         ))}
       </TableBody>

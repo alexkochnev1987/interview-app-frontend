@@ -24,6 +24,8 @@ export function useTeamMembers(initialMembers: TeamMember[]) {
   const [page, setPage] = useState(1)
   const [limit, setLimitState] = useState<TeamPageLimit>(DEFAULT_TEAM_PAGE_LIMIT)
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null)
+  const [editAccountMember, setEditAccountMember] = useState<TeamMember | null>(null)
+  const [deleteUserMember, setDeleteUserMember] = useState<TeamMember | null>(null)
 
   const deferredQuery = useDeferredValue(query)
   const t = useTranslations('team.stats')
@@ -119,6 +121,14 @@ export function useTeamMembers(initialMembers: TeamMember[]) {
     setMembers((prev) => prev.map((m) => (m.id === updated.id ? updated : m)))
   }
 
+  function handleAccountUpdated(updated: TeamMember) {
+    setMembers((prev) => prev.map((m) => (m.id === updated.id ? updated : m)))
+  }
+
+  function handleMemberDeleted(memberId: string) {
+    setMembers((prev) => prev.filter((m) => m.id !== memberId))
+  }
+
   return {
     actorId,
     actorRole,
@@ -134,9 +144,15 @@ export function useTeamMembers(initialMembers: TeamMember[]) {
     setLimit,
     editingMember,
     setEditingMember,
+    editAccountMember,
+    setEditAccountMember,
+    deleteUserMember,
+    setDeleteUserMember,
     filteredMembers,
     paginatedMembers,
     totalPages,
     handleRoleChanged,
+    handleAccountUpdated,
+    handleMemberDeleted,
   }
 }

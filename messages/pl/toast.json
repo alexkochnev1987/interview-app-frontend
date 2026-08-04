@@ -195,7 +195,13 @@
     "team": {
       "updateSuccess": "Rola zaktualizowana",
       "updateError": "Nie udało się zaktualizować roli",
-      "updateSuccessDescription": "{name} ma teraz rolę {role}."
+      "updateSuccessDescription": "{name} ma teraz rolę {role}.",
+      "editAccountSuccess": "Konto zaktualizowane",
+      "editAccountError": "Nie udało się zaktualizować konta",
+      "editAccountSuccessDescription": "Dane konta {name} zostały zapisane.",
+      "deleteSuccess": "Użytkownik usunięty",
+      "deleteError": "Nie udało się usunąć użytkownika",
+      "deleteSuccessDescription": "{name} został usunięty z zespołu."
     },
     "avatar": {
       "uploadSuccess": "Zdjęcie profilowe zaktualizowane",

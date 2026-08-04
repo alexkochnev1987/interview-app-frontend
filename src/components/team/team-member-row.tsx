@@ -21,13 +21,22 @@ interface TeamMemberRowProps {
   actorId: string
   actorRole: TeamRowActorRole
   onChangeRole: () => void
+  onEditAccount: () => void
+  onDeleteUser: () => void
 }
 
 function stopRowClick(event: MouseEvent<HTMLElement>) {
   event.stopPropagation()
 }
 
-export function TeamMemberRow({ member, actorId, actorRole, onChangeRole }: TeamMemberRowProps) {
+export function TeamMemberRow({
+  member,
+  actorId,
+  actorRole,
+  onChangeRole,
+  onEditAccount,
+  onDeleteUser,
+}: TeamMemberRowProps) {
   const router = useRouter()
   const actor = { id: actorId, role: actorRole }
   const target = { id: member.id, role: member.role }
@@ -68,6 +77,8 @@ export function TeamMemberRow({ member, actorId, actorRole, onChangeRole }: Team
           actorId={actorId}
           actorRole={actorRole}
           onChangeRole={onChangeRole}
+          onEditAccount={onEditAccount}
+          onDeleteUser={onDeleteUser}
         />
       </TableCell>
     </TableRow>
