@@ -6,14 +6,12 @@ import { useCallback, useDeferredValue, useMemo, useState } from 'react'
 import type { TeamMember } from '@/lib/api'
 import { useAuth } from '@/lib/auth-context'
 
-import {
-  filterAndSortTeamMembers,
-  getTeamPaginationItems,
-  type TeamRoleFilter,
-} from '../team-member-list'
+import { filterAndSortTeamMembers, type TeamRoleFilter } from '../team-member-list'
 import { normalizeTeamActorRole } from '../team-row-policy'
 
-const TEAM_TABLE_PAGE_SIZE = 4
+export const TEAM_PAGE_LIMIT_OPTIONS = [4, 10, 20, 50] as const
+export type TeamPageLimit = (typeof TEAM_PAGE_LIMIT_OPTIONS)[number]
+const DEFAULT_TEAM_PAGE_LIMIT: TeamPageLimit = 10
 
 export function useTeamMembers(initialMembers: TeamMember[]) {
   const { user } = useAuth()
@@ -24,6 +22,7 @@ export function useTeamMembers(initialMembers: TeamMember[]) {
   const [roleFilter, setRoleFilter] = useState<TeamRoleFilter>('all')
   const [query, setQuery] = useState('')
   const [page, setPage] = useState(1)
+  const [limit, setLimitState] = useState<TeamPageLimit>(DEFAULT_TEAM_PAGE_LIMIT)
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null)
 
   const deferredQuery = useDeferredValue(query)
@@ -85,7 +84,7 @@ export function useTeamMembers(initialMembers: TeamMember[]) {
     return filterAndSortTeamMembers(members, roleFilter, normalizedQuery)
   }, [members, roleFilter, deferredQuery])
 
-  const totalPages = Math.max(1, Math.ceil(filteredMembers.length / TEAM_TABLE_PAGE_SIZE))
+  const totalPages = Math.max(1, Math.ceil(filteredMembers.length / limit))
 
   const setPageClamped = useCallback(
     (update: number | ((previousPage: number) => number)) => {
@@ -99,13 +98,7 @@ export function useTeamMembers(initialMembers: TeamMember[]) {
   )
 
   const safePage = Math.min(page, totalPages)
-  const paginatedMembers = filteredMembers.slice(
-    (safePage - 1) * TEAM_TABLE_PAGE_SIZE,
-    safePage * TEAM_TABLE_PAGE_SIZE,
-  )
-  const showingFrom = filteredMembers.length === 0 ? 0 : (safePage - 1) * TEAM_TABLE_PAGE_SIZE + 1
-  const showingTo = Math.min(safePage * TEAM_TABLE_PAGE_SIZE, filteredMembers.length)
-  const paginationItems = getTeamPaginationItems(safePage, totalPages)
+  const paginatedMembers = filteredMembers.slice((safePage - 1) * limit, safePage * limit)
 
   function setRoleFilterAndResetPage(value: TeamRoleFilter) {
     setRoleFilter(value)
@@ -114,6 +107,11 @@ export function useTeamMembers(initialMembers: TeamMember[]) {
 
   function onSearchChange(value: string) {
     setQuery(value)
+    setPageClamped(1)
+  }
+
+  function setLimit(value: TeamPageLimit) {
+    setLimitState(value)
     setPageClamped(1)
   }
 
@@ -132,14 +130,13 @@ export function useTeamMembers(initialMembers: TeamMember[]) {
     onSearchChange,
     page: safePage,
     setPage: setPageClamped,
+    limit,
+    setLimit,
     editingMember,
     setEditingMember,
     filteredMembers,
     paginatedMembers,
-    showingFrom,
-    showingTo,
     totalPages,
-    paginationItems,
     handleRoleChanged,
   }
 }

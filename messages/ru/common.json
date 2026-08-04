@@ -41,6 +41,18 @@
       "pl": "на польском языке"
     }
   },
+  "pagination": {
+    "ariaLabel": "Пагинация",
+    "showing": "Показано <strong>{from}</strong>–<strong>{to}</strong> из <strong>{total}</strong>",
+    "pageOf": "Страница <strong>{page}</strong> из <strong>{totalPages}</strong>",
+    "firstPage": "Первая страница",
+    "previousPage": "Предыдущая страница",
+    "nextPage": "Следующая страница",
+    "lastPage": "Последняя страница",
+    "goToPage": "Перейти на страницу {page}",
+    "pageSizeLabel": "Строк на странице",
+    "pageSizeOption": "{count} на странице"
+  },
   "shared": {
     "fallback": {
       "backToDashboard": "Вернуться на панель",

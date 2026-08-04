@@ -22,14 +22,13 @@ export function TeamMembersContainer({ initialMembers }: TeamMembersContainerPro
     onSearchChange,
     page,
     setPage,
+    limit,
+    setLimit,
     editingMember,
     setEditingMember,
     filteredMembers,
     paginatedMembers,
-    showingFrom,
-    showingTo,
     totalPages,
-    paginationItems,
     handleRoleChanged,
   } = useTeamMembers(initialMembers)
 
@@ -48,14 +47,12 @@ export function TeamMembersContainer({ initialMembers }: TeamMembersContainerPro
         actorId={actorId}
         actorRole={actorRole}
         onRequestChangeRole={setEditingMember}
-        showingFrom={showingFrom}
-        showingTo={showingTo}
-        totalFiltered={filteredMembers.length}
+        total={filteredMembers.length}
         page={page}
         totalPages={totalPages}
-        paginationItems={paginationItems}
+        limit={limit}
         onPageChange={setPage}
-        onStepPage={(delta) => setPage((p) => p + delta)}
+        onLimitChange={setLimit}
       />
 
       {editingMember && (

@@ -38,7 +38,11 @@ import { routes } from '@/i18n/routes'
 import { useQuestionChipLabels } from '@/i18n/use-question-chip-labels'
 import { type BulkDeleteResult, type Question } from '@/lib/api'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
-import { buildQuestionsInfiniteParams } from '@/lib/questions-query-state'
+import {
+  buildQuestionsInfiniteParams,
+  DEFAULT_QUESTIONS_LIMIT,
+  QUESTION_PAGE_LIMIT_OPTIONS,
+} from '@/lib/questions-query-state'
 
 type QuestionsLibraryClientProps = {
   isSuperAdmin: boolean
@@ -66,7 +70,11 @@ export function QuestionsLibraryClient({
   const listLocale = query.state.locale ?? uiLocale
   const isCardsView = query.state.view === 'cards'
   const cardsInfiniteParams = useMemo(
-    () => buildQuestionsInfiniteParams(query.state, query.debouncedQ),
+    () =>
+      buildQuestionsInfiniteParams(
+        { ...query.state, limit: DEFAULT_QUESTIONS_LIMIT },
+        query.debouncedQ,
+      ),
     [query.state, query.debouncedQ],
   )
   const infinite = useQuestionsInfinite({
@@ -338,6 +346,8 @@ export function QuestionsLibraryClient({
           total={query.total}
           limit={query.state.limit}
           onPageChange={query.setPage}
+          limitOptions={QUESTION_PAGE_LIMIT_OPTIONS}
+          onLimitChange={query.setLimit}
         />
       ) : null}
     </Stack>

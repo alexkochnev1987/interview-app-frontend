@@ -41,6 +41,18 @@
       "pl": "на польскай мове"
     }
   },
+  "pagination": {
+    "ariaLabel": "Пагінацыя",
+    "showing": "Паказваецца <strong>{from}</strong>–<strong>{to}</strong> з <strong>{total}</strong>",
+    "pageOf": "Старонка <strong>{page}</strong> з <strong>{totalPages}</strong>",
+    "firstPage": "Першая старонка",
+    "previousPage": "Папярэдняя старонка",
+    "nextPage": "Наступная старонка",
+    "lastPage": "Апошняя старонка",
+    "goToPage": "Перайсці на старонку {page}",
+    "pageSizeLabel": "Радкоў на старонку",
+    "pageSizeOption": "{count} на старонку"
+  },
   "shared": {
     "fallback": {
       "backToDashboard": "Вярнуцца на панэль",
