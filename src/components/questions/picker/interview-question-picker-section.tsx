@@ -1,20 +1,25 @@
 'use client'
 
+import { SlidersHorizontal } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { useState } from 'react'
 
 import { InfiniteCardsLoader } from '@/components/questions/library/infinite-cards-loader'
 import { QuestionCard } from '@/components/questions/library/question-card'
 import { QuestionTable } from '@/components/questions/library/question-table'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Icon } from '@/components/ui/icon'
 import { CardGrid } from '@/components/ui/layout/card-grid'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { Pagination } from '@/components/ui/pagination'
 import { SearchInput } from '@/components/ui/search-input'
+import { Sheet, SheetBody, SheetHeader } from '@/components/ui/sheet'
 import { StatusPill } from '@/components/ui/status-pill'
 import { QUESTION_PAGE_LIMIT_OPTIONS, type QuestionPageLimit } from '@/lib/questions-query-state'
 
-import { QuestionFacetSidebar } from './question-facet-sidebar'
+import { QuestionFacetSidebar, type QuestionFacetSidebarProps } from './question-facet-sidebar'
 import { QuestionPickerFeed } from './question-picker-feed'
 import { QuestionPickerRefetchAlert } from './question-picker-refetch-alert'
 import { QuestionPickerToolbar } from './question-picker-toolbar'
@@ -24,44 +29,54 @@ import { type useInterviewQuestionPicker } from './use-interview-question-picker
 
 type InterviewQuestionPicker = ReturnType<typeof useInterviewQuestionPicker>
 
+function buildQuestionFacetSidebarProps(
+  picker: InterviewQuestionPicker,
+): Omit<QuestionFacetSidebarProps, 'hideHeading'> {
+  const { facetsResult, facets, query } = picker
+
+  return {
+    difficulties: facets.difficulties,
+    categories: facets.categories,
+    subcategories: facets.subcategories,
+    roles: facets.roles,
+    tags: facets.tags,
+    selected: {
+      locale: query.state.locale,
+      difficulty: query.state.difficulty,
+      category: query.state.category,
+      subcategory: query.state.subcategory,
+      role: query.state.role,
+      tags: query.state.tags,
+      status: query.state.status,
+    },
+    onLocaleChange: query.setLocale,
+    onDifficultyChange: query.setDifficulty,
+    onCategoryChange: query.setCategory,
+    onSubcategoryChange: query.setSubcategory,
+    onRoleChange: query.setRole,
+    onTagsChange: query.setTags,
+    onStatusChange: query.setStatus,
+    onReset: query.reset,
+    canReset: query.canReset,
+    showStatusFilter: false,
+    loading: facetsResult.loading,
+    error: facetsResult.error,
+    onRetry: facetsResult.refetch,
+  }
+}
+
 type InterviewQuestionPickerAsideProps = {
   picker: InterviewQuestionPicker
 }
 
 export function InterviewQuestionPickerAside({ picker }: InterviewQuestionPickerAsideProps) {
-  const { facetsResult, facets, query, selectedQuestions, removeSelected } = picker
+  const { selectedQuestions, removeSelected } = picker
 
   return (
     <>
-      <QuestionFacetSidebar
-        difficulties={facets.difficulties}
-        categories={facets.categories}
-        subcategories={facets.subcategories}
-        roles={facets.roles}
-        tags={facets.tags}
-        selected={{
-          locale: query.state.locale,
-          difficulty: query.state.difficulty,
-          category: query.state.category,
-          subcategory: query.state.subcategory,
-          role: query.state.role,
-          tags: query.state.tags,
-          status: query.state.status,
-        }}
-        onLocaleChange={query.setLocale}
-        onDifficultyChange={query.setDifficulty}
-        onCategoryChange={query.setCategory}
-        onSubcategoryChange={query.setSubcategory}
-        onRoleChange={query.setRole}
-        onTagsChange={query.setTags}
-        onStatusChange={query.setStatus}
-        onReset={query.reset}
-        canReset={query.canReset}
-        showStatusFilter={false}
-        loading={facetsResult.loading}
-        error={facetsResult.error}
-        onRetry={facetsResult.refetch}
-      />
+      <Stack visibility="lg-up">
+        <QuestionFacetSidebar {...buildQuestionFacetSidebarProps(picker)} />
+      </Stack>
 
       <QuestionSelectedPanel selected={selectedQuestions} onRemove={removeSelected} />
     </>
@@ -85,6 +100,9 @@ export function InterviewQuestionPickerMain({
 }: InterviewQuestionPickerMainProps) {
   const t = useTranslations('questions.common')
   const tToolbar = useTranslations('questions.picker.toolbar')
+  const tFacet = useTranslations('questions.picker.facet')
+  const tCommon = useTranslations('common')
+  const [filtersOpen, setFiltersOpen] = useState(false)
 
   const {
     query,
@@ -128,8 +146,42 @@ export function InterviewQuestionPickerMain({
         activeChips={activeChips}
         resultCount={view.total}
         loading={view.toolbarLoading}
-        viewToggle={<QuestionViewToggle view={query.state.view} onViewChange={query.setView} />}
+        viewToggle={
+          <Inline gap={2} align="center">
+            <Inline visibility="below-lg">
+              <Button
+                type="button"
+                variant="outline-pill"
+                shape="pill"
+                size="sm"
+                onClick={() => setFiltersOpen(true)}
+              >
+                <Icon size="sm">
+                  <SlidersHorizontal />
+                </Icon>
+                {tFacet('filtersTitle')}
+                {activeChips.length > 0 ? (
+                  <StatusPill tone="neutral" size="compact" casing="chip">
+                    {activeChips.length}
+                  </StatusPill>
+                ) : null}
+              </Button>
+            </Inline>
+            <QuestionViewToggle view={query.state.view} onViewChange={query.setView} />
+          </Inline>
+        }
       />
+
+      <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
+        <SheetHeader
+          title={tFacet('filtersTitle')}
+          onClose={() => setFiltersOpen(false)}
+          closeLabel={tCommon('close')}
+        />
+        <SheetBody>
+          <QuestionFacetSidebar {...buildQuestionFacetSidebarProps(picker)} hideHeading />
+        </SheetBody>
+      </Sheet>
 
       <Stack gap={4}>
         <QuestionPickerFeed
