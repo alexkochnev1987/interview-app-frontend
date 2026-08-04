@@ -18,9 +18,7 @@ import {
 } from '@/components/ui/select'
 import { StatusPill } from '@/components/ui/status-pill'
 import type { InterviewSortField, InterviewSortOrder } from '@/lib/api'
-import { MAX_INTERVIEWS_Q_LENGTH, type InterviewPageLimit } from '@/lib/interviews-query-state'
-
-import { InterviewPageSizeSelect } from './interview-page-size-select'
+import { MAX_INTERVIEWS_Q_LENGTH } from '@/lib/interviews-query-state'
 
 const SORT_OPTIONS: Array<{
   value: `${InterviewSortField}:${InterviewSortOrder}`
@@ -50,9 +48,6 @@ export type InterviewPickerToolbarProps = {
   resultCount: number
   loading: boolean
   viewToggle?: ReactNode
-  limit: number
-  onLimitChange: (limit: InterviewPageLimit) => void
-  pageSizeDisabled?: boolean
 }
 
 export function InterviewPickerToolbar(props: InterviewPickerToolbarProps) {
@@ -66,9 +61,6 @@ export function InterviewPickerToolbar(props: InterviewPickerToolbarProps) {
     resultCount,
     loading,
     viewToggle,
-    limit,
-    onLimitChange,
-    pageSizeDisabled,
   } = props
 
   const sortValue = `${sortBy}:${sortOrder}` as `${InterviewSortField}:${InterviewSortOrder}`
@@ -112,11 +104,6 @@ export function InterviewPickerToolbar(props: InterviewPickerToolbarProps) {
 
         <Inline gap={2} align="center" wrap="wrap">
           {viewToggle}
-          <InterviewPageSizeSelect
-            limit={limit}
-            onLimitChange={onLimitChange}
-            disabled={pageSizeDisabled}
-          />
           <Select
             value={sortValue}
             onValueChange={(value) => {

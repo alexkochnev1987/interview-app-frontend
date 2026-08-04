@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 
 import { cn } from '@/lib/utils'
 
-const iconBadgeVariants = cva('flex shrink-0 items-center justify-center', {
+export const iconBadgeVariants = cva('flex shrink-0 items-center justify-center', {
   variants: {
     tone: {
       primary: 'bg-[hsl(var(--primary-fixed)/0.85)] text-[hsl(var(--primary))]',

@@ -27,6 +27,7 @@ import type { InterviewsLibraryPrefetch } from '@/lib/interviews-library-prefetc
 import {
   buildInterviewsInfiniteParams,
   DEFAULT_INTERVIEWS_LIMIT,
+  INTERVIEW_PAGE_LIMIT_OPTIONS,
 } from '@/lib/interviews-query-state'
 
 import { useInterviewFacets } from '../hooks/use-interview-facets'
@@ -163,9 +164,6 @@ export function InterviewsLibraryClient({ initialPrefetch }: InterviewsLibraryCl
         activeChips={activeChips}
         resultCount={view.total}
         loading={view.toolbarLoading}
-        limit={query.state.limit}
-        onLimitChange={query.setLimit}
-        pageSizeDisabled={isCardsView}
         viewToggle={
           <Inline gap={2} align="center">
             <Button
@@ -244,6 +242,8 @@ export function InterviewsLibraryClient({ initialPrefetch }: InterviewsLibraryCl
           total={query.total}
           limit={query.state.limit}
           onPageChange={query.setPage}
+          limitOptions={INTERVIEW_PAGE_LIMIT_OPTIONS}
+          onLimitChange={query.setLimit}
         />
       ) : null}
     </Stack>

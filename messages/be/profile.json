@@ -17,6 +17,15 @@
       "changePassword": "Змяніць пароль",
       "comingSoon": "Хутка"
     },
+    "avatar": {
+      "edit": "Рэдагаваць фота профілю",
+      "change": "Змяніць фота",
+      "remove": "Выдаліць фота",
+      "restoreGoogle": "Аднавіць фота з Google",
+      "unsupportedType": "Абярыце выяву ў фармаце JPEG, PNG або WEBP.",
+      "empty": "Гэты файл пусты.",
+      "tooLarge": "Памер выявы павінен быць менш за 5 МБ."
+    },
     "preferences": {
       "theme": "Тэма",
       "themeSystem": "Сістэмная",

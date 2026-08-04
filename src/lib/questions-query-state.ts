@@ -15,6 +15,9 @@ export const DEFAULT_QUESTIONS_LIMIT = 20
 export const QUESTIONS_SEARCH_DEBOUNCE_MS = 500
 const MAX_QUESTIONS_Q_LENGTH = 200
 
+export const QUESTION_PAGE_LIMIT_OPTIONS = [10, 20, 50, 100] as const
+export type QuestionPageLimit = (typeof QUESTION_PAGE_LIMIT_OPTIONS)[number]
+
 export const EMPTY_QUESTION_FACETS: QuestionFacetsResponse = {
   difficulties: [],
   categories: [],
@@ -108,7 +111,10 @@ export function readQuestionsFromSearchParams(
   const page = Number(params.get('page'))
   if (Number.isFinite(page) && page >= 1) next.page = Math.floor(page)
   const limit = Number(params.get('limit'))
-  if (Number.isFinite(limit) && limit >= 1 && limit <= 100) {
+  if (
+    Number.isFinite(limit) &&
+    (QUESTION_PAGE_LIMIT_OPTIONS as readonly number[]).includes(Math.floor(limit))
+  ) {
     next.limit = Math.floor(limit)
   }
   const view = params.get('view')

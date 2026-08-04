@@ -197,6 +197,14 @@
       "updateError": "Could not update role",
       "updateSuccessDescription": "{name} is now {role}."
     },
+    "avatar": {
+      "uploadSuccess": "Profile picture updated",
+      "uploadError": "Failed to update profile picture",
+      "removeSuccess": "Profile picture removed",
+      "removeError": "Failed to remove profile picture",
+      "restoreSuccess": "Google picture restored",
+      "restoreError": "Failed to restore Google picture"
+    },
     "template": {
       "createSuccess": "Template created",
       "createError": "Failed to create template",

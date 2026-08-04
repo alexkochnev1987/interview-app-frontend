@@ -13,9 +13,9 @@ import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 import { AppSidebar } from '@/components/ui/app-sidebar'
+import { Avatar } from '@/components/ui/avatar'
 import { BrandMark } from '@/components/ui/brand-mark'
 import { Button } from '@/components/ui/button'
-import { IconBadge } from '@/components/ui/icon-badge'
 import { IdentityBadge } from '@/components/ui/identity-badge'
 import { Stack } from '@/components/ui/layout/stack'
 import {
@@ -37,8 +37,6 @@ import {
   canReadQuestions,
   canReviewAssessments,
 } from '@/lib/auth-roles'
-import { getCandidateInitials } from '@/lib/interview-formatters'
-import { cn } from '@/lib/utils'
 
 export function SideNav() {
   const { user, logout } = useAuth()
@@ -145,10 +143,14 @@ export function SideNav() {
               aria-current={profileActive ? 'page' : undefined}
               className={sideNavProfileLinkClass}
             >
-              <IconBadge tone="surface" size="sm" shape="circle" textSize="sm">
-                {getCandidateInitials(user.name)}
-              </IconBadge>
-              <Stack gap={0} className={cn('min-w-0', sideNavRevealClass)}>
+              <Avatar
+                name={user.name}
+                pictureUrl={user.pictureUrl}
+                size="sm"
+                textSize="sm"
+                tone="surface"
+              />
+              <Stack gap={0} flexChild="contain" className={sideNavRevealClass}>
                 <IdentityBadge
                   layout="stacked"
                   nameMaxWidth="none"

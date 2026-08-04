@@ -5,18 +5,12 @@ import type { TeamMemberRole } from './team-roles'
 
 export type TeamRoleFilter = TeamMemberRole | 'all'
 
-export type TeamPaginationItem = number | 'ellipsis-start' | 'ellipsis-end'
-
 export type TeamStatCard = {
   label: string
   value: number
   annotation: string
   tone: 'primary' | 'info' | 'neutral' | 'warning' | 'success'
   accent: 'primary' | 'info' | 'neutral' | 'warning' | 'success'
-}
-
-export function getMemberInitials(name: string): string {
-  return name.trim()[0]?.toUpperCase() ?? ''
 }
 
 function byTeamTableOrder(a: TeamMember, b: TeamMember): number {
@@ -82,28 +76,4 @@ export function buildTeamStatCards(members: TeamMember[]): TeamStatCard[] {
       accent: 'success',
     },
   ]
-}
-
-export function getTeamPaginationItems(
-  currentPage: number,
-  totalPages: number,
-): TeamPaginationItem[] {
-  if (totalPages <= 1) return [1]
-  if (totalPages <= 3) {
-    return Array.from({ length: totalPages }, (_, i) => i + 1)
-  }
-  if (currentPage === 1) {
-    return [1, 2, 'ellipsis-end']
-  }
-  if (currentPage === 2) {
-    return Array.from({ length: Math.min(4, totalPages) }, (_, i) => i + 1)
-  }
-  if (currentPage >= totalPages - 1) {
-    const start = Math.max(1, totalPages - 2)
-    return [
-      'ellipsis-start',
-      ...Array.from({ length: totalPages - start + 1 }, (_, i) => start + i),
-    ]
-  }
-  return ['ellipsis-start', currentPage - 1, currentPage, currentPage + 1, 'ellipsis-end']
 }

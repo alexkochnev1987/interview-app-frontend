@@ -17,9 +17,6 @@
       "title": "Nie znaleziono żadnych członków",
       "description": "Spróbuj zmienić filtr roli, aby zobaczyć więcej wyników."
     },
-    "pagination": {
-      "showing": "Wyświetlono {from}–{to} z {total} członków"
-    },
     "stats": {
       "totalMembers": "Całkowita liczba członków",
       "allRoles": "Wszystkie role",
