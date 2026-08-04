@@ -2,6 +2,7 @@
   "nav": {
     "dashboard": "Панель",
     "questions": "Вопросы",
+    "assistant": "Ассистент",
     "assessments": "Оценки",
     "newInterview": "Новое интервью",
     "team": "Команда",

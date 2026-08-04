@@ -90,6 +90,7 @@ const config: Config = {
       boxShadow: {
         soft: 'var(--shadow-soft)',
         float: 'var(--shadow-float)',
+        'chat-widget': 'var(--shadow-chat-widget)',
       },
       letterSpacing: {
         'display-loose': '-0.02em',

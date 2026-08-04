@@ -99,3 +99,15 @@ export function canManageTeam(role: string | null | undefined): boolean {
 export function canAssignInterviewHr(role: string | null | undefined): boolean {
   return canManageTeam(role)
 }
+
+const AI_ASSISTANT_ROLES: ReadonlySet<AppRole> = new Set([
+  APP_ROLE.super_admin,
+  APP_ROLE.admin,
+  APP_ROLE.hr,
+  APP_ROLE.candidate,
+])
+
+export function canUseAiAssistant(role: string | null | undefined): boolean {
+  if (!role || !isAppRole(role)) return false
+  return AI_ASSISTANT_ROLES.has(role)
+}
