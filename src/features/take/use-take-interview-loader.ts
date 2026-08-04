@@ -1,17 +1,15 @@
 import { useCallback, useEffect, useRef } from 'react'
 
-import type { Locale } from '@/i18n/locales'
 import { getTakeInterview, type TakeInterviewData } from '@/lib/api'
 
 import type { TakeMessageGetter } from './messages'
 
-export type TakeInterviewLoadMode = 'initial' | 'resume' | 'locale'
+export type TakeInterviewLoadMode = 'initial' | 'resume'
 
 interface UseTakeInterviewLoaderParams {
   id: string
   candidateToken: string
   skipInitialLoad?: boolean
-  contentLocale?: Locale
   onData: (data: TakeInterviewData, mode: TakeInterviewLoadMode, tokenOverride?: string) => void
   onError: (message: string) => void
   onCleanup: () => void
@@ -26,14 +24,12 @@ export function useTakeInterviewLoader({
   id,
   candidateToken,
   skipInitialLoad,
-  contentLocale,
   onData,
   onError,
   onCleanup,
   takeMessage,
 }: UseTakeInterviewLoaderParams) {
   const candidateTokenRef = useRef(candidateToken)
-  const contentLocaleRef = useRef(contentLocale)
   const onDataRef = useRef(onData)
   const onErrorRef = useRef(onError)
   const onCleanupRef = useRef(onCleanup)
@@ -42,13 +38,8 @@ export function useTakeInterviewLoader({
   const abortControllerRef = useRef<AbortController | null>(null)
 
   const loadInterview = useCallback(
-    async (
-      mode: TakeInterviewLoadMode = 'initial',
-      tokenOverride?: string,
-      localeOverride?: Locale,
-    ) => {
+    async (mode: TakeInterviewLoadMode = 'initial', tokenOverride?: string) => {
       const effectiveToken = tokenOverride ?? candidateTokenRef.current
-      const effectiveContentLocale = localeOverride ?? contentLocaleRef.current
       const generation = ++loadGenerationRef.current
 
       abortControllerRef.current?.abort()
@@ -56,16 +47,12 @@ export function useTakeInterviewLoader({
       abortControllerRef.current = abortController
 
       try {
-        const data = await getTakeInterview(id, effectiveToken, effectiveContentLocale, {
+        // API resolves question text via interviewLocale when contentLocale is omitted.
+        const data = await getTakeInterview(id, effectiveToken, {
           signal: abortController.signal,
         })
 
         if (generation !== loadGenerationRef.current) {
-          return
-        }
-
-        const latestLocale = localeOverride ?? contentLocaleRef.current
-        if (effectiveContentLocale !== latestLocale) {
           return
         }
 
@@ -91,13 +78,12 @@ export function useTakeInterviewLoader({
     if (candidateToken) {
       candidateTokenRef.current = candidateToken
     }
-    contentLocaleRef.current = contentLocale
     onDataRef.current = onData
     onErrorRef.current = onError
     onCleanupRef.current = onCleanup
     takeMessageRef.current = takeMessage
     loadInterviewRef.current = loadInterview
-  }, [candidateToken, contentLocale, onData, onError, onCleanup, takeMessage, loadInterview])
+  }, [candidateToken, onData, onError, onCleanup, takeMessage, loadInterview])
 
   useEffect(() => {
     if (!skipInitialLoad) {
