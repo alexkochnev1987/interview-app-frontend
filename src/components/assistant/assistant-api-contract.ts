@@ -16,3 +16,4 @@ export const ASSISTANT_CONFIRM_MESSAGE = 'confirm' as const
 
 export const ASSISTANT_CHAT_LAUNCHER_ID = 'assistant-chat-launcher'
 export const ASSISTANT_CHAT_COMPOSER_ID = 'assistant-chat-composer'
+export const ASSISTANT_CHAT_WIDGET_TITLE_ID = 'assistant-chat-widget-title'
