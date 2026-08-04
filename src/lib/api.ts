@@ -178,6 +178,20 @@ export type FetchInterviewFacetsParams = NonNullable<
 >
 
 export type CreateInterviewPayload = Schemas['CreateInterviewDto']
+export type RecruiterAssistantChatPayload = Schemas['RecruiterAssistantChatDto']
+export type RecruiterAssistantResponse = Schemas['RecruiterAssistantResponseDto']
+export type RecruiterAssistantCreatePendingAction =
+  Schemas['RecruiterAssistantCreatePendingActionDto']
+export type RecruiterAssistantAssignHrPendingAction =
+  Schemas['RecruiterAssistantAssignHrPendingActionDto']
+export type RecruiterAssistantPendingAction =
+  | RecruiterAssistantCreatePendingAction
+  | RecruiterAssistantAssignHrPendingAction
+export type RecruiterAssistantSuggestedQuestion = Schemas['RecruiterAssistantSuggestedQuestionDto']
+export type RecruiterAssistantInterviewSummary = Schemas['RecruiterAssistantInterviewSummaryDto']
+export type RecruiterAssistantReviewState = Schemas['RecruiterAssistantReviewStateDto']
+export type RecruiterAssistantCreatedInterview = Schemas['RecruiterAssistantCreatedInterviewDto']
+export type RecruiterAssistantResponseStatus = RecruiterAssistantResponse['status']
 
 export type PresignedUrlResponse = Schemas['PresignedUrlResponseDto']
 
@@ -424,6 +438,19 @@ export async function login(data: LoginPayload): Promise<AuthUserResponseDto> {
     client.POST('/auth/login', {
       ...LOCALIZED_HEADERS,
       body: data,
+    }),
+  )
+}
+
+export async function sendRecruiterAssistantMessage(
+  data: RecruiterAssistantChatPayload,
+  init?: { signal?: AbortSignal },
+): Promise<RecruiterAssistantResponse> {
+  return handle(
+    client.POST('/ai/chat', {
+      ...LOCALIZED_HEADERS,
+      body: data,
+      signal: init?.signal,
     }),
   )
 }

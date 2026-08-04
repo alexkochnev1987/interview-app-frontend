@@ -13,6 +13,8 @@ const cardVariants = cva(
         surfaceFlat: 'border border-hairline-strong bg-surface-glass shadow-none',
         floating: 'border border-hairline-strong bg-surface-glass shadow-float',
         floatingSolid: 'border border-hairline-strong bg-card shadow-float',
+        chatWidget:
+          'border-2 border-[hsl(var(--primary)/0.42)] bg-card shadow-chat-widget ring-1 ring-inset ring-[hsl(var(--primary)/0.1)]',
         recordingHero: 'border border-hairline-strong bg-white shadow-float',
         metric:
           'relative isolate border border-hairline-strong bg-[linear-gradient(135deg,hsl(var(--card)/0.98),hsl(var(--surface-low)/0.58))] shadow-float after:pointer-events-none after:absolute after:-right-10 after:-top-10 after:size-24 after:rounded-full after:bg-[hsl(var(--primary)/0.08)] after:blur-2xl',
