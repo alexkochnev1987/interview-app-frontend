@@ -1,9 +1,15 @@
 'use client'
 
-import { LoaderCircle, PanelLeftClose, PanelLeftOpen, Trash2 } from 'lucide-react'
+import {
+  LoaderCircle,
+  PanelLeftClose,
+  PanelLeftOpen,
+  SlidersHorizontal,
+  Trash2,
+} from 'lucide-react'
 import { useLocale } from 'next-intl'
 import { useTranslations } from 'next-intl'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { cloneElement, useEffect, useMemo, useRef, useState } from 'react'
 
 import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { BulkDeleteResultAlerts } from '@/components/questions/library/bulk-delete-result-alerts'
@@ -33,6 +39,8 @@ import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { Pagination } from '@/components/ui/pagination'
 import { SearchInput } from '@/components/ui/search-input'
+import { Sheet, SheetBody, SheetHeader } from '@/components/ui/sheet'
+import { StatusPill } from '@/components/ui/status-pill'
 import { useRouter } from '@/i18n/navigation'
 import { routes } from '@/i18n/routes'
 import { useQuestionChipLabels } from '@/i18n/use-question-chip-labels'
@@ -117,6 +125,9 @@ export function QuestionsLibraryClient({
   const [bulkConfirmOpen, setBulkConfirmOpen] = useState(false)
   const [bulkResult, setBulkResult] = useState<BulkDeleteResult | null>(null)
   const [sidebarHidden, setSidebarHidden] = useState(false)
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  const tFacet = useTranslations('questions.picker.facet')
+  const tCommon = useTranslations('common')
   const hydratedSidebarRef = useRef(false)
   useEffect(() => {
     if (hydratedSidebarRef.current) return
@@ -231,17 +242,38 @@ export function QuestionsLibraryClient({
         loading={view.toolbarLoading}
         viewToggle={
           <Inline gap={2} align="center">
-            <Button
-              type="button"
-              variant="outline-pill"
-              shape="pill"
-              size="icon-sm"
-              onClick={toggleSidebar}
-              aria-label={sidebarHidden ? t('showFiltersSidebar') : t('hideFiltersSidebar')}
-              aria-pressed={sidebarHidden}
-            >
-              {sidebarHidden ? <PanelLeftOpen /> : <PanelLeftClose />}
-            </Button>
+            <Inline visibility="lg-up">
+              <Button
+                type="button"
+                variant="outline-pill"
+                shape="pill"
+                size="icon-sm"
+                onClick={toggleSidebar}
+                aria-label={sidebarHidden ? t('showFiltersSidebar') : t('hideFiltersSidebar')}
+                aria-pressed={sidebarHidden}
+              >
+                {sidebarHidden ? <PanelLeftOpen /> : <PanelLeftClose />}
+              </Button>
+            </Inline>
+            <Inline visibility="below-lg">
+              <Button
+                type="button"
+                variant="outline-pill"
+                shape="pill"
+                size="sm"
+                onClick={() => setFiltersOpen(true)}
+              >
+                <Icon size="sm">
+                  <SlidersHorizontal />
+                </Icon>
+                {tFacet('filtersTitle')}
+                {activeChips.length > 0 ? (
+                  <StatusPill tone="neutral" size="compact" casing="chip">
+                    {activeChips.length}
+                  </StatusPill>
+                ) : null}
+              </Button>
+            </Inline>
             <QuestionViewToggle view={query.state.view} onViewChange={query.setView} />
           </Inline>
         }
@@ -365,10 +397,19 @@ export function QuestionsLibraryClient({
         mainContent
       ) : (
         <Grid columns="aside-22-left" gap={6}>
-          {sidebar}
+          <Stack visibility="lg-up">{sidebar}</Stack>
           {mainContent}
         </Grid>
       )}
+
+      <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
+        <SheetHeader
+          title={tFacet('filtersTitle')}
+          onClose={() => setFiltersOpen(false)}
+          closeLabel={tCommon('close')}
+        />
+        <SheetBody>{cloneElement(sidebar, { hideHeading: true })}</SheetBody>
+      </Sheet>
 
       <ConfirmDialog
         open={bulkConfirmOpen}
