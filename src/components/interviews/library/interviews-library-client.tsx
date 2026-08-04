@@ -1,8 +1,8 @@
 'use client'
 
-import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
+import { PanelLeftClose, PanelLeftOpen, SlidersHorizontal } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { cloneElement, useEffect, useMemo, useRef, useState } from 'react'
 
 import { InterviewFacetSidebar } from '@/components/interviews/picker'
 import { InterviewPickerFeed } from '@/components/interviews/picker'
@@ -17,6 +17,8 @@ import { Grid } from '@/components/ui/layout/grid'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { Pagination } from '@/components/ui/pagination'
+import { Sheet, SheetBody, SheetHeader } from '@/components/ui/sheet'
+import { StatusPill } from '@/components/ui/status-pill'
 import { useRouter } from '@/i18n/navigation'
 import { routes } from '@/i18n/routes'
 import { useInterviewChipLabels } from '@/i18n/use-interview-chip-labels'
@@ -45,6 +47,8 @@ type InterviewsLibraryClientProps = {
 export function InterviewsLibraryClient({ initialPrefetch }: InterviewsLibraryClientProps) {
   const router = useRouter()
   const t = useTranslations('interviews.library.client')
+  const tFacet = useTranslations('interviews.library.facet')
+  const tCommon = useTranslations('common')
   const { user } = useAuth()
   const showAssignedHrFilter = canAssignInterviewHr(user?.role)
 
@@ -105,6 +109,7 @@ export function InterviewsLibraryClient({ initialPrefetch }: InterviewsLibraryCl
   const view = pickInterviewsViewSource(isCardsView, query, infinite, query.isSearchPending)
 
   const [sidebarHidden, setSidebarHidden] = useState(false)
+  const [filtersOpen, setFiltersOpen] = useState(false)
   const hydratedSidebarRef = useRef(false)
 
   useEffect(() => {
@@ -166,25 +171,46 @@ export function InterviewsLibraryClient({ initialPrefetch }: InterviewsLibraryCl
         loading={view.toolbarLoading}
         viewToggle={
           <Inline gap={2} align="center">
-            <Button
-              type="button"
-              variant="outline-pill"
-              shape="pill"
-              size="icon-sm"
-              onClick={toggleSidebar}
-              aria-label={sidebarHidden ? t('showFiltersSidebar') : t('hideFiltersSidebar')}
-              aria-pressed={sidebarHidden}
-            >
-              {sidebarHidden ? (
-                <Icon size="md">
-                  <PanelLeftOpen />
+            <Inline visibility="lg-up">
+              <Button
+                type="button"
+                variant="outline-pill"
+                shape="pill"
+                size="icon-sm"
+                onClick={toggleSidebar}
+                aria-label={sidebarHidden ? t('showFiltersSidebar') : t('hideFiltersSidebar')}
+                aria-pressed={sidebarHidden}
+              >
+                {sidebarHidden ? (
+                  <Icon size="md">
+                    <PanelLeftOpen />
+                  </Icon>
+                ) : (
+                  <Icon size="md">
+                    <PanelLeftClose />
+                  </Icon>
+                )}
+              </Button>
+            </Inline>
+            <Inline visibility="below-lg">
+              <Button
+                type="button"
+                variant="outline-pill"
+                shape="pill"
+                size="sm"
+                onClick={() => setFiltersOpen(true)}
+              >
+                <Icon size="sm">
+                  <SlidersHorizontal />
                 </Icon>
-              ) : (
-                <Icon size="md">
-                  <PanelLeftClose />
-                </Icon>
-              )}
-            </Button>
+                {tFacet('filtersTitle')}
+                {activeChips.length > 0 ? (
+                  <StatusPill tone="neutral" size="compact" casing="chip">
+                    {activeChips.length}
+                  </StatusPill>
+                ) : null}
+              </Button>
+            </Inline>
             <InterviewViewToggle view={query.state.view} onViewChange={query.setView} />
           </Inline>
         }
@@ -249,12 +275,25 @@ export function InterviewsLibraryClient({ initialPrefetch }: InterviewsLibraryCl
     </Stack>
   )
 
-  return sidebarHidden ? (
-    mainContent
-  ) : (
-    <Grid columns="aside-22-left" gap={6}>
-      {sidebar}
-      {mainContent}
-    </Grid>
+  return (
+    <>
+      {sidebarHidden ? (
+        mainContent
+      ) : (
+        <Grid columns="aside-22-left" gap={6}>
+          <Stack visibility="lg-up">{sidebar}</Stack>
+          {mainContent}
+        </Grid>
+      )}
+
+      <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
+        <SheetHeader
+          title={tFacet('filtersTitle')}
+          onClose={() => setFiltersOpen(false)}
+          closeLabel={tCommon('close')}
+        />
+        <SheetBody>{cloneElement(sidebar, { hideHeading: true })}</SheetBody>
+      </Sheet>
+    </>
   )
 }
