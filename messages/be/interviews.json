@@ -43,9 +43,7 @@
         "searchPlaceholder": "Пошук па імені кандыдата",
         "resultCount": "{count} інтэрв'ю",
         "removeChipAria": "Выдаліць {label}",
-        "sortLabel": "Сартаванне",
-        "pageSizeLabel": "Радкоў на старонку",
-        "pageSizeOption": "{count} на старонку"
+        "sortLabel": "Сартаванне"
       },
       "sort": {
         "updatedAt_desc": "Спачатку нядаўна абноўленыя",

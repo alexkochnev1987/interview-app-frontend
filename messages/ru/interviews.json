@@ -43,9 +43,7 @@
         "searchPlaceholder": "Поиск по имени кандидата",
         "resultCount": "{count} интервью",
         "removeChipAria": "Удалить {label}",
-        "sortLabel": "Сортировка",
-        "pageSizeLabel": "Строк на странице",
-        "pageSizeOption": "{count} на странице"
+        "sortLabel": "Сортировка"
       },
       "sort": {
         "updatedAt_desc": "Сначала недавно обновлённые",
