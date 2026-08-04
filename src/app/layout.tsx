@@ -22,7 +22,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const htmlLang = resolveHtmlLang(resolvedLocale)
 
   return (
-    <html lang={htmlLang} suppressHydrationWarning>
+    <html lang={htmlLang} suppressHydrationWarning data-scroll-behavior="smooth">
       <AppBody>
         <ThemeProvider
           attribute="class"
