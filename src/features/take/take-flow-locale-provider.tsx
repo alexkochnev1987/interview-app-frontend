@@ -2,34 +2,16 @@
 
 import { NextIntlClientProvider, useLocale, useMessages } from 'next-intl'
 import { useSearchParams } from 'next/navigation'
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type ReactNode,
-} from 'react'
+import { useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 
 import { resolveHtmlLang } from '@/i18n/html-lang'
-import { LOCALES, type Locale } from '@/i18n/locales'
+import { DEFAULT_LOCALE, LOCALES, type Locale } from '@/i18n/locales'
 import { mergeLocaleModules } from '@/i18n/module-loader-core.mjs'
 import { localizedPath, pathLocale } from '@/i18n/pathname'
 import { setClientApiLocale } from '@/lib/api'
 
-const LOCALE_COOKIE_NAME = 'NEXT_LOCALE'
-const LOCALE_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365
 const TAKE_FLOW_MESSAGE_MODULES = ['common', 'takeFlow', 'toast', 'apiErrors'] as const
-const TAKE_FLOW_NAMESPACE_KEYS = [
-  'metadata',
-  'common',
-  'languageSwitcher',
-  'shared',
-  'takeFlow',
-  'toast',
-] as const
+const TAKE_FLOW_NAMESPACE_KEYS = ['metadata', 'common', 'shared', 'takeFlow', 'toast'] as const
 const API_ERROR_KEY_PATTERN = /^[A-Z][A-Z0-9_]+$/
 
 function finalizeTakeFlowMessages(merged: TakeFlowMessages): TakeFlowMessages {
@@ -81,6 +63,27 @@ function isCompleteTakeFlowMessages(messages: TakeFlowMessages): boolean {
   return 'takeFlow' in messages && 'toast' in messages && 'apiErrors' in messages
 }
 
+function resolveImmediateTakeFlowMessages(
+  effectiveLocale: Locale,
+  parentLocale: Locale,
+  parentMessages: TakeFlowMessages,
+): TakeFlowMessages | null {
+  const cached = takeFlowMessagesCache.get(effectiveLocale)
+  if (cached && isCompleteTakeFlowMessages(cached)) {
+    return cached
+  }
+
+  if (effectiveLocale === parentLocale) {
+    const seeded = pickTakeFlowMessages(parentMessages)
+    if (isCompleteTakeFlowMessages(seeded)) {
+      takeFlowMessagesCache.set(effectiveLocale, seeded)
+      return seeded
+    }
+  }
+
+  return null
+}
+
 async function loadTakeFlowLocaleMessages(locale: Locale): Promise<TakeFlowMessages> {
   const cached = takeFlowMessagesCache.get(locale)
   if (cached && isCompleteTakeFlowMessages(cached)) {
@@ -110,21 +113,11 @@ async function loadTakeFlowLocaleMessages(locale: Locale): Promise<TakeFlowMessa
   return request
 }
 
-function prefetchTakeFlowLocaleMessages() {
-  for (const locale of LOCALES) {
-    void loadTakeFlowLocaleMessages(locale)
+export function resolveTakeInterviewLocale(locale?: string | null): Locale {
+  if (locale && (LOCALES as readonly string[]).includes(locale)) {
+    return locale as Locale
   }
-}
-
-type TakeFlowLocaleContextValue = {
-  locale: Locale
-  switchLocale: (nextLocale: Locale) => void
-}
-
-const TakeFlowLocaleContext = createContext<TakeFlowLocaleContextValue | null>(null)
-
-function writeLocaleCookie(locale: Locale) {
-  document.cookie = `${LOCALE_COOKIE_NAME}=${locale};path=/;max-age=${LOCALE_COOKIE_MAX_AGE_SECONDS};samesite=lax`
+  return DEFAULT_LOCALE
 }
 
 function replaceTakeFlowUrlLocale(nextLocale: Locale, searchQuery: string) {
@@ -139,94 +132,89 @@ function replaceTakeFlowUrlLocale(nextLocale: Locale, searchQuery: string) {
 
 type TakeFlowLocaleProviderProps = {
   children: ReactNode
+  /**
+   * HR-selected interview language once known.
+   * `null`/`undefined` keeps the current route locale and does not rewrite the URL
+   * (token entry loads interviewLocale asynchronously).
+   */
+  interviewLocale?: Locale | null
 }
 
-function TakeFlowLocaleProviderInner({ children }: TakeFlowLocaleProviderProps) {
+function TakeFlowLocaleProviderInner({
+  children,
+  interviewLocale,
+}: {
+  children: ReactNode
+  interviewLocale: Locale | null
+}) {
   const parentLocale = useLocale() as Locale
   const parentMessages = useMessages()
   const searchParams = useSearchParams()
+  const effectiveLocale = interviewLocale ?? parentLocale
+  const localeLocked = interviewLocale !== null
 
-  const [locale, setLocale] = useState<Locale>(parentLocale)
-  const [messages, setMessages] = useState(parentMessages)
-  const localeSwitchGenerationRef = useRef(0)
+  const immediateMessages = useMemo(
+    () =>
+      resolveImmediateTakeFlowMessages(
+        effectiveLocale,
+        parentLocale,
+        parentMessages as TakeFlowMessages,
+      ),
+    [effectiveLocale, parentLocale, parentMessages],
+  )
 
-  useEffect(() => {
-    const seeded = pickTakeFlowMessages(parentMessages as TakeFlowMessages)
-    if (isCompleteTakeFlowMessages(seeded)) {
-      takeFlowMessagesCache.set(parentLocale, seeded)
+  const [loadedMessages, setLoadedMessages] = useState<{
+    locale: Locale
+    messages: TakeFlowMessages
+  } | null>(null)
+  const localeApplyGenerationRef = useRef(0)
+
+  const activeMessages =
+    immediateMessages ??
+    (loadedMessages?.locale === effectiveLocale ? loadedMessages.messages : null)
+  const locale = activeMessages ? effectiveLocale : parentLocale
+  const messages = activeMessages ?? (parentMessages as TakeFlowMessages)
+
+  useLayoutEffect(() => {
+    const generation = ++localeApplyGenerationRef.current
+    const searchQuery = searchParams.toString()
+
+    const applySideEffects = () => {
+      setClientApiLocale(effectiveLocale)
+      if (localeLocked) {
+        replaceTakeFlowUrlLocale(effectiveLocale, searchQuery)
+      } else {
+        document.documentElement.lang = resolveHtmlLang(effectiveLocale)
+      }
     }
-    prefetchTakeFlowLocaleMessages()
-  }, [parentLocale, parentMessages])
 
-  useEffect(() => {
-    setClientApiLocale(locale)
-    document.documentElement.lang = resolveHtmlLang(locale)
-  }, [locale])
+    if (activeMessages) {
+      applySideEffects()
+      return
+    }
 
-  const applyLocaleSwitch = useCallback(
-    (nextLocale: Locale, nextMessages: TakeFlowMessages) => {
-      setLocale(nextLocale)
-      setMessages(nextMessages)
-      writeLocaleCookie(nextLocale)
-      setClientApiLocale(nextLocale)
-      replaceTakeFlowUrlLocale(nextLocale, searchParams.toString())
-    },
-    [searchParams],
-  )
-
-  const switchLocale = useCallback(
-    (nextLocale: Locale) => {
-      if (nextLocale === locale || !LOCALES.includes(nextLocale)) {
+    // eslint-disable-next-line promise/always-return
+    void loadTakeFlowLocaleMessages(effectiveLocale).then((nextMessages) => {
+      if (generation !== localeApplyGenerationRef.current) {
         return
       }
-
-      const generation = ++localeSwitchGenerationRef.current
-
-      const cachedMessages = takeFlowMessagesCache.get(nextLocale)
-      if (cachedMessages && isCompleteTakeFlowMessages(cachedMessages)) {
-        if (generation !== localeSwitchGenerationRef.current) {
-          return
-        }
-        applyLocaleSwitch(nextLocale, cachedMessages)
-        return
-      }
-
-      // eslint-disable-next-line promise/always-return
-      void loadTakeFlowLocaleMessages(nextLocale).then((nextMessages) => {
-        if (generation !== localeSwitchGenerationRef.current) {
-          return
-        }
-        applyLocaleSwitch(nextLocale, nextMessages)
-      })
-    },
-    [applyLocaleSwitch, locale],
-  )
-
-  const contextValue = useMemo(
-    () => ({
-      locale,
-      switchLocale,
-    }),
-    [locale, switchLocale],
-  )
+      setLoadedMessages({ locale: effectiveLocale, messages: nextMessages })
+    })
+  }, [activeMessages, effectiveLocale, localeLocked, searchParams])
 
   return (
-    <TakeFlowLocaleContext.Provider value={contextValue}>
-      <NextIntlClientProvider locale={locale} messages={messages}>
-        {children}
-      </NextIntlClientProvider>
-    </TakeFlowLocaleContext.Provider>
+    <NextIntlClientProvider locale={locale} messages={messages}>
+      {children}
+    </NextIntlClientProvider>
   )
 }
 
-export function TakeFlowLocaleProvider({ children }: TakeFlowLocaleProviderProps) {
-  return <TakeFlowLocaleProviderInner>{children}</TakeFlowLocaleProviderInner>
-}
+export function TakeFlowLocaleProvider({ children, interviewLocale }: TakeFlowLocaleProviderProps) {
+  const lockedLocale = interviewLocale == null ? null : resolveTakeInterviewLocale(interviewLocale)
 
-export function useTakeFlowLocale() {
-  const context = useContext(TakeFlowLocaleContext)
-  if (!context) {
-    throw new Error('useTakeFlowLocale must be used within TakeFlowLocaleProvider')
-  }
-  return context
+  return (
+    <TakeFlowLocaleProviderInner interviewLocale={lockedLocale}>
+      {children}
+    </TakeFlowLocaleProviderInner>
+  )
 }
