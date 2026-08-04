@@ -27,6 +27,10 @@
       "tooLarge": "Images must be under 5 MB."
     },
     "preferences": {
+      "theme": "Theme",
+      "themeSystem": "System",
+      "themeLight": "Light",
+      "themeDark": "Dark",
       "language": "Language",
       "productTour": "Product tour"
     }

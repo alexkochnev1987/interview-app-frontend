@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 const codeBlockVariants = cva('whitespace-pre-wrap font-mono text-foreground', {
   variants: {
     size: {
-      md: 'text-sm leading-6 break-words',
+      md: 'text-sm leading-6 wrap-break-word',
       sm: 'text-xs leading-5 break-all',
     },
     inset: {

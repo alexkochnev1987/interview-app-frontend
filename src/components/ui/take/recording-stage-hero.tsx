@@ -73,10 +73,10 @@ function AiInterviewerOrbRing({
       <span
         className={cn(
           'block size-full rounded-full border-solid border-[hsl(var(--primary-container)/0.42)] shadow-none origin-center',
-          'border-[1.5px] lg:border-[2px]',
+          'border-[1.5px] lg:border-2',
           isSpeaking
-            ? '[will-change:opacity,transform] animate-ai-orb-ring-speaking'
-            : 'opacity-[0.48] [transform:scale(1)]',
+            ? 'will-change-[opacity,transform] animate-ai-orb-ring-speaking'
+            : 'opacity-[0.48] transform-[scale(1)]',
         )}
         style={isSpeaking ? { animationDelay: `${animationDelayS}s` } : undefined}
       />
@@ -154,11 +154,7 @@ function RecordingAiInterviewerSessionLayout({
     >
       <RecordingHiddenCaptureVideo videoRef={screenVideoRef} />
 
-      <Inline
-        justify="center"
-        align="center"
-        className="pointer-events-none absolute inset-0 z-[1]"
-      >
+      <Inline justify="center" align="center" className="pointer-events-none absolute inset-0 z-1">
         <AiInterviewerAvatarPlaceholder presence={interviewerPresence} />
       </Inline>
 
@@ -179,7 +175,7 @@ function RecordingAiInterviewerSessionLayout({
         padding="none"
         radius="md"
         className={cn(
-          'pointer-events-none absolute z-[5] overflow-hidden rounded-[1rem] border border-background/95 bg-slate-950 shadow-none ring-[1px] ring-border/55',
+          'pointer-events-none absolute z-5 overflow-hidden rounded-2xl border border-background/95 bg-slate-950 shadow-none ring-[1px] ring-border/55',
           'bottom-3 right-3 h-[104px] w-[156px]',
           'sm:bottom-4 sm:right-4 sm:h-[118px] sm:w-[176px]',
           'lg:h-[136px] lg:w-[208px]',

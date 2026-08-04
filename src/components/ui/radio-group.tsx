@@ -27,7 +27,7 @@ function RadioItem({ children, className, disabled, ...props }: RadioItemProps) 
       data-slot="radio-group-item"
       disabled={disabled}
       className={cn(
-        'group flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left text-sm transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+        'group flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left text-sm transition-colors outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
         'border-border bg-transparent text-muted-foreground hover:border-primary/40 hover:text-foreground',
         'data-[state=checked]:border-primary data-[state=checked]:bg-primary/5 data-[state=checked]:text-foreground',
         'disabled:cursor-not-allowed disabled:opacity-50',

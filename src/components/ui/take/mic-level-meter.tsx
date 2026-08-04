@@ -16,7 +16,7 @@ export function MicLevelMeter({ stream, className }: MicLevelMeterProps) {
     <div
       data-slot="mic-level-meter"
       className={cn(
-        'relative w-1.5 self-stretch min-h-[4.25rem] overflow-hidden rounded-full bg-muted-foreground/20',
+        'relative w-1.5 self-stretch min-h-17 overflow-hidden rounded-full bg-muted-foreground/20',
         className,
       )}
     >

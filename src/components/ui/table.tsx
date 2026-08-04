@@ -29,7 +29,7 @@ function Table({
       data-slot="table"
       className={cn(
         'w-full caption-bottom text-sm',
-        tabularWidth === 'wide' && 'min-w-[42rem]',
+        tabularWidth === 'wide' && 'min-w-2xl',
         className,
       )}
       {...props}
@@ -45,10 +45,10 @@ function Table({
       <div
         data-slot="table-wrapper"
         data-scrollbar="top"
-        className="w-full min-w-0 overflow-x-auto [transform:rotateX(180deg)]"
+        className="w-full min-w-0 overflow-x-auto transform-[rotateX(180deg)]"
         style={minHeightRem != null ? { minHeight: `${minHeightRem}rem` } : undefined}
       >
-        <div className="[transform:rotateX(180deg)]">{tableNode}</div>
+        <div className="transform-[rotateX(180deg)]">{tableNode}</div>
       </div>
     )
   }

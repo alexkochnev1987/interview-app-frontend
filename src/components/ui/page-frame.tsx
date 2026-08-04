@@ -10,7 +10,7 @@ const pageFrameVariants = cva('', {
     },
     stretch: {
       none: '',
-      viewport: 'min-h-[100dvh] flex flex-col box-border',
+      viewport: 'min-h-dvh flex flex-col box-border',
     },
   },
   defaultVariants: {

@@ -121,7 +121,7 @@ const takeTextVariants = cva('', {
       labelSmStrong: 'text-sm font-semibold text-foreground',
       labelSm: 'text-sm font-medium text-foreground',
       captionMutedXs: 'text-xs leading-5 text-muted-foreground',
-      captionWarningXs: 'text-xs leading-5 text-[var(--color-status-pending-fg)]',
+      captionWarningXs: 'text-xs leading-5 text-(--color-status-pending-fg)',
       transcriptDraft: 'ml-1 italic text-muted-foreground',
       iconPrimary: 'text-[hsl(var(--primary))]',
     },

@@ -9,7 +9,7 @@ const videoFrameVariants = cva('relative w-full overflow-hidden bg-black ring-1 
   variants: {
     aspect: {
       auto: '',
-      recording: 'aspect-[16/10] max-h-[400px]',
+      recording: 'aspect-16/10 max-h-[400px]',
     },
     density: {
       comfortable: 'my-4 rounded-3xl',

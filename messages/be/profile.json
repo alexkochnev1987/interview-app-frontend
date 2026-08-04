@@ -27,6 +27,10 @@
       "tooLarge": "Памер выявы павінен быць менш за 5 МБ."
     },
     "preferences": {
+      "theme": "Тэма",
+      "themeSystem": "Сістэмная",
+      "themeLight": "Светлая",
+      "themeDark": "Цёмная",
       "language": "Мова",
       "productTour": "Тур па прадукте"
     }

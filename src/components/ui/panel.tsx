@@ -12,7 +12,7 @@ const panelVariants = cva('ring-1 ring-border/45', {
       slateWell: 'bg-slate-50 dark:bg-slate-950/45',
     },
     radius: {
-      md: 'rounded-[1.25rem]',
+      md: 'rounded-xl-2',
       lg: 'rounded-[1.5rem]',
     },
     padding: {

@@ -49,7 +49,7 @@ export function AppSidebar({
         <div
           aria-hidden
           onClick={onClose}
-          className="fixed inset-0 z-30 bg-scrim/55 backdrop-blur-sm"
+          className="fixed inset-0 z-30 bg-scrim/55 backdrop-blur-xs"
         />
       ) : null}
       <aside
@@ -71,7 +71,7 @@ export function AppSidebar({
           onClick={onToggle}
           aria-pressed={toggleOpen}
           aria-label={toggleOpen ? collapseLabel : expandLabel}
-          className={cn('fixed right-4 top-4 z-50 shadow-sm lg:hidden', !toggleOpen && 'size-10')}
+          className={cn('fixed right-4 top-4 z-50 shadow-xs lg:hidden', !toggleOpen && 'size-10')}
         >
           <Icon size="md">{toggleOpen ? <X /> : <Menu />}</Icon>
         </Button>
