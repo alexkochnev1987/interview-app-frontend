@@ -60,7 +60,7 @@ function AiInterviewerOrbRing({
   animationDelayS: number
   presence: RecordingAiPresence
 }) {
-  const isSpeaking = presence === 'speaking'
+  const isAnimating = presence === 'speaking' || presence === 'listening'
 
   return (
     <span
@@ -74,11 +74,11 @@ function AiInterviewerOrbRing({
         className={cn(
           'block size-full rounded-full border-solid border-[hsl(var(--primary-container)/0.42)] shadow-none origin-center',
           'border-[1.5px] lg:border-2',
-          isSpeaking
+          isAnimating
             ? 'will-change-[opacity,transform] animate-ai-orb-ring-speaking'
             : 'opacity-[0.48] scale-100',
         )}
-        style={isSpeaking ? { animationDelay: `${animationDelayS}s` } : undefined}
+        style={isAnimating ? { animationDelay: `${animationDelayS}s` } : undefined}
       />
     </span>
   )
