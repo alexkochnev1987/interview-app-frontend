@@ -1,10 +1,13 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { FormEvent, useEffect, useRef, useState } from 'react'
 
+import { LOCALES, type Locale } from '@/i18n/locales'
+import { usePathname, useRouter } from '@/i18n/navigation'
 import {
   RecruiterAssistantPendingAction,
+  type RecruiterAssistantResponse,
   resetRecruiterAssistantChat,
   sendRecruiterAssistantMessage,
 } from '@/lib/api'
@@ -31,6 +34,17 @@ function formatError(err: unknown, fallbackMessage: string): string {
 
 function isAbortError(err: unknown): boolean {
   return err instanceof DOMException && err.name === 'AbortError'
+}
+
+function isAppLocale(value: string): value is Locale {
+  return (LOCALES as readonly string[]).includes(value)
+}
+
+function shouldSwitchLocale(
+  result: RecruiterAssistantResponse,
+  currentLocale: Locale,
+): result is RecruiterAssistantResponse & { locale: Locale } {
+  return Boolean(result.locale && result.locale !== currentLocale && isAppLocale(result.locale))
 }
 
 function applyAssistantResult(
@@ -73,6 +87,9 @@ function applyAssistantResult(
 export function useAiAssistantChat() {
   const { user } = useAuth()
   const t = useTranslations('assistant')
+  const locale = useLocale() as Locale
+  const pathname = usePathname()
+  const router = useRouter()
   const welcomeRole = resolveAssistantWelcomeRole(user?.role)
   const welcomeText = buildAssistantWelcomeText(t, welcomeRole)
 
@@ -107,6 +124,11 @@ export function useAiAssistantChat() {
     return requestId === requestIdRef.current
   }
 
+  function applyLocaleFromResult(result: RecruiterAssistantResponse) {
+    if (!shouldSwitchLocale(result, locale)) return
+    router.replace(pathname, { locale: result.locale })
+  }
+
   async function submitMessage(event?: FormEvent<HTMLFormElement>) {
     event?.preventDefault()
     const text = input.trim()
@@ -138,6 +160,7 @@ export function useAiAssistantChat() {
         result,
       })
       setInput('')
+      applyLocaleFromResult(result)
     } catch (err) {
       if (!isLatestRequest(requestId) || isAbortError(err)) return
       setError(formatError(err, t('errors.requestFailed')))
@@ -179,6 +202,7 @@ export function useAiAssistantChat() {
         text: result.response,
         result,
       })
+      applyLocaleFromResult(result)
     } catch (err) {
       if (!isLatestRequest(requestId) || isAbortError(err)) return
       setError(formatError(err, t('errors.requestFailed')))
@@ -214,6 +238,7 @@ export function useAiAssistantChat() {
 
       setMessages([{ id: 'welcome', role: 'assistant', text: result.response }])
       setSessionId(result.sessionId ?? null)
+      applyLocaleFromResult(result)
     } catch (err) {
       if (!isLatestRequest(requestId) || isAbortError(err)) return
       setError(formatError(err, t('errors.requestFailed')))
