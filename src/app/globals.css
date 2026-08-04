@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@plugin "tailwindcss-animate";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -100,9 +101,6 @@
   --radius-xl-3: 1.5rem;
   --radius-xl-4: 1.6rem;
 
-  --shadow-soft: var(--shadow-soft);
-  --shadow-float: var(--shadow-float);
-
   --tracking-display-loose: -0.02em;
   --tracking-display: -0.03em;
   --tracking-display-tight: -0.04em;
@@ -122,9 +120,6 @@
   --background-image-hero-glow:
     radial-gradient(circle at top left, hsl(var(--primary-fixed) / 0.28), transparent 44%),
     radial-gradient(circle at 85% 14%, hsl(var(--secondary-fixed) / 0.18), transparent 30%);
-
-  --font-sans: var(--font-sans);
-  --font-heading: var(--font-sans);
 
   --animate-ai-orb-ring-speaking: aiOrbRingSpeaking 1.5s ease-in-out infinite;
   --animate-indeterminate-progress: indeterminateProgress 1.4s linear infinite;
@@ -148,6 +143,14 @@
       transform: translateX(200%) scaleX(0.5);
     }
   }
+}
+
+@theme inline {
+  --shadow-soft: var(--shadow-soft);
+  --shadow-float: var(--shadow-float);
+
+  --font-sans: var(--font-sans);
+  --font-heading: var(--font-sans);
 }
 
 @layer base {
