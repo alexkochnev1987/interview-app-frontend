@@ -49,6 +49,7 @@
       "createInterview": "Создать недостающие вопросы и затем создать интервью.",
       "createQuestions": "Создать недостающие вопросы из предложенного набора.",
       "assignHr": "Назначить выбранного HR-специалиста на это интервью.",
+      "createSingleQuestion": "Создать этот вопрос в банке вопросов.",
       "action": "Подтвердить действие",
       "userMessage": "Подтвердить",
       "cancel": "Отмена",
@@ -62,6 +63,7 @@
         "interviewLocale": "Язык интервью",
         "interviewId": "ID интервью",
         "assignedHrId": "ID HR-специалиста",
+        "questionName": "Название вопроса",
         "questions": "Вопросы",
         "questionsSummary": "{total} всего ({newCount} новых)"
       }

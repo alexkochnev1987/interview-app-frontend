@@ -49,6 +49,7 @@
       "createInterview": "Create missing questions and create the interview.",
       "createQuestions": "Create the missing questions from this suggested set.",
       "assignHr": "Assign this interview to the selected HR reviewer.",
+      "createSingleQuestion": "Create this question in the question bank.",
       "action": "Confirm action",
       "userMessage": "Confirm",
       "cancel": "Cancel",
@@ -62,6 +63,7 @@
         "interviewLocale": "Interview language",
         "interviewId": "Interview ID",
         "assignedHrId": "HR reviewer ID",
+        "questionName": "Question name",
         "questions": "Questions",
         "questionsSummary": "{total} total ({newCount} new)"
       }

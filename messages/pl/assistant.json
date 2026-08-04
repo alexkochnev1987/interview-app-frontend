@@ -49,6 +49,7 @@
       "createInterview": "Utwórz brakujące pytania, a następnie utwórz interview.",
       "createQuestions": "Utwórz brakujące pytania z tego sugerowanego zestawu.",
       "assignHr": "Przypisz to interview do wybranego pracownika HR.",
+      "createSingleQuestion": "Utwórz to pytanie w banku pytań.",
       "action": "Potwierdź działanie",
       "userMessage": "Potwierdź",
       "cancel": "Anuluj",
@@ -62,6 +63,7 @@
         "interviewLocale": "Język interview",
         "interviewId": "ID interview",
         "assignedHrId": "ID pracownika HR",
+        "questionName": "Nazwa pytania",
         "questions": "Pytania",
         "questionsSummary": "{total} łącznie ({newCount} nowych)"
       }

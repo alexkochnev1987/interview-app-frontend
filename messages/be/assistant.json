@@ -49,6 +49,7 @@
       "createInterview": "Стварыць адсутныя пытанні і затым стварыць інтэрв'ю.",
       "createQuestions": "Стварыць адсутныя пытанні з прапанаванага набору.",
       "assignHr": "Прызначыць выбранага HR-спецыяліста на гэта інтэрв'ю.",
+      "createSingleQuestion": "Стварыць гэта пытанне ў банку пытанняў.",
       "action": "Пацвердзіць дзеянне",
       "userMessage": "Пацвердзіць",
       "cancel": "Скасаваць",
@@ -62,6 +63,7 @@
         "interviewLocale": "Мова інтэрв'ю",
         "interviewId": "ID інтэрв'ю",
         "assignedHrId": "ID HR-спецыяліста",
+        "questionName": "Назва пытання",
         "questions": "Пытанні",
         "questionsSummary": "{total} усяго ({newCount} новых)"
       }

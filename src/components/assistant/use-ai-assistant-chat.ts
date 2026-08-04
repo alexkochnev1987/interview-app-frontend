@@ -34,13 +34,36 @@ function applyAssistantResult(
   t: ReturnType<typeof useTranslations<'assistant'>>,
 ): {
   pendingAction: RecruiterAssistantPendingAction | null
+  pendingActionId: string | null
+  sessionId: string | null
   error: string | null
 } {
-  if (result.status === 'needs_confirmation' && !result.pendingAction) {
-    return { pendingAction: null, error: t('errors.missingPendingAction') }
+  const sessionId = result.sessionId ?? null
+
+  if (result.status === 'needs_confirmation') {
+    if (!result.pendingAction || !result.pendingActionId) {
+      return {
+        pendingAction: null,
+        pendingActionId: null,
+        sessionId,
+        error: t('errors.missingPendingAction'),
+      }
+    }
+
+    return {
+      pendingAction: result.pendingAction,
+      pendingActionId: result.pendingActionId,
+      sessionId,
+      error: null,
+    }
   }
 
-  return { pendingAction: result.pendingAction ?? null, error: null }
+  return {
+    pendingAction: null,
+    pendingActionId: null,
+    sessionId,
+    error: null,
+  }
 }
 
 export function useAiAssistantChat() {
@@ -54,6 +77,8 @@ export function useAiAssistantChat() {
   ])
   const [input, setInput] = useState('')
   const [pendingAction, setPendingAction] = useState<RecruiterAssistantPendingAction | null>(null)
+  const [pendingActionId, setPendingActionId] = useState<string | null>(null)
+  const [sessionId, setSessionId] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -85,6 +110,7 @@ export function useAiAssistantChat() {
 
     setError(null)
     setPendingAction(null)
+    setPendingActionId(null)
     setLoading(true)
     appendMessage({ role: 'user', text })
 
@@ -92,13 +118,15 @@ export function useAiAssistantChat() {
 
     try {
       const result = await sendRecruiterAssistantMessage(
-        { message: text },
+        { message: text, ...(sessionId ? { sessionId } : {}) },
         { signal: abortController.signal },
       )
       if (!isLatestRequest(requestId)) return
 
       const applied = applyAssistantResult(result, t)
       setPendingAction(applied.pendingAction)
+      setPendingActionId(applied.pendingActionId)
+      if (applied.sessionId) setSessionId(applied.sessionId)
       if (applied.error) setError(applied.error)
       appendMessage({
         role: 'assistant',
@@ -118,7 +146,7 @@ export function useAiAssistantChat() {
   }
 
   async function confirmPendingAction() {
-    if (!pendingAction || loading) return
+    if (!pendingAction || !pendingActionId || loading) return
 
     setError(null)
     setLoading(true)
@@ -130,7 +158,8 @@ export function useAiAssistantChat() {
       const result = await sendRecruiterAssistantMessage(
         {
           message: ASSISTANT_CONFIRM_MESSAGE,
-          pendingAction,
+          pendingActionId,
+          ...(sessionId ? { sessionId } : {}),
         },
         { signal: abortController.signal },
       )
@@ -138,6 +167,8 @@ export function useAiAssistantChat() {
 
       const applied = applyAssistantResult(result, t)
       setPendingAction(applied.pendingAction)
+      setPendingActionId(applied.pendingActionId)
+      if (applied.sessionId) setSessionId(applied.sessionId)
       if (applied.error) setError(applied.error)
       appendMessage({
         role: 'assistant',
@@ -156,6 +187,7 @@ export function useAiAssistantChat() {
 
   function dismissPendingAction() {
     setPendingAction(null)
+    setPendingActionId(null)
   }
 
   function appendMessage(message: Omit<AiAssistantChatMessage, 'id'>) {

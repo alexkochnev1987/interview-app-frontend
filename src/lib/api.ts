@@ -184,9 +184,12 @@ export type RecruiterAssistantCreatePendingAction =
   Schemas['RecruiterAssistantCreatePendingActionDto']
 export type RecruiterAssistantAssignHrPendingAction =
   Schemas['RecruiterAssistantAssignHrPendingActionDto']
+export type RecruiterAssistantCreateSingleQuestionPendingAction =
+  Schemas['RecruiterAssistantCreateSingleQuestionPendingActionDto']
 export type RecruiterAssistantPendingAction =
   | RecruiterAssistantCreatePendingAction
   | RecruiterAssistantAssignHrPendingAction
+  | RecruiterAssistantCreateSingleQuestionPendingAction
 export type RecruiterAssistantSuggestedQuestion = Schemas['RecruiterAssistantSuggestedQuestionDto']
 export type RecruiterAssistantInterviewSummary = Schemas['RecruiterAssistantInterviewSummaryDto']
 export type RecruiterAssistantReviewState = Schemas['RecruiterAssistantReviewStateDto']
