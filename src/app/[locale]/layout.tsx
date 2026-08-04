@@ -4,6 +4,7 @@ import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server
 import { notFound } from 'next/navigation'
 
 import { HtmlLangSync } from '@/components/app/html-lang-sync'
+import { ThemeSync } from '@/components/app/theme-sync'
 import { DemoModeBanner } from '@/components/demo/demo-mode-banner'
 import { AppMain, AppShellRoot } from '@/components/ui/app-shell'
 import { Toaster } from '@/components/ui/toaster'
@@ -56,6 +57,7 @@ export default async function LocaleLayout({
   return (
     <>
       <HtmlLangSync lang={htmlLang} />
+      <ThemeSync />
       <NextIntlClientProvider locale={locale} messages={messages}>
         <AppQueryClientProvider>
           <AuthProvider initialUser={session.user}>

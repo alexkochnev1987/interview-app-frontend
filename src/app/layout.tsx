@@ -7,6 +7,7 @@ import { AppBody } from '@/components/ui/app-shell'
 import { resolveHtmlLang } from '@/i18n/html-lang'
 import type { Locale } from '@/i18n/locales'
 import { routing } from '@/i18n/routing'
+import { getEnvTheme } from '@/lib/theme'
 
 // oxlint-disable-next-line import/no-unassigned-import
 import './globals.css'
@@ -20,9 +21,15 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     }
   } catch {}
   const htmlLang = resolveHtmlLang(resolvedLocale)
+  const envTheme = getEnvTheme()
 
   return (
-    <html lang={htmlLang} suppressHydrationWarning data-scroll-behavior="smooth">
+    <html
+      lang={htmlLang}
+      data-theme={envTheme}
+      suppressHydrationWarning
+      data-scroll-behavior="smooth"
+    >
       <AppBody>
         <ThemeProvider
           attribute="class"

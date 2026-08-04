@@ -159,13 +159,19 @@
     --card-foreground: 195 7.4% 10.6%;
     --popover: 0 0% 100%;
     --popover-foreground: 195 7.4% 10.6%;
-    --primary: 360 61% 48%;
+    /* Brand Theme Base Channels (Default: Innowise Red) */
+    --primary-h: 360;
+    --primary-s: 61%;
+    --primary-l: 48%;
+
+    /* Dynamic Brand Computations (Light Mode) */
+    --primary: var(--primary-h) var(--primary-s) var(--primary-l);
     --primary-foreground: 0 0% 100%;
-    --primary-container: 360 61% 42%;
-    --primary-fixed: 360 100% 94%;
-    --secondary: 360 61% 48%;
-    --secondary-foreground: 0 0% 100%;
-    --secondary-fixed: 360 100% 94%;
+    --primary-container: var(--primary-h) var(--primary-s) calc(var(--primary-l) - 6%);
+    --primary-fixed: var(--primary-h) 100% 94%;
+    --secondary: var(--primary);
+    --secondary-foreground: var(--primary-foreground);
+    --secondary-fixed: var(--primary-fixed);
     --muted: 0 0% 93.3%;
     --muted-foreground: 244 10.4% 30.2%;
     --accent: 0 0% 90%;
@@ -186,7 +192,7 @@
     --scrim: 222 47% 11%;
     --border: 0 0% 88%;
     --input: 0 0% 88%;
-    --ring: 360 61% 48%;
+    --ring: var(--primary);
     --surface-low: 0 0% 96%;
     --radius: 0.875rem;
     --shadow-soft: 0 18px 40px rgba(17, 24, 39, 0.08);
@@ -229,13 +235,14 @@
     --card-foreground: 0 0% 95%;
     --popover: 0 0% 19%;
     --popover-foreground: 0 0% 95%;
-    --primary: 360 61% 48%;
+    /* Dynamic Brand Computations (Dark Mode) */
+    --primary: var(--primary-h) var(--primary-s) var(--primary-l);
     --primary-foreground: 0 0% 100%;
-    --primary-container: 360 50% 38%;
-    --primary-fixed: 360 40% 24%;
-    --secondary: 360 61% 48%;
-    --secondary-foreground: 0 0% 100%;
-    --secondary-fixed: 360 40% 24%;
+    --primary-container: var(--primary-h) var(--primary-s) calc(var(--primary-l) - 10%);
+    --primary-fixed: var(--primary-h) 40% 24%;
+    --secondary: var(--primary);
+    --secondary-foreground: var(--primary-foreground);
+    --secondary-fixed: var(--primary-fixed);
     --muted: 0 0% 27%;
     --muted-foreground: 0 0% 72%;
     --accent: 0 0% 27%;
@@ -256,7 +263,7 @@
     --scrim: 0 0% 0%;
     --border: 0 0% 38%;
     --input: 0 0% 38%;
-    --ring: 360 61% 48%;
+    --ring: var(--primary);
     --surface-low: 0 0% 18%;
     --shadow-soft: 0 20px 50px rgba(0, 0, 0, 0.35);
     --shadow-float: 0 26px 70px rgba(0, 0, 0, 0.45);
@@ -290,9 +297,76 @@
     --pill-orange-border: 25 40% 30%;
   }
 
+  /* Theme Palette Definitions (Light Mode) */
+  :root,
+  [data-theme='innowise'] {
+    --primary-h: 360;
+    --primary-s: 61%;
+    --primary-l: 48%;
+  }
+
+  [data-theme='red'] {
+    --primary-h: 0;
+    --primary-s: 72%;
+    --primary-l: 51%;
+  }
+
+  [data-theme='blue'] {
+    --primary-h: 221;
+    --primary-s: 83%;
+    --primary-l: 53%;
+  }
+
+  [data-theme='purple'] {
+    --primary-h: 262;
+    --primary-s: 83%;
+    --primary-l: 58%;
+  }
+
+  /* Theme Palette Definitions (Dark Mode) */
+  .dark,
+  .dark[data-theme='innowise'] {
+    --primary-h: 360;
+    --primary-s: 61%;
+    --primary-l: 48%;
+  }
+
+  .dark[data-theme='red'] {
+    --primary-h: 0;
+    --primary-s: 84%;
+    --primary-l: 60%;
+  }
+
+  .dark[data-theme='blue'] {
+    --primary-h: 217;
+    --primary-s: 91%;
+    --primary-l: 60%;
+  }
+
+  .dark[data-theme='purple'] {
+    --primary-h: 263;
+    --primary-s: 90%;
+    --primary-l: 66%;
+  }
+
   * {
     border-color: hsl(var(--border));
     outline-color: hsl(var(--ring) / 0.5);
+  }
+
+  [data-sonner-toaster] {
+    --normal-bg: hsl(var(--card));
+    --normal-border: hsl(var(--border));
+    --normal-text: hsl(var(--card-foreground));
+    --success-bg: hsl(var(--success-soft));
+    --success-border: hsl(var(--success-soft-border));
+    --success-text: hsl(var(--success-soft-foreground));
+    --error-bg: hsl(var(--danger-soft));
+    --error-border: hsl(var(--danger-soft-border));
+    --error-text: hsl(var(--danger-soft-foreground));
+    --warning-bg: hsl(var(--warning-soft));
+    --warning-border: hsl(var(--warning-soft-border));
+    --warning-text: hsl(var(--warning-soft-foreground));
   }
 
   html {
