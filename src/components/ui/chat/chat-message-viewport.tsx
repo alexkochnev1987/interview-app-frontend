@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from 'class-variance-authority'
-import * as React from 'react'
+import { ComponentProps } from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -20,6 +20,6 @@ export function ChatMessageViewport({
   className,
   size,
   ...props
-}: React.ComponentProps<'div'> & VariantProps<typeof chatMessageViewportVariants>) {
+}: ComponentProps<'div'> & VariantProps<typeof chatMessageViewportVariants>) {
   return <div className={cn(chatMessageViewportVariants({ size }), className)} {...props} />
 }

@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from 'class-variance-authority'
-import * as React from 'react'
+import { ComponentProps } from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -19,6 +19,6 @@ export function ChatComposerBar({
   className,
   tone,
   ...props
-}: React.ComponentProps<'div'> & VariantProps<typeof chatComposerBarVariants>) {
+}: ComponentProps<'div'> & VariantProps<typeof chatComposerBarVariants>) {
   return <div className={cn(chatComposerBarVariants({ tone }), className)} {...props} />
 }
