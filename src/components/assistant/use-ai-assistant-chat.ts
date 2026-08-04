@@ -130,7 +130,7 @@ export function useAiAssistantChat() {
       const result = await sendRecruiterAssistantMessage(
         {
           message: ASSISTANT_CONFIRM_MESSAGE,
-          pendingActionId: pendingAction?.id,
+          pendingAction,
         },
         { signal: abortController.signal },
       )
