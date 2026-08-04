@@ -3,6 +3,8 @@ import { hasLocale, NextIntlClientProvider } from 'next-intl'
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 
+import { AssistantChatMount } from '@/components/assistant/assistant-chat-mount'
+import { AssistantChatProvider } from '@/components/assistant/assistant-chat-provider'
 import { DemoModeBanner } from '@/components/demo/demo-mode-banner'
 import { AppBody } from '@/components/ui/app-shell'
 import { AppMain, AppShellRoot } from '@/components/ui/app-shell'
@@ -59,18 +61,21 @@ export default async function LocaleLayout({
         <NextIntlClientProvider locale={locale} messages={messages}>
           <AppQueryClientProvider>
             <AuthProvider initialUser={session.user}>
-              <OnboardingProvider>
-                <TooltipProvider>
-                  <AppShellRoot>
-                    <SideNav />
-                    <AppMain>
-                      <DemoModeBanner />
-                      {children}
-                    </AppMain>
-                  </AppShellRoot>
-                  <Toaster />
-                </TooltipProvider>
-              </OnboardingProvider>
+              <AssistantChatProvider>
+                <OnboardingProvider>
+                  <TooltipProvider>
+                    <AppShellRoot>
+                      <SideNav />
+                      <AppMain>
+                        <DemoModeBanner />
+                        {children}
+                      </AppMain>
+                    </AppShellRoot>
+                    <AssistantChatMount />
+                    <Toaster />
+                  </TooltipProvider>
+                </OnboardingProvider>
+              </AssistantChatProvider>
             </AuthProvider>
           </AppQueryClientProvider>
         </NextIntlClientProvider>

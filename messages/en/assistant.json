@@ -1,0 +1,119 @@
+{
+  "assistant": {
+    "name": "Herman",
+    "closeAriaLabel": "Close Herman",
+    "bubbleLabel": "Herman",
+    "sendAriaLabel": "Send message",
+    "loading": "Working...",
+    "errors": {
+      "requestFailed": "Something went wrong. Please try again.",
+      "missingPendingAction": "This action needs confirmation, but the details were not returned. Please try again."
+    },
+    "denial": {
+      "refusedTitle": "I can't help with that",
+      "deniedTitle": "You don't have access",
+      "escalateHint": "Contact your {role} to request access."
+    },
+    "status": {
+      "executedTitle": "Done",
+      "online": "Online"
+    },
+    "input": {
+      "placeholder": {
+        "hr": "Ask about your interviews, reviews, or creating an interview…",
+        "candidate": "Ask whether you have an interview, its status, or schedule…",
+        "admin": "Ask about unassigned interviews, filters, or assigning HR…",
+        "super_admin": "Ask about interviews, assignments, questions, or org-wide data…"
+      }
+    },
+    "welcome": {
+      "intro": "Hi, I'm Herman, your AI hiring assistant.",
+      "lead": "Here's what I can help you with:",
+      "items": {
+        "myInterviews": "List interviews you own or are assigned to",
+        "readyForReview": "Find interviews ready for your review",
+        "interviewStatus": "Check status and details for your interviews",
+        "createFlow": "Prepare questions and create interviews (with your confirmation)",
+        "hasInterview": "Check whether you have an interview",
+        "candidateStatus": "Check the status of your interview",
+        "reviewed": "See if your interview has been reviewed",
+        "schedule": "Share when and where your interview is, or your candidate link",
+        "unassigned": "List unassigned interviews",
+        "filters": "Filter interviews by status, HR, and other app filters",
+        "assignHr": "Assign an interview to an HR reviewer (with your confirmation)",
+        "orgQueries": "Answer broader interview, question, and team queries in your org"
+      }
+    },
+    "confirm": {
+      "title": "Pending confirmation",
+      "createInterview": "Create missing questions and create the interview.",
+      "createQuestions": "Create the missing questions from this suggested set.",
+      "assignHr": "Assign this interview to the selected HR reviewer.",
+      "action": "Confirm action",
+      "userMessage": "Confirm",
+      "cancel": "Cancel",
+      "noPermission": "You don't have permission to confirm this action.",
+      "details": {
+        "interview": "Interview",
+        "hrReviewer": "HR reviewer",
+        "position": "Position",
+        "candidate": "Candidate",
+        "candidateEmail": "Candidate email",
+        "interviewLocale": "Interview language",
+        "interviewId": "Interview ID",
+        "assignedHrId": "HR reviewer ID",
+        "questions": "Questions",
+        "questionsSummary": "{total} total ({newCount} new)"
+      }
+    },
+    "questionPlan": {
+      "title": "Question plan",
+      "empty": "Suggested and matched questions will appear here after you send a request.",
+      "summary": "{existing} matched in the question bank, {missing} need creation.",
+      "newBadge": "New",
+      "existingBadge": "Existing"
+    },
+    "createdInterview": {
+      "openLink": "Open candidate link"
+    },
+    "interviewList": {
+      "heading": "Interviews",
+      "viewDetail": "View details",
+      "progress": "{submitted}/{total} answered"
+    },
+    "interviewSummary": {
+      "heading": "Interview",
+      "statusLabel": "Status",
+      "reviewed": "Reviewed",
+      "notReviewed": "Not reviewed yet",
+      "outcome": "Outcome",
+      "shareLinkActive": "Feedback link active",
+      "shareLinkInactive": "Feedback link inactive",
+      "viewDetail": "View details",
+      "openCandidateLink": "Open your interview link"
+    },
+    "prompts": {
+      "hr": {
+        "myInterviews": "Show my interviews",
+        "readyForReview": "Show interviews ready for my review",
+        "createInterview": "Help me prepare questions and create an interview"
+      },
+      "candidate": {
+        "hasInterview": "Do I have an interview?",
+        "status": "What is the status of my interview?",
+        "reviewed": "Has my interview been reviewed?"
+      },
+      "admin": {
+        "unassigned": "Show unassigned interviews",
+        "byStatus": "Show completed interviews",
+        "assignHr": "Assign an interview to an HR reviewer"
+      },
+      "super_admin": {
+        "unassigned": "Show unassigned interviews",
+        "byStatus": "Show interviews by status",
+        "assignHr": "Assign an interview to an HR reviewer",
+        "orgOverview": "Summarize interview activity in my org"
+      }
+    }
+  }
+}
