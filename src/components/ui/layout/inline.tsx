@@ -41,6 +41,13 @@ const inlineVariants = cva('flex flex-row', {
       none: '',
       fill: 'min-h-0 min-w-0 flex-1 basis-[min(100%,14rem)]',
     },
+    visibility: {
+      always: '',
+      'below-sm': 'sm:hidden',
+      'sm-up': 'hidden sm:flex',
+      'below-lg': 'lg:hidden',
+      'lg-up': 'hidden lg:flex',
+    },
   },
   defaultVariants: {
     gap: 4,
@@ -49,6 +56,7 @@ const inlineVariants = cva('flex flex-row', {
     wrap: 'nowrap',
     width: 'auto',
     grow: 'none',
+    visibility: 'always',
   },
 })
 
@@ -66,13 +74,17 @@ export function Inline({
   wrap,
   width,
   grow,
+  visibility,
   ...props
 }: InlineProps) {
   const Comp = (as ?? 'div') as React.ElementType
 
   return (
     <Comp
-      className={cn(inlineVariants({ gap, align, justify, wrap, width, grow }), className)}
+      className={cn(
+        inlineVariants({ gap, align, justify, wrap, width, grow, visibility }),
+        className,
+      )}
       {...props}
     />
   )

@@ -34,7 +34,7 @@ const gridVariants = cva('grid', {
         'grid-cols-1 min-h-0 lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-stretch lg:[&>*]:min-h-0',
       'assistant-chat': 'min-h-0 grid-cols-[minmax(0,1fr)_22.5rem] items-stretch [&>*]:min-h-0',
       'aside-22-left':
-        'grid-cols-1 min-h-0 xl:grid-cols-[20rem_minmax(0,1fr)] xl:items-start xl:[&>*]:min-h-0',
+        'grid-cols-1 min-h-0 lg:grid-cols-[20rem_minmax(0,1fr)] lg:items-start lg:[&>*]:min-h-0',
       'login-shell': 'grid-cols-1 lg:grid-cols-[1.1fr_420px] lg:items-center',
       'editor-2': 'grid-cols-1 xl:grid-cols-2',
       'identity-4': 'grid-cols-1 lg:grid-cols-2 xl:grid-cols-4',
