@@ -2,10 +2,10 @@
 
 import { Send } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { type KeyboardEvent, useEffect, useRef } from 'react'
+import { type KeyboardEvent, useEffect, useRef, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
-import { ChatComposerBar, ChatMessageViewport } from '@/components/ui/chat'
+import { ChatComposerBar, ChatMessageViewport, ChatReplyAnnouncer } from '@/components/ui/chat'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText } from '@/components/ui/text'
@@ -35,6 +35,8 @@ export function AiAssistantChat() {
   const t = useTranslations('assistant')
   const showPrompts = !messages.some((message) => message.role === 'user')
   const bottomRef = useRef<HTMLDivElement>(null)
+  const lastAnnouncedIdRef = useRef<string | null>(null)
+  const [announcement, setAnnouncement] = useState('')
 
   useEffect(() => {
     if (!open) return
@@ -45,6 +47,16 @@ export function AiAssistantChat() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
   }, [messages, loading])
 
+  useEffect(() => {
+    if (loading) return
+
+    const latestAssistant = messages.toReversed().find((message) => message.role === 'assistant')
+    if (!latestAssistant || latestAssistant.id === lastAnnouncedIdRef.current) return
+
+    lastAnnouncedIdRef.current = latestAssistant.id
+    setAnnouncement(latestAssistant.text)
+  }, [loading, messages])
+
   function handleComposerKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
     if (event.key !== 'Enter' || event.shiftKey) return
     event.preventDefault()
@@ -53,6 +65,7 @@ export function AiAssistantChat() {
 
   return (
     <>
+      <ChatReplyAnnouncer>{announcement}</ChatReplyAnnouncer>
       <Stack gap={0} grow="fill" height="full">
         <ChatMessageViewport size="widget">
           <Stack gap={3}>

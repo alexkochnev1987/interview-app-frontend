@@ -1,3 +1,4 @@
+export * from './chat-reply-announcer'
 export * from './chat-composer-bar'
 export * from './chat-message-bubble'
 export * from './chat-result-card'

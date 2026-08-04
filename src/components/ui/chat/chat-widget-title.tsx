@@ -40,10 +40,18 @@ type ChatWidgetTitleProps = VariantProps<typeof chatWidgetTitleIconVariants> & {
   name: string
   status: string
   icon: ReactNode
+  titleId?: string
   className?: string
 }
 
-export function ChatWidgetTitle({ name, status, icon, size, className }: ChatWidgetTitleProps) {
+export function ChatWidgetTitle({
+  name,
+  status,
+  icon,
+  size,
+  titleId,
+  className,
+}: ChatWidgetTitleProps) {
   return (
     <Inline gap={3} align="center" className={className}>
       <div className={cn(chatWidgetTitleIconVariants({ size }))}>
@@ -51,7 +59,7 @@ export function ChatWidgetTitle({ name, status, icon, size, className }: ChatWid
         <span className={chatWidgetTitleStatusDotVariants({ size })} aria-hidden />
       </div>
       <Stack gap={0}>
-        <BodyText as="span" size="sm-tight" weight="semibold" tone="foreground">
+        <BodyText as="span" id={titleId} size="sm-tight" weight="semibold" tone="foreground">
           {name}
         </BodyText>
         <BodyText as="span" size="xs" tone="muted">

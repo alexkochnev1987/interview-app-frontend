@@ -1,5 +1,7 @@
 'use client'
 
+// oxlint-disable jsx-a11y/prefer-tag-over-role
+import { FocusScope } from '@radix-ui/react-focus-scope'
 import { cva, type VariantProps } from 'class-variance-authority'
 import * as React from 'react'
 
@@ -32,6 +34,8 @@ const chatWidgetShellVariants = cva(
 type ChatWidgetShellProps = React.ComponentProps<'div'> &
   VariantProps<typeof chatWidgetShellVariants> & {
     closing?: boolean
+    titleId?: string
+    trapped?: boolean
   }
 
 export function ChatWidgetShell({
@@ -40,10 +44,15 @@ export function ChatWidgetShell({
   corner,
   size,
   closing = false,
+  titleId,
+  trapped = false,
   ...props
 }: ChatWidgetShellProps) {
   return (
     <Card
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={titleId}
       variant="chatWidget"
       size="flush"
       height="full"
@@ -53,7 +62,14 @@ export function ChatWidgetShell({
       )}
       {...props}
     >
-      {children}
+      <FocusScope
+        trapped={trapped}
+        loop
+        className="flex h-full min-h-0 w-full flex-col"
+        onMountAutoFocus={(event) => event.preventDefault()}
+      >
+        {children}
+      </FocusScope>
     </Card>
   )
 }

@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
 import { AiAssistantChat } from '@/components/assistant/ai-assistant-chat'
+import { ASSISTANT_CHAT_WIDGET_TITLE_ID } from '@/components/assistant/assistant-api-contract'
 import {
   useAssistantChatSession,
   useAssistantChatShell,
@@ -66,11 +67,16 @@ export function AssistantChatWidget() {
   return (
     <>
       <ChatWidgetBackdrop closing={closing} />
-      <ChatWidgetShell closing={closing}>
+      <ChatWidgetShell
+        closing={closing}
+        titleId={ASSISTANT_CHAT_WIDGET_TITLE_ID}
+        trapped={open && !pendingAction}
+      >
         <Stack gap={0} grow="fill" height="full">
           <ChatWidgetHeader>
             <Inline justify="between" align="center">
               <ChatWidgetTitle
+                titleId={ASSISTANT_CHAT_WIDGET_TITLE_ID}
                 name={t('name')}
                 status={t('status.online')}
                 icon={
