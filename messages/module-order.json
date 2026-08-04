@@ -1,6 +1,7 @@
 [
   "common",
   "nav",
+  "assistant",
   "login",
   "dashboard",
   "questions",

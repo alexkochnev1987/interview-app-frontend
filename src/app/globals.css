@@ -190,13 +190,22 @@
     --success-soft-border: 152 60% 76%;
     --success-soft-foreground: 154 65% 18%;
     --scrim: 222 47% 11%;
-    --border: 0 0% 88%;
-    --input: 0 0% 88%;
-    --ring: var(--primary);
-    --surface-low: 0 0% 96%;
+    --border: 249 20.4% 80.8%;
+    --input: 249 20.4% 80.8%;
+    --ring: 243 74% 57.8%;
+    --surface-low: 210 9.1% 95.7%;
+    --surface-high: 210 4.3% 91%;
+    --surface-highest: 200 5.3% 88.8%;
+    --ink-muted: 244 10.4% 30.2%;
+    --tertiary: 23 100% 24.7%;
+    --tertiary-container: 24 100% 32.2%;
     --radius: 0.875rem;
     --shadow-soft: 0 18px 40px rgba(17, 24, 39, 0.08);
     --shadow-float: 0 26px 60px rgba(17, 24, 39, 0.12);
+    --shadow-chat-widget:
+      0 0 0 1px hsl(var(--primary) / 0.22), 0 0 10px hsl(var(--primary) / 0.34),
+      0 0 22px hsl(var(--primary) / 0.22), 0 0 36px hsl(var(--primary) / 0.12),
+      0 28px 64px rgba(17, 24, 39, 0.28), 0 12px 32px rgba(17, 24, 39, 0.18);
     --transition: 180ms ease;
 
     --pill-amber: 23 82% 31%;
@@ -267,6 +276,10 @@
     --surface-low: 0 0% 18%;
     --shadow-soft: 0 20px 50px rgba(0, 0, 0, 0.35);
     --shadow-float: 0 26px 70px rgba(0, 0, 0, 0.45);
+    --shadow-chat-widget:
+      0 0 0 1px hsl(var(--primary) / 0.28), 0 0 12px hsl(var(--primary) / 0.38),
+      0 0 26px hsl(var(--primary) / 0.26), 0 0 42px hsl(var(--primary) / 0.14),
+      0 32px 76px rgba(0, 0, 0, 0.62), 0 14px 36px rgba(0, 0, 0, 0.44);
 
     --pill-amber: 23 90% 75%;
     --pill-amber-bg: 23 35% 20%;

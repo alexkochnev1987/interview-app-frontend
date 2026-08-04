@@ -1,0 +1,119 @@
+{
+  "assistant": {
+    "name": "Herman",
+    "closeAriaLabel": "Zamknij Hermana",
+    "bubbleLabel": "Herman",
+    "sendAriaLabel": "Wyślij wiadomość",
+    "loading": "Przetwarzanie...",
+    "errors": {
+      "requestFailed": "Coś poszło nie tak. Spróbuj ponownie.",
+      "missingPendingAction": "To działanie wymaga potwierdzenia, ale szczegóły nie zostały zwrócone. Spróbuj ponownie."
+    },
+    "denial": {
+      "refusedTitle": "Nie mogę w tym pomóc",
+      "deniedTitle": "Nie masz dostępu",
+      "escalateHint": "Skontaktuj się ze swoim {role}, aby uzyskać dostęp."
+    },
+    "status": {
+      "executedTitle": "Gotowe",
+      "online": "Online"
+    },
+    "input": {
+      "placeholder": {
+        "hr": "Zapytaj o swoje interview, recenzje lub tworzenie interview…",
+        "candidate": "Zapytaj, czy masz interview, jaki jest jego status lub termin…",
+        "admin": "Zapytaj o nieprzypisane interview, filtry lub przypisywanie HR…",
+        "super_admin": "Zapytaj o interview, przypisania, pytania lub dane całej organizacji…"
+      }
+    },
+    "welcome": {
+      "intro": "Cześć, jestem Herman, Twoim asystentem AI ds. rekrutacji.",
+      "lead": "Oto, w czym mogę pomóc:",
+      "items": {
+        "myInterviews": "Wyświetl interview, których jesteś właścicielem lub do których jesteś przypisany",
+        "readyForReview": "Znajdź interview gotowe do oceny",
+        "interviewStatus": "Sprawdź status i szczegóły swoich interview",
+        "createFlow": "Przygotuj pytania i utwórz interview (po Twoim potwierdzeniu)",
+        "hasInterview": "Sprawdź, czy masz interview",
+        "candidateStatus": "Sprawdź status swojego interview",
+        "reviewed": "Sprawdź, czy Twoje interview zostało ocenione",
+        "schedule": "Pokaż termin i miejsce interview lub link dla kandydata",
+        "unassigned": "Wyświetl nieprzypisane interview",
+        "filters": "Filtruj interview według statusu, HR i innych filtrów aplikacji",
+        "assignHr": "Przypisz interview do pracownika HR (po Twoim potwierdzeniu)",
+        "orgQueries": "Odpowiedz na pytania dotyczące interview, pytań i zespołu w organizacji"
+      }
+    },
+    "confirm": {
+      "title": "Oczekuje na potwierdzenie",
+      "createInterview": "Utwórz brakujące pytania, a następnie utwórz interview.",
+      "createQuestions": "Utwórz brakujące pytania z tego sugerowanego zestawu.",
+      "assignHr": "Przypisz to interview do wybranego pracownika HR.",
+      "action": "Potwierdź działanie",
+      "userMessage": "Potwierdź",
+      "cancel": "Anuluj",
+      "noPermission": "Nie masz uprawnień do potwierdzenia tego działania.",
+      "details": {
+        "interview": "Interview",
+        "hrReviewer": "Pracownik HR",
+        "position": "Stanowisko",
+        "candidate": "Kandydat",
+        "candidateEmail": "E-mail kandydata",
+        "interviewLocale": "Język interview",
+        "interviewId": "ID interview",
+        "assignedHrId": "ID pracownika HR",
+        "questions": "Pytania",
+        "questionsSummary": "{total} łącznie ({newCount} nowych)"
+      }
+    },
+    "questionPlan": {
+      "title": "Plan pytań",
+      "empty": "Sugerowane i dopasowane pytania pojawią się tutaj po wysłaniu zapytania.",
+      "summary": "{existing} znaleziono w bazie pytań, {missing} wymaga utworzenia.",
+      "newBadge": "Nowe",
+      "existingBadge": "Istniejące"
+    },
+    "createdInterview": {
+      "openLink": "Otwórz link dla kandydata"
+    },
+    "interviewList": {
+      "heading": "Interview",
+      "viewDetail": "Szczegóły",
+      "progress": "{submitted}/{total} odpowiedzi"
+    },
+    "interviewSummary": {
+      "heading": "Interview",
+      "statusLabel": "Status",
+      "reviewed": "Ocenione",
+      "notReviewed": "Jeszcze nie ocenione",
+      "outcome": "Wynik",
+      "shareLinkActive": "Link do feedbacku aktywny",
+      "shareLinkInactive": "Link do feedbacku nieaktywny",
+      "viewDetail": "Szczegóły",
+      "openCandidateLink": "Otwórz link do interview"
+    },
+    "prompts": {
+      "hr": {
+        "myInterviews": "Pokaż moje interview",
+        "readyForReview": "Pokaż interview gotowe do oceny",
+        "createInterview": "Pomóż mi przygotować pytania i utworzyć interview"
+      },
+      "candidate": {
+        "hasInterview": "Czy mam interview?",
+        "status": "Jaki jest status mojego interview?",
+        "reviewed": "Czy moje interview zostało ocenione?"
+      },
+      "admin": {
+        "unassigned": "Pokaż nieprzypisane interview",
+        "byStatus": "Pokaż ukończone interview",
+        "assignHr": "Przypisz interview do pracownika HR"
+      },
+      "super_admin": {
+        "unassigned": "Pokaż nieprzypisane interview",
+        "byStatus": "Pokaż interview według statusu",
+        "assignHr": "Przypisz interview do pracownika HR",
+        "orgOverview": "Podsumuj aktywność interview w organizacji"
+      }
+    }
+  }
+}
