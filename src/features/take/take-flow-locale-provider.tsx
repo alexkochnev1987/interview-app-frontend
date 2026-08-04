@@ -2,7 +2,7 @@
 
 import { NextIntlClientProvider, useLocale, useMessages } from 'next-intl'
 import { useSearchParams } from 'next/navigation'
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 
 import { resolveHtmlLang } from '@/i18n/html-lang'
 import { DEFAULT_LOCALE, LOCALES, type Locale } from '@/i18n/locales'
@@ -61,6 +61,27 @@ function pickTakeFlowMessages(fullMessages: TakeFlowMessages): TakeFlowMessages 
 
 function isCompleteTakeFlowMessages(messages: TakeFlowMessages): boolean {
   return 'takeFlow' in messages && 'toast' in messages && 'apiErrors' in messages
+}
+
+function resolveImmediateTakeFlowMessages(
+  effectiveLocale: Locale,
+  parentLocale: Locale,
+  parentMessages: TakeFlowMessages,
+): TakeFlowMessages | null {
+  const cached = takeFlowMessagesCache.get(effectiveLocale)
+  if (cached && isCompleteTakeFlowMessages(cached)) {
+    return cached
+  }
+
+  if (effectiveLocale === parentLocale) {
+    const seeded = pickTakeFlowMessages(parentMessages)
+    if (isCompleteTakeFlowMessages(seeded)) {
+      takeFlowMessagesCache.set(effectiveLocale, seeded)
+      return seeded
+    }
+  }
+
+  return null
 }
 
 async function loadTakeFlowLocaleMessages(locale: Locale): Promise<TakeFlowMessages> {
@@ -132,29 +153,33 @@ function TakeFlowLocaleProviderInner({
   const effectiveLocale = interviewLocale ?? parentLocale
   const localeLocked = interviewLocale !== null
 
-  const [locale, setLocale] = useState<Locale>(effectiveLocale)
-  const [messages, setMessages] = useState(parentMessages)
+  const immediateMessages = useMemo(
+    () =>
+      resolveImmediateTakeFlowMessages(
+        effectiveLocale,
+        parentLocale,
+        parentMessages as TakeFlowMessages,
+      ),
+    [effectiveLocale, parentLocale, parentMessages],
+  )
+
+  const [loadedMessages, setLoadedMessages] = useState<{
+    locale: Locale
+    messages: TakeFlowMessages
+  } | null>(null)
   const localeApplyGenerationRef = useRef(0)
 
-  useEffect(() => {
-    if (effectiveLocale === parentLocale) {
-      const seeded = pickTakeFlowMessages(parentMessages as TakeFlowMessages)
-      if (isCompleteTakeFlowMessages(seeded)) {
-        takeFlowMessagesCache.set(parentLocale, seeded)
-      }
-    }
-  }, [effectiveLocale, parentLocale, parentMessages])
+  const activeMessages =
+    immediateMessages ??
+    (loadedMessages?.locale === effectiveLocale ? loadedMessages.messages : null)
+  const locale = activeMessages ? effectiveLocale : parentLocale
+  const messages = activeMessages ?? (parentMessages as TakeFlowMessages)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const generation = ++localeApplyGenerationRef.current
     const searchQuery = searchParams.toString()
 
-    const applyLocale = (nextMessages: TakeFlowMessages) => {
-      if (generation !== localeApplyGenerationRef.current) {
-        return
-      }
-      setLocale(effectiveLocale)
-      setMessages(nextMessages)
+    const applySideEffects = () => {
       setClientApiLocale(effectiveLocale)
       if (localeLocked) {
         replaceTakeFlowUrlLocale(effectiveLocale, searchQuery)
@@ -163,26 +188,19 @@ function TakeFlowLocaleProviderInner({
       }
     }
 
-    const cachedMessages = takeFlowMessagesCache.get(effectiveLocale)
-    if (cachedMessages && isCompleteTakeFlowMessages(cachedMessages)) {
-      applyLocale(cachedMessages)
+    if (activeMessages) {
+      applySideEffects()
       return
-    }
-
-    if (effectiveLocale === parentLocale) {
-      const seeded = pickTakeFlowMessages(parentMessages as TakeFlowMessages)
-      if (isCompleteTakeFlowMessages(seeded)) {
-        takeFlowMessagesCache.set(effectiveLocale, seeded)
-        applyLocale(seeded)
-        return
-      }
     }
 
     // eslint-disable-next-line promise/always-return
     void loadTakeFlowLocaleMessages(effectiveLocale).then((nextMessages) => {
-      applyLocale(nextMessages)
+      if (generation !== localeApplyGenerationRef.current) {
+        return
+      }
+      setLoadedMessages({ locale: effectiveLocale, messages: nextMessages })
     })
-  }, [effectiveLocale, localeLocked, parentLocale, parentMessages, searchParams])
+  }, [activeMessages, effectiveLocale, localeLocked, searchParams])
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>

@@ -1,8 +1,8 @@
 'use client'
 
 import { AlertCircle } from 'lucide-react'
-import { useTranslations } from 'next-intl'
-import { useCallback, useEffect, useState, type ReactNode } from 'react'
+import { useLocale, useTranslations } from 'next-intl'
+import { useCallback, useLayoutEffect, useState, type ReactNode } from 'react'
 
 import { PageContent, PageMainLayout, PageMainViewport } from '@/components/layout/page-shell'
 import {
@@ -53,6 +53,7 @@ export function TakeInterviewClient({
         id={id}
         candidateToken={candidateToken}
         initialInterview={initialInterview}
+        lockedLocale={interviewLocale}
         onInterviewLocale={setInterviewLocale}
       />
     </TakeFlowLocaleProvider>
@@ -60,6 +61,7 @@ export function TakeInterviewClient({
 }
 
 type TakeInterviewClientInnerProps = TakeInterviewClientProps & {
+  lockedLocale: Locale | null
   onInterviewLocale: (locale: Locale) => void
 }
 
@@ -67,11 +69,13 @@ function TakeInterviewClientInner({
   id,
   candidateToken = '',
   initialInterview,
+  lockedLocale,
   onInterviewLocale,
 }: TakeInterviewClientInnerProps) {
   const t = useTranslations('toast.pageGate.take')
   const tCommon = useTranslations('common')
   const tTake = useTranslations('takeFlow')
+  const uiLocale = useLocale() as Locale
 
   const takeMessage = useCallback(
     (key: TakeMessageKey, values?: TakeMessageValues) =>
@@ -145,12 +149,16 @@ function TakeInterviewClientInner({
     takeMessage,
   })
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!interview?.interviewLocale) {
       return
     }
-    onInterviewLocale(resolveTakeInterviewLocale(interview.interviewLocale))
-  }, [interview?.interviewLocale, onInterviewLocale])
+    const nextLocale = resolveTakeInterviewLocale(interview.interviewLocale)
+    if (nextLocale === lockedLocale) {
+      return
+    }
+    onInterviewLocale(nextLocale)
+  }, [interview?.interviewLocale, lockedLocale, onInterviewLocale])
 
   useTakeInterviewBeforeUnload(stage, takeMessage('beforeUnloadLeaveInterview'))
 
@@ -166,6 +174,13 @@ function TakeInterviewClientInner({
     ),
     [cameraStream],
   )
+
+  const targetInterviewLocale = interview?.interviewLocale
+    ? resolveTakeInterviewLocale(interview.interviewLocale)
+    : null
+  const awaitingLocaleLock =
+    targetInterviewLocale != null &&
+    (lockedLocale !== targetInterviewLocale || uiLocale !== targetInterviewLocale)
 
   if (error && !interview) {
     return (
@@ -185,7 +200,7 @@ function TakeInterviewClientInner({
     )
   }
 
-  if (stage === 'loading' || !interview) {
+  if (stage === 'loading' || !interview || awaitingLocaleLock) {
     return (
       <PageMainLayout>
         <LoadingStateCard label={tCommon('loading')} />
