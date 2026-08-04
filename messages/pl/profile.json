@@ -27,6 +27,10 @@
       "tooLarge": "Obraz musi być mniejszy niż 5 MB."
     },
     "preferences": {
+      "theme": "Motyw",
+      "themeSystem": "Systemowy",
+      "themeLight": "Jasny",
+      "themeDark": "Ciemny",
       "language": "Język",
       "productTour": "Przewodnik po produkcie"
     }

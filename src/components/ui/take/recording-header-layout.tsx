@@ -30,7 +30,7 @@ export function RecordingHeaderRow({ children }: { children: ReactNode }) {
     <Stack
       gap={3}
       width="full"
-      className={cn('min-h-0 [scrollbar-width:thin]', 'lg:flex-row lg:items-center')}
+      className={cn('min-h-0 scrollbar-thin', 'lg:flex-row lg:items-center')}
     >
       <Stack width="full" grow="fill" className="min-h-0 min-w-0 lg:min-h-0">
         {left}
@@ -72,7 +72,7 @@ export function RecordingHeaderShell({ children }: { children: ReactNode }) {
         'dark:bg-background',
       )}
     >
-      <div className="relative z-[1] w-full min-w-0">{children}</div>
+      <div className="relative z-1 w-full min-w-0">{children}</div>
     </Stack>
   )
 }

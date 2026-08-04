@@ -34,7 +34,7 @@ export function SortableTableHead({
         type="button"
         onClick={onSortClick}
         className={cn(
-          'group/sort inline-flex w-full items-center gap-1 text-[0.68rem] font-bold uppercase tracking-widest text-foreground/70 transition-colors hover:text-foreground focus-visible:text-foreground focus-visible:outline-none',
+          'group/sort inline-flex w-full items-center gap-1 text-[0.68rem] font-bold uppercase tracking-widest text-foreground/70 transition-colors hover:text-foreground focus-visible:text-foreground focus-visible:outline-hidden',
           align === 'right' && 'justify-end',
         )}
       >

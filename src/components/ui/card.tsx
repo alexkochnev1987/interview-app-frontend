@@ -4,7 +4,7 @@ import type { ComponentProps } from 'react'
 import { cn } from '@/lib/utils'
 
 const cardVariants = cva(
-  'group/card flex flex-col overflow-hidden rounded-xl text-sm text-card-foreground has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl',
+  'group/card flex flex-col overflow-hidden rounded-xl text-sm text-card-foreground has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:has-data-[slot=card-footer]:pb-0 [img:first-child]:*:rounded-t-xl [img:last-child]:*:rounded-b-xl',
   {
     variants: {
       variant: {
@@ -15,15 +15,15 @@ const cardVariants = cva(
         floatingSolid: 'border border-hairline-strong bg-card shadow-float',
         chatWidget:
           'border-2 border-[hsl(var(--primary)/0.42)] bg-card shadow-chat-widget ring-1 ring-inset ring-[hsl(var(--primary)/0.1)]',
-        recordingHero: 'border border-hairline-strong bg-white shadow-float',
+        recordingHero: 'border border-border bg-card shadow-float',
         metric:
           'relative isolate border border-hairline-strong bg-[linear-gradient(135deg,hsl(var(--card)/0.98),hsl(var(--surface-low)/0.58))] shadow-float after:pointer-events-none after:absolute after:-right-10 after:-top-10 after:size-24 after:rounded-full after:bg-[hsl(var(--primary)/0.08)] after:blur-2xl',
         tinted: 'border border-hairline-strong bg-surface-low-glass shadow-soft',
         warning: 'border border-warning-soft-border bg-warning-soft shadow-soft',
         'danger-soft':
-          'border border-danger-soft-border bg-danger-soft text-danger-soft-foreground shadow-soft [&_[data-slot=card-title]]:text-danger-soft-foreground [&_[data-slot=card-description]]:text-danger-soft-foreground/80',
+          'border border-danger-soft-border bg-danger-soft text-danger-soft-foreground shadow-soft **:data-[slot=card-title]:text-danger-soft-foreground **:data-[slot=card-description]:text-danger-soft-foreground/80',
         'scheduled-soft':
-          'border border-scheduled-soft-foreground bg-scheduled-soft text-scheduled-soft-foreground shadow-soft [&_[data-slot=card-title]]:text-scheduled-soft-foreground [&_[data-slot=card-description]]:text-scheduled-soft-foreground/80 [&_.text-muted-foreground]:text-scheduled-soft-foreground/75',
+          'border border-scheduled-soft-foreground bg-scheduled-soft text-scheduled-soft-foreground shadow-soft **:data-[slot=card-title]:text-scheduled-soft-foreground **:data-[slot=card-description]:text-scheduled-soft-foreground/80 [&_.text-muted-foreground]:text-scheduled-soft-foreground/75',
         ghost: 'bg-transparent',
       },
       size: {
@@ -37,7 +37,7 @@ const cardVariants = cva(
       },
       effects: {
         none: '',
-        blur: 'backdrop-blur-sm',
+        blur: 'backdrop-blur-xs',
         'blur-strong': 'backdrop-blur-xl',
       },
       interaction: {
@@ -59,11 +59,11 @@ const cardVariants = cva(
       },
       accent: {
         none: '',
-        primary: 'border-l-[4px] border-l-[hsl(var(--primary))]',
-        neutral: 'border-l-[4px] border-l-slate-300',
-        info: 'border-l-[4px] border-l-sky-300',
-        warning: 'border-l-[4px] border-l-amber-300',
-        success: 'border-l-[4px] border-l-emerald-300',
+        primary: 'border-l-4 border-l-[hsl(var(--primary))]',
+        neutral: 'border-l-4 border-l-slate-300',
+        info: 'border-l-4 border-l-sky-300',
+        warning: 'border-l-4 border-l-amber-300',
+        success: 'border-l-4 border-l-emerald-300',
       },
       flexChild: {
         default: '',
@@ -207,7 +207,7 @@ function CardHeader({
     <div
       data-slot="card-header"
       className={cn(
-        'group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-xl has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3',
+        'group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-xl has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-4 [.border-b]:group-data-[size=sm]/card:pb-3',
         cardHeaderInsetVariants({ inset }),
         cardHeaderSpacingVariants({ spacing }),
         className,
@@ -289,7 +289,7 @@ const cardContentInsetVariants = cva('', {
   variants: {
     inset: {
       card: 'px-4 group-data-[size=xs]/card:px-6 group-data-[size=sm]/card:px-3 group-data-[size=md]/card:px-5 group-data-[size=lg]/card:px-8 group-data-[size=state]/card:px-8',
-      none: '!px-0',
+      none: 'px-0!',
     },
   },
   defaultVariants: {

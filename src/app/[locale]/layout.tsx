@@ -2,11 +2,13 @@ import type { Metadata } from 'next'
 import { hasLocale, NextIntlClientProvider } from 'next-intl'
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
+import { ReactNode } from 'react'
 
+import { HtmlLangSync } from '@/components/app/html-lang-sync'
+import { ThemeSync } from '@/components/app/theme-sync'
 import { AssistantChatMount } from '@/components/assistant/assistant-chat-mount'
 import { AssistantChatProvider } from '@/components/assistant/assistant-chat-provider'
 import { DemoModeBanner } from '@/components/demo/demo-mode-banner'
-import { AppBody } from '@/components/ui/app-shell'
 import { AppMain, AppShellRoot } from '@/components/ui/app-shell'
 import { Toaster } from '@/components/ui/toaster'
 import { TooltipProvider } from '@/components/ui/tooltip'
@@ -42,7 +44,7 @@ export default async function LocaleLayout({
   children,
   params,
 }: {
-  children: React.ReactNode
+  children: ReactNode
   params: Promise<{ locale: string }>
 }) {
   const { locale } = await params
@@ -56,30 +58,30 @@ export default async function LocaleLayout({
   const htmlLang = resolveHtmlLang(locale as Locale)
 
   return (
-    <html lang={htmlLang}>
-      <AppBody>
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          <AppQueryClientProvider>
-            <AuthProvider initialUser={session.user}>
-              <AssistantChatProvider>
-                <OnboardingProvider>
-                  <TooltipProvider>
-                    <AppShellRoot>
-                      <SideNav />
-                      <AppMain>
-                        <DemoModeBanner />
-                        {children}
-                      </AppMain>
-                    </AppShellRoot>
-                    <AssistantChatMount />
-                    <Toaster />
-                  </TooltipProvider>
-                </OnboardingProvider>
-              </AssistantChatProvider>
-            </AuthProvider>
-          </AppQueryClientProvider>
-        </NextIntlClientProvider>
-      </AppBody>
-    </html>
+    <>
+      <HtmlLangSync lang={htmlLang} />
+      <ThemeSync />
+      <NextIntlClientProvider locale={locale} messages={messages}>
+        <AppQueryClientProvider>
+          <AuthProvider initialUser={session.user}>
+            <AssistantChatProvider>
+              <OnboardingProvider>
+                <TooltipProvider>
+                  <AppShellRoot>
+                    <SideNav />
+                    <AppMain>
+                      <DemoModeBanner />
+                      {children}
+                    </AppMain>
+                  </AppShellRoot>
+                  <AssistantChatMount />
+                  <Toaster />
+                </TooltipProvider>
+              </OnboardingProvider>
+            </AssistantChatProvider>
+          </AuthProvider>
+        </AppQueryClientProvider>
+      </NextIntlClientProvider>
+    </>
   )
 }

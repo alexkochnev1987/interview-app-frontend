@@ -19,7 +19,7 @@ function DropdownMenuPortal(props: ComponentProps<typeof DM.Portal>) {
 }
 
 const dropdownContentStyles = cn(
-  'z-[100] max-h-96 min-w-[12.5rem] overflow-y-auto rounded-xl border border-hairline-strong bg-popover p-1.5 text-popover-foreground shadow-float',
+  'z-100 max-h-96 min-w-50 overflow-y-auto rounded-xl border border-hairline-strong bg-popover p-1.5 text-popover-foreground shadow-float',
   'data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95',
   'data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
 )
@@ -45,7 +45,7 @@ function DropdownMenuContent({
 }
 
 const dropdownMenuItemVariants = cva(
-  "relative flex w-full cursor-pointer select-none items-center gap-2 rounded-lg border-0 bg-transparent px-3 py-2.5 text-left text-sm font-semibold outline-none transition-colors [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 data-[disabled]:pointer-events-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-45 data-[highlighted]:bg-muted/75",
+  "relative flex w-full cursor-pointer select-none items-center gap-2 rounded-lg border-0 bg-transparent px-3 py-2.5 text-left text-sm font-semibold outline-hidden transition-colors [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 data-disabled:pointer-events-none data-disabled:cursor-not-allowed data-disabled:opacity-45 data-highlighted:bg-muted/75",
   {
     variants: {
       tone: {

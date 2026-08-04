@@ -18,11 +18,11 @@ const tabsListVariants = cva(
 )
 
 const tabTriggerVariants = cva(
-  'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50',
+  'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-all outline-hidden select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       active: {
-        true: 'bg-secondary text-secondary-foreground shadow-sm',
+        true: 'bg-secondary text-secondary-foreground shadow-xs',
         false: 'text-muted-foreground hover:bg-muted hover:text-foreground',
       },
     },
