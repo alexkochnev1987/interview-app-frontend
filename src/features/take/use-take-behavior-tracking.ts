@@ -87,7 +87,7 @@ export function useTakeBehaviorTracking({
 
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
-      window.removeEventListener('blur-sm', handleWindowBlur)
+      window.removeEventListener('blur', handleWindowBlur)
       document.removeEventListener('copy', handleCopy)
       document.removeEventListener('paste', handlePaste)
       window.removeEventListener('resize', handleResize)
