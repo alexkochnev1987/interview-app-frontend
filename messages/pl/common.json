@@ -6,6 +6,7 @@
   "common": {
     "appName": "AI Interview Architect",
     "brandEyebrow": "Intelligent Conductor",
+    "close": "Zamknij",
     "loading": "Ładowanie...",
     "notAvailable": "Niedostępne",
     "backToHome": "Wróć do strony głównej",

@@ -1,9 +1,17 @@
 'use client'
 
+import { SlidersHorizontal } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { useState } from 'react'
+
+import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { Icon } from '@/components/ui/icon'
+import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { Pagination } from '@/components/ui/pagination'
 import { Separator } from '@/components/ui/separator'
+import { Sheet, SheetBody, SheetHeader } from '@/components/ui/sheet'
 import { TEAM_PAGE_LIMIT_OPTIONS, type TeamPageLimit } from '@/features/team/hooks/use-team-members'
 import type { TeamRoleFilter, TeamStatCard } from '@/features/team/team-member-list'
 import type { TeamRowActorRole } from '@/features/team/team-row-policy'
@@ -51,6 +59,19 @@ export function TeamMembersView({
   onPageChange,
   onLimitChange,
 }: TeamMembersViewProps) {
+  const t = useTranslations('team')
+  const tCommon = useTranslations('common')
+  const [filtersOpen, setFiltersOpen] = useState(false)
+
+  const filtersContent = (
+    <TeamMembersFilters
+      roleFilter={roleFilter}
+      onRoleFilterChange={onRoleFilterChange}
+      query={query}
+      onQueryChange={onQueryChange}
+    />
+  )
+
   return (
     <>
       <TeamMembersHeading />
@@ -58,13 +79,31 @@ export function TeamMembersView({
 
       <Card variant="surface" flexChild="contain">
         <CardContent spacing="sm">
-          <TeamMembersFilters
-            roleFilter={roleFilter}
-            onRoleFilterChange={onRoleFilterChange}
-            query={query}
-            onQueryChange={onQueryChange}
-          />
+          <Stack visibility="sm-up">{filtersContent}</Stack>
+          <Inline visibility="below-sm">
+            <Button
+              type="button"
+              variant="outline-pill"
+              shape="pill"
+              size="sm"
+              onClick={() => setFiltersOpen(true)}
+            >
+              <Icon size="sm">
+                <SlidersHorizontal />
+              </Icon>
+              {t('filters.filtersButton')}
+            </Button>
+          </Inline>
         </CardContent>
+
+        <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
+          <SheetHeader
+            title={t('filters.filtersButton')}
+            onClose={() => setFiltersOpen(false)}
+            closeLabel={tCommon('close')}
+          />
+          <SheetBody>{filtersContent}</SheetBody>
+        </Sheet>
 
         <Separator />
 

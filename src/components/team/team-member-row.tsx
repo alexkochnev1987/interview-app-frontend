@@ -53,13 +53,13 @@ export function TeamMemberRow({ member, actorId, actorRole, onChangeRole }: Team
           </BodyText>
         </Inline>
       </TableCell>
-      <TableCell>
+      <TableCell visibility="lg-up">
         <BodyText size="sm">{member.email}</BodyText>
       </TableCell>
-      <TableCell>
+      <TableCell visibility="md-up">
         <TeamRoleBadge role={member.role} />
       </TableCell>
-      <TableCell>
+      <TableCell visibility="lg-up">
         <BodyText size="sm">{formatInterviewDate(member.createdAt)}</BodyText>
       </TableCell>
       <TableCell onClick={stopRowClick}>

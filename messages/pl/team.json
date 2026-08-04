@@ -3,7 +3,8 @@
     "heading": "Członkowie zespołu",
     "lead": "Zarządzaj współpracownikami w przestrzeni roboczej i poziomami dostępu.",
     "filters": {
-      "label": "Filtry:"
+      "label": "Filtry:",
+      "filtersButton": "Filtry"
     },
     "searchPlaceholder": "Szukaj według nazwy lub adresu e-mail",
     "table": {
@@ -12,6 +13,9 @@
       "accessRole": "Rola dostępu",
       "joined": "Data dołączenia",
       "actions": "Działania"
+    },
+    "card": {
+      "joined": "Dołączył(a) {date}"
     },
     "empty": {
       "title": "Nie znaleziono żadnych członków",
