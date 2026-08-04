@@ -80,6 +80,9 @@
     "createdInterview": {
       "openLink": "Otwórz link dla kandydata"
     },
+    "createdQuestion": {
+      "openLink": "Otwórz pytanie"
+    },
     "interviewList": {
       "heading": "Interview",
       "viewDetail": "Szczegóły",
@@ -110,12 +113,14 @@
       "admin": {
         "unassigned": "Pokaż nieprzypisane interview",
         "byStatus": "Pokaż ukończone interview",
-        "assignHr": "Przypisz interview do pracownika HR"
+        "assignHr": "Przypisz interview do pracownika HR",
+        "createQuestion": "Pomóż mi utworzyć nowe pytanie rekrutacyjne"
       },
       "super_admin": {
         "unassigned": "Pokaż nieprzypisane interview",
         "byStatus": "Pokaż interview według statusu",
         "assignHr": "Przypisz interview do pracownika HR",
+        "createQuestion": "Pomóż mi utworzyć nowe pytanie rekrutacyjne",
         "orgOverview": "Podsumuj aktywność interview w organizacji"
       }
     }

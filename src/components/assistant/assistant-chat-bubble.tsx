@@ -14,6 +14,7 @@ import { BodyText } from '@/components/ui/text'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
 
 import type { AiAssistantChatMessage } from './ai-assistant-chat-types'
+import { AssistantCreatedQuestion } from './assistant-created-question'
 import { AssistantInterviewList } from './assistant-interview-list'
 import { AssistantInterviewSummary } from './assistant-interview-summary'
 
@@ -89,6 +90,9 @@ export function AssistantChatBubble({ message, muted }: AssistantChatBubbleProps
           ) : null}
           {message.result?.interview ? (
             <AssistantInterviewSummary interview={message.result.interview} />
+          ) : null}
+          {message.result?.createdQuestion ? (
+            <AssistantCreatedQuestion question={message.result.createdQuestion} />
           ) : null}
         </Stack>
         {message.result?.createdInterview ? (

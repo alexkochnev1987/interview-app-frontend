@@ -194,6 +194,7 @@ export type RecruiterAssistantSuggestedQuestion = Schemas['RecruiterAssistantSug
 export type RecruiterAssistantInterviewSummary = Schemas['RecruiterAssistantInterviewSummaryDto']
 export type RecruiterAssistantReviewState = Schemas['RecruiterAssistantReviewStateDto']
 export type RecruiterAssistantCreatedInterview = Schemas['RecruiterAssistantCreatedInterviewDto']
+export type RecruiterAssistantCreatedQuestion = Schemas['RecruiterAssistantCreatedQuestionDto']
 export type RecruiterAssistantResponseStatus = RecruiterAssistantResponse['status']
 
 export type PresignedUrlResponse = Schemas['PresignedUrlResponseDto']

@@ -4,13 +4,17 @@ import type { AssistantWelcomeRole } from './assistant-i18n'
 
 export type AssistantPromptKey = string
 
-const WRITE_PROMPT_KEYS = new Set<AssistantPromptKey>(['createInterview', 'assignHr'])
+const WRITE_PROMPT_KEYS = new Set<AssistantPromptKey>([
+  'createInterview',
+  'assignHr',
+  'createQuestion',
+])
 
 const PROMPT_KEYS: Record<AssistantWelcomeRole, AssistantPromptKey[]> = {
   [APP_ROLE.hr]: ['myInterviews', 'readyForReview', 'createInterview'],
   [APP_ROLE.candidate]: ['hasInterview', 'status', 'reviewed'],
-  [APP_ROLE.admin]: ['unassigned', 'byStatus', 'assignHr'],
-  [APP_ROLE.super_admin]: ['unassigned', 'byStatus', 'assignHr', 'orgOverview'],
+  [APP_ROLE.admin]: ['unassigned', 'byStatus', 'assignHr', 'createQuestion'],
+  [APP_ROLE.super_admin]: ['unassigned', 'byStatus', 'assignHr', 'createQuestion', 'orgOverview'],
 }
 
 export function getAssistantPromptKeys(

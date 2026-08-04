@@ -80,6 +80,9 @@
     "createdInterview": {
       "openLink": "Open candidate link"
     },
+    "createdQuestion": {
+      "openLink": "Open question"
+    },
     "interviewList": {
       "heading": "Interviews",
       "viewDetail": "View details",
@@ -110,12 +113,14 @@
       "admin": {
         "unassigned": "Show unassigned interviews",
         "byStatus": "Show completed interviews",
-        "assignHr": "Assign an interview to an HR reviewer"
+        "assignHr": "Assign an interview to an HR reviewer",
+        "createQuestion": "Help me create a new interview question"
       },
       "super_admin": {
         "unassigned": "Show unassigned interviews",
         "byStatus": "Show interviews by status",
         "assignHr": "Assign an interview to an HR reviewer",
+        "createQuestion": "Help me create a new interview question",
         "orgOverview": "Summarize interview activity in my org"
       }
     }
