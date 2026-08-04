@@ -35,7 +35,7 @@ export default async function TakeInterviewPage({ params, searchParams }: TakeIn
     interview =
       (await requestServer<TakeInterviewData>(`/take/${encodedId}`, ctx, {
         withLocaleHeader: false,
-        query: { contentLocale: locale },
+        // Omit contentLocale: API resolves questions via interviewLocale.
       })) ?? null
   } catch (err) {
     error = err instanceof Error ? err.message : t('loadFailedFallback')

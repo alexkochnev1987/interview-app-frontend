@@ -4,7 +4,7 @@ import type { TakeInterviewData } from '@/lib/api'
 import { canStartNewAttempt, type AnswerAttemptMeta } from './attempt-limit'
 import { isLastInterviewQuestion } from './messages'
 
-export type ClientInterviewLoadMode = 'initial' | 'resume' | 'locale'
+export type ClientInterviewLoadMode = 'initial' | 'resume'
 
 export type PendingVersionAction = 'submit' | 'rerecord' | null
 export type VersionPersistKind = Exclude<PendingVersionAction, null>
@@ -55,7 +55,7 @@ export function resolveInterviewLoadMode(
   mode: ClientInterviewLoadMode,
   options: { serverPrefetched?: boolean },
 ): InterviewLoadMode {
-  if (mode === 'resume' || mode === 'locale') {
+  if (mode === 'resume') {
     return 'resume'
   }
   return options.serverPrefetched ? 'returning' : 'initial'

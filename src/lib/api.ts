@@ -1049,7 +1049,6 @@ export async function getResults(id: string): Promise<InterviewResult> {
 export async function getTakeInterview(
   id: string,
   token?: string,
-  contentLocale?: Locale,
   init?: { signal?: AbortSignal },
 ): Promise<TakeInterviewData> {
   return handle(
@@ -1057,10 +1056,7 @@ export async function getTakeInterview(
       headers: buildClientBaseHeaders(),
       params: {
         path: { id },
-        query: {
-          ...(token ? { token } : {}),
-          ...(contentLocale ? { contentLocale } : {}),
-        },
+        query: token ? { token } : {},
       },
       signal: init?.signal,
     }),
