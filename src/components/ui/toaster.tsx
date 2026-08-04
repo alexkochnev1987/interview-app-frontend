@@ -12,15 +12,28 @@ export function Toaster(props: ToasterProps) {
       closeButton
       position="top-right"
       theme={theme as ToasterProps['theme']}
+      className="toaster group"
       toastOptions={{
         duration: 5000,
-        className:
-          'relative rounded-xl border border-border/70 bg-background pr-12 text-card-foreground shadow-xl',
-        descriptionClassName: 'text-muted-foreground',
+        style: {
+          background: 'hsl(var(--card))',
+          color: 'hsl(var(--card-foreground))',
+          borderColor: 'hsl(var(--border))',
+        },
         classNames: {
-          success: 'text-card-foreground **:data-icon:text-success-soft-foreground',
-          error: 'text-card-foreground **:data-icon:text-danger-soft-foreground',
-          closeButton: 'left-auto! right-2! top-1/2! -translate-y-1/2!',
+          toast:
+            'group toast !bg-card !text-card-foreground !border-border/70 !shadow-xl relative rounded-xl border pr-12',
+          description: '!text-muted-foreground',
+          actionButton: '!bg-primary !text-primary-foreground font-medium',
+          cancelButton: '!bg-muted !text-muted-foreground',
+          success:
+            '!bg-success-soft !text-success-soft-foreground !border-success-soft-border **:data-icon:!text-success-soft-foreground',
+          error:
+            '!bg-danger-soft !text-danger-soft-foreground !border-danger-soft-border **:data-icon:!text-danger-soft-foreground',
+          warning:
+            '!bg-warning-soft !text-warning-soft-foreground !border-warning-soft-border **:data-icon:!text-warning-soft-foreground',
+          closeButton:
+            'left-auto! right-2! top-1/2! -translate-y-1/2! !border-border !bg-card !text-card-foreground',
         },
       }}
       {...props}
