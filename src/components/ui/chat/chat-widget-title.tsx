@@ -23,7 +23,7 @@ const chatWidgetTitleIconVariants = cva(
 )
 
 const chatWidgetTitleStatusDotVariants = cva(
-  'absolute rounded-full border-2 border-card bg-emerald-500',
+  'absolute rounded-full border-2 border-card bg-pill-emerald',
   {
     variants: {
       size: {
