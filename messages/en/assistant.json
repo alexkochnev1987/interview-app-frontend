@@ -2,6 +2,8 @@
   "assistant": {
     "name": "Herman",
     "closeAriaLabel": "Close Herman",
+    "newChatAriaLabel": "Start new chat",
+    "newChatTooltip": "New chat",
     "bubbleLabel": "Herman",
     "sendAriaLabel": "Send message",
     "loading": "Working...",

@@ -3,7 +3,11 @@
 import { useTranslations } from 'next-intl'
 import { FormEvent, useEffect, useRef, useState } from 'react'
 
-import { RecruiterAssistantPendingAction, sendRecruiterAssistantMessage } from '@/lib/api'
+import {
+  RecruiterAssistantPendingAction,
+  resetRecruiterAssistantChat,
+  sendRecruiterAssistantMessage,
+} from '@/lib/api'
 import { ApiError } from '@/lib/api-error'
 import { useAuth } from '@/lib/auth-context'
 
@@ -190,6 +194,36 @@ export function useAiAssistantChat() {
     setPendingActionId(null)
   }
 
+  async function resetChat() {
+    if (loading) return
+
+    abortControllerRef.current?.abort()
+    const abortController = new AbortController()
+    abortControllerRef.current = abortController
+    const requestId = ++requestIdRef.current
+
+    setError(null)
+    setPendingAction(null)
+    setPendingActionId(null)
+    setInput('')
+    setLoading(true)
+
+    try {
+      const result = await resetRecruiterAssistantChat({ signal: abortController.signal })
+      if (!isLatestRequest(requestId)) return
+
+      setMessages([{ id: 'welcome', role: 'assistant', text: result.response }])
+      setSessionId(result.sessionId ?? null)
+    } catch (err) {
+      if (!isLatestRequest(requestId) || isAbortError(err)) return
+      setError(formatError(err, t('errors.requestFailed')))
+    } finally {
+      if (isLatestRequest(requestId)) {
+        setLoading(false)
+      }
+    }
+  }
+
   function appendMessage(message: Omit<AiAssistantChatMessage, 'id'>) {
     setMessages((current) => [...current, createMessage(message)])
   }
@@ -205,5 +239,6 @@ export function useAiAssistantChat() {
     submitMessage,
     confirmPendingAction,
     dismissPendingAction,
+    resetChat,
   }
 }

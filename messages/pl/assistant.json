@@ -2,6 +2,8 @@
   "assistant": {
     "name": "Herman",
     "closeAriaLabel": "Zamknij Hermana",
+    "newChatAriaLabel": "Nowy czat",
+    "newChatTooltip": "Nowy czat",
     "bubbleLabel": "Herman",
     "sendAriaLabel": "Wyślij wiadomość",
     "loading": "Przetwarzanie...",

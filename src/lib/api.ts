@@ -458,6 +458,17 @@ export async function sendRecruiterAssistantMessage(
   )
 }
 
+export async function resetRecruiterAssistantChat(init?: {
+  signal?: AbortSignal
+}): Promise<RecruiterAssistantResponse> {
+  return handle(
+    client.POST('/ai/chat/reset', {
+      ...LOCALIZED_HEADERS,
+      signal: init?.signal,
+    }),
+  )
+}
+
 export async function demoLogin(): Promise<AuthUserResponseDto> {
   return handle(client.POST('/auth/demo', LOCALIZED_HEADERS))
 }
