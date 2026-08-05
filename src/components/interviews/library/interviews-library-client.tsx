@@ -2,7 +2,7 @@
 
 import { PanelLeftClose, PanelLeftOpen, SlidersHorizontal } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { cloneElement, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { InterviewFacetSidebar } from '@/components/interviews/picker'
 import { InterviewPickerFeed } from '@/components/interviews/picker'
@@ -10,6 +10,7 @@ import { InterviewPickerRefetchAlert } from '@/components/interviews/picker'
 import { InterviewPickerToolbar } from '@/components/interviews/picker'
 import { InterviewViewToggle } from '@/components/interviews/picker'
 import { pickInterviewsViewSource } from '@/components/interviews/picker'
+import type { InterviewFacetSidebarProps } from '@/components/interviews/picker/interview-facet-sidebar'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { CardGrid } from '@/components/ui/layout/card-grid'
@@ -137,26 +138,24 @@ export function InterviewsLibraryClient({ initialPrefetch }: InterviewsLibraryCl
     setSidebarHidden((prev) => !prev)
   }
 
-  const sidebar = (
-    <InterviewFacetSidebar
-      positions={facetsResult.facets.positions}
-      statuses={facetsResult.facets.statuses}
-      selected={{
-        position: query.state.position,
-        status: query.state.status,
-        assignedHrId: query.state.assignedHrId,
-      }}
-      onPositionChange={query.setPosition}
-      onStatusChange={query.setStatus}
-      onAssignedHrIdChange={query.setAssignedHrId}
-      showAssignedHrFilter={showAssignedHrFilter}
-      onReset={query.reset}
-      canReset={query.canReset}
-      loading={facetsResult.loading}
-      error={facetsResult.error}
-      onRetry={facetsResult.refetch}
-    />
-  )
+  const facetSidebarProps: Omit<InterviewFacetSidebarProps, 'hideHeading'> = {
+    positions: facetsResult.facets.positions,
+    statuses: facetsResult.facets.statuses,
+    selected: {
+      position: query.state.position,
+      status: query.state.status,
+      assignedHrId: query.state.assignedHrId,
+    },
+    onPositionChange: query.setPosition,
+    onStatusChange: query.setStatus,
+    onAssignedHrIdChange: query.setAssignedHrId,
+    showAssignedHrFilter: showAssignedHrFilter,
+    onReset: query.reset,
+    canReset: query.canReset,
+    loading: facetsResult.loading,
+    error: facetsResult.error,
+    onRetry: facetsResult.refetch,
+  }
 
   const mainContent = (
     <Stack gap={4}>
@@ -199,6 +198,7 @@ export function InterviewsLibraryClient({ initialPrefetch }: InterviewsLibraryCl
                 shape="pill"
                 size="sm"
                 onClick={() => setFiltersOpen(true)}
+                aria-expanded={filtersOpen}
               >
                 <Icon size="sm">
                   <SlidersHorizontal />
@@ -281,7 +281,9 @@ export function InterviewsLibraryClient({ initialPrefetch }: InterviewsLibraryCl
         mainContent
       ) : (
         <Grid columns="aside-22-left" gap={6}>
-          <Stack visibility="lg-up">{sidebar}</Stack>
+          <Stack visibility="lg-up">
+            <InterviewFacetSidebar {...facetSidebarProps} />
+          </Stack>
           {mainContent}
         </Grid>
       )}
@@ -292,7 +294,9 @@ export function InterviewsLibraryClient({ initialPrefetch }: InterviewsLibraryCl
           onClose={() => setFiltersOpen(false)}
           closeLabel={tCommon('close')}
         />
-        <SheetBody>{cloneElement(sidebar, { hideHeading: true })}</SheetBody>
+        <SheetBody>
+          <InterviewFacetSidebar {...facetSidebarProps} hideHeading />
+        </SheetBody>
       </Sheet>
     </>
   )

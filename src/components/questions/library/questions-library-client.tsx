@@ -9,7 +9,7 @@ import {
 } from 'lucide-react'
 import { useLocale } from 'next-intl'
 import { useTranslations } from 'next-intl'
-import { cloneElement, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { BulkDeleteResultAlerts } from '@/components/questions/library/bulk-delete-result-alerts'
@@ -21,6 +21,7 @@ import {
   buildActiveFilterChips,
   pickQuestionsViewSource,
   QuestionFacetSidebar,
+  type QuestionFacetSidebarProps,
   QuestionPickerFeed,
   QuestionPickerRefetchAlert,
   QuestionPickerToolbar,
@@ -194,37 +195,35 @@ export function QuestionsLibraryClient({
   const selectedCount = selectedIds.size
   const view = pickQuestionsViewSource(isCardsView, query, infinite, query.isSearchPending)
 
-  const sidebar = (
-    <QuestionFacetSidebar
-      difficulties={facets.difficulties}
-      categories={facets.categories}
-      subcategories={facets.subcategories}
-      roles={facets.roles}
-      tags={facets.tags}
-      selected={{
-        locale: query.state.locale,
-        difficulty: query.state.difficulty,
-        category: query.state.category,
-        subcategory: query.state.subcategory,
-        role: query.state.role,
-        tags: query.state.tags,
-        status: query.state.status,
-      }}
-      onDifficultyChange={query.setDifficulty}
-      onLocaleChange={query.setLocale}
-      onCategoryChange={query.setCategory}
-      onSubcategoryChange={query.setSubcategory}
-      onRoleChange={query.setRole}
-      onTagsChange={query.setTags}
-      onStatusChange={query.setStatus}
-      onReset={query.reset}
-      canReset={query.canReset}
-      showStatusFilter={isSuperAdmin}
-      loading={facetsResult.loading}
-      error={facetsResult.error}
-      onRetry={facetsResult.refetch}
-    />
-  )
+  const facetSidebarProps: Omit<QuestionFacetSidebarProps, 'hideHeading'> = {
+    difficulties: facets.difficulties,
+    categories: facets.categories,
+    subcategories: facets.subcategories,
+    roles: facets.roles,
+    tags: facets.tags,
+    selected: {
+      locale: query.state.locale,
+      difficulty: query.state.difficulty,
+      category: query.state.category,
+      subcategory: query.state.subcategory,
+      role: query.state.role,
+      tags: query.state.tags,
+      status: query.state.status,
+    },
+    onDifficultyChange: query.setDifficulty,
+    onLocaleChange: query.setLocale,
+    onCategoryChange: query.setCategory,
+    onSubcategoryChange: query.setSubcategory,
+    onRoleChange: query.setRole,
+    onTagsChange: query.setTags,
+    onStatusChange: query.setStatus,
+    onReset: query.reset,
+    canReset: query.canReset,
+    showStatusFilter: isSuperAdmin,
+    loading: facetsResult.loading,
+    error: facetsResult.error,
+    onRetry: facetsResult.refetch,
+  }
 
   const mainContent = (
     <Stack gap={4}>
@@ -262,6 +261,7 @@ export function QuestionsLibraryClient({
                 shape="pill"
                 size="sm"
                 onClick={() => setFiltersOpen(true)}
+                aria-expanded={filtersOpen}
               >
                 <Icon size="sm">
                   <SlidersHorizontal />
@@ -397,7 +397,9 @@ export function QuestionsLibraryClient({
         mainContent
       ) : (
         <Grid columns="aside-22-left" gap={6}>
-          <Stack visibility="lg-up">{sidebar}</Stack>
+          <Stack visibility="lg-up">
+            <QuestionFacetSidebar {...facetSidebarProps} />
+          </Stack>
           {mainContent}
         </Grid>
       )}
@@ -408,7 +410,9 @@ export function QuestionsLibraryClient({
           onClose={() => setFiltersOpen(false)}
           closeLabel={tCommon('close')}
         />
-        <SheetBody>{cloneElement(sidebar, { hideHeading: true })}</SheetBody>
+        <SheetBody>
+          <QuestionFacetSidebar {...facetSidebarProps} hideHeading />
+        </SheetBody>
       </Sheet>
 
       <ConfirmDialog
