@@ -408,6 +408,36 @@ export async function updateUserRole(
   )
 }
 
+export type UpdateTeamMemberPayload = Schemas['UpdateUserDto']
+
+export async function updateTeamMember(
+  id: string,
+  data: UpdateTeamMemberPayload,
+): Promise<TeamMember> {
+  return handle(
+    client.PATCH('/users/{id}', {
+      ...LOCALIZED_HEADERS,
+      params: { path: { id } },
+      body: data,
+    }),
+  )
+}
+
+/** Hard-deletes a user. Backend responds with HTTP 204 and no body. */
+export async function deleteTeamMember(id: string): Promise<void> {
+  const { error, response } = await client.DELETE('/users/{id}', {
+    ...LOCALIZED_HEADERS,
+    params: { path: { id } },
+  })
+
+  if (error) {
+    const message = messageFromError(error, response.status)
+    const path = new URL(response.url).pathname
+    const { code, params } = extractApiErrorFields(error)
+    throw new ApiError(response.status, message, path, undefined, code, params)
+  }
+}
+
 export async function fetchQuestions(
   params?: FetchQuestionsParams,
   init?: { signal?: AbortSignal },

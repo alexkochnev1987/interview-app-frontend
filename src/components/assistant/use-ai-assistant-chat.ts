@@ -125,6 +125,11 @@ export function useAiAssistantChat() {
     return requestId === requestIdRef.current
   }
 
+  function clearPendingAction() {
+    setPendingAction(null)
+    setPendingActionId(null)
+  }
+
   function applyLocaleFromResult(result: RecruiterAssistantResponse) {
     if (!shouldSwitchLocale(result, locale)) return
     router.replace(pathname, { locale: result.locale })
@@ -137,8 +142,7 @@ export function useAiAssistantChat() {
     if (!text || loading) return
 
     setError(null)
-    setPendingAction(null)
-    setPendingActionId(null)
+    clearPendingAction()
     setLoading(true)
     appendMessage({ role: 'user', text: options?.displayText ?? text })
 
@@ -234,8 +238,7 @@ export function useAiAssistantChat() {
   }
 
   function dismissPendingAction() {
-    setPendingAction(null)
-    setPendingActionId(null)
+    clearPendingAction()
   }
 
   async function resetChat() {
@@ -247,8 +250,7 @@ export function useAiAssistantChat() {
     const requestId = ++requestIdRef.current
 
     setError(null)
-    setPendingAction(null)
-    setPendingActionId(null)
+    clearPendingAction()
     setInput('')
     setLoading(true)
 

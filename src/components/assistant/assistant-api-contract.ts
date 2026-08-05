@@ -6,8 +6,9 @@
  * backend owns multi-turn context via `sessionId`.
  *
  * Confirm: send `message: ASSISTANT_CONFIRM_MESSAGE` with `pendingActionId`
- * (and `sessionId`) from the prior `needs_confirmation` response. The server
- * re-validates the pending action server-side.
+ * (and `sessionId`) from the prior `needs_confirmation` response. Optionally
+ * include `pendingAction` when the user removed questions from a create-interview
+ * plan. The server re-validates the pending action server-side.
  *
  * Cancel: client-only — `dismissPendingAction` clears local state. No cancel
  * endpoint exists. Sending a new message also clears pending state locally.
