@@ -56,13 +56,11 @@ export function AiAssistantChat() {
 
   useEffect(() => {
     if (loading) return
-
-    const latestAssistant = messages.toReversed().find((message) => message.role === 'assistant')
     if (!latestAssistant || latestAssistant.id === lastAnnouncedIdRef.current) return
 
     lastAnnouncedIdRef.current = latestAssistant.id
     setAnnouncement(latestAssistant.text)
-  }, [loading, messages])
+  }, [latestAssistant, loading])
 
   function handleComposerKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
     if (event.key !== 'Enter' || event.shiftKey) return
