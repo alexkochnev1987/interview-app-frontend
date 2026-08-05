@@ -59,7 +59,7 @@ export function AssessmentsListToolbar({
   )
 
   return (
-    <Card variant="surface" size="xs">
+    <Card variant="surface" size="sm">
       <CardContent>
         <Stack visibility="sm-up">
           <Grid columns="toolbar-2" gap={4} align="center">

@@ -130,12 +130,16 @@ export function QuestionPickerToolbar(props: QuestionPickerToolbarProps) {
 
       <Stack gap={2} visibility="below-lg">
         <Inline gap={2} align="center" wrap="wrap">
-          {resultRow}
           {viewToggle}
         </Inline>
-        <Inline gap={2} align="center" justify="end" wrap="wrap">
-          {sortSelect}
-          {bulkActions}
+        <Inline gap={2} align="center" justify="between" wrap="wrap">
+          <Inline gap={2} align="center" wrap="wrap">
+            {resultRow}
+          </Inline>
+          <Inline gap={2} align="center" wrap="wrap">
+            {sortSelect}
+            {bulkActions}
+          </Inline>
         </Inline>
       </Stack>
     </Stack>

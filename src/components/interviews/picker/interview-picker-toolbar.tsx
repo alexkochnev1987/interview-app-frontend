@@ -139,10 +139,12 @@ export function InterviewPickerToolbar(props: InterviewPickerToolbarProps) {
 
       <Stack gap={2} visibility="below-lg">
         <Inline gap={2} align="center" wrap="wrap">
-          {resultRow}
           {viewToggle}
         </Inline>
-        <Inline gap={2} align="center" wrap="wrap">
+        <Inline gap={2} align="center" justify="between" wrap="wrap">
+          <Inline gap={2} align="center" wrap="wrap">
+            {resultRow}
+          </Inline>
           {sortSelect}
         </Inline>
       </Stack>
