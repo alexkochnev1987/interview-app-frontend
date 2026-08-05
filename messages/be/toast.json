@@ -195,7 +195,13 @@
     "team": {
       "updateSuccess": "Роля абноўлена",
       "updateError": "Не ўдалося абнавіць ролю",
-      "updateSuccessDescription": "{name} цяпер {role}."
+      "updateSuccessDescription": "{name} цяпер {role}.",
+      "editAccountSuccess": "Уліковы запіс абноўлены",
+      "editAccountError": "Не ўдалося абнавіць уліковы запіс",
+      "editAccountSuccessDescription": "Даныя ўліковага запісу {name} захаваны.",
+      "deleteSuccess": "Карыстальнік выдалены",
+      "deleteError": "Не ўдалося выдаліць карыстальніка",
+      "deleteSuccessDescription": "{name} выдалены з каманды."
     },
     "avatar": {
       "uploadSuccess": "Фота профілю абноўлена",

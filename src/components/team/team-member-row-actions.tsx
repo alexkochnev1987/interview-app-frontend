@@ -54,6 +54,8 @@ interface TeamMemberRowActionsProps {
   actorId: string
   actorRole: TeamRowActorRole
   onChangeRole: () => void
+  onEditAccount: () => void
+  onDeleteUser: () => void
 }
 
 export function TeamMemberRowActions({
@@ -61,6 +63,8 @@ export function TeamMemberRowActions({
   actorId,
   actorRole,
   onChangeRole,
+  onEditAccount,
+  onDeleteUser,
 }: TeamMemberRowActionsProps) {
   const t = useTranslations('team.actions')
 
@@ -78,7 +82,7 @@ export function TeamMemberRowActions({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" sideOffset={6}>
-        {ROW_ACTIONS.filter(({ id }) => isTeamRowActionVisible(id, actorId, member)).map(
+        {ROW_ACTIONS.filter(({ id }) => isTeamRowActionVisible(id, actorId, member, actorRole)).map(
           ({ id, labelKey, Icon, tone }) => {
             const enabled = isTeamRowActionEnabled(id, actorId, actorRole, member)
             return (
@@ -89,6 +93,8 @@ export function TeamMemberRowActions({
                 onSelect={() => {
                   if (!enabled) return
                   if (id === 'change-role') onChangeRole()
+                  if (id === 'edit-account') onEditAccount()
+                  if (id === 'delete-user') onDeleteUser()
                 }}
               >
                 <Inline gap={3} align="center">
