@@ -155,6 +155,7 @@ export function InterviewQuestionPickerMain({
                 shape="pill"
                 size="sm"
                 onClick={() => setFiltersOpen(true)}
+                aria-expanded={filtersOpen}
               >
                 <Icon size="sm">
                   <SlidersHorizontal />
