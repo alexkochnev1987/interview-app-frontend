@@ -178,7 +178,9 @@ export type FetchInterviewFacetsParams = NonNullable<
 >
 
 export type CreateInterviewPayload = Schemas['CreateInterviewDto']
-export type RecruiterAssistantChatPayload = Schemas['RecruiterAssistantChatDto']
+export type RecruiterAssistantChatPayload = Schemas['RecruiterAssistantChatDto'] & {
+  pendingAction?: RecruiterAssistantCreatePendingAction
+}
 export type RecruiterAssistantResponse = Schemas['RecruiterAssistantResponseDto']
 export type RecruiterAssistantCreatePendingAction =
   Schemas['RecruiterAssistantCreatePendingActionDto']
@@ -195,6 +197,7 @@ export type RecruiterAssistantInterviewSummary = Schemas['RecruiterAssistantInte
 export type RecruiterAssistantReviewState = Schemas['RecruiterAssistantReviewStateDto']
 export type RecruiterAssistantCreatedInterview = Schemas['RecruiterAssistantCreatedInterviewDto']
 export type RecruiterAssistantCreatedQuestion = Schemas['RecruiterAssistantCreatedQuestionDto']
+export type RecruiterAssistantRedirect = Schemas['RecruiterAssistantRedirectDto']
 export type RecruiterAssistantResponseStatus = RecruiterAssistantResponse['status']
 
 export type PresignedUrlResponse = Schemas['PresignedUrlResponseDto']

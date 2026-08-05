@@ -26,6 +26,14 @@
         "candidate": "Ask whether you have an interview, its status, or schedule…",
         "admin": "Ask about unassigned interviews, filters, or assigning HR…",
         "super_admin": "Ask about interviews, assignments, questions, or org-wide data…"
+      },
+      "awaiting": {
+        "candidateName": "Enter the candidate name…",
+        "position": "Enter the job position…",
+        "questionName": "Enter the question name…",
+        "templateChoice": "Pick a template above or enter its number…",
+        "hr": "Enter the HR reviewer name…",
+        "interview": "Describe or name the interview…"
       }
     },
     "welcome": {
@@ -73,15 +81,25 @@
     "questionPlan": {
       "title": "Question plan",
       "empty": "Suggested and matched questions will appear here after you send a request.",
+      "emptySelected": "Add at least one question before confirming.",
       "summary": "{existing} matched in the question bank, {missing} need creation.",
       "newBadge": "New",
-      "existingBadge": "Existing"
+      "existingBadge": "Existing",
+      "removeAria": "Remove {title} from this interview"
     },
     "createdInterview": {
-      "openLink": "Open candidate link"
+      "openLink": "Open candidate link",
+      "viewDetail": "View interview details"
     },
     "createdQuestion": {
       "openLink": "Open question"
+    },
+    "templateList": {
+      "heading": "Choose a template",
+      "questionCount": "{count, plural, one {# question} other {# questions}}"
+    },
+    "redirect": {
+      "continue": "Continue in the app"
     },
     "interviewList": {
       "heading": "Interviews",

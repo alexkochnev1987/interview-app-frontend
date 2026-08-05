@@ -26,6 +26,14 @@
         "candidate": "Zapytaj, czy masz interview, jaki jest jego status lub termin…",
         "admin": "Zapytaj o nieprzypisane interview, filtry lub przypisywanie HR…",
         "super_admin": "Zapytaj o interview, przypisania, pytania lub dane całej organizacji…"
+      },
+      "awaiting": {
+        "candidateName": "Wpisz imię kandydata…",
+        "position": "Wpisz stanowisko…",
+        "questionName": "Wpisz nazwę pytania…",
+        "templateChoice": "Wybierz szablon powyżej lub wpisz jego numer…",
+        "hr": "Wpisz nazwisko pracownika HR…",
+        "interview": "Opisz lub nazwij interview…"
       }
     },
     "welcome": {
@@ -73,15 +81,25 @@
     "questionPlan": {
       "title": "Plan pytań",
       "empty": "Sugerowane i dopasowane pytania pojawią się tutaj po wysłaniu zapytania.",
+      "emptySelected": "Dodaj co najmniej jedno pytanie przed potwierdzeniem.",
       "summary": "{existing} znaleziono w bazie pytań, {missing} wymaga utworzenia.",
       "newBadge": "Nowe",
-      "existingBadge": "Istniejące"
+      "existingBadge": "Istniejące",
+      "removeAria": "Usuń {title} z tego interview"
     },
     "createdInterview": {
-      "openLink": "Otwórz link dla kandydata"
+      "openLink": "Otwórz link dla kandydata",
+      "viewDetail": "Szczegóły interview"
     },
     "createdQuestion": {
       "openLink": "Otwórz pytanie"
+    },
+    "templateList": {
+      "heading": "Wybierz szablon",
+      "questionCount": "{count, plural, one {# pytanie} few {# pytania} many {# pytań} other {# pytania}}"
+    },
+    "redirect": {
+      "continue": "Kontynuuj w aplikacji"
     },
     "interviewList": {
       "heading": "Interview",

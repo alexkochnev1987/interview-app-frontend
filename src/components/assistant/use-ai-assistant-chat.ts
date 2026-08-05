@@ -7,6 +7,7 @@ import { LOCALES, type Locale } from '@/i18n/locales'
 import { usePathname, useRouter } from '@/i18n/navigation'
 import {
   RecruiterAssistantPendingAction,
+  type RecruiterAssistantChatPayload,
   type RecruiterAssistantResponse,
   resetRecruiterAssistantChat,
   sendRecruiterAssistantMessage,
@@ -129,16 +130,17 @@ export function useAiAssistantChat() {
     router.replace(pathname, { locale: result.locale })
   }
 
-  async function submitMessage(event?: FormEvent<HTMLFormElement>) {
-    event?.preventDefault()
-    const text = input.trim()
+  async function sendUserMessage(
+    text: string,
+    options?: { restoreInputOnError?: boolean; displayText?: string },
+  ) {
     if (!text || loading) return
 
     setError(null)
     setPendingAction(null)
     setPendingActionId(null)
     setLoading(true)
-    appendMessage({ role: 'user', text })
+    appendMessage({ role: 'user', text: options?.displayText ?? text })
 
     const { abortController, requestId } = beginRequest()
 
@@ -159,12 +161,11 @@ export function useAiAssistantChat() {
         text: result.response,
         result,
       })
-      setInput('')
       applyLocaleFromResult(result)
     } catch (err) {
       if (!isLatestRequest(requestId) || isAbortError(err)) return
       setError(formatError(err, t('errors.requestFailed')))
-      setInput(text)
+      if (options?.restoreInputOnError) setInput(text)
     } finally {
       if (isLatestRequest(requestId)) {
         setLoading(false)
@@ -172,8 +173,18 @@ export function useAiAssistantChat() {
     }
   }
 
-  async function confirmPendingAction() {
-    if (!pendingAction || !pendingActionId || loading) return
+  async function submitMessage(event?: FormEvent<HTMLFormElement>) {
+    event?.preventDefault()
+    const text = input.trim()
+    if (!text) return
+
+    setInput('')
+    await sendUserMessage(text, { restoreInputOnError: true })
+  }
+
+  async function confirmPendingAction(actionOverride?: RecruiterAssistantPendingAction | null) {
+    const action = actionOverride ?? pendingAction
+    if (!action || !pendingActionId || loading) return
 
     setError(null)
     setLoading(true)
@@ -182,14 +193,23 @@ export function useAiAssistantChat() {
     const { abortController, requestId } = beginRequest()
 
     try {
-      const result = await sendRecruiterAssistantMessage(
-        {
-          message: ASSISTANT_CONFIRM_MESSAGE,
-          pendingActionId,
-          ...(sessionId ? { sessionId } : {}),
-        },
-        { signal: abortController.signal },
-      )
+      const payload: RecruiterAssistantChatPayload = {
+        message: ASSISTANT_CONFIRM_MESSAGE,
+        pendingActionId,
+        ...(sessionId ? { sessionId } : {}),
+      }
+
+      if (
+        action.type === 'create_interview' &&
+        pendingAction?.type === 'create_interview' &&
+        action.questions.length !== pendingAction.questions.length
+      ) {
+        payload.pendingAction = action
+      }
+
+      const result = await sendRecruiterAssistantMessage(payload, {
+        signal: abortController.signal,
+      })
       if (!isLatestRequest(requestId)) return
 
       const applied = applyAssistantResult(result, t)
@@ -262,6 +282,7 @@ export function useAiAssistantChat() {
     error,
     welcomeRole,
     submitMessage,
+    sendUserMessage,
     confirmPendingAction,
     dismissPendingAction,
     resetChat,

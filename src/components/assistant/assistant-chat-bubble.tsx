@@ -4,26 +4,35 @@ import { Bot, CheckCircle2, ShieldAlert } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
 import { ChatMessageBubble } from '@/components/ui/chat'
 import { Icon } from '@/components/ui/icon'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
-import { SafeExternalLink } from '@/components/ui/safe-external-link'
 import { BodyText } from '@/components/ui/text'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
 
 import type { AiAssistantChatMessage } from './ai-assistant-chat-types'
+import { AssistantCreatedInterview } from './assistant-created-interview'
 import { AssistantCreatedQuestion } from './assistant-created-question'
 import { AssistantInterviewList } from './assistant-interview-list'
 import { AssistantInterviewSummary } from './assistant-interview-summary'
+import { AssistantRedirectAction } from './assistant-redirect-action'
+import { AssistantTemplateList } from './assistant-template-list'
+import type { AssistantTemplateSelection } from './assistant-template-selection'
 
 type AssistantChatBubbleProps = {
   message: AiAssistantChatMessage
   muted?: boolean
+  disabled?: boolean
+  onSelectTemplate?: (selection: AssistantTemplateSelection) => void
 }
 
-export function AssistantChatBubble({ message, muted }: AssistantChatBubbleProps) {
+export function AssistantChatBubble({
+  message,
+  muted,
+  disabled = false,
+  onSelectTemplate,
+}: AssistantChatBubbleProps) {
   const t = useTranslations('assistant')
   const sharedLabels = useSharedLabels()
   const isUser = message.role === 'user'
@@ -94,16 +103,23 @@ export function AssistantChatBubble({ message, muted }: AssistantChatBubbleProps
           {message.result?.createdQuestion ? (
             <AssistantCreatedQuestion question={message.result.createdQuestion} />
           ) : null}
+          {message.result?.createdInterview ? (
+            <AssistantCreatedInterview interview={message.result.createdInterview} />
+          ) : null}
+          {message.result?.redirect ? (
+            <AssistantRedirectAction redirect={message.result.redirect} />
+          ) : null}
+          {message.result?.awaitingInput === 'templateChoice' &&
+          message.result.templates &&
+          message.result.templates.length > 0 &&
+          onSelectTemplate ? (
+            <AssistantTemplateList
+              templates={message.result.templates}
+              disabled={disabled}
+              onSelect={onSelectTemplate}
+            />
+          ) : null}
         </Stack>
-        {message.result?.createdInterview ? (
-          <Stack gap={2}>
-            <Button asChild size="sm" variant="outline">
-              <SafeExternalLink href={message.result.createdInterview.candidateLink}>
-                {t('createdInterview.openLink')}
-              </SafeExternalLink>
-            </Button>
-          </Stack>
-        ) : null}
       </ChatMessageBubble>
     </Inline>
   )
