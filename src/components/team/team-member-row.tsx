@@ -65,7 +65,7 @@ export function TeamMemberRow({
       <TableCell visibility="lg-up">
         <BodyText size="sm">{member.email}</BodyText>
       </TableCell>
-      <TableCell visibility="md-up">
+      <TableCell>
         <TeamRoleBadge role={member.role} />
       </TableCell>
       <TableCell visibility="lg-up">

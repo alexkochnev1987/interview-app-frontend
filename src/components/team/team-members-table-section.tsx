@@ -54,7 +54,7 @@ export function TeamMembersTableSection({
             <TableRow>
               <TableHead>{t('table.memberName')}</TableHead>
               <TableHead visibility="lg-up">{t('table.email')}</TableHead>
-              <TableHead visibility="md-up">{t('table.accessRole')}</TableHead>
+              <TableHead>{t('table.accessRole')}</TableHead>
               <TableHead visibility="lg-up">{t('table.joined')}</TableHead>
               <TableHead>{t('table.actions')}</TableHead>
             </TableRow>
