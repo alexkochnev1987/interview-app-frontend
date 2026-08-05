@@ -53,6 +53,7 @@ export function AssistantChatBubble({ message, muted }: AssistantChatBubbleProps
         <Stack gap={2}>
           {lines.map((line, index) => (
             <BodyText
+              // oxlint-disable-next-line react/no-array-index-key
               key={`${message.id}-${index}`}
               as="span"
               size="sm"

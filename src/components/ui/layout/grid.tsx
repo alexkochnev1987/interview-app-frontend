@@ -29,12 +29,12 @@ const gridVariants = cva('grid', {
       'split-85-115': 'grid-cols-1 xl:grid-cols-[0.85fr_1.15fr]',
       'split-72-128': 'grid-cols-1 xl:grid-cols-[0.72fr_1.28fr]',
       'aside-22':
-        'grid-cols-1 min-h-0 xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-start xl:[&>*]:min-h-0',
+        'grid-cols-1 min-h-0 xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-start xl:*:min-h-0',
       'aside-24':
-        'grid-cols-1 min-h-0 lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-stretch lg:[&>*]:min-h-0',
+        'grid-cols-1 min-h-0 lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-stretch lg:*:min-h-0',
       'assistant-chat': 'min-h-0 grid-cols-[minmax(0,1fr)_22.5rem] items-stretch [&>*]:min-h-0',
       'aside-22-left':
-        'grid-cols-1 min-h-0 lg:grid-cols-[20rem_minmax(0,1fr)] lg:items-start lg:[&>*]:min-h-0',
+        'grid-cols-1 min-h-0 lg:grid-cols-[20rem_minmax(0,1fr)] lg:items-start lg:*:min-h-0',
       'login-shell': 'grid-cols-1 lg:grid-cols-[1.1fr_420px] lg:items-center',
       'editor-2': 'grid-cols-1 xl:grid-cols-2',
       'identity-4': 'grid-cols-1 lg:grid-cols-2 xl:grid-cols-4',
@@ -42,7 +42,7 @@ const gridVariants = cva('grid', {
       'toolbar-2': 'grid-cols-1 md:grid-cols-[1fr_220px]',
       'toolbar-3': 'grid-cols-1 md:grid-cols-[1fr_220px_auto]',
       'toolbar-filter-search':
-        'grid-cols-1 gap-3 [&>*]:min-w-0 md:grid-cols-[auto_minmax(16rem,1fr)] md:items-center',
+        'grid-cols-1 gap-3 *:min-w-0 md:grid-cols-[auto_minmax(16rem,1fr)] md:items-center',
       'metrics-3': 'grid-cols-1 md:grid-cols-3',
       'metrics-2-md': 'grid-cols-1 sm:grid-cols-2',
       'metrics-5': 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5',
@@ -52,7 +52,7 @@ const gridVariants = cva('grid', {
       'lobby-shell': cn(
         'grid-cols-1 lg:grid-cols-[1.1fr_0.9fr]',
         'grid-rows-[minmax(min(42vh,280px),auto)_auto] lg:grid-rows-[minmax(0,1fr)]',
-        '[&>*]:min-h-0',
+        '*:min-h-0',
       ),
     },
     align: {

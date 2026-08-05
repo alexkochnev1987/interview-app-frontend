@@ -27,6 +27,10 @@
       "tooLarge": "Размер изображения должен быть меньше 5 МБ."
     },
     "preferences": {
+      "theme": "Тема",
+      "themeSystem": "Системная",
+      "themeLight": "Светлая",
+      "themeDark": "Темная",
       "language": "Язык",
       "productTour": "Обзор продукта"
     }

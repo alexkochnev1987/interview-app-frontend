@@ -22,9 +22,18 @@ interface TeamMemberCardProps {
   actorId: string
   actorRole: TeamRowActorRole
   onChangeRole: () => void
+  onEditAccount: () => void
+  onDeleteUser: () => void
 }
 
-export function TeamMemberCard({ member, actorId, actorRole, onChangeRole }: TeamMemberCardProps) {
+export function TeamMemberCard({
+  member,
+  actorId,
+  actorRole,
+  onChangeRole,
+  onEditAccount,
+  onDeleteUser,
+}: TeamMemberCardProps) {
   const t = useTranslations('team.card')
   const actor = { id: actorId, role: actorRole }
   const target = { id: member.id, role: member.role }
@@ -76,6 +85,8 @@ export function TeamMemberCard({ member, actorId, actorRole, onChangeRole }: Tea
           actorId={actorId}
           actorRole={actorRole}
           onChangeRole={onChangeRole}
+          onEditAccount={onEditAccount}
+          onDeleteUser={onDeleteUser}
         />
       </CardContent>
     </Card>

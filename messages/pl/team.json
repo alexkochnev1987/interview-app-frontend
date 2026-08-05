@@ -44,6 +44,30 @@
       "cancel": "Anuluj",
       "footnote": "Zmiana ta wchodzi w życie natychmiast. Użytkownik utrzymuje swoją sesję do następnego żądania."
     },
+    "editAccount": {
+      "title": "Edytuj konto",
+      "accessibilityTitle": "Edytuj konto",
+      "nameLabel": "Imię i nazwisko",
+      "emailLabel": "E-mail",
+      "nameRequired": "Podaj imię i nazwisko.",
+      "emailRequired": "Podaj adres e-mail.",
+      "emailInvalid": "Podaj prawidłowy adres e-mail.",
+      "googleEmailNotice": "To konto loguje się przez Google. Zmiana adresu e-mail rozłączy logowanie Google dla tego konta.",
+      "saving": "Zapisywanie...",
+      "save": "Zapisz zmiany",
+      "cancel": "Anuluj",
+      "footnote": "Tutaj można zmienić tylko imię i nazwisko oraz e-mail. Aby zmienić dostęp, użyj „Zmień rolę”."
+    },
+    "deleteUser": {
+      "title": "Usuń użytkownika",
+      "accessibilityTitle": "Usuń użytkownika",
+      "description": "Trwale usunąć {name} ({email})? Tej operacji nie można cofnąć.",
+      "demoNotice": "To konto demo. Po usunięciu może być konieczne ponowne utworzenie danych demo.",
+      "deleting": "Usuwanie...",
+      "confirm": "Usuń użytkownika",
+      "cancel": "Anuluj",
+      "footnote": "Konto i powiązany dostęp są usuwane natychmiast."
+    },
     "actions": {
       "changeRole": "Zmień rolę",
       "editAccount": "Edytuj konto",

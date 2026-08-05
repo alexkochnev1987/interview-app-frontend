@@ -84,7 +84,7 @@ export function FormField({
               <TooltipTrigger
                 type="button"
                 aria-label={labelTooltipLabel}
-                className="inline-flex size-4 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+                className="inline-flex size-4 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring/50"
               >
                 <HelpCircle className="size-4" />
               </TooltipTrigger>

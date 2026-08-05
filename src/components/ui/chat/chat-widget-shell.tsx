@@ -3,7 +3,7 @@
 // oxlint-disable jsx-a11y/prefer-tag-over-role
 import { FocusScope } from '@radix-ui/react-focus-scope'
 import { cva, type VariantProps } from 'class-variance-authority'
-import * as React from 'react'
+import { ComponentProps } from 'react'
 
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
@@ -31,7 +31,7 @@ const chatWidgetShellVariants = cva(
   },
 )
 
-type ChatWidgetShellProps = React.ComponentProps<'div'> &
+type ChatWidgetShellProps = ComponentProps<'div'> &
   VariantProps<typeof chatWidgetShellVariants> & {
     closing?: boolean
     titleId?: string

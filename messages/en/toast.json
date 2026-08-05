@@ -195,7 +195,13 @@
     "team": {
       "updateSuccess": "Role updated",
       "updateError": "Could not update role",
-      "updateSuccessDescription": "{name} is now {role}."
+      "updateSuccessDescription": "{name} is now {role}.",
+      "editAccountSuccess": "Account updated",
+      "editAccountError": "Could not update account",
+      "editAccountSuccessDescription": "{name}'s account details were saved.",
+      "deleteSuccess": "User deleted",
+      "deleteError": "Could not delete user",
+      "deleteSuccessDescription": "{name} was removed from the team."
     },
     "avatar": {
       "uploadSuccess": "Profile picture updated",

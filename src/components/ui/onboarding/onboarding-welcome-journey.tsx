@@ -41,7 +41,7 @@ export function OnboardingWelcomeJourney() {
     <div className={journeyTrackVariants()}>
       <div
         aria-hidden
-        className="pointer-events-none absolute left-[12%] right-[12%] top-4 z-0 h-px bg-gradient-to-r from-[hsl(var(--primary)/0.08)] via-[hsl(var(--primary)/0.28)] to-[hsl(var(--primary)/0.08)]"
+        className="pointer-events-none absolute left-[12%] right-[12%] top-4 z-0 h-px bg-linear-to-r from-[hsl(var(--primary)/0.08)] via-[hsl(var(--primary)/0.28)] to-[hsl(var(--primary)/0.08)]"
       />
 
       <div className={journeyRowVariants()}>
