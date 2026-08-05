@@ -64,58 +64,80 @@ export function QuestionPickerToolbar(props: QuestionPickerToolbarProps) {
   const tToolbar = useTranslations('questions.picker.toolbar')
   const tSort = useTranslations('questions.picker.sort')
 
+  const resultRow = (
+    <>
+      <StatusPill tone="neutral">
+        {loading ? '…' : tToolbar('resultCount', { count: resultCount })}
+      </StatusPill>
+      {activeChips.map((chip) => (
+        <StatusPill key={chip.key} tone="neutral" casing="chip">
+          <Inline gap={1} align="center">
+            <span>{chip.label}</span>
+            <Button
+              type="button"
+              variant="ghost"
+              shape="pill"
+              size="icon-xxs"
+              aria-label={tToolbar('removeChipAria', { label: chip.label })}
+              onClick={chip.onRemove}
+            >
+              <Icon size="xs">
+                <X />
+              </Icon>
+            </Button>
+          </Inline>
+        </StatusPill>
+      ))}
+    </>
+  )
+
+  const sortSelect = (
+    <Select
+      value={sortValue}
+      onValueChange={(value) => {
+        const [nextSortBy, nextSortOrder] = value.split(':') as [
+          QuestionSortField,
+          QuestionSortOrder,
+        ]
+        onSortChange(nextSortBy, nextSortOrder)
+      }}
+    >
+      <SelectTrigger variant="surface" size="md" shape="pill" width="auto-wide">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {SORT_OPTIONS.map((option) => (
+          <SelectItem key={option.value} value={option.value}>
+            {tSort(option.key)}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  )
+
   return (
     <Stack gap={3}>
-      <Inline gap={2} align="center" wrap="wrap">
-        <StatusPill tone="neutral">
-          {loading ? '…' : tToolbar('resultCount', { count: resultCount })}
-        </StatusPill>
-        {activeChips.map((chip) => (
-          <StatusPill key={chip.key} tone="neutral" casing="chip">
-            <Inline gap={1} align="center">
-              <span>{chip.label}</span>
-              <Button
-                type="button"
-                variant="ghost"
-                shape="pill"
-                size="icon-xxs"
-                aria-label={tToolbar('removeChipAria', { label: chip.label })}
-                onClick={chip.onRemove}
-              >
-                <Icon size="xs">
-                  <X />
-                </Icon>
-              </Button>
-            </Inline>
-          </StatusPill>
-        ))}
-        {viewToggle}
-      </Inline>
+      <Stack gap={3} visibility="lg-up">
+        <Inline gap={2} align="center" justify="end" wrap="wrap">
+          {viewToggle}
+          {sortSelect}
+          {bulkActions}
+        </Inline>
+        <Inline gap={2} align="center" wrap="wrap">
+          {resultRow}
+        </Inline>
+      </Stack>
 
-      <Inline gap={2} align="center" justify="end" wrap="wrap">
-        <Select
-          value={sortValue}
-          onValueChange={(value) => {
-            const [nextSortBy, nextSortOrder] = value.split(':') as [
-              QuestionSortField,
-              QuestionSortOrder,
-            ]
-            onSortChange(nextSortBy, nextSortOrder)
-          }}
-        >
-          <SelectTrigger variant="surface" size="md" shape="pill" width="auto-wide">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {SORT_OPTIONS.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {tSort(option.key)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {bulkActions}
-      </Inline>
+      <Stack gap={2} visibility="below-lg">
+        <Inline gap={2} align="center" wrap="wrap">
+          {resultRow}
+          {viewToggle}
+        </Inline>
+        <Inline gap={2} align="center" justify="end" wrap="wrap">
+          {sortSelect}
+          {bulkActions}
+        </Inline>
+      </Stack>
     </Stack>
   )
 }
