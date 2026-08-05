@@ -25,6 +25,8 @@ interface TeamMembersViewProps {
   actorId: string
   actorRole: TeamRowActorRole
   onRequestChangeRole: (member: TeamMember) => void
+  onRequestEditAccount: (member: TeamMember) => void
+  onRequestDeleteUser: (member: TeamMember) => void
   total: number
   page: number
   totalPages: number
@@ -44,6 +46,8 @@ export function TeamMembersView({
   actorId,
   actorRole,
   onRequestChangeRole,
+  onRequestEditAccount,
+  onRequestDeleteUser,
   total,
   page,
   totalPages,
@@ -75,6 +79,8 @@ export function TeamMembersView({
             actorId={actorId}
             actorRole={actorRole}
             onRequestChangeRole={onRequestChangeRole}
+            onRequestEditAccount={onRequestEditAccount}
+            onRequestDeleteUser={onRequestDeleteUser}
           />
         </Stack>
       </Card>

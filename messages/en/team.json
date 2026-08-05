@@ -40,6 +40,30 @@
       "cancel": "Cancel",
       "footnote": "This change takes effect immediately. The user keeps their session until next request."
     },
+    "editAccount": {
+      "title": "Edit account",
+      "accessibilityTitle": "Edit account",
+      "nameLabel": "Name",
+      "emailLabel": "Email",
+      "nameRequired": "Enter a name.",
+      "emailRequired": "Enter an email address.",
+      "emailInvalid": "Enter a valid email address.",
+      "googleEmailNotice": "This account signs in with Google. Changing the email will disconnect Google sign-in for this account.",
+      "saving": "Saving...",
+      "save": "Save changes",
+      "cancel": "Cancel",
+      "footnote": "Only name and email can be changed here. Use Change role to update access."
+    },
+    "deleteUser": {
+      "title": "Delete user",
+      "accessibilityTitle": "Delete user",
+      "description": "Permanently delete {name} ({email})? This cannot be undone.",
+      "demoNotice": "This is the demo account. After deletion you may need to re-provision demo data.",
+      "deleting": "Deleting...",
+      "confirm": "Delete user",
+      "cancel": "Cancel",
+      "footnote": "The account and related access are removed immediately."
+    },
     "actions": {
       "changeRole": "Change role",
       "editAccount": "Edit account",

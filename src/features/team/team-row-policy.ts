@@ -13,7 +13,16 @@ export function isTeamRowActionVisible(
   actionId: TeamRowActionId,
   actorId: string,
   member: TeamMember,
+  actorRole: TeamRowActorRole,
 ): boolean {
+  if (actionId === 'edit-account' && member.demo) {
+    return false
+  }
+
+  if (actionId === 'delete-user' && member.demo && actorRole !== 'super_admin') {
+    return false
+  }
+
   return !(actionId === 'delete-user' && actorId !== '' && member.id === actorId)
 }
 
@@ -25,6 +34,14 @@ export function isTeamRowActionEnabled(
 ): boolean {
   if (!actorId) return false
 
+  if (actionId === 'edit-account' && member.demo) {
+    return false
+  }
+
+  if (actionId === 'delete-user' && member.demo && actorRole !== 'super_admin') {
+    return false
+  }
+
   if (actionId === 'change-role') {
     return canActorReassignMemberRole({
       actorId,
@@ -32,10 +49,6 @@ export function isTeamRowActionEnabled(
       memberId: member.id,
       memberRole: member.role,
     })
-  }
-
-  if (actorRole === 'super_admin') {
-    return true
   }
 
   if (actionId === 'edit-account') {

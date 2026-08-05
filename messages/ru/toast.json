@@ -195,7 +195,13 @@
     "team": {
       "updateSuccess": "Роль обновлена",
       "updateError": "Не удалось обновить роль",
-      "updateSuccessDescription": "{name} теперь {role}."
+      "updateSuccessDescription": "{name} теперь {role}.",
+      "editAccountSuccess": "Аккаунт обновлён",
+      "editAccountError": "Не удалось обновить аккаунт",
+      "editAccountSuccessDescription": "Данные аккаунта {name} сохранены.",
+      "deleteSuccess": "Пользователь удалён",
+      "deleteError": "Не удалось удалить пользователя",
+      "deleteSuccessDescription": "{name} удалён из команды."
     },
     "avatar": {
       "uploadSuccess": "Фото профиля обновлено",
