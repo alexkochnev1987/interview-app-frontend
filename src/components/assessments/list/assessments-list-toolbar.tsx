@@ -41,48 +41,58 @@ export function AssessmentsListToolbar({
   const sharedLabels = useSharedLabels()
   const [filtersOpen, setFiltersOpen] = useState(false)
 
-  const filtersContent = (
-    <Grid columns="toolbar-2" gap={4} align="center">
-      <SearchInput
-        value={query}
-        onChange={(event) => onQueryChange(event.target.value)}
-        placeholder={t('searchPlaceholder')}
-      />
-      <Select value={status} onValueChange={(value) => onStatusChange(value as StatusFilter)}>
-        <SelectTrigger variant="surface" size="lg" shape="pill">
-          <SelectValue placeholder={t('allStatuses')} />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">{t('allStatuses')}</SelectItem>
-          <SelectItem value="ready_to_score">
-            {sharedLabels.reviewStatus('ready_to_score')}
-          </SelectItem>
-          <SelectItem value="ready">{sharedLabels.reviewStatus('ready')}</SelectItem>
-          <SelectItem value="scoring">{t('statusScoring')}</SelectItem>
-          <SelectItem value="failed">{sharedLabels.reviewStatus('failed')}</SelectItem>
-        </SelectContent>
-      </Select>
-    </Grid>
+  const statusSelect = (
+    <Select value={status} onValueChange={(value) => onStatusChange(value as StatusFilter)}>
+      <SelectTrigger variant="surface" size="lg" shape="pill">
+        <SelectValue placeholder={t('allStatuses')} />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="all">{t('allStatuses')}</SelectItem>
+        <SelectItem value="ready_to_score">
+          {sharedLabels.reviewStatus('ready_to_score')}
+        </SelectItem>
+        <SelectItem value="ready">{sharedLabels.reviewStatus('ready')}</SelectItem>
+        <SelectItem value="scoring">{t('statusScoring')}</SelectItem>
+        <SelectItem value="failed">{sharedLabels.reviewStatus('failed')}</SelectItem>
+      </SelectContent>
+    </Select>
   )
 
   return (
     <Card variant="surface" size="xs">
       <CardContent>
-        <Stack visibility="sm-up">{filtersContent}</Stack>
-        <Inline visibility="below-sm">
-          <Button
-            type="button"
-            variant="outline-pill"
-            shape="pill"
-            size="sm"
-            onClick={() => setFiltersOpen(true)}
-          >
-            <Icon size="sm">
-              <SlidersHorizontal />
-            </Icon>
-            {t('filtersButton')}
-          </Button>
-        </Inline>
+        <Stack visibility="sm-up">
+          <Grid columns="toolbar-2" gap={4} align="center">
+            <SearchInput
+              value={query}
+              onChange={(event) => onQueryChange(event.target.value)}
+              placeholder={t('searchPlaceholder')}
+            />
+            {statusSelect}
+          </Grid>
+        </Stack>
+        <Stack gap={3} visibility="below-sm">
+          <SearchInput
+            value={query}
+            onChange={(event) => onQueryChange(event.target.value)}
+            placeholder={t('searchPlaceholder')}
+          />
+          <Inline>
+            <Button
+              type="button"
+              variant="outline-pill"
+              shape="pill"
+              size="sm"
+              onClick={() => setFiltersOpen(true)}
+              aria-expanded={filtersOpen}
+            >
+              <Icon size="sm">
+                <SlidersHorizontal />
+              </Icon>
+              {t('filtersButton')}
+            </Button>
+          </Inline>
+        </Stack>
       </CardContent>
 
       <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
@@ -91,7 +101,7 @@ export function AssessmentsListToolbar({
           onClose={() => setFiltersOpen(false)}
           closeLabel={tCommon('close')}
         />
-        <SheetBody>{filtersContent}</SheetBody>
+        <SheetBody>{statusSelect}</SheetBody>
       </Sheet>
     </Card>
   )
