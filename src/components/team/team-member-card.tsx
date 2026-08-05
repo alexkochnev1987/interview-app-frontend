@@ -40,23 +40,43 @@ export function TeamMemberCard({
   const canOpenProfile = canViewUserProfile(target, actor)
   const profileHref = member.id === actorId ? routes.profile.me : routes.profile.detail(member.id)
 
-  const body = (
-    <>
+  const identity = (
+    <Inline gap={3} align="center">
+      <Avatar
+        name={member.name}
+        pictureUrl={member.pictureUrl}
+        size="sm"
+        textSize="sm"
+        tone="surface"
+      />
+      <Stack gap={1}>
+        <CardTitle size="list">{member.name}</CardTitle>
+        <BodyText size="sm" tone="muted">
+          {member.email}
+        </BodyText>
+      </Stack>
+    </Inline>
+  )
+
+  return (
+    <Card variant="surface" interaction={canOpenProfile ? 'hover' : 'none'}>
       <CardHeader spacing="sm">
-        <Inline gap={3} align="center">
-          <Avatar
-            name={member.name}
-            pictureUrl={member.pictureUrl}
-            size="sm"
-            textSize="sm"
-            tone="surface"
+        <Inline gap={3} align="center" justify="between">
+          {canOpenProfile ? (
+            <UnstyledLink href={profileHref} display="contents" aria-label={member.name}>
+              {identity}
+            </UnstyledLink>
+          ) : (
+            identity
+          )}
+          <TeamMemberRowActions
+            member={member}
+            actorId={actorId}
+            actorRole={actorRole}
+            onChangeRole={onChangeRole}
+            onEditAccount={onEditAccount}
+            onDeleteUser={onDeleteUser}
           />
-          <Stack gap={1}>
-            <CardTitle size="list">{member.name}</CardTitle>
-            <BodyText size="sm" tone="muted">
-              {member.email}
-            </BodyText>
-          </Stack>
         </Inline>
       </CardHeader>
       <CardContent spacing="sm">
@@ -66,28 +86,6 @@ export function TeamMemberCard({
             {t('joined', { date: formatInterviewDate(member.createdAt) })}
           </BodyText>
         </Inline>
-      </CardContent>
-    </>
-  )
-
-  return (
-    <Card variant="surface" interaction={canOpenProfile ? 'hover' : 'none'}>
-      {canOpenProfile ? (
-        <UnstyledLink href={profileHref} display="contents" aria-label={member.name}>
-          {body}
-        </UnstyledLink>
-      ) : (
-        body
-      )}
-      <CardContent spacing="sm" layout="row-end">
-        <TeamMemberRowActions
-          member={member}
-          actorId={actorId}
-          actorRole={actorRole}
-          onChangeRole={onChangeRole}
-          onEditAccount={onEditAccount}
-          onDeleteUser={onDeleteUser}
-        />
       </CardContent>
     </Card>
   )
