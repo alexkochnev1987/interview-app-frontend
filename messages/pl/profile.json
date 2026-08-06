@@ -33,6 +33,13 @@
       "themeDark": "Ciemny",
       "language": "Język",
       "productTour": "Przewodnik po produkcie"
+    },
+    "assignedInterviews": {
+      "title": "Rozmowy przypisane temu HR",
+      "assignAnother": "Przypisz kolejną rozmowę temu HR",
+      "expand": "Pokaż przypisane rozmowy",
+      "collapse": "Ukryj przypisane rozmowy",
+      "empty": "Brak rozmów przypisanych temu HR."
     }
   }
 }

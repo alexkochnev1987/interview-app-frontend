@@ -33,6 +33,13 @@
       "themeDark": "Dark",
       "language": "Language",
       "productTour": "Product tour"
+    },
+    "assignedInterviews": {
+      "title": "Interviews they have assigned",
+      "assignAnother": "Assign another interview to this HR",
+      "expand": "Show assigned interviews",
+      "collapse": "Hide assigned interviews",
+      "empty": "No interviews assigned to this HR yet."
     }
   }
 }
