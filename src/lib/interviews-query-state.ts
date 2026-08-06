@@ -31,6 +31,7 @@ export type InterviewsQueryState = {
   position?: string
   status?: InterviewStatusFilter
   assignedHrId?: string
+  demo?: boolean
   sortBy: InterviewSortField
   sortOrder: InterviewSortOrder
   page: number
@@ -129,7 +130,7 @@ export function toInterviewsSearchParams(
 }
 
 function buildInterviewFilterParams(
-  state: Pick<InterviewsQueryState, 'position' | 'status' | 'assignedHrId'>,
+  state: Pick<InterviewsQueryState, 'position' | 'status' | 'assignedHrId' | 'demo'>,
   debouncedQ: string,
 ): Omit<FetchInterviewsParams, 'sortBy' | 'sortOrder' | 'page' | 'limit'> {
   return {
@@ -137,6 +138,7 @@ function buildInterviewFilterParams(
     position: state.position,
     status: state.status,
     assignedHrId: state.assignedHrId,
+    demo: state.demo,
   }
 }
 

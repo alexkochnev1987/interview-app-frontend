@@ -39,7 +39,15 @@
       "assignAnother": "Przypisz kolejną rozmowę temu HR",
       "expand": "Pokaż przypisane rozmowy",
       "collapse": "Ukryj przypisane rozmowy",
-      "empty": "Brak rozmów przypisanych temu HR."
+      "empty": "Brak rozmów przypisanych temu HR.",
+      "demoAssignOnlyDemoHr": "Konta demo mogą przypisywać rozmowy wyłącznie do demo HR.",
+      "assignDialog": {
+        "title": "Przypisz nieprzypisaną rozmowę",
+        "description": "Wybierz rozmowę bez przypisanego HR i przypisz ją do {name}.",
+        "assign": "Przypisz rozmowę",
+        "assigning": "Przypisywanie…",
+        "cancel": "Anuluj"
+      }
     }
   }
 }

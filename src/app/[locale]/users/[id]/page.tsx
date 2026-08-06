@@ -1,5 +1,6 @@
 import { getTranslations } from 'next-intl/server'
 
+import { QueryHydrationBoundary } from '@/components/questions/query-hydration-boundary'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
@@ -12,6 +13,8 @@ import {
   redirectIfUnauthenticated,
   redirectIfUnauthorizedError,
 } from '@/lib/auth-gate'
+import { APP_ROLE, canAssignInterviewHr } from '@/lib/auth-roles'
+import { prefetchHrAssignedInterviews } from '@/lib/interviews-library-prefetch'
 import { requestServer } from '@/lib/server-fetch'
 import { canViewUserProfile } from '@/lib/user-profile-access'
 
@@ -77,9 +80,28 @@ export default async function UserProfilePage({ params }: UserProfilePageProps) 
 
   const mode = auth.me.id === user.id ? 'self' : 'member'
 
+  let assignedInterviewsPrefetch
+  if (user.role === APP_ROLE.hr && canAssignInterviewHr(auth.me.role)) {
+    try {
+      assignedInterviewsPrefetch = await prefetchHrAssignedInterviews(auth.ctx, user.id)
+    } catch (err) {
+      redirectIfUnauthorizedError(err, returnPath, locale)
+    }
+  }
+
+  const profile = (
+    <ProfileView user={user} mode={mode} assignedInterviewsPrefetch={assignedInterviewsPrefetch} />
+  )
+
   return (
     <PageShell>
-      <ProfileView user={user} mode={mode} />
+      {assignedInterviewsPrefetch ? (
+        <QueryHydrationBoundary state={assignedInterviewsPrefetch.dehydratedState}>
+          {profile}
+        </QueryHydrationBoundary>
+      ) : (
+        profile
+      )}
     </PageShell>
   )
 }

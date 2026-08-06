@@ -49,6 +49,9 @@ type InterviewCreateFormProps = {
   initialPosition?: string
   // Set when prefilled from a template; its id is recorded on create to bump popularity.
   initialTemplateId?: string
+  initialAssignedHrId?: string
+  lockAssignedHr?: boolean
+  allowDemoWrite?: boolean
 }
 
 function questionSupportsInterviewLocale(question: Question, locale: Locale): boolean {
@@ -67,15 +70,19 @@ export function InterviewCreateForm({
   initialSelected,
   initialPosition,
   initialTemplateId,
+  initialAssignedHrId,
+  lockAssignedHr = false,
+  allowDemoWrite = false,
 }: InterviewCreateFormProps) {
   const t = useTranslations('questions.common')
   const uiLocale = useLocale() as Locale
   const router = useRouter()
   const toastMessages = useToastMessages()
   const isDemo = useIsDemo()
+  const readOnlyDemo = isDemo && !allowDemoWrite
   const [candidateName, setCandidateName] = useState('')
   const [position, setPosition] = useState(initialPosition ?? '')
-  const [assignedHrId, setAssignedHrId] = useState<string | undefined>()
+  const [assignedHrId, setAssignedHrId] = useState<string | undefined>(initialAssignedHrId)
   const { user } = useAuth()
   const canAssign = canAssignInterviewHr(user?.role)
   const [interviewLocale, setInterviewLocale] = useState<Locale>(uiLocale)
@@ -197,7 +204,7 @@ export function InterviewCreateForm({
                       onChange={(event) => setCandidateName(event.target.value)}
                       placeholder={t('candidateNamePlaceholder')}
                       autoComplete="name"
-                      disabled={submitting || isDemo}
+                      disabled={submitting || readOnlyDemo}
                     />
                   </IconAffix>
                 </FormField>
@@ -216,23 +223,34 @@ export function InterviewCreateForm({
                       value={position}
                       onChange={(event) => setPosition(event.target.value)}
                       placeholder={t('positionPlaceholder')}
-                      disabled={submitting || isDemo}
+                      disabled={submitting || readOnlyDemo}
                     />
                   </IconAffix>
                 </FormField>
 
                 {canAssign ? (
                   <FormField htmlFor="assignedHr" label={t('assignedHrLabel')}>
-                    <DemoWriteGuard width="full" disabled={submitting}>
+                    {allowDemoWrite ? (
                       <AssignedHrSelect
                         id="assignedHr"
                         value={assignedHrId}
                         onValueChange={setAssignedHrId}
-                        allowUnassigned
+                        allowUnassigned={!lockAssignedHr}
                         enabled={canAssign}
-                        disabled={submitting}
+                        disabled={submitting || lockAssignedHr}
                       />
-                    </DemoWriteGuard>
+                    ) : (
+                      <DemoWriteGuard width="full" disabled={submitting || lockAssignedHr}>
+                        <AssignedHrSelect
+                          id="assignedHr"
+                          value={assignedHrId}
+                          onValueChange={setAssignedHrId}
+                          allowUnassigned={!lockAssignedHr}
+                          enabled={canAssign}
+                          disabled={submitting || lockAssignedHr}
+                        />
+                      </DemoWriteGuard>
+                    )}
                   </FormField>
                 ) : null}
 
@@ -240,7 +258,7 @@ export function InterviewCreateForm({
                   <Select
                     value={interviewLocale}
                     onValueChange={(value) => setInterviewLocale(value as Locale)}
-                    disabled={submitting || isDemo}
+                    disabled={submitting || readOnlyDemo}
                   >
                     <SelectTrigger
                       id="interviewLocale"
@@ -277,7 +295,7 @@ export function InterviewCreateForm({
                   </Alert>
                 ) : null}
 
-                <DemoWriteGuard width="full" disabled={submitting || selectedCount === 0}>
+                {allowDemoWrite ? (
                   <Button
                     type="submit"
                     variant="gradient"
@@ -294,7 +312,28 @@ export function InterviewCreateForm({
                       <ArrowRight />
                     </Icon>
                   </Button>
-                </DemoWriteGuard>
+                ) : (
+                  <DemoWriteGuard width="full" disabled={submitting || selectedCount === 0}>
+                    <Button
+                      type="submit"
+                      variant="gradient"
+                      width="full"
+                      disabled={submitting || selectedCount === 0}
+                    >
+                      {submitting
+                        ? toastMessages.pageGate.interview.creatingLabel
+                        : t(
+                            selectedCount > 0
+                              ? 'createInterviewCtaWithCount'
+                              : 'createInterviewCta',
+                            { count: selectedCount },
+                          )}
+                      <Icon size="md">
+                        <ArrowRight />
+                      </Icon>
+                    </Button>
+                  </DemoWriteGuard>
+                )}
               </CardContent>
             </Card>
 
@@ -305,7 +344,7 @@ export function InterviewCreateForm({
             picker={picker}
             title={t('selectionTitle')}
             description={t('selectionDescription')}
-            disabled={submitting || isDemo}
+            disabled={submitting || readOnlyDemo}
             highlightQuestionId={highlightQuestionId}
           />
         </Grid>

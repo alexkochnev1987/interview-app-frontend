@@ -39,7 +39,15 @@
       "assignAnother": "Assign another interview to this HR",
       "expand": "Show assigned interviews",
       "collapse": "Hide assigned interviews",
-      "empty": "No interviews assigned to this HR yet."
+      "empty": "No interviews assigned to this HR yet.",
+      "demoAssignOnlyDemoHr": "Demo accounts can only assign interviews to the demo HR.",
+      "assignDialog": {
+        "title": "Assign unassigned interview",
+        "description": "Select an interview without an HR reviewer and assign it to {name}.",
+        "assign": "Assign interview",
+        "assigning": "Assigning…",
+        "cancel": "Cancel"
+      }
     }
   }
 }
