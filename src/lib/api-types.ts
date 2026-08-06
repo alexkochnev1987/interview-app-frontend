@@ -2411,6 +2411,8 @@ export interface components {
             message: string;
             pendingActionId?: string;
             sessionId?: string;
+            /** @description Optional create-interview/question-plan override sent with confirmation. Questions may only be removed, not added or edited. */
+            pendingAction?: components["schemas"]["RecruiterAssistantCreatePendingActionDto"];
         };
         RecruiterAssistantCreatedQuestionDto: {
             id: string;

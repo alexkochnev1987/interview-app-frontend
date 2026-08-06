@@ -3,6 +3,7 @@
 import { X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
+import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Inline } from '@/components/ui/layout/inline'
@@ -64,17 +65,19 @@ export function AssistantQuestionPlan({
               ) : null}
             </Stack>
             {onRemoveQuestion ? (
-              <Button
-                type="button"
-                variant="outline"
-                shape="pill"
-                size="icon-xs"
-                disabled={removeDisabled}
-                aria-label={t('questionPlan.removeAria', { title: question.questionText })}
-                onClick={() => onRemoveQuestion(question.key)}
-              >
-                <X className="size-3" />
-              </Button>
+              <DemoWriteGuard disabled={removeDisabled}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  shape="pill"
+                  size="icon-xs"
+                  disabled={removeDisabled}
+                  aria-label={t('questionPlan.removeAria', { title: question.questionText })}
+                  onClick={() => onRemoveQuestion(question.key)}
+                >
+                  <X className="size-3" />
+                </Button>
+              </DemoWriteGuard>
             ) : null}
           </Inline>
         ))}

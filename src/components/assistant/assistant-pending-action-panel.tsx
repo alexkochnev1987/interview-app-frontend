@@ -87,7 +87,7 @@ export function AssistantPendingActionContent({
         <AssistantQuestionPlan
           questions={questions}
           onRemoveQuestion={editable ? handleRemoveQuestion : undefined}
-          removeDisabled={loading || isDemo}
+          removeDisabled={loading}
         />
       ) : null}
 
