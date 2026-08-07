@@ -789,9 +789,9 @@ export function useTakeOrchestrator({
     clearRecordingArtifacts,
   ])
 
-  async function proceedToLobby() {
+  function proceedToLobby() {
     // Refresh config before the next question so updated limits take effect.
-    await refreshAppConfig()
+    void refreshAppConfig().catch(console.error)
     autoStartedQuestionKeyRef.current = ''
     pendingReuseReservedRef.current = null
     setSetupError('')

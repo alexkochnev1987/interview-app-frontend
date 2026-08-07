@@ -14,8 +14,6 @@ export interface PublicAppConfig {
   ENABLE_GOOGLE_OAUTH: boolean
   /** Whether candidate-feedback share links are available. */
   ENABLE_FEEDBACK_SHARE_LINKS: boolean
-  /** Emergency killswitch — blocks normal UI when `true`. */
-  MAINTENANCE_MODE_KILLSWITCH: boolean
   /** Default UI theme mode (system | light | dark). */
   DEFAULT_THEME_MODE: string
   /** Active UI color theme preset (innowise | red | blue | purple). */
@@ -30,7 +28,6 @@ export const DEFAULT_PUBLIC_APP_CONFIG: PublicAppConfig = {
   MAX_ANSWER_ATTEMPTS_PER_QUESTION: 3,
   ENABLE_GOOGLE_OAUTH: true,
   ENABLE_FEEDBACK_SHARE_LINKS: true,
-  MAINTENANCE_MODE_KILLSWITCH: false,
   DEFAULT_THEME_MODE: 'system',
   APP_THEME: 'innowise',
   ENABLE_AI_ASSISTANT: true,

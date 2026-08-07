@@ -39,7 +39,7 @@ export function AppConfigProvider({ children, initialConfig }: AppConfigProvider
   const [prevInitialConfig, setPrevInitialConfig] = useState(initialConfig)
 
   // Sync with SSR re-renders (same pattern as AuthProvider).
-  if (initialConfig !== prevInitialConfig) {
+  if (JSON.stringify(initialConfig) !== JSON.stringify(prevInitialConfig)) {
     setPrevInitialConfig(initialConfig)
     setConfig(initialConfig)
   }

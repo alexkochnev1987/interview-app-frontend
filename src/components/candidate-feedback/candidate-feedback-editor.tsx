@@ -512,19 +512,17 @@ export function CandidateFeedbackEditor({
             ) : null}
           </Inline>
 
-          {ENABLE_FEEDBACK_SHARE_LINKS ? (
-            <CandidateFeedbackSharePanel
-              shareUrl={shareUrl}
-              expiresAt={expiresAt}
-              hasActiveLink={hasActiveLink}
-              copyStatus={copyStatus}
-              canRevoke={canRevokeShareLink}
-              revoking={revokingShareLink}
-              createBusy={creatingShareLink}
-              onCopy={() => void copyShareLink()}
-              onRevoke={() => void revokeShareLink()}
-            />
-          ) : null}
+          <CandidateFeedbackSharePanel
+            shareUrl={shareUrl}
+            expiresAt={expiresAt}
+            hasActiveLink={hasActiveLink}
+            copyStatus={copyStatus}
+            canRevoke={canRevokeShareLink}
+            revoking={revokingShareLink}
+            createBusy={creatingShareLink}
+            onCopy={() => void copyShareLink()}
+            onRevoke={() => void revokeShareLink()}
+          />
 
           {generateAllSkipSummary ? (
             <CandidateFeedbackSkippedSummary

@@ -10,7 +10,6 @@ import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { SurfaceTile } from '@/components/ui/surface-tile'
 import { BodyText } from '@/components/ui/text'
-import { useAppConfig } from '@/lib/app-config-context'
 import { formatFeedbackShareLinkPreview } from '@/lib/interview-detail-format'
 import { formatInterviewDate } from '@/lib/interview-formatters'
 
@@ -40,9 +39,8 @@ export function CandidateFeedbackSharePanel({
   onRevoke,
 }: CandidateFeedbackSharePanelProps) {
   const t = useTranslations('interviews.candidateFeedback')
-  const { ENABLE_FEEDBACK_SHARE_LINKS } = useAppConfig()
 
-  if (!ENABLE_FEEDBACK_SHARE_LINKS || (!shareUrl && !expiresAt && !hasActiveLink)) {
+  if (!shareUrl && !expiresAt && !hasActiveLink) {
     return null
   }
 
