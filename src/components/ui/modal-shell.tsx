@@ -61,8 +61,6 @@ export function ModalShell({
   accessibilityTitle,
   accessibilityDescription,
 }: ModalShellProps) {
-  if (typeof document === 'undefined') return null
-
   return (
     <DialogPrimitive.Root
       defaultOpen

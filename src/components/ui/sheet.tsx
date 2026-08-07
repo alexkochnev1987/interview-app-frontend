@@ -58,8 +58,6 @@ export function Sheet({
   children,
   accessibilityDescription,
 }: SheetProps) {
-  if (typeof document === 'undefined') return null
-
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
       <DialogPrimitive.Portal>
