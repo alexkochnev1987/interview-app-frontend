@@ -33,6 +33,7 @@ import {
   type Interview,
 } from '@/lib/api'
 import { getErrorMessage as getApiErrorMessage } from '@/lib/api-error'
+import { useAppConfig } from '@/lib/app-config-context'
 import { useAuth } from '@/lib/auth-context'
 import { canCreateFeedbackShareLink, canRevokeFeedbackShareLink } from '@/lib/auth-permissions'
 import {
@@ -88,7 +89,8 @@ export function CandidateFeedbackEditor({
   const toastMessages = useCandidateFeedbackToastMessages()
   const { formatErrorMessage } = useCandidateFeedbackErrorLabel()
   const { user } = useAuth()
-  const canCreateShareLink = canCreateFeedbackShareLink(user)
+  const { ENABLE_FEEDBACK_SHARE_LINKS } = useAppConfig()
+  const canCreateShareLink = canCreateFeedbackShareLink(user) && ENABLE_FEEDBACK_SHARE_LINKS
   const canRevokeShareLink = canRevokeFeedbackShareLink(user)
   const { feedback, replaceFeedback, kick, refresh, paused } = useCandidateFeedbackData(
     interview.id,
@@ -510,17 +512,19 @@ export function CandidateFeedbackEditor({
             ) : null}
           </Inline>
 
-          <CandidateFeedbackSharePanel
-            shareUrl={shareUrl}
-            expiresAt={expiresAt}
-            hasActiveLink={hasActiveLink}
-            copyStatus={copyStatus}
-            canRevoke={canRevokeShareLink}
-            revoking={revokingShareLink}
-            createBusy={creatingShareLink}
-            onCopy={() => void copyShareLink()}
-            onRevoke={() => void revokeShareLink()}
-          />
+          {ENABLE_FEEDBACK_SHARE_LINKS ? (
+            <CandidateFeedbackSharePanel
+              shareUrl={shareUrl}
+              expiresAt={expiresAt}
+              hasActiveLink={hasActiveLink}
+              copyStatus={copyStatus}
+              canRevoke={canRevokeShareLink}
+              revoking={revokingShareLink}
+              createBusy={creatingShareLink}
+              onCopy={() => void copyShareLink()}
+              onRevoke={() => void revokeShareLink()}
+            />
+          ) : null}
 
           {generateAllSkipSummary ? (
             <CandidateFeedbackSkippedSummary
