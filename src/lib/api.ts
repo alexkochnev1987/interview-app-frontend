@@ -165,11 +165,19 @@ export type PublicCandidateFeedbackQuestionBlock =
 export type InterviewCancelResponse = Schemas['InterviewCancelResponseDto']
 export type InterviewDeleteResponse = Schemas['InterviewDeleteResponseDto']
 
-export type InterviewListItem = Schemas['InterviewListItemDto']
+export type InterviewListItem = Schemas['InterviewListItemDto'] & {
+  /** Present when the API exposes interview demo scope on list rows. */
+  demo?: boolean
+}
 export type PaginatedInterviews = Schemas['PaginatedInterviewsResponseDto']
 export type InterviewFacetsResponse = Schemas['InterviewFacetsResponseDto']
 export type InterviewFacetCount = Schemas['InterviewFacetCountDto']
-export type FetchInterviewsParams = NonNullable<paths['/interviews']['get']['parameters']['query']>
+export type FetchInterviewsParams = NonNullable<
+  paths['/interviews']['get']['parameters']['query']
+> & {
+  /** When true, return only demo-scoped interviews. When false, exclude demo interviews. */
+  demo?: boolean
+}
 export type InterviewSortField = NonNullable<FetchInterviewsParams['sortBy']>
 export type InterviewSortOrder = NonNullable<FetchInterviewsParams['sortOrder']>
 export type InterviewStatusFilter = NonNullable<FetchInterviewsParams['status']>
