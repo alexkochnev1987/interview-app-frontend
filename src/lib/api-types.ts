@@ -13,7 +13,7 @@ export interface paths {
         };
         /**
          * Get public runtime variables
-         * @description Returns a key→value dictionary of all variables marked as public (is_public=true). Available to any authenticated user including candidates. Secret variables are always excluded regardless of is_public flag.
+         * @description Returns a key→value dictionary of all variables marked as public (is_public=true). Available to all users including unauthenticated visitors.
          */
         get: operations["PublicConfigController_getPublicConfig"];
         put?: never;
@@ -1263,8 +1263,56 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        SystemConfigEntryDto: {
+            /**
+             * @description Configuration variable key in UPPER_SNAKE_CASE
+             * @example APP_THEME
+             */
+            key: string;
+            /**
+             * @description Current variable value
+             * @example innowise
+             */
+            value: string;
+            /**
+             * @description Data type hint for parsing and UI rendering
+             * @example enum
+             * @enum {string}
+             */
+            valueType: "string" | "number" | "boolean" | "enum" | "json" | "secret";
+            /**
+             * @description Allowed option values for enum type variables
+             * @example [
+             *       "innowise",
+             *       "red",
+             *       "blue",
+             *       "purple"
+             *     ]
+             */
+            options?: string[];
+            /**
+             * @description Human-readable description of variable purpose
+             * @example Active UI theme color preset
+             */
+            description?: string;
+            /**
+             * @description Whether this variable is exposed in GET /api/config/public
+             * @example true
+             */
+            isPublic: boolean;
+            /**
+             * @description Whether the value is masked on the frontend (••••••••)
+             * @example false
+             */
+            isSecret: boolean;
+            /**
+             * @description Whether this variable has a custom database override applied
+             * @example false
+             */
+            isOverridden: boolean;
+        };
         /** @enum {string} */
-        ApiErrorCode: "BAD_REQUEST" | "VALIDATION_ERROR" | "INVALID_LOCALE" | "REGISTRATION_FAILED" | "UPLOAD_FAILED" | "UPLOAD_NOT_ALLOWED" | "ANSWER_ATTEMPT_LIMIT_REACHED" | "ANSWER_VERSION_NOT_RESERVED" | "ANSWER_VERSION_OVERWRITE_FORBIDDEN" | "AVATAR_UNSUPPORTED_TYPE" | "AVATAR_TOO_LARGE" | "AVATAR_NO_GOOGLE_PICTURE" | "UNAUTHORIZED" | "INVALID_CREDENTIALS" | "AUTHENTICATION_REQUIRED" | "CANDIDATE_SESSION_REQUIRED" | "INVALID_CANDIDATE_SESSION" | "INTERVIEW_TOKEN_REQUIRED" | "INVALID_INTERVIEW_TOKEN" | "FORBIDDEN" | "INSUFFICIENT_PERMISSIONS" | "ACCESS_DENIED" | "NOT_FOUND" | "QUESTION_NOT_FOUND" | "INTERVIEW_NOT_FOUND" | "USER_NOT_FOUND" | "FEEDBACK_NOT_FOUND" | "CONFLICT" | "QUESTION_IN_USE" | "VALIDATION_RUNNING" | "QUESTION_DUPLICATE" | "SERVICE_UNAVAILABLE" | "AI_PROVIDER_NOT_CONFIGURED" | "EMBEDDING_PROVIDER_NOT_CONFIGURED" | "INTERNAL_SERVER_ERROR";
+        ApiErrorCode: "BAD_REQUEST" | "VALIDATION_ERROR" | "INVALID_LOCALE" | "REGISTRATION_FAILED" | "UPLOAD_FAILED" | "UPLOAD_NOT_ALLOWED" | "ANSWER_ATTEMPT_LIMIT_REACHED" | "ANSWER_VERSION_NOT_RESERVED" | "ANSWER_VERSION_OVERWRITE_FORBIDDEN" | "AVATAR_UNSUPPORTED_TYPE" | "AVATAR_TOO_LARGE" | "AVATAR_NO_GOOGLE_PICTURE" | "INVALID_CONFIG_VALUE" | "UNAUTHORIZED" | "INVALID_CREDENTIALS" | "AUTHENTICATION_REQUIRED" | "CANDIDATE_SESSION_REQUIRED" | "INVALID_CANDIDATE_SESSION" | "INTERVIEW_TOKEN_REQUIRED" | "INVALID_INTERVIEW_TOKEN" | "FORBIDDEN" | "INSUFFICIENT_PERMISSIONS" | "ACCESS_DENIED" | "NOT_FOUND" | "QUESTION_NOT_FOUND" | "INTERVIEW_NOT_FOUND" | "USER_NOT_FOUND" | "FEEDBACK_NOT_FOUND" | "CONFLICT" | "QUESTION_IN_USE" | "VALIDATION_RUNNING" | "QUESTION_DUPLICATE" | "SERVICE_UNAVAILABLE" | "AI_PROVIDER_NOT_CONFIGURED" | "EMBEDDING_PROVIDER_NOT_CONFIGURED" | "INTERNAL_SERVER_ERROR";
         ApiErrorResponseDto: {
             /** @example 400 */
             statusCode: number;
@@ -1295,7 +1343,17 @@ export interface components {
              * @default string
              * @enum {string}
              */
-            valueType: "string" | "number" | "boolean" | "json" | "secret";
+            valueType: "string" | "number" | "boolean" | "enum" | "json" | "secret";
+            /**
+             * @description Allowed option values for enum variables
+             * @example [
+             *       "innowise",
+             *       "red",
+             *       "blue",
+             *       "purple"
+             *     ]
+             */
+            options?: string[];
             /**
              * @description Whether this variable is exposed to the frontend via GET /config/public
              * @default false
@@ -2734,14 +2792,6 @@ export interface operations {
                 };
                 content?: never;
             };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponseDto"];
-                };
-            };
         };
     };
     AppConfigController_listAll: {
@@ -2761,7 +2811,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["SystemConfigEntryDto"][];
+                };
             };
             401: {
                 headers: {
@@ -2805,7 +2857,17 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["SystemConfigEntryDto"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
             };
             401: {
                 headers: {
