@@ -29,12 +29,11 @@ interface CandidateFeedbackPageProps {
 
 export default async function CandidateFeedbackPage({ params }: CandidateFeedbackPageProps) {
   const { id, locale } = await params
-  const t = await getTranslations({
-    locale,
-    namespace: 'toast.pageGate.candidateFeedback',
-  })
-  const tCommon = await getTranslations({ locale, namespace: 'common' })
-  const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
+  const [t, tCommon, tFallback] = await Promise.all([
+    getTranslations({ locale, namespace: 'toast.pageGate.candidateFeedback' }),
+    getTranslations({ locale, namespace: 'common' }),
+    getTranslations({ locale, namespace: 'shared.fallback' }),
+  ])
 
   const returnPath = candidateFeedbackPath(id)
   const backHref = routes.interviews.detail(id)

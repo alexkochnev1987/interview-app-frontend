@@ -22,8 +22,10 @@ interface UserProfilePageProps {
 
 export default async function UserProfilePage({ params }: UserProfilePageProps) {
   const { locale, id } = await params
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.profile' })
-  const tCommon = await getTranslations({ locale, namespace: 'common' })
+  const [t, tCommon] = await Promise.all([
+    getTranslations({ locale, namespace: 'toast.pageGate.profile' }),
+    getTranslations({ locale, namespace: 'common' }),
+  ])
   const returnPath = `/users/${id}`
 
   const auth = await loadAuthGate(() => true, locale)

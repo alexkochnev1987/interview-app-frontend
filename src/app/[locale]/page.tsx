@@ -32,8 +32,10 @@ interface DashboardPageProps {
 
 export default async function DashboardPage({ params, searchParams }: DashboardPageProps) {
   const { locale } = await params
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.dashboard' })
-  const tCommon = await getTranslations({ locale, namespace: 'common' })
+  const [t, tCommon] = await Promise.all([
+    getTranslations({ locale, namespace: 'toast.pageGate.dashboard' }),
+    getTranslations({ locale, namespace: 'common' }),
+  ])
   const auth = await loadAuthGate(canAccessDashboard, locale)
   redirectIfUnauthenticated(auth, '/', locale)
   if (auth.kind === 'forbidden') {

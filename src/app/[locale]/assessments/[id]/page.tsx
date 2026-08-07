@@ -20,9 +20,11 @@ interface AssessmentDetailPageProps {
 
 export default async function AssessmentDetailPage({ params }: AssessmentDetailPageProps) {
   const { id, locale } = await params
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.assessments' })
-  const tCommon = await getTranslations({ locale, namespace: 'common' })
-  const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
+  const [t, tCommon, tFallback] = await Promise.all([
+    getTranslations({ locale, namespace: 'toast.pageGate.assessments' }),
+    getTranslations({ locale, namespace: 'common' }),
+    getTranslations({ locale, namespace: 'shared.fallback' }),
+  ])
 
   const returnPath = `/assessments/${encodeURIComponent(id)}`
   const auth = await loadAuthGate(canReviewAssessments, locale)

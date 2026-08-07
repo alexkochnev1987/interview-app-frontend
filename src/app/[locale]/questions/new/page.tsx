@@ -16,9 +16,11 @@ interface NewQuestionPageProps {
 
 export default async function NewQuestionPage({ params }: NewQuestionPageProps) {
   const { locale } = await params
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.questions' })
-  const tCommon = await getTranslations({ locale, namespace: 'common' })
-  const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
+  const [t, tCommon, tFallback] = await Promise.all([
+    getTranslations({ locale, namespace: 'toast.pageGate.questions' }),
+    getTranslations({ locale, namespace: 'common' }),
+    getTranslations({ locale, namespace: 'shared.fallback' }),
+  ])
   const auth = await loadAuthGate(canCreateQuestions, locale)
   redirectIfUnauthenticated(auth, routes.questions.new, locale)
   if (auth.kind === 'forbidden') {

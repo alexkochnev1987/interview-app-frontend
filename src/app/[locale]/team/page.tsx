@@ -20,8 +20,10 @@ interface TeamPageProps {
 
 export default async function TeamPage({ params }: TeamPageProps) {
   const { locale } = await params
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.team' })
-  const tCommon = await getTranslations({ locale, namespace: 'common' })
+  const [t, tCommon] = await Promise.all([
+    getTranslations({ locale, namespace: 'toast.pageGate.team' }),
+    getTranslations({ locale, namespace: 'common' }),
+  ])
 
   const auth = await loadAuthGate(canManageTeam, locale)
   redirectIfUnauthenticated(auth, '/team', locale)

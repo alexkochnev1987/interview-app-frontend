@@ -26,8 +26,10 @@ interface InterviewDetailPageProps {
 
 export default async function InterviewDetailPage({ params }: InterviewDetailPageProps) {
   const { id, locale } = await params
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.interview' })
-  const tCommon = await getTranslations({ locale, namespace: 'common' })
+  const [t, tCommon] = await Promise.all([
+    getTranslations({ locale, namespace: 'toast.pageGate.interview' }),
+    getTranslations({ locale, namespace: 'common' }),
+  ])
 
   const returnPath = `/interviews/${encodeURIComponent(id)}`
   const auth = await loadAuthGate(canConfigureInterview, locale)

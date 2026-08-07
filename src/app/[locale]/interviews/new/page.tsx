@@ -32,14 +32,13 @@ export default async function NewInterviewPage({ params, searchParams }: NewInte
   const fromInterview = Array.isArray(fromInterviewParam)
     ? fromInterviewParam[0]
     : fromInterviewParam
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.interview' })
-  const tQuestions = await getTranslations({
-    locale,
-    namespace: 'toast.pageGate.questions',
-  })
-  const tCommon = await getTranslations({ locale, namespace: 'common' })
-  const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
-  const tPrefill = await getTranslations({ locale, namespace: 'templates.prefill' })
+  const [t, tQuestions, tCommon, tFallback, tPrefill] = await Promise.all([
+    getTranslations({ locale, namespace: 'toast.pageGate.interview' }),
+    getTranslations({ locale, namespace: 'toast.pageGate.questions' }),
+    getTranslations({ locale, namespace: 'common' }),
+    getTranslations({ locale, namespace: 'shared.fallback' }),
+    getTranslations({ locale, namespace: 'templates.prefill' }),
+  ])
   const auth = await loadAuthGate(canConfigureInterview, locale)
   redirectIfUnauthenticated(auth, '/interviews/new', locale)
   if (auth.kind === 'forbidden') {
