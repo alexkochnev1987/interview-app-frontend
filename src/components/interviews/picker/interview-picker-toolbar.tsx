@@ -67,6 +67,57 @@ export function InterviewPickerToolbar(props: InterviewPickerToolbarProps) {
   const tToolbar = useTranslations('interviews.library.toolbar')
   const tSort = useTranslations('interviews.library.sort')
 
+  const resultRow = (
+    <>
+      <StatusPill tone="neutral">
+        {loading ? '…' : tToolbar('resultCount', { count: resultCount })}
+      </StatusPill>
+      {activeChips.map((chip) => (
+        <StatusPill key={chip.key} tone="neutral" casing="chip">
+          <Inline gap={1} align="center">
+            <span>{chip.label}</span>
+            <Button
+              type="button"
+              variant="ghost"
+              shape="pill"
+              size="icon-xxs"
+              aria-label={tToolbar('removeChipAria', { label: chip.label })}
+              onClick={chip.onRemove}
+            >
+              <Icon size="xs">
+                <X />
+              </Icon>
+            </Button>
+          </Inline>
+        </StatusPill>
+      ))}
+    </>
+  )
+
+  const sortSelect = (
+    <Select
+      value={sortValue}
+      onValueChange={(value) => {
+        const [nextSortBy, nextSortOrder] = value.split(':') as [
+          InterviewSortField,
+          InterviewSortOrder,
+        ]
+        onSortChange(nextSortBy, nextSortOrder)
+      }}
+    >
+      <SelectTrigger variant="surface" size="md" shape="pill" width="auto-wide">
+        <SelectValue placeholder={tToolbar('sortLabel')} />
+      </SelectTrigger>
+      <SelectContent>
+        {SORT_OPTIONS.map((option) => (
+          <SelectItem key={option.value} value={option.value}>
+            {tSort(option.key)}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  )
+
   return (
     <Stack gap={3}>
       <SearchInput
@@ -76,57 +127,27 @@ export function InterviewPickerToolbar(props: InterviewPickerToolbarProps) {
         placeholder={tToolbar('searchPlaceholder')}
       />
 
-      <Inline gap={3} align="center" justify="between" wrap="wrap">
+      <Inline gap={3} align="center" justify="between" wrap="wrap" visibility="lg-up">
         <Inline gap={2} align="center" wrap="wrap">
-          <StatusPill tone="neutral">
-            {loading ? '…' : tToolbar('resultCount', { count: resultCount })}
-          </StatusPill>
-          {activeChips.map((chip) => (
-            <StatusPill key={chip.key} tone="neutral" casing="chip">
-              <Inline gap={1} align="center">
-                <span>{chip.label}</span>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  shape="pill"
-                  size="icon-xxs"
-                  aria-label={tToolbar('removeChipAria', { label: chip.label })}
-                  onClick={chip.onRemove}
-                >
-                  <Icon size="xs">
-                    <X />
-                  </Icon>
-                </Button>
-              </Inline>
-            </StatusPill>
-          ))}
+          {resultRow}
         </Inline>
-
         <Inline gap={2} align="center" wrap="wrap">
           {viewToggle}
-          <Select
-            value={sortValue}
-            onValueChange={(value) => {
-              const [nextSortBy, nextSortOrder] = value.split(':') as [
-                InterviewSortField,
-                InterviewSortOrder,
-              ]
-              onSortChange(nextSortBy, nextSortOrder)
-            }}
-          >
-            <SelectTrigger variant="surface" size="md" shape="pill" width="auto-wide">
-              <SelectValue placeholder={tToolbar('sortLabel')} />
-            </SelectTrigger>
-            <SelectContent>
-              {SORT_OPTIONS.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {tSort(option.key)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {sortSelect}
         </Inline>
       </Inline>
+
+      <Stack gap={2} visibility="below-lg">
+        <Inline gap={2} align="center" wrap="wrap">
+          {viewToggle}
+        </Inline>
+        <Inline gap={2} align="center" justify="between" wrap="wrap">
+          <Inline gap={2} align="center" wrap="wrap">
+            {resultRow}
+          </Inline>
+          {sortSelect}
+        </Inline>
+      </Stack>
     </Stack>
   )
 }
