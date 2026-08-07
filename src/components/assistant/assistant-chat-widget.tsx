@@ -1,6 +1,6 @@
 'use client'
 
-import { Monitor, X } from 'lucide-react'
+import { MessageSquarePlus, Monitor, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
@@ -25,7 +25,7 @@ const CHAT_WIDGET_CLOSE_MS = 200
 
 export function AssistantChatWidget() {
   const { open, closeAndRestoreFocus } = useAssistantChatShell()
-  const { pendingAction } = useAssistantChatSession()
+  const { pendingAction, resetChat, loading } = useAssistantChatSession()
   const t = useTranslations('assistant')
   const [mounted, setMounted] = useState(open)
   const [closing, setClosing] = useState(false)
@@ -85,15 +85,28 @@ export function AssistantChatWidget() {
                   </Icon>
                 }
               />
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon-sm"
-                onClick={closeAndRestoreFocus}
-                aria-label={t('closeAriaLabel')}
-              >
-                <X />
-              </Button>
+              <Inline gap={1} align="center">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  disabled={loading}
+                  onClick={() => void resetChat()}
+                  aria-label={t('newChatAriaLabel')}
+                  title={t('newChatTooltip')}
+                >
+                  <MessageSquarePlus />
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={closeAndRestoreFocus}
+                  aria-label={t('closeAriaLabel')}
+                >
+                  <X />
+                </Button>
+              </Inline>
             </Inline>
           </ChatWidgetHeader>
           <AiAssistantChat />

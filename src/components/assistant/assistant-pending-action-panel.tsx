@@ -1,6 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
+import { useEffect, useState } from 'react'
 
 import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -17,12 +18,16 @@ import {
   getPendingActionQuestions,
 } from './assistant-confirm-copy'
 import { canConfirmAssistantPendingAction } from './assistant-pending-action-auth'
+import {
+  isEditableInterviewPendingAction,
+  removePendingActionQuestion,
+} from './assistant-pending-action-questions'
 import { AssistantQuestionPlan } from './assistant-question-plan'
 
 type AssistantPendingActionContentProps = {
   pendingAction: RecruiterAssistantPendingAction
   loading?: boolean
-  onConfirm: () => void
+  onConfirm: (pendingAction: RecruiterAssistantPendingAction) => void
   onCancel: () => void
 }
 
@@ -37,15 +42,29 @@ export function AssistantPendingActionContent({
   const t = useTranslations('assistant')
   const tCommon = useTranslations('common')
   const tLocales = useTranslations('languageSwitcher.locales')
-  const canConfirm = canConfirmAssistantPendingAction(pendingAction, user?.role)
-  const details = getPendingActionConfirmDetails(pendingAction, t, {
+  const editable = isEditableInterviewPendingAction(pendingAction)
+  const [draftAction, setDraftAction] = useState(pendingAction)
+
+  useEffect(() => {
+    setDraftAction(pendingAction)
+  }, [pendingAction])
+
+  const actionForConfirm = editable ? draftAction : pendingAction
+  const canConfirm = canConfirmAssistantPendingAction(actionForConfirm, user?.role)
+  const details = getPendingActionConfirmDetails(actionForConfirm, t, {
     formatInterviewLocale: (locale) => (tLocales.has(locale) ? tLocales(locale) : locale),
   })
-  const questions = getPendingActionQuestions(pendingAction)
+  const questions = getPendingActionQuestions(actionForConfirm)
+  const confirmDisabled = loading || (editable && questions.length === 0)
+
+  function handleRemoveQuestion(questionKey: string) {
+    if (!isEditableInterviewPendingAction(draftAction)) return
+    setDraftAction(removePendingActionQuestion(draftAction, questionKey))
+  }
 
   return (
     <Stack gap={3}>
-      <BodyText>{getPendingActionConfirmMessage(pendingAction, t)}</BodyText>
+      <BodyText>{getPendingActionConfirmMessage(actionForConfirm, t)}</BodyText>
 
       {isDemo ? (
         <Alert variant="warning">
@@ -64,12 +83,24 @@ export function AssistantPendingActionContent({
         </Stack>
       ) : null}
 
-      {questions.length > 0 ? <AssistantQuestionPlan questions={questions} /> : null}
+      {questions.length > 0 || editable ? (
+        <AssistantQuestionPlan
+          questions={questions}
+          onRemoveQuestion={editable ? handleRemoveQuestion : undefined}
+          removeDisabled={loading}
+        />
+      ) : null}
 
       <Stack gap={2}>
         {canConfirm ? (
-          <DemoWriteGuard width="full" disabled={loading}>
-            <Button variant="gradient" width="full" loading={loading} onClick={onConfirm}>
+          <DemoWriteGuard width="full" disabled={confirmDisabled}>
+            <Button
+              variant="gradient"
+              width="full"
+              loading={loading}
+              disabled={confirmDisabled}
+              onClick={() => onConfirm(actionForConfirm)}
+            >
               {t('confirm.action')}
             </Button>
           </DemoWriteGuard>
