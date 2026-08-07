@@ -1,50 +1,29 @@
 import { getTranslations } from 'next-intl/server'
+import { Suspense } from 'react'
 
 import { CandidateFeedbackShareView } from '@/components/feedback/candidate-feedback-share-view'
-import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
-import type { Locale } from '@/i18n/locales'
-import { getSharedCandidateFeedback, type PublicCandidateFeedbackResponse } from '@/lib/api'
+import { DetailPageSkeleton } from '@/components/ui/skeleton'
+import { getSharedCandidateFeedback } from '@/lib/api'
 import { getServerRequestContext } from '@/lib/server-fetch'
 
 interface CandidateFeedbackSharePageProps {
-  params: Promise<{ token: string; locale: Locale }>
+  params: Promise<{ token: string }>
 }
 
-export default async function CandidateFeedbackSharePage({
-  params,
-}: CandidateFeedbackSharePageProps) {
-  const { token, locale } = await params
-  const t = await getTranslations({
-    locale,
-    namespace: 'toast.pageGate.feedbackShare',
-  })
-  const ctx = await getServerRequestContext(locale)
+async function CandidateFeedbackShareData({ params }: CandidateFeedbackSharePageProps) {
+  const { token } = await params
+  const ctx = await getServerRequestContext()
+  const feedback = await getSharedCandidateFeedback(token, ctx)
 
-  let feedback: PublicCandidateFeedbackResponse | null = null
-  let error: string | null = null
-
-  try {
-    feedback = await getSharedCandidateFeedback(token, ctx)
-  } catch (err) {
-    error = err instanceof Error ? err.message : t('loadFailedFallback')
+  if (!feedback) {
+    throw new Error('Shared feedback not found')
   }
 
-  if (error || !feedback) {
-    return (
-      <FlashErrorPageFallback
-        title={t('unavailableTitle')}
-        description={error ?? t('loadFailedFallback')}
-        showAction={false}
-      />
-    )
-  }
-
-  // Preset outcome copy is candidate-facing content and must match interviewLocale,
-  // even when the share chrome stays in the UI locale.
   const tShareOutcome = await getTranslations({
     locale: feedback.interviewLocale,
     namespace: 'feedback.share',
   })
+
   const outcomeMessage =
     feedback.outcome === 'custom'
       ? (feedback.outcomeMessage?.trim() ?? '')
@@ -53,4 +32,12 @@ export default async function CandidateFeedbackSharePage({
         : ''
 
   return <CandidateFeedbackShareView feedback={feedback} outcomeMessage={outcomeMessage} />
+}
+
+export default function CandidateFeedbackSharePage({ params }: CandidateFeedbackSharePageProps) {
+  return (
+    <Suspense fallback={<DetailPageSkeleton />}>
+      <CandidateFeedbackShareData params={params} />
+    </Suspense>
+  )
 }

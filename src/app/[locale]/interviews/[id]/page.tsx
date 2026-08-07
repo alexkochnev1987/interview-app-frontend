@@ -1,103 +1,51 @@
-import { getTranslations } from 'next-intl/server'
+import { forbidden } from 'next/navigation'
+import { Suspense } from 'react'
 
-import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
-import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
-import type { Locale } from '@/i18n/locales'
+import { DetailPageSkeleton } from '@/components/ui/skeleton'
 import { type Interview, type InterviewResult } from '@/lib/api'
-import {
-  loadAuthGate,
-  redirectIfUnauthenticated,
-  redirectIfUnauthorizedError,
-} from '@/lib/auth-gate'
+import { requireAuthGate } from '@/lib/auth-gate'
 import { canConfigureInterview } from '@/lib/auth-roles'
 import { canEditInterview } from '@/lib/interview-management'
-import { prefetchInterviewCreatePicker } from '@/lib/questions-library-prefetch'
-import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
-import { isForbiddenError, requestServer } from '@/lib/server-fetch'
+import { prefetchInterviewCreatePicker, type QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
+import { requestServer } from '@/lib/server-fetch'
 
 import InterviewDetailClient from './interview-detail-client'
 
 interface InterviewDetailPageProps {
   params: Promise<{
     id: string
-    locale: Locale
   }>
 }
 
-export default async function InterviewDetailPage({ params }: InterviewDetailPageProps) {
-  const { id, locale } = await params
-  const [t, tCommon] = await Promise.all([
-    getTranslations({ locale, namespace: 'toast.pageGate.interview' }),
-    getTranslations({ locale, namespace: 'common' }),
-  ])
-
-  const returnPath = `/interviews/${encodeURIComponent(id)}`
-  const auth = await loadAuthGate(canConfigureInterview, locale)
-  redirectIfUnauthenticated(auth, returnPath, locale)
-  if (auth.kind === 'forbidden') {
-    return (
-      <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
-    )
-  }
-  if (auth.kind === 'error') {
-    return (
-      <FlashErrorPageFallback
-        title={t('unavailableTitle')}
-        description={`${tCommon('sessionVerificationFailed')} ${auth.message}`}
-      />
-    )
-  }
+async function InterviewDetailData({ params }: InterviewDetailPageProps) {
+  const { id } = await params
+  const { ctx } = await requireAuthGate(canConfigureInterview, `/interviews/${encodeURIComponent(id)}`)
 
   const encodedId = encodeURIComponent(id)
-  let interview: Interview | null = null
-  let results: InterviewResult | null = null
-  let error: string | null = null
+  const interview = await requestServer<Interview>(`/interviews/${encodedId}`, ctx, {
+    withLocaleHeader: false,
+  })
 
-  try {
-    interview =
-      (await requestServer<Interview>(`/interviews/${encodedId}`, auth.ctx, {
-        withLocaleHeader: false,
-      })) ?? null
-
-    if (interview) {
-      results = interview.result ?? null
-
-      if (interview.status === 'completed') {
-        try {
-          results =
-            (await requestServer<InterviewResult>(`/interviews/${encodedId}/results`, auth.ctx, {
-              withLocaleHeader: false,
-            })) ??
-            interview.result ??
-            null
-        } catch {
-          results = interview.result ?? null
-        }
-      }
-    }
-  } catch (err) {
-    redirectIfUnauthorizedError(err, returnPath, locale)
-    if (isForbiddenError(err)) {
-      return (
-        <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
-      )
-    }
-    error = err instanceof Error ? err.message : t('loadFailedFallback')
+  if (!interview) {
+    forbidden()
   }
 
-  if (error || !interview) {
-    return (
-      <FlashErrorPageFallback
-        title={t('unavailableTitle')}
-        description={error ?? t('notFoundFallback')}
-      />
-    )
+  let results: InterviewResult | null = interview.result ?? null
+  if (interview.status === 'completed') {
+    try {
+      results =
+        (await requestServer<InterviewResult>(`/interviews/${encodedId}/results`, ctx, {
+          withLocaleHeader: false,
+        })) ?? interview.result ?? null
+    } catch {
+      results = interview.result ?? null
+    }
   }
 
   let editPickerPrefetch: QuestionsLibraryPrefetch | null = null
   if (canEditInterview(interview)) {
     try {
-      editPickerPrefetch = await prefetchInterviewCreatePicker(auth.ctx)
+      editPickerPrefetch = await prefetchInterviewCreatePicker(ctx)
     } catch {
       editPickerPrefetch = null
     }
@@ -110,5 +58,13 @@ export default async function InterviewDetailPage({ params }: InterviewDetailPag
       initialResults={results}
       editPickerPrefetch={editPickerPrefetch}
     />
+  )
+}
+
+export default function InterviewDetailPage({ params }: InterviewDetailPageProps) {
+  return (
+    <Suspense fallback={<DetailPageSkeleton />}>
+      <InterviewDetailData params={params} />
+    </Suspense>
   )
 }

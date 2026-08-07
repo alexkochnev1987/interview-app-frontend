@@ -6,6 +6,7 @@ import { getQueryClient } from '@/lib/get-query-client'
 import { requestServer, type ServerRequestContext } from '@/lib/server-fetch'
 
 export async function prefetchTemplatesList(ctx: ServerRequestContext): Promise<DehydratedState> {
+  'use cache: private'
   const queryClient = getQueryClient()
   await queryClient.prefetchQuery({
     queryKey: templatesListQueryKey(ctx.locale),

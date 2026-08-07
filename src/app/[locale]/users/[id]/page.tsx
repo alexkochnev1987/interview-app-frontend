@@ -1,89 +1,37 @@
-import { getTranslations } from 'next-intl/server'
+import { forbidden } from 'next/navigation'
 import { Suspense } from 'react'
 
-import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
-import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
+import { DetailPageSkeleton } from '@/components/ui/skeleton'
 import { ProfileView } from '@/features/profile/profile-view'
-import type { Locale } from '@/i18n/locales'
 import { type TeamMember } from '@/lib/api'
-import { isApiError } from '@/lib/api-error'
-import {
-  loadAuthGate,
-  redirectIfUnauthenticated,
-  redirectIfUnauthorizedError,
-} from '@/lib/auth-gate'
+import { requireAuthGate } from '@/lib/auth-gate'
 import { requestServer } from '@/lib/server-fetch'
 import { canViewUserProfile } from '@/lib/user-profile-access'
 
 interface UserProfilePageProps {
-  params: Promise<{ locale: Locale; id: string }>
+  params: Promise<{ id: string }>
 }
 
-export default async function UserProfilePage({ params }: UserProfilePageProps) {
-  const { locale, id } = await params
-  const [t, tCommon] = await Promise.all([
-    getTranslations({ locale, namespace: 'toast.pageGate.profile' }),
-    getTranslations({ locale, namespace: 'common' }),
-  ])
-  const returnPath = `/users/${id}`
+async function UserProfileData({ params }: UserProfilePageProps) {
+  const { id } = await params
+  const { ctx, me } = await requireAuthGate(() => true, `/users/${id}`)
+  const user = await requestServer<TeamMember>(`/users/${encodeURIComponent(id)}`, ctx)
 
-  const auth = await loadAuthGate(() => true, locale)
-  redirectIfUnauthenticated(auth, returnPath, locale)
-
-  if (auth.kind === 'error') {
-    return (
-      <FlashErrorPageFallback title={tCommon('profileLoadFailed')} description={auth.message} />
-    )
+  if (!user || !canViewUserProfile({ id: user.id, role: user.role }, { id: me.id, role: me.role })) {
+    forbidden()
   }
 
-  if (auth.kind !== 'authorized') {
-    return (
-      <FlashErrorPageFallback
-        title={tCommon('profileLoadFailed')}
-        description={tCommon('sessionVerificationFailed')}
-      />
-    )
-  }
+  const mode = me.id === user.id ? 'self' : 'member'
 
-  let user: TeamMember | null = null
-  let error: string | null = null
+  return <ProfileView user={user} mode={mode} />
+}
 
-  try {
-    user = (await requestServer<TeamMember>(`/users/${encodeURIComponent(id)}`, auth.ctx)) ?? null
-  } catch (err) {
-    redirectIfUnauthorizedError(err, returnPath, locale)
-    if (isApiError(err) && err.status === 404) {
-      return (
-        <FlashErrorPageFallback title={t('loadFailedTitle')} description={t('notFoundFallback')} />
-      )
-    }
-    error = err instanceof Error ? err.message : t('loadFailedFallback')
-  }
-
-  if (error || !user) {
-    return (
-      <FlashErrorPageFallback
-        title={t('loadFailedTitle')}
-        description={error ?? t('notFoundFallback')}
-      />
-    )
-  }
-
-  if (
-    !canViewUserProfile({ id: user.id, role: user.role }, { id: auth.me.id, role: auth.me.role })
-  ) {
-    return (
-      <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
-    )
-  }
-
-  const mode = auth.me.id === user.id ? 'self' : 'member'
-
+export default function UserProfilePage({ params }: UserProfilePageProps) {
   return (
     <PageShell>
-      <Suspense fallback={null}>
-        <ProfileView user={user} mode={mode} />
+      <Suspense fallback={<DetailPageSkeleton />}>
+        <UserProfileData params={params} />
       </Suspense>
     </PageShell>
   )

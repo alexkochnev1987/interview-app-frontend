@@ -1,83 +1,41 @@
-import { getTranslations } from 'next-intl/server'
 import { Suspense } from 'react'
 
 import { InterviewsLibraryClient } from '@/components/interviews/library/interviews-library-client'
 import { QueryHydrationBoundary } from '@/components/questions/query-hydration-boundary'
-import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
-import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
-import type { Locale } from '@/i18n/locales'
+import { TableSkeleton } from '@/components/ui/skeleton'
 import { routes } from '@/i18n/routes'
-import { loadAuthGate, redirectIfUnauthenticated } from '@/lib/auth-gate'
+import { requireAuthGate } from '@/lib/auth-gate'
 import { canAssignInterviewHr, canConfigureInterview } from '@/lib/auth-roles'
 import { prefetchInterviewsLibrary } from '@/lib/interviews-library-prefetch'
 import { toInterviewsSearchParams } from '@/lib/interviews-query-state'
 
-const ERROR_BACK_HREF = '/'
-
 interface InterviewsPageProps {
-  params: Promise<{ locale: Locale }>
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
-export default async function InterviewsPage({ params, searchParams }: InterviewsPageProps) {
-  const { locale } = await params
-  const [t, tCommon, tFallback] = await Promise.all([
-    getTranslations({ locale, namespace: 'toast.pageGate.interviews' }),
-    getTranslations({ locale, namespace: 'common' }),
-    getTranslations({ locale, namespace: 'shared.fallback' }),
-  ])
-  const auth = await loadAuthGate(canConfigureInterview, locale)
-  redirectIfUnauthenticated(auth, routes.interviews.list, locale)
-
-  if (auth.kind === 'forbidden') {
-    return (
-      <ForbiddenAccessPage
-        title={t('libraryForbiddenTitle')}
-        description={t('libraryForbiddenDescription')}
-      />
-    )
-  }
-
-  if (auth.kind === 'error') {
-    return (
-      <FlashErrorPageFallback
-        title={t('libraryUnavailableTitle')}
-        description={`${tCommon('sessionVerificationFailed')} ${auth.message}`}
-        backHref={ERROR_BACK_HREF}
-        backLabel={tFallback('backToDashboard')}
-      />
-    )
-  }
-
+async function InterviewsData({ searchParams }: { searchParams: InterviewsPageProps['searchParams'] }) {
+  const { ctx, me } = await requireAuthGate(canConfigureInterview, routes.interviews.list)
   const urlParams = toInterviewsSearchParams(await searchParams)
-  const allowAssignedHrFilter = canAssignInterviewHr(auth.me.role)
-  let initialPrefetch
+  const allowAssignedHrFilter = canAssignInterviewHr(me.role)
 
-  try {
-    initialPrefetch = await prefetchInterviewsLibrary(auth.ctx, urlParams, {
-      allowAssignedHrFilter,
-    })
-  } catch (err) {
-    const message = err instanceof Error ? err.message : t('libraryLoadFailedFallback')
-
-    return (
-      <FlashErrorPageFallback
-        title={t('libraryUnavailableTitle')}
-        description={message}
-        backHref={ERROR_BACK_HREF}
-        backLabel={tFallback('backToDashboard')}
-      />
-    )
-  }
+  const initialPrefetch = await prefetchInterviewsLibrary(ctx, urlParams, {
+    allowAssignedHrFilter,
+  })
 
   return (
+    <QueryHydrationBoundary state={initialPrefetch.dehydratedState}>
+      <InterviewsLibraryClient initialPrefetch={initialPrefetch} />
+    </QueryHydrationBoundary>
+  )
+}
+
+export default function InterviewsPage({ searchParams }: InterviewsPageProps) {
+  return (
     <PageShell>
-      <QueryHydrationBoundary state={initialPrefetch.dehydratedState}>
-        <Suspense fallback={null}>
-          <InterviewsLibraryClient initialPrefetch={initialPrefetch} />
-        </Suspense>
-      </QueryHydrationBoundary>
+      <Suspense fallback={<TableSkeleton />}>
+        <InterviewsData searchParams={searchParams} />
+      </Suspense>
     </PageShell>
   )
 }

@@ -12,6 +12,11 @@ const nonDefaultLocales = LOCALES.filter((locale) => locale !== DEFAULT_LOCALE)
 const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
+  experimental: {
+    instantInsights: {
+      validationLevel: 'manual-warning',
+    },
+  },
   distDir: process.env.NODE_ENV === 'development' ? '.next-dev' : '.next',
   output: 'standalone',
   allowedDevOrigins: ['127.0.0.1'],

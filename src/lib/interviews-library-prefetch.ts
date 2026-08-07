@@ -49,6 +49,7 @@ async function fetchFacetsPage(
 export async function fetchUnfilteredInterviewFacets(
   ctx: ServerRequestContext,
 ): Promise<InterviewFacetsResponse> {
+  'use cache: private'
   return fetchFacetsPage({}, ctx)
 }
 
@@ -111,6 +112,7 @@ export async function prefetchInterviewsLibrary(
   searchParams: URLSearchParams,
   options?: { allowAssignedHrFilter?: boolean },
 ): Promise<InterviewsLibraryPrefetch> {
+  'use cache: private'
   const queryState = resolveInterviewsQueryState(searchParams, {
     allowAssignedHrFilter: options?.allowAssignedHrFilter,
   })

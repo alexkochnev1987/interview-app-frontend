@@ -1,11 +1,7 @@
-import { AlertCircle } from 'lucide-react'
-import { getTranslations } from 'next-intl/server'
 import { Suspense } from 'react'
 
 import { PageContent, PageMainLayout } from '@/components/layout/page-shell'
-import { Icon } from '@/components/ui/icon'
-import { EmptyStateCard } from '@/components/ui/state-card'
-import type { Locale } from '@/i18n/locales'
+import { DetailPageSkeleton } from '@/components/ui/skeleton'
 import { type TakeInterviewData } from '@/lib/api'
 import { getServerRequestContext, requestServer } from '@/lib/server-fetch'
 import { readSearchParamToken } from '@/lib/text'
@@ -13,60 +9,39 @@ import { readSearchParamToken } from '@/lib/text'
 import { TakeInterviewClient } from './take-interview-client'
 
 interface TakeInterviewPageProps {
-  params: Promise<{ id: string; locale: Locale }>
+  params: Promise<{ id: string }>
   searchParams: Promise<{ token?: string | string[] }>
 }
 
-export default async function TakeInterviewPage({ params, searchParams }: TakeInterviewPageProps) {
-  const { id, locale } = await params
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.take' })
+async function TakeInterviewDataComponent({ params, searchParams }: TakeInterviewPageProps) {
+  const { id } = await params
   const token = readSearchParamToken((await searchParams).token)
 
   if (token) {
-    return (
-      <Suspense fallback={null}>
-        <TakeInterviewClient id={id} candidateToken={token} />
-      </Suspense>
-    )
+    return <TakeInterviewClient id={id} candidateToken={token} />
   }
 
-  const ctx = await getServerRequestContext(locale)
+  const ctx = await getServerRequestContext()
   const encodedId = encodeURIComponent(id)
+  const interview = await requestServer<TakeInterviewData>(`/take/${encodedId}`, ctx, {
+    withLocaleHeader: false,
+  })
 
-  let interview: TakeInterviewData | null = null
-  let error: string | null = null
-
-  try {
-    interview =
-      (await requestServer<TakeInterviewData>(`/take/${encodedId}`, ctx, {
-        withLocaleHeader: false,
-        // Omit contentLocale: API resolves questions via interviewLocale.
-      })) ?? null
-  } catch (err) {
-    error = err instanceof Error ? err.message : t('loadFailedFallback')
+  if (!interview) {
+    throw new Error('Interview not found')
   }
 
-  if (error || !interview) {
-    return (
-      <PageMainLayout>
-        <PageContent>
-          <EmptyStateCard
-            icon={
-              <Icon size="lg">
-                <AlertCircle />
-              </Icon>
-            }
-            title={t('unavailableTitle')}
-            description={error ?? t('loadFailedFallback')}
-          />
-        </PageContent>
-      </PageMainLayout>
-    )
-  }
+  return <TakeInterviewClient id={id} initialInterview={interview} />
+}
 
+export default function TakeInterviewPage({ params, searchParams }: TakeInterviewPageProps) {
   return (
-    <Suspense fallback={null}>
-      <TakeInterviewClient id={id} initialInterview={interview} />
-    </Suspense>
+    <PageMainLayout>
+      <PageContent>
+        <Suspense fallback={<DetailPageSkeleton />}>
+          <TakeInterviewDataComponent params={params} searchParams={searchParams} />
+        </Suspense>
+      </PageContent>
+    </PageMainLayout>
   )
 }

@@ -1,69 +1,31 @@
-import { getTranslations } from 'next-intl/server'
+import { Suspense } from 'react'
 
 import { QueryHydrationBoundary } from '@/components/questions/query-hydration-boundary'
 import { TemplatesListClient } from '@/components/templates/templates-list-client'
-import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
-import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
-import type { Locale } from '@/i18n/locales'
+import { TableSkeleton } from '@/components/ui/skeleton'
 import { routes } from '@/i18n/routes'
-import { loadAuthGate, redirectIfUnauthenticated } from '@/lib/auth-gate'
+import { requireAuthGate } from '@/lib/auth-gate'
 import { canConfigureInterview } from '@/lib/auth-roles'
 import { prefetchTemplatesList } from '@/lib/templates-prefetch'
 
-const ERROR_BACK_HREF = '/'
-
-interface TemplatesPageProps {
-  params: Promise<{ locale: Locale }>
-}
-
-export default async function TemplatesPage({ params }: TemplatesPageProps) {
-  const { locale } = await params
-  const [t, tCommon, tFallback] = await Promise.all([
-    getTranslations({ locale, namespace: 'toast.pageGate.templates' }),
-    getTranslations({ locale, namespace: 'common' }),
-    getTranslations({ locale, namespace: 'shared.fallback' }),
-  ])
-  const auth = await loadAuthGate(canConfigureInterview, locale)
-  redirectIfUnauthenticated(auth, routes.templates.list, locale)
-
-  if (auth.kind === 'forbidden') {
-    return (
-      <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
-    )
-  }
-
-  if (auth.kind === 'error') {
-    return (
-      <FlashErrorPageFallback
-        title={t('unavailableTitle')}
-        description={`${tCommon('sessionVerificationFailed')} ${auth.message}`}
-        backHref={ERROR_BACK_HREF}
-        backLabel={tFallback('backToDashboard')}
-      />
-    )
-  }
-
-  let dehydratedState
-  try {
-    dehydratedState = await prefetchTemplatesList(auth.ctx)
-  } catch (err) {
-    const message = err instanceof Error ? err.message : t('loadFailedFallback')
-    return (
-      <FlashErrorPageFallback
-        title={t('unavailableTitle')}
-        description={message}
-        backHref={ERROR_BACK_HREF}
-        backLabel={tFallback('backToDashboard')}
-      />
-    )
-  }
+async function TemplatesData() {
+  const { ctx } = await requireAuthGate(canConfigureInterview, routes.templates.list)
+  const dehydratedState = await prefetchTemplatesList(ctx)
 
   return (
+    <QueryHydrationBoundary state={dehydratedState}>
+      <TemplatesListClient />
+    </QueryHydrationBoundary>
+  )
+}
+
+export default function TemplatesPage() {
+  return (
     <PageShell>
-      <QueryHydrationBoundary state={dehydratedState}>
-        <TemplatesListClient />
-      </QueryHydrationBoundary>
+      <Suspense fallback={<TableSkeleton />}>
+        <TemplatesData />
+      </Suspense>
     </PageShell>
   )
 }

@@ -1,18 +1,9 @@
-import { getTranslations } from 'next-intl/server'
 import { Suspense } from 'react'
 
 import { DashboardView } from '@/components/dashboard/dashboard-view'
 import { QueryHydrationBoundary } from '@/components/questions/query-hydration-boundary'
-import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
-import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
-import type { Locale } from '@/i18n/locales'
-import { routes } from '@/i18n/routes'
-import type { InterviewFacetsResponse } from '@/lib/api'
-import {
-  loadAuthGate,
-  redirectIfUnauthenticated,
-  redirectIfUnauthorizedError,
-} from '@/lib/auth-gate'
+import { CardGridSkeleton } from '@/components/ui/skeleton'
+import { requireAuthGate } from '@/lib/auth-gate'
 import { canAccessDashboard } from '@/lib/auth-roles'
 import { computeDashboardMetrics } from '@/lib/dashboard-metrics'
 import {
@@ -20,80 +11,33 @@ import {
   prefetchInterviewsLibrary,
 } from '@/lib/interviews-library-prefetch'
 import { toInterviewsSearchParams } from '@/lib/interviews-query-state'
-import { isForbiddenError } from '@/lib/server-fetch'
-
-const ERROR_SIGN_IN_HREF = '/login'
-const ERROR_ESCAPE_HREF = routes.questions.list
 
 interface DashboardPageProps {
-  params: Promise<{ locale: Locale }>
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
-export default async function DashboardPage({ params, searchParams }: DashboardPageProps) {
-  const { locale } = await params
-  const [t, tCommon] = await Promise.all([
-    getTranslations({ locale, namespace: 'toast.pageGate.dashboard' }),
-    getTranslations({ locale, namespace: 'common' }),
-  ])
-  const auth = await loadAuthGate(canAccessDashboard, locale)
-  redirectIfUnauthenticated(auth, '/', locale)
-  if (auth.kind === 'forbidden') {
-    return (
-      <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
-    )
-  }
-  if (auth.kind === 'error') {
-    return (
-      <FlashErrorPageFallback
-        title={t('unavailableTitle')}
-        description={`${tCommon('sessionVerificationFailed')} ${auth.message}`}
-        backHref={ERROR_SIGN_IN_HREF}
-        backLabel={t('signInActionLabel')}
-      />
-    )
-  }
-
+async function DashboardData({ searchParams }: { searchParams: DashboardPageProps['searchParams'] }) {
+  const { ctx, me } = await requireAuthGate(canAccessDashboard, '/')
   const urlParams = toInterviewsSearchParams(await searchParams)
-  let initialPrefetch
-  let metricsFacets: InterviewFacetsResponse | undefined
-  let error: string | null = null
 
-  try {
-    const [prefetch, unfilteredFacets] = await Promise.all([
-      prefetchInterviewsLibrary(auth.ctx, urlParams),
-      fetchUnfilteredInterviewFacets(auth.ctx),
-    ])
-    initialPrefetch = prefetch
-    metricsFacets = unfilteredFacets
-  } catch (err) {
-    redirectIfUnauthorizedError(err, '/', locale)
-    if (isForbiddenError(err)) {
-      return (
-        <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
-      )
-    }
-    error = err instanceof Error ? err.message : t('loadFailedFallback')
-  }
-
-  if (error || !initialPrefetch || !metricsFacets) {
-    return (
-      <FlashErrorPageFallback
-        title={t('loadFailedTitle')}
-        description={error ?? t('loadFailedFallback')}
-        backHref={ERROR_ESCAPE_HREF}
-        backLabel={t('questionBankActionLabel')}
-      />
-    )
-  }
+  const [initialPrefetch, metricsFacets] = await Promise.all([
+    prefetchInterviewsLibrary(ctx, urlParams),
+    fetchUnfilteredInterviewFacets(ctx),
+  ])
 
   const metrics = computeDashboardMetrics(metricsFacets)
 
   return (
     <QueryHydrationBoundary state={initialPrefetch.dehydratedState}>
-      <Suspense fallback={null}>
-        <DashboardView metrics={metrics} isDemo={auth.me.demo} initialPrefetch={initialPrefetch} />
-      </Suspense>
+      <DashboardView metrics={metrics} isDemo={me.demo} initialPrefetch={initialPrefetch} />
     </QueryHydrationBoundary>
+  )
+}
+
+export default function DashboardPage({ searchParams }: DashboardPageProps) {
+  return (
+    <Suspense fallback={<CardGridSkeleton />}>
+      <DashboardData searchParams={searchParams} />
+    </Suspense>
   )
 }

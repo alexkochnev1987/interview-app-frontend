@@ -96,6 +96,7 @@ export async function prefetchQuestionsLibrary(
   searchParams: URLSearchParams,
   options?: { lockStatus?: QuestionStatusFilter },
 ): Promise<QuestionsLibraryPrefetch> {
+  'use cache: private'
   const queryState = resolveQuestionsQueryState(searchParams, options)
   const isTableView = queryState.view === 'table'
 
@@ -108,6 +109,7 @@ export async function prefetchQuestionsLibrary(
 export async function prefetchInterviewCreatePicker(
   ctx: ServerRequestContext,
 ): Promise<QuestionsLibraryPrefetch> {
+  'use cache: private'
   const queryState = resolveQuestionsQueryState(new URLSearchParams(), {
     lockStatus: 'active',
   })

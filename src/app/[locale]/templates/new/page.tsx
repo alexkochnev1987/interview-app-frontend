@@ -1,83 +1,42 @@
 import { getTranslations } from 'next-intl/server'
+import { Suspense } from 'react'
 
 import { QueryHydrationBoundary } from '@/components/questions/query-hydration-boundary'
 import { TemplateForm } from '@/components/templates/template-form'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
-import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
-import type { Locale } from '@/i18n/locales'
+import { DetailPageSkeleton } from '@/components/ui/skeleton'
 import { routes } from '@/i18n/routes'
-import { loadAuthGate, redirectIfUnauthenticated } from '@/lib/auth-gate'
+import { requireAuthGate } from '@/lib/auth-gate'
 import { canConfigureInterview } from '@/lib/auth-roles'
 import { prefetchInterviewCreatePicker } from '@/lib/questions-library-prefetch'
 import { fetchInterview } from '@/lib/templates-prefetch'
 
-const ERROR_BACK_HREF = routes.templates.list
-
 interface NewTemplatePageProps {
-  params: Promise<{ locale: Locale }>
   searchParams: Promise<{ fromInterview?: string | string[] }>
 }
 
-export default async function NewTemplatePage({ params, searchParams }: NewTemplatePageProps) {
-  const { locale } = await params
+async function NewTemplateData({ searchParams }: { searchParams: NewTemplatePageProps['searchParams'] }) {
   const { fromInterview: fromInterviewParam } = await searchParams
   const fromInterview = Array.isArray(fromInterviewParam)
     ? fromInterviewParam[0]
     : fromInterviewParam
-  const [t, tCommon, tFallback, tPrefill] = await Promise.all([
-    getTranslations({ locale, namespace: 'toast.pageGate.templates' }),
-    getTranslations({ locale, namespace: 'common' }),
-    getTranslations({ locale, namespace: 'shared.fallback' }),
-    getTranslations({ locale, namespace: 'templates.prefill' }),
+
+  const { ctx } = await requireAuthGate(canConfigureInterview, routes.templates.new)
+  const [tPrefill, initialPrefetch] = await Promise.all([
+    getTranslations({ namespace: 'templates.prefill' }),
+    prefetchInterviewCreatePicker(ctx),
   ])
-  const auth = await loadAuthGate(canConfigureInterview, locale)
-  redirectIfUnauthenticated(auth, routes.templates.new, locale)
 
-  if (auth.kind === 'forbidden') {
-    return (
-      <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
-    )
-  }
-
-  if (auth.kind === 'error') {
-    return (
-      <FlashErrorPageFallback
-        title={t('unavailableTitle')}
-        description={`${tCommon('sessionVerificationFailed')} ${auth.message}`}
-        backHref={ERROR_BACK_HREF}
-        backLabel={tFallback('backToTemplates')}
-      />
-    )
-  }
-
-  let initialPrefetch
-  try {
-    initialPrefetch = await prefetchInterviewCreatePicker(auth.ctx)
-  } catch (err) {
-    const message = err instanceof Error ? err.message : t('loadFailedFallback')
-    return (
-      <FlashErrorPageFallback
-        title={t('unavailableTitle')}
-        description={message}
-        backHref={ERROR_BACK_HREF}
-        backLabel={tFallback('backToTemplates')}
-      />
-    )
-  }
-
-  // "Save as template" from a past interview: prefill questions + position.
-  // A present-but-unloadable source is surfaced rather than silently dropped.
   let interview
   let sourceInterviewMissing = false
   if (fromInterview) {
-    interview = await fetchInterview(auth.ctx, fromInterview).catch(() => undefined)
+    interview = await fetchInterview(ctx, fromInterview).catch(() => undefined)
     sourceInterviewMissing = !interview
   }
 
   return (
-    <PageShell>
+    <>
       {sourceInterviewMissing ? (
         <Alert variant="warning">
           <AlertTitle>{tPrefill('unavailableTitle')}</AlertTitle>
@@ -91,6 +50,16 @@ export default async function NewTemplatePage({ params, searchParams }: NewTempl
           initialPosition={interview?.position}
         />
       </QueryHydrationBoundary>
+    </>
+  )
+}
+
+export default function NewTemplatePage({ searchParams }: NewTemplatePageProps) {
+  return (
+    <PageShell>
+      <Suspense fallback={<DetailPageSkeleton />}>
+        <NewTemplateData searchParams={searchParams} />
+      </Suspense>
     </PageShell>
   )
 }

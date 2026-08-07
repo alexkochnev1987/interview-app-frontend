@@ -1,17 +1,11 @@
-import { getTranslations } from 'next-intl/server'
+import { forbidden } from 'next/navigation'
+import { Suspense } from 'react'
 
 import { CandidateFeedbackEditor } from '@/components/candidate-feedback/candidate-feedback-editor'
-import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
-import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
-import type { Locale } from '@/i18n/locales'
-import { routes } from '@/i18n/routes'
+import { DetailPageSkeleton } from '@/components/ui/skeleton'
 import { type Interview } from '@/lib/api'
 import { isApiError } from '@/lib/api-error'
-import {
-  loadAuthGate,
-  redirectIfUnauthenticated,
-  redirectIfUnauthorizedError,
-} from '@/lib/auth-gate'
+import { requireAuthGate } from '@/lib/auth-gate'
 import { canConfigureInterview } from '@/lib/auth-roles'
 import {
   candidateFeedbackPath,
@@ -21,140 +15,64 @@ import {
   type CandidateFeedbackResponse,
 } from '@/lib/candidate-feedback'
 import { canAccessCandidateFeedback } from '@/lib/interview-management'
-import { isForbiddenError, requestServer } from '@/lib/server-fetch'
+import { requestServer } from '@/lib/server-fetch'
 
 interface CandidateFeedbackPageProps {
-  params: Promise<{ id: string; locale: Locale }>
+  params: Promise<{ id: string }>
 }
 
-export default async function CandidateFeedbackPage({ params }: CandidateFeedbackPageProps) {
-  const { id, locale } = await params
-  const [t, tCommon, tFallback] = await Promise.all([
-    getTranslations({ locale, namespace: 'toast.pageGate.candidateFeedback' }),
-    getTranslations({ locale, namespace: 'common' }),
-    getTranslations({ locale, namespace: 'shared.fallback' }),
-  ])
-
-  const returnPath = candidateFeedbackPath(id)
-  const backHref = routes.interviews.detail(id)
-  const auth = await loadAuthGate(canConfigureInterview, locale)
-  redirectIfUnauthenticated(auth, returnPath, locale)
-
-  if (auth.kind === 'forbidden') {
-    return (
-      <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
-    )
-  }
-
-  if (auth.kind === 'error') {
-    return (
-      <FlashErrorPageFallback
-        title={t('unavailableTitle')}
-        description={`${tCommon('sessionVerificationFailed')} ${auth.message}`}
-        backHref={backHref}
-        backLabel={tFallback('backToInterview')}
-      />
-    )
-  }
+async function CandidateFeedbackData({ params }: CandidateFeedbackPageProps) {
+  const { id } = await params
+  const { ctx } = await requireAuthGate(canConfigureInterview, candidateFeedbackPath(id))
 
   const encodedId = encodeURIComponent(id)
   let interview: Interview | null = null
   let feedback: CandidateFeedbackResponse | null = null
-  let error: string | null = null
-  let notFound = false
 
   const [interviewResult, feedbackResult] = await Promise.allSettled([
-    requestServer<Interview>(`/interviews/${encodedId}`, auth.ctx, {
+    requestServer<Interview>(`/interviews/${encodedId}`, ctx, {
       withLocaleHeader: false,
     }),
     requestServer<ApiCandidateFeedbackDto>(
       `/interviews/${encodedId}/candidate-feedback`,
-      auth.ctx,
+      ctx,
       { withLocaleHeader: false },
     ),
   ])
 
-  if (interviewResult.status === 'rejected') {
-    const err = interviewResult.reason
-    redirectIfUnauthorizedError(err, returnPath, locale)
-    if (isForbiddenError(err)) {
-      return (
-        <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
-      )
-    }
-    if (isApiError(err) && err.status === 404) {
-      notFound = true
-    } else {
-      error = err instanceof Error ? err.message : t('loadFailedFallback')
-    }
+  if (interviewResult.status === 'fulfilled' && interviewResult.value) {
+    interview = interviewResult.value
   } else {
-    interview = interviewResult.value ?? null
+    forbidden()
   }
 
-  if (!notFound && !error && interview) {
-    const interviewLocale = interview.interviewLocale ?? locale
+  const interviewLocale = interview.interviewLocale ?? 'en'
 
-    if (feedbackResult.status === 'rejected') {
-      const err = feedbackResult.reason
-      redirectIfUnauthorizedError(err, returnPath, locale)
-      if (isForbiddenError(err)) {
-        return (
-          <ForbiddenAccessPage
-            title={t('forbiddenTitle')}
-            description={t('forbiddenDescription')}
-          />
-        )
-      }
-      if (isApiError(err) && err.status === 404) {
-        feedback = createEmptyCandidateFeedback(interview.id, interviewLocale)
-      } else {
-        error = err instanceof Error ? err.message : t('loadFailedFallback')
-      }
-    } else if (feedbackResult.value) {
-      feedback = mapCandidateFeedbackFromApi(
-        {
-          ...feedbackResult.value,
-          interviewId: feedbackResult.value.interviewId ?? interview.id,
-        },
-        interviewLocale,
-      )
-    } else {
-      feedback = createEmptyCandidateFeedback(interview.id, interviewLocale)
-    }
-  }
-
-  if (notFound || (!error && !interview)) {
-    return (
-      <FlashErrorPageFallback
-        title={t('unavailableTitle')}
-        description={t('notFoundFallback')}
-        backHref={backHref}
-        backLabel={tFallback('backToInterview')}
-      />
+  if (feedbackResult.status === 'fulfilled' && feedbackResult.value) {
+    feedback = mapCandidateFeedbackFromApi(
+      {
+        ...feedbackResult.value,
+        interviewId: feedbackResult.value.interviewId ?? interview.id,
+      },
+      interviewLocale,
     )
-  }
-
-  if (error || !interview || !feedback) {
-    return (
-      <FlashErrorPageFallback
-        title={t('unavailableTitle')}
-        description={error ?? t('loadFailedFallback')}
-        backHref={backHref}
-        backLabel={tFallback('backToInterview')}
-      />
-    )
+  } else if (feedbackResult.status === 'rejected' && isApiError(feedbackResult.reason) && feedbackResult.reason.status === 404) {
+    feedback = createEmptyCandidateFeedback(interview.id, interviewLocale)
+  } else {
+    feedback = createEmptyCandidateFeedback(interview.id, interviewLocale)
   }
 
   if (!canAccessCandidateFeedback(interview)) {
-    return (
-      <FlashErrorPageFallback
-        title={t('statusUnavailableTitle')}
-        description={t('statusUnavailableDescription')}
-        backHref={backHref}
-        backLabel={tFallback('backToInterview')}
-      />
-    )
+    forbidden()
   }
 
   return <CandidateFeedbackEditor interview={interview} initialFeedback={feedback} />
+}
+
+export default function CandidateFeedbackPage({ params }: CandidateFeedbackPageProps) {
+  return (
+    <Suspense fallback={<DetailPageSkeleton />}>
+      <CandidateFeedbackData params={params} />
+    </Suspense>
+  )
 }

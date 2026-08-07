@@ -1,85 +1,46 @@
-import { getTranslations } from 'next-intl/server'
+import { forbidden } from 'next/navigation'
+import { Suspense } from 'react'
 
 import { QueryHydrationBoundary } from '@/components/questions/query-hydration-boundary'
 import { TemplateForm } from '@/components/templates/template-form'
-import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
-import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
-import type { Locale } from '@/i18n/locales'
+import { DetailPageSkeleton } from '@/components/ui/skeleton'
 import { routes } from '@/i18n/routes'
-import { loadAuthGate, redirectIfUnauthenticated } from '@/lib/auth-gate'
+import { requireAuthGate } from '@/lib/auth-gate'
 import { canConfigureInterview } from '@/lib/auth-roles'
 import { prefetchInterviewCreatePicker } from '@/lib/questions-library-prefetch'
 import { fetchTemplate } from '@/lib/templates-prefetch'
 
-const ERROR_BACK_HREF = routes.templates.list
-
 interface EditTemplatePageProps {
-  params: Promise<{ locale: Locale; id: string }>
+  params: Promise<{ id: string }>
 }
 
-export default async function EditTemplatePage({ params }: EditTemplatePageProps) {
-  const { locale, id } = await params
-  const [t, tCommon, tFallback] = await Promise.all([
-    getTranslations({ locale, namespace: 'toast.pageGate.templates' }),
-    getTranslations({ locale, namespace: 'common' }),
-    getTranslations({ locale, namespace: 'shared.fallback' }),
+async function EditTemplateData({ params }: EditTemplatePageProps) {
+  const { id } = await params
+  const { ctx } = await requireAuthGate(canConfigureInterview, routes.templates.detail(id))
+
+  const [initialPrefetch, template] = await Promise.all([
+    prefetchInterviewCreatePicker(ctx),
+    fetchTemplate(ctx, id),
   ])
-  const auth = await loadAuthGate(canConfigureInterview, locale)
-  redirectIfUnauthenticated(auth, routes.templates.detail(id), locale)
-
-  if (auth.kind === 'forbidden') {
-    return (
-      <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
-    )
-  }
-
-  if (auth.kind === 'error') {
-    return (
-      <FlashErrorPageFallback
-        title={t('unavailableTitle')}
-        description={`${tCommon('sessionVerificationFailed')} ${auth.message}`}
-        backHref={ERROR_BACK_HREF}
-        backLabel={tFallback('backToTemplates')}
-      />
-    )
-  }
-
-  let initialPrefetch
-  let template
-  try {
-    ;[initialPrefetch, template] = await Promise.all([
-      prefetchInterviewCreatePicker(auth.ctx),
-      fetchTemplate(auth.ctx, id),
-    ])
-  } catch (err) {
-    const message = err instanceof Error ? err.message : t('loadFailedFallback')
-    return (
-      <FlashErrorPageFallback
-        title={t('unavailableTitle')}
-        description={message}
-        backHref={ERROR_BACK_HREF}
-        backLabel={tFallback('backToTemplates')}
-      />
-    )
-  }
 
   if (!template) {
-    return (
-      <FlashErrorPageFallback
-        title={t('unavailableTitle')}
-        description={t('notFoundFallback')}
-        backHref={ERROR_BACK_HREF}
-        backLabel={tFallback('backToTemplates')}
-      />
-    )
+    forbidden()
   }
 
   return (
+    <QueryHydrationBoundary state={initialPrefetch.dehydratedState}>
+      <TemplateForm initialPrefetch={initialPrefetch} template={template} />
+    </QueryHydrationBoundary>
+  )
+}
+
+export default function EditTemplatePage({ params }: EditTemplatePageProps) {
+  return (
     <PageShell>
-      <QueryHydrationBoundary state={initialPrefetch.dehydratedState}>
-        <TemplateForm initialPrefetch={initialPrefetch} template={template} />
-      </QueryHydrationBoundary>
+      <Suspense fallback={<DetailPageSkeleton />}>
+        <EditTemplateData params={params} />
+      </Suspense>
     </PageShell>
   )
 }

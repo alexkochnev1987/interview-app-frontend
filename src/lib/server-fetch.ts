@@ -118,6 +118,7 @@ export async function requestServer<T>(
     withLocaleHeader?: boolean
   },
 ): Promise<T | undefined> {
+  'use cache: private'
   const locale = resolveApiLocale(options?.locale ?? ctx.locale)
   const withLocaleHeader = options?.withLocaleHeader ?? true
   const reqHeaders: HeadersInit = {

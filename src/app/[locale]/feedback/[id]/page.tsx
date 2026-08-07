@@ -1,46 +1,39 @@
-import { getTranslations } from 'next-intl/server'
+import { Suspense } from 'react'
 
 import { FeedbackView } from '@/components/feedback/feedback-view'
-import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
-import type { Locale } from '@/i18n/locales'
+import { DetailPageSkeleton } from '@/components/ui/skeleton'
 import { type FeedbackResponse } from '@/lib/api'
 import { getServerRequestContext, requestServer } from '@/lib/server-fetch'
 import { readSearchParamToken } from '@/lib/text'
 
 interface FeedbackPageProps {
-  params: Promise<{ id: string; locale: Locale }>
+  params: Promise<{ id: string }>
   searchParams: Promise<{ token?: string | string[] }>
 }
 
-export default async function FeedbackPage({ params, searchParams }: FeedbackPageProps) {
-  const { id, locale } = await params
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.feedback' })
+async function FeedbackData({ params, searchParams }: FeedbackPageProps) {
+  const { id } = await params
   const token = readSearchParamToken((await searchParams).token)
 
-  const ctx = await getServerRequestContext(locale)
+  const ctx = await getServerRequestContext()
   const encodedId = encodeURIComponent(id)
 
-  let feedback: FeedbackResponse | null = null
-  let error: string | null = null
+  const feedback = await requestServer<FeedbackResponse>(`/feedback/${encodedId}`, ctx, {
+    query: token ? { token } : undefined,
+    withLocaleHeader: false,
+  })
 
-  try {
-    feedback =
-      (await requestServer<FeedbackResponse>(`/feedback/${encodedId}`, ctx, {
-        query: token ? { token } : undefined,
-        withLocaleHeader: false,
-      })) ?? null
-  } catch (err) {
-    error = err instanceof Error ? err.message : t('loadFailedFallback')
-  }
-
-  if (error || !feedback) {
-    return (
-      <FlashErrorPageFallback
-        title={t('unavailableTitle')}
-        description={error ?? t('loadFailedFallback')}
-      />
-    )
+  if (!feedback) {
+    throw new Error('Feedback not found')
   }
 
   return <FeedbackView feedback={feedback} />
+}
+
+export default function FeedbackPage({ params, searchParams }: FeedbackPageProps) {
+  return (
+    <Suspense fallback={<DetailPageSkeleton />}>
+      <FeedbackData params={params} searchParams={searchParams} />
+    </Suspense>
+  )
 }
