@@ -2,6 +2,8 @@
   "assistant": {
     "name": "Herman",
     "closeAriaLabel": "Close Herman",
+    "newChatAriaLabel": "Start new chat",
+    "newChatTooltip": "New chat",
     "bubbleLabel": "Herman",
     "sendAriaLabel": "Send message",
     "loading": "Working...",
@@ -24,6 +26,14 @@
         "candidate": "Ask whether you have an interview, its status, or schedule…",
         "admin": "Ask about unassigned interviews, filters, or assigning HR…",
         "super_admin": "Ask about interviews, assignments, questions, or org-wide data…"
+      },
+      "awaiting": {
+        "candidateName": "Enter the candidate name…",
+        "position": "Enter the job position…",
+        "questionName": "Enter the question name…",
+        "templateChoice": "Pick a template above or enter its number…",
+        "hr": "Enter the HR reviewer name…",
+        "interview": "Describe or name the interview…"
       }
     },
     "welcome": {
@@ -49,6 +59,7 @@
       "createInterview": "Create missing questions and create the interview.",
       "createQuestions": "Create the missing questions from this suggested set.",
       "assignHr": "Assign this interview to the selected HR reviewer.",
+      "createSingleQuestion": "Create this question in the question bank.",
       "action": "Confirm action",
       "userMessage": "Confirm",
       "cancel": "Cancel",
@@ -62,6 +73,7 @@
         "interviewLocale": "Interview language",
         "interviewId": "Interview ID",
         "assignedHrId": "HR reviewer ID",
+        "questionName": "Question name",
         "questions": "Questions",
         "questionsSummary": "{total} total ({newCount} new)"
       }
@@ -69,12 +81,25 @@
     "questionPlan": {
       "title": "Question plan",
       "empty": "Suggested and matched questions will appear here after you send a request.",
+      "emptySelected": "Add at least one question before confirming.",
       "summary": "{existing} matched in the question bank, {missing} need creation.",
       "newBadge": "New",
-      "existingBadge": "Existing"
+      "existingBadge": "Existing",
+      "removeAria": "Remove {title} from this interview"
     },
     "createdInterview": {
-      "openLink": "Open candidate link"
+      "openLink": "Open candidate link",
+      "viewDetail": "View interview details"
+    },
+    "createdQuestion": {
+      "openLink": "Open question"
+    },
+    "templateList": {
+      "heading": "Choose a template",
+      "questionCount": "{count, plural, one {# question} other {# questions}}"
+    },
+    "redirect": {
+      "continue": "Continue in the app"
     },
     "interviewList": {
       "heading": "Interviews",
@@ -106,12 +131,14 @@
       "admin": {
         "unassigned": "Show unassigned interviews",
         "byStatus": "Show completed interviews",
-        "assignHr": "Assign an interview to an HR reviewer"
+        "assignHr": "Assign an interview to an HR reviewer",
+        "createQuestion": "Help me create a new interview question"
       },
       "super_admin": {
         "unassigned": "Show unassigned interviews",
         "byStatus": "Show interviews by status",
         "assignHr": "Assign an interview to an HR reviewer",
+        "createQuestion": "Help me create a new interview question",
         "orgOverview": "Summarize interview activity in my org"
       }
     }

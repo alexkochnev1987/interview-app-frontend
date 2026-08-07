@@ -22,16 +22,27 @@ interface NewInterviewPageProps {
   searchParams: Promise<{
     templateId?: string | string[]
     fromInterview?: string | string[]
+    candidateName?: string | string[]
+    position?: string | string[]
   }>
+}
+
+function firstSearchParam(value?: string | string[]): string | undefined {
+  return Array.isArray(value) ? value[0] : value
 }
 
 export default async function NewInterviewPage({ params, searchParams }: NewInterviewPageProps) {
   const { locale } = await params
-  const { templateId: templateIdParam, fromInterview: fromInterviewParam } = await searchParams
-  const templateId = Array.isArray(templateIdParam) ? templateIdParam[0] : templateIdParam
-  const fromInterview = Array.isArray(fromInterviewParam)
-    ? fromInterviewParam[0]
-    : fromInterviewParam
+  const {
+    templateId: templateIdParam,
+    fromInterview: fromInterviewParam,
+    candidateName: candidateNameParam,
+    position: positionParam,
+  } = await searchParams
+  const templateId = firstSearchParam(templateIdParam)
+  const fromInterview = firstSearchParam(fromInterviewParam)
+  const candidateName = firstSearchParam(candidateNameParam)
+  const positionFromQuery = firstSearchParam(positionParam)
   const t = await getTranslations({ locale, namespace: 'toast.pageGate.interview' })
   const tQuestions = await getTranslations({
     locale,
@@ -89,7 +100,7 @@ export default async function NewInterviewPage({ params, searchParams }: NewInte
     sourceInterviewMissing = !sourceInterview
   }
   const prefillQuestions = template?.questions ?? sourceInterview?.questions
-  const prefillPosition = template?.position ?? sourceInterview?.position
+  const prefillPosition = positionFromQuery ?? template?.position ?? sourceInterview?.position
 
   return (
     <PageShell>
@@ -119,6 +130,7 @@ export default async function NewInterviewPage({ params, searchParams }: NewInte
         <InterviewCreateForm
           initialPrefetch={initialPrefetch}
           initialSelected={prefillQuestions}
+          initialCandidateName={candidateName}
           initialPosition={prefillPosition}
           initialTemplateId={template ? templateId : undefined}
         />

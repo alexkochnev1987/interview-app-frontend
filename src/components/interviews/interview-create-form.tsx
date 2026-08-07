@@ -44,8 +44,9 @@ import { useToastMessages } from '@/lib/use-toast-messages'
 
 type InterviewCreateFormProps = {
   initialPrefetch: QuestionsLibraryPrefetch
-  // Optional prefill: seeds the question picker and position; candidate name stays empty.
+  // Optional prefill: seeds the question picker, position, and candidate name.
   initialSelected?: Question[]
+  initialCandidateName?: string
   initialPosition?: string
   // Set when prefilled from a template; its id is recorded on create to bump popularity.
   initialTemplateId?: string
@@ -65,6 +66,7 @@ function questionSupportsInterviewLocale(question: Question, locale: Locale): bo
 export function InterviewCreateForm({
   initialPrefetch,
   initialSelected,
+  initialCandidateName,
   initialPosition,
   initialTemplateId,
 }: InterviewCreateFormProps) {
@@ -73,7 +75,7 @@ export function InterviewCreateForm({
   const router = useRouter()
   const toastMessages = useToastMessages()
   const isDemo = useIsDemo()
-  const [candidateName, setCandidateName] = useState('')
+  const [candidateName, setCandidateName] = useState(initialCandidateName ?? '')
   const [position, setPosition] = useState(initialPosition ?? '')
   const [assignedHrId, setAssignedHrId] = useState<string | undefined>()
   const { user } = useAuth()
