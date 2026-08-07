@@ -297,7 +297,9 @@ export function ConfigDashboard({ initialConfigs }: ConfigDashboardProps) {
                   <TableRow key={entry.key}>
                     <TableCell width="fill">
                       <Stack gap={1}>
-                        <BodyText weight="semibold">{entry.key}</BodyText>
+                        <BodyText tone="foreground" weight="semibold">
+                          {entry.key}
+                        </BodyText>
                         {entry.description ? (
                           <BodyText size="xs" tone="muted">
                             {entry.description}
