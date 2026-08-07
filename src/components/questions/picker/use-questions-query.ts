@@ -12,7 +12,7 @@ import {
   type SetStateAction,
 } from 'react'
 
-import { usePathname, useRouter } from '@/i18n/navigation'
+import { usePathname } from '@/i18n/navigation'
 import {
   fetchQuestions,
   type LocaleCode,
@@ -135,7 +135,6 @@ export function useQuestionsQuery(options: UseQuestionsQueryOptions = {}): UseQu
     eligibleForInterview,
   } = options
   const [capturedInitial] = useState<Partial<QuestionsQueryState> | undefined>(initial)
-  const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
@@ -198,8 +197,8 @@ export function useQuestionsQuery(options: UseQuestionsQueryOptions = {}): UseQu
     }
     const url = stateUrl.length > 0 ? `${pathname}?${stateUrl}` : pathname
     lastWrittenUrlRef.current = stateUrl
-    router.replace(url, { scroll: false })
-  }, [stateUrl, pathname, router, syncUrl, capturedInitial, lockStatus, searchParams])
+    window.history.replaceState(window.history.state, '', url)
+  }, [stateUrl, pathname, syncUrl, capturedInitial, lockStatus, searchParams])
 
   const fetchParams = useMemo(
     () => buildQuestionsFetchParams(state, debouncedQ, { eligibleForInterview }),

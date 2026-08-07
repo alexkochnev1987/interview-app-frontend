@@ -17,7 +17,7 @@ import {
   useVoidCallback,
 } from '@/components/questions/picker/query-hook-helpers'
 import { splitListQueryErrors } from '@/components/questions/picker/split-questions-query-errors'
-import { usePathname, useRouter } from '@/i18n/navigation'
+import { usePathname } from '@/i18n/navigation'
 import {
   fetchInterviews,
   type InterviewListItem,
@@ -124,7 +124,6 @@ export function useInterviewsQuery(
     allowAssignedHrFilter = true,
   } = options
   const [capturedInitial] = useState<Partial<InterviewsQueryState> | undefined>(initial)
-  const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
@@ -197,9 +196,8 @@ export function useInterviewsQuery(
     }
     const url = stateUrl.length > 0 ? `${pathname}?${stateUrl}` : pathname
     lastWrittenUrlRef.current = stateUrl
-    router.replace(url, { scroll: false })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stateUrl, pathname, router, syncUrl, capturedInitial, searchParams, allowAssignedHrFilter])
+    window.history.replaceState(window.history.state, '', url)
+  }, [stateUrl, pathname, syncUrl, capturedInitial, searchParams, allowAssignedHrFilter])
 
   const fetchParams = useMemo(
     () => buildInterviewsFetchParams(state, debouncedQ),
