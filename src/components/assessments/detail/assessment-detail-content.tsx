@@ -89,6 +89,16 @@ export function AssessmentDetailContent({ initialInterview }: AssessmentDetailCo
     <EvaluationActionsProvider onEvaluationStarted={onEvaluationStarted}>
       <DetailHeader interview={interview} actions={headerActions} />
 
+      {interview.result ? (
+        <Section gap={4}>
+          <Stack gap={2}>
+            <EyebrowLabel size="lg">{tAssessments('detail.scorecardEyebrow')}</EyebrowLabel>
+            <SectionHeading>{tAssessments('detail.scorecardHeading')}</SectionHeading>
+          </Stack>
+          <OverallPanel result={interview.result} />
+        </Section>
+      ) : null}
+
       {!isReadyToScore ? <EvaluationStatusBanner interview={interview} /> : null}
 
       {paused ? <LiveRefreshNotice onRefresh={refresh} /> : null}
@@ -117,16 +127,6 @@ export function AssessmentDetailContent({ initialInterview }: AssessmentDetailCo
           <AlertTitle>{tAssessments('detail.failedTitle')}</AlertTitle>
           <AlertDescription>{tAssessments('detail.failedDescription')}</AlertDescription>
         </Alert>
-      ) : null}
-
-      {interview.result ? (
-        <Section gap={4}>
-          <Stack gap={2}>
-            <EyebrowLabel size="lg">{tAssessments('detail.scorecardEyebrow')}</EyebrowLabel>
-            <SectionHeading>{tAssessments('detail.scorecardHeading')}</SectionHeading>
-          </Stack>
-          <OverallPanel result={interview.result} />
-        </Section>
       ) : null}
 
       <Section gap={4}>
