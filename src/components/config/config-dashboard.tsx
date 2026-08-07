@@ -350,11 +350,12 @@ export function ConfigDashboard({ initialConfigs }: ConfigDashboardProps) {
                           </Button>
                         </DemoWriteGuard>
 
-                        <DemoWriteGuard>
+                        <DemoWriteGuard disabled={entry.isOverridden === false}>
                           <Button
                             type="button"
                             variant="ghost"
                             size="xs"
+                            disabled={entry.isOverridden === false}
                             onClick={() => setResetTargetKey(entry.key)}
                           >
                             <Icon size="xs">

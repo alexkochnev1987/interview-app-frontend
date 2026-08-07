@@ -49,6 +49,7 @@ export interface SystemConfigEntry {
   description?: string
   isPublic: boolean
   isSecret: boolean
+  isOverridden?: boolean
 }
 
 /** Payload for `PUT /api/config/:key`. */
