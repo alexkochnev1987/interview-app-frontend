@@ -47,4 +47,8 @@ export interface SystemConfigEntry {
 /** Payload for `PUT /api/config/:key`. */
 export interface UpdateSystemConfigPayload {
   value: string
+  valueType?: SystemConfigValueType
+  description?: string
+  isPublic?: boolean
+  isSecret?: boolean
 }
