@@ -16,8 +16,10 @@ import { OnboardingProvider } from '@/features/onboarding/onboarding-provider'
 import { resolveHtmlLang } from '@/i18n/html-lang'
 import type { Locale } from '@/i18n/locales'
 import { routing } from '@/i18n/routing'
+import { AppConfigProvider } from '@/lib/app-config-context'
 import { AuthProvider } from '@/lib/auth-context'
 import { getServerSessionSnapshot } from '@/lib/auth-server'
+import { getServerConfigSnapshot } from '@/lib/config-server'
 import { AppQueryClientProvider } from '@/lib/query-client-provider'
 
 import { SideNav } from './side-nav'
@@ -54,7 +56,10 @@ export default async function LocaleLayout({
 
   setRequestLocale(locale)
   const messages = await getMessages()
-  const session = await getServerSessionSnapshot()
+  const [session, initialConfig] = await Promise.all([
+    getServerSessionSnapshot(),
+    getServerConfigSnapshot(),
+  ])
   const htmlLang = resolveHtmlLang(locale as Locale)
 
   return (
@@ -64,21 +69,23 @@ export default async function LocaleLayout({
       <NextIntlClientProvider locale={locale} messages={messages}>
         <AppQueryClientProvider>
           <AuthProvider initialUser={session.user}>
-            <AssistantChatProvider>
-              <OnboardingProvider>
-                <TooltipProvider>
-                  <AppShellRoot>
-                    <SideNav />
-                    <AppMain>
-                      <DemoModeBanner />
-                      {children}
-                    </AppMain>
-                  </AppShellRoot>
-                  <AssistantChatMount />
-                  <Toaster />
-                </TooltipProvider>
-              </OnboardingProvider>
-            </AssistantChatProvider>
+            <AppConfigProvider initialConfig={initialConfig}>
+              <AssistantChatProvider>
+                <OnboardingProvider>
+                  <TooltipProvider>
+                    <AppShellRoot>
+                      <SideNav />
+                      <AppMain>
+                        <DemoModeBanner />
+                        {children}
+                      </AppMain>
+                    </AppShellRoot>
+                    <AssistantChatMount />
+                    <Toaster />
+                  </TooltipProvider>
+                </OnboardingProvider>
+              </AssistantChatProvider>
+            </AppConfigProvider>
           </AuthProvider>
         </AppQueryClientProvider>
       </NextIntlClientProvider>
