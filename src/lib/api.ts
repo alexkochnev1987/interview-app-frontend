@@ -178,19 +178,26 @@ export type FetchInterviewFacetsParams = NonNullable<
 >
 
 export type CreateInterviewPayload = Schemas['CreateInterviewDto']
-export type RecruiterAssistantChatPayload = Schemas['RecruiterAssistantChatDto']
+export type RecruiterAssistantChatPayload = Schemas['RecruiterAssistantChatDto'] & {
+  pendingAction?: RecruiterAssistantCreatePendingAction
+}
 export type RecruiterAssistantResponse = Schemas['RecruiterAssistantResponseDto']
 export type RecruiterAssistantCreatePendingAction =
   Schemas['RecruiterAssistantCreatePendingActionDto']
 export type RecruiterAssistantAssignHrPendingAction =
   Schemas['RecruiterAssistantAssignHrPendingActionDto']
+export type RecruiterAssistantCreateSingleQuestionPendingAction =
+  Schemas['RecruiterAssistantCreateSingleQuestionPendingActionDto']
 export type RecruiterAssistantPendingAction =
   | RecruiterAssistantCreatePendingAction
   | RecruiterAssistantAssignHrPendingAction
+  | RecruiterAssistantCreateSingleQuestionPendingAction
 export type RecruiterAssistantSuggestedQuestion = Schemas['RecruiterAssistantSuggestedQuestionDto']
 export type RecruiterAssistantInterviewSummary = Schemas['RecruiterAssistantInterviewSummaryDto']
 export type RecruiterAssistantReviewState = Schemas['RecruiterAssistantReviewStateDto']
 export type RecruiterAssistantCreatedInterview = Schemas['RecruiterAssistantCreatedInterviewDto']
+export type RecruiterAssistantCreatedQuestion = Schemas['RecruiterAssistantCreatedQuestionDto']
+export type RecruiterAssistantRedirect = Schemas['RecruiterAssistantRedirectDto']
 export type RecruiterAssistantResponseStatus = RecruiterAssistantResponse['status']
 
 export type PresignedUrlResponse = Schemas['PresignedUrlResponseDto']
@@ -480,6 +487,17 @@ export async function sendRecruiterAssistantMessage(
     client.POST('/ai/chat', {
       ...LOCALIZED_HEADERS,
       body: data,
+      signal: init?.signal,
+    }),
+  )
+}
+
+export async function resetRecruiterAssistantChat(init?: {
+  signal?: AbortSignal
+}): Promise<RecruiterAssistantResponse> {
+  return handle(
+    client.POST('/ai/chat/reset', {
+      ...LOCALIZED_HEADERS,
       signal: init?.signal,
     }),
   )

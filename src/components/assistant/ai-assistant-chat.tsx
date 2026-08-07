@@ -27,6 +27,7 @@ export function AiAssistantChat() {
     error,
     welcomeRole,
     submitMessage,
+    sendUserMessage,
     confirmPendingAction,
     dismissPendingAction,
   } = useAssistantChatSession()
@@ -34,6 +35,12 @@ export function AiAssistantChat() {
 
   const t = useTranslations('assistant')
   const showPrompts = !messages.some((message) => message.role === 'user')
+  const latestAssistant = messages.findLast((message) => message.role === 'assistant')
+  const awaitingInput = latestAssistant?.result?.awaitingInput
+  const composerPlaceholder =
+    awaitingInput && t.has(`input.awaiting.${awaitingInput}`)
+      ? t(`input.awaiting.${awaitingInput}`)
+      : t(`input.placeholder.${welcomeRole}`)
   const bottomRef = useRef<HTMLDivElement>(null)
   const lastAnnouncedIdRef = useRef<string | null>(null)
   const [announcement, setAnnouncement] = useState('')
@@ -49,13 +56,11 @@ export function AiAssistantChat() {
 
   useEffect(() => {
     if (loading) return
-
-    const latestAssistant = messages.toReversed().find((message) => message.role === 'assistant')
     if (!latestAssistant || latestAssistant.id === lastAnnouncedIdRef.current) return
 
     lastAnnouncedIdRef.current = latestAssistant.id
     setAnnouncement(latestAssistant.text)
-  }, [loading, messages])
+  }, [latestAssistant, loading])
 
   function handleComposerKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
     if (event.key !== 'Enter' || event.shiftKey) return
@@ -69,9 +74,27 @@ export function AiAssistantChat() {
       <Stack gap={0} grow="fill" height="full">
         <ChatMessageViewport size="widget">
           <Stack gap={3}>
-            {messages.map((message) => (
-              <AssistantChatBubble key={message.id} message={message} />
-            ))}
+            {messages.map((message, index) => {
+              const isLatestAssistant =
+                message.role === 'assistant' &&
+                !messages.slice(index + 1).some((entry) => entry.role === 'assistant')
+
+              return (
+                <AssistantChatBubble
+                  key={message.id}
+                  message={message}
+                  disabled={loading}
+                  onSelectTemplate={
+                    isLatestAssistant && !loading
+                      ? (selection) =>
+                          void sendUserMessage(selection.message, {
+                            displayText: selection.displayText,
+                          })
+                      : undefined
+                  }
+                />
+              )
+            })}
             {loading ? (
               <AssistantChatBubble
                 message={{
@@ -108,7 +131,7 @@ export function AiAssistantChat() {
                   value={input}
                   onChange={(event) => setInput(event.target.value)}
                   onKeyDown={handleComposerKeyDown}
-                  placeholder={t(`input.placeholder.${welcomeRole}`)}
+                  placeholder={composerPlaceholder}
                 />
                 <Button
                   type="submit"

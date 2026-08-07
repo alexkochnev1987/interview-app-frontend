@@ -2,6 +2,8 @@
   "assistant": {
     "name": "Herman",
     "closeAriaLabel": "Zamknij Hermana",
+    "newChatAriaLabel": "Nowy czat",
+    "newChatTooltip": "Nowy czat",
     "bubbleLabel": "Herman",
     "sendAriaLabel": "Wyślij wiadomość",
     "loading": "Przetwarzanie...",
@@ -24,6 +26,14 @@
         "candidate": "Zapytaj, czy masz interview, jaki jest jego status lub termin…",
         "admin": "Zapytaj o nieprzypisane interview, filtry lub przypisywanie HR…",
         "super_admin": "Zapytaj o interview, przypisania, pytania lub dane całej organizacji…"
+      },
+      "awaiting": {
+        "candidateName": "Wpisz imię kandydata…",
+        "position": "Wpisz stanowisko…",
+        "questionName": "Wpisz nazwę pytania…",
+        "templateChoice": "Wybierz szablon powyżej lub wpisz jego numer…",
+        "hr": "Wpisz nazwisko pracownika HR…",
+        "interview": "Opisz lub nazwij interview…"
       }
     },
     "welcome": {
@@ -49,6 +59,7 @@
       "createInterview": "Utwórz brakujące pytania, a następnie utwórz interview.",
       "createQuestions": "Utwórz brakujące pytania z tego sugerowanego zestawu.",
       "assignHr": "Przypisz to interview do wybranego pracownika HR.",
+      "createSingleQuestion": "Utwórz to pytanie w banku pytań.",
       "action": "Potwierdź działanie",
       "userMessage": "Potwierdź",
       "cancel": "Anuluj",
@@ -62,6 +73,7 @@
         "interviewLocale": "Język interview",
         "interviewId": "ID interview",
         "assignedHrId": "ID pracownika HR",
+        "questionName": "Nazwa pytania",
         "questions": "Pytania",
         "questionsSummary": "{total} łącznie ({newCount} nowych)"
       }
@@ -69,12 +81,25 @@
     "questionPlan": {
       "title": "Plan pytań",
       "empty": "Sugerowane i dopasowane pytania pojawią się tutaj po wysłaniu zapytania.",
+      "emptySelected": "Dodaj co najmniej jedno pytanie przed potwierdzeniem.",
       "summary": "{existing} znaleziono w bazie pytań, {missing} wymaga utworzenia.",
       "newBadge": "Nowe",
-      "existingBadge": "Istniejące"
+      "existingBadge": "Istniejące",
+      "removeAria": "Usuń {title} z tego interview"
     },
     "createdInterview": {
-      "openLink": "Otwórz link dla kandydata"
+      "openLink": "Otwórz link dla kandydata",
+      "viewDetail": "Szczegóły interview"
+    },
+    "createdQuestion": {
+      "openLink": "Otwórz pytanie"
+    },
+    "templateList": {
+      "heading": "Wybierz szablon",
+      "questionCount": "{count, plural, one {# pytanie} few {# pytania} many {# pytań} other {# pytania}}"
+    },
+    "redirect": {
+      "continue": "Kontynuuj w aplikacji"
     },
     "interviewList": {
       "heading": "Interview",
@@ -106,12 +131,14 @@
       "admin": {
         "unassigned": "Pokaż nieprzypisane interview",
         "byStatus": "Pokaż ukończone interview",
-        "assignHr": "Przypisz interview do pracownika HR"
+        "assignHr": "Przypisz interview do pracownika HR",
+        "createQuestion": "Pomóż mi utworzyć nowe pytanie rekrutacyjne"
       },
       "super_admin": {
         "unassigned": "Pokaż nieprzypisane interview",
         "byStatus": "Pokaż interview według statusu",
         "assignHr": "Przypisz interview do pracownika HR",
+        "createQuestion": "Pomóż mi utworzyć nowe pytanie rekrutacyjne",
         "orgOverview": "Podsumuj aktywność interview w organizacji"
       }
     }
