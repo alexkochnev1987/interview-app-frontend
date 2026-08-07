@@ -22,6 +22,13 @@ import { Stack } from '@/components/ui/layout/stack'
 import { ModalShell } from '@/components/ui/modal-shell'
 import { SearchInput } from '@/components/ui/search-input'
 import { SegmentedGroup } from '@/components/ui/segmented-group'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { SortableTableHead } from '@/components/ui/sortable-table-head'
 import { EmptyStateCard } from '@/components/ui/state-card'
 import { StatusPill } from '@/components/ui/status-pill'
@@ -50,6 +57,7 @@ function renderValueTypeBadge(valueType: SystemConfigValueType, value?: string) 
     valueType === 'boolean' || value === 'true' || value === 'false' ? 'boolean' : valueType
   switch (displayType) {
     case 'boolean':
+    case 'enum':
       return (
         <EyebrowBadge tone="primary" size="sm">
           {displayType}
@@ -144,6 +152,7 @@ export function ConfigDashboard({ initialConfigs }: ConfigDashboardProps) {
         const updated = await updateSystemConfig(editingEntry.key, {
           value: editValue,
           valueType: editingEntry.valueType,
+          options: editingEntry.options,
           description: editingEntry.description,
           isPublic: editingEntry.isPublic,
           isSecret: editingEntry.isSecret,
@@ -363,8 +372,6 @@ export function ConfigDashboard({ initialConfigs }: ConfigDashboardProps) {
           </DataTableSurface>
         </Stack>
       </Section>
-
-      {}
       {editingEntry ? (
         <ModalShell
           accessibilityTitle={t('editModal.title')}
@@ -380,9 +387,22 @@ export function ConfigDashboard({ initialConfigs }: ConfigDashboardProps) {
           <CardContent>
             <Stack gap={4}>
               <FormField label={t('editModal.valueLabel')}>
-                {editingEntry.valueType === 'boolean' ||
-                editingEntry.value === 'true' ||
-                editingEntry.value === 'false' ? (
+                {editingEntry.options && editingEntry.options.length > 0 ? (
+                  <Select value={editValue} onValueChange={setEditValue}>
+                    <SelectTrigger width="full">
+                      <SelectValue placeholder="Select option..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {editingEntry.options.map((opt) => (
+                        <SelectItem key={opt} value={opt}>
+                          {opt}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : editingEntry.valueType === 'boolean' ||
+                  editingEntry.value === 'true' ||
+                  editingEntry.value === 'false' ? (
                   <SegmentedGroup ariaLabel={t('editModal.valueLabel')}>
                     <Button
                       type="button"
@@ -431,7 +451,6 @@ export function ConfigDashboard({ initialConfigs }: ConfigDashboardProps) {
         </ModalShell>
       ) : null}
 
-      {}
       {showAddModal ? (
         <ModalShell
           accessibilityTitle={t('addModal.title')}
@@ -504,7 +523,6 @@ export function ConfigDashboard({ initialConfigs }: ConfigDashboardProps) {
         </ModalShell>
       ) : null}
 
-      {}
       <ConfirmDialog
         open={resetTargetKey !== null}
         title={t('resetModal.title')}

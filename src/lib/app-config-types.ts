@@ -16,6 +16,12 @@ export interface PublicAppConfig {
   ENABLE_FEEDBACK_SHARE_LINKS: boolean
   /** Emergency killswitch — blocks normal UI when `true`. */
   MAINTENANCE_MODE_KILLSWITCH: boolean
+  /** Default UI theme mode (system | light | dark). */
+  DEFAULT_THEME_MODE: string
+  /** Active UI color theme preset (innowise | red | blue | purple). */
+  APP_THEME: string
+  /** Whether recruiter AI assistant widget is enabled. */
+  ENABLE_AI_ASSISTANT: boolean
 }
 
 /** Hardcoded defaults used when the server snapshot is unavailable. */
@@ -25,6 +31,9 @@ export const DEFAULT_PUBLIC_APP_CONFIG: PublicAppConfig = {
   ENABLE_GOOGLE_OAUTH: true,
   ENABLE_FEEDBACK_SHARE_LINKS: true,
   MAINTENANCE_MODE_KILLSWITCH: false,
+  DEFAULT_THEME_MODE: 'system',
+  APP_THEME: 'innowise',
+  ENABLE_AI_ASSISTANT: true,
 }
 
 // ---------------------------------------------------------------------------
@@ -32,13 +41,14 @@ export const DEFAULT_PUBLIC_APP_CONFIG: PublicAppConfig = {
 // ---------------------------------------------------------------------------
 
 /** Value type descriptor returned by the config API. */
-export type SystemConfigValueType = 'string' | 'number' | 'boolean' | 'json' | 'secret'
+export type SystemConfigValueType = 'string' | 'number' | 'boolean' | 'enum' | 'json' | 'secret'
 
 /** A single system configuration variable as returned by `GET /api/config`. */
 export interface SystemConfigEntry {
   key: string
   value: string
   valueType: SystemConfigValueType
+  options?: string[]
   description?: string
   isPublic: boolean
   isSecret: boolean
@@ -48,6 +58,7 @@ export interface SystemConfigEntry {
 export interface UpdateSystemConfigPayload {
   value: string
   valueType?: SystemConfigValueType
+  options?: string[]
   description?: string
   isPublic?: boolean
   isSecret?: boolean

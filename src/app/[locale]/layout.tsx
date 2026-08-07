@@ -65,11 +65,11 @@ export default async function LocaleLayout({
   return (
     <>
       <HtmlLangSync lang={htmlLang} />
-      <ThemeSync />
       <NextIntlClientProvider locale={locale} messages={messages}>
         <AppQueryClientProvider>
           <AuthProvider initialUser={session.user}>
             <AppConfigProvider initialConfig={initialConfig}>
+              <ThemeSync />
               <AssistantChatProvider>
                 <OnboardingProvider>
                   <TooltipProvider>
