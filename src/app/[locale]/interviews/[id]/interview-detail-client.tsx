@@ -185,6 +185,8 @@ export default function InterviewDetailClient({
         />
       </Grid>
 
+      {results ? <InterviewScorecard results={results} /> : null}
+
       {isEditing ? (
         <InterviewDetailEditSection
           interview={interview}
@@ -204,8 +206,6 @@ export default function InterviewDetailClient({
           onUpload={handleUpload}
         />
       )}
-
-      {results ? <InterviewScorecard results={results} /> : null}
 
       <InterviewDetailCancelDialog
         open={cancelConfirmOpen}

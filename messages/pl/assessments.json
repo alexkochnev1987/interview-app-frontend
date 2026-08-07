@@ -5,6 +5,7 @@
       "title": "Przeglądaj przesłane rozmowy i oceny AI.",
       "lead": "Otwórz zakończoną rozmowę, aby zobaczyć odpowiedzi kandydata, punktację, sygnały behawioralne i wynik ogólny.",
       "searchPlaceholder": "Szukaj po imieniu kandydata lub stanowisku",
+      "filtersButton": "Filtry",
       "allStatuses": "Wszystkie statusy",
       "statusScoring": "Ocenianie",
       "emptyTitle": "Brak ocen",

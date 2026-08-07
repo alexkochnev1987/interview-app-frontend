@@ -1,6 +1,12 @@
 'use client'
 
-import { LoaderCircle, PanelLeftClose, PanelLeftOpen, Trash2 } from 'lucide-react'
+import {
+  LoaderCircle,
+  PanelLeftClose,
+  PanelLeftOpen,
+  SlidersHorizontal,
+  Trash2,
+} from 'lucide-react'
 import { useLocale } from 'next-intl'
 import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -15,6 +21,7 @@ import {
   buildActiveFilterChips,
   pickQuestionsViewSource,
   QuestionFacetSidebar,
+  type QuestionFacetSidebarProps,
   QuestionPickerFeed,
   QuestionPickerRefetchAlert,
   QuestionPickerToolbar,
@@ -33,6 +40,8 @@ import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { Pagination } from '@/components/ui/pagination'
 import { SearchInput } from '@/components/ui/search-input'
+import { Sheet, SheetBody, SheetHeader } from '@/components/ui/sheet'
+import { StatusPill } from '@/components/ui/status-pill'
 import { useRouter } from '@/i18n/navigation'
 import { routes } from '@/i18n/routes'
 import { useQuestionChipLabels } from '@/i18n/use-question-chip-labels'
@@ -117,6 +126,9 @@ export function QuestionsLibraryClient({
   const [bulkConfirmOpen, setBulkConfirmOpen] = useState(false)
   const [bulkResult, setBulkResult] = useState<BulkDeleteResult | null>(null)
   const [sidebarHidden, setSidebarHidden] = useState(false)
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  const tFacet = useTranslations('questions.picker.facet')
+  const tCommon = useTranslations('common')
   const hydratedSidebarRef = useRef(false)
   useEffect(() => {
     if (hydratedSidebarRef.current) return
@@ -183,37 +195,35 @@ export function QuestionsLibraryClient({
   const selectedCount = selectedIds.size
   const view = pickQuestionsViewSource(isCardsView, query, infinite, query.isSearchPending)
 
-  const sidebar = (
-    <QuestionFacetSidebar
-      difficulties={facets.difficulties}
-      categories={facets.categories}
-      subcategories={facets.subcategories}
-      roles={facets.roles}
-      tags={facets.tags}
-      selected={{
-        locale: query.state.locale,
-        difficulty: query.state.difficulty,
-        category: query.state.category,
-        subcategory: query.state.subcategory,
-        role: query.state.role,
-        tags: query.state.tags,
-        status: query.state.status,
-      }}
-      onDifficultyChange={query.setDifficulty}
-      onLocaleChange={query.setLocale}
-      onCategoryChange={query.setCategory}
-      onSubcategoryChange={query.setSubcategory}
-      onRoleChange={query.setRole}
-      onTagsChange={query.setTags}
-      onStatusChange={query.setStatus}
-      onReset={query.reset}
-      canReset={query.canReset}
-      showStatusFilter={isSuperAdmin}
-      loading={facetsResult.loading}
-      error={facetsResult.error}
-      onRetry={facetsResult.refetch}
-    />
-  )
+  const facetSidebarProps: Omit<QuestionFacetSidebarProps, 'hideHeading'> = {
+    difficulties: facets.difficulties,
+    categories: facets.categories,
+    subcategories: facets.subcategories,
+    roles: facets.roles,
+    tags: facets.tags,
+    selected: {
+      locale: query.state.locale,
+      difficulty: query.state.difficulty,
+      category: query.state.category,
+      subcategory: query.state.subcategory,
+      role: query.state.role,
+      tags: query.state.tags,
+      status: query.state.status,
+    },
+    onDifficultyChange: query.setDifficulty,
+    onLocaleChange: query.setLocale,
+    onCategoryChange: query.setCategory,
+    onSubcategoryChange: query.setSubcategory,
+    onRoleChange: query.setRole,
+    onTagsChange: query.setTags,
+    onStatusChange: query.setStatus,
+    onReset: query.reset,
+    canReset: query.canReset,
+    showStatusFilter: isSuperAdmin,
+    loading: facetsResult.loading,
+    error: facetsResult.error,
+    onRetry: facetsResult.refetch,
+  }
 
   const mainContent = (
     <Stack gap={4}>
@@ -231,17 +241,39 @@ export function QuestionsLibraryClient({
         loading={view.toolbarLoading}
         viewToggle={
           <Inline gap={2} align="center">
-            <Button
-              type="button"
-              variant="outline-pill"
-              shape="pill"
-              size="icon-sm"
-              onClick={toggleSidebar}
-              aria-label={sidebarHidden ? t('showFiltersSidebar') : t('hideFiltersSidebar')}
-              aria-pressed={sidebarHidden}
-            >
-              {sidebarHidden ? <PanelLeftOpen /> : <PanelLeftClose />}
-            </Button>
+            <Inline visibility="lg-up">
+              <Button
+                type="button"
+                variant="outline-pill"
+                shape="pill"
+                size="icon-sm"
+                onClick={toggleSidebar}
+                aria-label={sidebarHidden ? t('showFiltersSidebar') : t('hideFiltersSidebar')}
+                aria-pressed={sidebarHidden}
+              >
+                {sidebarHidden ? <PanelLeftOpen /> : <PanelLeftClose />}
+              </Button>
+            </Inline>
+            <Inline visibility="below-lg">
+              <Button
+                type="button"
+                variant="outline-pill"
+                shape="pill"
+                size="sm"
+                onClick={() => setFiltersOpen(true)}
+                aria-expanded={filtersOpen}
+              >
+                <Icon size="sm">
+                  <SlidersHorizontal />
+                </Icon>
+                {tFacet('filtersTitle')}
+                {activeChips.length > 0 ? (
+                  <StatusPill tone="neutral" size="compact" casing="chip">
+                    {activeChips.length}
+                  </StatusPill>
+                ) : null}
+              </Button>
+            </Inline>
             <QuestionViewToggle view={query.state.view} onViewChange={query.setView} />
           </Inline>
         }
@@ -365,10 +397,23 @@ export function QuestionsLibraryClient({
         mainContent
       ) : (
         <Grid columns="aside-22-left" gap={6}>
-          {sidebar}
+          <Stack visibility="lg-up">
+            <QuestionFacetSidebar {...facetSidebarProps} />
+          </Stack>
           {mainContent}
         </Grid>
       )}
+
+      <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
+        <SheetHeader
+          title={tFacet('filtersTitle')}
+          onClose={() => setFiltersOpen(false)}
+          closeLabel={tCommon('close')}
+        />
+        <SheetBody>
+          <QuestionFacetSidebar {...facetSidebarProps} hideHeading />
+        </SheetBody>
+      </Sheet>
 
       <ConfirmDialog
         open={bulkConfirmOpen}

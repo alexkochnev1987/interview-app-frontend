@@ -62,13 +62,13 @@ export function TeamMemberRow({
           </BodyText>
         </Inline>
       </TableCell>
-      <TableCell>
+      <TableCell visibility="lg-up">
         <BodyText size="sm">{member.email}</BodyText>
       </TableCell>
       <TableCell>
         <TeamRoleBadge role={member.role} />
       </TableCell>
-      <TableCell>
+      <TableCell visibility="lg-up">
         <BodyText size="sm">{formatInterviewDate(member.createdAt)}</BodyText>
       </TableCell>
       <TableCell onClick={stopRowClick}>

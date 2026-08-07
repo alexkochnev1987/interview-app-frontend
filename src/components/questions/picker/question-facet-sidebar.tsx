@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { EyebrowLabel } from '@/components/ui/eyebrow-label'
 import { FacetRowButton } from '@/components/ui/facet-row-button'
+import { Icon } from '@/components/ui/icon'
 import { IconAffix } from '@/components/ui/icon-affix'
 import { Input } from '@/components/ui/input'
 import { DividedStack, DividedStackItem } from '@/components/ui/layout/divided-stack'
@@ -50,6 +51,8 @@ export type QuestionFacetSidebarProps = {
   loading: boolean
   error: string | null
   onRetry: () => void
+  /** Suppress the built-in title row, e.g. when rendered inside a Sheet that already shows one. */
+  hideHeading?: boolean
 }
 
 export function QuestionFacetSidebar(props: QuestionFacetSidebarProps) {
@@ -73,6 +76,7 @@ export function QuestionFacetSidebar(props: QuestionFacetSidebarProps) {
     loading,
     error,
     onRetry,
+    hideHeading = false,
   } = props
   const toastMessages = useToastMessages()
   const t = useTranslations('questions.picker.facet')
@@ -90,16 +94,18 @@ export function QuestionFacetSidebar(props: QuestionFacetSidebarProps) {
     <Card variant="surface" size="sm">
       <CardContent spacing="md">
         <Stack gap={3}>
-          <Inline gap={2} align="center" justify="between">
-            <BodyText as="span" size="base" tone="foreground" weight="semibold">
-              {t('filtersTitle')}
-            </BodyText>
-            {activeFilterCount > 0 ? (
-              <BodyText as="span" size="xs" tone="muted">
-                {t('activeFilters', { count: activeFilterCount })}
+          {!hideHeading ? (
+            <Inline gap={2} align="center" justify="between">
+              <BodyText as="span" size="base" tone="foreground" weight="semibold">
+                {t('filtersTitle')}
               </BodyText>
-            ) : null}
-          </Inline>
+              {activeFilterCount > 0 ? (
+                <BodyText as="span" size="xs" tone="muted">
+                  {t('activeFilters', { count: activeFilterCount })}
+                </BodyText>
+              ) : null}
+            </Inline>
+          ) : null}
 
           <Button
             type="button"
@@ -111,7 +117,9 @@ export function QuestionFacetSidebar(props: QuestionFacetSidebarProps) {
             onClick={onReset}
             title={t('resetTitle')}
           >
-            <RotateCcw className="size-4" />
+            <Icon size="md">
+              <RotateCcw />
+            </Icon>
             {activeFilterCount > 0
               ? t('resetAllWithCount', { count: activeFilterCount })
               : t('resetAll')}
@@ -279,7 +287,13 @@ function TagsFacetSection(props: {
   return (
     <FacetSection title={t('tagsTitle')} activeCount={selected.length}>
       <Stack gap={2}>
-        <IconAffix icon={<Search className="size-3.5" />}>
+        <IconAffix
+          icon={
+            <Icon size="sm">
+              <Search />
+            </Icon>
+          }
+        >
           <Input
             type="search"
             size="md"

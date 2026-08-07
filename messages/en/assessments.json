@@ -5,6 +5,7 @@
       "title": "Review submitted interviews and AI evaluations.",
       "lead": "Open a finished interview to see candidate answers, per-question scoring, behavior signals, and the overall result.",
       "searchPlaceholder": "Search by candidate name or position",
+      "filtersButton": "Filters",
       "allStatuses": "All statuses",
       "statusScoring": "Scoring",
       "emptyTitle": "No assessments yet",

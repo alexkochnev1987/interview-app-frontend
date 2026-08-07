@@ -4,11 +4,13 @@ import { Users } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 import { CardContent } from '@/components/ui/card'
+import { Stack } from '@/components/ui/layout/stack'
 import { EmptyStateCard } from '@/components/ui/state-card'
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import type { TeamRowActorRole } from '@/features/team/team-row-policy'
 import type { TeamMember } from '@/lib/api'
 
+import { TeamMemberCard } from './team-member-card'
 import { TeamMemberRow } from './team-member-row'
 
 interface TeamMembersTableSectionProps {
@@ -45,29 +47,50 @@ export function TeamMembersTableSection({
   }
 
   return (
-    <Table minRows={4} tabularWidth="wide">
-      <TableHeader>
-        <TableRow>
-          <TableHead>{t('table.memberName')}</TableHead>
-          <TableHead>{t('table.email')}</TableHead>
-          <TableHead>{t('table.accessRole')}</TableHead>
-          <TableHead>{t('table.joined')}</TableHead>
-          <TableHead>{t('table.actions')}</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {members.map((member) => (
-          <TeamMemberRow
-            key={member.id}
-            member={member}
-            actorId={actorId}
-            actorRole={actorRole}
-            onChangeRole={() => onRequestChangeRole(member)}
-            onEditAccount={() => onRequestEditAccount(member)}
-            onDeleteUser={() => onRequestDeleteUser(member)}
-          />
-        ))}
-      </TableBody>
-    </Table>
+    <>
+      <Stack visibility="sm-up">
+        <Table minRows={4} tabularWidth="wide">
+          <TableHeader>
+            <TableRow>
+              <TableHead>{t('table.memberName')}</TableHead>
+              <TableHead visibility="lg-up">{t('table.email')}</TableHead>
+              <TableHead>{t('table.accessRole')}</TableHead>
+              <TableHead visibility="lg-up">{t('table.joined')}</TableHead>
+              <TableHead>{t('table.actions')}</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {members.map((member) => (
+              <TeamMemberRow
+                key={member.id}
+                member={member}
+                actorId={actorId}
+                actorRole={actorRole}
+                onChangeRole={() => onRequestChangeRole(member)}
+                onEditAccount={() => onRequestEditAccount(member)}
+                onDeleteUser={() => onRequestDeleteUser(member)}
+              />
+            ))}
+          </TableBody>
+        </Table>
+      </Stack>
+      <Stack visibility="below-sm">
+        <CardContent spacing="sm">
+          <Stack gap={3}>
+            {members.map((member) => (
+              <TeamMemberCard
+                key={member.id}
+                member={member}
+                actorId={actorId}
+                actorRole={actorRole}
+                onChangeRole={() => onRequestChangeRole(member)}
+                onEditAccount={() => onRequestEditAccount(member)}
+                onDeleteUser={() => onRequestDeleteUser(member)}
+              />
+            ))}
+          </Stack>
+        </CardContent>
+      </Stack>
+    </>
   )
 }
