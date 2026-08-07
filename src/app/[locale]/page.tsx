@@ -1,4 +1,5 @@
 import { getTranslations } from 'next-intl/server'
+import { Suspense } from 'react'
 
 import { DashboardView } from '@/components/dashboard/dashboard-view'
 import { QueryHydrationBoundary } from '@/components/questions/query-hydration-boundary'
@@ -88,7 +89,9 @@ export default async function DashboardPage({ params, searchParams }: DashboardP
 
   return (
     <QueryHydrationBoundary state={initialPrefetch.dehydratedState}>
-      <DashboardView metrics={metrics} isDemo={auth.me.demo} initialPrefetch={initialPrefetch} />
+      <Suspense fallback={null}>
+        <DashboardView metrics={metrics} isDemo={auth.me.demo} initialPrefetch={initialPrefetch} />
+      </Suspense>
     </QueryHydrationBoundary>
   )
 }

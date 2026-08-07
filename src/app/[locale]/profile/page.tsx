@@ -1,4 +1,5 @@
 import { getTranslations } from 'next-intl/server'
+import { Suspense } from 'react'
 
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { PageShell } from '@/components/ui/layout/page-shell'
@@ -34,7 +35,9 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
   return (
     <PageShell>
-      <ProfileView user={auth.me} />
+      <Suspense fallback={null}>
+        <ProfileView user={auth.me} />
+      </Suspense>
     </PageShell>
   )
 }

@@ -1,4 +1,5 @@
 import { getTranslations } from 'next-intl/server'
+import { Suspense } from 'react'
 
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
@@ -79,7 +80,9 @@ export default async function UserProfilePage({ params }: UserProfilePageProps) 
 
   return (
     <PageShell>
-      <ProfileView user={user} mode={mode} />
+      <Suspense fallback={null}>
+        <ProfileView user={user} mode={mode} />
+      </Suspense>
     </PageShell>
   )
 }

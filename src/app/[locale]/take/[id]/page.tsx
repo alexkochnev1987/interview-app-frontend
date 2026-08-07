@@ -1,5 +1,6 @@
 import { AlertCircle } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
+import { Suspense } from 'react'
 
 import { PageContent, PageMainLayout } from '@/components/layout/page-shell'
 import { Icon } from '@/components/ui/icon'
@@ -22,7 +23,11 @@ export default async function TakeInterviewPage({ params, searchParams }: TakeIn
   const token = readSearchParamToken((await searchParams).token)
 
   if (token) {
-    return <TakeInterviewClient id={id} candidateToken={token} />
+    return (
+      <Suspense fallback={null}>
+        <TakeInterviewClient id={id} candidateToken={token} />
+      </Suspense>
+    )
   }
 
   const ctx = await getServerRequestContext(locale)
@@ -59,5 +64,9 @@ export default async function TakeInterviewPage({ params, searchParams }: TakeIn
     )
   }
 
-  return <TakeInterviewClient id={id} initialInterview={interview} />
+  return (
+    <Suspense fallback={null}>
+      <TakeInterviewClient id={id} initialInterview={interview} />
+    </Suspense>
+  )
 }

@@ -1,3 +1,5 @@
+import { Suspense } from 'react'
+
 import { LoginForm } from '@/components/login/login-form'
 import { LoginHeader } from '@/components/login/login-header'
 import { LoginMarketingPanel } from '@/components/login/login-marketing-panel'
@@ -9,11 +11,15 @@ export default function LoginPage() {
   return (
     <PageShell align="top">
       <Stack gap={8} height="full">
-        <LoginHeader />
+        <Suspense fallback={null}>
+          <LoginHeader />
+        </Suspense>
         <Stack grow="fill" justify="center">
           <Grid columns="login-shell" gap={8} align="center">
             <LoginMarketingPanel />
-            <LoginForm />
+            <Suspense fallback={null}>
+              <LoginForm />
+            </Suspense>
           </Grid>
         </Stack>
       </Stack>
