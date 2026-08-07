@@ -3,7 +3,8 @@
     "heading": "Team Members",
     "lead": "Manage your workspace collaborators and their access levels.",
     "filters": {
-      "label": "Filters:"
+      "label": "Filters:",
+      "filtersButton": "Filters"
     },
     "searchPlaceholder": "Search by name or email",
     "table": {
@@ -12,6 +13,9 @@
       "accessRole": "Access Role",
       "joined": "Joined",
       "actions": "Actions"
+    },
+    "card": {
+      "joined": "Joined {date}"
     },
     "empty": {
       "title": "No members found",

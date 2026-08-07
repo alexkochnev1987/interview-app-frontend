@@ -1,4 +1,4 @@
-export { QuestionFacetSidebar } from './question-facet-sidebar'
+export { QuestionFacetSidebar, type QuestionFacetSidebarProps } from './question-facet-sidebar'
 export { QuestionPickerFeed } from './question-picker-feed'
 export { QuestionPickerRefetchAlert } from './question-picker-refetch-alert'
 export { QuestionPickerToolbar } from './question-picker-toolbar'

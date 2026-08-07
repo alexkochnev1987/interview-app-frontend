@@ -65,6 +65,8 @@ const stackVariants = cva('flex flex-col', {
       always: '',
       'below-sm': 'sm:hidden',
       'sm-up': 'hidden sm:flex',
+      'below-lg': 'lg:hidden',
+      'lg-up': 'hidden lg:flex',
     },
   },
   defaultVariants: {

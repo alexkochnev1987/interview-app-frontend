@@ -39,6 +39,8 @@ export type InterviewFacetSidebarProps = {
   loading: boolean
   error: string | null
   onRetry: () => void
+  /** Suppress the built-in title row, e.g. when rendered inside a Sheet that already shows one. */
+  hideHeading?: boolean
 }
 
 export function InterviewFacetSidebar(props: InterviewFacetSidebarProps) {
@@ -55,6 +57,7 @@ export function InterviewFacetSidebar(props: InterviewFacetSidebarProps) {
     loading,
     error,
     onRetry,
+    hideHeading = false,
   } = props
   const t = useTranslations('interviews.library.facet')
 
@@ -65,16 +68,18 @@ export function InterviewFacetSidebar(props: InterviewFacetSidebarProps) {
     <Card variant="surface" size="sm">
       <CardContent spacing="md">
         <Stack gap={3}>
-          <Inline gap={2} align="center" justify="between">
-            <BodyText as="span" size="base" tone="foreground" weight="semibold">
-              {t('filtersTitle')}
-            </BodyText>
-            {activeFilterCount > 0 ? (
-              <BodyText as="span" size="xs" tone="muted">
-                {t('activeFilters', { count: activeFilterCount })}
+          {!hideHeading ? (
+            <Inline gap={2} align="center" justify="between">
+              <BodyText as="span" size="base" tone="foreground" weight="semibold">
+                {t('filtersTitle')}
               </BodyText>
-            ) : null}
-          </Inline>
+              {activeFilterCount > 0 ? (
+                <BodyText as="span" size="xs" tone="muted">
+                  {t('activeFilters', { count: activeFilterCount })}
+                </BodyText>
+              ) : null}
+            </Inline>
+          ) : null}
 
           <Button
             type="button"
