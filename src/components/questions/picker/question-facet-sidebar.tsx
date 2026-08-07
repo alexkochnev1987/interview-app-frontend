@@ -314,18 +314,21 @@ function TagsFacetSection(props: {
           </BodyText>
         ) : (
           <Stack gap={1}>
-            {visible.map((item) => {
-              const isSelected = selected.includes(item.value)
-              return (
-                <FacetRowButton
-                  key={item.value}
-                  label={item.value}
-                  trailing={item.count}
-                  state={isSelected ? 'selected' : 'default'}
-                  onClick={() => toggleTag(item.value)}
-                />
-              )
-            })}
+            {(() => {
+              const selectedSet = new Set(selected)
+              return visible.map((item) => {
+                const isSelected = selectedSet.has(item.value)
+                return (
+                  <FacetRowButton
+                    key={item.value}
+                    label={item.value}
+                    trailing={item.count}
+                    state={isSelected ? 'selected' : 'default'}
+                    onClick={() => toggleTag(item.value)}
+                  />
+                )
+              })
+            })()}
             {hidden > 0 && trimmed.length === 0 ? (
               <ShowMoreToggle expanded={false} onClick={() => setExpanded(true)}>
                 {t('showAll', { count: filtered.length })}

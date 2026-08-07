@@ -61,35 +61,38 @@ export function EditorTranslateLocalesPanel({
           </BodyText>
         ) : (
           <Stack gap={2}>
-            {availableLocales.map((locale) => {
-              const status = getLocaleStatus(locale)
-              const error = getLocaleError(locale)
-              const checkboxId = `translate-locale-${locale}`
+            {(() => {
+              const selectedSet = new Set(selectedLocales)
+              return availableLocales.map((locale) => {
+                const status = getLocaleStatus(locale)
+                const error = getLocaleError(locale)
+                const checkboxId = `translate-locale-${locale}`
 
-              return (
-                <Stack key={locale} gap={1}>
-                  <Inline gap={2} align="center">
-                    <Checkbox
-                      id={checkboxId}
-                      checked={selectedLocales.includes(locale)}
-                      disabled={disabled || isBatchTranslating}
-                      onCheckedChange={(checked) => onToggleLocale(locale, checked === true)}
-                    />
-                    <Label htmlFor={checkboxId}>{localeLabel(locale)}</Label>
-                    {status === 'loading' ? (
-                      <BodyText as="span" size="xs" tone="muted">
-                        {t('localeLoading')}
+                return (
+                  <Stack key={locale} gap={1}>
+                    <Inline gap={2} align="center">
+                      <Checkbox
+                        id={checkboxId}
+                        checked={selectedSet.has(locale)}
+                        disabled={disabled || isBatchTranslating}
+                        onCheckedChange={(checked) => onToggleLocale(locale, checked === true)}
+                      />
+                      <Label htmlFor={checkboxId}>{localeLabel(locale)}</Label>
+                      {status === 'loading' ? (
+                        <BodyText as="span" size="xs" tone="muted">
+                          {t('localeLoading')}
+                        </BodyText>
+                      ) : null}
+                    </Inline>
+                    {error ? (
+                      <BodyText role="alert" size="sm" tone="danger">
+                        {error}
                       </BodyText>
                     ) : null}
-                  </Inline>
-                  {error ? (
-                    <BodyText role="alert" size="sm" tone="danger">
-                      {error}
-                    </BodyText>
-                  ) : null}
-                </Stack>
-              )
-            })}
+                  </Stack>
+                )
+              })
+            })()}
           </Stack>
         )}
 

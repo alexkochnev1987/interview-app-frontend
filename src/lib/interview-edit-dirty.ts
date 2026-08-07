@@ -5,10 +5,9 @@ export function getSelectedQuestionIdsInEditOrder(
   selectedById: ReadonlyMap<string, unknown>,
 ): string[] {
   const initialIds = initialQuestions.map((question) => question.id)
+  const initialIdsSet = new Set(initialIds)
   const keptInOrder = initialIds.filter((id) => selectedById.has(id))
-  const addedInPickerOrder = Array.from(selectedById.keys()).filter(
-    (id) => !initialIds.includes(id),
-  )
+  const addedInPickerOrder = Array.from(selectedById.keys()).filter((id) => !initialIdsSet.has(id))
   return [...keptInOrder, ...addedInPickerOrder]
 }
 
