@@ -146,6 +146,7 @@ export function ConfigDashboard({ initialConfigs }: ConfigDashboardProps) {
 
   async function handleSaveEdit() {
     if (!editingEntry) return
+    if (editingEntry.isSecret && editValue.trim() === '') return
 
     await runMutation(
       async () => {
@@ -445,7 +446,12 @@ export function ConfigDashboard({ initialConfigs }: ConfigDashboardProps) {
                 <Button type="button" variant="ghost" onClick={() => setEditingEntry(null)}>
                   {t('editModal.cancel')}
                 </Button>
-                <Button type="button" variant="gradient" onClick={() => void handleSaveEdit()}>
+                <Button
+                  type="button"
+                  variant="gradient"
+                  disabled={editingEntry.isSecret && editValue.trim() === ''}
+                  onClick={() => void handleSaveEdit()}
+                >
                   {t('editModal.save')}
                 </Button>
               </Inline>

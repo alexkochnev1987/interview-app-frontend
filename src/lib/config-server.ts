@@ -1,7 +1,7 @@
 import { cache } from 'react'
 
 import type { PublicAppConfig } from './app-config-types'
-import { DEFAULT_PUBLIC_APP_CONFIG } from './app-config-types'
+import { DEFAULT_PUBLIC_APP_CONFIG, parsePublicConfig } from './app-config-types'
 import { getServerRequestContext, requestServer } from './server-fetch'
 
 /**
@@ -14,10 +14,10 @@ import { getServerRequestContext, requestServer } from './server-fetch'
 export const getServerConfigSnapshot = cache(async (): Promise<PublicAppConfig> => {
   try {
     const ctx = await getServerRequestContext()
-    const raw = await requestServer<Partial<PublicAppConfig>>('/config/public', ctx, {
+    const raw = await requestServer<Record<string, unknown>>('/config/public', ctx, {
       withLocaleHeader: false,
     })
-    return { ...DEFAULT_PUBLIC_APP_CONFIG, ...raw }
+    return parsePublicConfig(raw)
   } catch {
     // If the config endpoint is not deployed yet or the backend is down,
     // fall back to hardcoded defaults so the app remains functional.

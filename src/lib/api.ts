@@ -1346,7 +1346,7 @@ import type {
   SystemConfigEntry,
   UpdateSystemConfigPayload,
 } from './app-config-types'
-import { DEFAULT_PUBLIC_APP_CONFIG } from './app-config-types'
+import { parsePublicConfig } from './app-config-types'
 
 /** Fetch the public configuration snapshot (all authenticated users). */
 export async function getPublicConfig(): Promise<PublicAppConfig> {
@@ -1365,8 +1365,8 @@ export async function getPublicConfig(): Promise<PublicAppConfig> {
     )
   }
 
-  const raw = (await res.json()) as Partial<PublicAppConfig>
-  return { ...DEFAULT_PUBLIC_APP_CONFIG, ...raw }
+  const raw = (await res.json()) as Record<string, unknown>
+  return parsePublicConfig(raw)
 }
 
 /** Fetch all system config entries (super-admin only). */
