@@ -11,8 +11,15 @@ export interface AnswerAttemptMeta {
   maxAttempts?: number
 }
 
-export function getMaxAttempts(meta?: AnswerAttemptMeta): number {
-  return meta?.maxAttempts ?? MAX_ANSWER_ATTEMPTS_PER_QUESTION
+/**
+ * Resolve the effective max-attempts budget for a question.
+ *
+ * Priority: `meta.maxAttempts` (per-interview override from the backend)
+ *         → `configDefault`    (dynamic value from `useAppConfig()`)
+ *         → `MAX_ANSWER_ATTEMPTS_PER_QUESTION` (hardcoded fallback)
+ */
+export function getMaxAttempts(meta?: AnswerAttemptMeta, configDefault?: number): number {
+  return meta?.maxAttempts ?? configDefault ?? MAX_ANSWER_ATTEMPTS_PER_QUESTION
 }
 
 export function getUsedAttempts(meta?: AnswerAttemptMeta): number {
