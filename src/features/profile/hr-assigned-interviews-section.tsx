@@ -91,7 +91,7 @@ export function HrAssignedInterviewsSection({
         actions={assignAction}
         expandLabel={t('expand')}
         collapseLabel={t('collapse')}
-        tone="danger-soft"
+        tone="primary"
       >
         <Stack gap={4}>
           <InterviewPickerFeed

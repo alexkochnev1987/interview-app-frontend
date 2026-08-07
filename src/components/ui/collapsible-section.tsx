@@ -14,7 +14,7 @@ const collapsibleSectionVariants = cva('w-full overflow-hidden', {
     emphasis: {
       default: '',
       featured:
-        'shadow-float ring-1 ring-danger-soft-border/35 transition-shadow duration-200 hover:shadow-float',
+        'shadow-float transition-shadow duration-200 hover:shadow-float ring-1 ring-[hsl(var(--primary)/0.35)]',
     },
   },
   defaultVariants: {
@@ -26,6 +26,8 @@ const collapsibleHeaderVariants = cva('border-b px-4 py-4 sm:px-5 sm:py-5', {
   variants: {
     tone: {
       default: 'border-hairline-strong bg-transparent',
+      primary:
+        'border-[hsl(var(--primary)/0.35)] bg-primary-gradient text-primary-foreground **:data-[slot=card-title]:text-primary-foreground [&_[data-slot=card-action]_button]:border-primary-foreground/25 [&_[data-slot=card-action]_button]:bg-background/95 [&_[data-slot=card-action]_button]:text-foreground [&_[data-slot=card-action]_button]:shadow-soft [&_[data-slot=card-action]_button]:hover:bg-background',
       'danger-soft':
         'border-danger-soft-border bg-danger-soft text-danger-soft-foreground **:data-[slot=card-title]:text-danger-soft-foreground [&_[data-slot=card-action]_button]:border-danger-soft-foreground/25 [&_[data-slot=card-action]_button]:bg-background/95 [&_[data-slot=card-action]_button]:text-foreground [&_[data-slot=card-action]_button]:shadow-soft [&_[data-slot=card-action]_button]:hover:bg-background',
     },
@@ -41,6 +43,7 @@ const collapsibleToggleVariants = cva(
     variants: {
       tone: {
         default: 'focus-visible:ring-ring/50',
+        primary: 'focus-visible:ring-primary-foreground/30',
         'danger-soft': 'focus-visible:ring-danger-soft-foreground/25',
       },
     },
@@ -75,7 +78,7 @@ export function CollapsibleSection({
   emphasis = 'default',
 }: CollapsibleSectionProps) {
   const [expanded, setExpanded] = useState(defaultExpanded)
-  const featured = tone === 'danger-soft' || emphasis === 'featured'
+  const featured = tone === 'primary' || tone === 'danger-soft' || emphasis === 'featured'
 
   return (
     <Card
@@ -102,9 +105,11 @@ export function CollapsibleSection({
               <span
                 className={cn(
                   'flex size-9 shrink-0 items-center justify-center rounded-full ring-1',
-                  tone === 'danger-soft'
-                    ? 'bg-danger-soft-foreground/10 text-danger-soft-foreground ring-danger-soft-foreground/20'
-                    : 'bg-surface-low-glass text-muted-foreground ring-hairline',
+                  tone === 'primary'
+                    ? 'bg-primary-foreground/15 text-primary-foreground ring-primary-foreground/25'
+                    : tone === 'danger-soft'
+                      ? 'bg-danger-soft-foreground/10 text-danger-soft-foreground ring-danger-soft-foreground/20'
+                      : 'bg-surface-low-glass text-muted-foreground ring-hairline',
                 )}
               >
                 {leadingIcon}
