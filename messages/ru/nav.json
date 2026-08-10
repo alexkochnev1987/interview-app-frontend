@@ -10,6 +10,7 @@
     "logout": "Выйти",
     "signIn": "Войти",
     "templates": "Шаблоны",
+    "config": "Конфигурация",
     "expandSidebar": "Развернуть боковую панель",
     "collapseSidebar": "Свернуть боковую панель"
   }

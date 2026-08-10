@@ -17,6 +17,7 @@ import { useRouter } from '@/i18n/navigation'
 import { stripLocalePrefix } from '@/i18n/pathname'
 import { demoLogin, getAuthMe, login, logout as apiLogout } from '@/lib/api'
 import { ApiError } from '@/lib/api-error'
+import { useAppConfig } from '@/lib/app-config-context'
 import { useAuth } from '@/lib/auth-context'
 import { safeRedirectPath } from '@/lib/safe-redirect-path'
 import { useToastMessages } from '@/lib/use-toast-messages'
@@ -27,6 +28,7 @@ export function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { establishSession } = useAuth()
+  const { ENABLE_GOOGLE_OAUTH } = useAppConfig()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -136,11 +138,13 @@ export function LoginForm() {
 
             <DividerLabel>{t('or')}</DividerLabel>
 
-            <Button asChild variant="outline-pill" size="xl" width="full">
-              <Link href="/api/auth/google" prefetch={false}>
-                {t('google')}
-              </Link>
-            </Button>
+            {ENABLE_GOOGLE_OAUTH ? (
+              <Button asChild variant="outline-pill" size="xl" width="full">
+                <Link href="/api/auth/google" prefetch={false}>
+                  {t('google')}
+                </Link>
+              </Button>
+            ) : null}
 
             <Button
               type="button"

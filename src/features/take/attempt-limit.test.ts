@@ -2,7 +2,13 @@ import { describe, expect, it } from 'vitest'
 
 import type { TakeInterviewData } from '@/lib/api'
 
-import { canStartNewAttempt, shouldReuseReservedAttemptForRetake } from './attempt-limit'
+import {
+  canStartNewAttempt,
+  canRequestRetake,
+  resolveInitialVersionNumber,
+  resolveNextVersionAfterSave,
+  shouldReuseReservedAttemptForRetake,
+} from './attempt-limit'
 import {
   resolveQuestionAnswerPhase,
   shouldCleanupExhaustedSession,
@@ -38,6 +44,16 @@ function interviewFixture(overrides: Partial<TakeInterviewData> = {}): TakeInter
 }
 
 describe('take attempt UX', () => {
+  it('respects configDefault when meta.maxAttempts is undefined', () => {
+    expect(canStartNewAttempt({ versionCount: 3 }, 5)).toBe(true)
+    expect(canStartNewAttempt({ versionCount: 5 }, 5)).toBe(false)
+    expect(canRequestRetake(4, undefined, 5)).toBe(true)
+    expect(canRequestRetake(5, undefined, 5)).toBe(false)
+    expect(resolveInitialVersionNumber({ versionCount: 5 }, 5)).toBe(5)
+    expect(resolveNextVersionAfterSave(4, { versionCount: 4 }, 5)).toBe(5)
+    expect(resolveNextVersionAfterSave(5, { versionCount: 5 }, 5)).toBeNull()
+  })
+
   it('gates new attempts and retake reuse vs advance when version already has media', () => {
     expect(canStartNewAttempt({ versionCount: 2, maxAttempts: 3 })).toBe(true)
     expect(canStartNewAttempt({ versionCount: 3, maxAttempts: 3 })).toBe(false)
