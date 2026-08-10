@@ -32,8 +32,8 @@
         "position": "Enter the job position…",
         "questionName": "Enter the question name…",
         "templateChoice": "Pick a template above or enter its number…",
-        "hr": "Enter the HR reviewer name…",
-        "interview": "Describe or name the interview…"
+        "hr": "Pick an HR reviewer above or type their name…",
+        "interview": "Pick an interview above or type the name/ID…"
       }
     },
     "welcome": {
@@ -98,11 +98,15 @@
       "heading": "Choose a template",
       "questionCount": "{count, plural, one {# question} other {# questions}}"
     },
+    "hrList": {
+      "heading": "Choose an HR reviewer"
+    },
     "redirect": {
       "continue": "Continue in the app"
     },
     "interviewList": {
       "heading": "Interviews",
+      "chooseHeading": "Choose an interview",
       "viewDetail": "View details",
       "progress": "{submitted}/{total} answered"
     },

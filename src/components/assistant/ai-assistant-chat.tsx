@@ -92,6 +92,22 @@ export function AiAssistantChat() {
                           })
                       : undefined
                   }
+                  onSelectHr={
+                    isLatestAssistant && !loading
+                      ? (selection) =>
+                          void sendUserMessage(selection.message, {
+                            displayText: selection.displayText,
+                          })
+                      : undefined
+                  }
+                  onSelectInterview={
+                    isLatestAssistant && !loading
+                      ? (selection) =>
+                          void sendUserMessage(selection.message, {
+                            displayText: selection.displayText,
+                          })
+                      : undefined
+                  }
                 />
               )
             })}

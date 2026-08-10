@@ -32,8 +32,8 @@
         "position": "Wpisz stanowisko…",
         "questionName": "Wpisz nazwę pytania…",
         "templateChoice": "Wybierz szablon powyżej lub wpisz jego numer…",
-        "hr": "Wpisz nazwisko pracownika HR…",
-        "interview": "Opisz lub nazwij interview…"
+        "hr": "Wybierz pracownika HR powyżej lub wpisz imię…",
+        "interview": "Wybierz interview powyżej lub wpisz nazwę/ID…"
       }
     },
     "welcome": {
@@ -98,11 +98,15 @@
       "heading": "Wybierz szablon",
       "questionCount": "{count, plural, one {# pytanie} few {# pytania} many {# pytań} other {# pytania}}"
     },
+    "hrList": {
+      "heading": "Wybierz pracownika HR"
+    },
     "redirect": {
       "continue": "Kontynuuj w aplikacji"
     },
     "interviewList": {
       "heading": "Interview",
+      "chooseHeading": "Wybierz interview",
       "viewDetail": "Szczegóły",
       "progress": "{submitted}/{total} odpowiedzi"
     },

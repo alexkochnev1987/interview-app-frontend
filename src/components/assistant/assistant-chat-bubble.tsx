@@ -14,7 +14,10 @@ import { useSharedLabels } from '@/i18n/use-shared-labels'
 import type { AiAssistantChatMessage } from './ai-assistant-chat-types'
 import { AssistantCreatedInterview } from './assistant-created-interview'
 import { AssistantCreatedQuestion } from './assistant-created-question'
+import { AssistantHrList } from './assistant-hr-list'
+import type { AssistantHrSelection } from './assistant-hr-selection'
 import { AssistantInterviewList } from './assistant-interview-list'
+import type { AssistantInterviewSelection } from './assistant-interview-selection'
 import { AssistantInterviewSummary } from './assistant-interview-summary'
 import { AssistantRedirectAction } from './assistant-redirect-action'
 import { AssistantTemplateList } from './assistant-template-list'
@@ -25,6 +28,8 @@ type AssistantChatBubbleProps = {
   muted?: boolean
   disabled?: boolean
   onSelectTemplate?: (selection: AssistantTemplateSelection) => void
+  onSelectHr?: (selection: AssistantHrSelection) => void
+  onSelectInterview?: (selection: AssistantInterviewSelection) => void
 }
 
 export function AssistantChatBubble({
@@ -32,6 +37,8 @@ export function AssistantChatBubble({
   muted,
   disabled = false,
   onSelectTemplate,
+  onSelectHr,
+  onSelectInterview,
 }: AssistantChatBubbleProps) {
   const t = useTranslations('assistant')
   const sharedLabels = useSharedLabels()
@@ -95,7 +102,13 @@ export function AssistantChatBubble({
           ) : null}
 
           {message.result?.interviews && message.result.interviews.length > 0 ? (
-            <AssistantInterviewList interviews={message.result.interviews} />
+            <AssistantInterviewList
+              interviews={message.result.interviews}
+              disabled={disabled}
+              onSelect={
+                message.result.awaitingInput === 'interview' ? onSelectInterview : undefined
+              }
+            />
           ) : null}
           {message.result?.interview ? (
             <AssistantInterviewSummary interview={message.result.interview} />
@@ -118,6 +131,12 @@ export function AssistantChatBubble({
               disabled={disabled}
               onSelect={onSelectTemplate}
             />
+          ) : null}
+          {message.result?.awaitingInput === 'hr' &&
+          message.result.hrs &&
+          message.result.hrs.length > 0 &&
+          onSelectHr ? (
+            <AssistantHrList hrs={message.result.hrs} disabled={disabled} onSelect={onSelectHr} />
           ) : null}
         </Stack>
       </ChatMessageBubble>
