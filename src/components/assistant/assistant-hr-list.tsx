@@ -12,7 +12,7 @@ import { type AssistantHrSelection } from './assistant-hr-selection'
 type AssistantHrListProps = {
   hrs: AssignedHr[]
   disabled?: boolean
-  onSelect: (selection: AssistantHrSelection) => void
+  onSelect?: (selection: AssistantHrSelection) => void
 }
 
 export function AssistantHrList({ hrs, disabled = false, onSelect }: AssistantHrListProps) {
@@ -25,7 +25,7 @@ export function AssistantHrList({ hrs, disabled = false, onSelect }: AssistantHr
   return (
     <Stack gap={1.5}>
       <BodyText as="span" size="xs" weight="semibold" tone="muted">
-        {t('hrList.heading')}
+        {onSelect ? t('hrList.heading') : t('hrList.listHeading')}
       </BodyText>
       <Stack gap={1}>
         {hrs.map((hr) => (

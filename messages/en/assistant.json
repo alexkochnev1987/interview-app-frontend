@@ -49,6 +49,7 @@
         "reviewed": "See if your interview has been reviewed",
         "schedule": "Share when and where your interview is, or your candidate link",
         "unassigned": "List unassigned interviews",
+        "showHrs": "List available HR reviewers",
         "filters": "Filter interviews by status, HR, and other app filters",
         "assignHr": "Assign an interview to an HR reviewer (with your confirmation)",
         "orgQueries": "Answer broader interview, question, and team queries in your org"
@@ -99,7 +100,8 @@
       "questionCount": "{count, plural, one {# question} other {# questions}}"
     },
     "hrList": {
-      "heading": "Choose an HR reviewer"
+      "heading": "Choose an HR reviewer",
+      "listHeading": "HR reviewers"
     },
     "redirect": {
       "continue": "Continue in the app"
@@ -134,12 +136,14 @@
       },
       "admin": {
         "unassigned": "Show unassigned interviews",
+        "showHrs": "Show HR reviewers",
         "byStatus": "Show completed interviews",
         "assignHr": "Assign an interview to an HR reviewer",
         "createQuestion": "Help me create a new interview question"
       },
       "super_admin": {
         "unassigned": "Show unassigned interviews",
+        "showHrs": "Show HR reviewers",
         "byStatus": "Show interviews by status",
         "assignHr": "Assign an interview to an HR reviewer",
         "createQuestion": "Help me create a new interview question",

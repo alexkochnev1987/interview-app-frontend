@@ -132,11 +132,12 @@ export function AssistantChatBubble({
               onSelect={onSelectTemplate}
             />
           ) : null}
-          {message.result?.awaitingInput === 'hr' &&
-          message.result.hrs &&
-          message.result.hrs.length > 0 &&
-          onSelectHr ? (
-            <AssistantHrList hrs={message.result.hrs} disabled={disabled} onSelect={onSelectHr} />
+          {message.result?.hrs && message.result.hrs.length > 0 ? (
+            <AssistantHrList
+              hrs={message.result.hrs}
+              disabled={disabled}
+              onSelect={message.result.awaitingInput === 'hr' ? onSelectHr : undefined}
+            />
           ) : null}
         </Stack>
       </ChatMessageBubble>

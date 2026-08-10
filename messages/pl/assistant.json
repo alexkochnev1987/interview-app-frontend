@@ -49,6 +49,7 @@
         "reviewed": "Sprawdź, czy Twoje interview zostało ocenione",
         "schedule": "Pokaż termin i miejsce interview lub link dla kandydata",
         "unassigned": "Wyświetl nieprzypisane interview",
+        "showHrs": "Wyświetl dostępnych pracowników HR",
         "filters": "Filtruj interview według statusu, HR i innych filtrów aplikacji",
         "assignHr": "Przypisz interview do pracownika HR (po Twoim potwierdzeniu)",
         "orgQueries": "Odpowiedz na pytania dotyczące interview, pytań i zespołu w organizacji"
@@ -99,7 +100,8 @@
       "questionCount": "{count, plural, one {# pytanie} few {# pytania} many {# pytań} other {# pytania}}"
     },
     "hrList": {
-      "heading": "Wybierz pracownika HR"
+      "heading": "Wybierz pracownika HR",
+      "listHeading": "Pracownicy HR"
     },
     "redirect": {
       "continue": "Kontynuuj w aplikacji"
@@ -134,12 +136,14 @@
       },
       "admin": {
         "unassigned": "Pokaż nieprzypisane interview",
+        "showHrs": "Pokaż pracowników HR",
         "byStatus": "Pokaż ukończone interview",
         "assignHr": "Przypisz interview do pracownika HR",
         "createQuestion": "Pomóż mi utworzyć nowe pytanie rekrutacyjne"
       },
       "super_admin": {
         "unassigned": "Pokaż nieprzypisane interview",
+        "showHrs": "Pokaż pracowników HR",
         "byStatus": "Pokaż interview według statusu",
         "assignHr": "Przypisz interview do pracownika HR",
         "createQuestion": "Pomóż mi utworzyć nowe pytanie rekrutacyjne",
