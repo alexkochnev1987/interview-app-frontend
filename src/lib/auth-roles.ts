@@ -111,3 +111,10 @@ export function canUseAiAssistant(role: string | null | undefined): boolean {
   if (!role || !isAppRole(role)) return false
   return AI_ASSISTANT_ROLES.has(role)
 }
+
+export function canShowRecruiterAssistant(
+  user: { role: string; recruiterAssistantEnabled?: boolean } | null | undefined,
+): boolean {
+  if (!user || !canUseAiAssistant(user.role)) return false
+  return user.recruiterAssistantEnabled !== false
+}
