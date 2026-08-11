@@ -31,6 +31,8 @@
       "maskedSecret": "••••••••••••",
       "edit": "Рэдагаваць",
       "reset": "Скінуць",
+      "expandRecruiterRoles": "Паказаць доступ па ролях",
+      "collapseRecruiterRoles": "Схаваць доступ па ролях",
       "noResultsTitle": "Зменныя не знойдзены",
       "noResultsDesc": "Паспрабуйце змяніць пошукавы запыт."
     },
