@@ -5,6 +5,20 @@
     "lead": "Manage dynamic application variables, timeouts, attempt limits, and feature toggles in real-time.",
     "searchPlaceholder": "Filter configuration keys...",
     "quickAdd": "Add Variable",
+    "featureToggles": {
+      "heading": "Feature toggles",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "recruiterAssistant": {
+        "label": "Herman (recruiter assistant)",
+        "description": "Show the AI hiring assistant widget for eligible users."
+      },
+      "recruiterAssistantRoles": {
+        "heading": "Role access",
+        "description": "Enable or disable Herman per role. Unset roles inherit the org-wide default.",
+        "roleDescription": "Whether Herman is enabled for {role} users."
+      }
+    },
     "forbiddenTitle": "Access Restricted",
     "forbiddenDesc": "You need super_admin privileges to view or edit system configuration.",
     "table": {
@@ -17,6 +31,8 @@
       "maskedSecret": "••••••••••••",
       "edit": "Edit",
       "reset": "Reset",
+      "expandRecruiterRoles": "Show role access",
+      "collapseRecruiterRoles": "Hide role access",
       "noResultsTitle": "No variables found",
       "noResultsDesc": "Try adjusting your search query."
     },

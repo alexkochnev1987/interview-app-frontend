@@ -5,6 +5,20 @@
     "lead": "Кіруйце дынамічнымі зменнымі, таймаўтамі, лімітамі спроб і сцяжкамі функцый у рэальным часе.",
     "searchPlaceholder": "Фільтр ключоў канфігурацыі...",
     "quickAdd": "Дадаць зменную",
+    "featureToggles": {
+      "heading": "Сцяжкі функцый",
+      "enabled": "Уключана",
+      "disabled": "Выключана",
+      "recruiterAssistant": {
+        "label": "Herman (recruiter assistant)",
+        "description": "Паказваць віджэт ІІ-памочніка па найме для адпаведных карыстальнікаў."
+      },
+      "recruiterAssistantRoles": {
+        "heading": "Доступ па ролях",
+        "description": "Уключайце або адключайце Hermana для кожнай ролі. Невызначаныя ролі атрымліваюць агульнае значэнне.",
+        "roleDescription": "Ці ўключаны Herman для карыстальнікаў з роляй {role}."
+      }
+    },
     "forbiddenTitle": "Доступ абмежаваны",
     "forbiddenDesc": "Для прагляду або рэдагавання сістэмнай канфігурацыі патрабуюцца правы super_admin.",
     "table": {

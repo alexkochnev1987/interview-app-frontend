@@ -36,6 +36,7 @@ import { TableHeader, TableBody, TableCell, TableHead, TableRow } from '@/compon
 import { BodyText, SectionHeading } from '@/components/ui/text'
 import { Textarea } from '@/components/ui/textarea'
 import { useTableSort } from '@/components/ui/use-table-sort'
+import { useSharedLabels } from '@/i18n/use-shared-labels'
 import {
   deleteSystemConfig,
   getSystemConfigs,
@@ -44,9 +45,27 @@ import {
   type SystemConfigValueType,
 } from '@/lib/api'
 import { useRefreshAppConfig } from '@/lib/app-config-context'
+import {
+  DEPRECATED_CONFIG_KEYS,
+  RECRUITER_ASSISTANT_ENABLED_KEY,
+  RECRUITER_ASSISTANT_NESTED_CONFIG_KEYS,
+  RECRUITER_ASSISTANT_ROLE_LOCKS,
+  type RecruiterAssistantLockRole,
+} from '@/lib/app-config-types'
 import { runMutation } from '@/lib/run-mutation'
 
 type ConfigSortField = 'key' | 'valueType' | 'value'
+
+type RoleEditValues = Record<RecruiterAssistantLockRole, string>
+
+function createRoleEditValues(configs: SystemConfigEntry[]): RoleEditValues {
+  return Object.fromEntries(
+    RECRUITER_ASSISTANT_ROLE_LOCKS.map(({ role, key }) => {
+      const entry = configs.find((item) => item.key === key)
+      return [role, entry?.value ?? 'true']
+    }),
+  ) as RoleEditValues
+}
 
 interface ConfigDashboardProps {
   initialConfigs: SystemConfigEntry[]
@@ -84,14 +103,43 @@ function renderValueTypeBadge(valueType: SystemConfigValueType, value?: string) 
   }
 }
 
+function renderBooleanToggle(ariaLabel: string, value: string, onChange: (next: string) => void) {
+  return (
+    <SegmentedGroup ariaLabel={ariaLabel}>
+      <Button
+        type="button"
+        variant={value === 'true' ? 'secondary' : 'ghost'}
+        shape="pill"
+        size="sm"
+        onClick={() => onChange('true')}
+      >
+        true
+      </Button>
+      <Button
+        type="button"
+        variant={value === 'false' ? 'secondary' : 'ghost'}
+        shape="pill"
+        size="sm"
+        onClick={() => onChange('false')}
+      >
+        false
+      </Button>
+    </SegmentedGroup>
+  )
+}
+
 export function ConfigDashboard({ initialConfigs }: ConfigDashboardProps) {
   const t = useTranslations('config')
+  const sharedLabels = useSharedLabels()
   const refreshPublicConfig = useRefreshAppConfig()
 
   const [configs, setConfigs] = useState<SystemConfigEntry[]>(initialConfigs)
   const [search, setSearch] = useState('')
   const [editingEntry, setEditingEntry] = useState<SystemConfigEntry | null>(null)
   const [editValue, setEditValue] = useState('')
+  const [editRoleValues, setEditRoleValues] = useState<RoleEditValues>(() =>
+    createRoleEditValues(initialConfigs),
+  )
   const [resetTargetKey, setResetTargetKey] = useState<string | null>(null)
   const [showAddModal, setShowAddModal] = useState(false)
 
@@ -114,11 +162,15 @@ export function ConfigDashboard({ initialConfigs }: ConfigDashboardProps) {
   const [newIsSecret, setNewIsSecret] = useState(false)
   const [newDescription, setNewDescription] = useState('')
 
+  const editingRecruiterAssistant = editingEntry?.key === RECRUITER_ASSISTANT_ENABLED_KEY
+
   const filteredConfigs = configs
     .filter(
       (item) =>
-        item.key.toLowerCase().includes(search.toLowerCase()) ||
-        (item.description && item.description.toLowerCase().includes(search.toLowerCase())),
+        !RECRUITER_ASSISTANT_NESTED_CONFIG_KEYS.has(item.key) &&
+        !DEPRECATED_CONFIG_KEYS.has(item.key) &&
+        (item.key.toLowerCase().includes(search.toLowerCase()) ||
+          (item.description && item.description.toLowerCase().includes(search.toLowerCase()))),
     )
     .toSorted((a, b) => {
       let comparison = 0
@@ -142,6 +194,9 @@ export function ConfigDashboard({ initialConfigs }: ConfigDashboardProps) {
   function handleOpenEdit(entry: SystemConfigEntry) {
     setEditingEntry(entry)
     setEditValue(entry.isSecret ? '' : entry.value)
+    if (entry.key === RECRUITER_ASSISTANT_ENABLED_KEY) {
+      setEditRoleValues(createRoleEditValues(configs))
+    }
   }
 
   async function handleSaveEdit() {
@@ -158,6 +213,26 @@ export function ConfigDashboard({ initialConfigs }: ConfigDashboardProps) {
           isPublic: editingEntry.isPublic,
           isSecret: editingEntry.isSecret,
         })
+
+        if (editingEntry.key === RECRUITER_ASSISTANT_ENABLED_KEY) {
+          await Promise.all(
+            RECRUITER_ASSISTANT_ROLE_LOCKS.map(async ({ role, key }) => {
+              const existing = configs.find((item) => item.key === key)
+              await updateSystemConfig(key, {
+                value: editRoleValues[role],
+                valueType: 'boolean',
+                description:
+                  existing?.description ??
+                  t('featureToggles.recruiterAssistantRoles.roleDescription', {
+                    role: sharedLabels.role(role),
+                  }),
+                isPublic: false,
+                isSecret: false,
+              })
+            }),
+          )
+        }
+
         setEditingEntry(null)
         await reloadConfigs()
         await refreshPublicConfig()
@@ -407,26 +482,7 @@ export function ConfigDashboard({ initialConfigs }: ConfigDashboardProps) {
                 ) : editingEntry.valueType === 'boolean' ||
                   editingEntry.value === 'true' ||
                   editingEntry.value === 'false' ? (
-                  <SegmentedGroup ariaLabel={t('editModal.valueLabel')}>
-                    <Button
-                      type="button"
-                      variant={editValue === 'true' ? 'secondary' : 'ghost'}
-                      shape="pill"
-                      size="sm"
-                      onClick={() => setEditValue('true')}
-                    >
-                      true
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={editValue === 'false' ? 'secondary' : 'ghost'}
-                      shape="pill"
-                      size="sm"
-                      onClick={() => setEditValue('false')}
-                    >
-                      false
-                    </Button>
-                  </SegmentedGroup>
+                  renderBooleanToggle(t('editModal.valueLabel'), editValue, setEditValue)
                 ) : editingEntry.valueType === 'json' ? (
                   <Textarea
                     value={editValue}
@@ -441,6 +497,31 @@ export function ConfigDashboard({ initialConfigs }: ConfigDashboardProps) {
                   />
                 )}
               </FormField>
+
+              {editingRecruiterAssistant ? (
+                <Stack gap={3}>
+                  <Stack gap={1}>
+                    <SectionHeading size="sm">
+                      {t('featureToggles.recruiterAssistantRoles.heading')}
+                    </SectionHeading>
+                    <BodyText size="sm" tone="muted">
+                      {t('featureToggles.recruiterAssistantRoles.description')}
+                    </BodyText>
+                  </Stack>
+                  <Stack gap={3}>
+                    {RECRUITER_ASSISTANT_ROLE_LOCKS.map(({ role }) => {
+                      const roleLabel = sharedLabels.role(role)
+                      return (
+                        <FormField key={role} label={roleLabel}>
+                          {renderBooleanToggle(roleLabel, editRoleValues[role], (next) =>
+                            setEditRoleValues((current) => ({ ...current, [role]: next })),
+                          )}
+                        </FormField>
+                      )
+                    })}
+                  </Stack>
+                </Stack>
+              ) : null}
 
               <Inline gap={2} justify="end" width="full">
                 <Button type="button" variant="ghost" onClick={() => setEditingEntry(null)}>

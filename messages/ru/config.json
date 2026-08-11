@@ -5,6 +5,20 @@
     "lead": "Управляйте динамическими переменными приложения, таймаутами, лимитами попыток и флагами функций в реальном времени.",
     "searchPlaceholder": "Фильтр ключей конфигурации...",
     "quickAdd": "Добавить переменную",
+    "featureToggles": {
+      "heading": "Флаги функций",
+      "enabled": "Включено",
+      "disabled": "Выключено",
+      "recruiterAssistant": {
+        "label": "Herman (recruiter assistant)",
+        "description": "Показывать виджет ИИ-помощника по найму для подходящих пользователей."
+      },
+      "recruiterAssistantRoles": {
+        "heading": "Доступ по ролям",
+        "description": "Включайте или отключайте Herman для каждой роли. Незаданные роли наследуют общее значение.",
+        "roleDescription": "Включён ли Herman для пользователей с ролью {role}."
+      }
+    },
     "forbiddenTitle": "Доступ ограничен",
     "forbiddenDesc": "Для просмотра или редактирования системной конфигурации требуются права super_admin.",
     "table": {
@@ -17,6 +31,8 @@
       "maskedSecret": "••••••••••••",
       "edit": "Редактировать",
       "reset": "Сбросить",
+      "expandRecruiterRoles": "Показать доступ по ролям",
+      "collapseRecruiterRoles": "Скрыть доступ по ролям",
       "noResultsTitle": "Переменные не найдены",
       "noResultsDesc": "Попробуйте изменить поисковый запрос."
     },
