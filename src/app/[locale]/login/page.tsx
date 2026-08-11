@@ -16,7 +16,9 @@ export default function LoginPage() {
         </Suspense>
         <Stack grow="fill" justify="center">
           <Grid columns="login-shell" gap={8} align="center">
-            <LoginMarketingPanel />
+            <Suspense fallback={null}>
+              <LoginMarketingPanel />
+            </Suspense>
             <Suspense fallback={null}>
               <LoginForm />
             </Suspense>

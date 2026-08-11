@@ -1,3 +1,5 @@
+'use client'
+
 import { ArrowRight, LockKeyhole, ShieldCheck, Sparkles } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
