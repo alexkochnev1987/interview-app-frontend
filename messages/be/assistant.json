@@ -31,6 +31,7 @@
         "candidateName": "Увядзіце імя кандыдата…",
         "position": "Увядзіце пасаду…",
         "questionName": "Увядзіце назву пытання…",
+        "confirmAddDespiteSimilar": "Абярыце «Працягнуць» або «Скасаваць» вышэй…",
         "templateChoice": "Выберыце шаблон вышэй або ўвядзіце яго нумар…",
         "hr": "Абярыце HR-спецыяліста вышэй або ўвядзіце імя…",
         "interview": "Абярыце інтэрв'ю вышэй або ўвядзіце імя/ID…"
@@ -94,6 +95,15 @@
     },
     "createdQuestion": {
       "openLink": "Адкрыць пытанне"
+    },
+    "similarQuestions": {
+      "heading": "Падобныя пытанні (супадзенне 80%+)",
+      "matchScore": "супадзенне {score}"
+    },
+    "confirmAddDespiteSimilar": {
+      "heading": "Усё роўна стварыць гэта пытанне?",
+      "continue": "Працягнуць стварэнне",
+      "abort": "Скасаваць"
     },
     "templateList": {
       "heading": "Выберыце шаблон",
