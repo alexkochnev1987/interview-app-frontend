@@ -19,7 +19,6 @@ import type { TeamMember } from '@/lib/api'
 
 import { TeamMemberStats } from './team-member-stats'
 import { TeamMembersFilters } from './team-members-filters'
-import { TeamMembersHeading } from './team-members-heading'
 import { TeamMembersTableSection } from './team-members-table-section'
 
 interface TeamMembersViewProps {
@@ -78,7 +77,6 @@ export function TeamMembersView({
 
   return (
     <>
-      <TeamMembersHeading />
       <TeamMemberStats statCards={statCards} />
 
       <Card variant="surface" flexChild="contain">
