@@ -1,12 +1,15 @@
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
+import { Suspense } from 'react'
 
 import { ConfigDashboard } from '@/components/config/config-dashboard'
-import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
+import { PageShell } from '@/components/ui/layout/page-shell'
+import { TableSkeleton } from '@/components/ui/skeleton'
+import type { Locale } from '@/i18n/locales'
 import type { SystemConfigEntry } from '@/lib/api'
+import { requireAuthGate } from '@/lib/auth-gate'
 import { isSuperAdmin } from '@/lib/auth-roles'
-import { getServerSessionSnapshot } from '@/lib/auth-server'
-import { getServerRequestContext, requestServer } from '@/lib/server-fetch'
+import { requestServer } from '@/lib/server-fetch'
 
 export async function generateMetadata({
   params,
@@ -22,22 +25,9 @@ export async function generateMetadata({
   }
 }
 
-export default async function ConfigPage({ params }: { params: Promise<{ locale: string }> }) {
+async function ConfigData({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
-  const [session, ctx, tConfig] = await Promise.all([
-    getServerSessionSnapshot(),
-    getServerRequestContext(locale),
-    getTranslations({ locale, namespace: 'config' }),
-  ])
-
-  if (!isSuperAdmin(session.user?.role)) {
-    return (
-      <ForbiddenAccessPage
-        title={tConfig('forbiddenTitle')}
-        description={tConfig('forbiddenDesc')}
-      />
-    )
-  }
+  const { ctx } = await requireAuthGate(isSuperAdmin, '/config', locale as Locale)
 
   let initialConfigs: SystemConfigEntry[] = []
   try {
@@ -51,4 +41,14 @@ export default async function ConfigPage({ params }: { params: Promise<{ locale:
   }
 
   return <ConfigDashboard initialConfigs={initialConfigs} />
+}
+
+export default function ConfigPage({ params }: { params: Promise<{ locale: string }> }) {
+  return (
+    <PageShell>
+      <Suspense fallback={<TableSkeleton />}>
+        <ConfigData params={params} />
+      </Suspense>
+    </PageShell>
+  )
 }

@@ -1,4 +1,5 @@
 import { getTranslations } from 'next-intl/server'
+import { Suspense } from 'react'
 
 import { InterviewCreateForm } from '@/components/interviews/interview-create-form'
 import { InterviewCreateIntro } from '@/components/interviews/interview-create-intro'
@@ -7,6 +8,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
+import { DetailPageSkeleton } from '@/components/ui/skeleton'
 import type { Locale } from '@/i18n/locales'
 import { Link } from '@/i18n/navigation'
 import { routes } from '@/i18n/routes'
@@ -31,7 +33,13 @@ function firstSearchParam(value?: string | string[]): string | undefined {
   return Array.isArray(value) ? value[0] : value
 }
 
-export default async function NewInterviewPage({ params, searchParams }: NewInterviewPageProps) {
+async function NewInterviewData({
+  params,
+  searchParams,
+}: {
+  params: NewInterviewPageProps['params']
+  searchParams: NewInterviewPageProps['searchParams']
+}) {
   const { locale } = await params
   const {
     templateId: templateIdParam,
@@ -84,9 +92,6 @@ export default async function NewInterviewPage({ params, searchParams }: NewInte
     )
   }
 
-  // Prefill from a template (?templateId=) or a past interview (?fromInterview=);
-  // templateId wins. When an id is present but the source cannot be loaded
-  // (deleted or out of scope), surface a warning rather than a silent blank form.
   let template
   let templateMissing = false
   if (templateId) {
@@ -103,8 +108,7 @@ export default async function NewInterviewPage({ params, searchParams }: NewInte
   const prefillPosition = positionFromQuery ?? template?.position ?? sourceInterview?.position
 
   return (
-    <PageShell>
-      <InterviewCreateIntro />
+    <>
       {template ? (
         <Alert variant="default">
           <AlertTitle>{tPrefill('bannerTitle', { name: template.name })}</AlertTitle>
@@ -135,6 +139,17 @@ export default async function NewInterviewPage({ params, searchParams }: NewInte
           initialTemplateId={template ? templateId : undefined}
         />
       </QueryHydrationBoundary>
+    </>
+  )
+}
+
+export default function NewInterviewPage({ params, searchParams }: NewInterviewPageProps) {
+  return (
+    <PageShell>
+      <InterviewCreateIntro />
+      <Suspense fallback={<DetailPageSkeleton />}>
+        <NewInterviewData params={params} searchParams={searchParams} />
+      </Suspense>
     </PageShell>
   )
 }
