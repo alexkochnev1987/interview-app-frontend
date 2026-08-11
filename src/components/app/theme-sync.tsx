@@ -2,19 +2,23 @@
 
 import { useEffect } from 'react'
 
-import { type AppTheme, getEnvTheme } from '@/lib/theme'
+import { useAppConfig } from '@/lib/app-config-context'
+import { isAppTheme, type AppTheme, getEnvTheme } from '@/lib/theme'
 
 interface ThemeSyncProps {
   theme?: AppTheme
 }
 
 export function ThemeSync({ theme }: ThemeSyncProps) {
+  const appConfig = useAppConfig()
+  const dynamicTheme = isAppTheme(appConfig.APP_THEME) ? appConfig.APP_THEME : undefined
+
   useEffect(() => {
-    const activeTheme = theme || getEnvTheme()
+    const activeTheme = theme || dynamicTheme || getEnvTheme()
     if (document.documentElement.getAttribute('data-theme') !== activeTheme) {
       document.documentElement.setAttribute('data-theme', activeTheme)
     }
-  }, [theme])
+  }, [theme, dynamicTheme])
 
   return null
 }
