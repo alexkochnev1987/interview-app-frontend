@@ -13,6 +13,10 @@
     "serviceUnavailable": "Usługa jest niedostępna",
     "sessionVerificationFailed": "Nie udało się zweryfikować sesji lub uprawnień.",
     "profileLoadFailed": "Nie udało się załadować profilu.",
+    "forbiddenTitle": "Dostęp ograniczony",
+    "forbiddenDescription": "Nie masz uprawnień do dostępu do tego zasobu.",
+    "unauthorizedTitle": "Wymagana autoryzacja",
+    "unauthorizedDescription": "Zaloguj się, aby uzyskać dostęp do tej strony.",
     "demoMode": {
       "bannerTitle": "Demo tylko do odczytu",
       "bannerDescription": "Przeglądasz konto demo. Przeglądanie jest w pełni dostępne, a zapisywanie wyłączone. Możesz nawet wypróbować proces rozmowy kandydata z oczekującej rozmowy.",

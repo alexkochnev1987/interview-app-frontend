@@ -13,6 +13,10 @@
     "serviceUnavailable": "Service is unavailable",
     "sessionVerificationFailed": "We could not verify your session or permissions.",
     "profileLoadFailed": "Failed to load your profile.",
+    "forbiddenTitle": "Access Restricted",
+    "forbiddenDescription": "You do not have permission to access this resource.",
+    "unauthorizedTitle": "Authentication Required",
+    "unauthorizedDescription": "Please log in to access this page.",
     "demoMode": {
       "bannerTitle": "Read-only demo",
       "bannerDescription": "You are exploring a demo account. Browsing is fully enabled and saving is turned off. You can even try the candidate interview process from a pending interview.",
