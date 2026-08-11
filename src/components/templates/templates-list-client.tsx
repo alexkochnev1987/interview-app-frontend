@@ -126,21 +126,6 @@ export function TemplatesListClient() {
 
   return (
     <Stack gap={6}>
-      <Inline justify="between" align="center" gap={4}>
-        <Stack gap={1}>
-          <CardTitle size="xl">{t('title')}</CardTitle>
-          <CardDescription>{t('description')}</CardDescription>
-        </Stack>
-        <DemoWriteGuard>
-          <Button variant="gradient" onClick={() => router.push(routes.templates.new)}>
-            <Icon size="md">
-              <Plus />
-            </Icon>
-            {t('newButton')}
-          </Button>
-        </DemoWriteGuard>
-      </Inline>
-
       {isError ? (
         <Alert variant="danger">
           <AlertTitle>{t('list.loadError')}</AlertTitle>
