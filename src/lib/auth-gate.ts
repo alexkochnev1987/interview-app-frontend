@@ -1,8 +1,10 @@
+import { hasLocale } from 'next-intl'
 import { getLocale, getTranslations } from 'next-intl/server'
 import { forbidden, redirect } from 'next/navigation'
 
 import type { Locale } from '@/i18n/locales'
 import { localizedPath } from '@/i18n/pathname'
+import { routing } from '@/i18n/routing'
 
 import type { MeResponse } from './api'
 import { ApiError } from './api-error'
@@ -82,7 +84,10 @@ export async function requireAuthGate(
   returnPath: string,
   locale?: Locale,
 ): Promise<{ ctx: ServerRequestContext; me: MeResponse }> {
-  const currentLocale = locale ?? (await getLocale())
+  const rawLocale = locale ?? (await getLocale())
+  const currentLocale: Locale = hasLocale(routing.locales, rawLocale)
+    ? rawLocale
+    : (routing.defaultLocale as Locale)
   const auth = await loadAuthGate(roleCheck, currentLocale)
   redirectIfUnauthenticated(auth, returnPath, currentLocale)
   if (auth.kind === 'forbidden') {
@@ -93,4 +98,3 @@ export async function requireAuthGate(
   }
   return { ctx: auth.ctx, me: auth.me }
 }
-

@@ -6,6 +6,7 @@ import { TemplateForm } from '@/components/templates/template-form'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { DetailPageSkeleton } from '@/components/ui/skeleton'
+import type { Locale } from '@/i18n/locales'
 import { routes } from '@/i18n/routes'
 import { requireAuthGate } from '@/lib/auth-gate'
 import { canConfigureInterview } from '@/lib/auth-roles'
@@ -13,18 +14,26 @@ import { prefetchInterviewCreatePicker } from '@/lib/questions-library-prefetch'
 import { fetchInterview } from '@/lib/templates-prefetch'
 
 interface NewTemplatePageProps {
+  params: Promise<{ locale: Locale }>
   searchParams: Promise<{ fromInterview?: string | string[] }>
 }
 
-async function NewTemplateData({ searchParams }: { searchParams: NewTemplatePageProps['searchParams'] }) {
+async function NewTemplateData({
+  params,
+  searchParams,
+}: {
+  params: NewTemplatePageProps['params']
+  searchParams: NewTemplatePageProps['searchParams']
+}) {
+  const { locale } = await params
   const { fromInterview: fromInterviewParam } = await searchParams
   const fromInterview = Array.isArray(fromInterviewParam)
     ? fromInterviewParam[0]
     : fromInterviewParam
 
-  const { ctx } = await requireAuthGate(canConfigureInterview, routes.templates.new)
+  const { ctx } = await requireAuthGate(canConfigureInterview, routes.templates.new, locale)
   const [tPrefill, initialPrefetch] = await Promise.all([
-    getTranslations({ namespace: 'templates.prefill' }),
+    getTranslations({ locale, namespace: 'templates.prefill' }),
     prefetchInterviewCreatePicker(ctx),
   ])
 
@@ -54,11 +63,11 @@ async function NewTemplateData({ searchParams }: { searchParams: NewTemplatePage
   )
 }
 
-export default function NewTemplatePage({ searchParams }: NewTemplatePageProps) {
+export default function NewTemplatePage({ params, searchParams }: NewTemplatePageProps) {
   return (
     <PageShell>
       <Suspense fallback={<DetailPageSkeleton />}>
-        <NewTemplateData searchParams={searchParams} />
+        <NewTemplateData params={params} searchParams={searchParams} />
       </Suspense>
     </PageShell>
   )
