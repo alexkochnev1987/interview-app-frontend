@@ -10,6 +10,7 @@
     "logout": "Logout",
     "signIn": "Sign In",
     "templates": "Templates",
+    "config": "System Config",
     "expandSidebar": "Expand sidebar",
     "collapseSidebar": "Collapse sidebar"
   }
