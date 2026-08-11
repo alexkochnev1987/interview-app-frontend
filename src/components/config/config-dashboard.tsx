@@ -47,11 +47,13 @@ import {
 import { useRefreshAppConfig } from '@/lib/app-config-context'
 import {
   DEPRECATED_CONFIG_KEYS,
+  isRecruiterAssistantConfigKey,
   RECRUITER_ASSISTANT_ENABLED_KEY,
   RECRUITER_ASSISTANT_NESTED_CONFIG_KEYS,
   RECRUITER_ASSISTANT_ROLE_LOCKS,
   type RecruiterAssistantLockRole,
 } from '@/lib/app-config-types'
+import { useAuth } from '@/lib/auth-context'
 import { runMutation } from '@/lib/run-mutation'
 
 type ConfigSortField = 'key' | 'valueType' | 'value'
@@ -132,6 +134,7 @@ export function ConfigDashboard({ initialConfigs }: ConfigDashboardProps) {
   const t = useTranslations('config')
   const sharedLabels = useSharedLabels()
   const refreshPublicConfig = useRefreshAppConfig()
+  const { refreshSession } = useAuth()
 
   const [configs, setConfigs] = useState<SystemConfigEntry[]>(initialConfigs)
   const [search, setSearch] = useState('')
@@ -184,6 +187,11 @@ export function ConfigDashboard({ initialConfigs }: ConfigDashboardProps) {
       return sortOrder === 'asc' ? comparison : -comparison
     })
 
+  async function refreshRecruiterAssistantRuntime() {
+    await refreshPublicConfig()
+    await refreshSession()
+  }
+
   async function reloadConfigs() {
     try {
       const fresh = await getSystemConfigs()
@@ -205,7 +213,8 @@ export function ConfigDashboard({ initialConfigs }: ConfigDashboardProps) {
 
     await runMutation(
       async () => {
-        const updated = await updateSystemConfig(editingEntry.key, {
+        const savedKey = editingEntry.key
+        const updated = await updateSystemConfig(savedKey, {
           value: editValue,
           valueType: editingEntry.valueType,
           options: editingEntry.options,
@@ -214,7 +223,7 @@ export function ConfigDashboard({ initialConfigs }: ConfigDashboardProps) {
           isSecret: editingEntry.isSecret,
         })
 
-        if (editingEntry.key === RECRUITER_ASSISTANT_ENABLED_KEY) {
+        if (savedKey === RECRUITER_ASSISTANT_ENABLED_KEY) {
           await Promise.all(
             RECRUITER_ASSISTANT_ROLE_LOCKS.map(async ({ role, key }) => {
               const existing = configs.find((item) => item.key === key)
@@ -235,7 +244,11 @@ export function ConfigDashboard({ initialConfigs }: ConfigDashboardProps) {
 
         setEditingEntry(null)
         await reloadConfigs()
-        await refreshPublicConfig()
+        if (isRecruiterAssistantConfigKey(savedKey)) {
+          await refreshRecruiterAssistantRuntime()
+        } else {
+          await refreshPublicConfig()
+        }
         return updated
       },
       {
@@ -254,7 +267,11 @@ export function ConfigDashboard({ initialConfigs }: ConfigDashboardProps) {
         await deleteSystemConfig(keyToReset)
         setResetTargetKey(null)
         await reloadConfigs()
-        await refreshPublicConfig()
+        if (isRecruiterAssistantConfigKey(keyToReset)) {
+          await refreshRecruiterAssistantRuntime()
+        } else {
+          await refreshPublicConfig()
+        }
       },
       {
         successMessage: t('toast.resetSuccess'),
