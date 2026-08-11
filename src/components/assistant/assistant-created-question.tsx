@@ -16,15 +16,17 @@ export function AssistantCreatedQuestion({ question }: AssistantCreatedQuestionP
   const t = useTranslations('assistant')
 
   return (
-    <ChatResultCard>
-      <Stack gap={1.5}>
-        <BodyText size="sm" weight="medium">
-          {question.questionText}
-        </BodyText>
-        <BodyText as="span" size="xs" tone="primary">
-          <UnstyledLink href={question.href}>{t('createdQuestion.openLink')}</UnstyledLink>
-        </BodyText>
-      </Stack>
-    </ChatResultCard>
+    <UnstyledLink href={question.href}>
+      <ChatResultCard>
+        <Stack gap={1.5}>
+          <BodyText size="sm" weight="medium">
+            {question.questionText}
+          </BodyText>
+          <BodyText as="span" size="xs" tone="primary">
+            {t('createdQuestion.openLink')}
+          </BodyText>
+        </Stack>
+      </ChatResultCard>
+    </UnstyledLink>
   )
 }

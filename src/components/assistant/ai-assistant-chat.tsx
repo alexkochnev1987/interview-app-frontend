@@ -108,6 +108,14 @@ export function AiAssistantChat() {
                           })
                       : undefined
                   }
+                  onSimilarityDecision={
+                    isLatestAssistant && !loading
+                      ? (selection) =>
+                          void sendUserMessage(selection.message, {
+                            displayText: selection.displayText,
+                          })
+                      : undefined
+                  }
                 />
               )
             })}
