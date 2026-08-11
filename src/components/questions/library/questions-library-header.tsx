@@ -12,21 +12,22 @@ import { HeroGrid } from '@/components/ui/layout/hero-grid'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { MetricPanel } from '@/components/ui/metric-panel'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Link } from '@/i18n/navigation'
 import { routes } from '@/i18n/routes'
 import { useIsDemo } from '@/lib/auth-context'
 
 interface QuestionsLibraryHeaderProps {
-  loading: boolean
-  totalCount: number
-  visibleCount: number
+  loading?: boolean
+  totalCount?: number
+  visibleCount?: number
 }
 
 export function QuestionsLibraryHeader({
   loading,
   totalCount,
   visibleCount,
-}: QuestionsLibraryHeaderProps) {
+}: QuestionsLibraryHeaderProps = {}) {
   const t = useTranslations('questions.library.header')
   const isDemo = useIsDemo()
 
@@ -67,12 +68,24 @@ export function QuestionsLibraryHeader({
               <MetricPanel
                 tone="elevated"
                 label={t('totalQuestions')}
-                value={loading ? '...' : totalCount}
+                value={
+                  loading || totalCount === undefined ? (
+                    <Skeleton className="h-9 w-12 rounded-lg" />
+                  ) : (
+                    totalCount
+                  )
+                }
               />
               <MetricPanel
                 tone="elevated"
                 label={t('visibleNow')}
-                value={loading ? '...' : visibleCount}
+                value={
+                  loading || visibleCount === undefined ? (
+                    <Skeleton className="h-9 w-12 rounded-lg" />
+                  ) : (
+                    visibleCount
+                  )
+                }
               />
             </Grid>
           </CardContent>
