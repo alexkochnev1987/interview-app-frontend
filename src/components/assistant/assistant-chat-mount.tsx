@@ -8,9 +8,9 @@ import { canShowRecruiterAssistant } from '@/lib/auth-roles'
 
 export function AssistantChatMount() {
   const { user } = useAuth()
-  const { ENABLE_AI_ASSISTANT } = useAppConfig()
+  const { RECRUITER_ASSISTANT_ENABLED } = useAppConfig()
 
-  if (!ENABLE_AI_ASSISTANT || !canShowRecruiterAssistant(user)) {
+  if (!RECRUITER_ASSISTANT_ENABLED || !canShowRecruiterAssistant(user)) {
     return null
   }
 
