@@ -11,21 +11,31 @@ export interface AnswerAttemptMeta {
   maxAttempts?: number
 }
 
-export function getMaxAttempts(meta?: AnswerAttemptMeta): number {
-  return meta?.maxAttempts ?? MAX_ANSWER_ATTEMPTS_PER_QUESTION
+/**
+ * Resolve the effective max-attempts budget for a question.
+ *
+ * Priority: `meta.maxAttempts` (per-interview override from the backend)
+ *         → `configDefault`    (dynamic value from `useAppConfig()`)
+ *         → `MAX_ANSWER_ATTEMPTS_PER_QUESTION` (hardcoded fallback)
+ */
+export function getMaxAttempts(meta?: AnswerAttemptMeta, configDefault?: number): number {
+  return meta?.maxAttempts ?? configDefault ?? MAX_ANSWER_ATTEMPTS_PER_QUESTION
 }
 
 export function getUsedAttempts(meta?: AnswerAttemptMeta): number {
   return meta?.versionCount ?? 0
 }
 
-export function canStartNewAttempt(meta?: AnswerAttemptMeta): boolean {
-  return getUsedAttempts(meta) < getMaxAttempts(meta)
+export function canStartNewAttempt(meta?: AnswerAttemptMeta, configDefault?: number): boolean {
+  return getUsedAttempts(meta) < getMaxAttempts(meta, configDefault)
 }
 
-export function resolveInitialVersionNumber(meta?: AnswerAttemptMeta): number {
+export function resolveInitialVersionNumber(
+  meta?: AnswerAttemptMeta,
+  configDefault?: number,
+): number {
   const used = getUsedAttempts(meta)
-  const max = getMaxAttempts(meta)
+  const max = getMaxAttempts(meta, configDefault)
   if (used >= max) {
     return meta?.selectedVersionNumber ?? used
   }
@@ -35,8 +45,9 @@ export function resolveInitialVersionNumber(meta?: AnswerAttemptMeta): number {
 export function resolveNextVersionAfterSave(
   savedVersionNumber: number,
   meta?: AnswerAttemptMeta,
+  configDefault?: number,
 ): number | null {
-  const max = getMaxAttempts(meta)
+  const max = getMaxAttempts(meta, configDefault)
   const usedAfterSave = Math.max(getUsedAttempts(meta), savedVersionNumber)
   const nextVersion = savedVersionNumber + 1
   if (nextVersion > max || usedAfterSave >= max) {
@@ -45,8 +56,12 @@ export function resolveNextVersionAfterSave(
   return nextVersion
 }
 
-export function canRequestRetake(currentVersionNumber: number, meta?: AnswerAttemptMeta): boolean {
-  return currentVersionNumber < getMaxAttempts(meta)
+export function canRequestRetake(
+  currentVersionNumber: number,
+  meta?: AnswerAttemptMeta,
+  configDefault?: number,
+): boolean {
+  return currentVersionNumber < getMaxAttempts(meta, configDefault)
 }
 
 export function shouldReuseReservedAttemptForRetake(params: {
