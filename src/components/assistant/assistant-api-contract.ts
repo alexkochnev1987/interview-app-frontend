@@ -1,13 +1,14 @@
 /**
  * AI assistant chat API contract (current backend).
  *
- * Session: `RecruiterAssistantChatDto` sends only `message` (+ optional
- * `pendingActionId` on confirm). No client `history` / `conversationId`; the
- * backend owns multi-turn context if it persists any at all.
+ * Session: `RecruiterAssistantChatDto` sends `message` plus optional
+ * `sessionId` on follow-up turns. No client `history` / `conversationId`; the
+ * backend owns multi-turn context via `sessionId`.
  *
- * Confirm: send `message: ASSISTANT_CONFIRM_MESSAGE` with the `pendingActionId`
- * from the prior `needs_confirmation` response. The server loads and consumes
- * the stored pending action by id.
+ * Confirm: send `message: ASSISTANT_CONFIRM_MESSAGE` with `pendingActionId`
+ * (and `sessionId`) from the prior `needs_confirmation` response. Optionally
+ * include `pendingAction` when the user removed questions from a create-interview
+ * plan. The server re-validates the pending action server-side.
  *
  * Cancel: client-only — `dismissPendingAction` clears local state. No cancel
  * endpoint exists. Sending a new message also clears pending state locally.

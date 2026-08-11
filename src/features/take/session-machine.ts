@@ -17,9 +17,10 @@ export type ExhaustedHint = 'submit' | 'no-media'
 
 export function resolveQuestionAnswerPhase(
   interview: TakeInterviewData | null | undefined,
+  configDefault?: number,
 ): QuestionAnswerPhase {
   const meta = answerAttemptMetaFromInterview(interview)
-  if (!isAttemptsExhausted(meta)) {
+  if (!isAttemptsExhausted(meta, configDefault)) {
     return 'recording'
   }
   if (interview?.currentAnswerMeta?.hasSubmittableMedia) {
@@ -31,6 +32,7 @@ export function resolveQuestionAnswerPhase(
 export function stageAfterInterviewLoad(
   interview: TakeInterviewData,
   mode: InterviewLoadMode,
+  configDefault?: number,
 ): TakeStage {
   if (interview.completed) {
     return 'complete'
@@ -39,7 +41,7 @@ export function stageAfterInterviewLoad(
     return 'consent'
   }
   if (mode === 'returning') {
-    const exhausted = isAttemptsExhausted(answerAttemptMetaFromInterview(interview))
+    const exhausted = isAttemptsExhausted(answerAttemptMetaFromInterview(interview), configDefault)
     if (
       exhausted &&
       isLastInterviewQuestion(interview.currentQuestionIndex, interview.totalQuestions)
@@ -75,8 +77,8 @@ export function answerAttemptMetaFromInterview(
   }
 }
 
-export function isAttemptsExhausted(meta?: AnswerAttemptMeta): boolean {
-  return !canStartNewAttempt(meta)
+export function isAttemptsExhausted(meta?: AnswerAttemptMeta, configDefault?: number): boolean {
+  return !canStartNewAttempt(meta, configDefault)
 }
 
 export function shouldCleanupExhaustedSession(params: {

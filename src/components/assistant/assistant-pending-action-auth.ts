@@ -12,6 +12,8 @@ export function canConfirmAssistantPendingAction(
       return canConfigureInterview(role)
     case 'create_questions':
       return canCreateQuestions(role)
+    case 'create_single_question':
+      return canCreateQuestions(role)
     default:
       return false
   }

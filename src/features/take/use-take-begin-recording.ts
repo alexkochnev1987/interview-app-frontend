@@ -69,6 +69,8 @@ interface UseTakeBeginRecordingParams {
   handleRecordedChunk: (target: CaptureTarget, blob: Blob) => void
   onRecordersStopped: () => void
   primeBrowserTranscriptForRecordingSession: () => void
+  /** Dynamic recording limit from app config; falls back to TAKE_RECORDING_LIMIT_SECONDS. */
+  recordingLimitSeconds?: number
   takeMessage: TakeMessageGetter
 }
 
@@ -119,6 +121,7 @@ export function useTakeBeginRecording({
   handleRecordedChunk,
   onRecordersStopped,
   primeBrowserTranscriptForRecordingSession,
+  recordingLimitSeconds = TAKE_RECORDING_LIMIT_SECONDS,
   takeMessage,
 }: UseTakeBeginRecordingParams) {
   function handleRecorderStopped() {
@@ -282,7 +285,7 @@ export function useTakeBeginRecording({
     primeBrowserTranscriptForRecordingSession()
 
     setRecording(true)
-    setTimeLeft(TAKE_RECORDING_LIMIT_SECONDS)
+    setTimeLeft(recordingLimitSeconds)
     setSetupError('')
     setStage('recording')
     clearVersionPersistKind()
