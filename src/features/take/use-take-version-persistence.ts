@@ -116,12 +116,12 @@ export function useTakeVersionPersistence({
     (message?: string) => {
       notifyError(
         takeMessage('answerAttemptLimitReached', {
-          max: interview?.maxAttempts ?? MAX_ANSWER_ATTEMPTS_PER_QUESTION,
+          max: interview?.maxAttempts ?? appConfig.MAX_ANSWER_ATTEMPTS_PER_QUESTION,
         }),
         { description: message },
       )
     },
-    [interview?.maxAttempts, takeMessage],
+    [interview?.maxAttempts, appConfig.MAX_ANSWER_ATTEMPTS_PER_QUESTION, takeMessage],
   )
 
   const handleAttemptLimitApiError = useCallback(

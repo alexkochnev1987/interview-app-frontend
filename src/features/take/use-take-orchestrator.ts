@@ -796,6 +796,7 @@ export function useTakeOrchestrator({
 
   function proceedToLobby() {
     // Refresh config before the next question so updated limits take effect.
+    // This is fire-and-forget (best-effort) so the next question may start with the previous snapshot if the request hasn't settled.
     void refreshAppConfig().catch(console.error)
     autoStartedQuestionKeyRef.current = ''
     pendingReuseReservedRef.current = null

@@ -22,7 +22,10 @@ export interface PublicAppConfig {
   ENABLE_AI_ASSISTANT: boolean
 }
 
-/** Hardcoded defaults used when the server snapshot is unavailable. */
+/**
+ * Hardcoded defaults used when the server snapshot is unavailable.
+ * Note: These are intentionally fail-closed (ENABLE_* = false) to ensure a safe fallback.
+ */
 export const DEFAULT_PUBLIC_APP_CONFIG: PublicAppConfig = {
   MAX_ANSWER_DURATION_SECONDS: 240,
   MAX_ANSWER_ATTEMPTS_PER_QUESTION: 3,

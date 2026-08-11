@@ -39,7 +39,12 @@ export function AppConfigProvider({ children, initialConfig }: AppConfigProvider
   const [prevInitialConfig, setPrevInitialConfig] = useState(initialConfig)
 
   // Sync with SSR re-renders (same pattern as AuthProvider).
-  if (JSON.stringify(initialConfig) !== JSON.stringify(prevInitialConfig)) {
+  const hasChanged = Object.keys(initialConfig).some(
+    (key) =>
+      initialConfig[key as keyof PublicAppConfig] !==
+      prevInitialConfig[key as keyof PublicAppConfig],
+  )
+  if (hasChanged) {
     setPrevInitialConfig(initialConfig)
     setConfig(initialConfig)
   }
