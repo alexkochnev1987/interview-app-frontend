@@ -50,7 +50,7 @@ export function ConfigTableRow({
           <Stack gap={1}>
             <BodyText tone="foreground" weight="semibold">
               {nested ? (
-                <Inline gap={1.5} align="center">
+                <Inline gap={1} align="center">
                   <BodyText as="span" size="sm" tone="muted">
                     ↳
                   </BodyText>
