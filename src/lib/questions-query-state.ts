@@ -68,9 +68,13 @@ export const DEFAULT_QUESTIONS_QUERY: QuestionsQueryState = {
 }
 
 export function readQuestionsFromSearchParams(
-  params: URLSearchParams,
+  rawParams: URLSearchParams | Record<string, unknown>,
   fallback: QuestionsQueryState = DEFAULT_QUESTIONS_QUERY,
 ): QuestionsQueryState {
+  const params =
+    rawParams && typeof (rawParams as { get?: unknown }).get === 'function'
+      ? (rawParams as URLSearchParams)
+      : new URLSearchParams(rawParams as Record<string, string>)
   const next: QuestionsQueryState = { ...fallback }
   const q = params.get('q')
   if (q !== null) next.q = q.slice(0, MAX_QUESTIONS_Q_LENGTH)

@@ -57,10 +57,14 @@ export const EMPTY_INTERVIEW_FACETS: InterviewFacetsResponse = {
 }
 
 export function readInterviewsFromSearchParams(
-  params: URLSearchParams,
+  rawParams: URLSearchParams | Record<string, unknown>,
   fallback: InterviewsQueryState = DEFAULT_INTERVIEWS_QUERY,
   options?: { allowAssignedHrFilter?: boolean },
 ): InterviewsQueryState {
+  const params =
+    rawParams && typeof (rawParams as { get?: unknown }).get === 'function'
+      ? (rawParams as URLSearchParams)
+      : new URLSearchParams(rawParams as Record<string, string>)
   const next: InterviewsQueryState = { ...fallback }
   const allowAssignedHrFilter = options?.allowAssignedHrFilter ?? true
 
