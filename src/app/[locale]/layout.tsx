@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { hasLocale, NextIntlClientProvider } from 'next-intl'
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
-import { ReactNode } from 'react'
+import { ReactNode, Suspense } from 'react'
 
 import { HtmlLangSync } from '@/components/app/html-lang-sync'
 import { ThemeSync } from '@/components/app/theme-sync'
@@ -55,11 +55,8 @@ export default async function LocaleLayout({
   }
 
   setRequestLocale(locale)
-  const messages = await getMessages()
-  const [session, initialConfig] = await Promise.all([
-    getServerSessionSnapshot(),
-    getServerConfigSnapshot(),
-  ])
+  const [messages, initialConfig] = await Promise.all([getMessages(), getServerConfigSnapshot()])
+  const sessionPromise = getServerSessionSnapshot()
   const htmlLang = resolveHtmlLang(locale as Locale)
 
   return (
@@ -67,26 +64,28 @@ export default async function LocaleLayout({
       <HtmlLangSync lang={htmlLang} />
       <NextIntlClientProvider locale={locale} messages={messages}>
         <AppQueryClientProvider>
-          <AuthProvider initialUser={session.user}>
-            <AppConfigProvider initialConfig={initialConfig}>
-              <ThemeSync />
-              <AssistantChatProvider>
-                <OnboardingProvider>
-                  <TooltipProvider>
-                    <AppShellRoot>
-                      <SideNav />
-                      <AppMain>
-                        <DemoModeBanner />
-                        {children}
-                      </AppMain>
-                    </AppShellRoot>
-                    <AssistantChatMount />
-                    <Toaster />
-                  </TooltipProvider>
-                </OnboardingProvider>
-              </AssistantChatProvider>
-            </AppConfigProvider>
-          </AuthProvider>
+          <Suspense fallback={null}>
+            <AuthProvider sessionPromise={sessionPromise}>
+              <AppConfigProvider initialConfig={initialConfig}>
+                <ThemeSync />
+                <AssistantChatProvider>
+                  <OnboardingProvider>
+                    <TooltipProvider>
+                      <AppShellRoot>
+                        <SideNav />
+                        <AppMain>
+                          <DemoModeBanner />
+                          {children}
+                        </AppMain>
+                      </AppShellRoot>
+                      <AssistantChatMount />
+                      <Toaster />
+                    </TooltipProvider>
+                  </OnboardingProvider>
+                </AssistantChatProvider>
+              </AppConfigProvider>
+            </AuthProvider>
+          </Suspense>
         </AppQueryClientProvider>
       </NextIntlClientProvider>
     </>

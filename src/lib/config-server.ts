@@ -2,7 +2,7 @@ import { cache } from 'react'
 
 import type { PublicAppConfig } from './app-config-types'
 import { DEFAULT_PUBLIC_APP_CONFIG, parsePublicConfig } from './app-config-types'
-import { getServerRequestContext, requestServer } from './server-fetch'
+import { requestPublicServer } from './server-fetch'
 
 /**
  * Server-side helper that fetches the public config snapshot during RSC render.
@@ -12,15 +12,12 @@ import { getServerRequestContext, requestServer } from './server-fetch'
  * the hardcoded defaults are returned — the app never crashes on config miss.
  */
 export const getServerConfigSnapshot = cache(async (): Promise<PublicAppConfig> => {
+  'use cache'
   try {
-    const ctx = await getServerRequestContext()
-    const raw = await requestServer<Record<string, unknown>>('/config/public', ctx, {
-      withLocaleHeader: false,
-    })
+    const raw = await requestPublicServer<Record<string, unknown>>('/config/public')
+    if (!raw) return DEFAULT_PUBLIC_APP_CONFIG
     return parsePublicConfig(raw)
   } catch {
-    // If the config endpoint is not deployed yet or the backend is down,
-    // fall back to hardcoded defaults so the app remains functional.
     return DEFAULT_PUBLIC_APP_CONFIG
   }
 })

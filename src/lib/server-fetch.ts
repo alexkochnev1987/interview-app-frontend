@@ -32,6 +32,7 @@ export interface ServerRequestContext {
 
 export const getServerRequestContext = cache(
   async (locale?: string): Promise<ServerRequestContext> => {
+    'use cache: private'
     const headerStore = await headers()
     const rawCookieHeader = headerStore.get('cookie')
     const cookieHeader = rawCookieHeader ?? (await buildCookieHeaderFallback())
@@ -138,6 +139,21 @@ export async function requestServer<T>(
   })
 
   return parseServerResponse<T>(res, path)
+}
+
+export async function requestPublicServer<T>(path: string): Promise<T | undefined> {
+  'use cache'
+  const backendUrl = process.env.BACKEND_URL || 'http://localhost:3000'
+  try {
+    const res = await fetch(`${backendUrl}${path}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      signal: AbortSignal.timeout(SERVER_REQUEST_TIMEOUT_MS),
+    })
+    return parseServerResponse<T>(res, path)
+  } catch {
+    return undefined
+  }
 }
 
 function buildServerApiUrl(path: string, origin: string, query?: Record<string, unknown>): string {

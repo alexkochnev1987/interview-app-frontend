@@ -1,5 +1,3 @@
-import { hasLocale } from 'next-intl'
-import { getLocale } from 'next-intl/server'
 import { ReactNode } from 'react'
 
 import { ThemeProvider } from '@/components/app/theme-provider'
@@ -14,14 +12,7 @@ import { getEnvTheme, isAppTheme } from '@/lib/theme'
 import './globals.css'
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
-  let resolvedLocale: Locale = routing.defaultLocale
-  try {
-    const rawLocale = await getLocale()
-    if (hasLocale(routing.locales, rawLocale)) {
-      resolvedLocale = rawLocale
-    }
-  } catch {}
-  const htmlLang = resolveHtmlLang(resolvedLocale)
+  const htmlLang = resolveHtmlLang(routing.defaultLocale as Locale)
   const config = await getServerConfigSnapshot()
   const activeTheme = isAppTheme(config.APP_THEME) ? config.APP_THEME : getEnvTheme()
   const defaultThemeMode = config.DEFAULT_THEME_MODE || 'system'

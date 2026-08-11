@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, type ReactNode } from 'react'
+import { createContext, useContext, use, useState, type ReactNode } from 'react'
 
 import { useRouter } from '@/i18n/navigation'
 import {
@@ -10,6 +10,7 @@ import {
   type AvatarUpdateResponse,
   type CompleteOnboardingStatus,
 } from '@/lib/api'
+import type { ServerSessionSnapshot } from '@/lib/auth-server'
 
 interface AuthContextType {
   user: User | null
@@ -31,11 +32,15 @@ const AuthContext = createContext<AuthContextType>({
 
 export function AuthProvider({
   children,
-  initialUser,
+  initialUser: propInitialUser,
+  sessionPromise,
 }: {
   children: ReactNode
-  initialUser: User | null
+  initialUser?: User | null
+  sessionPromise?: Promise<ServerSessionSnapshot>
 }) {
+  const snapshot = sessionPromise ? use(sessionPromise) : null
+  const initialUser = snapshot ? snapshot.user : (propInitialUser ?? null)
   const router = useRouter()
   const [user, setUser] = useState<User | null>(initialUser)
   const [prevInitialUser, setPrevInitialUser] = useState(initialUser)

@@ -20,6 +20,7 @@ export type ServerSessionSnapshot = {
 }
 
 export async function getServerSessionSnapshot(): Promise<ServerSessionSnapshot> {
+  'use cache: private'
   const ctx = await getServerRequestContext()
 
   if (!ctx.cookieHeader) {
