@@ -111,7 +111,9 @@
     },
     "hrList": {
       "heading": "Wybierz pracownika HR",
-      "listHeading": "Pracownicy HR"
+      "listHeading": "Pracownicy HR",
+      "showResponse": "Oto dostępni pracownicy HR:",
+      "empty": "W Twojej organizacji nie ma dostępnych pracowników HR."
     },
     "redirect": {
       "continue": "Kontynuuj w aplikacji"

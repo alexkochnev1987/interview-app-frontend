@@ -1331,3 +1331,90 @@ export async function deleteTemplate(id: string): Promise<DeleteTemplateResponse
     }),
   )
 }
+
+// ---------------------------------------------------------------------------
+// Dynamic application configuration
+// ---------------------------------------------------------------------------
+
+export type {
+  PublicAppConfig,
+  SystemConfigEntry,
+  SystemConfigValueType,
+  UpdateSystemConfigPayload,
+} from './app-config-types'
+export { DEFAULT_PUBLIC_APP_CONFIG } from './app-config-types'
+
+import type {
+  PublicAppConfig,
+  SystemConfigEntry,
+  UpdateSystemConfigPayload,
+} from './app-config-types'
+import { parsePublicConfig } from './app-config-types'
+
+/** Fetch the public configuration snapshot (all authenticated users). */
+export async function getPublicConfig(): Promise<PublicAppConfig> {
+  const res = await fetchClientApi('/api/config/public')
+
+  if (!res.ok) {
+    const body = await res.text()
+    const { code, params } = extractApiErrorFieldsFromBody(body)
+    throw new ApiError(
+      res.status,
+      messageFromBody(body, res.status),
+      '/config/public',
+      body,
+      code,
+      params,
+    )
+  }
+
+  const raw = (await res.json()) as Record<string, unknown>
+  return parsePublicConfig(raw)
+}
+
+/** Fetch all system config entries (super-admin only). */
+export async function getSystemConfigs(): Promise<SystemConfigEntry[]> {
+  const res = await fetchClientApi('/api/config')
+
+  if (!res.ok) {
+    const body = await res.text()
+    const { code, params } = extractApiErrorFieldsFromBody(body)
+    throw new ApiError(res.status, messageFromBody(body, res.status), '/config', body, code, params)
+  }
+
+  return (await res.json()) as SystemConfigEntry[]
+}
+
+/** Update a single system config variable (super-admin only). */
+export async function updateSystemConfig(
+  key: string,
+  payload: UpdateSystemConfigPayload,
+): Promise<SystemConfigEntry> {
+  const path = `/config/${encodeURIComponent(key)}`
+  const res = await fetchClientApi(`/api${path}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  })
+
+  if (!res.ok) {
+    const body = await res.text()
+    const { code, params } = extractApiErrorFieldsFromBody(body)
+    throw new ApiError(res.status, messageFromBody(body, res.status), path, body, code, params)
+  }
+
+  return (await res.json()) as SystemConfigEntry
+}
+
+/** Delete (reset to default) a system config variable (super-admin only). */
+export async function deleteSystemConfig(key: string): Promise<void> {
+  const path = `/config/${encodeURIComponent(key)}`
+  const res = await fetchClientApi(`/api${path}`, {
+    method: 'DELETE',
+  })
+
+  if (!res.ok) {
+    const body = await res.text()
+    const { code, params } = extractApiErrorFieldsFromBody(body)
+    throw new ApiError(res.status, messageFromBody(body, res.status), path, body, code, params)
+  }
+}

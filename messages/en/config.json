@@ -1,0 +1,75 @@
+{
+  "config": {
+    "eyebrow": "Super Admin Control",
+    "title": "System Configuration",
+    "lead": "Manage dynamic application variables, timeouts, attempt limits, and feature toggles in real-time.",
+    "searchPlaceholder": "Filter configuration keys...",
+    "quickAdd": "Add Variable",
+    "featureToggles": {
+      "heading": "Feature toggles",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "recruiterAssistant": {
+        "label": "Herman (recruiter assistant)",
+        "description": "Show the AI hiring assistant widget for eligible users."
+      },
+      "recruiterAssistantRoles": {
+        "heading": "Role access",
+        "description": "Enable or disable Herman per role. Unset roles inherit the org-wide default.",
+        "roleDescription": "Whether Herman is enabled for {role} users."
+      }
+    },
+    "forbiddenTitle": "Access Restricted",
+    "forbiddenDesc": "You need super_admin privileges to view or edit system configuration.",
+    "table": {
+      "colKey": "Variable Key & Description",
+      "colType": "Type & Scope",
+      "colValue": "Current Value",
+      "colActions": "Actions",
+      "publicBadge": "Public",
+      "secretBadge": "Secret",
+      "maskedSecret": "••••••••••••",
+      "edit": "Edit",
+      "reset": "Reset",
+      "expandRecruiterRoles": "Show role access",
+      "collapseRecruiterRoles": "Hide role access",
+      "noResultsTitle": "No variables found",
+      "noResultsDesc": "Try adjusting your search query."
+    },
+    "editModal": {
+      "title": "Edit Variable",
+      "description": "Update system configuration value for {key}.",
+      "valueLabel": "Value",
+      "save": "Save Changes",
+      "cancel": "Cancel",
+      "updating": "Saving..."
+    },
+    "addModal": {
+      "title": "Add System Variable",
+      "description": "Create or override a dynamic configuration variable.",
+      "keyLabel": "Variable Key (UPPER_SNAKE_CASE)",
+      "valueLabel": "Value",
+      "valueTypeLabel": "Type",
+      "isPublicLabel": "Public (Expose to client / candidates)",
+      "isSecretLabel": "Secret (Masked in UI)",
+      "descriptionLabel": "Description (Optional)",
+      "create": "Add Variable",
+      "cancel": "Cancel",
+      "creating": "Creating..."
+    },
+    "resetModal": {
+      "title": "Reset variable to default?",
+      "description": "This will remove the custom override for {key} and restore system defaults.",
+      "confirm": "Reset to Default",
+      "cancel": "Cancel"
+    },
+    "toast": {
+      "updatedSuccess": "Configuration updated successfully",
+      "updatedError": "Failed to update configuration",
+      "resetSuccess": "Configuration reset to default",
+      "resetError": "Failed to reset configuration",
+      "createdSuccess": "Variable added successfully",
+      "createdError": "Failed to add variable"
+    }
+  }
+}

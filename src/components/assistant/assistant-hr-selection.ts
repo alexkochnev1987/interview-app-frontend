@@ -5,7 +5,7 @@ export type AssistantHrSelection = {
 
 export function toAssistantHrSelection(hr: { id: string; name: string }): AssistantHrSelection {
   return {
-    message: hr.name,
+    message: hr.id,
     displayText: hr.name,
   }
 }

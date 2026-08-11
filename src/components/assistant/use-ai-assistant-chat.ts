@@ -9,6 +9,7 @@ import {
   RecruiterAssistantPendingAction,
   type RecruiterAssistantChatPayload,
   type RecruiterAssistantResponse,
+  fetchHrUsers,
   resetRecruiterAssistantChat,
   sendRecruiterAssistantMessage,
 } from '@/lib/api'
@@ -18,6 +19,7 @@ import { useAuth } from '@/lib/auth-context'
 import type { AiAssistantChatMessage } from './ai-assistant-chat-types'
 import { ASSISTANT_CONFIRM_MESSAGE } from './assistant-api-contract'
 import { resolveAssistantWelcomeRole } from './assistant-i18n'
+import { canUseShowHrsPrompt, isShowHrsMessage, shouldAttachHrList } from './assistant-show-hrs'
 import { buildAssistantWelcomeText } from './build-assistant-welcome'
 
 function createMessage(message: Omit<AiAssistantChatMessage, 'id'>): AiAssistantChatMessage {
@@ -46,6 +48,24 @@ function shouldSwitchLocale(
   currentLocale: Locale,
 ): result is RecruiterAssistantResponse & { locale: Locale } {
   return Boolean(result.locale && result.locale !== currentLocale && isAppLocale(result.locale))
+}
+
+async function enrichAssistantResultWithHrList(
+  result: RecruiterAssistantResponse,
+  userMessage: string,
+  t: ReturnType<typeof useTranslations<'assistant'>>,
+  signal?: AbortSignal,
+): Promise<RecruiterAssistantResponse> {
+  if (!shouldAttachHrList(result, userMessage, t)) {
+    return result
+  }
+
+  try {
+    const hrs = await fetchHrUsers({ signal })
+    return { ...result, hrs }
+  } catch {
+    return result
+  }
 }
 
 function applyAssistantResult(
@@ -141,6 +161,43 @@ export function useAiAssistantChat() {
   ) {
     if (!text || loading) return
 
+    if (canUseShowHrsPrompt(user?.role) && isShowHrsMessage(text, t)) {
+      setError(null)
+      clearPendingAction()
+      setLoading(true)
+      appendMessage({ role: 'user', text: options?.displayText ?? text })
+
+      const { abortController, requestId } = beginRequest()
+
+      try {
+        const hrs = await fetchHrUsers({ signal: abortController.signal })
+        if (!isLatestRequest(requestId)) return
+
+        const responseText = hrs.length > 0 ? t('hrList.showResponse') : t('hrList.empty')
+        const result: RecruiterAssistantResponse = {
+          response: responseText,
+          status: 'answered',
+          hrs,
+        }
+
+        appendMessage({
+          role: 'assistant',
+          text: responseText,
+          result,
+        })
+      } catch (err) {
+        if (!isLatestRequest(requestId) || isAbortError(err)) return
+        setError(formatError(err, t('errors.requestFailed')))
+        if (options?.restoreInputOnError) setInput(text)
+      } finally {
+        if (isLatestRequest(requestId)) {
+          setLoading(false)
+        }
+      }
+
+      return
+    }
+
     setError(null)
     clearPendingAction()
     setLoading(true)
@@ -149,9 +206,14 @@ export function useAiAssistantChat() {
     const { abortController, requestId } = beginRequest()
 
     try {
-      const result = await sendRecruiterAssistantMessage(
-        { message: text, ...(sessionId ? { sessionId } : {}) },
-        { signal: abortController.signal },
+      const result = await enrichAssistantResultWithHrList(
+        await sendRecruiterAssistantMessage(
+          { message: text, ...(sessionId ? { sessionId } : {}) },
+          { signal: abortController.signal },
+        ),
+        text,
+        t,
+        abortController.signal,
       )
       if (!isLatestRequest(requestId)) return
 

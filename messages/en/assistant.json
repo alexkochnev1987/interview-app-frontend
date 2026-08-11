@@ -111,7 +111,9 @@
     },
     "hrList": {
       "heading": "Choose an HR reviewer",
-      "listHeading": "HR reviewers"
+      "listHeading": "HR reviewers",
+      "showResponse": "Here are the available HR reviewers:",
+      "empty": "No HR reviewers are available in your organization."
     },
     "redirect": {
       "continue": "Continue in the app"
