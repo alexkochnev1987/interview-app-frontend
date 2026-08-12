@@ -26,7 +26,10 @@ export const RECRUITER_ASSISTANT_ROLE_CONFIG_KEYS = new Set<string>(
 export const RECRUITER_ASSISTANT_NESTED_CONFIG_KEYS = RECRUITER_ASSISTANT_ROLE_CONFIG_KEYS
 
 /** Legacy alias kept for public-config fallback only. */
-export const DEPRECATED_CONFIG_KEYS = new Set<string>(['ENABLE_AI_ASSISTANT'])
+export const DEPRECATED_CONFIG_KEYS = new Set<string>([
+  'ENABLE_AI_ASSISTANT',
+  'RECRUITER_ASSISTANT_ENABLED_ROLES',
+])
 
 export function isRecruiterAssistantConfigKey(key: string): boolean {
   return key === RECRUITER_ASSISTANT_ENABLED_KEY || RECRUITER_ASSISTANT_ROLE_CONFIG_KEYS.has(key)
