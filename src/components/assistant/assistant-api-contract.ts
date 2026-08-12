@@ -14,17 +14,17 @@
  * endpoint exists. Sending a new message also clears pending state locally.
  *
  * Similarity gate (`awaitingInput: confirmAddDespiteSimilar`): the backend NLU
- * expects one of the English `message` strings below. Localized button labels
- * are for display only (`displayText` in the chat). Prefer the Continue/Cancel
- * controls over free-text composer input for this step.
+ * matcher accepts an exact `yes` to continue, or `no` followed by a space and
+ * more text to abort (e.g. `no cancel`). Localized button labels are for display
+ * only (`displayText` in the chat).
  */
 export const ASSISTANT_CONFIRM_MESSAGE = 'confirm' as const
 
-/** Backend NLU phrase to proceed with create_question despite similar matches. */
-export const ASSISTANT_SIMILARITY_CONTINUE_MESSAGE = 'yes, create the question anyway' as const
+/** Exact backend NLU match to proceed despite similar questions. */
+export const ASSISTANT_SIMILARITY_CONTINUE_MESSAGE = 'yes' as const
 
-/** Backend NLU phrase to abort create_question after similar matches. */
-export const ASSISTANT_SIMILARITY_ABORT_MESSAGE = 'no, cancel creating the question' as const
+/** Backend NLU abort phrase: `no` keyword plus trailing words separated by space. */
+export const ASSISTANT_SIMILARITY_ABORT_MESSAGE = 'no cancel' as const
 
 export type AssistantSimilarityIntent = 'continue' | 'abort'
 
