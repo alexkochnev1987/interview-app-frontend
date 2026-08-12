@@ -15,7 +15,7 @@
       },
       "recruiterAssistantRoles": {
         "heading": "Доступ па ролях",
-        "description": "Уключайце або адключайце Hermana для кожнай ролі. Невызначаныя ролі атрымліваюць агульнае значэнне.",
+        "description": "Уключайце або адключайце Hermana для кожнай ролі.",
         "roleDescription": "Ці ўключаны Herman для карыстальнікаў з роляй {role}."
       }
     },
@@ -31,8 +31,6 @@
       "maskedSecret": "••••••••••••",
       "edit": "Рэдагаваць",
       "reset": "Скінуць",
-      "expandRecruiterRoles": "Паказаць доступ па ролях",
-      "collapseRecruiterRoles": "Схаваць доступ па ролях",
       "noResultsTitle": "Зменныя не знойдзены",
       "noResultsDesc": "Паспрабуйце змяніць пошукавы запыт."
     },

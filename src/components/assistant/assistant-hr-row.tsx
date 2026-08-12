@@ -40,8 +40,8 @@ export function AssistantHrRow({ hr, disabled = false, onSelect }: AssistantHrRo
       <Button
         type="button"
         variant="outline"
+        size="picker"
         width="full"
-        className="h-auto justify-start py-2.5"
         disabled={disabled}
         onClick={() => onSelect(toAssistantHrSelection(hr))}
       >

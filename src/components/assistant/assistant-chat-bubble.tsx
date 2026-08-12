@@ -20,7 +20,6 @@ import type { AssistantHrSelection } from './assistant-hr-selection'
 import type { AssistantInterviewSelection } from './assistant-interview-selection'
 import { AssistantInterviewSummary } from './assistant-interview-summary'
 import { AssistantRedirectAction } from './assistant-redirect-action'
-import { looksLikeHrListResponse } from './assistant-show-hrs'
 import { AssistantSimilarQuestionList } from './assistant-similar-question-list'
 import type { AssistantSimilarityDecision } from './assistant-similarity-decision'
 import { AssistantSimilarityDecisionList } from './assistant-similarity-decision-list'
@@ -56,10 +55,7 @@ export function AssistantChatBubble({
   const isDenied = status === 'denied'
   const isExecuted = status === 'executed'
   const escalateTo = message.result?.escalateTo
-  const showHrList =
-    (message.result?.hrs?.length ?? 0) > 0 ||
-    message.result?.awaitingInput === 'hr' ||
-    looksLikeHrListResponse(message.text)
+  const showHrList = message.result?.hrs !== undefined || message.result?.awaitingInput === 'hr'
 
   return (
     <Inline justify={isUser ? 'end' : 'start'} width="full">

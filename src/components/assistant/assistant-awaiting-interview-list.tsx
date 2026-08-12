@@ -7,6 +7,7 @@ import { fetchInterviews, type InterviewListItem } from '@/lib/api'
 import { AssistantInterviewList } from './assistant-interview-list'
 import type { AssistantInterviewSelection } from './assistant-interview-selection'
 
+/** Fallback cap for unassigned interviews in the Herman picker; typing still resolves by name. */
 const ASSISTANT_INTERVIEW_PICKER_LIMIT = 50
 
 type AssistantAwaitingInterviewListProps = {
