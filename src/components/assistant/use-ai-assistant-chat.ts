@@ -19,7 +19,7 @@ import { useAuth } from '@/lib/auth-context'
 import type { AiAssistantChatMessage } from './ai-assistant-chat-types'
 import { ASSISTANT_CONFIRM_MESSAGE } from './assistant-api-contract'
 import { resolveAssistantWelcomeRole } from './assistant-i18n'
-import { canUseShowHrsPrompt, isShowHrsMessage, shouldAttachHrList } from './assistant-show-hrs'
+import { shouldAttachHrList } from './assistant-show-hrs'
 import { buildAssistantWelcomeText } from './build-assistant-welcome'
 
 function createMessage(message: Omit<AiAssistantChatMessage, 'id'>): AiAssistantChatMessage {
@@ -160,43 +160,6 @@ export function useAiAssistantChat() {
     options?: { restoreInputOnError?: boolean; displayText?: string },
   ) {
     if (!text || loading) return
-
-    if (canUseShowHrsPrompt(user?.role) && isShowHrsMessage(text, t)) {
-      setError(null)
-      clearPendingAction()
-      setLoading(true)
-      appendMessage({ role: 'user', text: options?.displayText ?? text })
-
-      const { abortController, requestId } = beginRequest()
-
-      try {
-        const hrs = await fetchHrUsers({ signal: abortController.signal })
-        if (!isLatestRequest(requestId)) return
-
-        const responseText = hrs.length > 0 ? t('hrList.showResponse') : t('hrList.empty')
-        const result: RecruiterAssistantResponse = {
-          response: responseText,
-          status: 'answered',
-          hrs,
-        }
-
-        appendMessage({
-          role: 'assistant',
-          text: responseText,
-          result,
-        })
-      } catch (err) {
-        if (!isLatestRequest(requestId) || isAbortError(err)) return
-        setError(formatError(err, t('errors.requestFailed')))
-        if (options?.restoreInputOnError) setInput(text)
-      } finally {
-        if (isLatestRequest(requestId)) {
-          setLoading(false)
-        }
-      }
-
-      return
-    }
 
     setError(null)
     clearPendingAction()

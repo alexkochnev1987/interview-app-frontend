@@ -17,10 +17,10 @@ export function AssistantAwaitingHrList({
   disabled = false,
   onSelect,
 }: AssistantAwaitingHrListProps) {
-  const shouldFetch = !hrs || hrs.length === 0
+  const shouldFetch = !!onSelect && hrs === undefined
   const { hrUsers, loading } = useHrUsers({ enabled: shouldFetch })
 
-  const resolvedHrs = hrs && hrs.length > 0 ? hrs : hrUsers
+  const resolvedHrs = hrs ?? (shouldFetch ? hrUsers : [])
 
   if (resolvedHrs.length === 0) {
     return null

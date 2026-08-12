@@ -23,19 +23,11 @@ export function isShowHrsMessage(
   return messageKeys.some((key) => t(key).trim().toLowerCase() === normalized)
 }
 
-export function looksLikeHrListResponse(response: string): boolean {
-  return /\bfound \d+ hr reviewer/i.test(response)
-}
-
 export function shouldAttachHrList(
   result: RecruiterAssistantResponse,
   userMessage: string,
   t: ReturnType<typeof useTranslations<'assistant'>>,
 ): boolean {
-  if (result.hrs && result.hrs.length > 0) return false
-  return (
-    result.awaitingInput === 'hr' ||
-    isShowHrsMessage(userMessage, t) ||
-    looksLikeHrListResponse(result.response)
-  )
+  if (result.hrs !== undefined) return false
+  return result.awaitingInput === 'hr' || isShowHrsMessage(userMessage, t)
 }
