@@ -15,7 +15,7 @@
       },
       "recruiterAssistantRoles": {
         "heading": "Dostęp według ról",
-        "description": "Włączaj lub wyłączaj Hermana dla każdej roli. Role bez ustawienia dziedziczą wartość ogólną.",
+        "description": "Włączaj lub wyłączaj Hermana dla każdej roli.",
         "roleDescription": "Czy Herman jest włączony dla użytkowników z rolą {role}."
       }
     },
@@ -31,8 +31,6 @@
       "maskedSecret": "••••••••••••",
       "edit": "Edytuj",
       "reset": "Resetuj",
-      "expandRecruiterRoles": "Pokaż dostęp według ról",
-      "collapseRecruiterRoles": "Ukryj dostęp według ról",
       "noResultsTitle": "Nie znaleziono zmiennych",
       "noResultsDesc": "Spróbuj zmienić zapytanie wyszukiwania."
     },

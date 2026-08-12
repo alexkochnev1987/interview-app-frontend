@@ -15,7 +15,7 @@
       },
       "recruiterAssistantRoles": {
         "heading": "Role access",
-        "description": "Enable or disable Herman per role. Unset roles inherit the org-wide default.",
+        "description": "Enable or disable Herman per role.",
         "roleDescription": "Whether Herman is enabled for {role} users."
       }
     },
@@ -31,8 +31,6 @@
       "maskedSecret": "••••••••••••",
       "edit": "Edit",
       "reset": "Reset",
-      "expandRecruiterRoles": "Show role access",
-      "collapseRecruiterRoles": "Hide role access",
       "noResultsTitle": "No variables found",
       "noResultsDesc": "Try adjusting your search query."
     },
