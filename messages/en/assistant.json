@@ -97,7 +97,7 @@
       "openLink": "Open question"
     },
     "similarQuestions": {
-      "heading": "Similar questions (80%+ match)",
+      "heading": "Similar questions",
       "matchScore": "{score} match"
     },
     "confirmAddDespiteSimilar": {

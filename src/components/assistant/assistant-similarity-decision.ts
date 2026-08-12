@@ -1,7 +1,8 @@
-export const ASSISTANT_SIMILARITY_CONTINUE_MESSAGE = 'yes, create the question anyway'
-export const ASSISTANT_SIMILARITY_ABORT_MESSAGE = 'no, cancel creating the question'
+import type { AssistantSimilarityIntent } from './assistant-api-contract'
+
+export type { AssistantSimilarityIntent } from './assistant-api-contract'
 
 export type AssistantSimilarityDecision = {
-  message: string
+  intent: AssistantSimilarityIntent
   displayText: string
 }

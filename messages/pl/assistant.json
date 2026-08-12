@@ -97,7 +97,7 @@
       "openLink": "Otwórz pytanie"
     },
     "similarQuestions": {
-      "heading": "Podobne pytania (dopasowanie 80%+)",
+      "heading": "Podobne pytania",
       "matchScore": "dopasowanie {score}"
     },
     "confirmAddDespiteSimilar": {

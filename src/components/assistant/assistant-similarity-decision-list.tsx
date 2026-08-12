@@ -6,11 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText } from '@/components/ui/text'
 
-import {
-  ASSISTANT_SIMILARITY_ABORT_MESSAGE,
-  ASSISTANT_SIMILARITY_CONTINUE_MESSAGE,
-  type AssistantSimilarityDecision,
-} from './assistant-similarity-decision'
+import type { AssistantSimilarityDecision } from './assistant-similarity-decision'
 
 type AssistantSimilarityDecisionListProps = {
   disabled?: boolean
@@ -36,7 +32,7 @@ export function AssistantSimilarityDecisionList({
           disabled={disabled}
           onClick={() =>
             onSelect({
-              message: ASSISTANT_SIMILARITY_CONTINUE_MESSAGE,
+              intent: 'continue',
               displayText: t('confirmAddDespiteSimilar.continue'),
             })
           }
@@ -50,7 +46,7 @@ export function AssistantSimilarityDecisionList({
           disabled={disabled}
           onClick={() =>
             onSelect({
-              message: ASSISTANT_SIMILARITY_ABORT_MESSAGE,
+              intent: 'abort',
               displayText: t('confirmAddDespiteSimilar.abort'),
             })
           }

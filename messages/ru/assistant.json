@@ -97,7 +97,7 @@
       "openLink": "Открыть вопрос"
     },
     "similarQuestions": {
-      "heading": "Похожие вопросы (совпадение 80%+)",
+      "heading": "Похожие вопросы",
       "matchScore": "совпадение {score}"
     },
     "confirmAddDespiteSimilar": {
