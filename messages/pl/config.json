@@ -5,6 +5,20 @@
     "lead": "Zarządzaj dynamicznymi zmiennymi aplikacji, limitami czasowymi, próbami i przełącznikami funkcji w czasie rzeczywistym.",
     "searchPlaceholder": "Filtruj klucze konfiguracji...",
     "quickAdd": "Dodaj zmienną",
+    "featureToggles": {
+      "heading": "Przełączniki funkcji",
+      "enabled": "Włączone",
+      "disabled": "Wyłączone",
+      "recruiterAssistant": {
+        "label": "Herman (recruiter assistant)",
+        "description": "Pokazuj widżet asystenta AI ds. rekrutacji dla uprawnionych użytkowników."
+      },
+      "recruiterAssistantRoles": {
+        "heading": "Dostęp według ról",
+        "description": "Włączaj lub wyłączaj Hermana dla każdej roli.",
+        "roleDescription": "Czy Herman jest włączony dla użytkowników z rolą {role}."
+      }
+    },
     "forbiddenTitle": "Dostęp ograniczony",
     "forbiddenDesc": "Wymagane uprawnienia super_admin, aby przeglądać lub edytować konfigurację systemu.",
     "table": {

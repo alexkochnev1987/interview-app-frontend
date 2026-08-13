@@ -7433,7 +7433,7 @@
           "value": {
             "type": "string",
             "description": "Variable value as string (numbers and booleans are stored as text)",
-            "example": "300"
+            "example": "240"
           },
           "valueType": {
             "type": "string",
@@ -7563,6 +7563,11 @@
             "type": "boolean",
             "example": true,
             "description": "Whether a Google photo is on file to restore, regardless of whether it is the currently active picture source."
+          },
+          "recruiterAssistantEnabled": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether Herman (recruiter AI assistant) is enabled for this user, based on org config and role."
           }
         },
         "required": [
@@ -7573,7 +7578,8 @@
           "demo",
           "createdAt",
           "avatarSource",
-          "hasGoogleAvatar"
+          "hasGoogleAvatar",
+          "recruiterAssistantEnabled"
         ]
       },
       "RegisterDto": {
@@ -10261,6 +10267,9 @@
           "versionNumber": {
             "type": "number",
             "description": "Reserved answer attempt/version being recorded."
+          },
+          "fileSizeBytes": {
+            "type": "number"
           }
         },
         "required": [
@@ -10296,6 +10305,9 @@
           "versionNumber": {
             "type": "number",
             "description": "Reserved answer attempt/version being confirmed."
+          },
+          "fileSizeBytes": {
+            "type": "number"
           }
         },
         "required": [
@@ -10342,6 +10354,9 @@
           "versionNumber": {
             "type": "number",
             "description": "Reserved answer attempt/version being recorded."
+          },
+          "fileSizeBytes": {
+            "type": "number"
           }
         },
         "required": [

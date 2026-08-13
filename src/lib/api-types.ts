@@ -1352,7 +1352,7 @@ export interface components {
         UpsertConfigVariableDto: {
             /**
              * @description Variable value as string (numbers and booleans are stored as text)
-             * @example 300
+             * @example 240
              */
             value: string;
             /**
@@ -1437,6 +1437,11 @@ export interface components {
              * @example true
              */
             hasGoogleAvatar: boolean;
+            /**
+             * @description Whether Herman (recruiter AI assistant) is enabled for this user, based on org config and role.
+             * @example true
+             */
+            recruiterAssistantEnabled: boolean;
         };
         RegisterDto: {
             email: string;
@@ -2272,6 +2277,7 @@ export interface components {
             mediaType?: "camera" | "screen";
             /** @description Reserved answer attempt/version being recorded. */
             versionNumber: number;
+            fileSizeBytes?: number;
         };
         PresignedUrlResponseDto: {
             uploadUrl: string;
@@ -2282,6 +2288,7 @@ export interface components {
             mediaKey: string;
             /** @description Reserved answer attempt/version being confirmed. */
             versionNumber: number;
+            fileSizeBytes?: number;
         };
         ConfirmUploadResponseDto: {
             mediaKey: string;
@@ -2296,6 +2303,7 @@ export interface components {
             mediaType?: "camera" | "screen";
             /** @description Reserved answer attempt/version being recorded. */
             versionNumber: number;
+            fileSizeBytes?: number;
         };
         MultipartUploadSessionResponseDto: {
             mediaKey: string;
