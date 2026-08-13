@@ -5,8 +5,15 @@ export type AssistantWelcomeRole = Extract<AppRole, 'super_admin' | 'admin' | 'h
 const WELCOME_ITEM_KEYS: Record<AssistantWelcomeRole, string[]> = {
   [APP_ROLE.hr]: ['myInterviews', 'readyForReview', 'interviewStatus', 'createFlow'],
   [APP_ROLE.candidate]: ['hasInterview', 'candidateStatus', 'reviewed', 'schedule'],
-  [APP_ROLE.admin]: ['unassigned', 'filters', 'assignHr', 'createFlow'],
-  [APP_ROLE.super_admin]: ['unassigned', 'filters', 'assignHr', 'createFlow', 'orgQueries'],
+  [APP_ROLE.admin]: ['unassigned', 'showHrs', 'filters', 'assignHr', 'createFlow'],
+  [APP_ROLE.super_admin]: [
+    'unassigned',
+    'showHrs',
+    'filters',
+    'assignHr',
+    'createFlow',
+    'orgQueries',
+  ],
 }
 
 export function resolveAssistantWelcomeRole(role: string | null | undefined): AssistantWelcomeRole {
