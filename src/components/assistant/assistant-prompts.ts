@@ -13,8 +13,15 @@ const WRITE_PROMPT_KEYS = new Set<AssistantPromptKey>([
 const PROMPT_KEYS: Record<AssistantWelcomeRole, AssistantPromptKey[]> = {
   [APP_ROLE.hr]: ['myInterviews', 'readyForReview', 'createInterview'],
   [APP_ROLE.candidate]: ['hasInterview', 'status', 'reviewed'],
-  [APP_ROLE.admin]: ['unassigned', 'byStatus', 'assignHr', 'createQuestion'],
-  [APP_ROLE.super_admin]: ['unassigned', 'byStatus', 'assignHr', 'createQuestion', 'orgOverview'],
+  [APP_ROLE.admin]: ['unassigned', 'showHrs', 'byStatus', 'assignHr', 'createQuestion'],
+  [APP_ROLE.super_admin]: [
+    'unassigned',
+    'showHrs',
+    'byStatus',
+    'assignHr',
+    'createQuestion',
+    'orgOverview',
+  ],
 }
 
 export function getAssistantPromptKeys(

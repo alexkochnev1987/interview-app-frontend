@@ -5,6 +5,20 @@
     "lead": "Управляйте динамическими переменными приложения, таймаутами, лимитами попыток и флагами функций в реальном времени.",
     "searchPlaceholder": "Фильтр ключей конфигурации...",
     "quickAdd": "Добавить переменную",
+    "featureToggles": {
+      "heading": "Флаги функций",
+      "enabled": "Включено",
+      "disabled": "Выключено",
+      "recruiterAssistant": {
+        "label": "Herman (recruiter assistant)",
+        "description": "Показывать виджет ИИ-помощника по найму для подходящих пользователей."
+      },
+      "recruiterAssistantRoles": {
+        "heading": "Доступ по ролям",
+        "description": "Включайте или отключайте Herman для каждой роли.",
+        "roleDescription": "Включён ли Herman для пользователей с ролью {role}."
+      }
+    },
     "forbiddenTitle": "Доступ ограничен",
     "forbiddenDesc": "Для просмотра или редактирования системной конфигурации требуются права super_admin.",
     "table": {

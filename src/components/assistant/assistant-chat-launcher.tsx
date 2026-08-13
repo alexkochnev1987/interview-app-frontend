@@ -8,7 +8,7 @@ import { FloatingActionAnchor } from '@/components/ui/floating-action-anchor'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { usePathname } from '@/i18n/navigation'
 import { useAuth } from '@/lib/auth-context'
-import { canUseAiAssistant } from '@/lib/auth-roles'
+import { canShowRecruiterAssistant } from '@/lib/auth-roles'
 
 import { ASSISTANT_CHAT_LAUNCHER_ID } from './assistant-api-contract'
 import { useAssistantChatShell } from './assistant-chat-provider'
@@ -23,7 +23,7 @@ export function AssistantChatLauncher() {
   const { toggle, open } = useAssistantChatShell()
   const t = useTranslations('assistant')
 
-  if (!user || !canUseAiAssistant(user.role) || !isAssistantLauncherPath(pathname)) {
+  if (!canShowRecruiterAssistant(user) || !isAssistantLauncherPath(pathname)) {
     return null
   }
 

@@ -32,8 +32,8 @@
         "position": "Enter the job position…",
         "questionName": "Enter the question name…",
         "templateChoice": "Pick a template above or enter its number…",
-        "hr": "Enter the HR reviewer name…",
-        "interview": "Describe or name the interview…"
+        "hr": "Pick an HR reviewer above or type their name…",
+        "interview": "Pick an interview above or type the name/ID…"
       }
     },
     "welcome": {
@@ -49,6 +49,7 @@
         "reviewed": "See if your interview has been reviewed",
         "schedule": "Share when and where your interview is, or your candidate link",
         "unassigned": "List unassigned interviews",
+        "showHrs": "List available HR reviewers",
         "filters": "Filter interviews by status, HR, and other app filters",
         "assignHr": "Assign an interview to an HR reviewer (with your confirmation)",
         "orgQueries": "Answer broader interview, question, and team queries in your org"
@@ -98,11 +99,18 @@
       "heading": "Choose a template",
       "questionCount": "{count, plural, one {# question} other {# questions}}"
     },
+    "hrList": {
+      "heading": "Choose an HR reviewer",
+      "listHeading": "HR reviewers",
+      "showResponse": "Here are the available HR reviewers:",
+      "empty": "No HR reviewers are available in your organization."
+    },
     "redirect": {
       "continue": "Continue in the app"
     },
     "interviewList": {
       "heading": "Interviews",
+      "chooseHeading": "Choose an interview",
       "viewDetail": "View details",
       "progress": "{submitted}/{total} answered"
     },
@@ -130,12 +138,14 @@
       },
       "admin": {
         "unassigned": "Show unassigned interviews",
+        "showHrs": "Show HR reviewers",
         "byStatus": "Show completed interviews",
         "assignHr": "Assign an interview to an HR reviewer",
         "createQuestion": "Help me create a new interview question"
       },
       "super_admin": {
         "unassigned": "Show unassigned interviews",
+        "showHrs": "Show HR reviewers",
         "byStatus": "Show interviews by status",
         "assignHr": "Assign an interview to an HR reviewer",
         "createQuestion": "Help me create a new interview question",

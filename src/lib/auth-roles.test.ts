@@ -9,6 +9,7 @@ import {
   canManageTeam,
   canReadQuestions,
   canReviewAssessments,
+  canShowRecruiterAssistant,
   canUpdateQuestions,
   compareRolesByAuthorityDesc,
   isSuperAdmin,
@@ -94,5 +95,17 @@ describe('auth-roles', () => {
     expect(canManageTeam('admin')).toBe(true)
     expect(canManageTeam('hr')).toBe(false)
     expect(canManageTeam(undefined)).toBe(false)
+  })
+
+  it('hides recruiter assistant when backend disables it for the user', () => {
+    expect(canShowRecruiterAssistant({ role: 'admin', recruiterAssistantEnabled: true })).toBe(true)
+    expect(canShowRecruiterAssistant({ role: 'admin', recruiterAssistantEnabled: false })).toBe(
+      false,
+    )
+    expect(canShowRecruiterAssistant({ role: 'admin' })).toBe(true)
+    expect(canShowRecruiterAssistant({ role: 'candidate', recruiterAssistantEnabled: false })).toBe(
+      false,
+    )
+    expect(canShowRecruiterAssistant(null)).toBe(false)
   })
 })

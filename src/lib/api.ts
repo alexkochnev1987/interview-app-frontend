@@ -78,6 +78,8 @@ export type AuthUserResponseDto = Schemas['AuthUserResponseDto']
 /** `/auth/me` includes effective permissions; OpenAPI DTO does not list them yet. */
 export type MeResponse = AuthUserResponseDto & {
   permissions?: readonly string[]
+  /** Mirrors backend RECRUITER_ASSISTANT_ENABLED* env gates for this user's role. */
+  recruiterAssistantEnabled?: boolean
 }
 export type LoginPayload = Schemas['LoginDto']
 export type LogoutResponse = Schemas['LogoutResponseDto']
