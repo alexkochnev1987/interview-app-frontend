@@ -115,8 +115,8 @@ function renderBooleanToggle(
   disabled = false,
 ) {
   return (
-    <DemoWriteGuard width="auto" disabled={disabled}>
-      <SegmentedGroup ariaLabel={ariaLabel}>
+    <SegmentedGroup ariaLabel={ariaLabel}>
+      <DemoWriteGuard width="auto" disabled={disabled}>
         <Button
           type="button"
           variant={value === 'true' ? 'secondary' : 'ghost'}
@@ -126,6 +126,8 @@ function renderBooleanToggle(
         >
           true
         </Button>
+      </DemoWriteGuard>
+      <DemoWriteGuard width="auto" disabled={disabled}>
         <Button
           type="button"
           variant={value === 'false' ? 'secondary' : 'ghost'}
@@ -135,8 +137,8 @@ function renderBooleanToggle(
         >
           false
         </Button>
-      </SegmentedGroup>
-    </DemoWriteGuard>
+      </DemoWriteGuard>
+    </SegmentedGroup>
   )
 }
 
@@ -155,6 +157,9 @@ export function ConfigDashboard({ initialConfigs }: ConfigDashboardProps) {
   )
   const [initialRoleValues, setInitialRoleValues] = useState<RoleEditValues>(() =>
     createRoleEditValues(initialConfigs, 'false'),
+  )
+  const [roleValuesBeforeGlobalOff, setRoleValuesBeforeGlobalOff] = useState<RoleEditValues | null>(
+    null,
   )
   const [resetTargetKey, setResetTargetKey] = useState<string | null>(null)
   const [showAddModal, setShowAddModal] = useState(false)
@@ -220,51 +225,48 @@ export function ConfigDashboard({ initialConfigs }: ConfigDashboardProps) {
       const roleValues = createRoleEditValues(configs, nextEditValue)
       setEditRoleValues(roleValues)
       setInitialRoleValues(roleValues)
+      setRoleValuesBeforeGlobalOff(null)
     }
   }
 
   function handleRecruiterGlobalChange(next: string) {
     setEditValue(next)
     if (next === 'false') {
+      setRoleValuesBeforeGlobalOff(editRoleValues)
       setEditRoleValues(
-        () =>
-          Object.fromEntries(
-            RECRUITER_ASSISTANT_ROLE_LOCKS.map(({ role }) => [role, 'false']),
-          ) as RoleEditValues,
+        Object.fromEntries(
+          RECRUITER_ASSISTANT_ROLE_LOCKS.map(({ role }) => [role, 'false']),
+        ) as RoleEditValues,
       )
+      return
+    }
+
+    if (next === 'true') {
+      setEditRoleValues(roleValuesBeforeGlobalOff ?? createRoleEditValues(configs, 'true'))
+      setRoleValuesBeforeGlobalOff(null)
     }
   }
 
   async function applyRecruiterAssistantRoleChanges() {
-    const failedKeys: string[] = []
-
     await RECRUITER_ASSISTANT_ROLE_LOCKS.reduce<Promise<void>>(async (chain, { role, key }) => {
       await chain
       const next = editRoleValues[role]
       const initial = initialRoleValues[role]
       if (next === initial) return
 
-      try {
-        const existing = configs.find((item) => item.key === key)
-        await updateSystemConfig(key, {
-          value: next,
-          valueType: 'boolean',
-          description:
-            existing?.description ??
-            t('featureToggles.recruiterAssistantRoles.roleDescription', {
-              role: sharedLabels.role(role),
-            }),
-          isPublic: false,
-          isSecret: false,
-        })
-      } catch {
-        failedKeys.push(key)
-      }
+      const existing = configs.find((item) => item.key === key)
+      await updateSystemConfig(key, {
+        value: next,
+        valueType: 'boolean',
+        description:
+          existing?.description ??
+          t('featureToggles.recruiterAssistantRoles.roleDescription', {
+            role: sharedLabels.role(role),
+          }),
+        isPublic: false,
+        isSecret: false,
+      })
     }, Promise.resolve())
-
-    if (failedKeys.length > 0) {
-      throw new Error(failedKeys.join(', '))
-    }
   }
 
   async function handleSaveEdit() {
