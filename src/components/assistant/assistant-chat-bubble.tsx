@@ -20,6 +20,9 @@ import type { AssistantHrSelection } from './assistant-hr-selection'
 import type { AssistantInterviewSelection } from './assistant-interview-selection'
 import { AssistantInterviewSummary } from './assistant-interview-summary'
 import { AssistantRedirectAction } from './assistant-redirect-action'
+import { AssistantSimilarQuestionList } from './assistant-similar-question-list'
+import type { AssistantSimilarityDecision } from './assistant-similarity-decision'
+import { AssistantSimilarityDecisionList } from './assistant-similarity-decision-list'
 import { AssistantTemplateList } from './assistant-template-list'
 import type { AssistantTemplateSelection } from './assistant-template-selection'
 
@@ -30,6 +33,7 @@ type AssistantChatBubbleProps = {
   onSelectTemplate?: (selection: AssistantTemplateSelection) => void
   onSelectHr?: (selection: AssistantHrSelection) => void
   onSelectInterview?: (selection: AssistantInterviewSelection) => void
+  onSimilarityDecision?: (selection: AssistantSimilarityDecision) => void
 }
 
 export function AssistantChatBubble({
@@ -39,6 +43,7 @@ export function AssistantChatBubble({
   onSelectTemplate,
   onSelectHr,
   onSelectInterview,
+  onSimilarityDecision,
 }: AssistantChatBubbleProps) {
   const t = useTranslations('assistant')
   const sharedLabels = useSharedLabels()
@@ -133,6 +138,12 @@ export function AssistantChatBubble({
               disabled={disabled}
               onSelect={onSelectTemplate}
             />
+          ) : null}
+          {message.result?.similarQuestions && message.result.similarQuestions.length > 0 ? (
+            <AssistantSimilarQuestionList questions={message.result.similarQuestions} />
+          ) : null}
+          {message.result?.awaitingInput === 'confirmAddDespiteSimilar' && onSimilarityDecision ? (
+            <AssistantSimilarityDecisionList disabled={disabled} onSelect={onSimilarityDecision} />
           ) : null}
           {showHrList ? (
             <AssistantAwaitingHrList

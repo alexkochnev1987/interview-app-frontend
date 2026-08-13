@@ -11,7 +11,10 @@ import { Stack } from '@/components/ui/layout/stack'
 import { BodyText } from '@/components/ui/text'
 import { Textarea } from '@/components/ui/textarea'
 
-import { ASSISTANT_CHAT_COMPOSER_ID } from './assistant-api-contract'
+import {
+  ASSISTANT_CHAT_COMPOSER_ID,
+  resolveAssistantSimilarityMessage,
+} from './assistant-api-contract'
 import { AssistantChatBubble } from './assistant-chat-bubble'
 import { useAssistantChatSession, useAssistantChatShell } from './assistant-chat-provider'
 import { AssistantExamplePrompts } from './assistant-example-prompts'
@@ -37,6 +40,7 @@ export function AiAssistantChat() {
   const showPrompts = !messages.some((message) => message.role === 'user')
   const latestAssistant = messages.findLast((message) => message.role === 'assistant')
   const awaitingInput = latestAssistant?.result?.awaitingInput
+  const awaitingSimilarityDecision = awaitingInput === 'confirmAddDespiteSimilar'
   const composerPlaceholder =
     awaitingInput && t.has(`input.awaiting.${awaitingInput}`)
       ? t(`input.awaiting.${awaitingInput}`)
@@ -108,6 +112,17 @@ export function AiAssistantChat() {
                           })
                       : undefined
                   }
+                  onSimilarityDecision={
+                    isLatestAssistant && !loading
+                      ? (selection) =>
+                          void sendUserMessage(
+                            resolveAssistantSimilarityMessage(selection.intent),
+                            {
+                              displayText: selection.displayText,
+                            },
+                          )
+                      : undefined
+                  }
                 />
               )
             })}
@@ -148,12 +163,13 @@ export function AiAssistantChat() {
                   onChange={(event) => setInput(event.target.value)}
                   onKeyDown={handleComposerKeyDown}
                   placeholder={composerPlaceholder}
+                  disabled={loading || awaitingSimilarityDecision}
                 />
                 <Button
                   type="submit"
                   size="icon-xl"
                   loading={loading}
-                  disabled={!input.trim()}
+                  disabled={!input.trim() || awaitingSimilarityDecision}
                   aria-label={t('sendAriaLabel')}
                 >
                   <Send />

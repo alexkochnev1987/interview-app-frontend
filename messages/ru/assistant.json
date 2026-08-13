@@ -31,6 +31,7 @@
         "candidateName": "Введите имя кандидата…",
         "position": "Введите должность…",
         "questionName": "Введите название вопроса…",
+        "confirmAddDespiteSimilar": "Выберите «Продолжить» или «Отмена» выше…",
         "templateChoice": "Выберите шаблон выше или введите его номер…",
         "hr": "Выберите HR-специалиста выше или введите имя…",
         "interview": "Выберите интервью выше или введите имя/ID…"
@@ -94,6 +95,15 @@
     },
     "createdQuestion": {
       "openLink": "Открыть вопрос"
+    },
+    "similarQuestions": {
+      "heading": "Похожие вопросы",
+      "matchScore": "совпадение {score}"
+    },
+    "confirmAddDespiteSimilar": {
+      "heading": "Всё равно создать этот вопрос?",
+      "continue": "Продолжить создание",
+      "abort": "Отмена"
     },
     "templateList": {
       "heading": "Выберите шаблон",

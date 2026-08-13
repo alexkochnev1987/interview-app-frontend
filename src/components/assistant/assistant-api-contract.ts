@@ -12,8 +12,27 @@
  *
  * Cancel: client-only — `dismissPendingAction` clears local state. No cancel
  * endpoint exists. Sending a new message also clears pending state locally.
+ *
+ * Similarity gate (`awaitingInput: confirmAddDespiteSimilar`): the backend NLU
+ * matcher accepts an exact `yes` to continue, or `no` followed by a space and
+ * more text to abort (e.g. `no cancel`). Localized button labels are for display
+ * only (`displayText` in the chat).
  */
 export const ASSISTANT_CONFIRM_MESSAGE = 'confirm' as const
+
+/** Exact backend NLU match to proceed despite similar questions. */
+export const ASSISTANT_SIMILARITY_CONTINUE_MESSAGE = 'yes' as const
+
+/** Backend NLU abort phrase: `no` keyword plus trailing words separated by space. */
+export const ASSISTANT_SIMILARITY_ABORT_MESSAGE = 'no cancel' as const
+
+export type AssistantSimilarityIntent = 'continue' | 'abort'
+
+export function resolveAssistantSimilarityMessage(intent: AssistantSimilarityIntent): string {
+  return intent === 'continue'
+    ? ASSISTANT_SIMILARITY_CONTINUE_MESSAGE
+    : ASSISTANT_SIMILARITY_ABORT_MESSAGE
+}
 
 export const ASSISTANT_CHAT_LAUNCHER_ID = 'assistant-chat-launcher'
 export const ASSISTANT_CHAT_COMPOSER_ID = 'assistant-chat-composer'

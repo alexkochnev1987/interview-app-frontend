@@ -31,6 +31,7 @@
         "candidateName": "Enter the candidate name…",
         "position": "Enter the job position…",
         "questionName": "Enter the question name…",
+        "confirmAddDespiteSimilar": "Choose Continue or Cancel above…",
         "templateChoice": "Pick a template above or enter its number…",
         "hr": "Pick an HR reviewer above or type their name…",
         "interview": "Pick an interview above or type the name/ID…"
@@ -94,6 +95,15 @@
     },
     "createdQuestion": {
       "openLink": "Open question"
+    },
+    "similarQuestions": {
+      "heading": "Similar questions",
+      "matchScore": "{score} match"
+    },
+    "confirmAddDespiteSimilar": {
+      "heading": "Still create this question?",
+      "continue": "Continue creating",
+      "abort": "Cancel"
     },
     "templateList": {
       "heading": "Choose a template",

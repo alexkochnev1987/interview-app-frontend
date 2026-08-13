@@ -31,6 +31,7 @@
         "candidateName": "Wpisz imię kandydata…",
         "position": "Wpisz stanowisko…",
         "questionName": "Wpisz nazwę pytania…",
+        "confirmAddDespiteSimilar": "Wybierz Kontynuuj lub Anuluj powyżej…",
         "templateChoice": "Wybierz szablon powyżej lub wpisz jego numer…",
         "hr": "Wybierz pracownika HR powyżej lub wpisz imię…",
         "interview": "Wybierz interview powyżej lub wpisz nazwę/ID…"
@@ -94,6 +95,15 @@
     },
     "createdQuestion": {
       "openLink": "Otwórz pytanie"
+    },
+    "similarQuestions": {
+      "heading": "Podobne pytania",
+      "matchScore": "dopasowanie {score}"
+    },
+    "confirmAddDespiteSimilar": {
+      "heading": "Mimo to utworzyć to pytanie?",
+      "continue": "Kontynuuj tworzenie",
+      "abort": "Anuluj"
     },
     "templateList": {
       "heading": "Wybierz szablon",
