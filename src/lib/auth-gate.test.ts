@@ -27,6 +27,7 @@ const meFixture = (role: string): MeResponse => ({
   createdAt: '2026-01-01T00:00:00.000Z',
   avatarSource: 'none',
   hasGoogleAvatar: false,
+  recruiterAssistantEnabled: true,
 })
 
 describe('auth-gate', () => {

@@ -1,3 +1,40 @@
+/** System config key for the org-wide Herman (recruiter assistant) toggle. */
+export const RECRUITER_ASSISTANT_ENABLED_KEY = 'RECRUITER_ASSISTANT_ENABLED' as const
+
+export type RecruiterAssistantLockRole = 'super_admin' | 'admin' | 'hr' | 'candidate'
+
+/** Per-role Herman locks — mirrors backend `RECRUITER_ASSISTANT_ENABLED_${ROLE}` env keys. */
+export const RECRUITER_ASSISTANT_ROLE_LOCKS: ReadonlyArray<{
+  role: RecruiterAssistantLockRole
+  key: `RECRUITER_ASSISTANT_ENABLED_${Uppercase<RecruiterAssistantLockRole>}`
+}> = [
+  { role: 'super_admin', key: 'RECRUITER_ASSISTANT_ENABLED_SUPER_ADMIN' },
+  { role: 'admin', key: 'RECRUITER_ASSISTANT_ENABLED_ADMIN' },
+  { role: 'hr', key: 'RECRUITER_ASSISTANT_ENABLED_HR' },
+  { role: 'candidate', key: 'RECRUITER_ASSISTANT_ENABLED_CANDIDATE' },
+]
+
+export function getRecruiterAssistantRoleConfigKey(role: RecruiterAssistantLockRole): string {
+  return `RECRUITER_ASSISTANT_ENABLED_${role.toUpperCase()}`
+}
+
+export const RECRUITER_ASSISTANT_ROLE_CONFIG_KEYS = new Set<string>(
+  RECRUITER_ASSISTANT_ROLE_LOCKS.map((entry) => entry.key),
+)
+
+/** Hidden from the flat table — shown nested under RECRUITER_ASSISTANT_ENABLED. */
+export const RECRUITER_ASSISTANT_NESTED_CONFIG_KEYS = RECRUITER_ASSISTANT_ROLE_CONFIG_KEYS
+
+/** Legacy alias kept for public-config fallback only. */
+export const DEPRECATED_CONFIG_KEYS = new Set<string>([
+  'ENABLE_AI_ASSISTANT',
+  'RECRUITER_ASSISTANT_ENABLED_ROLES',
+])
+
+export function isRecruiterAssistantConfigKey(key: string): boolean {
+  return key === RECRUITER_ASSISTANT_ENABLED_KEY || RECRUITER_ASSISTANT_ROLE_CONFIG_KEYS.has(key)
+}
+
 /**
  * Public application configuration — exposed to all authenticated users.
  *
@@ -18,8 +55,8 @@ export interface PublicAppConfig {
   DEFAULT_THEME_MODE: string
   /** Active UI color theme preset (innowise | red | blue | purple). */
   APP_THEME: string
-  /** Whether recruiter AI assistant widget is enabled. */
-  ENABLE_AI_ASSISTANT: boolean
+  /** Whether Herman (recruiter AI assistant) is enabled org-wide. */
+  RECRUITER_ASSISTANT_ENABLED: boolean
 }
 
 /**
@@ -33,7 +70,7 @@ export const DEFAULT_PUBLIC_APP_CONFIG: PublicAppConfig = {
   ENABLE_FEEDBACK_SHARE_LINKS: false,
   DEFAULT_THEME_MODE: 'system',
   APP_THEME: 'innowise',
-  ENABLE_AI_ASSISTANT: false,
+  RECRUITER_ASSISTANT_ENABLED: false,
 }
 
 function parseNumber(val: unknown, fallback: number): number {
@@ -91,9 +128,9 @@ export function parsePublicConfig(raw?: Record<string, unknown> | null): PublicA
       DEFAULT_PUBLIC_APP_CONFIG.DEFAULT_THEME_MODE,
     ),
     APP_THEME: parseString(raw.APP_THEME, DEFAULT_PUBLIC_APP_CONFIG.APP_THEME),
-    ENABLE_AI_ASSISTANT: parseBoolean(
-      raw.ENABLE_AI_ASSISTANT,
-      DEFAULT_PUBLIC_APP_CONFIG.ENABLE_AI_ASSISTANT,
+    RECRUITER_ASSISTANT_ENABLED: parseBoolean(
+      raw.RECRUITER_ASSISTANT_ENABLED ?? raw.ENABLE_AI_ASSISTANT,
+      DEFAULT_PUBLIC_APP_CONFIG.RECRUITER_ASSISTANT_ENABLED,
     ),
   }
 }

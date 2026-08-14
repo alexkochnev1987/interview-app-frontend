@@ -31,9 +31,10 @@
         "candidateName": "Wpisz imię kandydata…",
         "position": "Wpisz stanowisko…",
         "questionName": "Wpisz nazwę pytania…",
+        "confirmAddDespiteSimilar": "Wybierz Kontynuuj lub Anuluj powyżej…",
         "templateChoice": "Wybierz szablon powyżej lub wpisz jego numer…",
-        "hr": "Wpisz nazwisko pracownika HR…",
-        "interview": "Opisz lub nazwij interview…"
+        "hr": "Wybierz pracownika HR powyżej lub wpisz imię…",
+        "interview": "Wybierz interview powyżej lub wpisz nazwę/ID…"
       }
     },
     "welcome": {
@@ -49,6 +50,7 @@
         "reviewed": "Sprawdź, czy Twoje interview zostało ocenione",
         "schedule": "Pokaż termin i miejsce interview lub link dla kandydata",
         "unassigned": "Wyświetl nieprzypisane interview",
+        "showHrs": "Wyświetl dostępnych pracowników HR",
         "filters": "Filtruj interview według statusu, HR i innych filtrów aplikacji",
         "assignHr": "Przypisz interview do pracownika HR (po Twoim potwierdzeniu)",
         "orgQueries": "Odpowiedz na pytania dotyczące interview, pytań i zespołu w organizacji"
@@ -94,15 +96,31 @@
     "createdQuestion": {
       "openLink": "Otwórz pytanie"
     },
+    "similarQuestions": {
+      "heading": "Podobne pytania",
+      "matchScore": "dopasowanie {score}"
+    },
+    "confirmAddDespiteSimilar": {
+      "heading": "Mimo to utworzyć to pytanie?",
+      "continue": "Kontynuuj tworzenie",
+      "abort": "Anuluj"
+    },
     "templateList": {
       "heading": "Wybierz szablon",
       "questionCount": "{count, plural, one {# pytanie} few {# pytania} many {# pytań} other {# pytania}}"
+    },
+    "hrList": {
+      "heading": "Wybierz pracownika HR",
+      "listHeading": "Pracownicy HR",
+      "showResponse": "Oto dostępni pracownicy HR:",
+      "empty": "W Twojej organizacji nie ma dostępnych pracowników HR."
     },
     "redirect": {
       "continue": "Kontynuuj w aplikacji"
     },
     "interviewList": {
       "heading": "Interview",
+      "chooseHeading": "Wybierz interview",
       "viewDetail": "Szczegóły",
       "progress": "{submitted}/{total} odpowiedzi"
     },
@@ -130,12 +148,14 @@
       },
       "admin": {
         "unassigned": "Pokaż nieprzypisane interview",
+        "showHrs": "Pokaż pracowników HR",
         "byStatus": "Pokaż ukończone interview",
         "assignHr": "Przypisz interview do pracownika HR",
         "createQuestion": "Pomóż mi utworzyć nowe pytanie rekrutacyjne"
       },
       "super_admin": {
         "unassigned": "Pokaż nieprzypisane interview",
+        "showHrs": "Pokaż pracowników HR",
         "byStatus": "Pokaż interview według statusu",
         "assignHr": "Przypisz interview do pracownika HR",
         "createQuestion": "Pomóż mi utworzyć nowe pytanie rekrutacyjne",

@@ -9,6 +9,7 @@ import {
   RecruiterAssistantPendingAction,
   type RecruiterAssistantChatPayload,
   type RecruiterAssistantResponse,
+  fetchHrUsers,
   resetRecruiterAssistantChat,
   sendRecruiterAssistantMessage,
 } from '@/lib/api'
@@ -18,6 +19,7 @@ import { useAuth } from '@/lib/auth-context'
 import type { AiAssistantChatMessage } from './ai-assistant-chat-types'
 import { ASSISTANT_CONFIRM_MESSAGE } from './assistant-api-contract'
 import { resolveAssistantWelcomeRole } from './assistant-i18n'
+import { shouldAttachHrList } from './assistant-show-hrs'
 import { buildAssistantWelcomeText } from './build-assistant-welcome'
 
 function createMessage(message: Omit<AiAssistantChatMessage, 'id'>): AiAssistantChatMessage {
@@ -46,6 +48,24 @@ function shouldSwitchLocale(
   currentLocale: Locale,
 ): result is RecruiterAssistantResponse & { locale: Locale } {
   return Boolean(result.locale && result.locale !== currentLocale && isAppLocale(result.locale))
+}
+
+async function enrichAssistantResultWithHrList(
+  result: RecruiterAssistantResponse,
+  userMessage: string,
+  t: ReturnType<typeof useTranslations<'assistant'>>,
+  signal?: AbortSignal,
+): Promise<RecruiterAssistantResponse> {
+  if (!shouldAttachHrList(result, userMessage, t)) {
+    return result
+  }
+
+  try {
+    const hrs = await fetchHrUsers({ signal })
+    return { ...result, hrs }
+  } catch {
+    return result
+  }
 }
 
 function applyAssistantResult(
@@ -149,9 +169,14 @@ export function useAiAssistantChat() {
     const { abortController, requestId } = beginRequest()
 
     try {
-      const result = await sendRecruiterAssistantMessage(
-        { message: text, ...(sessionId ? { sessionId } : {}) },
-        { signal: abortController.signal },
+      const result = await enrichAssistantResultWithHrList(
+        await sendRecruiterAssistantMessage(
+          { message: text, ...(sessionId ? { sessionId } : {}) },
+          { signal: abortController.signal },
+        ),
+        text,
+        t,
+        abortController.signal,
       )
       if (!isLatestRequest(requestId)) return
 

@@ -1352,7 +1352,7 @@ export interface components {
         UpsertConfigVariableDto: {
             /**
              * @description Variable value as string (numbers and booleans are stored as text)
-             * @example 300
+             * @example 240
              */
             value: string;
             /**
@@ -1437,6 +1437,11 @@ export interface components {
              * @example true
              */
             hasGoogleAvatar: boolean;
+            /**
+             * @description Whether Herman (recruiter AI assistant) is enabled for this user, based on org config and role.
+             * @example true
+             */
+            recruiterAssistantEnabled: boolean;
         };
         RegisterDto: {
             email: string;
@@ -2272,6 +2277,7 @@ export interface components {
             mediaType?: "camera" | "screen";
             /** @description Reserved answer attempt/version being recorded. */
             versionNumber: number;
+            fileSizeBytes?: number;
         };
         PresignedUrlResponseDto: {
             uploadUrl: string;
@@ -2282,6 +2288,7 @@ export interface components {
             mediaKey: string;
             /** @description Reserved answer attempt/version being confirmed. */
             versionNumber: number;
+            fileSizeBytes?: number;
         };
         ConfirmUploadResponseDto: {
             mediaKey: string;
@@ -2296,6 +2303,7 @@ export interface components {
             mediaType?: "camera" | "screen";
             /** @description Reserved answer attempt/version being recorded. */
             versionNumber: number;
+            fileSizeBytes?: number;
         };
         MultipartUploadSessionResponseDto: {
             mediaKey: string;
@@ -2566,6 +2574,14 @@ export interface components {
             /** @description Optional create-interview/question-plan override sent with confirmation. Questions may only be removed, not added or edited. */
             pendingAction?: components["schemas"]["RecruiterAssistantCreatePendingActionDto"];
         };
+        RecruiterAssistantSimilarQuestionDto: {
+            id: string;
+            questionText: string;
+            /** @description Similarity score from 0 to 1 (e.g. 0.85 = 85% match). */
+            score: number;
+            /** @description Frontend route when the similar question card is clicked. */
+            href: string;
+        };
         RecruiterAssistantCreatedQuestionDto: {
             id: string;
             questionText: string;
@@ -2607,6 +2623,8 @@ export interface components {
             /** @enum {string} */
             status: "answered" | "needs_confirmation" | "executed" | "refused" | "denied";
             suggestedQuestions?: components["schemas"]["RecruiterAssistantSuggestedQuestionDto"][];
+            /** @description Existing questions with high similarity during create_question flow (clickable cards). */
+            similarQuestions?: components["schemas"]["RecruiterAssistantSimilarQuestionDto"][];
             pendingAction?: components["schemas"]["RecruiterAssistantCreatePendingActionDto"] | components["schemas"]["RecruiterAssistantAssignHrPendingActionDto"] | components["schemas"]["RecruiterAssistantCreateSingleQuestionPendingActionDto"];
             pendingActionId?: string;
             sessionId?: string;
@@ -2616,11 +2634,13 @@ export interface components {
             redirect?: components["schemas"]["RecruiterAssistantRedirectDto"];
             templates?: components["schemas"]["TemplateSummaryResponseDto"][];
             /** @enum {string} */
-            awaitingInput?: "hr" | "interview" | "questionName" | "candidateName" | "position" | "templateChoice";
+            awaitingInput?: "hr" | "interview" | "questionName" | "confirmAddDespiteSimilar" | "candidateName" | "position" | "templateChoice";
             createdInterview?: components["schemas"]["RecruiterAssistantCreatedInterviewDto"];
             /** @enum {string} */
             escalateTo?: "hr" | "admin" | "super_admin";
             interviews?: components["schemas"]["InterviewListItemDto"][];
+            /** @description HR reviewers returned for assign_hr picker steps or the list_hrs intent. */
+            hrs?: components["schemas"]["AssignedHrDto"][];
             interview?: components["schemas"]["RecruiterAssistantInterviewSummaryDto"];
         };
         PublicCandidateFeedbackTextBlockDto: {
