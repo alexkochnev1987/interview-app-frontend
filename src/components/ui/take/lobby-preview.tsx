@@ -3,7 +3,8 @@
 import { cva } from 'class-variance-authority'
 import type { ReactNode } from 'react'
 
-import { Inline, Stack } from '@/components/ui/layout'
+import { Inline } from '@/components/ui/layout/inline'
+import { Stack } from '@/components/ui/layout/stack'
 import { BodyText } from '@/components/ui/text'
 import { cn } from '@/lib/utils'
 

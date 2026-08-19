@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
-import { ChatResultCard } from '@/components/ui/chat'
+import { ChatResultCard } from '@/components/ui/chat/chat-result-card'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { StatusPill } from '@/components/ui/status-pill'

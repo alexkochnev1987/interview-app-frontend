@@ -4,7 +4,7 @@ import { Bot, CheckCircle2, ShieldAlert } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { ChatMessageBubble } from '@/components/ui/chat'
+import { ChatMessageBubble } from '@/components/ui/chat/chat-message-bubble'
 import { Icon } from '@/components/ui/icon'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'

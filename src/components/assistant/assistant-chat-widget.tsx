@@ -11,12 +11,10 @@ import {
   useAssistantChatShell,
 } from '@/components/assistant/assistant-chat-provider'
 import { Button } from '@/components/ui/button'
-import {
-  ChatWidgetBackdrop,
-  ChatWidgetHeader,
-  ChatWidgetShell,
-  ChatWidgetTitle,
-} from '@/components/ui/chat'
+import { ChatWidgetBackdrop } from '@/components/ui/chat/chat-widget-backdrop'
+import { ChatWidgetHeader } from '@/components/ui/chat/chat-widget-header'
+import { ChatWidgetShell } from '@/components/ui/chat/chat-widget-shell'
+import { ChatWidgetTitle } from '@/components/ui/chat/chat-widget-title'
 import { Icon } from '@/components/ui/icon'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'

@@ -4,13 +4,15 @@ import { PanelLeftClose, PanelLeftOpen, SlidersHorizontal } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
-import { InterviewFacetSidebar } from '@/components/interviews/picker'
-import { InterviewPickerFeed } from '@/components/interviews/picker'
-import { InterviewPickerRefetchAlert } from '@/components/interviews/picker'
-import { InterviewPickerToolbar } from '@/components/interviews/picker'
-import { InterviewViewToggle } from '@/components/interviews/picker'
-import { pickInterviewsViewSource } from '@/components/interviews/picker'
-import type { InterviewFacetSidebarProps } from '@/components/interviews/picker/interview-facet-sidebar'
+import {
+  InterviewFacetSidebar,
+  type InterviewFacetSidebarProps,
+} from '@/components/interviews/picker/interview-facet-sidebar'
+import { InterviewPickerFeed } from '@/components/interviews/picker/interview-picker-feed'
+import { InterviewPickerRefetchAlert } from '@/components/interviews/picker/interview-picker-refetch-alert'
+import { InterviewPickerToolbar } from '@/components/interviews/picker/interview-picker-toolbar'
+import { InterviewViewToggle } from '@/components/interviews/picker/interview-view-toggle'
+import { pickInterviewsViewSource } from '@/components/interviews/picker/pick-interviews-view-source'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { CardGrid } from '@/components/ui/layout/card-grid'

@@ -3,7 +3,8 @@
 import { Sparkles, UserRound } from 'lucide-react'
 import type { ReactNode, RefObject } from 'react'
 
-import { Inline, Stack } from '@/components/ui/layout'
+import { Inline } from '@/components/ui/layout/inline'
+import { Stack } from '@/components/ui/layout/stack'
 import { Panel } from '@/components/ui/panel'
 import { BodyText, Text } from '@/components/ui/text'
 import { cn } from '@/lib/utils'

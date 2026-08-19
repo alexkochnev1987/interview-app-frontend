@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 
-import { Container, Stack } from '@/components/ui/layout'
+import { Container } from '@/components/ui/layout/container'
+import { Stack } from '@/components/ui/layout/stack'
 import { PageFrame } from '@/components/ui/page-frame'
 
 type ChildrenProps = {
