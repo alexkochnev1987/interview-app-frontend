@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { ApiError } from '@/lib/api-error'
 
 import type { MultipartUploadSession } from './runtime'
-import { completeMultipartUpload } from './uploads'
+import { finalizeMultipartUpload } from './uploads'
 
 function sessionFixture(overrides: Partial<MultipartUploadSession> = {}): MultipartUploadSession {
   return {
@@ -24,7 +24,7 @@ function sessionFixture(overrides: Partial<MultipartUploadSession> = {}): Multip
   }
 }
 
-describe('completeMultipartUpload', () => {
+describe('finalizeMultipartUpload', () => {
   it('rethrows ApiError without wrapping', async () => {
     const apiError = new ApiError(
       409,
@@ -37,7 +37,7 @@ describe('completeMultipartUpload', () => {
     const completeMultipartUploadRequest = vi.fn().mockRejectedValue(apiError)
 
     await expect(
-      completeMultipartUpload({
+      finalizeMultipartUpload({
         target: 'camera',
         multipartUploadsRef,
         completeMultipartUploadRequest,

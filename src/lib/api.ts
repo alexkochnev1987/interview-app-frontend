@@ -153,7 +153,6 @@ type ValidateAllAnswersResponse = Schemas['StartAllAnswerValidationsResponseDto'
 export type StartAnswerValidationResult = Schemas['StartAnswerValidationResultDto']
 export type InterviewAnswerMediaResponse = Schemas['InterviewAnswerMediaResponseDto']
 export type CandidateLinkResponse = Schemas['CandidateLinkResponseDto']
-export type FeedbackLinkResponse = Schemas['FeedbackLinkResponseDto']
 export type CandidateFeedbackShareLinkResponse = Schemas['CandidateFeedbackShareLinkResponseDto']
 export type CandidateFeedbackShareLinkStatus =
   Schemas['CandidateFeedbackShareLinkStatusResponseDto']

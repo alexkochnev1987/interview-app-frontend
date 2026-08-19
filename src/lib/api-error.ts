@@ -33,13 +33,6 @@ export class ApiError extends Error {
   }
 }
 
-export class QuestionInUseError extends Error {
-  constructor(message: string) {
-    super(message)
-    this.name = 'QuestionInUseError'
-  }
-}
-
 export function isUnauthorizedError(err: unknown): boolean {
   return getApiErrorStatus(err) === 401
 }

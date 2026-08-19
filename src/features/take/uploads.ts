@@ -15,7 +15,7 @@ interface CompleteMultipartUploadParams {
   ) => Promise<void>
 }
 
-export async function completeMultipartUpload({
+export async function finalizeMultipartUpload({
   target,
   multipartUploadsRef,
   completeMultipartUploadRequest,
