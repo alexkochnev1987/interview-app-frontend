@@ -15,14 +15,12 @@ import {
   type GenerateAllCandidateFeedbackPlan,
   type UpdateCandidateFeedbackPayload,
 } from './candidate-feedback'
-import { normalizeInterviewsResponse } from './interviews-response'
 import {
   buildGenerateDraftRequestPayload,
   buildTranslateDraftRequestPayload,
 } from './question-editor/ai-draft-request'
 
-export { ApiError, QuestionInUseError } from './api-error'
-export { resolveApiLocale } from './api-locale'
+export { ApiError } from './api-error'
 export type LocaleCode = Locale
 
 function getInitialClientApiLocale(): LocaleCode {
@@ -728,11 +726,6 @@ export async function getInterview(id: string): Promise<Interview> {
   )
 }
 
-export async function getInterviews(): Promise<Interview[]> {
-  const data = await handle(client.GET('/interviews'))
-  return normalizeInterviewsResponse<Interview>(data, 'client:/interviews')
-}
-
 export async function fetchInterviews(
   params?: FetchInterviewsParams,
   init?: { signal?: AbortSignal },
@@ -799,29 +792,6 @@ export async function generateCandidateLink(id: string): Promise<CandidateLinkRe
     }),
   )
 }
-
-export async function generateFeedbackLink(id: string): Promise<FeedbackLinkResponse> {
-  return handle(
-    client.POST('/interviews/{id}/feedback-link', {
-      ...LOCALIZED_HEADERS,
-      params: { path: { id } },
-    }),
-  )
-}
-
-export {
-  buildQuestionBlocksView,
-  candidateFeedbackPath,
-  canRegenerateAnyCandidateFeedbackBlock,
-  createEmptyCandidateFeedback,
-  getSkippedGenerateAllQuestionResults,
-  isCandidateFeedbackEmpty,
-  isCandidateFeedbackGenerating,
-  isOverallBlockGenerationBusy,
-  isQuestionBlockGenerationBusy,
-  mapCandidateFeedbackFromApi,
-  parseCandidateFeedbackBody,
-} from './candidate-feedback'
 
 export async function getCandidateFeedback(
   id: string,
@@ -1278,15 +1248,6 @@ export async function getTemplates(): Promise<TemplateSummary[]> {
   )
 }
 
-export async function getTemplate(id: string): Promise<Template> {
-  return handle(
-    client.GET('/templates/{id}', {
-      ...LOCALIZED_HEADERS,
-      params: { path: { id } },
-    }),
-  )
-}
-
 export async function createTemplate(data: CreateTemplatePayload): Promise<Template> {
   return handle(
     client.POST('/templates', {
@@ -1324,7 +1285,6 @@ export type {
   SystemConfigValueType,
   UpdateSystemConfigPayload,
 } from './app-config-types'
-export { DEFAULT_PUBLIC_APP_CONFIG } from './app-config-types'
 
 import type {
   PublicAppConfig,

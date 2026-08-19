@@ -63,10 +63,6 @@ export function getApiErrorStatus(err: unknown): number | undefined {
   return isApiError(err) ? err.status : undefined
 }
 
-export function isConflictError(err: unknown): boolean {
-  return err instanceof QuestionInUseError || getApiErrorStatus(err) === 409
-}
-
 type ApiErrorTranslator = {
   has: (key: string) => boolean
   t: (key: string, params?: Record<string, string | number | Date>) => string

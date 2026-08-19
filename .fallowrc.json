@@ -7,6 +7,10 @@
     {
       "file": "src/components/ui/**",
       "exports": ["*"]
+    },
+    {
+      "file": "src/i18n/navigation.ts",
+      "exports": ["*"]
     }
   ],
   "ignoreExportsUsedInFile": true,
