@@ -2,22 +2,13 @@
 
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { useSearchParams } from 'next/navigation'
-import {
-  type Dispatch,
-  type SetStateAction,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
+import { type Dispatch, type SetStateAction, useCallback, useMemo, useState } from 'react'
 
 import {
   isPlaceholderLoading,
   useVoidCallback,
 } from '@/components/questions/picker/query-hook-helpers'
 import { splitListQueryErrors } from '@/components/questions/picker/split-questions-query-errors'
-import { usePathname, useRouter } from '@/i18n/navigation'
 import {
   fetchInterviews,
   type InterviewListItem,
@@ -37,6 +28,12 @@ import {
   type InterviewView,
   readInterviewsFromSearchParams,
 } from '@/lib/interviews-query-state'
+import {
+  usePageClamp,
+  useSearchDebounce,
+  useStoredViewHydration,
+  useUrlStateSync,
+} from '@/lib/use-facet-query-sync'
 import { useToastMessages } from '@/lib/use-toast-messages'
 
 import { interviewsListQueryKey } from '../library/query-keys'
@@ -124,8 +121,6 @@ export function useInterviewsQuery(
     allowAssignedHrFilter = true,
   } = options
   const [capturedInitial] = useState<Partial<InterviewsQueryState> | undefined>(initial)
-  const router = useRouter()
-  const pathname = usePathname()
   const searchParams = useSearchParams()
 
   const toastMessages = useToastMessages()
@@ -141,30 +136,23 @@ export function useInterviewsQuery(
     if (start.view === 'cards' && start.page !== 1) start.page = 1
     return start
   })
-  const hydratedStoredViewRef = useRef(false)
-  useEffect(() => {
-    if (hydratedStoredViewRef.current) return
-    hydratedStoredViewRef.current = true
-    if (serverHydrated) return
-    if (syncUrl && searchParams?.get('view') !== null) return
-    const stored = readStoredView()
-    if (stored) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- post-mount SSR-safe localStorage hydration of view preference
-      setState((prev) => (prev.view === stored ? prev : { ...prev, view: stored }))
-    }
-  }, [serverHydrated, syncUrl, searchParams])
-  const [debouncedQ, setDebouncedQ] = useState(() => state.q)
-  const lastWrittenUrlRef = useRef<string | null>(
-    syncUrl && searchParams ? searchParams.toString() : null,
-  )
 
-  useEffect(() => {
-    if (state.q === debouncedQ) return
-    const handle = window.setTimeout(() => setDebouncedQ(state.q), INTERVIEWS_SEARCH_DEBOUNCE_MS)
-    return () => window.clearTimeout(handle)
-  }, [state.q, debouncedQ])
+  useStoredViewHydration({
+    serverHydrated,
+    syncUrl,
+    searchParams,
+    readStoredView,
+    onHydrate: (view) => setState((prev) => (prev.view === view ? prev : { ...prev, view })),
+  })
 
-  const isSearchPending = state.q !== debouncedQ
+  const {
+    debouncedValue: debouncedQ,
+    isPending: isSearchPending,
+    setDebouncedValue: setDebouncedQ,
+  } = useSearchDebounce({
+    value: state.q,
+    delayMs: INTERVIEWS_SEARCH_DEBOUNCE_MS,
+  })
 
   const stateUrl = useMemo(
     () =>
@@ -175,31 +163,33 @@ export function useInterviewsQuery(
     [debouncedQ, state],
   )
 
-  useEffect(() => {
-    if (!syncUrl) return
-    const currentUrl = searchParams ? searchParams.toString() : ''
-    if (stateUrl === currentUrl) {
-      lastWrittenUrlRef.current = currentUrl
-      return
-    }
-    if (currentUrl !== lastWrittenUrlRef.current) {
+  const readFromUrl = useCallback(
+    (params: URLSearchParams) => {
       const base = withLockedDefaults(capturedInitial)
-      const fromUrl = searchParams
-        ? readInterviewsFromSearchParams(searchParams, base, {
-            allowAssignedHrFilter,
-          })
-        : base
+      const fromUrl = readInterviewsFromSearchParams(params, base, {
+        allowAssignedHrFilter,
+      })
       if (fromUrl.view === 'cards' && fromUrl.page !== 1) fromUrl.page = 1
-      lastWrittenUrlRef.current = currentUrl
-      setState(fromUrl)
-      setDebouncedQ(fromUrl.q)
-      return
-    }
-    const url = stateUrl.length > 0 ? `${pathname}?${stateUrl}` : pathname
-    lastWrittenUrlRef.current = stateUrl
-    router.replace(url, { scroll: false })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stateUrl, pathname, router, syncUrl, capturedInitial, searchParams, allowAssignedHrFilter])
+      return fromUrl
+    },
+    [capturedInitial, allowAssignedHrFilter],
+  )
+
+  const handleExternalUrlChange = useCallback(
+    (nextState: InterviewsQueryState) => {
+      setState(nextState)
+      setDebouncedQ(nextState.q)
+    },
+    [setDebouncedQ],
+  )
+
+  useUrlStateSync({
+    syncUrl,
+    stateUrl,
+    searchParams,
+    readFromUrl,
+    onExternalUrlChange: handleExternalUrlChange,
+  })
 
   const fetchParams = useMemo(
     () => buildInterviewsFetchParams(state, debouncedQ),
@@ -213,16 +203,10 @@ export function useInterviewsQuery(
     enabled: !disableFetchInCardsView || state.view !== 'cards',
   })
 
-  const total = query.data?.total
-  useEffect(() => {
-    if (query.data === undefined) return
-    const resolvedTotal = query.data.total
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- clamp page after fetch when filters reduce total below current page
-    setState((prev) => {
-      const maxPage = Math.max(1, Math.ceil(resolvedTotal / prev.limit))
-      return prev.page > maxPage ? { ...prev, page: maxPage } : prev
-    })
-  }, [query.data])
+  const total = query.data?.total ?? 0
+  usePageClamp(query.data?.total, state.limit, state.page, (clampedPage) => {
+    setState((prev) => (prev.page === clampedPage ? prev : { ...prev, page: clampedPage }))
+  })
 
   const items = query.data?.items ?? []
   const loading = isPlaceholderLoading(query)
@@ -295,7 +279,7 @@ export function useInterviewsQuery(
     const base = withLockedDefaults(capturedInitial)
     setState((prev) => ({ ...base, view: prev.view }))
     setDebouncedQ(base.q)
-  }, [capturedInitial])
+  }, [capturedInitial, setDebouncedQ])
   const refetch = useVoidCallback(query.refetch)
 
   const canReset = useMemo(() => {
