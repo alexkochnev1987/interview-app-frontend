@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
   "entry": ["scripts/*.mjs", "e2e/**/*.{ts,mjs}"],
-  "ignorePatterns": ["**/*.generated.*", "openapi/**"],
+  "ignorePatterns": ["**/*.generated.*", "openapi/**", "src/lib/api-types.ts"],
   "ignoreDependencies": ["@swc/helpers", "tailwindcss", "tailwindcss-animate"],
   "ignoreExports": [
     {
