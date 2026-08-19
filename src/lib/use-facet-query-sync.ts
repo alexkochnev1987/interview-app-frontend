@@ -103,7 +103,10 @@ export function usePageClamp(
   page: number,
   onClampPage: (clampedPage: number) => void,
 ): void {
-  const stableOnClamp = useCallback(onClampPage, [onClampPage])
+  const stableOnClamp = useCallback(
+    (clampedPage: number) => onClampPage(clampedPage),
+    [onClampPage],
+  )
 
   useEffect(() => {
     if (total === undefined) return

@@ -13,6 +13,7 @@ export function useScrollToTopOnPageChange(page: number) {
       return
     }
     rootRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    // oxlint-disable-next-line react/exhaustive-effect-dependencies
   }, [page])
 
   return rootRef

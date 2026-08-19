@@ -28,16 +28,18 @@ export function AssistantChatWidget() {
   const [mounted, setMounted] = useState(open)
   const [closing, setClosing] = useState(false)
 
-  useEffect(() => {
-    if (open) {
+  if (open) {
+    if (!mounted || closing) {
       setMounted(true)
       setClosing(false)
-      return
     }
-
-    if (!mounted) return
-
+  } else if (mounted && !closing) {
     setClosing(true)
+  }
+
+  useEffect(() => {
+    if (open || !mounted) return
+
     const timer = window.setTimeout(() => {
       setMounted(false)
       setClosing(false)

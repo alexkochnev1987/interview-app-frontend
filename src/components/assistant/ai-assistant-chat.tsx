@@ -58,6 +58,7 @@ export function AiAssistantChat() {
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+    // oxlint-disable-next-line react/exhaustive-effect-dependencies
   }, [messages, loading])
 
   useEffect(() => {
