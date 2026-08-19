@@ -1,0 +1,29 @@
+{
+  "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
+  "entry": ["scripts/*.mjs", "e2e/**/*.{ts,mjs}"],
+  "ignorePatterns": ["**/*.generated.*", "openapi/**"],
+  "ignoreDependencies": ["@swc/helpers", "tailwindcss", "tailwindcss-animate"],
+  "ignoreExports": [
+    {
+      "file": "src/components/ui/**",
+      "exports": ["*"]
+    }
+  ],
+  "ignoreExportsUsedInFile": true,
+  "rules": {
+    "unused-files": "error",
+    "unused-exports": "warn",
+    "unused-types": "warn",
+    "unused-dependencies": "warn",
+    "unused-dev-dependencies": "warn",
+    "unlisted-dependencies": "warn",
+    "unresolved-imports": "error",
+    "circular-dependencies": "warn",
+    "duplicate-exports": "warn",
+    "dev-dependencies-in-production": "warn",
+    "boundary-violation": "warn"
+  },
+  "duplicates": {
+    "minOccurrences": 3
+  }
+}
