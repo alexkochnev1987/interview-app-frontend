@@ -6,8 +6,8 @@ import { cn } from '@/lib/utils'
 export const iconBadgeVariants = cva('flex shrink-0 items-center justify-center', {
   variants: {
     tone: {
-      primary: 'bg-[hsl(var(--primary-fixed)/0.85)] text-[hsl(var(--primary))]',
-      surface: 'bg-surface-low-glass text-[hsl(var(--primary))] ring-1 ring-hairline',
+      primary: 'bg-primary-fixed/85 text-primary',
+      surface: 'bg-surface-low-glass text-primary ring-1 ring-hairline',
       danger: 'bg-danger-soft text-destructive ring-1 ring-danger-soft-border',
       gradient: 'bg-primary-gradient text-primary-foreground shadow-soft',
     },

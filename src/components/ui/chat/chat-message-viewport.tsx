@@ -9,7 +9,7 @@ const chatMessageViewportVariants = cva(
     variants: {
       size: {
         modal: 'max-h-[50vh] min-h-[320px]',
-        widget: 'min-h-0 flex-1 bg-[hsl(var(--surface-low))] dark:bg-background',
+        widget: 'min-h-0 flex-1 bg-surface-low dark:bg-background',
       },
     },
     defaultVariants: { size: 'modal' },

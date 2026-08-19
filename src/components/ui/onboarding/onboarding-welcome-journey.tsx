@@ -16,9 +16,9 @@ const journeyMarkerVariants = cva(
   {
     variants: {
       tone: {
-        start: 'bg-primary-gradient text-primary-foreground ring-[hsl(var(--primary)/0.2)]',
-        mid: 'bg-surface-low-glass text-[hsl(var(--primary))] ring-hairline',
-        end: 'bg-[hsl(var(--primary-fixed)/0.85)] text-[hsl(var(--primary))] ring-[hsl(var(--primary)/0.15)]',
+        start: 'bg-primary-gradient text-primary-foreground ring-primary/20',
+        mid: 'bg-surface-low-glass text-primary ring-hairline',
+        end: 'bg-primary-fixed/85 text-primary ring-primary/15',
       },
     },
     defaultVariants: {
@@ -41,7 +41,7 @@ export function OnboardingWelcomeJourney() {
     <div className={journeyTrackVariants()}>
       <div
         aria-hidden
-        className="pointer-events-none absolute left-[12%] right-[12%] top-4 z-0 h-px bg-linear-to-r from-[hsl(var(--primary)/0.08)] via-[hsl(var(--primary)/0.28)] to-[hsl(var(--primary)/0.08)]"
+        className="pointer-events-none absolute left-[12%] right-[12%] top-4 z-0 h-px bg-linear-to-r from-primary/10 via-primary/30 to-primary/10"
       />
 
       <div className={journeyRowVariants()}>
