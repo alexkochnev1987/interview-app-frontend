@@ -3,11 +3,10 @@ import { getTranslations } from 'next-intl/server'
 import { InterviewsLibraryClient } from '@/components/interviews/library/interviews-library-client'
 import { QueryHydrationBoundary } from '@/components/questions/query-hydration-boundary'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
-import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import type { Locale } from '@/i18n/locales'
 import { routes } from '@/i18n/routes'
-import { loadAuthGate, redirectIfUnauthenticated } from '@/lib/auth-gate'
+import { enforcePageAuth } from '@/lib/auth-gate'
 import { canAssignInterviewHr, canConfigureInterview } from '@/lib/auth-roles'
 import { prefetchInterviewsLibrary } from '@/lib/interviews-library-prefetch'
 import { toInterviewsSearchParams } from '@/lib/interviews-query-state'
@@ -22,30 +21,18 @@ interface InterviewsPageProps {
 export default async function InterviewsPage({ params, searchParams }: InterviewsPageProps) {
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'toast.pageGate.interviews' })
-  const tCommon = await getTranslations({ locale, namespace: 'common' })
   const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
-  const auth = await loadAuthGate(canConfigureInterview, locale)
-  redirectIfUnauthenticated(auth, routes.interviews.list, locale)
-
-  if (auth.kind === 'forbidden') {
-    return (
-      <ForbiddenAccessPage
-        title={t('libraryForbiddenTitle')}
-        description={t('libraryForbiddenDescription')}
-      />
-    )
-  }
-
-  if (auth.kind === 'error') {
-    return (
-      <FlashErrorPageFallback
-        title={t('libraryUnavailableTitle')}
-        description={`${tCommon('sessionVerificationFailed')} ${auth.message}`}
-        backHref={ERROR_BACK_HREF}
-        backLabel={tFallback('backToDashboard')}
-      />
-    )
-  }
+  const auth = await enforcePageAuth({
+    roleCheck: canConfigureInterview,
+    locale,
+    returnPath: routes.interviews.list,
+    forbiddenTitle: t('libraryForbiddenTitle'),
+    forbiddenDescription: t('libraryForbiddenDescription'),
+    errorTitle: t('libraryUnavailableTitle'),
+    backHref: ERROR_BACK_HREF,
+    backLabelKey: 'backToDashboard',
+  })
+  if (!auth.authorized) return auth.fallback
 
   const urlParams = toInterviewsSearchParams(await searchParams)
   const allowAssignedHrFilter = canAssignInterviewHr(auth.me.role)

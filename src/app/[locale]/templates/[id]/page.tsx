@@ -3,11 +3,10 @@ import { getTranslations } from 'next-intl/server'
 import { QueryHydrationBoundary } from '@/components/questions/query-hydration-boundary'
 import { TemplateForm } from '@/components/templates/template-form'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
-import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import type { Locale } from '@/i18n/locales'
 import { routes } from '@/i18n/routes'
-import { loadAuthGate, redirectIfUnauthenticated } from '@/lib/auth-gate'
+import { enforcePageAuth } from '@/lib/auth-gate'
 import { canConfigureInterview } from '@/lib/auth-roles'
 import { prefetchInterviewCreatePicker } from '@/lib/questions-library-prefetch'
 import { fetchTemplate } from '@/lib/templates-prefetch'
@@ -21,27 +20,16 @@ interface EditTemplatePageProps {
 export default async function EditTemplatePage({ params }: EditTemplatePageProps) {
   const { locale, id } = await params
   const t = await getTranslations({ locale, namespace: 'toast.pageGate.templates' })
-  const tCommon = await getTranslations({ locale, namespace: 'common' })
   const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
-  const auth = await loadAuthGate(canConfigureInterview, locale)
-  redirectIfUnauthenticated(auth, routes.templates.detail(id), locale)
-
-  if (auth.kind === 'forbidden') {
-    return (
-      <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
-    )
-  }
-
-  if (auth.kind === 'error') {
-    return (
-      <FlashErrorPageFallback
-        title={t('unavailableTitle')}
-        description={`${tCommon('sessionVerificationFailed')} ${auth.message}`}
-        backHref={ERROR_BACK_HREF}
-        backLabel={tFallback('backToTemplates')}
-      />
-    )
-  }
+  const auth = await enforcePageAuth({
+    roleCheck: canConfigureInterview,
+    locale,
+    returnPath: routes.templates.detail(id),
+    gateNamespace: 'toast.pageGate.templates',
+    backHref: ERROR_BACK_HREF,
+    backLabelKey: 'backToTemplates',
+  })
+  if (!auth.authorized) return auth.fallback
 
   let initialPrefetch
   let template

@@ -5,12 +5,11 @@ import { InterviewCreateIntro } from '@/components/interviews/interview-create-i
 import { QueryHydrationBoundary } from '@/components/questions/query-hydration-boundary'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
-import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import type { Locale } from '@/i18n/locales'
 import { Link } from '@/i18n/navigation'
 import { routes } from '@/i18n/routes'
-import { loadAuthGate, redirectIfUnauthenticated } from '@/lib/auth-gate'
+import { enforcePageAuth } from '@/lib/auth-gate'
 import { canConfigureInterview } from '@/lib/auth-roles'
 import { prefetchInterviewCreatePicker } from '@/lib/questions-library-prefetch'
 import { fetchInterview, fetchTemplate } from '@/lib/templates-prefetch'
@@ -44,30 +43,22 @@ export default async function NewInterviewPage({ params, searchParams }: NewInte
   const candidateName = firstSearchParam(candidateNameParam)
   const positionFromQuery = firstSearchParam(positionParam)
   const t = await getTranslations({ locale, namespace: 'toast.pageGate.interview' })
+  const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
   const tQuestions = await getTranslations({
     locale,
     namespace: 'toast.pageGate.questions',
   })
-  const tCommon = await getTranslations({ locale, namespace: 'common' })
-  const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
   const tPrefill = await getTranslations({ locale, namespace: 'templates.prefill' })
-  const auth = await loadAuthGate(canConfigureInterview, locale)
-  redirectIfUnauthenticated(auth, '/interviews/new', locale)
-  if (auth.kind === 'forbidden') {
-    return (
-      <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
-    )
-  }
-  if (auth.kind === 'error') {
-    return (
-      <FlashErrorPageFallback
-        title={t('createUnavailableTitle')}
-        description={`${tCommon('sessionVerificationFailed')} ${auth.message}`}
-        backHref={ERROR_BACK_HREF}
-        backLabel={tFallback('backToDashboard')}
-      />
-    )
-  }
+  const auth = await enforcePageAuth({
+    roleCheck: canConfigureInterview,
+    locale,
+    returnPath: '/interviews/new',
+    gateNamespace: 'toast.pageGate.interview',
+    errorTitle: t('createUnavailableTitle'),
+    backHref: ERROR_BACK_HREF,
+    backLabelKey: 'backToDashboard',
+  })
+  if (!auth.authorized) return auth.fallback
 
   let initialPrefetch
   try {
