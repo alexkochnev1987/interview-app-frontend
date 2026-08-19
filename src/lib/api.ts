@@ -150,7 +150,6 @@ export type Answer = Schemas['AnswerDto']
 export type InterviewResult = Schemas['InterviewResultResponseDto']
 export type Interview = Schemas['InterviewResponseDto']
 export type UpdateInterviewPayload = Schemas['UpdateInterviewDto']
-export type InterviewStatus = Interview['status']
 
 type ValidateAllAnswersResponse = Schemas['StartAllAnswerValidationsResponseDto']
 export type StartAnswerValidationResult = Schemas['StartAnswerValidationResultDto']
@@ -196,12 +195,10 @@ export type RecruiterAssistantPendingAction =
   | RecruiterAssistantCreateSingleQuestionPendingAction
 export type RecruiterAssistantSuggestedQuestion = Schemas['RecruiterAssistantSuggestedQuestionDto']
 export type RecruiterAssistantInterviewSummary = Schemas['RecruiterAssistantInterviewSummaryDto']
-export type RecruiterAssistantReviewState = Schemas['RecruiterAssistantReviewStateDto']
 export type RecruiterAssistantCreatedInterview = Schemas['RecruiterAssistantCreatedInterviewDto']
 export type RecruiterAssistantCreatedQuestion = Schemas['RecruiterAssistantCreatedQuestionDto']
 export type RecruiterAssistantSimilarQuestion = Schemas['RecruiterAssistantSimilarQuestionDto']
 export type RecruiterAssistantRedirect = Schemas['RecruiterAssistantRedirectDto']
-export type RecruiterAssistantResponseStatus = RecruiterAssistantResponse['status']
 
 export type PresignedUrlResponse = Schemas['PresignedUrlResponseDto']
 
@@ -812,21 +809,6 @@ export async function generateFeedbackLink(id: string): Promise<FeedbackLinkResp
   )
 }
 
-export type {
-  ApiCandidateFeedbackDto,
-  CandidateFeedbackBlock,
-  CandidateFeedbackBlockState,
-  CandidateFeedbackEditableState,
-  CandidateFeedbackQuestionBlock,
-  CandidateFeedbackResponse,
-  CandidateFeedbackSkipReason,
-  GenerateAllCandidateFeedbackOutcome,
-  GenerateAllCandidateFeedbackPlan,
-  GenerateAllCandidateFeedbackQuestionResult,
-  UpdateCandidateFeedbackOverallPayload,
-  UpdateCandidateFeedbackPayload,
-  UpdateCandidateFeedbackQuestionPayload,
-} from './candidate-feedback'
 export {
   buildQuestionBlocksView,
   candidateFeedbackPath,

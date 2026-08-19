@@ -1,6 +1,6 @@
 import { extractApiErrorFieldsFromBody, type ApiErrorParams } from './api-error-fields'
 
-export type { ApiErrorParamValue, ApiErrorParams } from './api-error-fields'
+export type { ApiErrorParams } from './api-error-fields'
 
 export class ApiError extends Error {
   public readonly code?: string

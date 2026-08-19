@@ -13,15 +13,6 @@ export type NormalizedInterview = InterviewLike & {
   answers: unknown[]
 }
 
-export type InterviewsListResponse<T extends InterviewLike = NormalizedInterview> =
-  | T[]
-  | {
-      items: T[]
-      total: number
-      page: number
-      limit: number
-    }
-
 function asArray(value: unknown): unknown[] {
   return Array.isArray(value) ? value : []
 }
