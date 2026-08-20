@@ -18,19 +18,21 @@ const ERROR_BACK_HREF = routes.questions.list
 
 export default async function EditQuestionPage({ params }: EditQuestionPageProps) {
   const { id, locale } = await params
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.questions' })
-  const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
   const returnPath = routes.questions.detail(id)
-  const auth = await enforcePageAuth({
-    roleCheck: canReadQuestions,
-    locale,
-    returnPath,
-    forbiddenTitle: t('libraryForbiddenTitle'),
-    forbiddenDescription: t('libraryForbiddenDescription'),
-    gateNamespace: 'toast.pageGate.questions',
-    backHref: ERROR_BACK_HREF,
-    backLabelKey: 'backToQuestionLibrary',
-  })
+  const [t, tFallback, auth] = await Promise.all([
+    getTranslations({ locale, namespace: 'toast.pageGate.questions' }),
+    getTranslations({ locale, namespace: 'shared.fallback' }),
+    enforcePageAuth({
+      roleCheck: canReadQuestions,
+      locale,
+      returnPath,
+      forbiddenTitleKey: 'libraryForbiddenTitle',
+      forbiddenDescriptionKey: 'libraryForbiddenDescription',
+      gateNamespace: 'toast.pageGate.questions',
+      backHref: ERROR_BACK_HREF,
+      backLabelKey: 'backToQuestionLibrary',
+    }),
+  ])
   if (!auth.authorized) return auth.fallback
 
   let question: Question | null = null

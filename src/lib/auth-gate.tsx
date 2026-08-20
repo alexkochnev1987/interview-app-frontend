@@ -89,9 +89,13 @@ export type EnforcePageAuthOptions = {
   backLabel?: string
   backLabelKey?: string
   forbiddenTitle?: string
+  forbiddenTitleKey?: string
   forbiddenDescription?: string
+  forbiddenDescriptionKey?: string
   errorTitle?: string
+  errorTitleKey?: string
   errorDescription?: string
+  errorDescriptionKey?: string
 }
 
 export type EnforcePageAuthResult =
@@ -122,9 +126,13 @@ export async function enforcePageAuth(
     backLabel,
     backLabelKey,
     forbiddenTitle,
+    forbiddenTitleKey,
     forbiddenDescription,
+    forbiddenDescriptionKey,
     errorTitle,
+    errorTitleKey,
     errorDescription,
+    errorDescriptionKey,
   } = options
 
   const auth = await loadAuthGate(roleCheck, locale)
@@ -137,10 +145,15 @@ export async function enforcePageAuth(
     if (gateNamespace && (!title || !description)) {
       const tGate = await getTranslations({ locale, namespace: gateNamespace })
       if (!title) {
-        title = getTranslationString(tGate, 'forbiddenTitle')
+        title =
+          (forbiddenTitleKey ? getTranslationString(tGate, forbiddenTitleKey) : undefined) ??
+          getTranslationString(tGate, 'forbiddenTitle')
       }
       if (!description) {
         description =
+          (forbiddenDescriptionKey
+            ? getTranslationString(tGate, forbiddenDescriptionKey)
+            : undefined) ??
           getTranslationString(tGate, 'forbiddenDescription') ??
           getTranslationString(tGate, 'forbiddenDesc')
       }
@@ -164,17 +177,24 @@ export async function enforcePageAuth(
     if (!title && gateNamespace) {
       const tGate = await getTranslations({ locale, namespace: gateNamespace })
       title =
-        getTranslationString(tGate, 'unavailableTitle') ?? getTranslationString(tGate, 'title')
+        (errorTitleKey ? getTranslationString(tGate, errorTitleKey) : undefined) ??
+        getTranslationString(tGate, 'unavailableTitle') ??
+        getTranslationString(tGate, 'title')
     }
     title = title || tCommon('profileLoadFailed')
 
-    const description =
-      errorDescription || `${tCommon('sessionVerificationFailed')} ${auth.message}`
+    let description = errorDescription
+    if (!description && errorDescriptionKey && gateNamespace) {
+      const tGate = await getTranslations({ locale, namespace: gateNamespace })
+      description = getTranslationString(tGate, errorDescriptionKey)
+    }
+    description = description || `${tCommon('sessionVerificationFailed')} ${auth.message}`
 
     let resolvedBackLabel = backLabel
     if (!resolvedBackLabel && gateNamespace) {
       const tGate = await getTranslations({ locale, namespace: gateNamespace })
       resolvedBackLabel =
+        (backLabelKey ? getTranslationString(tGate, backLabelKey) : undefined) ??
         getTranslationString(tGate, 'signInActionLabel') ??
         getTranslationString(tGate, 'actionLabel')
     }

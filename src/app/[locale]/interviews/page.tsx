@@ -20,18 +20,21 @@ interface InterviewsPageProps {
 
 export default async function InterviewsPage({ params, searchParams }: InterviewsPageProps) {
   const { locale } = await params
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.interviews' })
-  const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
-  const auth = await enforcePageAuth({
-    roleCheck: canConfigureInterview,
-    locale,
-    returnPath: routes.interviews.list,
-    forbiddenTitle: t('libraryForbiddenTitle'),
-    forbiddenDescription: t('libraryForbiddenDescription'),
-    errorTitle: t('libraryUnavailableTitle'),
-    backHref: ERROR_BACK_HREF,
-    backLabelKey: 'backToDashboard',
-  })
+  const [t, tFallback, auth] = await Promise.all([
+    getTranslations({ locale, namespace: 'toast.pageGate.interviews' }),
+    getTranslations({ locale, namespace: 'shared.fallback' }),
+    enforcePageAuth({
+      roleCheck: canConfigureInterview,
+      locale,
+      returnPath: routes.interviews.list,
+      gateNamespace: 'toast.pageGate.interviews',
+      forbiddenTitleKey: 'libraryForbiddenTitle',
+      forbiddenDescriptionKey: 'libraryForbiddenDescription',
+      errorTitleKey: 'libraryUnavailableTitle',
+      backHref: ERROR_BACK_HREF,
+      backLabelKey: 'backToDashboard',
+    }),
+  ])
   if (!auth.authorized) return auth.fallback
 
   const urlParams = toInterviewsSearchParams(await searchParams)

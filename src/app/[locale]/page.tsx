@@ -27,15 +27,17 @@ interface DashboardPageProps {
 
 export default async function DashboardPage({ params, searchParams }: DashboardPageProps) {
   const { locale } = await params
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.dashboard' })
-  const auth = await enforcePageAuth({
-    roleCheck: canAccessDashboard,
-    locale,
-    returnPath: '/',
-    gateNamespace: 'toast.pageGate.dashboard',
-    backHref: ERROR_SIGN_IN_HREF,
-    backLabel: t('signInActionLabel'),
-  })
+  const [t, auth] = await Promise.all([
+    getTranslations({ locale, namespace: 'toast.pageGate.dashboard' }),
+    enforcePageAuth({
+      roleCheck: canAccessDashboard,
+      locale,
+      returnPath: '/',
+      gateNamespace: 'toast.pageGate.dashboard',
+      backHref: ERROR_SIGN_IN_HREF,
+      backLabelKey: 'signInActionLabel',
+    }),
+  ])
   if (!auth.authorized) return auth.fallback
 
   const urlParams = toInterviewsSearchParams(await searchParams)

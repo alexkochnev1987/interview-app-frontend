@@ -42,22 +42,24 @@ export default async function NewInterviewPage({ params, searchParams }: NewInte
   const fromInterview = firstSearchParam(fromInterviewParam)
   const candidateName = firstSearchParam(candidateNameParam)
   const positionFromQuery = firstSearchParam(positionParam)
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.interview' })
-  const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
-  const tQuestions = await getTranslations({
-    locale,
-    namespace: 'toast.pageGate.questions',
-  })
-  const tPrefill = await getTranslations({ locale, namespace: 'templates.prefill' })
-  const auth = await enforcePageAuth({
-    roleCheck: canConfigureInterview,
-    locale,
-    returnPath: '/interviews/new',
-    gateNamespace: 'toast.pageGate.interview',
-    errorTitle: t('createUnavailableTitle'),
-    backHref: ERROR_BACK_HREF,
-    backLabelKey: 'backToDashboard',
-  })
+  const [t, tFallback, tQuestions, tPrefill, auth] = await Promise.all([
+    getTranslations({ locale, namespace: 'toast.pageGate.interview' }),
+    getTranslations({ locale, namespace: 'shared.fallback' }),
+    getTranslations({
+      locale,
+      namespace: 'toast.pageGate.questions',
+    }),
+    getTranslations({ locale, namespace: 'templates.prefill' }),
+    enforcePageAuth({
+      roleCheck: canConfigureInterview,
+      locale,
+      returnPath: '/interviews/new',
+      gateNamespace: 'toast.pageGate.interview',
+      errorTitleKey: 'createUnavailableTitle',
+      backHref: ERROR_BACK_HREF,
+      backLabelKey: 'backToDashboard',
+    }),
+  ])
   if (!auth.authorized) return auth.fallback
 
   let initialPrefetch

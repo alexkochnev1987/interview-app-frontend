@@ -18,16 +18,18 @@ interface TemplatesPageProps {
 
 export default async function TemplatesPage({ params }: TemplatesPageProps) {
   const { locale } = await params
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.templates' })
-  const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
-  const auth = await enforcePageAuth({
-    roleCheck: canConfigureInterview,
-    locale,
-    returnPath: routes.templates.list,
-    gateNamespace: 'toast.pageGate.templates',
-    backHref: ERROR_BACK_HREF,
-    backLabelKey: 'backToDashboard',
-  })
+  const [t, tFallback, auth] = await Promise.all([
+    getTranslations({ locale, namespace: 'toast.pageGate.templates' }),
+    getTranslations({ locale, namespace: 'shared.fallback' }),
+    enforcePageAuth({
+      roleCheck: canConfigureInterview,
+      locale,
+      returnPath: routes.templates.list,
+      gateNamespace: 'toast.pageGate.templates',
+      backHref: ERROR_BACK_HREF,
+      backLabelKey: 'backToDashboard',
+    }),
+  ])
   if (!auth.authorized) return auth.fallback
 
   let dehydratedState

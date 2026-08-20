@@ -20,18 +20,21 @@ interface QuestionsPageProps {
 
 export default async function QuestionsPage({ params, searchParams }: QuestionsPageProps) {
   const { locale } = await params
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.questions' })
-  const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
-  const auth = await enforcePageAuth({
-    roleCheck: canReadQuestions,
-    locale,
-    returnPath: routes.questions.list,
-    forbiddenTitle: t('libraryForbiddenTitle'),
-    forbiddenDescription: t('libraryForbiddenDescription'),
-    errorTitle: t('libraryUnavailableTitle'),
-    backHref: ERROR_BACK_HREF,
-    backLabelKey: 'backToDashboard',
-  })
+  const [t, tFallback, auth] = await Promise.all([
+    getTranslations({ locale, namespace: 'toast.pageGate.questions' }),
+    getTranslations({ locale, namespace: 'shared.fallback' }),
+    enforcePageAuth({
+      roleCheck: canReadQuestions,
+      locale,
+      returnPath: routes.questions.list,
+      gateNamespace: 'toast.pageGate.questions',
+      forbiddenTitleKey: 'libraryForbiddenTitle',
+      forbiddenDescriptionKey: 'libraryForbiddenDescription',
+      errorTitleKey: 'libraryUnavailableTitle',
+      backHref: ERROR_BACK_HREF,
+      backLabelKey: 'backToDashboard',
+    }),
+  ])
   if (!auth.authorized) return auth.fallback
 
   const superAdmin = isSuperAdmin(auth.me.role)

@@ -25,21 +25,23 @@ interface CandidateFeedbackPageProps {
 
 export default async function CandidateFeedbackPage({ params }: CandidateFeedbackPageProps) {
   const { id, locale } = await params
-  const t = await getTranslations({
-    locale,
-    namespace: 'toast.pageGate.candidateFeedback',
-  })
-  const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
   const returnPath = candidateFeedbackPath(id)
   const backHref = routes.interviews.detail(id)
-  const auth = await enforcePageAuth({
-    roleCheck: canConfigureInterview,
-    locale,
-    returnPath,
-    gateNamespace: 'toast.pageGate.candidateFeedback',
-    backHref,
-    backLabelKey: 'backToInterview',
-  })
+  const [t, tFallback, auth] = await Promise.all([
+    getTranslations({
+      locale,
+      namespace: 'toast.pageGate.candidateFeedback',
+    }),
+    getTranslations({ locale, namespace: 'shared.fallback' }),
+    enforcePageAuth({
+      roleCheck: canConfigureInterview,
+      locale,
+      returnPath,
+      gateNamespace: 'toast.pageGate.candidateFeedback',
+      backHref,
+      backLabelKey: 'backToInterview',
+    }),
+  ])
   if (!auth.authorized) return auth.fallback
 
   const encodedId = encodeURIComponent(id)

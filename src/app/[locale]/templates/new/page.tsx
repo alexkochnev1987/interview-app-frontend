@@ -25,17 +25,19 @@ export default async function NewTemplatePage({ params, searchParams }: NewTempl
   const fromInterview = Array.isArray(fromInterviewParam)
     ? fromInterviewParam[0]
     : fromInterviewParam
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.templates' })
-  const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
-  const tPrefill = await getTranslations({ locale, namespace: 'templates.prefill' })
-  const auth = await enforcePageAuth({
-    roleCheck: canConfigureInterview,
-    locale,
-    returnPath: routes.templates.new,
-    gateNamespace: 'toast.pageGate.templates',
-    backHref: ERROR_BACK_HREF,
-    backLabelKey: 'backToTemplates',
-  })
+  const [t, tFallback, tPrefill, auth] = await Promise.all([
+    getTranslations({ locale, namespace: 'toast.pageGate.templates' }),
+    getTranslations({ locale, namespace: 'shared.fallback' }),
+    getTranslations({ locale, namespace: 'templates.prefill' }),
+    enforcePageAuth({
+      roleCheck: canConfigureInterview,
+      locale,
+      returnPath: routes.templates.new,
+      gateNamespace: 'toast.pageGate.templates',
+      backHref: ERROR_BACK_HREF,
+      backLabelKey: 'backToTemplates',
+    }),
+  ])
   if (!auth.authorized) return auth.fallback
 
   let initialPrefetch

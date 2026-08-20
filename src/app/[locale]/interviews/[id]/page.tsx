@@ -22,16 +22,18 @@ interface InterviewDetailPageProps {
 
 export default async function InterviewDetailPage({ params }: InterviewDetailPageProps) {
   const { id, locale } = await params
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.interview' })
   const returnPath = `/interviews/${encodeURIComponent(id)}`
-  const auth = await enforcePageAuth({
-    roleCheck: canConfigureInterview,
-    locale,
-    returnPath,
-    gateNamespace: 'toast.pageGate.interview',
-    backHref: '/interviews',
-    backLabelKey: 'backToInterviews',
-  })
+  const [t, auth] = await Promise.all([
+    getTranslations({ locale, namespace: 'toast.pageGate.interview' }),
+    enforcePageAuth({
+      roleCheck: canConfigureInterview,
+      locale,
+      returnPath,
+      gateNamespace: 'toast.pageGate.interview',
+      backHref: '/interviews',
+      backLabelKey: 'backToInterviews',
+    }),
+  ])
   if (!auth.authorized) return auth.fallback
 
   const encodedId = encodeURIComponent(id)

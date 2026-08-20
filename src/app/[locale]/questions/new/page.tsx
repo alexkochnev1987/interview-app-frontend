@@ -1,5 +1,3 @@
-import { getTranslations } from 'next-intl/server'
-
 import { QuestionNewClient } from '@/components/questions/new/question-new-client'
 import type { Locale } from '@/i18n/locales'
 import { routes } from '@/i18n/routes'
@@ -14,14 +12,14 @@ interface NewQuestionPageProps {
 
 export default async function NewQuestionPage({ params }: NewQuestionPageProps) {
   const { locale } = await params
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.questions' })
   const auth = await enforcePageAuth({
     roleCheck: canCreateQuestions,
     locale,
     returnPath: routes.questions.new,
-    forbiddenTitle: t('createForbiddenTitle'),
-    forbiddenDescription: t('createForbiddenDescription'),
-    errorTitle: t('createUnavailableTitle'),
+    gateNamespace: 'toast.pageGate.questions',
+    forbiddenTitleKey: 'createForbiddenTitle',
+    forbiddenDescriptionKey: 'createForbiddenDescription',
+    errorTitleKey: 'createUnavailableTitle',
     backHref: ERROR_BACK_HREF,
     backLabelKey: 'backToQuestionLibrary',
   })

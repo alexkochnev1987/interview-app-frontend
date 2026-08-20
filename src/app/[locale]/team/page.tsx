@@ -16,15 +16,17 @@ interface TeamPageProps {
 
 export default async function TeamPage({ params }: TeamPageProps) {
   const { locale } = await params
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.team' })
-  const auth = await enforcePageAuth({
-    roleCheck: canManageTeam,
-    locale,
-    returnPath: '/team',
-    gateNamespace: 'toast.pageGate.team',
-    backHref: '/',
-    backLabelKey: 'backToDashboard',
-  })
+  const [t, auth] = await Promise.all([
+    getTranslations({ locale, namespace: 'toast.pageGate.team' }),
+    enforcePageAuth({
+      roleCheck: canManageTeam,
+      locale,
+      returnPath: '/team',
+      gateNamespace: 'toast.pageGate.team',
+      backHref: '/',
+      backLabelKey: 'backToDashboard',
+    }),
+  ])
   if (!auth.authorized) return auth.fallback
 
   let members: TeamMember[] = []

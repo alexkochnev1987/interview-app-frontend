@@ -19,16 +19,18 @@ interface EditTemplatePageProps {
 
 export default async function EditTemplatePage({ params }: EditTemplatePageProps) {
   const { locale, id } = await params
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.templates' })
-  const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
-  const auth = await enforcePageAuth({
-    roleCheck: canConfigureInterview,
-    locale,
-    returnPath: routes.templates.detail(id),
-    gateNamespace: 'toast.pageGate.templates',
-    backHref: ERROR_BACK_HREF,
-    backLabelKey: 'backToTemplates',
-  })
+  const [t, tFallback, auth] = await Promise.all([
+    getTranslations({ locale, namespace: 'toast.pageGate.templates' }),
+    getTranslations({ locale, namespace: 'shared.fallback' }),
+    enforcePageAuth({
+      roleCheck: canConfigureInterview,
+      locale,
+      returnPath: routes.templates.detail(id),
+      gateNamespace: 'toast.pageGate.templates',
+      backHref: ERROR_BACK_HREF,
+      backLabelKey: 'backToTemplates',
+    }),
+  ])
   if (!auth.authorized) return auth.fallback
 
   let initialPrefetch

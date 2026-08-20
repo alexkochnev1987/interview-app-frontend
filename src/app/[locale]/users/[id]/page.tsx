@@ -17,16 +17,17 @@ interface UserProfilePageProps {
 
 export default async function UserProfilePage({ params }: UserProfilePageProps) {
   const { locale, id } = await params
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.profile' })
   const returnPath = `/users/${id}`
-
-  const auth = await enforcePageAuth({
-    roleCheck: () => true,
-    locale,
-    returnPath,
-    gateNamespace: 'toast.pageGate.profile',
-    backHref: '/',
-  })
+  const [t, auth] = await Promise.all([
+    getTranslations({ locale, namespace: 'toast.pageGate.profile' }),
+    enforcePageAuth({
+      roleCheck: () => true,
+      locale,
+      returnPath,
+      gateNamespace: 'toast.pageGate.profile',
+      backHref: '/',
+    }),
+  ])
   if (!auth.authorized) return auth.fallback
 
   let user: TeamMember | null = null
