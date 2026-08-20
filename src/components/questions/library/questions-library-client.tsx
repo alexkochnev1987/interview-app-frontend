@@ -13,7 +13,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { BulkDeleteResultAlerts } from '@/components/questions/library/bulk-delete-result-alerts'
-import { InfiniteCardsLoader } from '@/components/questions/library/infinite-cards-loader'
+import { QuestionsInfiniteCardsLoader } from '@/components/questions/library/infinite-cards-loader'
 import { QuestionCard } from '@/components/questions/library/question-card'
 import { QuestionTable } from '@/components/questions/library/question-table'
 import { QuestionsLibraryHeader } from '@/components/questions/library/questions-library-header'
@@ -361,7 +361,7 @@ export function QuestionsLibraryClient({
       ) : null}
 
       {isCardsView && view.items.length > 0 ? (
-        <InfiniteCardsLoader
+        <QuestionsInfiniteCardsLoader
           hasNextPage={infinite.hasNextPage}
           isFetchingNextPage={infinite.isFetchingNextPage}
           totalLoaded={infinite.items.length}

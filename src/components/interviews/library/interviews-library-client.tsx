@@ -39,7 +39,7 @@ import { useInterviewFacets } from '../hooks/use-interview-facets'
 import { useInterviewsInfinite } from '../hooks/use-interviews-infinite'
 import { useInterviewsQuery } from '../hooks/use-interviews-query'
 import { buildActiveInterviewFilterChips } from '../picker/build-active-chips'
-import { InfiniteCardsLoader } from './infinite-cards-loader'
+import { InterviewsInfiniteCardsLoader } from './infinite-cards-loader'
 import { InterviewCard } from './interview-card'
 import { InterviewTable } from './interview-table'
 
@@ -253,7 +253,7 @@ export function InterviewsLibraryClient({ initialPrefetch }: InterviewsLibraryCl
       ) : null}
 
       {isCardsView && view.items.length > 0 ? (
-        <InfiniteCardsLoader
+        <InterviewsInfiniteCardsLoader
           hasNextPage={infinite.hasNextPage}
           isFetchingNextPage={infinite.isFetchingNextPage}
           totalLoaded={infinite.items.length}

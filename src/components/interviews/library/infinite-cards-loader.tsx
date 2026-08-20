@@ -7,12 +7,12 @@ import {
   type InfiniteCardsLoaderProps as UiInfiniteCardsLoaderProps,
 } from '@/components/ui/infinite-cards-loader'
 
-export type InfiniteCardsLoaderProps = Omit<UiInfiniteCardsLoaderProps, 'labels'> & {
+export type InterviewsInfiniteCardsLoaderProps = Omit<UiInfiniteCardsLoaderProps, 'labels'> & {
   totalLoaded: number
   total: number
 }
 
-export function InfiniteCardsLoader(props: InfiniteCardsLoaderProps) {
+export function InterviewsInfiniteCardsLoader(props: InterviewsInfiniteCardsLoaderProps) {
   const t = useTranslations('interviews.library.infinite')
   const tFeed = useTranslations('interviews.library.feed')
 
