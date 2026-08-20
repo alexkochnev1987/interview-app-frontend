@@ -210,7 +210,11 @@ function TakeInterviewClientInner({
 
   if (stage === 'complete') {
     return wrapTakeStage(
-      <TakeCompleteScreen candidateName={interview.candidateName} position={interview.position} />,
+      <TakeCompleteScreen
+        candidateName={interview.candidateName}
+        position={interview.position}
+        showHomeLink={!candidateToken}
+      />,
     )
   }
 
