@@ -172,6 +172,12 @@ export async function enforcePageAuth(
       errorDescription || `${tCommon('sessionVerificationFailed')} ${auth.message}`
 
     let resolvedBackLabel = backLabel
+    if (!resolvedBackLabel && gateNamespace) {
+      const tGate = await getTranslations({ locale, namespace: gateNamespace })
+      resolvedBackLabel =
+        getTranslationString(tGate, 'signInActionLabel') ??
+        getTranslationString(tGate, 'actionLabel')
+    }
     if (!resolvedBackLabel && backLabelKey) {
       const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
       resolvedBackLabel = getTranslationString(tFallback, backLabelKey)

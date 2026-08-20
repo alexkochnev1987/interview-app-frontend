@@ -34,6 +34,7 @@ export default async function DashboardPage({ params, searchParams }: DashboardP
     returnPath: '/',
     gateNamespace: 'toast.pageGate.dashboard',
     backHref: ERROR_SIGN_IN_HREF,
+    backLabel: t('signInActionLabel'),
   })
   if (!auth.authorized) return auth.fallback
 

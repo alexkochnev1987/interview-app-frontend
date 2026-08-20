@@ -27,6 +27,16 @@ export type UseInfiniteResourceResult<TItem> = {
   refetch: () => void
 }
 
+export function getNextInfinitePageParam<TItem, TPage extends { items?: TItem[]; total: number }>(
+  lastPage: TPage | undefined,
+  allPages: TPage[],
+): number | undefined {
+  const loaded = allPages.reduce((sum, p) => sum + (p.items?.length ?? 0), 0)
+  const total = lastPage?.total ?? 0
+  if (loaded >= total || !lastPage?.items?.length) return undefined
+  return allPages.length + 1
+}
+
 export function useInfiniteResource<TItem, TPage extends { items?: TItem[]; total: number }>({
   queryKey,
   queryFn,
@@ -38,12 +48,7 @@ export function useInfiniteResource<TItem, TPage extends { items?: TItem[]; tota
     queryKey,
     queryFn: ({ pageParam, signal }) => queryFn({ pageParam, signal }),
     initialPageParam: 1,
-    getNextPageParam: (lastPage, allPages) => {
-      const loaded = allPages.reduce((sum, p) => sum + (p.items?.length ?? 0), 0)
-      const total = lastPage?.total ?? 0
-      if (loaded >= total) return undefined
-      return allPages.length + 1
-    },
+    getNextPageParam: getNextInfinitePageParam,
     enabled,
     placeholderData: keepPreviousData,
   })
