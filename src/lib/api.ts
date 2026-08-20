@@ -169,6 +169,9 @@ export type InterviewDeleteResponse = Schemas['InterviewDeleteResponseDto']
 
 export type InterviewListItem = Schemas['InterviewListItemDto']
 export type PaginatedInterviews = Schemas['PaginatedInterviewsResponseDto']
+
+export type CandidatePortalInterviewListItem = Schemas['CandidatePortalInterviewListItemDto']
+export type CandidatePortalInterviewResults = Schemas['CandidatePortalInterviewResultsResponseDto']
 export type InterviewFacetsResponse = Schemas['InterviewFacetsResponseDto']
 export type InterviewFacetCount = Schemas['InterviewFacetCountDto']
 export type FetchInterviewsParams = NonNullable<paths['/interviews']['get']['parameters']['query']>
@@ -396,6 +399,22 @@ export async function fetchHrUsers(init?: { signal?: AbortSignal }): Promise<Ass
   }
 
   return hrUsers
+}
+
+export type CandidateSummary = Schemas['CandidateSummaryResponseDto']
+
+/** Minimal id/name/email lookup for the candidate-name typeahead on interview forms. */
+export async function fetchCandidates(
+  params?: { q?: string; limit?: number },
+  init?: { signal?: AbortSignal },
+): Promise<CandidateSummary[]> {
+  return handle(
+    client.GET('/users/candidates', {
+      ...LOCALIZED_HEADERS,
+      params: { query: { limit: 10, ...params } },
+      signal: init?.signal,
+    }),
+  )
 }
 
 export async function updateUserRole(
