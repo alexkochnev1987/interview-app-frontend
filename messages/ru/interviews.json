@@ -19,6 +19,7 @@
       },
       "assignedHrUnassigned": "Не назначен",
       "assignedHrAssigned": "Назначен: {name}",
+      "candidateEmailNotSet": "Email кандидата не указан — он не увидит это в своём портале",
       "demoTryCandidateExperience": "Попробовать как кандидат"
     },
     "library": {
@@ -137,6 +138,7 @@
       "title": "Редактирование интервью",
       "candidateName": "Имя кандидата",
       "candidateEmail": "Email кандидата",
+      "candidateEmailHint": "Необязательно. Связывает это интервью с аккаунтом кандидата в портале, чтобы он мог найти его после входа.",
       "position": "Должность",
       "questionsTitle": "Вопросы",
       "answersBlockEditNotice": "Редактирование отключено после загрузки ответов, так как ответы привязаны к порядку вопросов.",

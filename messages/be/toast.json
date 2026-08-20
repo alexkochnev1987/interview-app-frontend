@@ -110,6 +110,7 @@
         "notFoundFallback": "Запытанае інтэрв’ю не ўдалося загрузіць.",
         "setupBlockedTitle": "Наладжванне інтэрв’ю заблакіравана",
         "candidateNameRequired": "Укажыце імя кандыдата.",
+        "candidateEmailInvalid": "Увядзіце сапраўдны адрас электроннай пошты або пакіньце поле пустым.",
         "positionRequired": "Укажыце пазіцыю.",
         "questionsRequired": "Выберыце хаця б адно пытанне.",
         "creatingLabel": "Стварэнне..."

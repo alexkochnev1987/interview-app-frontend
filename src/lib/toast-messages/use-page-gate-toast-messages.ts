@@ -13,6 +13,7 @@ export function usePageGateToastMessages() {
     interview: {
       setupBlockedTitle: t('pageGate.interview.setupBlockedTitle'),
       candidateNameRequired: t('pageGate.interview.candidateNameRequired'),
+      candidateEmailInvalid: t('pageGate.interview.candidateEmailInvalid'),
       positionRequired: t('pageGate.interview.positionRequired'),
       questionsRequired: t('pageGate.interview.questionsRequired'),
       creatingLabel: t('pageGate.interview.creatingLabel'),
