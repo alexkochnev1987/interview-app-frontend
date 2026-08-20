@@ -24,6 +24,7 @@ import {
   type QuestionView,
   type QuestionsQueryState,
 } from '@/lib/questions-query-state'
+import { splitListQueryErrors } from '@/lib/split-query-errors'
 import {
   usePageClamp,
   useSearchDebounce,
@@ -34,7 +35,6 @@ import { useToastMessages } from '@/lib/use-toast-messages'
 
 import { isPlaceholderLoading, useVoidCallback } from './query-hook-helpers'
 import { questionsListQueryKey } from './query-keys'
-import { splitListQueryErrors } from './split-questions-query-errors'
 
 const VIEW_STORAGE_KEY = 'questions:view'
 

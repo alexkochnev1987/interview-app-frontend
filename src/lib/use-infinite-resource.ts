@@ -3,8 +3,8 @@
 import { keepPreviousData, useInfiniteQuery, type QueryKey } from '@tanstack/react-query'
 import { useCallback, useMemo } from 'react'
 
-import { splitInfiniteQueryErrors } from '@/components/questions/picker/split-questions-query-errors'
 import { getErrorMessage } from '@/lib/api-error'
+import { splitInfiniteQueryErrors } from '@/lib/split-query-errors'
 
 export type UseInfiniteResourceOptions<TItem, TPage extends { items?: TItem[]; total: number }> = {
   queryKey: QueryKey
@@ -39,9 +39,9 @@ export function useInfiniteResource<TItem, TPage extends { items?: TItem[]; tota
     queryFn: ({ pageParam, signal }) => queryFn({ pageParam, signal }),
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {
-      if (!lastPage?.items?.length) return undefined
       const loaded = allPages.reduce((sum, p) => sum + (p.items?.length ?? 0), 0)
-      if (loaded >= lastPage.total) return undefined
+      const total = lastPage?.total ?? 0
+      if (loaded >= total) return undefined
       return allPages.length + 1
     },
     enabled,

@@ -1,13 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
   "entry": ["scripts/*.mjs", "e2e/**/*.{ts,mjs}"],
-  "ignorePatterns": ["**/*.generated.*", "openapi/**", "src/lib/api-types.ts", "src/lib/api.ts"],
+  "ignorePatterns": ["**/*.generated.*", "openapi/**", "src/lib/api-types.ts"],
   "ignoreDependencies": ["@swc/helpers", "tailwindcss", "tailwindcss-animate"],
   "ignoreExports": [
-    {
-      "file": "src/components/ui/**",
-      "exports": ["*"]
-    },
     {
       "file": "src/i18n/navigation.ts",
       "exports": ["*"]

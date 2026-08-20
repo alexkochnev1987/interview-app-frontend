@@ -8,7 +8,6 @@ import {
   isPlaceholderLoading,
   useVoidCallback,
 } from '@/components/questions/picker/query-hook-helpers'
-import { splitListQueryErrors } from '@/components/questions/picker/split-questions-query-errors'
 import {
   fetchInterviews,
   type InterviewListItem,
@@ -28,6 +27,7 @@ import {
   type InterviewView,
   readInterviewsFromSearchParams,
 } from '@/lib/interviews-query-state'
+import { splitListQueryErrors } from '@/lib/split-query-errors'
 import {
   usePageClamp,
   useSearchDebounce,
