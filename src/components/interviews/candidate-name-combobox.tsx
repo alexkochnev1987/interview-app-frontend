@@ -114,6 +114,9 @@ export function CandidateNameCombobox({
             aria-expanded={open}
             aria-autocomplete="list"
             aria-controls={listboxId}
+            aria-activedescendant={
+              open && candidates.length > 0 ? `${listboxId}-option-${highlightedIndex}` : undefined
+            }
             disabled={disabled}
           />
         </IconAffix>
@@ -133,6 +136,7 @@ export function CandidateNameCombobox({
           candidates.map((candidate, index) => (
             <ComboboxPopoverItem
               key={candidate.id}
+              id={`${listboxId}-option-${index}`}
               // eslint-disable-next-line jsx-a11y/prefer-tag-over-role -- paired with the listbox above; not a native <option>
               role="option"
               aria-selected={index === highlightedIndex}
