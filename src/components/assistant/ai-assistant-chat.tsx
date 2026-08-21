@@ -5,7 +5,9 @@ import { useTranslations } from 'next-intl'
 import { type KeyboardEvent, useEffect, useRef, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
-import { ChatComposerBar, ChatMessageViewport, ChatReplyAnnouncer } from '@/components/ui/chat'
+import { ChatComposerBar } from '@/components/ui/chat/chat-composer-bar'
+import { ChatMessageViewport } from '@/components/ui/chat/chat-message-viewport'
+import { ChatReplyAnnouncer } from '@/components/ui/chat/chat-reply-announcer'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText } from '@/components/ui/text'
@@ -56,6 +58,7 @@ export function AiAssistantChat() {
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+    // oxlint-disable-next-line react/exhaustive-effect-dependencies
   }, [messages, loading])
 
   useEffect(() => {

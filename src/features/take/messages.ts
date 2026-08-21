@@ -139,7 +139,6 @@ export const TAKE_MESSAGES = {
 } as const
 
 export type TakeMessageKey = keyof typeof TAKE_MESSAGES
-export type TakeMessages = Record<TakeMessageKey, string>
 export type TakeMessageValues = Record<string, string | number | Date>
 export type TakeMessageGetter = (key: TakeMessageKey, values?: TakeMessageValues) => string
 

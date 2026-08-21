@@ -417,6 +417,7 @@ export function useTakeVersionPersistence({
       setSubmitError,
       setActionErrorKind,
       setStage,
+      // oxlint-disable-next-line react/memo-dependencies
       setVersionPersistKind,
       setCurrentVersionNumber,
       setRetakeCount,

@@ -7,11 +7,7 @@ import type { Locale } from '@/i18n/locales'
 import { routes } from '@/i18n/routes'
 import { type Interview } from '@/lib/api'
 import { isApiError } from '@/lib/api-error'
-import {
-  loadAuthGate,
-  redirectIfUnauthenticated,
-  redirectIfUnauthorizedError,
-} from '@/lib/auth-gate'
+import { enforcePageAuth, redirectIfUnauthorizedError } from '@/lib/auth-gate'
 import { canConfigureInterview } from '@/lib/auth-roles'
 import {
   candidateFeedbackPath,
@@ -29,34 +25,24 @@ interface CandidateFeedbackPageProps {
 
 export default async function CandidateFeedbackPage({ params }: CandidateFeedbackPageProps) {
   const { id, locale } = await params
-  const t = await getTranslations({
-    locale,
-    namespace: 'toast.pageGate.candidateFeedback',
-  })
-  const tCommon = await getTranslations({ locale, namespace: 'common' })
-  const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
-
   const returnPath = candidateFeedbackPath(id)
   const backHref = routes.interviews.detail(id)
-  const auth = await loadAuthGate(canConfigureInterview, locale)
-  redirectIfUnauthenticated(auth, returnPath, locale)
-
-  if (auth.kind === 'forbidden') {
-    return (
-      <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
-    )
-  }
-
-  if (auth.kind === 'error') {
-    return (
-      <FlashErrorPageFallback
-        title={t('unavailableTitle')}
-        description={`${tCommon('sessionVerificationFailed')} ${auth.message}`}
-        backHref={backHref}
-        backLabel={tFallback('backToInterview')}
-      />
-    )
-  }
+  const [t, tFallback, auth] = await Promise.all([
+    getTranslations({
+      locale,
+      namespace: 'toast.pageGate.candidateFeedback',
+    }),
+    getTranslations({ locale, namespace: 'shared.fallback' }),
+    enforcePageAuth({
+      roleCheck: canConfigureInterview,
+      locale,
+      returnPath,
+      gateNamespace: 'toast.pageGate.candidateFeedback',
+      backHref,
+      backLabelKey: 'backToInterview',
+    }),
+  ])
+  if (!auth.authorized) return auth.fallback
 
   const encodedId = encodeURIComponent(id)
   let interview: Interview | null = null

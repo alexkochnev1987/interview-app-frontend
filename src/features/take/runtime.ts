@@ -1,8 +1,8 @@
-import type { ClientTranscriptPayload } from '@/lib/api'
+import type { CaptureTarget, ClientTranscriptPayload } from '@/lib/api'
 
 import type { TakeBehaviorSignals } from './utils'
 
-export type CaptureTarget = 'camera' | 'screen'
+export type { CaptureTarget }
 
 export interface AnswerBehaviorEvent {
   eventType: 'tab_hidden' | 'window_blur' | 'copy' | 'paste' | 'keydown' | 'resize'

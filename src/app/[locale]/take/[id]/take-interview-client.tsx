@@ -5,28 +5,26 @@ import { useLocale, useTranslations } from 'next-intl'
 import { useCallback, useLayoutEffect, useState, type ReactNode } from 'react'
 
 import { PageContent, PageMainLayout, PageMainViewport } from '@/components/layout/page-shell'
-import {
-  TakeCompleteScreen,
-  TakeConsentScreen,
-  TakeLobbyScreen,
-  TakeRecordingScreen,
-} from '@/components/take'
+import { TakeConsentScreen } from '@/components/take/consent/consent-screen'
+import { TakeLobbyScreen } from '@/components/take/lobby/lobby-screen'
+import { TakeCompleteScreen } from '@/components/take/recording/recording-complete-screen'
+import { TakeRecordingScreen } from '@/components/take/recording/recording-screen'
 import { Icon } from '@/components/ui/icon'
-import { Stack } from '@/components/ui/layout'
+import { Stack } from '@/components/ui/layout/stack'
 import { EmptyStateCard, LoadingStateCard } from '@/components/ui/state-card'
 import {
   TAKE_MESSAGES,
   type TakeMessageKey,
   type TakeMessageValues,
-  useTakeInterviewBeforeUnload,
-  useTakeOrchestrator,
-} from '@/features/take'
+} from '@/features/take/messages'
 import { resolveQuestionAnswerPhase } from '@/features/take/session-machine'
 import {
   TakeFlowLocaleProvider,
   resolveTakeInterviewLocale,
 } from '@/features/take/take-flow-locale-provider'
 import { TakeMediaProvider } from '@/features/take/take-media-context'
+import { useTakeInterviewBeforeUnload } from '@/features/take/use-take-interview-before-unload'
+import { useTakeOrchestrator } from '@/features/take/use-take-orchestrator'
 import type { Locale } from '@/i18n/locales'
 import type { TakeInterviewData } from '@/lib/api'
 

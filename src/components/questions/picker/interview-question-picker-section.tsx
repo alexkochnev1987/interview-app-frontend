@@ -4,7 +4,7 @@ import { SlidersHorizontal } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
-import { InfiniteCardsLoader } from '@/components/questions/library/infinite-cards-loader'
+import { QuestionsInfiniteCardsLoader } from '@/components/questions/library/infinite-cards-loader'
 import { QuestionCard } from '@/components/questions/library/question-card'
 import { QuestionTable } from '@/components/questions/library/question-table'
 import { Button } from '@/components/ui/button'
@@ -256,7 +256,7 @@ export function InterviewQuestionPickerMain({
         ) : null}
 
         {isCardsView && view.items.length > 0 ? (
-          <InfiniteCardsLoader
+          <QuestionsInfiniteCardsLoader
             hasNextPage={infinite.hasNextPage}
             isFetchingNextPage={infinite.isFetchingNextPage}
             totalLoaded={infinite.items.length}

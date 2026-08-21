@@ -10,8 +10,9 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Inline, Stack } from '@/components/ui/layout'
-import { MicLevelMeter } from '@/components/ui/take'
+import { Inline } from '@/components/ui/layout/inline'
+import { Stack } from '@/components/ui/layout/stack'
+import { MicLevelMeter } from '@/components/ui/take/mic-level-meter'
 
 import { useMicTest } from './use-mic-test'
 

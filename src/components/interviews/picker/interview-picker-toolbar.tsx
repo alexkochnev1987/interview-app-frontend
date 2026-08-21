@@ -1,24 +1,20 @@
 'use client'
 
-import { X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { type ReactNode } from 'react'
+import { useMemo, type ReactNode } from 'react'
 
-import { Button } from '@/components/ui/button'
-import { Icon } from '@/components/ui/icon'
-import { Inline } from '@/components/ui/layout/inline'
-import { Stack } from '@/components/ui/layout/stack'
-import { SearchInput } from '@/components/ui/search-input'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { StatusPill } from '@/components/ui/status-pill'
+  FilterChipsRow,
+  PickerToolbarShell,
+  SortSelect,
+  type ActiveFilterChip,
+  type SortOption,
+} from '@/components/ui/picker-toolbar-shell'
+import { SearchInput } from '@/components/ui/search-input'
 import type { InterviewSortField, InterviewSortOrder } from '@/lib/api'
 import { MAX_INTERVIEWS_Q_LENGTH } from '@/lib/interviews-query-state'
+
+export type { ActiveFilterChip }
 
 const SORT_OPTIONS: Array<{
   value: `${InterviewSortField}:${InterviewSortOrder}`
@@ -31,12 +27,6 @@ const SORT_OPTIONS: Array<{
   { value: 'candidateName:asc', key: 'candidateName_asc' },
   { value: 'candidateName:desc', key: 'candidateName_desc' },
 ]
-
-export type ActiveFilterChip = {
-  key: string
-  label: string
-  onRemove: () => void
-}
 
 export type InterviewPickerToolbarProps = {
   q: string
@@ -67,87 +57,48 @@ export function InterviewPickerToolbar(props: InterviewPickerToolbarProps) {
   const tToolbar = useTranslations('interviews.library.toolbar')
   const tSort = useTranslations('interviews.library.sort')
 
-  const resultRow = (
-    <>
-      <StatusPill tone="neutral">
-        {loading ? '…' : tToolbar('resultCount', { count: resultCount })}
-      </StatusPill>
-      {activeChips.map((chip) => (
-        <StatusPill key={chip.key} tone="neutral" casing="chip">
-          <Inline gap={1} align="center">
-            <span>{chip.label}</span>
-            <Button
-              type="button"
-              variant="ghost"
-              shape="pill"
-              size="icon-xxs"
-              aria-label={tToolbar('removeChipAria', { label: chip.label })}
-              onClick={chip.onRemove}
-            >
-              <Icon size="xs">
-                <X />
-              </Icon>
-            </Button>
-          </Inline>
-        </StatusPill>
-      ))}
-    </>
-  )
-
-  const sortSelect = (
-    <Select
-      value={sortValue}
-      onValueChange={(value) => {
-        const [nextSortBy, nextSortOrder] = value.split(':') as [
-          InterviewSortField,
-          InterviewSortOrder,
-        ]
-        onSortChange(nextSortBy, nextSortOrder)
-      }}
-    >
-      <SelectTrigger variant="surface" size="md" shape="pill" width="auto-wide">
-        <SelectValue placeholder={tToolbar('sortLabel')} />
-      </SelectTrigger>
-      <SelectContent>
-        {SORT_OPTIONS.map((option) => (
-          <SelectItem key={option.value} value={option.value}>
-            {tSort(option.key)}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+  const sortOptions = useMemo<Array<SortOption<`${InterviewSortField}:${InterviewSortOrder}`>>>(
+    () =>
+      SORT_OPTIONS.map((option) => ({
+        value: option.value,
+        label: tSort(option.key),
+      })),
+    [tSort],
   )
 
   return (
-    <Stack gap={3}>
-      <SearchInput
-        value={q}
-        maxLength={MAX_INTERVIEWS_Q_LENGTH}
-        onChange={(event) => onQChange(event.target.value)}
-        placeholder={tToolbar('searchPlaceholder')}
-      />
-
-      <Inline gap={3} align="center" justify="between" wrap="wrap" visibility="lg-up">
-        <Inline gap={2} align="center" wrap="wrap">
-          {resultRow}
-        </Inline>
-        <Inline gap={2} align="center" wrap="wrap">
-          {viewToggle}
-          {sortSelect}
-        </Inline>
-      </Inline>
-
-      <Stack gap={2} visibility="below-lg">
-        <Inline gap={2} align="center" wrap="wrap">
-          {viewToggle}
-        </Inline>
-        <Inline gap={2} align="center" justify="between" wrap="wrap">
-          <Inline gap={2} align="center" wrap="wrap">
-            {resultRow}
-          </Inline>
-          {sortSelect}
-        </Inline>
-      </Stack>
-    </Stack>
+    <PickerToolbarShell
+      desktopLayout="split"
+      searchInput={
+        <SearchInput
+          value={q}
+          maxLength={MAX_INTERVIEWS_Q_LENGTH}
+          onChange={(event) => onQChange(event.target.value)}
+          placeholder={tToolbar('searchPlaceholder')}
+        />
+      }
+      chipsRow={
+        <FilterChipsRow
+          resultCountText={loading ? '…' : tToolbar('resultCount', { count: resultCount })}
+          chips={activeChips}
+          removeChipAriaLabel={(label) => tToolbar('removeChipAria', { label })}
+        />
+      }
+      sortSelect={
+        <SortSelect
+          value={sortValue}
+          onValueChange={(val) => {
+            const [nextSortBy, nextSortOrder] = val.split(':') as [
+              InterviewSortField,
+              InterviewSortOrder,
+            ]
+            onSortChange(nextSortBy, nextSortOrder)
+          }}
+          options={sortOptions}
+          placeholder={tToolbar('sortLabel')}
+        />
+      }
+      viewToggle={viewToggle}
+    />
   )
 }

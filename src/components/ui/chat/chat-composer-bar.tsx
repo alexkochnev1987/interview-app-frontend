@@ -7,7 +7,7 @@ const chatComposerBarVariants = cva('p-3', {
   variants: {
     tone: {
       default: 'border-t border-border/60 bg-transparent',
-      widget: 'border-t-2 border-[hsl(var(--primary)/0.28)] bg-card',
+      widget: 'border-t-2 border-primary/30 bg-card',
     },
   },
   defaultVariants: {

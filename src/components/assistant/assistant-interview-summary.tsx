@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl'
 
-import { ChatResultCard } from '@/components/ui/chat'
+import { ChatResultCard } from '@/components/ui/chat/chat-result-card'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { SafeExternalLink } from '@/components/ui/safe-external-link'

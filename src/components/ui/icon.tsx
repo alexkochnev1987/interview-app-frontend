@@ -14,7 +14,7 @@ const iconVariants = cva('shrink-0', {
     },
     tone: {
       inherit: '',
-      primary: 'text-[hsl(var(--primary))]',
+      primary: 'text-primary',
     },
   },
   defaultVariants: {

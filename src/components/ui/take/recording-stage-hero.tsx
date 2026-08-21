@@ -3,7 +3,8 @@
 import { Sparkles, UserRound } from 'lucide-react'
 import type { ReactNode, RefObject } from 'react'
 
-import { Inline, Stack } from '@/components/ui/layout'
+import { Inline } from '@/components/ui/layout/inline'
+import { Stack } from '@/components/ui/layout/stack'
 import { Panel } from '@/components/ui/panel'
 import { BodyText, Text } from '@/components/ui/text'
 import { cn } from '@/lib/utils'
@@ -34,16 +35,12 @@ function AiInterviewerLabelBadge() {
       wrap="nowrap"
       className={cn(
         RECORDING_TOOLBAR_PILL_ROW,
-        'rounded-full border border-[hsl(var(--primary-container)/0.18)] bg-[hsl(var(--primary-container)/0.3)]',
+        'rounded-full border border-primary-container/20 bg-primary-container/30',
         'px-2.5 py-0 text-primary',
-        'shadow-soft ring-1 ring-[hsl(var(--primary-container)/0.06)]',
+        'shadow-soft ring-1 ring-primary-container/10',
       )}
     >
-      <Sparkles
-        className="size-2.5 shrink-0 text-[hsl(var(--primary-container))]"
-        strokeWidth={2}
-        aria-hidden
-      />
+      <Sparkles className="size-2.5 shrink-0 text-primary-container" strokeWidth={2} aria-hidden />
       <Text as="span" variant="toolbarEyebrow">
         AI interviewer
       </Text>
@@ -52,11 +49,11 @@ function AiInterviewerLabelBadge() {
 }
 
 function AiInterviewerOrbRing({
-  sizeClassName,
+  sizePercent,
   animationDelayS,
   presence,
 }: {
-  sizeClassName: string
+  sizePercent: number
   animationDelayS: number
   presence: RecordingAiPresence
 }) {
@@ -64,19 +61,16 @@ function AiInterviewerOrbRing({
 
   return (
     <span
-      className={cn(
-        'pointer-events-none absolute left-1/2 top-1/2 aspect-square -translate-x-1/2 -translate-y-1/2',
-        sizeClassName,
-      )}
+      className="pointer-events-none absolute left-1/2 top-1/2 aspect-square -translate-x-1/2 -translate-y-1/2"
+      style={{ width: `${sizePercent}%`, height: `${sizePercent}%` }}
       aria-hidden
     >
       <span
         className={cn(
-          'block size-full rounded-full border-solid border-[hsl(var(--primary-container)/0.42)] shadow-none origin-center',
-          'border-[1.5px] lg:border-2',
+          'block size-full rounded-full border-solid border-primary-container/40 border-2 shadow-none origin-center',
           isAnimating
-            ? 'will-change-[opacity,transform] animate-ai-orb-ring-speaking'
-            : 'opacity-[0.48] scale-100',
+            ? 'will-change-transform animate-ai-orb-ring-speaking'
+            : 'opacity-50 scale-100',
         )}
         style={isAnimating ? { animationDelay: `${animationDelayS}s` } : undefined}
       />
@@ -89,37 +83,30 @@ function AiInterviewerAvatarPlaceholder({ presence }: { presence: RecordingAiPre
     <Inline
       justify="center"
       align="center"
-      className={cn(
-        'pointer-events-none relative mx-auto aspect-square shrink-0',
-        'w-[min(9.5rem,min(48vw,168px))] max-w-[min(82vw,9.5rem)]',
-        'lg:w-[min(16rem,min(72vw,260px))] lg:max-w-[min(90vw,16rem)]',
-      )}
+      className="pointer-events-none relative mx-auto aspect-square shrink-0"
+      style={{
+        width: 'clamp(9.5rem, 48vw, 16rem)',
+        maxWidth: '90vw',
+      }}
       aria-hidden
     >
-      <AiInterviewerOrbRing
-        presence={presence}
-        sizeClassName="max-lg:h-[108%] max-lg:w-[108%] lg:h-[126%] lg:w-[126%]"
-        animationDelayS={0}
-      />
-      <AiInterviewerOrbRing
-        presence={presence}
-        sizeClassName="max-lg:h-[92%] max-lg:w-[92%] lg:h-[104%] lg:w-[104%]"
-        animationDelayS={0.45}
-      />
+      <AiInterviewerOrbRing presence={presence} sizePercent={120} animationDelayS={0} />
+      <AiInterviewerOrbRing presence={presence} sizePercent={100} animationDelayS={0.45} />
 
       <Inline
         align="center"
         justify="center"
         wrap="nowrap"
-        className={cn(
-          'relative z-10 aspect-square max-w-[88%]',
-          'size-[clamp(5rem,min(24vmin,34%),7rem)] lg:size-[clamp(8.75rem,min(40vmin,52%),11.5rem)]',
-          'rounded-full',
-          'shadow-[inset_0_0_0_2px_hsl(var(--primary-container)/0.32)]',
-        )}
+        className="relative z-10 aspect-square max-w-[88%] rounded-full ring-2 ring-primary-container/30"
+        style={{
+          width: 'clamp(5rem, 24vmin, 11.5rem)',
+          height: 'clamp(5rem, 24vmin, 11.5rem)',
+          boxShadow: 'inset 0 0 0 2px var(--color-primary-container)',
+        }}
       >
         <UserRound
-          className="size-[40%] lg:size-[48%] text-[hsl(var(--primary))]"
+          className="text-primary"
+          style={{ width: '45%', height: '45%' }}
           strokeWidth={1.65}
           aria-hidden
         />
@@ -209,7 +196,7 @@ function RecordingTimerBadge({ timeLabel }: RecordingTimerBadgeProps) {
         aria-hidden
         size="xs"
         weight="semibold"
-        className={cn('leading-none text-destructive', 'animate-[blink_1s_steps(1,end)_infinite]')}
+        className="leading-none text-destructive animate-pulse"
       >
         ●
       </BodyText>

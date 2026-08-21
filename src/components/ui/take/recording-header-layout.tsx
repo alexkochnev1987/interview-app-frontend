@@ -3,7 +3,8 @@
 import { Clock, Layers, Loader2 } from 'lucide-react'
 import { Children, type ReactNode } from 'react'
 
-import { Inline, Stack } from '@/components/ui/layout'
+import { Inline } from '@/components/ui/layout/inline'
+import { Stack } from '@/components/ui/layout/stack'
 import { BodyText, Text } from '@/components/ui/text'
 import { cn } from '@/lib/utils'
 

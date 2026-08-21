@@ -1,11 +1,7 @@
-import { getTranslations } from 'next-intl/server'
-
 import { QuestionNewClient } from '@/components/questions/new/question-new-client'
-import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
-import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import type { Locale } from '@/i18n/locales'
 import { routes } from '@/i18n/routes'
-import { loadAuthGate, redirectIfUnauthenticated } from '@/lib/auth-gate'
+import { enforcePageAuth } from '@/lib/auth-gate'
 import { canCreateQuestions } from '@/lib/auth-roles'
 
 const ERROR_BACK_HREF = routes.questions.list
@@ -16,29 +12,18 @@ interface NewQuestionPageProps {
 
 export default async function NewQuestionPage({ params }: NewQuestionPageProps) {
   const { locale } = await params
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.questions' })
-  const tCommon = await getTranslations({ locale, namespace: 'common' })
-  const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
-  const auth = await loadAuthGate(canCreateQuestions, locale)
-  redirectIfUnauthenticated(auth, routes.questions.new, locale)
-  if (auth.kind === 'forbidden') {
-    return (
-      <ForbiddenAccessPage
-        title={t('createForbiddenTitle')}
-        description={t('createForbiddenDescription')}
-      />
-    )
-  }
-  if (auth.kind === 'error') {
-    return (
-      <FlashErrorPageFallback
-        title={t('createUnavailableTitle')}
-        description={`${tCommon('sessionVerificationFailed')} ${auth.message}`}
-        backHref={ERROR_BACK_HREF}
-        backLabel={tFallback('backToQuestionLibrary')}
-      />
-    )
-  }
+  const auth = await enforcePageAuth({
+    roleCheck: canCreateQuestions,
+    locale,
+    returnPath: routes.questions.new,
+    gateNamespace: 'toast.pageGate.questions',
+    forbiddenTitleKey: 'createForbiddenTitle',
+    forbiddenDescriptionKey: 'createForbiddenDescription',
+    errorTitleKey: 'createUnavailableTitle',
+    backHref: ERROR_BACK_HREF,
+    backLabelKey: 'backToQuestionLibrary',
+  })
+  if (!auth.authorized) return auth.fallback
 
   return <QuestionNewClient />
 }

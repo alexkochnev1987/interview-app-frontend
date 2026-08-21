@@ -1,4 +1,4 @@
-export type SplitQuestionsQueryErrors = {
+export type SplitQueryErrors = {
   blockingError: string | null
   paginationError: string | null
 }
@@ -7,7 +7,7 @@ export function splitListQueryErrors(
   errorMessage: string | null,
   visibleItemCount: number,
   isPlaceholderData: boolean,
-): SplitQuestionsQueryErrors {
+): SplitQueryErrors {
   if (!errorMessage) {
     return { blockingError: null, paginationError: null }
   }
@@ -20,7 +20,7 @@ export function splitInfiniteQueryErrors(
   errorMessage: string | null,
   visibleItemCount: number,
   isPlaceholderData: boolean,
-): SplitQuestionsQueryErrors {
+): SplitQueryErrors {
   if (!errorMessage) {
     return { blockingError: null, paginationError: null }
   }

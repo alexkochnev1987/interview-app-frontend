@@ -3,7 +3,7 @@ import { useTranslations } from 'next-intl'
 import { TakeRecordingHeaderStatus } from '@/components/take/recording/recording-header-status'
 import type { InterviewDataView, TakeStage } from '@/components/take/types'
 import { Heading } from '@/components/ui/heading'
-import { Inline } from '@/components/ui/layout'
+import { Inline } from '@/components/ui/layout/inline'
 import { StatusPill } from '@/components/ui/status-pill'
 import {
   RecordingHeaderCluster,
@@ -11,10 +11,10 @@ import {
   RecordingHeaderRow,
   RecordingHeaderShell,
   RecordingHeaderTitleCluster,
-} from '@/components/ui/take'
+} from '@/components/ui/take/recording-header-layout'
 import { BodyText } from '@/components/ui/text'
-import { TAKE_RECORDING_LIMIT_SECONDS, formatRecordingLimitLabel } from '@/features/take'
 import type { VersionPersistKind } from '@/features/take/session-machine'
+import { TAKE_RECORDING_LIMIT_SECONDS, formatRecordingLimitLabel } from '@/features/take/utils'
 
 interface TakeRecordingHeaderProps {
   interview: InterviewDataView

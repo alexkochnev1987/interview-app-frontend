@@ -4,11 +4,7 @@ import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallbac
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import type { Locale } from '@/i18n/locales'
 import { type Interview, type InterviewResult } from '@/lib/api'
-import {
-  loadAuthGate,
-  redirectIfUnauthenticated,
-  redirectIfUnauthorizedError,
-} from '@/lib/auth-gate'
+import { enforcePageAuth, redirectIfUnauthorizedError } from '@/lib/auth-gate'
 import { canConfigureInterview } from '@/lib/auth-roles'
 import { canEditInterview } from '@/lib/interview-management'
 import { prefetchInterviewCreatePicker } from '@/lib/questions-library-prefetch'
@@ -26,25 +22,19 @@ interface InterviewDetailPageProps {
 
 export default async function InterviewDetailPage({ params }: InterviewDetailPageProps) {
   const { id, locale } = await params
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.interview' })
-  const tCommon = await getTranslations({ locale, namespace: 'common' })
-
   const returnPath = `/interviews/${encodeURIComponent(id)}`
-  const auth = await loadAuthGate(canConfigureInterview, locale)
-  redirectIfUnauthenticated(auth, returnPath, locale)
-  if (auth.kind === 'forbidden') {
-    return (
-      <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
-    )
-  }
-  if (auth.kind === 'error') {
-    return (
-      <FlashErrorPageFallback
-        title={t('unavailableTitle')}
-        description={`${tCommon('sessionVerificationFailed')} ${auth.message}`}
-      />
-    )
-  }
+  const [t, auth] = await Promise.all([
+    getTranslations({ locale, namespace: 'toast.pageGate.interview' }),
+    enforcePageAuth({
+      roleCheck: canConfigureInterview,
+      locale,
+      returnPath,
+      gateNamespace: 'toast.pageGate.interview',
+      backHref: '/interviews',
+      backLabelKey: 'backToInterviews',
+    }),
+  ])
+  if (!auth.authorized) return auth.fallback
 
   const encodedId = encodeURIComponent(id)
   let interview: Interview | null = null

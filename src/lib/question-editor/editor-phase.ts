@@ -3,7 +3,6 @@ import type { QuestionInput } from '@/lib/api'
 import { type ContentFieldKey } from '@/lib/question-editor/field-keys'
 import {
   coerceLocaleTranslation,
-  hasLocaleDraftContent,
   localeDraftFromInput,
   type QuestionContentBlock,
 } from '@/lib/question-editor/parsers'
@@ -51,20 +50,9 @@ export function resolveInitialEditorPhase(args: {
   return 1
 }
 
-export function hasPersistedPrimaryContent(input: QuestionInput, primaryLocale: Locale): boolean {
-  return isPrimaryContentComplete(coerceLocaleTranslation(input.translations?.[primaryLocale]))
-}
-
 export function shouldUnlockPhase2AfterSave(input: QuestionInput, primaryLocale: Locale): boolean {
   return (
     isPrimaryContentComplete(coerceLocaleTranslation(input.translations?.[primaryLocale])) ||
     isPrimaryContentComplete(localeDraftFromInput(input))
-  )
-}
-
-export function hasAnyTranslationLocale(input: QuestionInput, primaryLocale: Locale): boolean {
-  return Object.entries(input.translations ?? {}).some(
-    ([locale, block]) =>
-      locale !== primaryLocale && hasLocaleDraftContent(coerceLocaleTranslation(block)),
   )
 }

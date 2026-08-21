@@ -7,11 +7,7 @@ import { ProfileView } from '@/features/profile/profile-view'
 import type { Locale } from '@/i18n/locales'
 import { type TeamMember } from '@/lib/api'
 import { isApiError } from '@/lib/api-error'
-import {
-  loadAuthGate,
-  redirectIfUnauthenticated,
-  redirectIfUnauthorizedError,
-} from '@/lib/auth-gate'
+import { enforcePageAuth, redirectIfUnauthorizedError } from '@/lib/auth-gate'
 import { requestServer } from '@/lib/server-fetch'
 import { canViewUserProfile } from '@/lib/user-profile-access'
 
@@ -21,27 +17,18 @@ interface UserProfilePageProps {
 
 export default async function UserProfilePage({ params }: UserProfilePageProps) {
   const { locale, id } = await params
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.profile' })
-  const tCommon = await getTranslations({ locale, namespace: 'common' })
   const returnPath = `/users/${id}`
-
-  const auth = await loadAuthGate(() => true, locale)
-  redirectIfUnauthenticated(auth, returnPath, locale)
-
-  if (auth.kind === 'error') {
-    return (
-      <FlashErrorPageFallback title={tCommon('profileLoadFailed')} description={auth.message} />
-    )
-  }
-
-  if (auth.kind !== 'authorized') {
-    return (
-      <FlashErrorPageFallback
-        title={tCommon('profileLoadFailed')}
-        description={tCommon('sessionVerificationFailed')}
-      />
-    )
-  }
+  const [t, auth] = await Promise.all([
+    getTranslations({ locale, namespace: 'toast.pageGate.profile' }),
+    enforcePageAuth({
+      roleCheck: () => true,
+      locale,
+      returnPath,
+      gateNamespace: 'toast.pageGate.profile',
+      backHref: '/',
+    }),
+  ])
+  if (!auth.authorized) return auth.fallback
 
   let user: TeamMember | null = null
   let error: string | null = null

@@ -2,12 +2,10 @@
 
 import { useTranslations } from 'next-intl'
 
-import {
-  TakeCompleteScreen,
-  TakeConsentScreen,
-  TakeLobbyScreen,
-  TakeRecordingScreen,
-} from '@/components/take'
+import { TakeConsentScreen } from '@/components/take/consent/consent-screen'
+import { TakeLobbyScreen } from '@/components/take/lobby/lobby-screen'
+import { TakeCompleteScreen } from '@/components/take/recording/recording-complete-screen'
+import { TakeRecordingScreen } from '@/components/take/recording/recording-screen'
 import { Button } from '@/components/ui/button'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'

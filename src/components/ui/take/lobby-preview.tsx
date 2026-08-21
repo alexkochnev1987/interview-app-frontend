@@ -3,7 +3,8 @@
 import { cva } from 'class-variance-authority'
 import type { ReactNode } from 'react'
 
-import { Inline, Stack } from '@/components/ui/layout'
+import { Inline } from '@/components/ui/layout/inline'
+import { Stack } from '@/components/ui/layout/stack'
 import { BodyText } from '@/components/ui/text'
 import { cn } from '@/lib/utils'
 
@@ -14,7 +15,7 @@ import {
 } from './camera-preview'
 
 const lobbyPreviewFrameLayout = cva(
-  'h-full min-h-0 min-w-0 flex-1 overflow-hidden rounded-xl bg-[hsl(var(--surface-low)/0.92)] shadow-none ring-1 ring-border/45 isolate',
+  'h-full min-h-0 min-w-0 flex-1 overflow-hidden rounded-xl bg-surface-low/90 shadow-none ring-1 ring-border/45 isolate',
 )
 
 export function LobbyPrepFloatingControls({ children }: { children: ReactNode }) {

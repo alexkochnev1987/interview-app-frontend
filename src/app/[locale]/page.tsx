@@ -13,11 +13,7 @@ import { PortalInterviewList } from '@/features/portal/portal-interview-list'
 import type { Locale } from '@/i18n/locales'
 import { routes } from '@/i18n/routes'
 import type { CandidatePortalInterviewListItem, InterviewFacetsResponse } from '@/lib/api'
-import {
-  loadAuthGate,
-  redirectIfUnauthenticated,
-  redirectIfUnauthorizedError,
-} from '@/lib/auth-gate'
+import { enforcePageAuth, redirectIfUnauthorizedError } from '@/lib/auth-gate'
 import { canViewDashboardHome } from '@/lib/auth-roles'
 import { computeDashboardMetrics } from '@/lib/dashboard-metrics'
 import {
@@ -38,25 +34,18 @@ interface DashboardPageProps {
 
 export default async function DashboardPage({ params, searchParams }: DashboardPageProps) {
   const { locale } = await params
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.dashboard' })
-  const tCommon = await getTranslations({ locale, namespace: 'common' })
-  const auth = await loadAuthGate(canViewDashboardHome, locale)
-  redirectIfUnauthenticated(auth, '/', locale)
-  if (auth.kind === 'forbidden') {
-    return (
-      <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
-    )
-  }
-  if (auth.kind === 'error') {
-    return (
-      <FlashErrorPageFallback
-        title={t('unavailableTitle')}
-        description={`${tCommon('sessionVerificationFailed')} ${auth.message}`}
-        backHref={ERROR_SIGN_IN_HREF}
-        backLabel={t('signInActionLabel')}
-      />
-    )
-  }
+  const [t, auth] = await Promise.all([
+    getTranslations({ locale, namespace: 'toast.pageGate.dashboard' }),
+    enforcePageAuth({
+      roleCheck: canViewDashboardHome,
+      locale,
+      returnPath: '/',
+      gateNamespace: 'toast.pageGate.dashboard',
+      backHref: ERROR_SIGN_IN_HREF,
+      backLabelKey: 'signInActionLabel',
+    }),
+  ])
+  if (!auth.authorized) return auth.fallback
 
   if (auth.me.role === 'candidate') {
     return renderCandidateDashboard(locale, auth.ctx)

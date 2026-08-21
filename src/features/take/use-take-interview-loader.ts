@@ -94,6 +94,7 @@ export function useTakeInterviewLoader({
       abortControllerRef.current?.abort()
       onCleanupRef.current()
     }
+    // oxlint-disable-next-line react/exhaustive-effect-dependencies
   }, [id, skipInitialLoad])
 
   return { loadInterview }

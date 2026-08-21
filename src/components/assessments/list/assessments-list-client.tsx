@@ -10,7 +10,7 @@ import {
   AssessmentsListToolbar,
   type StatusFilter,
 } from '@/components/assessments/list/assessments-list-toolbar'
-import { LiveRefreshNotice } from '@/components/assessments/live-refresh-notice'
+import { AssessmentLiveRefreshNotice } from '@/components/assessments/live-refresh-notice'
 import { Icon } from '@/components/ui/icon'
 import { CardGrid } from '@/components/ui/layout/card-grid'
 import { Stack } from '@/components/ui/layout/stack'
@@ -99,7 +99,7 @@ export function AssessmentsListClient({
           onStatusChange={setStatus}
         />
 
-        {paused ? <LiveRefreshNotice onRefresh={refresh} /> : null}
+        {paused ? <AssessmentLiveRefreshNotice onRefresh={refresh} /> : null}
 
         {filtered.length === 0 ? (
           <EmptyStateCard
