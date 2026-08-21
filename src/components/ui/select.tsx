@@ -212,7 +212,10 @@ export {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  // fallow-ignore-next-line unused-export
   SelectGroup,
+  // fallow-ignore-next-line unused-export
   SelectLabel,
+  // fallow-ignore-next-line unused-export
   SelectSeparator,
 }

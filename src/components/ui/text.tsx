@@ -43,7 +43,7 @@ const bodyTextVariants = cva('', {
       muted: 'text-muted-foreground',
       danger: 'text-danger-soft-foreground',
       warning: 'text-warning-soft-foreground',
-      primary: 'text-[hsl(var(--primary))]',
+      primary: 'text-primary',
     },
     weight: {
       normal: '',
@@ -123,7 +123,7 @@ const takeTextVariants = cva('', {
       captionMutedXs: 'text-xs leading-5 text-muted-foreground',
       captionWarningXs: 'text-xs leading-5 text-(--color-status-pending-fg)',
       transcriptDraft: 'ml-1 italic text-muted-foreground',
-      iconPrimary: 'text-[hsl(var(--primary))]',
+      iconPrimary: 'text-primary',
     },
   },
   defaultVariants: {

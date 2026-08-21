@@ -14,10 +14,10 @@ const cardVariants = cva(
         floating: 'border border-hairline-strong bg-surface-glass shadow-float',
         floatingSolid: 'border border-hairline-strong bg-card shadow-float',
         chatWidget:
-          'border-2 border-[hsl(var(--primary)/0.42)] bg-card shadow-chat-widget ring-1 ring-inset ring-[hsl(var(--primary)/0.1)]',
+          'border-2 border-primary/40 bg-card shadow-chat-widget ring-1 ring-inset ring-primary/10',
         recordingHero: 'border border-border bg-card shadow-float',
         metric:
-          'relative isolate border border-hairline-strong bg-[linear-gradient(135deg,hsl(var(--card)/0.98),hsl(var(--surface-low)/0.58))] shadow-float after:pointer-events-none after:absolute after:-right-10 after:-top-10 after:size-24 after:rounded-full after:bg-[hsl(var(--primary)/0.08)] after:blur-2xl',
+          'relative isolate border border-hairline-strong bg-card shadow-float after:pointer-events-none after:absolute after:-right-10 after:-top-10 after:size-24 after:rounded-full after:bg-primary/10 after:blur-2xl',
         tinted: 'border border-hairline-strong bg-surface-low-glass shadow-soft',
         warning: 'border border-warning-soft-border bg-warning-soft shadow-soft',
         'danger-soft':
@@ -49,7 +49,7 @@ const cardVariants = cva(
       state: {
         default: '',
         selected: 'ring-2 ring-destructive/70',
-        picked: 'ring-2 ring-[hsl(var(--primary)/0.55)]',
+        picked: 'ring-2 ring-primary/55',
         deleted: 'opacity-80',
         scheduled: '',
       },
@@ -59,7 +59,7 @@ const cardVariants = cva(
       },
       accent: {
         none: '',
-        primary: 'border-l-4 border-l-[hsl(var(--primary))]',
+        primary: 'border-l-4 border-l-primary',
         neutral: 'border-l-4 border-l-slate-300',
         info: 'border-l-4 border-l-sky-300',
         warning: 'border-l-4 border-l-amber-300',

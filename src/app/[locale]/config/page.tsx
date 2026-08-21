@@ -2,16 +2,16 @@ import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 
 import { ConfigDashboard } from '@/components/config/config-dashboard'
-import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
+import type { Locale } from '@/i18n/locales'
 import type { SystemConfigEntry } from '@/lib/api'
+import { enforcePageAuth } from '@/lib/auth-gate'
 import { isSuperAdmin } from '@/lib/auth-roles'
-import { getServerSessionSnapshot } from '@/lib/auth-server'
-import { getServerRequestContext, requestServer } from '@/lib/server-fetch'
+import { requestServer } from '@/lib/server-fetch'
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ locale: string }>
+  params: Promise<{ locale: Locale }>
 }): Promise<Metadata> {
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'config' })
@@ -22,26 +22,20 @@ export async function generateMetadata({
   }
 }
 
-export default async function ConfigPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function ConfigPage({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params
-  const [session, ctx, tConfig] = await Promise.all([
-    getServerSessionSnapshot(),
-    getServerRequestContext(locale),
-    getTranslations({ locale, namespace: 'config' }),
-  ])
-
-  if (!isSuperAdmin(session.user?.role)) {
-    return (
-      <ForbiddenAccessPage
-        title={tConfig('forbiddenTitle')}
-        description={tConfig('forbiddenDesc')}
-      />
-    )
-  }
+  const auth = await enforcePageAuth({
+    roleCheck: isSuperAdmin,
+    locale,
+    returnPath: '/config',
+    gateNamespace: 'config',
+    backHref: '/',
+  })
+  if (!auth.authorized) return auth.fallback
 
   let initialConfigs: SystemConfigEntry[] = []
   try {
-    const fetched = await requestServer<SystemConfigEntry[]>('/config', ctx)
+    const fetched = await requestServer<SystemConfigEntry[]>('/config', auth.ctx)
     if (fetched) {
       initialConfigs = fetched
     }

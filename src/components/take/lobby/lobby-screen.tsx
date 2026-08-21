@@ -9,7 +9,8 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { CardContent, CardTitle } from '@/components/ui/card'
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
-import { Grid, Stack } from '@/components/ui/layout'
+import { Grid } from '@/components/ui/layout/grid'
+import { Stack } from '@/components/ui/layout/stack'
 import type { StatusTone } from '@/components/ui/status-pill'
 import { SurfaceCard } from '@/components/ui/surface-card'
 import {
@@ -17,7 +18,7 @@ import {
   LobbyPreviewFrame,
   LobbyPreviewPlaceholder,
   LobbyScreenVideo,
-} from '@/components/ui/take'
+} from '@/components/ui/take/lobby-preview'
 import { Text } from '@/components/ui/text'
 
 import { TakePermissionStatusList } from '../consent/consent-permission-status-list'

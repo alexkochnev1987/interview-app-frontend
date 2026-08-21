@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 
-import { Container, Stack } from '@/components/ui/layout'
+import { Container } from '@/components/ui/layout/container'
+import { Stack } from '@/components/ui/layout/stack'
 import { PageFrame } from '@/components/ui/page-frame'
 
 type ChildrenProps = {
@@ -11,16 +12,6 @@ type PageMainViewportSpacing = 'page' | 'take'
 
 type PageMainViewportProps = ChildrenProps & {
   spacing?: PageMainViewportSpacing
-}
-
-export function PageMain({ children }: ChildrenProps) {
-  return (
-    <PageFrame as="main" spacing="page">
-      <Container width="default">
-        <Stack gap={8}>{children}</Stack>
-      </Container>
-    </PageFrame>
-  )
 }
 
 export function PageMainViewport({ children, spacing = 'page' }: PageMainViewportProps) {

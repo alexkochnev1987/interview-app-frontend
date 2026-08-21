@@ -3,11 +3,10 @@ import { getTranslations } from 'next-intl/server'
 import { QueryHydrationBoundary } from '@/components/questions/query-hydration-boundary'
 import { TemplatesListClient } from '@/components/templates/templates-list-client'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
-import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import type { Locale } from '@/i18n/locales'
 import { routes } from '@/i18n/routes'
-import { loadAuthGate, redirectIfUnauthenticated } from '@/lib/auth-gate'
+import { enforcePageAuth } from '@/lib/auth-gate'
 import { canConfigureInterview } from '@/lib/auth-roles'
 import { prefetchTemplatesList } from '@/lib/templates-prefetch'
 
@@ -19,28 +18,19 @@ interface TemplatesPageProps {
 
 export default async function TemplatesPage({ params }: TemplatesPageProps) {
   const { locale } = await params
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.templates' })
-  const tCommon = await getTranslations({ locale, namespace: 'common' })
-  const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
-  const auth = await loadAuthGate(canConfigureInterview, locale)
-  redirectIfUnauthenticated(auth, routes.templates.list, locale)
-
-  if (auth.kind === 'forbidden') {
-    return (
-      <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
-    )
-  }
-
-  if (auth.kind === 'error') {
-    return (
-      <FlashErrorPageFallback
-        title={t('unavailableTitle')}
-        description={`${tCommon('sessionVerificationFailed')} ${auth.message}`}
-        backHref={ERROR_BACK_HREF}
-        backLabel={tFallback('backToDashboard')}
-      />
-    )
-  }
+  const [t, tFallback, auth] = await Promise.all([
+    getTranslations({ locale, namespace: 'toast.pageGate.templates' }),
+    getTranslations({ locale, namespace: 'shared.fallback' }),
+    enforcePageAuth({
+      roleCheck: canConfigureInterview,
+      locale,
+      returnPath: routes.templates.list,
+      gateNamespace: 'toast.pageGate.templates',
+      backHref: ERROR_BACK_HREF,
+      backLabelKey: 'backToDashboard',
+    }),
+  ])
+  if (!auth.authorized) return auth.fallback
 
   let dehydratedState
   try {

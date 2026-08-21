@@ -3,7 +3,8 @@ import type { LucideIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 
-import { Grid, Stack } from '@/components/ui/layout'
+import { Grid } from '@/components/ui/layout/grid'
+import { Stack } from '@/components/ui/layout/stack'
 import { Panel } from '@/components/ui/panel'
 import { Text } from '@/components/ui/text'
 

@@ -64,6 +64,7 @@ export function RecordingVideo({
       detachRef.current?.()
       detachRef.current = null
     }
+    // oxlint-disable-next-line react/exhaustive-effect-dependencies
   }, [src])
 
   function handleError() {

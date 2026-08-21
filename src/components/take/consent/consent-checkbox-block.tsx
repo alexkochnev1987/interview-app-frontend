@@ -2,7 +2,8 @@ import { useTranslations } from 'next-intl'
 
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
-import { Inline, Stack } from '@/components/ui/layout'
+import { Inline } from '@/components/ui/layout/inline'
+import { Stack } from '@/components/ui/layout/stack'
 import { Panel } from '@/components/ui/panel'
 import { Text } from '@/components/ui/text'
 

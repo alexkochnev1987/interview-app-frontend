@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl'
 
-import { ChatResultCard } from '@/components/ui/chat'
+import { ChatResultCard } from '@/components/ui/chat/chat-result-card'
 import { Inline } from '@/components/ui/layout/inline'
 import { StatusPill } from '@/components/ui/status-pill'
 import { BodyText } from '@/components/ui/text'

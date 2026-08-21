@@ -5,10 +5,7 @@ import { cn } from '@/lib/utils'
 export function HeroNumber({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn(
-        'text-6xl font-semibold tracking-display-hero text-[hsl(var(--primary))]',
-        className,
-      )}
+      className={cn('text-6xl font-semibold tracking-display-hero text-primary', className)}
       {...props}
     />
   )

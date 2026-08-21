@@ -1,7 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -43,11 +43,13 @@ export function AssistantPendingActionContent({
   const tCommon = useTranslations('common')
   const tLocales = useTranslations('languageSwitcher.locales')
   const editable = isEditableInterviewPendingAction(pendingAction)
+  const [prevPendingAction, setPrevPendingAction] = useState(pendingAction)
   const [draftAction, setDraftAction] = useState(pendingAction)
 
-  useEffect(() => {
+  if (pendingAction !== prevPendingAction) {
+    setPrevPendingAction(pendingAction)
     setDraftAction(pendingAction)
-  }, [pendingAction])
+  }
 
   const actionForConfirm = editable ? draftAction : pendingAction
   const canConfirm = canConfirmAssistantPendingAction(actionForConfirm, user?.role)

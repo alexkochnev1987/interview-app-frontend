@@ -13,23 +13,23 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { BulkDeleteResultAlerts } from '@/components/questions/library/bulk-delete-result-alerts'
-import { InfiniteCardsLoader } from '@/components/questions/library/infinite-cards-loader'
+import { QuestionsInfiniteCardsLoader } from '@/components/questions/library/infinite-cards-loader'
 import { QuestionCard } from '@/components/questions/library/question-card'
 import { QuestionTable } from '@/components/questions/library/question-table'
 import { QuestionsLibraryHeader } from '@/components/questions/library/questions-library-header'
+import { buildActiveFilterChips } from '@/components/questions/picker/build-active-chips'
+import { pickQuestionsViewSource } from '@/components/questions/picker/pick-questions-view-source'
 import {
-  buildActiveFilterChips,
-  pickQuestionsViewSource,
   QuestionFacetSidebar,
   type QuestionFacetSidebarProps,
-  QuestionPickerFeed,
-  QuestionPickerRefetchAlert,
-  QuestionPickerToolbar,
-  QuestionViewToggle,
-  useQuestionFacets,
-  useQuestionsInfinite,
-  useQuestionsQuery,
-} from '@/components/questions/picker'
+} from '@/components/questions/picker/question-facet-sidebar'
+import { QuestionPickerFeed } from '@/components/questions/picker/question-picker-feed'
+import { QuestionPickerRefetchAlert } from '@/components/questions/picker/question-picker-refetch-alert'
+import { QuestionPickerToolbar } from '@/components/questions/picker/question-picker-toolbar'
+import { QuestionViewToggle } from '@/components/questions/picker/question-view-toggle'
+import { useQuestionFacets } from '@/components/questions/picker/use-question-facets'
+import { useQuestionsInfinite } from '@/components/questions/picker/use-questions-infinite'
+import { useQuestionsQuery } from '@/components/questions/picker/use-questions-query'
 import { useBulkDeleteQuestions } from '@/components/questions/use-question-mutations'
 import { Button } from '@/components/ui/button'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
@@ -361,7 +361,7 @@ export function QuestionsLibraryClient({
       ) : null}
 
       {isCardsView && view.items.length > 0 ? (
-        <InfiniteCardsLoader
+        <QuestionsInfiniteCardsLoader
           hasNextPage={infinite.hasNextPage}
           isFetchingNextPage={infinite.isFetchingNextPage}
           totalLoaded={infinite.items.length}

@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { ChatResultCard } from '@/components/ui/chat'
+import { ChatResultCard } from '@/components/ui/chat/chat-result-card'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText } from '@/components/ui/text'
 import { UnstyledLink } from '@/components/ui/unstyled-link'

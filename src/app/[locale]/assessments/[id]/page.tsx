@@ -6,11 +6,7 @@ import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import type { Locale } from '@/i18n/locales'
 import { type Interview } from '@/lib/api'
-import {
-  loadAuthGate,
-  redirectIfUnauthenticated,
-  redirectIfUnauthorizedError,
-} from '@/lib/auth-gate'
+import { enforcePageAuth, redirectIfUnauthorizedError } from '@/lib/auth-gate'
 import { canReviewAssessments } from '@/lib/auth-roles'
 import { isForbiddenError, requestServer } from '@/lib/server-fetch'
 
@@ -20,28 +16,20 @@ interface AssessmentDetailPageProps {
 
 export default async function AssessmentDetailPage({ params }: AssessmentDetailPageProps) {
   const { id, locale } = await params
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.assessments' })
-  const tCommon = await getTranslations({ locale, namespace: 'common' })
-  const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
-
   const returnPath = `/assessments/${encodeURIComponent(id)}`
-  const auth = await loadAuthGate(canReviewAssessments, locale)
-  redirectIfUnauthenticated(auth, returnPath, locale)
-  if (auth.kind === 'forbidden') {
-    return (
-      <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
-    )
-  }
-  if (auth.kind === 'error') {
-    return (
-      <FlashErrorPageFallback
-        title={t('unavailableTitle')}
-        description={`${tCommon('sessionVerificationFailed')} ${auth.message}`}
-        backHref="/assessments"
-        backLabel={tFallback('backToAssessments')}
-      />
-    )
-  }
+  const [t, tFallback, auth] = await Promise.all([
+    getTranslations({ locale, namespace: 'toast.pageGate.assessments' }),
+    getTranslations({ locale, namespace: 'shared.fallback' }),
+    enforcePageAuth({
+      roleCheck: canReviewAssessments,
+      locale,
+      returnPath,
+      gateNamespace: 'toast.pageGate.assessments',
+      backHref: '/assessments',
+      backLabelKey: 'backToAssessments',
+    }),
+  ])
+  if (!auth.authorized) return auth.fallback
 
   const encodedId = encodeURIComponent(id)
   let interview: Interview | null = null

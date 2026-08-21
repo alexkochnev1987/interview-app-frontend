@@ -30,7 +30,7 @@ export function ChatWidgetBackdrop({ closing = false, className }: ChatWidgetBac
       aria-hidden
       className={cn(
         chatWidgetBackdropVariants({ motion: closing ? 'out' : 'in' }),
-        'relative bg-[hsl(var(--scrim)/0.28)] backdrop-blur-[2px] before:pointer-events-none before:absolute before:inset-0 before:bg-[hsl(var(--primary)/0.07)]',
+        'relative bg-scrim/30 backdrop-blur-[2px] before:pointer-events-none before:absolute before:inset-0 before:bg-primary/10',
         className,
       )}
     />
