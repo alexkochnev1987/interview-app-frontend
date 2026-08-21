@@ -1,7 +1,7 @@
 'use client'
 
 import { BadgeCheck, Target } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { EyebrowBadge } from '@/components/ui/eyebrow-badge'
@@ -9,8 +9,10 @@ import { Icon } from '@/components/ui/icon'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { EmptyStateCard } from '@/components/ui/state-card'
+import { StatusPill } from '@/components/ui/status-pill'
 import { SurfaceTile } from '@/components/ui/surface-tile'
 import { BodyText, SectionHeading } from '@/components/ui/text'
+import type { Locale } from '@/i18n/locales'
 import type {
   PublicCandidateFeedbackQuestionBlock,
   PublicCandidateFeedbackResponse,
@@ -18,7 +20,10 @@ import type {
 } from '@/lib/api'
 
 type CandidateFeedbackContentProps = {
-  feedback: Pick<PublicCandidateFeedbackResponse, 'outcome' | 'overall' | 'questions'>
+  feedback: Pick<
+    PublicCandidateFeedbackResponse,
+    'interviewLocale' | 'outcome' | 'overall' | 'questions'
+  >
   /** Already resolved in interviewLocale for presets; custom text as published. */
   outcomeMessage: string
 }
@@ -163,12 +168,20 @@ function OutcomeCard({
  * with no page chrome of its own. Shared by the public share page (which
  * wraps it in its own marketing-style hero) and the candidate-portal detail
  * page (which wraps it in the plain dashboard-style page header instead).
+ *
+ * Chrome labels (eyebrow/title/empty-state copy) render in the viewer's UI
+ * locale, same as the rest of the app; only `outcomeMessage` and the
+ * candidate/HR-authored text blocks are pinned to `interviewLocale`. When
+ * those differ, the badge below is the one shared place that surfaces it —
+ * both callers rely on it instead of each rolling their own.
  */
 export function CandidateFeedbackContent({
   feedback,
   outcomeMessage,
 }: CandidateFeedbackContentProps) {
   const t = useTranslations('feedback.share')
+  const uiLocale = useLocale() as Locale
+  const showLanguageMismatchBadge = feedback.interviewLocale !== uiLocale
 
   const overall = hasPublishableText(feedback.overall) ? feedback.overall : undefined
   const questions = (feedback.questions ?? []).filter(hasPublishableText)
@@ -180,6 +193,16 @@ export function CandidateFeedbackContent({
 
   return (
     <Stack gap={6}>
+      {showLanguageMismatchBadge ? (
+        <Inline gap={3} align="center" wrap="wrap">
+          <StatusPill tone="neutral_meta" casing="chip" size="compact">
+            {t('languageBadgeInterviewAs', {
+              locale: feedback.interviewLocale.toUpperCase(),
+            })}
+          </StatusPill>
+        </Inline>
+      ) : null}
+
       {hasOutcome && feedback.outcome ? (
         <OutcomeCard
           outcome={feedback.outcome}

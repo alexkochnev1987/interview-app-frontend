@@ -1,7 +1,7 @@
 'use client'
 
 import { Sparkles } from 'lucide-react'
-import { useLocale, useTranslations } from 'next-intl'
+import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 
 const renderStrong = (chunks: ReactNode) => <strong>{chunks}</strong>
@@ -16,9 +16,7 @@ import { Inline } from '@/components/ui/layout/inline'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import { Section } from '@/components/ui/layout/section'
 import { Stack } from '@/components/ui/layout/stack'
-import { StatusPill } from '@/components/ui/status-pill'
 import { BodyText } from '@/components/ui/text'
-import type { Locale } from '@/i18n/locales'
 import type { PublicCandidateFeedbackResponse } from '@/lib/api'
 import { formatInterviewDate } from '@/lib/interview-formatters'
 
@@ -45,9 +43,6 @@ export function CandidateFeedbackShareView({
   outcomeMessage,
 }: CandidateFeedbackShareViewProps) {
   const t = useTranslations('feedback.share')
-  const uiLocale = useLocale() as Locale
-  const interviewLocale = feedback.interviewLocale
-  const showLanguageMismatchBadge = interviewLocale !== uiLocale
 
   return (
     <PageShell>
@@ -100,16 +95,6 @@ export function CandidateFeedbackShareView({
                 ) : null}
               </Inline>
             </Stack>
-
-            {showLanguageMismatchBadge ? (
-              <Inline gap={3} align="center" wrap="wrap">
-                <StatusPill tone="neutral_meta" casing="chip" size="compact">
-                  {t('languageBadgeInterviewAs', {
-                    locale: interviewLocale.toUpperCase(),
-                  })}
-                </StatusPill>
-              </Inline>
-            ) : null}
           </CardContent>
         </Card>
 
