@@ -1,5 +1,6 @@
 import createClient from 'openapi-fetch'
 
+// some
 import { LOCALES, type Locale } from '@/i18n/locales'
 
 import { ApiError } from './api-error'
