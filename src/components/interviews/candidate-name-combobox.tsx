@@ -2,7 +2,7 @@
 
 import { UserRound } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useEffect, useId, useState, type KeyboardEvent } from 'react'
+import { useId, useState, type KeyboardEvent } from 'react'
 
 import {
   ComboboxPopover,
@@ -52,9 +52,11 @@ export function CandidateNameCombobox({
   const open =
     focused && !dismissed && value.trim().length >= 2 && (loading || candidates.length > 0)
 
-  useEffect(() => {
+  const [previousCandidates, setPreviousCandidates] = useState(candidates)
+  if (candidates !== previousCandidates) {
+    setPreviousCandidates(candidates)
     setHighlightedIndex(0)
-  }, [candidates])
+  }
 
   function handleSelect(candidate: CandidateSummary) {
     onSelectCandidate(candidate)
