@@ -107,7 +107,11 @@ export function DemoTakeExperience({
         ) : null}
 
         {demo.stage === 'complete' ? (
-          <TakeCompleteScreen candidateName={candidateName} position={position} />
+          <TakeCompleteScreen
+            candidateName={candidateName}
+            position={position}
+            showHomeLink={false}
+          />
         ) : null}
       </Stack>
     </TakeMediaProvider>

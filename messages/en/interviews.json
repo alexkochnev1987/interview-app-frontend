@@ -19,6 +19,7 @@
       },
       "assignedHrUnassigned": "Unassigned",
       "assignedHrAssigned": "Assigned to {name}",
+      "candidateEmailNotSet": "No candidate email set — they won't see this in their portal",
       "demoTryCandidateExperience": "Try the candidate experience"
     },
     "library": {
@@ -137,6 +138,7 @@
       "title": "Edit interview",
       "candidateName": "Candidate name",
       "candidateEmail": "Candidate email",
+      "candidateEmailHint": "Optional. Matches this interview to the candidate's portal account so they can find it after signing in.",
       "position": "Position",
       "questionsTitle": "Questions",
       "answersBlockEditNotice": "Editing is disabled after answers have been uploaded, because answers are tied to question order.",

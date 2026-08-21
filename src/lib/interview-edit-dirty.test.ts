@@ -26,25 +26,26 @@ describe('interview-edit-dirty', () => {
       ['q2', {}],
     ])
 
-    expect(isInterviewEditDirty(interview, 'Alex', 'Engineer', unchangedSelection, undefined)).toBe(
-      false,
-    )
     expect(
-      isInterviewEditDirty(interview, 'Alex ', 'Engineer', unchangedSelection, undefined),
+      isInterviewEditDirty(interview, 'Alex', '', 'Engineer', unchangedSelection, undefined),
     ).toBe(false)
     expect(
-      isInterviewEditDirty(interview, 'Jordan', 'Engineer', unchangedSelection, undefined),
+      isInterviewEditDirty(interview, 'Alex ', '', 'Engineer', unchangedSelection, undefined),
+    ).toBe(false)
+    expect(
+      isInterviewEditDirty(interview, 'Jordan', '', 'Engineer', unchangedSelection, undefined),
     ).toBe(true)
-    expect(isInterviewEditDirty(interview, 'Alex', 'Lead', unchangedSelection, undefined)).toBe(
+    expect(isInterviewEditDirty(interview, 'Alex', '', 'Lead', unchangedSelection, undefined)).toBe(
       true,
     )
     expect(
-      isInterviewEditDirty(interview, 'Alex', 'Engineer', new Map([['q1', {}]]), undefined),
+      isInterviewEditDirty(interview, 'Alex', '', 'Engineer', new Map([['q1', {}]]), undefined),
     ).toBe(true)
     expect(
       isInterviewEditDirty(
         interview,
         'Alex',
+        '',
         'Engineer',
         new Map([
           ['q2', {}],
@@ -57,6 +58,7 @@ describe('interview-edit-dirty', () => {
       isInterviewEditDirty(
         interview,
         'Alex',
+        '',
         'Engineer',
         new Map([
           ['q2', {}],
@@ -64,6 +66,50 @@ describe('interview-edit-dirty', () => {
         ]),
         undefined,
       ),
+    ).toBe(true)
+  })
+
+  it('detects dirty candidate email changes, case/whitespace-insensitively', () => {
+    const interview = interviewFixture({
+      candidateName: 'Alex',
+      candidateEmail: 'alex@example.com',
+      position: 'Engineer',
+      questions: [questionFixture({ id: 'q1' })],
+    })
+    const unchangedSelection = new Map([['q1', {}]])
+
+    expect(
+      isInterviewEditDirty(
+        interview,
+        'Alex',
+        'Alex@Example.com',
+        'Engineer',
+        unchangedSelection,
+        undefined,
+      ),
+    ).toBe(false)
+    expect(
+      isInterviewEditDirty(
+        interview,
+        'Alex',
+        '  alex@example.com  ',
+        'Engineer',
+        unchangedSelection,
+        undefined,
+      ),
+    ).toBe(false)
+    expect(
+      isInterviewEditDirty(
+        interview,
+        'Alex',
+        'jordan@example.com',
+        'Engineer',
+        unchangedSelection,
+        undefined,
+      ),
+    ).toBe(true)
+    expect(
+      isInterviewEditDirty(interview, 'Alex', '', 'Engineer', unchangedSelection, undefined),
     ).toBe(true)
   })
 
@@ -79,6 +125,7 @@ describe('interview-edit-dirty', () => {
       isInterviewEditDirty(
         interview,
         interview.candidateName,
+        '',
         interview.position,
         unchangedSelection,
         'hr-1',
@@ -88,6 +135,7 @@ describe('interview-edit-dirty', () => {
       isInterviewEditDirty(
         interview,
         interview.candidateName,
+        '',
         interview.position,
         unchangedSelection,
         'hr-2',
@@ -97,6 +145,7 @@ describe('interview-edit-dirty', () => {
       isInterviewEditDirty(
         interview,
         interview.candidateName,
+        '',
         interview.position,
         unchangedSelection,
         undefined,

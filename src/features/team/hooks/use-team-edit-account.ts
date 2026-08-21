@@ -4,16 +4,9 @@ import { useMemo, useState } from 'react'
 
 import { updateTeamMember, type TeamMember } from '@/lib/api'
 import { useAuth } from '@/lib/auth-context'
+import { isValidEmail, normalizeEmail } from '@/lib/email-validation'
 import { runMutation } from '@/lib/run-mutation'
 import { useToastMessages } from '@/lib/use-toast-messages'
-
-function normalizeEmail(email: string): string {
-  return email.trim().toLowerCase()
-}
-
-function isValidEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-}
 
 export function useTeamEditAccount(
   member: TeamMember,

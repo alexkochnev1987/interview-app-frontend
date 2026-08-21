@@ -110,6 +110,7 @@
         "notFoundFallback": "The requested interview could not be loaded.",
         "setupBlockedTitle": "Interview setup blocked",
         "candidateNameRequired": "Candidate name is required.",
+        "candidateEmailInvalid": "Enter a valid email address, or leave it blank.",
         "positionRequired": "Position is required.",
         "questionsRequired": "Select at least one question.",
         "creatingLabel": "Creating..."

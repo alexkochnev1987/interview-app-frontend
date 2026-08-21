@@ -19,6 +19,7 @@
       },
       "assignedHrUnassigned": "Не прызначаны",
       "assignedHrAssigned": "Прызначаны: {name}",
+      "candidateEmailNotSet": "Email кандыдата не ўказаны — ён не ўбачыць гэта ў сваім партале",
       "demoTryCandidateExperience": "Паспрабаваць вопыт кандыдата"
     },
     "library": {
@@ -137,6 +138,7 @@
       "title": "Рэдагаванне інтэрв'ю",
       "candidateName": "Імя кандыдата",
       "candidateEmail": "Email кандыдата",
+      "candidateEmailHint": "Неабавязкова. Звязвае гэта інтэрв'ю з уліковым запісам кандыдата ў партале, каб ён мог знайсці яго пасля ўваходу.",
       "position": "Пасада",
       "questionsTitle": "Пытанні",
       "answersBlockEditNotice": "Рэдагаванне адключана пасля загрузкі адказаў, бо адказы прывязаны да парадку пытанняў.",

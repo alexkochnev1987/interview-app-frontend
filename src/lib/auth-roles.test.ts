@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  canAccessCandidatePortal,
   canAccessDashboard,
   canActorReassignMemberRole,
   canConfigureInterview,
@@ -11,6 +12,7 @@ import {
   canReviewAssessments,
   canShowRecruiterAssistant,
   canUpdateQuestions,
+  canViewDashboardHome,
   compareRolesByAuthorityDesc,
   isSuperAdmin,
   roleOutranks,
@@ -77,6 +79,23 @@ describe('auth-roles', () => {
 
     expect(canAccessDashboard('candidate')).toBe(false)
     expect(canReviewAssessments(null)).toBe(false)
+  })
+
+  it('grants candidate-portal access to the candidate role only', () => {
+    expect(canAccessCandidatePortal('candidate')).toBe(true)
+    for (const role of ['super_admin', 'admin', 'hr'] as const) {
+      expect(canAccessCandidatePortal(role)).toBe(false)
+    }
+    expect(canAccessCandidatePortal(null)).toBe(false)
+    expect(canAccessCandidatePortal(undefined)).toBe(false)
+  })
+
+  it('lets every staff role and the candidate role view the shared dashboard route', () => {
+    for (const role of ['super_admin', 'admin', 'hr', 'candidate'] as const) {
+      expect(canViewDashboardHome(role)).toBe(true)
+    }
+    expect(canViewDashboardHome(null)).toBe(false)
+    expect(canViewDashboardHome('unknown')).toBe(false)
   })
 
   it('restricts question mutations by role', () => {

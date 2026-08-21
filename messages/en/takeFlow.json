@@ -90,6 +90,7 @@
     "capabilityFairnessDescription": "Session and browser activity may be stored for evaluation integrity.",
     "completeTitle": "Thank you, {candidateName}",
     "completeDescription": "Your interview for {position} is submitted and saved securely for review. If you are selected to continue, our team will reach out within a few business days with next steps.",
+    "completeHomeCta": "Back to my interviews",
     "liveTranscriptTitle": "Live transcript",
     "liveTranscriptUnavailable": "Live transcript is unavailable in this browser. Recording continues as usual.",
     "liveTranscriptDraftSuffix": "(draft)",

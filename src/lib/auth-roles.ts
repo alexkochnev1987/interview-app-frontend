@@ -64,6 +64,15 @@ export function canAccessDashboard(role: string | null | undefined): boolean {
   return hasAdminRole(role)
 }
 
+export function canAccessCandidatePortal(role: string | null | undefined): boolean {
+  return role === APP_ROLE.candidate
+}
+
+/** Gate for the shared `/` route: staff see the dashboard, candidates see their interview list. */
+export function canViewDashboardHome(role: string | null | undefined): boolean {
+  return canAccessDashboard(role) || canAccessCandidatePortal(role)
+}
+
 export function canReviewAssessments(role: string | null | undefined): boolean {
   return hasAdminRole(role)
 }

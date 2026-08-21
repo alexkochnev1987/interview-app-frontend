@@ -1,11 +1,12 @@
 'use client'
 
-import { BriefcaseBusiness, UserRound } from 'lucide-react'
+import { BriefcaseBusiness, Mail } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { AssignedHrSelect } from '@/components/interviews/assigned-hr-select'
+import { CandidateNameCombobox } from '@/components/interviews/candidate-name-combobox'
 import {
   InterviewQuestionPickerAside,
   InterviewQuestionPickerMain,
@@ -26,6 +27,7 @@ import { BodyText } from '@/components/ui/text'
 import { updateInterview, type Interview } from '@/lib/api'
 import { useAuth } from '@/lib/auth-context'
 import { canAssignInterviewHr } from '@/lib/auth-roles'
+import { isValidEmail } from '@/lib/email-validation'
 import {
   getSelectedQuestionIdsInEditOrder,
   isInterviewEditDirty,
@@ -194,6 +196,7 @@ function InterviewFullEditPanel({
   const toastMessages = useToastMessages()
 
   const [candidateName, setCandidateName] = useState(interview.candidateName)
+  const [candidateEmail, setCandidateEmail] = useState(interview.candidateEmail ?? '')
   const [position, setPosition] = useState(interview.position)
   const initialAssignedHrId = interview.assignedHrId ?? interview.assignedHr?.id
   const [assignedHrId, setAssignedHrId] = useState<string | undefined>(initialAssignedHrId)
@@ -213,7 +216,14 @@ function InterviewFullEditPanel({
   const canSave = selectedCount > 0
 
   function isDirty() {
-    return isInterviewEditDirty(interview, candidateName, position, selectedById, assignedHrId)
+    return isInterviewEditDirty(
+      interview,
+      candidateName,
+      candidateEmail,
+      position,
+      selectedById,
+      assignedHrId,
+    )
   }
 
   function handleDiscardClick() {
@@ -231,6 +241,10 @@ function InterviewFullEditPanel({
       setError(toastMessages.pageGate.interview.candidateNameRequired)
       return
     }
+    if (candidateEmail.trim() && !isValidEmail(candidateEmail.trim())) {
+      setError(toastMessages.pageGate.interview.candidateEmailInvalid)
+      return
+    }
     if (!position.trim()) {
       setError(toastMessages.pageGate.interview.positionRequired)
       return
@@ -245,9 +259,12 @@ function InterviewFullEditPanel({
     try {
       const updated = await runMutation(
         () =>
-          // candidateEmail omitted intentionally - not collected in create/edit UI yet
           updateInterview(interview.id, {
             candidateName: candidateName.trim(),
+            // Blank clears the field client-side but is intentionally omitted
+            // from the payload: the backend's candidateEmail validator rejects
+            // an empty string, so leaving it out keeps the existing value.
+            ...(candidateEmail.trim() ? { candidateEmail: candidateEmail.trim() } : {}),
             position: position.trim(),
             questionIds: getSelectedQuestionIdsInEditOrder(interview.questions, selectedById),
             ...(canAssign && assignedHrId !== initialAssignedHrId
@@ -283,21 +300,44 @@ function InterviewFullEditPanel({
               <CardTitle size="lg">{tEdit('title')}</CardTitle>
             </CardHeader>
             <CardContent spacing="lg">
-              <FormField htmlFor="edit-candidateName" label={tEdit('candidateName')}>
+              <FormField
+                htmlFor="edit-candidateName"
+                label={tEdit('candidateName')}
+                hint={tPicker('candidateNameHint')}
+              >
+                <CandidateNameCombobox
+                  id="edit-candidateName"
+                  value={candidateName}
+                  onChange={setCandidateName}
+                  onSelectCandidate={(candidate) => {
+                    setCandidateName(candidate.name)
+                    setCandidateEmail(candidate.email)
+                  }}
+                  placeholder={tPicker('candidateNamePlaceholder')}
+                  disabled={submitting}
+                />
+              </FormField>
+
+              <FormField
+                htmlFor="edit-candidateEmail"
+                label={tEdit('candidateEmail')}
+                hint={tEdit('candidateEmailHint')}
+              >
                 <IconAffix
                   icon={
                     <Icon size="md">
-                      <UserRound />
+                      <Mail />
                     </Icon>
                   }
                 >
                   <Input
-                    id="edit-candidateName"
+                    id="edit-candidateEmail"
+                    type="email"
                     iconAffix="leading"
-                    value={candidateName}
-                    onChange={(event) => setCandidateName(event.target.value)}
-                    placeholder={tPicker('candidateNamePlaceholder')}
-                    autoComplete="name"
+                    value={candidateEmail}
+                    onChange={(event) => setCandidateEmail(event.target.value)}
+                    placeholder={tPicker('candidateEmailPlaceholder')}
+                    autoComplete="email"
                     disabled={submitting}
                   />
                 </IconAffix>

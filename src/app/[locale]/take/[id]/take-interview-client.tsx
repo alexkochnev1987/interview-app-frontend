@@ -31,12 +31,15 @@ import type { TakeInterviewData } from '@/lib/api'
 type TakeInterviewClientProps = {
   id: string
   candidateToken?: string
+  /** True when this token came from the portal's "continue" link, not an anonymous HR-emailed link. */
+  isPortalContinuation?: boolean
   initialInterview?: TakeInterviewData
 }
 
 export function TakeInterviewClient({
   id,
   candidateToken = '',
+  isPortalContinuation = false,
   initialInterview,
 }: TakeInterviewClientProps) {
   const [interviewLocale, setInterviewLocale] = useState<Locale | null>(() =>
@@ -50,6 +53,7 @@ export function TakeInterviewClient({
       <TakeInterviewClientInner
         id={id}
         candidateToken={candidateToken}
+        isPortalContinuation={isPortalContinuation}
         initialInterview={initialInterview}
         lockedLocale={interviewLocale}
         onInterviewLocale={setInterviewLocale}
@@ -66,6 +70,7 @@ type TakeInterviewClientInnerProps = TakeInterviewClientProps & {
 function TakeInterviewClientInner({
   id,
   candidateToken = '',
+  isPortalContinuation = false,
   initialInterview,
   lockedLocale,
   onInterviewLocale,
@@ -208,7 +213,11 @@ function TakeInterviewClientInner({
 
   if (stage === 'complete') {
     return wrapTakeStage(
-      <TakeCompleteScreen candidateName={interview.candidateName} position={interview.position} />,
+      <TakeCompleteScreen
+        candidateName={interview.candidateName}
+        position={interview.position}
+        showHomeLink={isPortalContinuation}
+      />,
     )
   }
 
