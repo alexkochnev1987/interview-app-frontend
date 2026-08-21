@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowLeft, ArrowRight, MessageSquareText } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Mail, MessageSquareText } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Fragment, type ReactNode } from 'react'
 
@@ -231,6 +231,14 @@ export function InterviewSummaryCard({
             <Stack gap={1.5}>
               <HeroTitle>{interview.candidateName}</HeroTitle>
               <HeroLead>{interview.position}</HeroLead>
+              <Inline gap={1} align="center">
+                <Icon size="xs" tone="inherit">
+                  <Mail />
+                </Icon>
+                <BodyText size="sm" tone="muted">
+                  {interview.candidateEmail || tDetail('candidateEmailNotSet')}
+                </BodyText>
+              </Inline>
             </Stack>
           </Inline>
 

@@ -13,16 +13,24 @@ import { TakeInterviewClient } from './take-interview-client'
 
 interface TakeInterviewPageProps {
   params: Promise<{ id: string; locale: Locale }>
-  searchParams: Promise<{ token?: string | string[] }>
+  searchParams: Promise<{ token?: string | string[]; from?: string | string[] }>
 }
 
 export default async function TakeInterviewPage({ params, searchParams }: TakeInterviewPageProps) {
   const { id, locale } = await params
   const t = await getTranslations({ locale, namespace: 'toast.pageGate.take' })
-  const token = readSearchParamToken((await searchParams).token)
+  const resolvedSearchParams = await searchParams
+  const token = readSearchParamToken(resolvedSearchParams.token)
+  const from = readSearchParamToken(resolvedSearchParams.from)
 
   if (token) {
-    return <TakeInterviewClient id={id} candidateToken={token} />
+    return (
+      <TakeInterviewClient
+        id={id}
+        candidateToken={token}
+        isPortalContinuation={from === 'portal'}
+      />
+    )
   }
 
   const ctx = await getServerRequestContext(locale)

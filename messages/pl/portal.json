@@ -1,0 +1,46 @@
+{
+  "portal": {
+    "myInterviews": {
+      "eyebrow": "Portal kandydata",
+      "title": "Moje rozmowy kwalifikacyjne",
+      "lead": "Wszystkie rozmowy powiązane z Twoim kontem, najpierw najbardziej istotne.",
+      "emptyTitle": "Brak rozmów",
+      "emptyDescription": "Gdy zostaniesz zaproszony na rozmowę, pojawi się tutaj.",
+      "loadFailedTitle": "Nie udało się wczytać Twoich rozmów",
+      "loadFailedFallback": "Wystąpił błąd podczas wczytywania Twoich rozmów. Spróbuj ponownie.",
+      "forbiddenTitle": "Tylko dla portalu kandydata",
+      "forbiddenDescription": "Ta strona jest dostępna tylko dla kont kandydatów."
+    },
+    "status": {
+      "not_started": "Nie rozpoczęto",
+      "in_progress": "W trakcie",
+      "awaiting_results": "Oczekiwanie na wyniki",
+      "results_ready": "Wyniki gotowe",
+      "failed": "Niedostępne"
+    },
+    "card": {
+      "updatedLabel": "Ostatnia aktualizacja"
+    },
+    "detail": {
+      "backToList": "Powrót do moich rozmów",
+      "continueTitle": "Gotowe do kontynuacji",
+      "continueDescription": "Kontynuuj od miejsca, w którym skończyłeś/aś.",
+      "continueCta": "Kontynuuj rozmowę",
+      "notReadyTitle": "Wyniki są w drodze",
+      "notReadyDescription": "Pokażemy Twoje wyniki tutaj, gdy będą gotowe.",
+      "failedTitle": "Tej rozmowy nie udało się ukończyć",
+      "failedDescription": "Coś poszło nie tak. Skontaktuj się z nami, jeśli masz pytania.",
+      "loadFailedTitle": "Nie udało się wczytać tej rozmowy",
+      "loadFailedFallback": "Wystąpił błąd podczas wczytywania tej rozmowy. Spróbuj ponownie.",
+      "tips": {
+        "title": "Zanim zaczniesz",
+        "questionCount": "{count, plural, one {# pytanie} few {# pytania} many {# pytań} other {# pytania}}",
+        "retry": "{count, plural, one {Dozwolona # próba nagrania na pytanie} few {Dozwolone # próby nagrania na pytanie} many {Dozwolonych # prób nagrania na pytanie} other {Dozwolonej # próby nagrania na pytanie}}",
+        "camera": "Upewnij się, że kamera i mikrofon działają",
+        "connection": "Znajdź ciche miejsce ze stabilnym połączeniem internetowym"
+      },
+      "resultsEyebrow": "Informacja zwrotna",
+      "resultsTitle": "Twoje wyniki"
+    }
+  }
+}

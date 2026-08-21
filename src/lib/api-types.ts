@@ -1276,6 +1276,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/portal/interviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the authenticated candidate's own interviews
+         * @description Matched by candidate_email against the caller's account email. Excludes demo/internal data. Most relevant (active, then most recently updated) first.
+         */
+        get: operations["PortalController_listMyInterviews"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/portal/interviews/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get one of the authenticated candidate's own interviews
+         * @description Same shape and scoping as the list endpoint, for the interview-detail page.
+         */
+        get: operations["PortalController_getMyInterview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/portal/interviews/{id}/results": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the authenticated candidate's own published feedback for one interview
+         * @description Reuses the same publishable-block eligibility as the HR-generated share link, but scoped by the caller's own email instead of a share token.
+         */
+        get: operations["PortalController_getMyInterviewResults"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/candidates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Search registered candidates by name or email
+         * @description Minimal id/name/email lookup for the interview-creation candidate picker. Granted to anyone who can create interviews (HR included), not gated by users:read.
+         */
+        get: operations["UserController_searchCandidates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2836,6 +2916,43 @@ export interface components {
              * @description Expiry of a usable share link (non-revoked, not expired, with publishable feedback). URL is never reconstructed from storage (DB stores sha256 only).
              */
             expiresAt: string;
+        };
+        CandidatePortalInterviewListItemDto: {
+            /** Format: uuid */
+            id: string;
+            position: string;
+            /** @enum {string} */
+            status: "pending" | "in_progress" | "processing" | "completed" | "failed";
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            questionCount: number;
+            /** @description Recording attempts allowed per question (server-configured, same for every interview). */
+            maxAnswerAttempts: number;
+            /** @description True once HR has published at least one candidate-feedback block for this interview. */
+            resultsReady: boolean;
+            /** @description Relative take-flow URL with a freshly minted candidate token; present only while the interview is not yet finished. */
+            continueUrl?: string;
+        };
+        CandidatePortalInterviewResultsResponseDto: {
+            /** @enum {string} */
+            interviewLocale: "en" | "be" | "ru" | "pl";
+            position: string;
+            /** Format: date-time */
+            interviewDate?: string;
+            overallScore?: number;
+            /** @enum {string} */
+            outcome?: "next_stage" | "keep_in_touch" | "custom";
+            outcomeMessage?: string;
+            overall?: components["schemas"]["PublicCandidateFeedbackTextBlockDto"];
+            questions?: components["schemas"]["PublicCandidateFeedbackQuestionBlockDto"][];
+        };
+        CandidateSummaryResponseDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            email: string;
         };
     };
     responses: never;
@@ -6658,6 +6775,150 @@ export interface operations {
                 };
             };
             503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    PortalController_listMyInterviews: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CandidatePortalInterviewListItemDto"][];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    PortalController_getMyInterview: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CandidatePortalInterviewListItemDto"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    PortalController_getMyInterviewResults: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CandidatePortalInterviewResultsResponseDto"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    UserController_searchCandidates: {
+        parameters: {
+            query?: {
+                /** @description Substring matched against candidate name or email (case-insensitive). */
+                q?: string;
+                limit?: number;
+            };
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CandidateSummaryResponseDto"][];
+                };
+            };
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };

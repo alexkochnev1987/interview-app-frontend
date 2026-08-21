@@ -90,6 +90,7 @@
     "capabilityFairnessDescription": "Aktywność sesji i przeglądarki może być przechowywana w celu zapewnienia integralności oceny.",
     "completeTitle": "Dziękuję, {candidateName}",
     "completeDescription": "Twoja rozmowa kwalifikacyjna na stanowisko {position} została przesłana i bezpiecznie zapisana do weryfikacji. Jeśli przejdziesz do kolejnego etapu, nasz zespół skontaktuje się z Tobą w ciągu kilku dni roboczych i przekaże dalsze kroki.",
+    "completeHomeCta": "Wróć do moich rozmów kwalifikacyjnych",
     "liveTranscriptTitle": "Transkrypcja na żywo",
     "liveTranscriptUnavailable": "Transkrypcja na żywo jest niedostępna w tej przeglądarce. Nagrywanie jest kontynuowane jak zwykle.",
     "liveTranscriptDraftSuffix": "(projekt)",

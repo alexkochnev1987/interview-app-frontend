@@ -32,4 +32,10 @@ export const routes = {
   feedback: {
     share: (token: string) => `/feedback/share/${encodeURIComponent(token)}`,
   },
+  portal: {
+    // The candidate's interview list lives on the shared dashboard route ('/'),
+    // not a separate landing page — see DashboardPage's role branch.
+    home: '/',
+    interviewDetail: (id: string) => `/portal/interviews/${encodeURIComponent(id)}`,
+  },
 } as const
