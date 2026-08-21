@@ -82,6 +82,7 @@ export function useTakeCandidateSession({
     interviewId,
     candidateToken,
     sessionReadyInitial,
+    // oxlint-disable-next-line react/exhaustive-effect-dependencies
     syncAttempt,
     clearTokenFromCurrentUrl,
     takeMessage,

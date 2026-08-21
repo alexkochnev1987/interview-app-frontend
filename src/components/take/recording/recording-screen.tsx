@@ -2,8 +2,9 @@ import { useTranslations } from 'next-intl'
 import type { RefObject } from 'react'
 
 import type { InterviewDataView, TakeStage } from '@/components/take/types'
-import { Grid, Stack } from '@/components/ui/layout'
-import { submitAnswerActionLabel } from '@/features/take'
+import { Grid } from '@/components/ui/layout/grid'
+import { Stack } from '@/components/ui/layout/stack'
+import { submitAnswerActionLabel } from '@/features/take/messages'
 import type { ExhaustedHint, VersionPersistKind } from '@/features/take/session-machine'
 import type { InterviewerPresence } from '@/features/take/use-take-question-tts'
 

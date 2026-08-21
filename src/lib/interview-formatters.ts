@@ -1,5 +1,3 @@
-import type { Interview } from '@/lib/api'
-
 /**
  * Fixed calendar zone for interview UI timestamps. Using the runtime default
  * timezone makes Node (SSR) and the browser disagree on the same instant,
@@ -41,10 +39,6 @@ export function formatInterviewDate(iso: string) {
 /** Date and time in the same fixed zone as {@link formatInterviewDate}. */
 export function formatInterviewDateTime(iso: string) {
   return interviewDateTimeFormatter.format(new Date(iso))
-}
-
-export function formatInterviewStatusLabel(status: Interview['status']) {
-  return status.replaceAll('_', ' ')
 }
 
 export function getCandidateInitials(name: string) {

@@ -4,7 +4,7 @@ import { cva } from 'class-variance-authority'
 import { Check, ChevronDown, Monitor, Moon, Sun } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useTheme } from 'next-themes'
-import { useEffect, useState } from 'react'
+import { useSyncExternalStore } from 'react'
 
 import {
   DropdownMenu,
@@ -65,6 +65,8 @@ const themeIcons = {
   dark: Moon,
 } as const
 
+const emptySubscribe = () => () => {}
+
 export function ThemeSwitcher({
   ariaLabel = 'Select theme',
   options,
@@ -72,12 +74,12 @@ export function ThemeSwitcher({
   width = 'fit',
 }: ThemeSwitcherProps) {
   const { theme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  )
   const t = useTranslations('profile.preferences')
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
 
   const defaultOptions: ThemeOption[] = [
     { value: 'system', label: t('themeSystem') },

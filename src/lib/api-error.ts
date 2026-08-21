@@ -1,6 +1,6 @@
 import { extractApiErrorFieldsFromBody, type ApiErrorParams } from './api-error-fields'
 
-export type { ApiErrorParamValue, ApiErrorParams } from './api-error-fields'
+export type { ApiErrorParams } from './api-error-fields'
 
 export class ApiError extends Error {
   public readonly code?: string
@@ -33,13 +33,6 @@ export class ApiError extends Error {
   }
 }
 
-export class QuestionInUseError extends Error {
-  constructor(message: string) {
-    super(message)
-    this.name = 'QuestionInUseError'
-  }
-}
-
 export function isUnauthorizedError(err: unknown): boolean {
   return getApiErrorStatus(err) === 401
 }
@@ -61,10 +54,6 @@ export function isApiError(err: unknown): err is ApiError {
 
 export function getApiErrorStatus(err: unknown): number | undefined {
   return isApiError(err) ? err.status : undefined
-}
-
-export function isConflictError(err: unknown): boolean {
-  return err instanceof QuestionInUseError || getApiErrorStatus(err) === 409
 }
 
 type ApiErrorTranslator = {

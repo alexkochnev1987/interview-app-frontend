@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl'
 import { CardContent } from '@/components/ui/card'
 import { Heading } from '@/components/ui/heading'
 import { IconBox } from '@/components/ui/icon-box'
-import { Stack } from '@/components/ui/layout'
+import { Stack } from '@/components/ui/layout/stack'
 import { SurfaceCard } from '@/components/ui/surface-card'
 import { Text } from '@/components/ui/text'
 

@@ -14,7 +14,7 @@ const journeyRowVariants = cva('relative z-10 grid w-full grid-cols-4 items-star
 const journeyNodeVariants = cva('flex min-w-0 flex-col items-center gap-2 px-1')
 
 const journeyMarkerVariants = cva(
-  'flex size-8 shrink-0 items-center justify-center rounded-full shadow-soft ring-1 bg-primary-gradient text-primary-foreground ring-[hsl(var(--primary)/0.2)]',
+  'flex size-8 shrink-0 items-center justify-center rounded-full shadow-soft ring-1 bg-primary-gradient text-primary-foreground ring-primary/20',
 )
 
 const journeySteps = [
@@ -31,7 +31,7 @@ export function OnboardingCompleteJourney() {
     <div className={journeyTrackVariants()}>
       <div
         aria-hidden
-        className="pointer-events-none absolute left-[12%] right-[12%] top-4 z-0 h-px bg-linear-to-r from-[hsl(var(--primary)/0.08)] via-[hsl(var(--primary)/0.28)] to-[hsl(var(--primary)/0.08)]"
+        className="pointer-events-none absolute left-[12%] right-[12%] top-4 z-0 h-px bg-linear-to-r from-primary/10 via-primary/30 to-primary/10"
       />
 
       <div className={journeyRowVariants()}>

@@ -11,7 +11,7 @@ const surfaceTileVariants = cva('ring-1 ring-hairline', {
       soft: 'bg-surface-low-soft',
       elevated: 'bg-surface-low-glass',
       glass: 'bg-surface-glass',
-      'primary-soft': 'bg-[hsl(var(--primary-fixed)/0.55)] ring-[hsl(var(--primary)/0.15)]',
+      'primary-soft': 'bg-primary-fixed/55 ring-primary/15',
     },
     padding: {
       none: '',
@@ -44,7 +44,7 @@ const surfaceTileVariants = cva('ring-1 ring-hairline', {
       'full-lg-auto': 'w-full max-w-full lg:w-auto',
     },
     active: {
-      true: 'bg-accent ring-[hsl(var(--primary)/0.15)]',
+      true: 'bg-accent ring-primary/15',
       false: '',
     },
   },

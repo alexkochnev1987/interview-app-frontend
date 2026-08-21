@@ -22,11 +22,11 @@ const badgeVariants = cva(
         info: 'bg-pill-sky-bg text-pill-sky border-pill-sky-border',
         neutral: 'bg-pill-slate-bg text-pill-slate border-pill-slate-border',
         capsLabelDefault:
-          'rounded-full border-0 bg-[hsl(var(--surface-low)/0.9)] font-semibold uppercase text-muted-foreground ring-1 ring-border/50',
+          'rounded-full border-0 bg-surface-low/90 font-semibold uppercase text-muted-foreground ring-1 ring-border/50',
         capsLabelMuted:
           'rounded-full border-0 bg-white/70 font-semibold uppercase text-muted-foreground ring-1 ring-border/40',
         capsLabelPrimary:
-          'rounded-full border-0 bg-[hsl(var(--primary-fixed)/0.8)] font-semibold uppercase text-[hsl(var(--primary))]',
+          'rounded-full border-0 bg-primary-fixed/80 font-semibold uppercase text-primary',
       },
       size: {
         default: '',

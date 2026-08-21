@@ -8,8 +8,6 @@ import {
 import type { components } from '@/lib/api-types'
 import { type MetadataFieldKey } from '@/lib/question-editor/field-keys'
 
-export { CONTENT_FIELD_KEYS, METADATA_FIELD_KEYS } from '@/lib/question-editor/field-keys'
-
 type CreateQuestionPayload = components['schemas']['CreateQuestionDto']
 type UpdateQuestionPayload = components['schemas']['UpdateQuestionDto']
 type TranslationValue = components['schemas']['QuestionTranslationDto']
@@ -372,52 +370,6 @@ export function applyLocaleDraft(
   }
 }
 
-export function buildTranslationsPayload(
-  primaryLocale: Locale,
-  currentLocale: Locale,
-  currentValue: QuestionInput,
-  drafts: Partial<Record<Locale, Partial<LocaleQuestionDraft>>>,
-): Record<string, TranslationValue> {
-  const mergedDrafts: Partial<Record<Locale, Partial<LocaleQuestionDraft>>> = {
-    ...drafts,
-    [currentLocale]: localeDraftFromInput(currentValue),
-  }
-
-  const result: Record<string, TranslationValue> = {}
-  for (const locale of LOCALES) {
-    const draft = mergedDrafts[locale]
-    if (!draft?.questionText?.trim()) continue
-
-    result[locale] = {
-      questionText: draft.questionText.trim(),
-      followUpQuestions: (draft.followUpQuestions ?? []).map((item) => item.trim()).filter(Boolean),
-      expectedConcepts: toTranslationExpectedConcepts(draft.expectedConcepts ?? []),
-      redFlags: toTranslationRedFlags(draft.redFlags ?? []),
-      sampleGoodAnswer: draft.sampleGoodAnswer?.trim() || undefined,
-    }
-  }
-
-  if (!result[primaryLocale]) {
-    const primaryDraft = mergedDrafts[primaryLocale]
-    result[primaryLocale] = {
-      questionText: primaryDraft?.questionText?.trim() || currentValue.questionText.trim(),
-      followUpQuestions: (primaryDraft?.followUpQuestions ?? currentValue.followUpQuestions ?? [])
-        .map((item) => item.trim())
-        .filter(Boolean),
-      expectedConcepts: toTranslationExpectedConcepts(
-        primaryDraft?.expectedConcepts ?? currentValue.expectedConcepts ?? [],
-      ),
-      redFlags: toTranslationRedFlags(primaryDraft?.redFlags ?? currentValue.redFlags ?? []),
-      sampleGoodAnswer:
-        primaryDraft?.sampleGoodAnswer?.trim() ||
-        currentValue.sampleGoodAnswer?.trim() ||
-        undefined,
-    }
-  }
-
-  return result
-}
-
 export function areEqual(left: unknown, right: unknown): boolean {
   return JSON.stringify(left) === JSON.stringify(right)
 }
@@ -605,17 +557,6 @@ export function resolveEditorLocaleDraft(
 
 export function hasPersistedLocaleTranslation(input: QuestionInput, locale: Locale): boolean {
   return hasLocaleDraftContent(coerceLocaleTranslation(input.translations?.[locale]))
-}
-
-export function resolveEditingContentLocale(
-  activeLocale: Locale,
-  primaryLocale: Locale,
-  input: QuestionInput,
-): Locale {
-  if (hasPersistedLocaleTranslation(input, activeLocale)) {
-    return activeLocale
-  }
-  return primaryLocale
 }
 
 export function localeDraftsFromTranslations(

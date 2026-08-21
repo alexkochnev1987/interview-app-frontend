@@ -9,7 +9,7 @@ import { BodyText } from '@/components/ui/text'
 import { cn } from '@/lib/utils'
 
 const chatWidgetTitleIconVariants = cva(
-  'relative flex shrink-0 items-center justify-center text-[hsl(var(--primary))]',
+  'relative flex shrink-0 items-center justify-center text-primary',
   {
     variants: {
       size: {

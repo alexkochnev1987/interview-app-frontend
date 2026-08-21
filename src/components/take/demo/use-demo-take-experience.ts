@@ -4,7 +4,11 @@ import { useLocale, useTranslations } from 'next-intl'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import type { InterviewDataView, PermissionStatus, TakeStage } from '@/components/take/types'
-import { TAKE_MESSAGES, type TakeMessageKey, type TakeMessageValues } from '@/features/take'
+import {
+  TAKE_MESSAGES,
+  type TakeMessageKey,
+  type TakeMessageValues,
+} from '@/features/take/messages'
 import type { InterviewerPresence } from '@/features/take/use-take-question-tts'
 import { permissionLabel, TAKE_RECORDING_LIMIT_SECONDS } from '@/features/take/utils'
 import type { Locale } from '@/i18n/locales'

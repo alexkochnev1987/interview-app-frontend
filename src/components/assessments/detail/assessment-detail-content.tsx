@@ -11,7 +11,7 @@ import { DetailHeader } from '@/components/assessments/detail/detail-header'
 import { EvaluationStatusBanner } from '@/components/assessments/detail/evaluation-status-banner'
 import { OverallPanel } from '@/components/assessments/detail/overall-panel'
 import { QuestionSection } from '@/components/assessments/detail/question-section'
-import { LiveRefreshNotice } from '@/components/assessments/live-refresh-notice'
+import { AssessmentLiveRefreshNotice } from '@/components/assessments/live-refresh-notice'
 import { InterviewReuseActions } from '@/components/templates/interview-reuse-actions'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -101,7 +101,7 @@ export function AssessmentDetailContent({ initialInterview }: AssessmentDetailCo
 
       {!isReadyToScore ? <EvaluationStatusBanner interview={interview} /> : null}
 
-      {paused ? <LiveRefreshNotice onRefresh={refresh} /> : null}
+      {paused ? <AssessmentLiveRefreshNotice onRefresh={refresh} /> : null}
 
       {isReadyToScore ? (
         <Card variant="floating" size="lg" accent="primary">

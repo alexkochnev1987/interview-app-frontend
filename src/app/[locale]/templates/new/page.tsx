@@ -4,11 +4,10 @@ import { QueryHydrationBoundary } from '@/components/questions/query-hydration-b
 import { TemplateForm } from '@/components/templates/template-form'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
-import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import type { Locale } from '@/i18n/locales'
 import { routes } from '@/i18n/routes'
-import { loadAuthGate, redirectIfUnauthenticated } from '@/lib/auth-gate'
+import { enforcePageAuth } from '@/lib/auth-gate'
 import { canConfigureInterview } from '@/lib/auth-roles'
 import { prefetchInterviewCreatePicker } from '@/lib/questions-library-prefetch'
 import { fetchInterview } from '@/lib/templates-prefetch'
@@ -26,29 +25,20 @@ export default async function NewTemplatePage({ params, searchParams }: NewTempl
   const fromInterview = Array.isArray(fromInterviewParam)
     ? fromInterviewParam[0]
     : fromInterviewParam
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.templates' })
-  const tCommon = await getTranslations({ locale, namespace: 'common' })
-  const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
-  const tPrefill = await getTranslations({ locale, namespace: 'templates.prefill' })
-  const auth = await loadAuthGate(canConfigureInterview, locale)
-  redirectIfUnauthenticated(auth, routes.templates.new, locale)
-
-  if (auth.kind === 'forbidden') {
-    return (
-      <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
-    )
-  }
-
-  if (auth.kind === 'error') {
-    return (
-      <FlashErrorPageFallback
-        title={t('unavailableTitle')}
-        description={`${tCommon('sessionVerificationFailed')} ${auth.message}`}
-        backHref={ERROR_BACK_HREF}
-        backLabel={tFallback('backToTemplates')}
-      />
-    )
-  }
+  const [t, tFallback, tPrefill, auth] = await Promise.all([
+    getTranslations({ locale, namespace: 'toast.pageGate.templates' }),
+    getTranslations({ locale, namespace: 'shared.fallback' }),
+    getTranslations({ locale, namespace: 'templates.prefill' }),
+    enforcePageAuth({
+      roleCheck: canConfigureInterview,
+      locale,
+      returnPath: routes.templates.new,
+      gateNamespace: 'toast.pageGate.templates',
+      backHref: ERROR_BACK_HREF,
+      backLabelKey: 'backToTemplates',
+    }),
+  ])
+  if (!auth.authorized) return auth.fallback
 
   let initialPrefetch
   try {

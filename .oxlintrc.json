@@ -9,7 +9,8 @@
   "rules": {
     "react/react-in-jsx-scope": "off",
     "react/exhaustive-deps": "warn",
-    "import/no-namespace": "warn"
+    "import/no-namespace": "warn",
+    "no-restricted-imports": "warn"
   },
   "settings": {
     "react": { "version": "19" },

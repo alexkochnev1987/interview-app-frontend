@@ -55,8 +55,8 @@ export default async function LocaleLayout({
   }
 
   setRequestLocale(locale)
-  const messages = await getMessages()
-  const [session, initialConfig] = await Promise.all([
+  const [messages, session, initialConfig] = await Promise.all([
+    getMessages(),
     getServerSessionSnapshot(),
     getServerConfigSnapshot(),
   ])

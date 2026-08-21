@@ -3,11 +3,10 @@ import { getTranslations } from 'next-intl/server'
 import { QuestionsLibraryClient } from '@/components/questions/library/questions-library-client'
 import { QueryHydrationBoundary } from '@/components/questions/query-hydration-boundary'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
-import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import type { Locale } from '@/i18n/locales'
 import { routes } from '@/i18n/routes'
-import { loadAuthGate, redirectIfUnauthenticated } from '@/lib/auth-gate'
+import { enforcePageAuth } from '@/lib/auth-gate'
 import { canReadQuestions, isSuperAdmin } from '@/lib/auth-roles'
 import { prefetchQuestionsLibrary } from '@/lib/questions-library-prefetch'
 import { toQuestionsSearchParams } from '@/lib/questions-query-state'
@@ -21,31 +20,22 @@ interface QuestionsPageProps {
 
 export default async function QuestionsPage({ params, searchParams }: QuestionsPageProps) {
   const { locale } = await params
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.questions' })
-  const tCommon = await getTranslations({ locale, namespace: 'common' })
-  const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
-  const auth = await loadAuthGate(canReadQuestions, locale)
-  redirectIfUnauthenticated(auth, routes.questions.list, locale)
-
-  if (auth.kind === 'forbidden') {
-    return (
-      <ForbiddenAccessPage
-        title={t('libraryForbiddenTitle')}
-        description={t('libraryForbiddenDescription')}
-      />
-    )
-  }
-
-  if (auth.kind === 'error') {
-    return (
-      <FlashErrorPageFallback
-        title={t('libraryUnavailableTitle')}
-        description={`${tCommon('sessionVerificationFailed')} ${auth.message}`}
-        backHref={ERROR_BACK_HREF}
-        backLabel={tFallback('backToDashboard')}
-      />
-    )
-  }
+  const [t, tFallback, auth] = await Promise.all([
+    getTranslations({ locale, namespace: 'toast.pageGate.questions' }),
+    getTranslations({ locale, namespace: 'shared.fallback' }),
+    enforcePageAuth({
+      roleCheck: canReadQuestions,
+      locale,
+      returnPath: routes.questions.list,
+      gateNamespace: 'toast.pageGate.questions',
+      forbiddenTitleKey: 'libraryForbiddenTitle',
+      forbiddenDescriptionKey: 'libraryForbiddenDescription',
+      errorTitleKey: 'libraryUnavailableTitle',
+      backHref: ERROR_BACK_HREF,
+      backLabelKey: 'backToDashboard',
+    }),
+  ])
+  if (!auth.authorized) return auth.fallback
 
   const superAdmin = isSuperAdmin(auth.me.role)
   const urlParams = toQuestionsSearchParams(await searchParams)
