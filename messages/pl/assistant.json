@@ -53,7 +53,13 @@
         "showHrs": "Wyświetl dostępnych pracowników HR",
         "filters": "Filtruj interview według statusu, HR i innych filtrów aplikacji",
         "assignHr": "Przypisz interview do pracownika HR (po Twoim potwierdzeniu)",
-        "orgQueries": "Odpowiedz na pytania dotyczące interview, pytań i zespołu w organizacji"
+        "orgQueries": "Odpowiedz na pytania dotyczące interview, pytań i zespołu w organizacji",
+        "questionCount": "Policz pytania w banku z opcjonalnymi filtrami",
+        "assessments": "Pokaż i filtruj oceny",
+        "myAssessments": "Pokaż przypisane do mnie oceny",
+        "teamOverview": "Podsumuj zespół według ról",
+        "teamByRole": "Pokaż członków zespołu według roli",
+        "orgOverview": "Podsumuj aktywność interview w organizacji"
       }
     },
     "confirm": {
@@ -116,7 +122,40 @@
       "empty": "W Twojej organizacji nie ma dostępnych pracowników HR."
     },
     "redirect": {
-      "continue": "Kontynuuj w aplikacji"
+      "continue": "Kontynuuj w aplikacji",
+      "openAssessments": "Otwórz oceny"
+    },
+    "questionCount": {
+      "heading": "Bank pytań",
+      "total": "{count, plural, one {# pytanie} few {# pytania} many {# pytań} other {# pytania}}"
+    },
+    "assessmentCount": {
+      "heading": "Oceny",
+      "total": "{count, plural, one {# ocena} few {# oceny} many {# ocen} other {# oceny}}",
+      "statusFilter": "Status: {status}",
+      "statusScoring": "Ocenianie",
+      "queryFilter": "Szukaj: \"{query}\""
+    },
+    "interviewActivity": {
+      "heading": "Aktywność interview",
+      "total": "{count, plural, one {# interview łącznie} few {# interview łącznie} many {# interview łącznie} other {# interview łącznie}}",
+      "active": "Aktywne",
+      "completed": "Zakończone",
+      "pending": "Oczekujące",
+      "inProgress": "W trakcie",
+      "processing": "Przetwarzanie",
+      "failed": "Nieudane"
+    },
+    "teamSummary": {
+      "heading": "Przegląd zespołu",
+      "total": "{count, plural, one {# członek} few {# członków} many {# członków} other {# członka}}",
+      "superAdmin": "Super admini",
+      "admin": "Admini",
+      "hr": "HR",
+      "candidate": "Kandydaci"
+    },
+    "teamList": {
+      "heading": "Członkowie zespołu"
     },
     "interviewList": {
       "heading": "Interview",
@@ -139,6 +178,9 @@
       "hr": {
         "myInterviews": "Pokaż moje interview",
         "readyForReview": "Pokaż interview gotowe do oceny",
+        "myAssessments": "Pokaż moje oceny",
+        "questionCount": "Ile mamy pytań?",
+        "orgOverview": "Podsumuj aktywność interview w organizacji",
         "createInterview": "Pomóż mi przygotować pytania i utworzyć interview"
       },
       "candidate": {
@@ -147,19 +189,28 @@
         "reviewed": "Czy moje interview zostało ocenione?"
       },
       "admin": {
+        "questionCount": "Ile mamy pytań?",
+        "assessments": "Pokaż wszystkie oceny",
+        "orgOverview": "Podsumuj aktywność interview w organizacji",
         "unassigned": "Pokaż nieprzypisane interview",
         "showHrs": "Pokaż pracowników HR",
         "byStatus": "Pokaż ukończone interview",
+        "teamOverview": "Pokaż mój zespół",
+        "teamByRole": "Pokaż wszystkich pracowników HR",
         "assignHr": "Przypisz interview do pracownika HR",
         "createQuestion": "Pomóż mi utworzyć nowe pytanie rekrutacyjne"
       },
       "super_admin": {
+        "questionCount": "Ile mamy pytań?",
+        "assessments": "Pokaż wszystkie oceny",
+        "orgOverview": "Podsumuj aktywność interview w organizacji",
         "unassigned": "Pokaż nieprzypisane interview",
         "showHrs": "Pokaż pracowników HR",
         "byStatus": "Pokaż interview według statusu",
+        "teamOverview": "Pokaż mój zespół",
+        "teamByRole": "Pokaż wszystkich adminów",
         "assignHr": "Przypisz interview do pracownika HR",
-        "createQuestion": "Pomóż mi utworzyć nowe pytanie rekrutacyjne",
-        "orgOverview": "Podsumuj aktywność interview w organizacji"
+        "createQuestion": "Pomóż mi utworzyć nowe pytanie rekrutacyjne"
       }
     }
   }

@@ -288,6 +288,7 @@ export function ConfigDashboard({ initialConfigs }: ConfigDashboardProps) {
         const globalChanged = editValue !== editingEntry.value
         const roleChangesPending =
           savedKey === RECRUITER_ASSISTANT_ENABLED_KEY &&
+          editValue !== 'false' &&
           RECRUITER_ASSISTANT_ROLE_LOCKS.some(
             ({ role }) => editRoleValues[role] !== initialRoleValues[role],
           )
