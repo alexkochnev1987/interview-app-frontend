@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import { useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 
 import { resolveHtmlLang } from '@/i18n/html-lang'
-import { DEFAULT_LOCALE, LOCALES, type Locale } from '@/i18n/locales'
+import { resolveTakeInterviewLocale, type Locale } from '@/i18n/locales'
 import { mergeLocaleModules } from '@/i18n/module-loader-core.mjs'
 import { localizedPath, pathLocale } from '@/i18n/pathname'
 import { setClientApiLocale } from '@/lib/api'
@@ -113,12 +113,7 @@ async function loadTakeFlowLocaleMessages(locale: Locale): Promise<TakeFlowMessa
   return request
 }
 
-export function resolveTakeInterviewLocale(locale?: string | null): Locale {
-  if (locale && (LOCALES as readonly string[]).includes(locale)) {
-    return locale as Locale
-  }
-  return DEFAULT_LOCALE
-}
+export { resolveTakeInterviewLocale }
 
 function replaceTakeFlowUrlLocale(nextLocale: Locale, searchQuery: string) {
   const { pathnameWithoutLocale } = pathLocale(window.location.pathname)
