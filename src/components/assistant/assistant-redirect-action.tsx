@@ -14,12 +14,12 @@ type AssistantRedirectActionProps = {
 
 export function AssistantRedirectAction({ redirect }: AssistantRedirectActionProps) {
   const t = useTranslations('assistant')
+  const label =
+    redirect.path === '/assessments' ? t('redirect.openAssessments') : t('redirect.continue')
 
   return (
     <Button asChild size="sm" variant="outline">
-      <UnstyledLink href={buildAssistantRedirectHref(redirect)}>
-        {t('redirect.continue')}
-      </UnstyledLink>
+      <UnstyledLink href={buildAssistantRedirectHref(redirect)}>{label}</UnstyledLink>
     </Button>
   )
 }
