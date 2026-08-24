@@ -12,17 +12,22 @@ import { BodyText } from '@/components/ui/text'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
 
 import type { AiAssistantChatMessage } from './ai-assistant-chat-types'
+import { AssistantAssessmentCount } from './assistant-assessment-count'
 import { AssistantAwaitingHrList } from './assistant-awaiting-hr-list'
 import { AssistantAwaitingInterviewList } from './assistant-awaiting-interview-list'
 import { AssistantCreatedInterview } from './assistant-created-interview'
 import { AssistantCreatedQuestion } from './assistant-created-question'
 import type { AssistantHrSelection } from './assistant-hr-selection'
+import { AssistantInterviewActivity } from './assistant-interview-activity'
 import type { AssistantInterviewSelection } from './assistant-interview-selection'
 import { AssistantInterviewSummary } from './assistant-interview-summary'
+import { AssistantQuestionCount } from './assistant-question-count'
 import { AssistantRedirectAction } from './assistant-redirect-action'
 import { AssistantSimilarQuestionList } from './assistant-similar-question-list'
 import type { AssistantSimilarityDecision } from './assistant-similarity-decision'
 import { AssistantSimilarityDecisionList } from './assistant-similarity-decision-list'
+import { AssistantTeamList } from './assistant-team-list'
+import { AssistantTeamSummary } from './assistant-team-summary'
 import { AssistantTemplateList } from './assistant-template-list'
 import type { AssistantTemplateSelection } from './assistant-template-selection'
 
@@ -119,6 +124,21 @@ export function AssistantChatBubble({
           ) : null}
           {message.result?.interview ? (
             <AssistantInterviewSummary interview={message.result.interview} />
+          ) : null}
+          {message.result?.questionCount ? (
+            <AssistantQuestionCount questionCount={message.result.questionCount} />
+          ) : null}
+          {message.result?.assessmentCount ? (
+            <AssistantAssessmentCount assessmentCount={message.result.assessmentCount} />
+          ) : null}
+          {message.result?.interviewActivity ? (
+            <AssistantInterviewActivity activity={message.result.interviewActivity} />
+          ) : null}
+          {message.result?.teamSummary ? (
+            <AssistantTeamSummary teamSummary={message.result.teamSummary} />
+          ) : null}
+          {message.result?.teamMembers && message.result.teamMembers.length > 0 ? (
+            <AssistantTeamList members={message.result.teamMembers} />
           ) : null}
           {message.result?.createdQuestion ? (
             <AssistantCreatedQuestion question={message.result.createdQuestion} />

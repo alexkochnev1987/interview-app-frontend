@@ -199,6 +199,11 @@ export type RecruiterAssistantCreatedInterview = Schemas['RecruiterAssistantCrea
 export type RecruiterAssistantCreatedQuestion = Schemas['RecruiterAssistantCreatedQuestionDto']
 export type RecruiterAssistantSimilarQuestion = Schemas['RecruiterAssistantSimilarQuestionDto']
 export type RecruiterAssistantRedirect = Schemas['RecruiterAssistantRedirectDto']
+export type RecruiterAssistantQuestionCount = Schemas['RecruiterAssistantQuestionCountDto']
+export type RecruiterAssistantAssessmentCount = Schemas['RecruiterAssistantAssessmentCountDto']
+export type RecruiterAssistantInterviewActivity = Schemas['RecruiterAssistantInterviewActivityDto']
+export type RecruiterAssistantTeamSummary = Schemas['RecruiterAssistantTeamSummaryDto']
+export type RecruiterAssistantResponseStatus = RecruiterAssistantResponse['status']
 
 export type PresignedUrlResponse = Schemas['PresignedUrlResponseDto']
 

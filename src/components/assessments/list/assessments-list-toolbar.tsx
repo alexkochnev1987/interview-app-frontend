@@ -20,8 +20,9 @@ import {
 } from '@/components/ui/select'
 import { Sheet, SheetBody, SheetHeader } from '@/components/ui/sheet'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
+import type { AssessmentsStatusFilter } from '@/lib/assessments-query-state'
 
-export type StatusFilter = 'all' | 'ready_to_score' | 'ready' | 'scoring' | 'failed'
+export type StatusFilter = AssessmentsStatusFilter
 
 interface AssessmentsListToolbarProps {
   query: string
