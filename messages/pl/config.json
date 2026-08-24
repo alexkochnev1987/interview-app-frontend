@@ -17,6 +17,14 @@
         "heading": "Dostęp według ról",
         "description": "Włączaj lub wyłączaj Hermana dla każdej roli.",
         "roleDescription": "Czy Herman jest włączony dla użytkowników z rolą {role}."
+      },
+      "liveTranscript": {
+        "label": "Transkrypcja na żywo",
+        "description": "Włącz panel transkrypcji mowy na żywo podczas nagrywania odpowiedzi przez kandydata."
+      },
+      "liveTranscriptDefaultExpanded": {
+        "label": "Transkrypcja na żywo domyślnie rozwinięta",
+        "description": "Początkowy stan panelu transkrypcji dla kandydata (domyślnie rozwinięty)."
       }
     },
     "forbiddenTitle": "Dostęp ograniczony",

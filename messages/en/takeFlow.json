@@ -95,6 +95,8 @@
     "liveTranscriptUnavailable": "Live transcript is unavailable in this browser. Recording continues as usual.",
     "liveTranscriptDraftSuffix": "(draft)",
     "liveTranscriptPlaceholder": "Transcript will appear while you speak...",
+    "liveTranscriptCollapse": "Collapse transcript",
+    "liveTranscriptExpand": "Expand transcript",
     "questionProgress": "Question {current} of {total}",
     "beforeUnloadLeaveInterview": "If you reload or leave now, you will exit this interview and may lose your progress. Are you sure?",
     "attemptsMetricLabel": "Attempts:",

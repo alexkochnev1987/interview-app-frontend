@@ -17,6 +17,14 @@
         "heading": "Role access",
         "description": "Enable or disable Herman per role.",
         "roleDescription": "Whether Herman is enabled for {role} users."
+      },
+      "liveTranscript": {
+        "label": "Live transcript",
+        "description": "Enable live speech-to-text transcript panel during candidate recordings."
+      },
+      "liveTranscriptDefaultExpanded": {
+        "label": "Live transcript expanded by default",
+        "description": "Whether the live transcript panel starts expanded by default for candidates."
       }
     },
     "forbiddenTitle": "Access Restricted",
