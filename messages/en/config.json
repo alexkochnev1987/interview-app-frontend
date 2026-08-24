@@ -27,6 +27,21 @@
         "description": "Whether the live transcript panel starts expanded by default for candidates."
       }
     },
+    "variableDescriptions": {
+      "ENABLE_LIVE_TRANSCRIPT": "Enable live speech-to-text transcript panel during candidate recordings.",
+      "LIVE_TRANSCRIPT_DEFAULT_EXPANDED": "Whether the live transcript panel starts expanded by default for candidates.",
+      "MAX_ANSWER_DURATION_SECONDS": "Maximum answer recording duration in seconds.",
+      "MAX_ANSWER_ATTEMPTS_PER_QUESTION": "Maximum recording attempts per question.",
+      "ENABLE_GOOGLE_OAUTH": "Whether Google OAuth sign-in button is shown.",
+      "ENABLE_FEEDBACK_SHARE_LINKS": "Whether candidate-feedback share links are available.",
+      "DEFAULT_THEME_MODE": "Default UI theme mode (system, light, dark).",
+      "APP_THEME": "Active UI color theme preset (innowise, red, blue, purple).",
+      "RECRUITER_ASSISTANT_ENABLED": "Whether Herman (recruiter AI assistant) is enabled org-wide.",
+      "AI_CANDIDATE_FEEDBACK": "Enable automated LLM feedback report generation for candidates upon interview completion.",
+      "AI_QUESTION_DRAFT_V2": "A/B testing switch to enable next-generation heuristic prompts for AI question generation.",
+      "ENABLE_AI_ANSWER_VALIDATION": "Master switch for Whisper media transcription and LLM answer grading workflow.",
+      "ENABLE_S3_MEDIA_CLEANUP": "Master switch for background orphan media cleaning job in AWS S3 or MinIO."
+    },
     "forbiddenTitle": "Access Restricted",
     "forbiddenDesc": "You need super_admin privileges to view or edit system configuration.",
     "table": {
