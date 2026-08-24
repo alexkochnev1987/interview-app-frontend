@@ -50,6 +50,7 @@ export function LiveTranscriptPanel({
             aria-label={
               isExpanded ? tTake('liveTranscriptCollapse') : tTake('liveTranscriptExpand')
             }
+            aria-expanded={isExpanded}
           >
             <Icon size="xs">{isExpanded ? <ChevronUp /> : <ChevronDown />}</Icon>
           </Button>
