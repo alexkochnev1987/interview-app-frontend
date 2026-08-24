@@ -57,6 +57,10 @@ export interface PublicAppConfig {
   APP_THEME: string
   /** Whether Herman (recruiter AI assistant) is enabled org-wide. */
   RECRUITER_ASSISTANT_ENABLED: boolean
+  /** Whether live browser speech-to-text transcript panel is enabled. */
+  ENABLE_LIVE_TRANSCRIPT: boolean
+  /** Whether the live transcript panel starts expanded for candidates. */
+  LIVE_TRANSCRIPT_DEFAULT_EXPANDED: boolean
 }
 
 /**
@@ -71,6 +75,8 @@ export const DEFAULT_PUBLIC_APP_CONFIG: PublicAppConfig = {
   DEFAULT_THEME_MODE: 'system',
   APP_THEME: 'innowise',
   RECRUITER_ASSISTANT_ENABLED: false,
+  ENABLE_LIVE_TRANSCRIPT: true,
+  LIVE_TRANSCRIPT_DEFAULT_EXPANDED: false,
 }
 
 function parseNumber(val: unknown, fallback: number): number {
@@ -131,6 +137,14 @@ export function parsePublicConfig(raw?: Record<string, unknown> | null): PublicA
     RECRUITER_ASSISTANT_ENABLED: parseBoolean(
       raw.RECRUITER_ASSISTANT_ENABLED ?? raw.ENABLE_AI_ASSISTANT,
       DEFAULT_PUBLIC_APP_CONFIG.RECRUITER_ASSISTANT_ENABLED,
+    ),
+    ENABLE_LIVE_TRANSCRIPT: parseBoolean(
+      raw.ENABLE_LIVE_TRANSCRIPT,
+      DEFAULT_PUBLIC_APP_CONFIG.ENABLE_LIVE_TRANSCRIPT,
+    ),
+    LIVE_TRANSCRIPT_DEFAULT_EXPANDED: parseBoolean(
+      raw.LIVE_TRANSCRIPT_DEFAULT_EXPANDED,
+      DEFAULT_PUBLIC_APP_CONFIG.LIVE_TRANSCRIPT_DEFAULT_EXPANDED,
     ),
   }
 }
