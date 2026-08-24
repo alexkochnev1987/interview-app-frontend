@@ -720,6 +720,84 @@
         ]
       }
     },
+    "/users/candidates": {
+      "get": {
+        "operationId": "UserController_searchCandidates",
+        "summary": "Search registered candidates by name or email",
+        "description": "Minimal id/name/email lookup for the interview-creation candidate picker. Granted to anyone who can create interviews (HR included), not gated by users:read.",
+        "parameters": [
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Substring matched against candidate name or email (case-insensitive).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "X-Locale",
+            "in": "header",
+            "required": false,
+            "description": "Response language for localized content. Defaults to `en` when omitted.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "be",
+                "ru",
+                "pl"
+              ],
+              "default": "en"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CandidateSummaryResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "users"
+        ],
+        "security": [
+          {
+            "sessionAuth": []
+          }
+        ]
+      }
+    },
     "/users/{id}": {
       "get": {
         "operationId": "UserController_findOne",
@@ -7465,84 +7543,6 @@
           }
         ]
       }
-    },
-    "/users/candidates": {
-      "get": {
-        "operationId": "UserController_searchCandidates",
-        "summary": "Search registered candidates by name or email",
-        "description": "Minimal id/name/email lookup for the interview-creation candidate picker. Granted to anyone who can create interviews (HR included), not gated by users:read.",
-        "parameters": [
-          {
-            "name": "q",
-            "required": false,
-            "in": "query",
-            "description": "Substring matched against candidate name or email (case-insensitive).",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "minimum": 1,
-              "maximum": 50,
-              "default": 20,
-              "type": "number"
-            }
-          },
-          {
-            "name": "X-Locale",
-            "in": "header",
-            "required": false,
-            "description": "Response language for localized content. Defaults to `en` when omitted.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "en",
-                "be",
-                "ru",
-                "pl"
-              ],
-              "default": "en"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CandidateSummaryResponseDto"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiErrorResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "users"
-        ],
-        "security": [
-          {
-            "sessionAuth": []
-          }
-        ]
-      }
     }
   },
   "info": {
@@ -7909,6 +7909,26 @@
             "example": "completed"
           }
         }
+      },
+      "CandidateSummaryResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email"
+        ]
       },
       "UserProfileResponseDto": {
         "type": "object",
@@ -12454,26 +12474,6 @@
         "required": [
           "interviewLocale",
           "position"
-        ]
-      },
-      "CandidateSummaryResponseDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "name",
-          "email"
         ]
       }
     }
