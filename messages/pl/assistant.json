@@ -123,7 +123,8 @@
     },
     "redirect": {
       "continue": "Kontynuuj w aplikacji",
-      "openAssessments": "Otwórz oceny"
+      "openAssessments": "Otwórz oceny",
+      "openingInterviewForm": "Otwieram formularz wywiadu."
     },
     "questionCount": {
       "heading": "Bank pytań",

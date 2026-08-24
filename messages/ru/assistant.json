@@ -123,7 +123,8 @@
     },
     "redirect": {
       "continue": "Продолжить в приложении",
-      "openAssessments": "Открыть оценки"
+      "openAssessments": "Открыть оценки",
+      "openingInterviewForm": "Открываю форму интервью."
     },
     "questionCount": {
       "heading": "Банк вопросов",

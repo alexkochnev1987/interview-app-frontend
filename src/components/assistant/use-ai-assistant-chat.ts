@@ -19,7 +19,12 @@ import { useAuth } from '@/lib/auth-context'
 import type { AiAssistantChatMessage } from './ai-assistant-chat-types'
 import { ASSISTANT_CONFIRM_MESSAGE } from './assistant-api-contract'
 import { resolveAssistantWelcomeRole } from './assistant-i18n'
+import {
+  findRecentInterviewFormRedirect,
+  isCreateOwnChoiceMessage,
+} from './assistant-interview-form-redirect'
 import { shouldAttachHrList } from './assistant-show-hrs'
+import { buildAssistantRedirectHref } from './build-assistant-redirect-href'
 import { buildAssistantWelcomeText } from './build-assistant-welcome'
 
 function createMessage(message: Omit<AiAssistantChatMessage, 'id'>): AiAssistantChatMessage {
@@ -155,6 +160,21 @@ export function useAiAssistantChat() {
     router.replace(pathname, { locale: result.locale })
   }
 
+  function completeCreateOwnRedirect(
+    text: string,
+    redirect: NonNullable<RecruiterAssistantResponse['redirect']>,
+    displayText?: string,
+  ) {
+    const response = t('redirect.openingInterviewForm')
+    appendMessage({ role: 'user', text: displayText ?? text })
+    appendMessage({
+      role: 'assistant',
+      text: response,
+      result: { status: 'answered', response, redirect },
+    })
+    router.push(buildAssistantRedirectHref(redirect))
+  }
+
   async function sendUserMessage(
     text: string,
     options?: { restoreInputOnError?: boolean; displayText?: string },
@@ -163,6 +183,15 @@ export function useAiAssistantChat() {
 
     setError(null)
     clearPendingAction()
+
+    if (isCreateOwnChoiceMessage(text)) {
+      const redirect = findRecentInterviewFormRedirect(messages)
+      if (redirect) {
+        completeCreateOwnRedirect(text, redirect, options?.displayText)
+        return
+      }
+    }
+
     setLoading(true)
     appendMessage({ role: 'user', text: options?.displayText ?? text })
 
@@ -191,6 +220,9 @@ export function useAiAssistantChat() {
         result,
       })
       applyLocaleFromResult(result)
+      if (isCreateOwnChoiceMessage(text) && result.redirect) {
+        router.push(buildAssistantRedirectHref(result.redirect))
+      }
     } catch (err) {
       if (!isLatestRequest(requestId) || isAbortError(err)) return
       setError(formatError(err, t('errors.requestFailed')))
