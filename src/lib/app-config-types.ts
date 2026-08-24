@@ -76,7 +76,7 @@ export const DEFAULT_PUBLIC_APP_CONFIG: PublicAppConfig = {
   APP_THEME: 'innowise',
   RECRUITER_ASSISTANT_ENABLED: false,
   ENABLE_LIVE_TRANSCRIPT: true,
-  LIVE_TRANSCRIPT_DEFAULT_EXPANDED: true,
+  LIVE_TRANSCRIPT_DEFAULT_EXPANDED: false,
 }
 
 function parseNumber(val: unknown, fallback: number): number {
