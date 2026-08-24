@@ -53,7 +53,13 @@
         "showHrs": "List available HR reviewers",
         "filters": "Filter interviews by status, HR, and other app filters",
         "assignHr": "Assign an interview to an HR reviewer (with your confirmation)",
-        "orgQueries": "Answer broader interview, question, and team queries in your org"
+        "orgQueries": "Answer broader interview, question, and team queries in your org",
+        "questionCount": "Count questions in the bank, with optional filters",
+        "assessments": "List and filter assessments",
+        "myAssessments": "List assessments assigned to you",
+        "teamOverview": "Summarize your team by role",
+        "teamByRole": "List teammates filtered by role",
+        "orgOverview": "Summarize interview activity in your org"
       }
     },
     "confirm": {
@@ -116,7 +122,40 @@
       "empty": "No HR reviewers are available in your organization."
     },
     "redirect": {
-      "continue": "Continue in the app"
+      "continue": "Continue in the app",
+      "openAssessments": "Open assessments"
+    },
+    "questionCount": {
+      "heading": "Question bank",
+      "total": "{count, plural, one {# question} other {# questions}}"
+    },
+    "assessmentCount": {
+      "heading": "Assessments",
+      "total": "{count, plural, one {# assessment} other {# assessments}}",
+      "statusFilter": "Status: {status}",
+      "statusScoring": "Scoring",
+      "queryFilter": "Search: \"{query}\""
+    },
+    "interviewActivity": {
+      "heading": "Interview activity",
+      "total": "{count, plural, one {# interview total} other {# interviews total}}",
+      "active": "Active",
+      "completed": "Completed",
+      "pending": "Pending",
+      "inProgress": "In progress",
+      "processing": "Processing",
+      "failed": "Failed"
+    },
+    "teamSummary": {
+      "heading": "Team overview",
+      "total": "{count, plural, one {# teammate total} other {# teammates total}}",
+      "superAdmin": "Super admins",
+      "admin": "Admins",
+      "hr": "HR",
+      "candidate": "Candidates"
+    },
+    "teamList": {
+      "heading": "Team members"
     },
     "interviewList": {
       "heading": "Interviews",
@@ -139,6 +178,9 @@
       "hr": {
         "myInterviews": "Show my interviews",
         "readyForReview": "Show interviews ready for my review",
+        "myAssessments": "Show my assessments",
+        "questionCount": "How many questions do we have?",
+        "orgOverview": "Summarize interview activity in my org",
         "createInterview": "Help me prepare questions and create an interview"
       },
       "candidate": {
@@ -147,19 +189,28 @@
         "reviewed": "Has my interview been reviewed?"
       },
       "admin": {
+        "questionCount": "How many questions do we have?",
+        "assessments": "Show all assessments",
+        "orgOverview": "Summarize interview activity in my org",
         "unassigned": "Show unassigned interviews",
         "showHrs": "Show HR reviewers",
         "byStatus": "Show completed interviews",
+        "teamOverview": "Show my team",
+        "teamByRole": "Show all HR team members",
         "assignHr": "Assign an interview to an HR reviewer",
         "createQuestion": "Help me create a new interview question"
       },
       "super_admin": {
+        "questionCount": "How many questions do we have?",
+        "assessments": "Show all assessments",
+        "orgOverview": "Summarize interview activity in my org",
         "unassigned": "Show unassigned interviews",
         "showHrs": "Show HR reviewers",
         "byStatus": "Show interviews by status",
+        "teamOverview": "Show my team",
+        "teamByRole": "Show all admins",
         "assignHr": "Assign an interview to an HR reviewer",
-        "createQuestion": "Help me create a new interview question",
-        "orgOverview": "Summarize interview activity in my org"
+        "createQuestion": "Help me create a new interview question"
       }
     }
   }
