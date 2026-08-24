@@ -185,14 +185,23 @@ export function ConfigDashboard({ initialConfigs }: ConfigDashboardProps) {
 
   const editingRecruiterAssistant = editingEntry?.key === RECRUITER_ASSISTANT_ENABLED_KEY
 
+  const getEntryDescription = (key: string, fallbackDesc?: string) => {
+    const i18nKey = `variableDescriptions.${key}`
+    return t.has(i18nKey) ? t(i18nKey) : fallbackDesc
+  }
+
   const filteredConfigs = configs
-    .filter(
-      (item) =>
-        !RECRUITER_ASSISTANT_NESTED_CONFIG_KEYS.has(item.key) &&
-        !DEPRECATED_CONFIG_KEYS.has(item.key) &&
-        (item.key.toLowerCase().includes(search.toLowerCase()) ||
-          (item.description && item.description.toLowerCase().includes(search.toLowerCase()))),
-    )
+    .filter((item) => {
+      if (
+        RECRUITER_ASSISTANT_NESTED_CONFIG_KEYS.has(item.key) ||
+        DEPRECATED_CONFIG_KEYS.has(item.key)
+      ) {
+        return false
+      }
+      const desc = getEntryDescription(item.key, item.description)
+      const q = search.toLowerCase()
+      return item.key.toLowerCase().includes(q) || Boolean(desc && desc.toLowerCase().includes(q))
+    })
     .toSorted((a, b) => {
       let comparison = 0
       if (sortBy === 'key') {
@@ -451,9 +460,9 @@ export function ConfigDashboard({ initialConfigs }: ConfigDashboardProps) {
                         <BodyText tone="foreground" weight="semibold">
                           {entry.key}
                         </BodyText>
-                        {entry.description ? (
+                        {getEntryDescription(entry.key, entry.description) ? (
                           <BodyText size="xs" tone="muted">
-                            {entry.description}
+                            {getEntryDescription(entry.key, entry.description)}
                           </BodyText>
                         ) : null}
                       </Stack>

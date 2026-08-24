@@ -1,10 +1,11 @@
 import { AlertCircle } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
+import { redirect } from 'next/navigation'
 
 import { PageContent, PageMainLayout } from '@/components/layout/page-shell'
 import { Icon } from '@/components/ui/icon'
 import { EmptyStateCard } from '@/components/ui/state-card'
-import type { Locale } from '@/i18n/locales'
+import { resolveTakeInterviewLocale, type Locale } from '@/i18n/locales'
 import { type TakeInterviewData } from '@/lib/api'
 import { getServerRequestContext, requestServer } from '@/lib/server-fetch'
 import { readSearchParamToken } from '@/lib/text'
@@ -65,6 +66,13 @@ export default async function TakeInterviewPage({ params, searchParams }: TakeIn
         </PageContent>
       </PageMainLayout>
     )
+  }
+
+  if (interview.interviewLocale) {
+    const targetLocale = resolveTakeInterviewLocale(interview.interviewLocale)
+    if (targetLocale !== locale) {
+      redirect(`/${targetLocale}/take/${id}`)
+    }
   }
 
   return <TakeInterviewClient id={id} initialInterview={interview} />
