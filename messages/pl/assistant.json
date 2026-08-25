@@ -29,6 +29,8 @@
       },
       "awaiting": {
         "candidateName": "Wpisz imię kandydata…",
+        "candidateChoice": "Wybierz kandydata powyżej lub wpisz nowe imię…",
+        "confirmRegisteredCandidate": "Wybierz Tak lub Nie powyżej…",
         "position": "Wpisz stanowisko…",
         "questionName": "Wpisz nazwę pytania…",
         "confirmAddDespiteSimilar": "Wybierz Kontynuuj lub Anuluj powyżej…",
@@ -110,6 +112,15 @@
       "heading": "Mimo to utworzyć to pytanie?",
       "continue": "Kontynuuj tworzenie",
       "abort": "Anuluj"
+    },
+    "confirmRegisteredCandidate": {
+      "heading": "Użyć tego zarejestrowanego kandydata?",
+      "yes": "Tak, użyj tego kandydata",
+      "no": "Nie, wpisz inne imię"
+    },
+    "candidateList": {
+      "heading": "Zarejestrowani kandydaci",
+      "newCandidate": "Nowy kandydat"
     },
     "templateList": {
       "heading": "Wybierz szablon",

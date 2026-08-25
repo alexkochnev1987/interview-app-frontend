@@ -29,6 +29,8 @@
       },
       "awaiting": {
         "candidateName": "Enter the candidate name…",
+        "candidateChoice": "Pick a candidate above or type a new name…",
+        "confirmRegisteredCandidate": "Choose Yes or No above…",
         "position": "Enter the job position…",
         "questionName": "Enter the question name…",
         "confirmAddDespiteSimilar": "Choose Continue or Cancel above…",
@@ -110,6 +112,15 @@
       "heading": "Still create this question?",
       "continue": "Continue creating",
       "abort": "Cancel"
+    },
+    "confirmRegisteredCandidate": {
+      "heading": "Use this registered candidate?",
+      "yes": "Yes, use this candidate",
+      "no": "No, enter a different name"
+    },
+    "candidateList": {
+      "heading": "Registered candidates",
+      "newCandidate": "New candidate"
     },
     "templateList": {
       "heading": "Choose a template",
