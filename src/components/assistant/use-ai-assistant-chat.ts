@@ -20,6 +20,7 @@ import type { AiAssistantChatMessage } from './ai-assistant-chat-types'
 import { ASSISTANT_CONFIRM_MESSAGE } from './assistant-api-contract'
 import { resolveAssistantWelcomeRole } from './assistant-i18n'
 import {
+  enrichInterviewFormRedirect,
   findRecentInterviewFormRedirect,
   isCreateOwnChoiceMessage,
 } from './assistant-interview-form-redirect'
@@ -221,7 +222,9 @@ export function useAiAssistantChat() {
       })
       applyLocaleFromResult(result)
       if (isCreateOwnChoiceMessage(text) && result.redirect) {
-        router.push(buildAssistantRedirectHref(result.redirect))
+        router.push(
+          buildAssistantRedirectHref(enrichInterviewFormRedirect(result.redirect, messages)),
+        )
       }
     } catch (err) {
       if (!isLatestRequest(requestId) || isAbortError(err)) return
