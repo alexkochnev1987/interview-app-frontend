@@ -13,8 +13,10 @@ import { useSharedLabels } from '@/i18n/use-shared-labels'
 
 import type { AiAssistantChatMessage } from './ai-assistant-chat-types'
 import { AssistantAssessmentCount } from './assistant-assessment-count'
+import { AssistantAwaitingCandidateList } from './assistant-awaiting-candidate-list'
 import { AssistantAwaitingHrList } from './assistant-awaiting-hr-list'
 import { AssistantAwaitingInterviewList } from './assistant-awaiting-interview-list'
+import type { AssistantCandidateSelection } from './assistant-candidate-selection'
 import { AssistantCreatedInterview } from './assistant-created-interview'
 import { AssistantCreatedQuestion } from './assistant-created-question'
 import type { AssistantHrSelection } from './assistant-hr-selection'
@@ -23,6 +25,8 @@ import type { AssistantInterviewSelection } from './assistant-interview-selectio
 import { AssistantInterviewSummary } from './assistant-interview-summary'
 import { AssistantQuestionCount } from './assistant-question-count'
 import { AssistantRedirectAction } from './assistant-redirect-action'
+import type { AssistantRegisteredCandidateDecision } from './assistant-registered-candidate-decision'
+import { AssistantRegisteredCandidateDecisionList } from './assistant-registered-candidate-decision-list'
 import { AssistantSimilarQuestionList } from './assistant-similar-question-list'
 import type { AssistantSimilarityDecision } from './assistant-similarity-decision'
 import { AssistantSimilarityDecisionList } from './assistant-similarity-decision-list'
@@ -38,6 +42,8 @@ type AssistantChatBubbleProps = {
   onSelectTemplate?: (selection: AssistantTemplateSelection) => void
   onSelectHr?: (selection: AssistantHrSelection) => void
   onSelectInterview?: (selection: AssistantInterviewSelection) => void
+  onSelectCandidate?: (selection: AssistantCandidateSelection) => void
+  onRegisteredCandidateDecision?: (selection: AssistantRegisteredCandidateDecision) => void
   onSimilarityDecision?: (selection: AssistantSimilarityDecision) => void
 }
 
@@ -48,6 +54,8 @@ export function AssistantChatBubble({
   onSelectTemplate,
   onSelectHr,
   onSelectInterview,
+  onSelectCandidate,
+  onRegisteredCandidateDecision,
   onSimilarityDecision,
 }: AssistantChatBubbleProps) {
   const t = useTranslations('assistant')
@@ -149,6 +157,14 @@ export function AssistantChatBubble({
           {message.result?.redirect ? (
             <AssistantRedirectAction redirect={message.result.redirect} />
           ) : null}
+          {message.result?.awaitingInput === 'candidateChoice' && onSelectCandidate ? (
+            <AssistantAwaitingCandidateList
+              candidates={message.result.candidates}
+              disabled={disabled}
+              onSelect={onSelectCandidate}
+              showNewCandidate
+            />
+          ) : null}
           {message.result?.awaitingInput === 'templateChoice' &&
           message.result.templates &&
           message.result.templates.length > 0 &&
@@ -161,6 +177,13 @@ export function AssistantChatBubble({
           ) : null}
           {message.result?.similarQuestions && message.result.similarQuestions.length > 0 ? (
             <AssistantSimilarQuestionList questions={message.result.similarQuestions} />
+          ) : null}
+          {message.result?.awaitingInput === 'confirmRegisteredCandidate' &&
+          onRegisteredCandidateDecision ? (
+            <AssistantRegisteredCandidateDecisionList
+              disabled={disabled}
+              onSelect={onRegisteredCandidateDecision}
+            />
           ) : null}
           {message.result?.awaitingInput === 'confirmAddDespiteSimilar' && onSimilarityDecision ? (
             <AssistantSimilarityDecisionList disabled={disabled} onSelect={onSimilarityDecision} />
