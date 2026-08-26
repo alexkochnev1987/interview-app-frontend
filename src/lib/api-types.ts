@@ -2693,6 +2693,8 @@ export interface components {
         };
         RecruiterAssistantReviewStateDto: {
             reviewed: boolean;
+            /** @description True once HR has published at least one candidate-feedback block. */
+            resultsReady?: boolean;
             shareLinkActive?: boolean;
             outcome?: string;
         };
