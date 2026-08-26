@@ -135,7 +135,6 @@
     "redirect": {
       "continue": "Kontynuuj w aplikacji",
       "openAssessments": "Otwórz oceny",
-      "openPortal": "Otwórz portal kandydata",
       "openPortalInterview": "Zobacz w portalu",
       "openingInterviewForm": "Otwieram formularz wywiadu."
     },
@@ -189,8 +188,6 @@
       "openCandidateLink": "Otwórz link do interview"
     },
     "candidateInterviewSummary": {
-      "continueInterview": "Kontynuuj interview",
-      "viewInPortal": "Zobacz w portalu",
       "reviewed": "Ocenione",
       "notReviewed": "Jeszcze nie ocenione",
       "resultsReady": "Wyniki gotowe",

@@ -135,7 +135,6 @@
     "redirect": {
       "continue": "Працягнуць у дадатку",
       "openAssessments": "Адкрыць ацэнкі",
-      "openPortal": "Адкрыць партал кандыдата",
       "openPortalInterview": "Адкрыць у партале",
       "openingInterviewForm": "Адкрываю форму інтэрв'ю."
     },
@@ -189,8 +188,6 @@
       "openCandidateLink": "Адкрыць спасылку на інтэрв'ю"
     },
     "candidateInterviewSummary": {
-      "continueInterview": "Працягнуць інтэрв'ю",
-      "viewInPortal": "Адкрыць у партале",
       "reviewed": "Разгледжана",
       "notReviewed": "Яшчэ не разгледжана",
       "resultsReady": "Вынікі гатовыя",

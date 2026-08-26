@@ -5,7 +5,6 @@ import {
   deriveAssistantCandidateInterviewStatusFromListItem,
   getAssistantCandidatePortalStatusLabelKey,
   getAssistantCandidateReviewPresentation,
-  resolveAssistantCandidateContinueLink,
 } from '@/components/assistant/assistant-candidate-interview-status'
 
 describe('deriveAssistantCandidateInterviewStatus', () => {
@@ -81,25 +80,5 @@ describe('getAssistantCandidateReviewPresentation', () => {
 
   it('returns null when reviewState is missing', () => {
     expect(getAssistantCandidateReviewPresentation(undefined)).toBeNull()
-  })
-})
-
-describe('resolveAssistantCandidateContinueLink', () => {
-  it('accepts internal take-flow paths from Herman', () => {
-    expect(
-      resolveAssistantCandidateContinueLink(
-        '/take/11111111-1111-4111-8111-111111111111?token=abc&from=portal',
-      ),
-    ).toEqual({
-      kind: 'internal',
-      href: '/take/11111111-1111-4111-8111-111111111111?token=abc&from=portal',
-    })
-  })
-
-  it('accepts absolute http links', () => {
-    expect(resolveAssistantCandidateContinueLink('https://example.com/take/1')).toEqual({
-      kind: 'external',
-      href: 'https://example.com/take/1',
-    })
   })
 })

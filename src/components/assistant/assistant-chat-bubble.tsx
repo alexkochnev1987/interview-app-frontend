@@ -29,6 +29,7 @@ import type { AssistantInterviewSelection } from './assistant-interview-selectio
 import { AssistantInterviewSummary } from './assistant-interview-summary'
 import { AssistantQuestionCount } from './assistant-question-count'
 import { AssistantRedirectAction } from './assistant-redirect-action'
+import { shouldShowAssistantRedirectAction } from './assistant-redirect-label'
 import type { AssistantRegisteredCandidateDecision } from './assistant-registered-candidate-decision'
 import { AssistantRegisteredCandidateDecisionList } from './assistant-registered-candidate-decision-list'
 import { AssistantSimilarQuestionList } from './assistant-similar-question-list'
@@ -168,7 +169,11 @@ export function AssistantChatBubble({
           {message.result?.createdInterview ? (
             <AssistantCreatedInterview interview={message.result.createdInterview} />
           ) : null}
-          {message.result?.redirect ? (
+          {message.result?.redirect &&
+          shouldShowAssistantRedirectAction(message.result.redirect, {
+            isCandidateView,
+            interviewId: message.result.interview?.id,
+          }) ? (
             <AssistantRedirectAction redirect={message.result.redirect} />
           ) : null}
           {message.result?.awaitingInput === 'candidateChoice' && onSelectCandidate ? (

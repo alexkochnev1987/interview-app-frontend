@@ -135,7 +135,6 @@
     "redirect": {
       "continue": "Продолжить в приложении",
       "openAssessments": "Открыть оценки",
-      "openPortal": "Открыть портал кандидата",
       "openPortalInterview": "Открыть в портале",
       "openingInterviewForm": "Открываю форму интервью."
     },
@@ -189,8 +188,6 @@
       "openCandidateLink": "Открыть ссылку на интервью"
     },
     "candidateInterviewSummary": {
-      "continueInterview": "Продолжить интервью",
-      "viewInPortal": "Открыть в портале",
       "reviewed": "Рассмотрено",
       "notReviewed": "Ещё не рассмотрено",
       "resultsReady": "Результаты готовы",

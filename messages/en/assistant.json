@@ -135,7 +135,6 @@
     "redirect": {
       "continue": "Continue in the app",
       "openAssessments": "Open assessments",
-      "openPortal": "Open candidate portal",
       "openPortalInterview": "View in portal",
       "openingInterviewForm": "Opening the interview form."
     },
@@ -189,8 +188,6 @@
       "openCandidateLink": "Open your interview link"
     },
     "candidateInterviewSummary": {
-      "continueInterview": "Continue interview",
-      "viewInPortal": "View in portal",
       "reviewed": "Reviewed",
       "notReviewed": "Not reviewed yet",
       "resultsReady": "Results ready",
