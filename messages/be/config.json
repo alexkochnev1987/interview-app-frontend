@@ -6,7 +6,7 @@
     "searchPlaceholder": "Фільтр ключоў канфігурацыі...",
     "quickAdd": "Дадаць зменную",
     "featureToggles": {
-      "heading": "Сцяжкі функцый",
+      "heading": "Сцягі функцый",
       "enabled": "Уключана",
       "disabled": "Выключана",
       "recruiterAssistant": {
@@ -15,9 +15,32 @@
       },
       "recruiterAssistantRoles": {
         "heading": "Доступ па ролях",
-        "description": "Уключайце або адключайце Hermana для кожнай ролі.",
+        "description": "Уключайце або адключайце Herman для кожнай ролі.",
         "roleDescription": "Ці ўключаны Herman для карыстальнікаў з роляй {role}."
+      },
+      "liveTranscript": {
+        "label": "Жывая стэнаграма",
+        "description": "Уключыць панэль распазнавання маўлення ў рэальным часе пры запісе адказу кандыдата."
+      },
+      "liveTranscriptDefaultExpanded": {
+        "label": "Жывая стэнаграма разгорнута па змаўчанні",
+        "description": "Пачатковы стан панэлі стэнаграмы для кандыдата (разгорнута па змаўчанні)."
       }
+    },
+    "variableDescriptions": {
+      "ENABLE_LIVE_TRANSCRIPT": "Уключыць панэль распазнавання маўлення ў рэальным часе пры запісе адказу кандыдата.",
+      "LIVE_TRANSCRIPT_DEFAULT_EXPANDED": "Пачатковы стан панэлі стэнаграмы для кандыдата (разгорнута па змаўчанні).",
+      "MAX_ANSWER_DURATION_SECONDS": "Максімальная працягласць запісу адказу ў секундах.",
+      "MAX_ANSWER_ATTEMPTS_PER_QUESTION": "Максімальная колькасць спробаў запісу адказу на адно пытанне.",
+      "ENABLE_GOOGLE_OAUTH": "Адлюстраванне кнопкі ўваходу праз Google OAuth.",
+      "ENABLE_FEEDBACK_SHARE_LINKS": "Магчымасць генерацыі публічных спасылак для прагляду фідбэку кандыдата.",
+      "DEFAULT_THEME_MODE": "Тэма афармлення па змаўчанні (system, light, dark).",
+      "APP_THEME": "Колеравая тэма інтэрфейсу праграмы (innowise, red, blue, purple).",
+      "RECRUITER_ASSISTANT_ENABLED": "Уключыць ІІ-памочніка Herman для ўсёй арганізацыі.",
+      "AI_CANDIDATE_FEEDBACK": "Уключыць аўтаматычную генерацыю справаздач з фідбэкам для кандыдатаў пасля завяршэння інтэрв'ю.",
+      "AI_QUESTION_DRAFT_V2": "A/B тэставанне эўрыстычных промптаў новага пакалення для генерацыі пытанняў.",
+      "ENABLE_AI_ANSWER_VALIDATION": "Галоўны пераключальнік транскрыпцыі Whisper і ацэнкі адказаў праз LLM.",
+      "ENABLE_S3_MEDIA_CLEANUP": "Галоўны пераключальнік фонавай ачысткі нявыкарыстаных медыяфайлаў у сховішчы S3/MinIO."
     },
     "forbiddenTitle": "Доступ абмежаваны",
     "forbiddenDesc": "Для прагляду або рэдагавання сістэмнай канфігурацыі патрабуюцца правы super_admin.",

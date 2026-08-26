@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
+import { useAppConfig } from '@/lib/app-config-context'
+
 import type {
   BrowserSpeechRecognitionConstructor,
   BrowserSpeechRecognitionInstance,
@@ -43,6 +45,7 @@ function getDefaultLanguage(): string {
 }
 
 export function useBrowserTranscript() {
+  const { ENABLE_LIVE_TRANSCRIPT } = useAppConfig()
   const [isSupported, setIsSupported] = useState(false)
   const [isListening, setIsListening] = useState(false)
   const [interimTranscript, setInterimTranscript] = useState('')
@@ -63,9 +66,9 @@ export function useBrowserTranscript() {
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- post-mount SSR-safe SpeechRecognition detection
-    setIsSupported(Boolean(getRecognitionConstructor()))
+    setIsSupported(ENABLE_LIVE_TRANSCRIPT && Boolean(getRecognitionConstructor()))
     languageRef.current = getDefaultLanguage()
-  }, [])
+  }, [ENABLE_LIVE_TRANSCRIPT])
 
   const clearStopTimeout = useCallback(() => {
     if (!stopTimeoutRef.current) {
@@ -153,6 +156,10 @@ export function useBrowserTranscript() {
   }, [])
 
   const ensureRecognition = useCallback(() => {
+    if (!ENABLE_LIVE_TRANSCRIPT) {
+      return null
+    }
+
     if (recognitionRef.current) {
       return recognitionRef.current
     }
@@ -240,6 +247,7 @@ export function useBrowserTranscript() {
     recognitionRef.current = recognition
     return recognition
   }, [
+    ENABLE_LIVE_TRANSCRIPT,
     appendFinalText,
     buildSnapshot,
     clearStopTimeout,
@@ -248,6 +256,10 @@ export function useBrowserTranscript() {
   ])
 
   const primeRecordingSession = useCallback(() => {
+    if (!ENABLE_LIVE_TRANSCRIPT) {
+      return
+    }
+
     setWarning(undefined)
     restartAttemptsRef.current = 0
     isSessionActiveRef.current = true
@@ -276,6 +288,7 @@ export function useBrowserTranscript() {
 
     armRecognitionResumeAfterSynthGap()
   }, [
+    ENABLE_LIVE_TRANSCRIPT,
     armRecognitionResumeAfterSynthGap,
     ensureRecognition,
     setFinalTranscriptValue,

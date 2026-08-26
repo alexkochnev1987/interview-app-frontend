@@ -5,7 +5,7 @@ import type { HTMLAttributes } from 'react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
-const surfaceTileVariants = cva('ring-1 ring-hairline', {
+const surfaceTileVariants = cva('@container ring-1 ring-hairline', {
   variants: {
     tone: {
       soft: 'bg-surface-low-soft',

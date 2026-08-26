@@ -13,6 +13,7 @@ import { IconLabel } from '@/components/ui/icon-label'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { Progress } from '@/components/ui/progress'
+import { CandidateLinkSkeleton } from '@/components/ui/skeleton'
 import { StatusPill } from '@/components/ui/status-pill'
 import { SurfaceTile } from '@/components/ui/surface-tile'
 import { BodyText } from '@/components/ui/text'
@@ -107,20 +108,24 @@ export function CandidateAccessPanel({
               </Inline>
             </Inline>
 
-            <BodyText size="sm">
-              {isDemo
-                ? tCommon('demoMode.readOnlyHint')
-                : candidateLinkStatus === 'loading'
-                  ? t('generatingLink')
-                  : candidateLinkStatus === 'error'
-                    ? candidateLinkError
-                    : candidateLinkPreview || t('linkNotReady')}
-            </BodyText>
-            {candidateLinkStatus === 'ready' && candidateLink ? (
-              <BodyText size="xs" title={candidateLink}>
-                {t('linkPreviewHelp')}
-              </BodyText>
-            ) : null}
+            {candidateLinkStatus === 'loading' && !isDemo ? (
+              <CandidateLinkSkeleton aria-label={t('generatingLink')} />
+            ) : (
+              <Stack gap={1.5}>
+                <BodyText size="sm">
+                  {isDemo
+                    ? tCommon('demoMode.readOnlyHint')
+                    : candidateLinkStatus === 'error'
+                      ? candidateLinkError
+                      : candidateLinkPreview || t('linkNotReady')}
+                </BodyText>
+                {candidateLinkStatus === 'ready' && candidateLink ? (
+                  <BodyText size="xs" title={candidateLink}>
+                    {t('linkPreviewHelp')}
+                  </BodyText>
+                ) : null}
+              </Stack>
+            )}
             {canPreviewDemoTake ? (
               <Button
                 type="button"
