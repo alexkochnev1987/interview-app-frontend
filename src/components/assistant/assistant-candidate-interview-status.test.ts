@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   deriveAssistantCandidateInterviewStatus,
+  deriveAssistantCandidateInterviewStatusFromListItem,
   getAssistantCandidatePortalStatusLabelKey,
   getAssistantCandidateReviewPresentation,
   resolveAssistantCandidateContinueLink,
@@ -44,6 +45,20 @@ describe('deriveAssistantCandidateInterviewStatus', () => {
         status: 'unknown',
       }),
     ).toBe('failed')
+  })
+})
+
+describe('deriveAssistantCandidateInterviewStatusFromListItem', () => {
+  it('maps list item status without reviewState', () => {
+    expect(deriveAssistantCandidateInterviewStatusFromListItem({ status: 'pending' })).toBe(
+      'not_started',
+    )
+    expect(deriveAssistantCandidateInterviewStatusFromListItem({ status: 'in_progress' })).toBe(
+      'in_progress',
+    )
+    expect(deriveAssistantCandidateInterviewStatusFromListItem({ status: 'completed' })).toBe(
+      'awaiting_results',
+    )
   })
 })
 

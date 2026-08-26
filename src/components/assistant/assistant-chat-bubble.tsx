@@ -18,6 +18,7 @@ import { AssistantAssessmentCount } from './assistant-assessment-count'
 import { AssistantAwaitingCandidateList } from './assistant-awaiting-candidate-list'
 import { AssistantAwaitingHrList } from './assistant-awaiting-hr-list'
 import { AssistantAwaitingInterviewList } from './assistant-awaiting-interview-list'
+import { AssistantCandidateInterviewList } from './assistant-candidate-interview-list'
 import { AssistantCandidateInterviewSummary } from './assistant-candidate-interview-summary'
 import type { AssistantCandidateSelection } from './assistant-candidate-selection'
 import { AssistantCreatedInterview } from './assistant-created-interview'
@@ -125,8 +126,12 @@ export function AssistantChatBubble({
             </Alert>
           ) : null}
 
-          {(message.result?.interviews?.length ?? 0) > 0 ||
-          message.result?.awaitingInput === 'interview' ? (
+          {isCandidateView && message.result?.interviews && message.result.interviews.length > 0 ? (
+            <AssistantCandidateInterviewList interviews={message.result.interviews} />
+          ) : null}
+          {!isCandidateView &&
+          ((message.result?.interviews?.length ?? 0) > 0 ||
+            message.result?.awaitingInput === 'interview') ? (
             <AssistantAwaitingInterviewList
               interviews={message.result?.interviews}
               disabled={disabled}

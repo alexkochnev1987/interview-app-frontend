@@ -194,6 +194,9 @@
       "resultsReady": "Wyniki gotowe",
       "outcome": "Wynik"
     },
+    "candidateInterviewList": {
+      "heading": "Twoje interview"
+    },
     "prompts": {
       "hr": {
         "myInterviews": "Pokaż moje interview",

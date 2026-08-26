@@ -194,6 +194,9 @@
       "resultsReady": "Результаты готовы",
       "outcome": "Результат"
     },
+    "candidateInterviewList": {
+      "heading": "Ваши интервью"
+    },
     "prompts": {
       "hr": {
         "myInterviews": "Показать мои интервью",

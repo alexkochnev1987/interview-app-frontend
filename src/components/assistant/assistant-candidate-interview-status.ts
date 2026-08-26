@@ -41,6 +41,16 @@ export function deriveAssistantCandidateInterviewStatus(
   })
 }
 
+/** List items from Herman omit reviewState; completed rows default to awaiting_results. */
+export function deriveAssistantCandidateInterviewStatusFromListItem(
+  interview: Pick<InterviewListItem, 'status'>,
+): PortalInterviewStatus {
+  return derivePortalInterviewStatus({
+    status: parseInterviewStatus(interview.status),
+    resultsReady: false,
+  })
+}
+
 /** i18n key under the `portal` namespace — reuse `portal.status.*` labels in assistant cards. */
 export function getAssistantCandidatePortalStatusLabelKey(
   status: PortalInterviewStatus,
