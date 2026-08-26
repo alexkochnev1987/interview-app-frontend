@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest'
 import {
   deriveAssistantCandidateInterviewStatus,
   getAssistantCandidatePortalStatusLabelKey,
+  getAssistantCandidateReviewPresentation,
+  resolveAssistantCandidateContinueLink,
 } from '@/components/assistant/assistant-candidate-interview-status'
 
 describe('deriveAssistantCandidateInterviewStatus', () => {
@@ -49,5 +51,40 @@ describe('getAssistantCandidatePortalStatusLabelKey', () => {
   it('returns portal.status keys for reuse in assistant UI', () => {
     expect(getAssistantCandidatePortalStatusLabelKey('in_progress')).toBe('status.in_progress')
     expect(getAssistantCandidatePortalStatusLabelKey('results_ready')).toBe('status.results_ready')
+  })
+})
+
+describe('getAssistantCandidateReviewPresentation', () => {
+  it('prioritizes resultsReady over reviewed', () => {
+    expect(
+      getAssistantCandidateReviewPresentation({
+        reviewed: false,
+        resultsReady: true,
+      }),
+    ).toEqual({ tone: 'completed', labelKey: 'resultsReady' })
+  })
+
+  it('returns null when reviewState is missing', () => {
+    expect(getAssistantCandidateReviewPresentation(undefined)).toBeNull()
+  })
+})
+
+describe('resolveAssistantCandidateContinueLink', () => {
+  it('accepts internal take-flow paths from Herman', () => {
+    expect(
+      resolveAssistantCandidateContinueLink(
+        '/take/11111111-1111-4111-8111-111111111111?token=abc&from=portal',
+      ),
+    ).toEqual({
+      kind: 'internal',
+      href: '/take/11111111-1111-4111-8111-111111111111?token=abc&from=portal',
+    })
+  })
+
+  it('accepts absolute http links', () => {
+    expect(resolveAssistantCandidateContinueLink('https://example.com/take/1')).toEqual({
+      kind: 'external',
+      href: 'https://example.com/take/1',
+    })
   })
 })

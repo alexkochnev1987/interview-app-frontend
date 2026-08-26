@@ -186,6 +186,14 @@
       "viewDetail": "Szczegóły",
       "openCandidateLink": "Otwórz link do interview"
     },
+    "candidateInterviewSummary": {
+      "continueInterview": "Kontynuuj interview",
+      "viewInPortal": "Zobacz w portalu",
+      "reviewed": "Ocenione",
+      "notReviewed": "Jeszcze nie ocenione",
+      "resultsReady": "Wyniki gotowe",
+      "outcome": "Wynik"
+    },
     "prompts": {
       "hr": {
         "myInterviews": "Pokaż moje interview",

@@ -186,6 +186,14 @@
       "viewDetail": "Падрабязнасці",
       "openCandidateLink": "Адкрыць спасылку на інтэрв'ю"
     },
+    "candidateInterviewSummary": {
+      "continueInterview": "Працягнуць інтэрв'ю",
+      "viewInPortal": "Адкрыць у партале",
+      "reviewed": "Разгледжана",
+      "notReviewed": "Яшчэ не разгледжана",
+      "resultsReady": "Вынікі гатовыя",
+      "outcome": "Вынік"
+    },
     "prompts": {
       "hr": {
         "myInterviews": "Паказаць мае інтэрв'ю",

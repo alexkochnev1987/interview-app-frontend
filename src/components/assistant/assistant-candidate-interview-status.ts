@@ -1,8 +1,10 @@
 import type { InterviewListItem, RecruiterAssistantInterviewSummary } from '@/lib/api'
 import {
   derivePortalInterviewStatus,
+  portalInterviewStatusTone,
   type PortalInterviewStatus,
 } from '@/lib/portal-interview-status'
+import { parseSafeHttpUrl } from '@/lib/safe-external-url'
 
 const INTERVIEW_STATUSES = [
   'pending',
@@ -45,3 +47,48 @@ export function getAssistantCandidatePortalStatusLabelKey(
 ): AssistantCandidatePortalStatusLabelKey {
   return `status.${status}`
 }
+
+export type AssistantCandidateReviewLabelKey = 'resultsReady' | 'reviewed' | 'notReviewed'
+
+export function getAssistantCandidateReviewPresentation(
+  reviewState: RecruiterAssistantInterviewSummary['reviewState'],
+): { tone: 'completed' | 'pending'; labelKey: AssistantCandidateReviewLabelKey } | null {
+  if (!reviewState) {
+    return null
+  }
+
+  if (reviewState.resultsReady) {
+    return { tone: 'completed', labelKey: 'resultsReady' }
+  }
+
+  if (reviewState.reviewed) {
+    return { tone: 'completed', labelKey: 'reviewed' }
+  }
+
+  return { tone: 'pending', labelKey: 'notReviewed' }
+}
+
+export type AssistantCandidateContinueLink =
+  | { kind: 'internal'; href: string }
+  | { kind: 'external'; href: string }
+
+export function resolveAssistantCandidateContinueLink(
+  candidateLink: string | undefined,
+): AssistantCandidateContinueLink | null {
+  if (!candidateLink) {
+    return null
+  }
+
+  if (candidateLink.startsWith('/')) {
+    return { kind: 'internal', href: candidateLink }
+  }
+
+  const safeUrl = parseSafeHttpUrl(candidateLink)
+  if (!safeUrl) {
+    return null
+  }
+
+  return { kind: 'external', href: safeUrl.href }
+}
+
+export { portalInterviewStatusTone }

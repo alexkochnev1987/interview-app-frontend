@@ -186,6 +186,14 @@
       "viewDetail": "Подробнее",
       "openCandidateLink": "Открыть ссылку на интервью"
     },
+    "candidateInterviewSummary": {
+      "continueInterview": "Продолжить интервью",
+      "viewInPortal": "Открыть в портале",
+      "reviewed": "Рассмотрено",
+      "notReviewed": "Ещё не рассмотрено",
+      "resultsReady": "Результаты готовы",
+      "outcome": "Результат"
+    },
     "prompts": {
       "hr": {
         "myInterviews": "Показать мои интервью",
