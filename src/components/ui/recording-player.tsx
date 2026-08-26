@@ -10,7 +10,7 @@ import { Icon } from '@/components/ui/icon'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { RecordingVideo } from '@/components/ui/recording-video'
-import type { VideoFrameVariants } from '@/components/ui/video-frame'
+import { VideoFrame, type VideoFrameVariants } from '@/components/ui/video-frame'
 
 type PlaybackIssue = 'playbackFailed' | 'durationUnavailable'
 
@@ -82,5 +82,20 @@ export function RecordingPlayer({ src, density, onRetry }: RecordingPlayerProps)
         </Alert>
       ) : null}
     </Stack>
+  )
+}
+
+export function RecordingPlayerSkeleton({
+  density = 'compact',
+}: {
+  density?: VideoFrameVariants['density']
+}) {
+  return (
+    <VideoFrame
+      aspect="recording"
+      density={density}
+      aria-hidden="true"
+      className="bg-muted animate-pulse"
+    />
   )
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { getInterviewAnswerMedia, type Interview } from '@/lib/api'
 
@@ -18,45 +18,46 @@ export function useAnswerMedia({ id, interview, failedLoadMediaLabel }: UseAnswe
   const mediaFetchInterviewIdRef = useRef(id)
 
   useEffect(() => {
-    if (!interview) {
-      return
-    }
-
     if (mediaFetchInterviewIdRef.current !== id) {
       requestedMediaRef.current.clear()
       mediaFetchInterviewIdRef.current = id
+      setMediaByQuestion({})
     }
+  }, [id])
 
-    const answersWithMedia = interview.answers.filter(
-      (answer) => answer.mediaKey || answer.screenMediaKey,
-    )
-    if (answersWithMedia.length === 0) {
-      return
-    }
-
-    answersWithMedia.forEach((answer) => {
-      const mediaFingerprint = `${answer.mediaKey ?? ''}|${answer.screenMediaKey ?? ''}`
-      if (requestedMediaRef.current.get(answer.questionIndex) === mediaFingerprint) {
+  const loadMedia = useCallback(
+    (questionIndex: number) => {
+      if (!interview) {
         return
       }
 
-      requestedMediaRef.current.set(answer.questionIndex, mediaFingerprint)
+      const answer = interview.answers.find((a) => a.questionIndex === questionIndex)
+      if (!answer || (!answer.mediaKey && !answer.screenMediaKey)) {
+        return
+      }
+
+      const mediaFingerprint = `${answer.mediaKey ?? ''}|${answer.screenMediaKey ?? ''}`
+      if (requestedMediaRef.current.get(questionIndex) === mediaFingerprint) {
+        return
+      }
+
+      requestedMediaRef.current.set(questionIndex, mediaFingerprint)
 
       setMediaByQuestion((current) => ({
         ...current,
-        [answer.questionIndex]: {
-          ...current[answer.questionIndex],
+        [questionIndex]: {
+          ...current[questionIndex],
           loading: true,
           errorMessage: undefined,
         },
       }))
 
-      void getInterviewAnswerMedia(id, answer.questionIndex)
+      void getInterviewAnswerMedia(id, questionIndex)
         // eslint-disable-next-line promise/always-return
         .then((media) => {
           setMediaByQuestion((current) => ({
             ...current,
-            [answer.questionIndex]: {
+            [questionIndex]: {
               loading: false,
               cameraUrl: media.cameraUrl,
               screenUrl: media.screenUrl,
@@ -66,16 +67,18 @@ export function useAnswerMedia({ id, interview, failedLoadMediaLabel }: UseAnswe
         .catch((mediaError) => {
           setMediaByQuestion((current) => ({
             ...current,
-            [answer.questionIndex]: {
+            [questionIndex]: {
               loading: false,
               errorMessage: mediaError instanceof Error ? mediaError.message : failedLoadMediaLabel,
             },
           }))
         })
-    })
-  }, [id, interview, failedLoadMediaLabel])
+    },
+    [id, interview, failedLoadMediaLabel],
+  )
 
   return {
     mediaByQuestion,
+    loadMedia,
   }
 }

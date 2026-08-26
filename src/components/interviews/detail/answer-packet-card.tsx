@@ -2,7 +2,7 @@
 
 import { CircleAlert, LoaderCircle, Upload } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 
 import type {
   AnswerMediaState,
@@ -18,7 +18,7 @@ import { HoverGroup } from '@/components/ui/hover-group'
 import { Grid } from '@/components/ui/layout/grid'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
-import { RecordingPlayer } from '@/components/ui/recording-player'
+import { RecordingPlayer, RecordingPlayerSkeleton } from '@/components/ui/recording-player'
 import { StatusPill } from '@/components/ui/status-pill'
 import { SurfaceTile } from '@/components/ui/surface-tile'
 import { BodyText } from '@/components/ui/text'
@@ -223,27 +223,43 @@ function EvaluationGrid({ evaluation }: EvaluationGridProps) {
 }
 
 interface AnswerMediaPanelsProps {
-  media: AnswerMediaState
+  media: AnswerMediaState | undefined
+  answer: Answer
 }
 
-function AnswerMediaPanels({ media }: AnswerMediaPanelsProps) {
+function AnswerMediaPanels({ media, answer }: AnswerMediaPanelsProps) {
   const t = useTranslations('questions.common')
+
+  const hasCamera = Boolean(answer.mediaKey || answer.camera?.mediaKey)
+  const hasScreen = Boolean(answer.screenMediaKey || answer.screen?.mediaKey)
+
+  if (!hasCamera && !hasScreen) {
+    return null
+  }
 
   return (
     <Grid columns="metrics-2-md" gap={4}>
-      {media.cameraUrl ? (
+      {hasCamera ? (
         <SurfaceTile rounded="xl">
           <Stack gap={3}>
             <EyebrowLabel>{t('candidateCamera')}</EyebrowLabel>
-            <RecordingPlayer src={media.cameraUrl} density="compact" />
+            {media?.cameraUrl ? (
+              <RecordingPlayer src={media.cameraUrl} density="compact" />
+            ) : (
+              <RecordingPlayerSkeleton density="compact" />
+            )}
           </Stack>
         </SurfaceTile>
       ) : null}
-      {media.screenUrl ? (
+      {hasScreen ? (
         <SurfaceTile rounded="xl">
           <Stack gap={3}>
             <EyebrowLabel>{t('candidateScreen')}</EyebrowLabel>
-            <RecordingPlayer src={media.screenUrl} density="compact" />
+            {media?.screenUrl ? (
+              <RecordingPlayer src={media.screenUrl} density="compact" />
+            ) : (
+              <RecordingPlayerSkeleton density="compact" />
+            )}
           </Stack>
         </SurfaceTile>
       ) : null}
@@ -294,6 +310,7 @@ export interface AnswerPacketCardProps {
   hasActiveValidation: boolean
   validating: boolean
   onUpload: (questionIndex: number, fileInput: HTMLInputElement | null) => void
+  onLoadMedia?: (questionIndex: number) => void
 }
 
 export function AnswerPacketCard({
@@ -306,16 +323,46 @@ export function AnswerPacketCard({
   hasActiveValidation,
   validating,
   onUpload,
+  onLoadMedia,
 }: AnswerPacketCardProps) {
   const t = useTranslations('questions.common')
   const tDetail = useTranslations('interviews.detail')
   const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const cardRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const el = cardRef.current
+    if (
+      !el ||
+      !onLoadMedia ||
+      !answer ||
+      (!answer.mediaKey && !answer.screenMediaKey && !answer.camera && !answer.screen)
+    ) {
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          onLoadMedia(questionIndex)
+          observer.disconnect()
+        }
+      },
+      { rootMargin: '200px 0px' },
+    )
+
+    observer.observe(el)
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [questionIndex, answer, onLoadMedia])
 
   const statusPill = getAnswerStatusPill(answer, uploadState)
 
   return (
     <HoverGroup>
-      <Card variant="surface" interaction="hover">
+      <Card variant="surface" interaction="hover" ref={cardRef}>
         <CardHeader spacing="md">
           <Inline gap={4} align="start" justify="between" wrap="wrap">
             <Stack gap={3}>
@@ -376,7 +423,13 @@ export function AnswerPacketCard({
             </SurfaceTile>
           ) : null}
 
-          {media?.cameraUrl || media?.screenUrl ? <AnswerMediaPanels media={media} /> : null}
+          {answer &&
+          (answer.mediaKey ||
+            answer.screenMediaKey ||
+            answer.camera?.mediaKey ||
+            answer.screen?.mediaKey) ? (
+            <AnswerMediaPanels media={media} answer={answer} />
+          ) : null}
 
           <ConceptsGrid question={question} />
 
