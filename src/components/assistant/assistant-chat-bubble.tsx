@@ -10,12 +10,15 @@ import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText } from '@/components/ui/text'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
+import { useAuth } from '@/lib/auth-context'
+import { APP_ROLE } from '@/lib/auth-roles'
 
 import type { AiAssistantChatMessage } from './ai-assistant-chat-types'
 import { AssistantAssessmentCount } from './assistant-assessment-count'
 import { AssistantAwaitingCandidateList } from './assistant-awaiting-candidate-list'
 import { AssistantAwaitingHrList } from './assistant-awaiting-hr-list'
 import { AssistantAwaitingInterviewList } from './assistant-awaiting-interview-list'
+import { AssistantCandidateInterviewSummary } from './assistant-candidate-interview-summary'
 import type { AssistantCandidateSelection } from './assistant-candidate-selection'
 import { AssistantCreatedInterview } from './assistant-created-interview'
 import { AssistantCreatedQuestion } from './assistant-created-question'
@@ -60,6 +63,8 @@ export function AssistantChatBubble({
 }: AssistantChatBubbleProps) {
   const t = useTranslations('assistant')
   const sharedLabels = useSharedLabels()
+  const { user } = useAuth()
+  const isCandidateView = user?.role === APP_ROLE.candidate
   const isUser = message.role === 'user'
   const lines = message.text.split('\n')
 
@@ -131,7 +136,11 @@ export function AssistantChatBubble({
             />
           ) : null}
           {message.result?.interview ? (
-            <AssistantInterviewSummary interview={message.result.interview} />
+            isCandidateView ? (
+              <AssistantCandidateInterviewSummary interview={message.result.interview} />
+            ) : (
+              <AssistantInterviewSummary interview={message.result.interview} />
+            )
           ) : null}
           {message.result?.questionCount ? (
             <AssistantQuestionCount questionCount={message.result.questionCount} />
