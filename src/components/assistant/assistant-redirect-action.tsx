@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
 import type { RecruiterAssistantRedirect } from '@/lib/api'
 
+import { getAssistantRedirectLabelKey } from './assistant-redirect-label'
 import { buildAssistantRedirectHref } from './build-assistant-redirect-href'
 
 type AssistantRedirectActionProps = {
@@ -14,8 +15,7 @@ type AssistantRedirectActionProps = {
 
 export function AssistantRedirectAction({ redirect }: AssistantRedirectActionProps) {
   const t = useTranslations('assistant')
-  const label =
-    redirect.path === '/assessments' ? t('redirect.openAssessments') : t('redirect.continue')
+  const label = t(getAssistantRedirectLabelKey(redirect))
 
   return (
     <Button asChild size="sm" variant="outline">

@@ -23,7 +23,7 @@
     "input": {
       "placeholder": {
         "hr": "Zapytaj o swoje interview, recenzje lub tworzenie interview…",
-        "candidate": "Zapytaj, czy masz interview, jaki jest jego status lub termin…",
+        "candidate": "Zapytaj o status ostatniego interview, ocenę według roli lub otwarte interview…",
         "admin": "Zapytaj o nieprzypisane interview, filtry lub przypisywanie HR…",
         "super_admin": "Zapytaj o interview, przypisania, pytania lub dane całej organizacji…"
       },
@@ -47,10 +47,10 @@
         "readyForReview": "Znajdź interview gotowe do oceny",
         "interviewStatus": "Sprawdź status i szczegóły swoich interview",
         "createFlow": "Przygotuj pytania i utwórz interview (po Twoim potwierdzeniu)",
-        "hasInterview": "Sprawdź, czy masz interview",
-        "candidateStatus": "Sprawdź status swojego interview",
-        "reviewed": "Sprawdź, czy Twoje interview zostało ocenione",
-        "schedule": "Pokaż termin i miejsce interview lub link dla kandydata",
+        "latestStatus": "Sprawdź status swojego ostatniego interview",
+        "statusByPosition": "Sprawdź status interview według nazwy roli",
+        "reviewedByPosition": "Sprawdź, czy konkretne interview zostało ocenione",
+        "openInterviews": "Wyświetl interview oczekujące na ukończenie",
         "unassigned": "Wyświetl nieprzypisane interview",
         "showHrs": "Wyświetl dostępnych pracowników HR",
         "filters": "Filtruj interview według statusu, HR i innych filtrów aplikacji",
@@ -135,6 +135,8 @@
     "redirect": {
       "continue": "Kontynuuj w aplikacji",
       "openAssessments": "Otwórz oceny",
+      "openPortal": "Otwórz portal kandydata",
+      "openPortalInterview": "Zobacz w portalu",
       "openingInterviewForm": "Otwieram formularz wywiadu."
     },
     "questionCount": {
@@ -207,9 +209,10 @@
         "createInterview": "Pomóż mi przygotować pytania i utworzyć interview"
       },
       "candidate": {
-        "hasInterview": "Czy mam interview?",
-        "status": "Jaki jest status mojego interview?",
-        "reviewed": "Czy moje interview zostało ocenione?"
+        "latestStatus": "Jaki jest status mojego ostatniego interview?",
+        "statusByPosition": "Jaki jest status mojego interview na stanowisko React Developer?",
+        "reviewedByPosition": "Czy moje interview na stanowisko React Developer zostało ocenione?",
+        "openInterviews": "Pokaż moje nieukończone interview"
       },
       "admin": {
         "questionCount": "Ile mamy pytań?",
