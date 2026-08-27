@@ -53,7 +53,7 @@ describe('assistant-query-auth', () => {
   describe('non-query prompts', () => {
     it('allows prompts without explicit query auth', () => {
       expect(canUseAssistantQueryPrompt('unassigned', 'candidate')).toBe(true)
-      expect(canUseAssistantQueryPrompt('hasInterview', null)).toBe(true)
+      expect(canUseAssistantQueryPrompt('latestStatus', null)).toBe(true)
     })
   })
 })

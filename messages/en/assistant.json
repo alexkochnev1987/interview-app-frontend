@@ -23,12 +23,14 @@
     "input": {
       "placeholder": {
         "hr": "Ask about your interviews, reviews, or creating an interview…",
-        "candidate": "Ask whether you have an interview, its status, or schedule…",
+        "candidate": "Ask about your latest interview status, review by role, or open interviews…",
         "admin": "Ask about unassigned interviews, filters, or assigning HR…",
         "super_admin": "Ask about interviews, assignments, questions, or org-wide data…"
       },
       "awaiting": {
         "candidateName": "Enter the candidate name…",
+        "candidateChoice": "Pick a candidate above or type a new name…",
+        "confirmRegisteredCandidate": "Choose Yes or No above…",
         "position": "Enter the job position…",
         "questionName": "Enter the question name…",
         "confirmAddDespiteSimilar": "Choose Continue or Cancel above…",
@@ -45,10 +47,10 @@
         "readyForReview": "Find interviews ready for your review",
         "interviewStatus": "Check status and details for your interviews",
         "createFlow": "Prepare questions and create interviews (with your confirmation)",
-        "hasInterview": "Check whether you have an interview",
-        "candidateStatus": "Check the status of your interview",
-        "reviewed": "See if your interview has been reviewed",
-        "schedule": "Share when and where your interview is, or your candidate link",
+        "latestStatus": "Check the status of your latest interview",
+        "statusByPosition": "Check interview status by role name",
+        "reviewedByPosition": "See whether a specific interview has been reviewed",
+        "openInterviews": "List interviews waiting to be completed",
         "unassigned": "List unassigned interviews",
         "showHrs": "List available HR reviewers",
         "filters": "Filter interviews by status, HR, and other app filters",
@@ -111,6 +113,15 @@
       "continue": "Continue creating",
       "abort": "Cancel"
     },
+    "confirmRegisteredCandidate": {
+      "heading": "Use this registered candidate?",
+      "yes": "Yes, use this candidate",
+      "no": "No, enter a different name"
+    },
+    "candidateList": {
+      "heading": "Registered candidates",
+      "newCandidate": "New candidate"
+    },
     "templateList": {
       "heading": "Choose a template",
       "questionCount": "{count, plural, one {# question} other {# questions}}"
@@ -123,7 +134,9 @@
     },
     "redirect": {
       "continue": "Continue in the app",
-      "openAssessments": "Open assessments"
+      "openAssessments": "Open assessments",
+      "openPortalInterview": "View in portal",
+      "openingInterviewForm": "Opening the interview form."
     },
     "questionCount": {
       "heading": "Question bank",
@@ -174,6 +187,15 @@
       "viewDetail": "View details",
       "openCandidateLink": "Open your interview link"
     },
+    "candidateInterviewSummary": {
+      "reviewed": "Reviewed",
+      "notReviewed": "Not reviewed yet",
+      "resultsReady": "Results ready",
+      "outcome": "Outcome"
+    },
+    "candidateInterviewList": {
+      "heading": "Your interviews"
+    },
     "prompts": {
       "hr": {
         "myInterviews": "Show my interviews",
@@ -184,9 +206,10 @@
         "createInterview": "Help me prepare questions and create an interview"
       },
       "candidate": {
-        "hasInterview": "Do I have an interview?",
-        "status": "What is the status of my interview?",
-        "reviewed": "Has my interview been reviewed?"
+        "latestStatus": "What is the status of my latest interview?",
+        "statusByPosition": "What is the status of my React Developer interview?",
+        "reviewedByPosition": "Has my React Developer interview been reviewed?",
+        "openInterviews": "Show my uncompleted interviews"
       },
       "admin": {
         "questionCount": "How many questions do we have?",
