@@ -65,6 +65,7 @@ export function useAnswerMedia({ id, interview, failedLoadMediaLabel }: UseAnswe
           }))
         })
         .catch((mediaError) => {
+          requestedMediaRef.current.delete(questionIndex)
           setMediaByQuestion((current) => ({
             ...current,
             [questionIndex]: {

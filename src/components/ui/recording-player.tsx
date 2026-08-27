@@ -1,6 +1,6 @@
 'use client'
 
-import { RefreshCw } from 'lucide-react'
+import { AlertCircle, RefreshCw } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
@@ -10,6 +10,7 @@ import { Icon } from '@/components/ui/icon'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { RecordingVideo } from '@/components/ui/recording-video'
+import { BodyText } from '@/components/ui/text'
 import { VideoFrame, type VideoFrameVariants } from '@/components/ui/video-frame'
 
 type PlaybackIssue = 'playbackFailed' | 'durationUnavailable'
@@ -97,5 +98,41 @@ export function RecordingPlayerSkeleton({
       aria-hidden="true"
       className="bg-muted animate-pulse"
     />
+  )
+}
+
+export function RecordingPlayerError({
+  density = 'compact',
+  message,
+  onRetry,
+}: {
+  density?: VideoFrameVariants['density']
+  message?: string
+  onRetry?: () => void
+}) {
+  const t = useTranslations('recordingPlayer')
+  return (
+    <VideoFrame
+      aspect="recording"
+      density={density}
+      className="flex flex-col items-center justify-center bg-destructive/5 p-6 text-center ring-1 ring-destructive/20"
+    >
+      <Stack gap={3} align="center">
+        <Icon size="lg" className="text-destructive">
+          <AlertCircle />
+        </Icon>
+        <BodyText size="sm" tone="danger" weight="medium">
+          {message || t('playbackFailedTitle')}
+        </BodyText>
+        {onRetry ? (
+          <Button type="button" variant="outline-pill" shape="pill" size="sm" onClick={onRetry}>
+            <Icon size="sm">
+              <RefreshCw />
+            </Icon>
+            {t('refresh')}
+          </Button>
+        ) : null}
+      </Stack>
+    </VideoFrame>
   )
 }

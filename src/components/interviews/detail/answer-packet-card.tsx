@@ -18,7 +18,11 @@ import { HoverGroup } from '@/components/ui/hover-group'
 import { Grid } from '@/components/ui/layout/grid'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
-import { RecordingPlayer, RecordingPlayerSkeleton } from '@/components/ui/recording-player'
+import {
+  RecordingPlayer,
+  RecordingPlayerError,
+  RecordingPlayerSkeleton,
+} from '@/components/ui/recording-player'
 import { StatusPill } from '@/components/ui/status-pill'
 import { SurfaceTile } from '@/components/ui/surface-tile'
 import { BodyText } from '@/components/ui/text'
@@ -225,9 +229,10 @@ function EvaluationGrid({ evaluation }: EvaluationGridProps) {
 interface AnswerMediaPanelsProps {
   media: AnswerMediaState | undefined
   answer: Answer
+  onRetry?: () => void
 }
 
-function AnswerMediaPanels({ media, answer }: AnswerMediaPanelsProps) {
+function AnswerMediaPanels({ media, answer, onRetry }: AnswerMediaPanelsProps) {
   const t = useTranslations('questions.common')
 
   const hasCamera = Boolean(answer.mediaKey || answer.camera?.mediaKey)
@@ -244,7 +249,13 @@ function AnswerMediaPanels({ media, answer }: AnswerMediaPanelsProps) {
           <Stack gap={3}>
             <EyebrowLabel>{t('candidateCamera')}</EyebrowLabel>
             {media?.cameraUrl ? (
-              <RecordingPlayer src={media.cameraUrl} density="compact" />
+              <RecordingPlayer src={media.cameraUrl} density="compact" onRetry={onRetry} />
+            ) : media?.errorMessage ? (
+              <RecordingPlayerError
+                density="compact"
+                message={media.errorMessage}
+                onRetry={onRetry}
+              />
             ) : (
               <RecordingPlayerSkeleton density="compact" />
             )}
@@ -256,7 +267,13 @@ function AnswerMediaPanels({ media, answer }: AnswerMediaPanelsProps) {
           <Stack gap={3}>
             <EyebrowLabel>{t('candidateScreen')}</EyebrowLabel>
             {media?.screenUrl ? (
-              <RecordingPlayer src={media.screenUrl} density="compact" />
+              <RecordingPlayer src={media.screenUrl} density="compact" onRetry={onRetry} />
+            ) : media?.errorMessage ? (
+              <RecordingPlayerError
+                density="compact"
+                message={media.errorMessage}
+                onRetry={onRetry}
+              />
             ) : (
               <RecordingPlayerSkeleton density="compact" />
             )}
@@ -428,7 +445,11 @@ export function AnswerPacketCard({
             answer.screenMediaKey ||
             answer.camera?.mediaKey ||
             answer.screen?.mediaKey) ? (
-            <AnswerMediaPanels media={media} answer={answer} />
+            <AnswerMediaPanels
+              media={media}
+              answer={answer}
+              onRetry={onLoadMedia ? () => onLoadMedia(questionIndex) : undefined}
+            />
           ) : null}
 
           <ConceptsGrid question={question} />
