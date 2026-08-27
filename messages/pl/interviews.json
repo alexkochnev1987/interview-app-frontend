@@ -19,6 +19,7 @@
       },
       "assignedHrUnassigned": "Nieprzypisany",
       "assignedHrAssigned": "Przypisany do {name}",
+      "candidateEmailNotSet": "Nie podano adresu e-mail kandydata — nie zobaczy tego w swoim portalu",
       "demoTryCandidateExperience": "Wypróbuj jako kandydat"
     },
     "library": {
@@ -137,6 +138,7 @@
       "title": "Edycja wywiadu",
       "candidateName": "Imię i nazwisko kandydata",
       "candidateEmail": "Email kandydata",
+      "candidateEmailHint": "Opcjonalne. Łączy tę rozmowę z kontem kandydata w portalu, aby mógł ją znaleźć po zalogowaniu.",
       "position": "Stanowisko",
       "questionsTitle": "Pytania",
       "answersBlockEditNotice": "Edycja jest wyłączona po przesłaniu odpowiedzi, ponieważ odpowiedzi są powiązane z kolejnością pytań.",

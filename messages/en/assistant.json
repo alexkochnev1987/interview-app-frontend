@@ -2,6 +2,8 @@
   "assistant": {
     "name": "Herman",
     "closeAriaLabel": "Close Herman",
+    "newChatAriaLabel": "Start new chat",
+    "newChatTooltip": "New chat",
     "bubbleLabel": "Herman",
     "sendAriaLabel": "Send message",
     "loading": "Working...",
@@ -21,9 +23,20 @@
     "input": {
       "placeholder": {
         "hr": "Ask about your interviews, reviews, or creating an interview…",
-        "candidate": "Ask whether you have an interview, its status, or schedule…",
+        "candidate": "Ask about your latest interview status, review by role, or open interviews…",
         "admin": "Ask about unassigned interviews, filters, or assigning HR…",
         "super_admin": "Ask about interviews, assignments, questions, or org-wide data…"
+      },
+      "awaiting": {
+        "candidateName": "Enter the candidate name…",
+        "candidateChoice": "Pick a candidate above or type a new name…",
+        "confirmRegisteredCandidate": "Choose Yes or No above…",
+        "position": "Enter the job position…",
+        "questionName": "Enter the question name…",
+        "confirmAddDespiteSimilar": "Choose Continue or Cancel above…",
+        "templateChoice": "Pick a template above or enter its number…",
+        "hr": "Pick an HR reviewer above or type their name…",
+        "interview": "Pick an interview above or type the name/ID…"
       }
     },
     "welcome": {
@@ -34,14 +47,21 @@
         "readyForReview": "Find interviews ready for your review",
         "interviewStatus": "Check status and details for your interviews",
         "createFlow": "Prepare questions and create interviews (with your confirmation)",
-        "hasInterview": "Check whether you have an interview",
-        "candidateStatus": "Check the status of your interview",
-        "reviewed": "See if your interview has been reviewed",
-        "schedule": "Share when and where your interview is, or your candidate link",
+        "latestStatus": "Check the status of your latest interview",
+        "statusByPosition": "Check interview status by role name",
+        "reviewedByPosition": "See whether a specific interview has been reviewed",
+        "openInterviews": "List interviews waiting to be completed",
         "unassigned": "List unassigned interviews",
+        "showHrs": "List available HR reviewers",
         "filters": "Filter interviews by status, HR, and other app filters",
         "assignHr": "Assign an interview to an HR reviewer (with your confirmation)",
-        "orgQueries": "Answer broader interview, question, and team queries in your org"
+        "orgQueries": "Answer broader interview, question, and team queries in your org",
+        "questionCount": "Count questions in the bank, with optional filters",
+        "assessments": "List and filter assessments",
+        "myAssessments": "List assessments assigned to you",
+        "teamOverview": "Summarize your team by role",
+        "teamByRole": "List teammates filtered by role",
+        "orgOverview": "Summarize interview activity in your org"
       }
     },
     "confirm": {
@@ -49,6 +69,7 @@
       "createInterview": "Create missing questions and create the interview.",
       "createQuestions": "Create the missing questions from this suggested set.",
       "assignHr": "Assign this interview to the selected HR reviewer.",
+      "createSingleQuestion": "Create this question in the question bank.",
       "action": "Confirm action",
       "userMessage": "Confirm",
       "cancel": "Cancel",
@@ -62,6 +83,7 @@
         "interviewLocale": "Interview language",
         "interviewId": "Interview ID",
         "assignedHrId": "HR reviewer ID",
+        "questionName": "Question name",
         "questions": "Questions",
         "questionsSummary": "{total} total ({newCount} new)"
       }
@@ -69,15 +91,88 @@
     "questionPlan": {
       "title": "Question plan",
       "empty": "Suggested and matched questions will appear here after you send a request.",
+      "emptySelected": "Add at least one question before confirming.",
       "summary": "{existing} matched in the question bank, {missing} need creation.",
       "newBadge": "New",
-      "existingBadge": "Existing"
+      "existingBadge": "Existing",
+      "removeAria": "Remove {title} from this interview"
     },
     "createdInterview": {
-      "openLink": "Open candidate link"
+      "openLink": "Open candidate link",
+      "viewDetail": "View interview details"
+    },
+    "createdQuestion": {
+      "openLink": "Open question"
+    },
+    "similarQuestions": {
+      "heading": "Similar questions",
+      "matchScore": "{score} match"
+    },
+    "confirmAddDespiteSimilar": {
+      "heading": "Still create this question?",
+      "continue": "Continue creating",
+      "abort": "Cancel"
+    },
+    "confirmRegisteredCandidate": {
+      "heading": "Use this registered candidate?",
+      "yes": "Yes, use this candidate",
+      "no": "No, enter a different name"
+    },
+    "candidateList": {
+      "heading": "Registered candidates",
+      "newCandidate": "New candidate"
+    },
+    "templateList": {
+      "heading": "Choose a template",
+      "questionCount": "{count, plural, one {# question} other {# questions}}"
+    },
+    "hrList": {
+      "heading": "Choose an HR reviewer",
+      "listHeading": "HR reviewers",
+      "showResponse": "Here are the available HR reviewers:",
+      "empty": "No HR reviewers are available in your organization."
+    },
+    "redirect": {
+      "continue": "Continue in the app",
+      "openAssessments": "Open assessments",
+      "openPortalInterview": "View in portal",
+      "openingInterviewForm": "Opening the interview form."
+    },
+    "questionCount": {
+      "heading": "Question bank",
+      "total": "{count, plural, one {# question} other {# questions}}"
+    },
+    "assessmentCount": {
+      "heading": "Assessments",
+      "total": "{count, plural, one {# assessment} other {# assessments}}",
+      "statusFilter": "Status: {status}",
+      "statusScoring": "Scoring",
+      "queryFilter": "Search: \"{query}\""
+    },
+    "interviewActivity": {
+      "heading": "Interview activity",
+      "total": "{count, plural, one {# interview total} other {# interviews total}}",
+      "active": "Active",
+      "completed": "Completed",
+      "pending": "Pending",
+      "inProgress": "In progress",
+      "processing": "Processing",
+      "failed": "Failed"
+    },
+    "teamSummary": {
+      "heading": "Team overview",
+      "total": "{count, plural, one {# teammate total} other {# teammates total}}",
+      "superAdmin": "Super admins",
+      "admin": "Admins",
+      "hr": "HR",
+      "candidate": "Candidates"
+    },
+    "teamList": {
+      "heading": "Team members"
     },
     "interviewList": {
       "heading": "Interviews",
+      "chooseHeading": "Choose an interview",
       "viewDetail": "View details",
       "progress": "{submitted}/{total} answered"
     },
@@ -92,27 +187,53 @@
       "viewDetail": "View details",
       "openCandidateLink": "Open your interview link"
     },
+    "candidateInterviewSummary": {
+      "reviewed": "Reviewed",
+      "notReviewed": "Not reviewed yet",
+      "resultsReady": "Results ready",
+      "outcome": "Outcome"
+    },
+    "candidateInterviewList": {
+      "heading": "Your interviews"
+    },
     "prompts": {
       "hr": {
         "myInterviews": "Show my interviews",
         "readyForReview": "Show interviews ready for my review",
+        "myAssessments": "Show my assessments",
+        "questionCount": "How many questions do we have?",
+        "orgOverview": "Summarize interview activity in my org",
         "createInterview": "Help me prepare questions and create an interview"
       },
       "candidate": {
-        "hasInterview": "Do I have an interview?",
-        "status": "What is the status of my interview?",
-        "reviewed": "Has my interview been reviewed?"
+        "latestStatus": "What is the status of my latest interview?",
+        "statusByPosition": "What is the status of my React Developer interview?",
+        "reviewedByPosition": "Has my React Developer interview been reviewed?",
+        "openInterviews": "Show my uncompleted interviews"
       },
       "admin": {
+        "questionCount": "How many questions do we have?",
+        "assessments": "Show all assessments",
+        "orgOverview": "Summarize interview activity in my org",
         "unassigned": "Show unassigned interviews",
+        "showHrs": "Show HR reviewers",
         "byStatus": "Show completed interviews",
-        "assignHr": "Assign an interview to an HR reviewer"
+        "teamOverview": "Show my team",
+        "teamByRole": "Show all HR team members",
+        "assignHr": "Assign an interview to an HR reviewer",
+        "createQuestion": "Help me create a new interview question"
       },
       "super_admin": {
+        "questionCount": "How many questions do we have?",
+        "assessments": "Show all assessments",
+        "orgOverview": "Summarize interview activity in my org",
         "unassigned": "Show unassigned interviews",
+        "showHrs": "Show HR reviewers",
         "byStatus": "Show interviews by status",
+        "teamOverview": "Show my team",
+        "teamByRole": "Show all admins",
         "assignHr": "Assign an interview to an HR reviewer",
-        "orgOverview": "Summarize interview activity in my org"
+        "createQuestion": "Help me create a new interview question"
       }
     }
   }

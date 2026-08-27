@@ -6,11 +6,7 @@ import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import type { Locale } from '@/i18n/locales'
 import { routes } from '@/i18n/routes'
 import { type Question } from '@/lib/api'
-import {
-  loadAuthGate,
-  redirectIfUnauthenticated,
-  redirectIfUnauthorizedError,
-} from '@/lib/auth-gate'
+import { enforcePageAuth, redirectIfUnauthorizedError } from '@/lib/auth-gate'
 import { canDeleteQuestions, canReadQuestions, canUpdateQuestions } from '@/lib/auth-roles'
 import { isForbiddenError, requestServer } from '@/lib/server-fetch'
 
@@ -22,31 +18,22 @@ const ERROR_BACK_HREF = routes.questions.list
 
 export default async function EditQuestionPage({ params }: EditQuestionPageProps) {
   const { id, locale } = await params
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.questions' })
-  const tCommon = await getTranslations({ locale, namespace: 'common' })
-  const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
-
   const returnPath = routes.questions.detail(id)
-  const auth = await loadAuthGate(canReadQuestions, locale)
-  redirectIfUnauthenticated(auth, returnPath, locale)
-  if (auth.kind === 'forbidden') {
-    return (
-      <ForbiddenAccessPage
-        title={t('libraryForbiddenTitle')}
-        description={t('libraryForbiddenDescription')}
-      />
-    )
-  }
-  if (auth.kind === 'error') {
-    return (
-      <FlashErrorPageFallback
-        title={t('unavailableTitle')}
-        description={`${tCommon('sessionVerificationFailed')} ${auth.message}`}
-        backHref={ERROR_BACK_HREF}
-        backLabel={tFallback('backToQuestionLibrary')}
-      />
-    )
-  }
+  const [t, tFallback, auth] = await Promise.all([
+    getTranslations({ locale, namespace: 'toast.pageGate.questions' }),
+    getTranslations({ locale, namespace: 'shared.fallback' }),
+    enforcePageAuth({
+      roleCheck: canReadQuestions,
+      locale,
+      returnPath,
+      forbiddenTitleKey: 'libraryForbiddenTitle',
+      forbiddenDescriptionKey: 'libraryForbiddenDescription',
+      gateNamespace: 'toast.pageGate.questions',
+      backHref: ERROR_BACK_HREF,
+      backLabelKey: 'backToQuestionLibrary',
+    }),
+  ])
+  if (!auth.authorized) return auth.fallback
 
   let question: Question | null = null
   let error: string | null = null

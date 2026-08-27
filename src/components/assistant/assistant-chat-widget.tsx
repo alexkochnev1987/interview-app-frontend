@@ -1,6 +1,6 @@
 'use client'
 
-import { Monitor, X } from 'lucide-react'
+import { MessageSquarePlus, Monitor, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
@@ -11,12 +11,10 @@ import {
   useAssistantChatShell,
 } from '@/components/assistant/assistant-chat-provider'
 import { Button } from '@/components/ui/button'
-import {
-  ChatWidgetBackdrop,
-  ChatWidgetHeader,
-  ChatWidgetShell,
-  ChatWidgetTitle,
-} from '@/components/ui/chat'
+import { ChatWidgetBackdrop } from '@/components/ui/chat/chat-widget-backdrop'
+import { ChatWidgetHeader } from '@/components/ui/chat/chat-widget-header'
+import { ChatWidgetShell } from '@/components/ui/chat/chat-widget-shell'
+import { ChatWidgetTitle } from '@/components/ui/chat/chat-widget-title'
 import { Icon } from '@/components/ui/icon'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
@@ -25,21 +23,23 @@ const CHAT_WIDGET_CLOSE_MS = 200
 
 export function AssistantChatWidget() {
   const { open, closeAndRestoreFocus } = useAssistantChatShell()
-  const { pendingAction } = useAssistantChatSession()
+  const { pendingAction, resetChat, loading } = useAssistantChatSession()
   const t = useTranslations('assistant')
   const [mounted, setMounted] = useState(open)
   const [closing, setClosing] = useState(false)
 
-  useEffect(() => {
-    if (open) {
+  if (open) {
+    if (!mounted || closing) {
       setMounted(true)
       setClosing(false)
-      return
     }
-
-    if (!mounted) return
-
+  } else if (mounted && !closing) {
     setClosing(true)
+  }
+
+  useEffect(() => {
+    if (open || !mounted) return
+
     const timer = window.setTimeout(() => {
       setMounted(false)
       setClosing(false)
@@ -85,15 +85,28 @@ export function AssistantChatWidget() {
                   </Icon>
                 }
               />
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon-sm"
-                onClick={closeAndRestoreFocus}
-                aria-label={t('closeAriaLabel')}
-              >
-                <X />
-              </Button>
+              <Inline gap={1} align="center">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  disabled={loading}
+                  onClick={() => void resetChat()}
+                  aria-label={t('newChatAriaLabel')}
+                  title={t('newChatTooltip')}
+                >
+                  <MessageSquarePlus />
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={closeAndRestoreFocus}
+                  aria-label={t('closeAriaLabel')}
+                >
+                  <X />
+                </Button>
+              </Inline>
             </Inline>
           </ChatWidgetHeader>
           <AiAssistantChat />

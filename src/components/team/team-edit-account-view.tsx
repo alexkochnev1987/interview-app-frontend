@@ -1,19 +1,16 @@
 'use client'
 
-import { X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { Button } from '@/components/ui/button'
-import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { FormField } from '@/components/ui/form-field'
 import { Input } from '@/components/ui/input'
-import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
-import { ModalShell } from '@/components/ui/modal-shell'
-import { Separator } from '@/components/ui/separator'
 import { BodyText } from '@/components/ui/text'
 import type { TeamMember } from '@/lib/api'
+
+import { TeamMemberModalShell } from './team-member-modal-shell'
 
 type NameErrorKey = 'nameRequired'
 type EmailErrorKey = 'emailRequired' | 'emailInvalid'
@@ -60,96 +57,73 @@ export function TeamEditAccountView({
   const showGoogleEmailNotice = isGoogleLinkedTeamMember(member)
 
   return (
-    <ModalShell
-      dismissDisabled={loading}
-      onDismiss={onDismiss}
+    <TeamMemberModalShell
+      member={member}
+      title={t('title')}
       accessibilityTitle={t('accessibilityTitle')}
-      accessibilityDescription={`${member.name}, ${member.email}`}
+      loading={loading}
+      onDismiss={onDismiss}
     >
-      <CardHeader spacing="sm">
-        <Inline justify="between" align="start">
-          <Stack gap={1}>
-            <CardTitle size="lg">{t('title')}</CardTitle>
-            <BodyText size="sm">
-              {member.name} · {member.email}
-            </BodyText>
-          </Stack>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-sm"
-            disabled={loading}
-            onClick={onDismiss}
+      <form
+        onSubmit={(event) => {
+          event.preventDefault()
+          void onSave()
+        }}
+      >
+        <Stack gap={4}>
+          <FormField
+            htmlFor="team-edit-account-name"
+            label={t('nameLabel')}
+            error={nameErrorKey ? t(nameErrorKey) : undefined}
           >
-            <X />
-          </Button>
-        </Inline>
-      </CardHeader>
+            <Input
+              id="team-edit-account-name"
+              type="text"
+              value={name}
+              onChange={(event) => onNameChange(event.target.value)}
+              autoComplete="name"
+              disabled={loading}
+            />
+          </FormField>
 
-      <Separator />
+          <FormField
+            htmlFor="team-edit-account-email"
+            label={t('emailLabel')}
+            hint={showGoogleEmailNotice ? t('googleEmailNotice') : undefined}
+            error={emailErrorKey ? t(emailErrorKey) : undefined}
+          >
+            <Input
+              id="team-edit-account-email"
+              type="email"
+              value={email}
+              onChange={(event) => onEmailChange(event.target.value)}
+              autoComplete="email"
+              disabled={loading}
+            />
+          </FormField>
 
-      <CardContent spacing="md">
-        <form
-          onSubmit={(event) => {
-            event.preventDefault()
-            void onSave()
-          }}
-        >
-          <Stack gap={4}>
-            <FormField
-              htmlFor="team-edit-account-name"
-              label={t('nameLabel')}
-              error={nameErrorKey ? t(nameErrorKey) : undefined}
-            >
-              <Input
-                id="team-edit-account-name"
-                type="text"
-                value={name}
-                onChange={(event) => onNameChange(event.target.value)}
-                autoComplete="name"
-                disabled={loading}
-              />
-            </FormField>
-
-            <FormField
-              htmlFor="team-edit-account-email"
-              label={t('emailLabel')}
-              hint={showGoogleEmailNotice ? t('googleEmailNotice') : undefined}
-              error={emailErrorKey ? t(emailErrorKey) : undefined}
-            >
-              <Input
-                id="team-edit-account-email"
-                type="email"
-                value={email}
-                onChange={(event) => onEmailChange(event.target.value)}
-                autoComplete="email"
-                disabled={loading}
-              />
-            </FormField>
-
-            <Stack gap={2}>
-              <DemoWriteGuard disabled={!hasChange || loading}>
-                <Button type="submit" variant="gradient" shape="pill">
-                  {loading ? t('saving') : t('save')}
-                </Button>
-              </DemoWriteGuard>
-              <Button
-                type="button"
-                variant="ghost"
-                shape="pill"
-                disabled={loading}
-                onClick={onDismiss}
-              >
-                {t('cancel')}
+          <Stack gap={2}>
+            <DemoWriteGuard disabled={!hasChange || loading}>
+              <Button type="submit" variant="gradient" shape="pill">
+                {loading ? t('saving') : t('save')}
               </Button>
-            </Stack>
-
-            <BodyText size="xs" tone="muted">
-              {t('footnote')}
-            </BodyText>
+            </DemoWriteGuard>
+            <Button
+              type="button"
+              variant="ghost"
+              shape="pill"
+              disabled={loading}
+              onClick={onDismiss}
+            >
+              {t('cancel')}
+            </Button>
           </Stack>
-        </form>
-      </CardContent>
-    </ModalShell>
+
+          <BodyText size="xs" tone="muted">
+            {t('footnote')}
+          </BodyText>
+        </Stack>
+      </form>
+    </TeamMemberModalShell>
   )
 }

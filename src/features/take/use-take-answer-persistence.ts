@@ -33,7 +33,7 @@ import {
 } from './runtime'
 import {
   abortMultipartUploads as abortMultipartUploadsData,
-  completeMultipartUpload as completeMultipartUploadData,
+  finalizeMultipartUpload,
 } from './uploads'
 import type { AnswerMetaUpdate } from './use-take-begin-recording'
 import type { TakeBehaviorSignals } from './utils'
@@ -287,7 +287,7 @@ export function useTakeAnswerPersistence({
 
   const completeMultipartUpload = useCallback(
     async (target: CaptureTarget) => {
-      await completeMultipartUploadData({
+      await finalizeMultipartUpload({
         target,
         multipartUploadsRef,
         completeMultipartUploadRequest,

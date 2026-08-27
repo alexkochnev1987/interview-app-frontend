@@ -110,6 +110,7 @@
         "notFoundFallback": "Запрошенное интервью не удалось загрузить.",
         "setupBlockedTitle": "Настройка интервью заблокирована",
         "candidateNameRequired": "Укажите имя кандидата.",
+        "candidateEmailInvalid": "Введите действительный адрес электронной почты или оставьте поле пустым.",
         "positionRequired": "Укажите позицию.",
         "questionsRequired": "Выберите хотя бы один вопрос.",
         "creatingLabel": "Создание..."

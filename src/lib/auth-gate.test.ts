@@ -2,9 +2,22 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { MeResponse } from '@/lib/api'
 import { ApiError } from '@/lib/api-error'
-import { loadAuthGate } from '@/lib/auth-gate'
+import { enforcePageAuth, loadAuthGate } from '@/lib/auth-gate'
 import { fetchCachedServerAuthMe } from '@/lib/auth-server'
 import { getServerRequestContext } from '@/lib/server-fetch'
+
+const redirectMock = vi.hoisted(() => vi.fn())
+vi.mock('next/navigation', () => ({
+  redirect: redirectMock,
+}))
+
+vi.mock('@/components/ui/flash-error-page-fallback', () => ({
+  FlashErrorPageFallback: vi.fn(() => 'FlashErrorPageFallback'),
+}))
+
+vi.mock('@/components/ui/forbidden-access-page', () => ({
+  ForbiddenAccessPage: vi.fn(() => 'ForbiddenAccessPage'),
+}))
 
 vi.mock('@/lib/auth-server', () => ({
   fetchCachedServerAuthMe: vi.fn(),
@@ -27,6 +40,7 @@ const meFixture = (role: string): MeResponse => ({
   createdAt: '2026-01-01T00:00:00.000Z',
   avatarSource: 'none',
   hasGoogleAvatar: false,
+  recruiterAssistantEnabled: true,
 })
 
 describe('auth-gate', () => {
@@ -94,6 +108,55 @@ describe('auth-gate', () => {
     await expect(loadAuthGate(() => true, 'en')).resolves.toEqual({
       kind: 'error',
       message: 'network down',
+    })
+  })
+
+  describe('enforcePageAuth', () => {
+    it('returns authorized result when auth passes', async () => {
+      vi.mocked(fetchCachedServerAuthMe).mockResolvedValue(meFixture('admin'))
+
+      const res = await enforcePageAuth({
+        roleCheck: (role) => role === 'admin',
+        locale: 'en',
+        returnPath: '/interviews',
+      })
+
+      expect(res.authorized).toBe(true)
+      if (res.authorized) {
+        expect(res.me.role).toBe('admin')
+      }
+    })
+
+    it('returns fallback for forbidden', async () => {
+      vi.mocked(fetchCachedServerAuthMe).mockResolvedValue(meFixture('hr'))
+
+      const res = await enforcePageAuth({
+        roleCheck: (role) => role === 'super_admin',
+        locale: 'en',
+        returnPath: '/config',
+        gateNamespace: 'config',
+      })
+
+      expect(res.authorized).toBe(false)
+      if (!res.authorized) {
+        expect(res.fallback).toBeDefined()
+      }
+    })
+
+    it('returns fallback for errors', async () => {
+      vi.mocked(fetchCachedServerAuthMe).mockRejectedValue(new Error('network fail'))
+
+      const res = await enforcePageAuth({
+        roleCheck: () => true,
+        locale: 'en',
+        returnPath: '/assessments',
+        gateNamespace: 'toast.pageGate.assessments',
+      })
+
+      expect(res.authorized).toBe(false)
+      if (!res.authorized) {
+        expect(res.fallback).toBeDefined()
+      }
     })
   })
 })

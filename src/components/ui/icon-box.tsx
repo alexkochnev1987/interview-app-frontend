@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 const iconBoxVariants = cva('flex items-center justify-center', {
   variants: {
     tone: {
-      primarySoft: 'bg-[hsl(var(--primary-fixed)/0.85)] text-[hsl(var(--primary))]',
+      primarySoft: 'bg-primary-fixed/85 text-primary',
     },
     size: {
       sm: 'size-12',

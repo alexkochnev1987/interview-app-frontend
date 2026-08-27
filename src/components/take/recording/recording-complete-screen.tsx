@@ -1,19 +1,27 @@
 import { CheckCircle2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
+import { Button } from '@/components/ui/button'
 import { CardContent } from '@/components/ui/card'
 import { Heading } from '@/components/ui/heading'
 import { IconBox } from '@/components/ui/icon-box'
-import { Stack } from '@/components/ui/layout'
+import { Stack } from '@/components/ui/layout/stack'
 import { SurfaceCard } from '@/components/ui/surface-card'
 import { Text } from '@/components/ui/text'
+import { UnstyledLink } from '@/components/ui/unstyled-link'
+import { routes } from '@/i18n/routes'
 
 interface TakeCompleteScreenProps {
   candidateName: string
   position: string
+  showHomeLink?: boolean
 }
 
-export function TakeCompleteScreen({ candidateName, position }: TakeCompleteScreenProps) {
+export function TakeCompleteScreen({
+  candidateName,
+  position,
+  showHomeLink = false,
+}: TakeCompleteScreenProps) {
   const tTake = useTranslations('takeFlow')
   return (
     <SurfaceCard tone="glassFloat" size="lg">
@@ -26,6 +34,11 @@ export function TakeCompleteScreen({ candidateName, position }: TakeCompleteScre
             <Heading variant="heroTitle">{tTake('completeTitle', { candidateName })}</Heading>
             <Text variant="heroDescription">{tTake('completeDescription', { position })}</Text>
           </Stack>
+          {showHomeLink ? (
+            <Button asChild variant="gradient" size="lg">
+              <UnstyledLink href={routes.portal.home}>{tTake('completeHomeCta')}</UnstyledLink>
+            </Button>
+          ) : null}
         </Stack>
       </CardContent>
     </SurfaceCard>

@@ -1,7 +1,7 @@
 import { useTranslations } from 'next-intl'
 
 import type { TakeStage } from '@/components/take/types'
-import { Inline } from '@/components/ui/layout'
+import { Inline } from '@/components/ui/layout/inline'
 import { StatusPill } from '@/components/ui/status-pill'
 import {
   resolveTakeScreenShareStatus,

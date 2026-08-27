@@ -1,4 +1,5 @@
 import type { Interview } from '@/lib/api'
+import { normalizeEmail } from '@/lib/email-validation'
 
 export function getSelectedQuestionIdsInEditOrder(
   initialQuestions: Array<{ id: string }>,
@@ -23,9 +24,10 @@ export function isInterviewHrAssignmentDirty(
 export function isInterviewEditDirty(
   interview: Pick<
     Interview,
-    'candidateName' | 'position' | 'questions' | 'assignedHrId' | 'assignedHr'
+    'candidateName' | 'candidateEmail' | 'position' | 'questions' | 'assignedHrId' | 'assignedHr'
   >,
   candidateName: string,
+  candidateEmail: string,
   position: string,
   selectedById: ReadonlyMap<string, unknown>,
   assignedHrId?: string,
@@ -35,6 +37,9 @@ export function isInterviewEditDirty(
     return true
   }
   if (candidateName.trim() !== interview.candidateName.trim()) {
+    return true
+  }
+  if (normalizeEmail(candidateEmail) !== normalizeEmail(interview.candidateEmail ?? '')) {
     return true
   }
   if (position.trim() !== interview.position.trim()) {

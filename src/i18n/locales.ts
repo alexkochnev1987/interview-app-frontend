@@ -4,17 +4,11 @@ export type Locale = (typeof LOCALES)[number]
 
 export const DEFAULT_LOCALE: Locale = 'en'
 
-export const LOCALE_FORMATS: Record<Locale, string> = {
-  en: 'en-US',
-  be: 'be-BY',
-  ru: 'ru-RU',
-  pl: 'pl-PL',
+export function resolveInterviewLocale(locale?: string | null): Locale {
+  if (locale && (LOCALES as readonly string[]).includes(locale)) {
+    return locale as Locale
+  }
+  return DEFAULT_LOCALE
 }
 
-export function resolveSpeechSynthesisLocale(locale: Locale): string {
-  // Belarusian: most browsers lack be-BY voices; ru-RU is the closest available fallback.
-  if (locale === 'be') {
-    return LOCALE_FORMATS.ru
-  }
-  return LOCALE_FORMATS[locale]
-}
+export const resolveTakeInterviewLocale = resolveInterviewLocale

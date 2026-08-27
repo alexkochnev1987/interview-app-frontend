@@ -10,7 +10,7 @@ import type { RecruiterAssistantPendingAction } from '@/lib/api'
 type AssistantPendingActionModalProps = {
   pendingAction: RecruiterAssistantPendingAction
   loading?: boolean
-  onConfirm: () => void
+  onConfirm: (pendingAction: RecruiterAssistantPendingAction) => void
   onCancel: () => void
 }
 

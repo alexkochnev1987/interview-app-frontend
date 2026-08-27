@@ -4,27 +4,69 @@ import { Bot, CheckCircle2, ShieldAlert } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
-import { ChatMessageBubble } from '@/components/ui/chat'
+import { ChatMessageBubble } from '@/components/ui/chat/chat-message-bubble'
 import { Icon } from '@/components/ui/icon'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
-import { SafeExternalLink } from '@/components/ui/safe-external-link'
 import { BodyText } from '@/components/ui/text'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
+import { useAuth } from '@/lib/auth-context'
+import { APP_ROLE } from '@/lib/auth-roles'
 
 import type { AiAssistantChatMessage } from './ai-assistant-chat-types'
-import { AssistantInterviewList } from './assistant-interview-list'
+import { AssistantAssessmentCount } from './assistant-assessment-count'
+import { AssistantAwaitingCandidateList } from './assistant-awaiting-candidate-list'
+import { AssistantAwaitingHrList } from './assistant-awaiting-hr-list'
+import { AssistantAwaitingInterviewList } from './assistant-awaiting-interview-list'
+import { AssistantCandidateInterviewList } from './assistant-candidate-interview-list'
+import { AssistantCandidateInterviewSummary } from './assistant-candidate-interview-summary'
+import type { AssistantCandidateSelection } from './assistant-candidate-selection'
+import { AssistantCreatedInterview } from './assistant-created-interview'
+import { AssistantCreatedQuestion } from './assistant-created-question'
+import type { AssistantHrSelection } from './assistant-hr-selection'
+import { AssistantInterviewActivity } from './assistant-interview-activity'
+import type { AssistantInterviewSelection } from './assistant-interview-selection'
 import { AssistantInterviewSummary } from './assistant-interview-summary'
+import { AssistantQuestionCount } from './assistant-question-count'
+import { AssistantRedirectAction } from './assistant-redirect-action'
+import { shouldShowAssistantRedirectAction } from './assistant-redirect-label'
+import type { AssistantRegisteredCandidateDecision } from './assistant-registered-candidate-decision'
+import { AssistantRegisteredCandidateDecisionList } from './assistant-registered-candidate-decision-list'
+import { AssistantSimilarQuestionList } from './assistant-similar-question-list'
+import type { AssistantSimilarityDecision } from './assistant-similarity-decision'
+import { AssistantSimilarityDecisionList } from './assistant-similarity-decision-list'
+import { AssistantTeamList } from './assistant-team-list'
+import { AssistantTeamSummary } from './assistant-team-summary'
+import { AssistantTemplateList } from './assistant-template-list'
+import type { AssistantTemplateSelection } from './assistant-template-selection'
 
 type AssistantChatBubbleProps = {
   message: AiAssistantChatMessage
   muted?: boolean
+  disabled?: boolean
+  onSelectTemplate?: (selection: AssistantTemplateSelection) => void
+  onSelectHr?: (selection: AssistantHrSelection) => void
+  onSelectInterview?: (selection: AssistantInterviewSelection) => void
+  onSelectCandidate?: (selection: AssistantCandidateSelection) => void
+  onRegisteredCandidateDecision?: (selection: AssistantRegisteredCandidateDecision) => void
+  onSimilarityDecision?: (selection: AssistantSimilarityDecision) => void
 }
 
-export function AssistantChatBubble({ message, muted }: AssistantChatBubbleProps) {
+export function AssistantChatBubble({
+  message,
+  muted,
+  disabled = false,
+  onSelectTemplate,
+  onSelectHr,
+  onSelectInterview,
+  onSelectCandidate,
+  onRegisteredCandidateDecision,
+  onSimilarityDecision,
+}: AssistantChatBubbleProps) {
   const t = useTranslations('assistant')
   const sharedLabels = useSharedLabels()
+  const { user } = useAuth()
+  const isCandidateView = user?.role === APP_ROLE.candidate
   const isUser = message.role === 'user'
   const lines = message.text.split('\n')
 
@@ -33,6 +75,7 @@ export function AssistantChatBubble({ message, muted }: AssistantChatBubbleProps
   const isDenied = status === 'denied'
   const isExecuted = status === 'executed'
   const escalateTo = message.result?.escalateTo
+  const showHrList = message.result?.hrs !== undefined || message.result?.awaitingInput === 'hr'
 
   return (
     <Inline justify={isUser ? 'end' : 'start'} width="full">
@@ -84,22 +127,94 @@ export function AssistantChatBubble({ message, muted }: AssistantChatBubbleProps
             </Alert>
           ) : null}
 
-          {message.result?.interviews && message.result.interviews.length > 0 ? (
-            <AssistantInterviewList interviews={message.result.interviews} />
+          {isCandidateView && message.result?.interviews && message.result.interviews.length > 0 ? (
+            <AssistantCandidateInterviewList interviews={message.result.interviews} />
+          ) : null}
+          {!isCandidateView &&
+          ((message.result?.interviews?.length ?? 0) > 0 ||
+            message.result?.awaitingInput === 'interview') ? (
+            <AssistantAwaitingInterviewList
+              interviews={message.result?.interviews}
+              disabled={disabled}
+              onSelect={
+                message.result?.awaitingInput === 'interview' ? onSelectInterview : undefined
+              }
+            />
           ) : null}
           {message.result?.interview ? (
-            <AssistantInterviewSummary interview={message.result.interview} />
+            isCandidateView ? (
+              <AssistantCandidateInterviewSummary interview={message.result.interview} />
+            ) : (
+              <AssistantInterviewSummary interview={message.result.interview} />
+            )
+          ) : null}
+          {message.result?.questionCount ? (
+            <AssistantQuestionCount questionCount={message.result.questionCount} />
+          ) : null}
+          {message.result?.assessmentCount ? (
+            <AssistantAssessmentCount assessmentCount={message.result.assessmentCount} />
+          ) : null}
+          {message.result?.interviewActivity ? (
+            <AssistantInterviewActivity activity={message.result.interviewActivity} />
+          ) : null}
+          {message.result?.teamSummary ? (
+            <AssistantTeamSummary teamSummary={message.result.teamSummary} />
+          ) : null}
+          {message.result?.teamMembers && message.result.teamMembers.length > 0 ? (
+            <AssistantTeamList members={message.result.teamMembers} />
+          ) : null}
+          {message.result?.createdQuestion ? (
+            <AssistantCreatedQuestion question={message.result.createdQuestion} />
+          ) : null}
+          {message.result?.createdInterview ? (
+            <AssistantCreatedInterview interview={message.result.createdInterview} />
+          ) : null}
+          {message.result?.redirect &&
+          shouldShowAssistantRedirectAction(message.result.redirect, {
+            isCandidateView,
+            interviewId: message.result.interview?.id,
+          }) ? (
+            <AssistantRedirectAction redirect={message.result.redirect} />
+          ) : null}
+          {message.result?.awaitingInput === 'candidateChoice' && onSelectCandidate ? (
+            <AssistantAwaitingCandidateList
+              candidates={message.result.candidates}
+              disabled={disabled}
+              onSelect={onSelectCandidate}
+              showNewCandidate
+            />
+          ) : null}
+          {message.result?.awaitingInput === 'templateChoice' &&
+          message.result.templates &&
+          message.result.templates.length > 0 &&
+          onSelectTemplate ? (
+            <AssistantTemplateList
+              templates={message.result.templates}
+              disabled={disabled}
+              onSelect={onSelectTemplate}
+            />
+          ) : null}
+          {message.result?.similarQuestions && message.result.similarQuestions.length > 0 ? (
+            <AssistantSimilarQuestionList questions={message.result.similarQuestions} />
+          ) : null}
+          {message.result?.awaitingInput === 'confirmRegisteredCandidate' &&
+          onRegisteredCandidateDecision ? (
+            <AssistantRegisteredCandidateDecisionList
+              disabled={disabled}
+              onSelect={onRegisteredCandidateDecision}
+            />
+          ) : null}
+          {message.result?.awaitingInput === 'confirmAddDespiteSimilar' && onSimilarityDecision ? (
+            <AssistantSimilarityDecisionList disabled={disabled} onSelect={onSimilarityDecision} />
+          ) : null}
+          {showHrList ? (
+            <AssistantAwaitingHrList
+              hrs={message.result?.hrs}
+              disabled={disabled}
+              onSelect={message.result?.awaitingInput === 'hr' ? onSelectHr : undefined}
+            />
           ) : null}
         </Stack>
-        {message.result?.createdInterview ? (
-          <Stack gap={2}>
-            <Button asChild size="sm" variant="outline">
-              <SafeExternalLink href={message.result.createdInterview.candidateLink}>
-                {t('createdInterview.openLink')}
-              </SafeExternalLink>
-            </Button>
-          </Stack>
-        ) : null}
       </ChatMessageBubble>
     </Inline>
   )

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  canAccessCandidatePortal,
   canAccessDashboard,
   canActorReassignMemberRole,
   canConfigureInterview,
@@ -9,7 +10,9 @@ import {
   canManageTeam,
   canReadQuestions,
   canReviewAssessments,
+  canShowRecruiterAssistant,
   canUpdateQuestions,
+  canViewDashboardHome,
   compareRolesByAuthorityDesc,
   isSuperAdmin,
   roleOutranks,
@@ -78,6 +81,23 @@ describe('auth-roles', () => {
     expect(canReviewAssessments(null)).toBe(false)
   })
 
+  it('grants candidate-portal access to the candidate role only', () => {
+    expect(canAccessCandidatePortal('candidate')).toBe(true)
+    for (const role of ['super_admin', 'admin', 'hr'] as const) {
+      expect(canAccessCandidatePortal(role)).toBe(false)
+    }
+    expect(canAccessCandidatePortal(null)).toBe(false)
+    expect(canAccessCandidatePortal(undefined)).toBe(false)
+  })
+
+  it('lets every staff role and the candidate role view the shared dashboard route', () => {
+    for (const role of ['super_admin', 'admin', 'hr', 'candidate'] as const) {
+      expect(canViewDashboardHome(role)).toBe(true)
+    }
+    expect(canViewDashboardHome(null)).toBe(false)
+    expect(canViewDashboardHome('unknown')).toBe(false)
+  })
+
   it('restricts question mutations by role', () => {
     expect(canCreateQuestions('super_admin')).toBe(true)
     expect(canCreateQuestions('admin')).toBe(true)
@@ -94,5 +114,17 @@ describe('auth-roles', () => {
     expect(canManageTeam('admin')).toBe(true)
     expect(canManageTeam('hr')).toBe(false)
     expect(canManageTeam(undefined)).toBe(false)
+  })
+
+  it('hides recruiter assistant when backend disables it for the user', () => {
+    expect(canShowRecruiterAssistant({ role: 'admin', recruiterAssistantEnabled: true })).toBe(true)
+    expect(canShowRecruiterAssistant({ role: 'admin', recruiterAssistantEnabled: false })).toBe(
+      false,
+    )
+    expect(canShowRecruiterAssistant({ role: 'admin' })).toBe(true)
+    expect(canShowRecruiterAssistant({ role: 'candidate', recruiterAssistantEnabled: false })).toBe(
+      false,
+    )
+    expect(canShowRecruiterAssistant(null)).toBe(false)
   })
 })

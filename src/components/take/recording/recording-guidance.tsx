@@ -1,7 +1,7 @@
 import { useTranslations } from 'next-intl'
 
 import type { TakeStage } from '@/components/take/types'
-import { Stack } from '@/components/ui/layout'
+import { Stack } from '@/components/ui/layout/stack'
 import { Panel } from '@/components/ui/panel'
 import { Text } from '@/components/ui/text'
 import type { ExhaustedHint } from '@/features/take/session-machine'

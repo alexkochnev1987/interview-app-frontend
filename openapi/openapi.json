@@ -1,6 +1,276 @@
 {
   "openapi": "3.0.0",
   "paths": {
+    "/config/public": {
+      "get": {
+        "operationId": "PublicConfigController_getPublicConfig",
+        "summary": "Get public runtime variables",
+        "description": "Returns a key→value dictionary of all variables marked as public (is_public=true). Available to all users including unauthenticated visitors.",
+        "parameters": [
+          {
+            "name": "X-Locale",
+            "in": "header",
+            "required": false,
+            "description": "Response language for localized content. Defaults to `en` when omitted.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "be",
+                "ru",
+                "pl"
+              ],
+              "default": "en"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Public configuration dictionary"
+          }
+        },
+        "tags": [
+          "config"
+        ]
+      }
+    },
+    "/config": {
+      "get": {
+        "operationId": "AppConfigController_listAll",
+        "summary": "List all runtime variables",
+        "description": "Returns the full list of runtime configuration variables. Secret variable values are masked with \"********\".",
+        "parameters": [
+          {
+            "name": "X-Locale",
+            "in": "header",
+            "required": false,
+            "description": "Response language for localized content. Defaults to `en` when omitted.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "be",
+                "ru",
+                "pl"
+              ],
+              "default": "en"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of all configuration variables",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SystemConfigEntryDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "config"
+        ],
+        "security": [
+          {
+            "sessionAuth": []
+          }
+        ]
+      }
+    },
+    "/config/{key}": {
+      "put": {
+        "operationId": "AppConfigController_upsert",
+        "summary": "Create or update a runtime variable",
+        "description": "Upserts a variable in the database. The new value takes effect within 15 seconds across all running Fargate instances. Overrides any value set in .env or process.env.",
+        "parameters": [
+          {
+            "name": "key",
+            "required": true,
+            "in": "path",
+            "description": "Variable key in UPPER_SNAKE_CASE",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Locale",
+            "in": "header",
+            "required": false,
+            "description": "Response language for localized content. Defaults to `en` when omitted.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "be",
+                "ru",
+                "pl"
+              ],
+              "default": "en"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertConfigVariableDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The saved variable record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemConfigEntryDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "config"
+        ],
+        "security": [
+          {
+            "sessionAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "AppConfigController_remove",
+        "summary": "Delete a runtime variable override",
+        "description": "Removes the variable from the database. The application falls back to reading from process.env / .env or the code-level default.",
+        "parameters": [
+          {
+            "name": "key",
+            "required": true,
+            "in": "path",
+            "description": "Variable key to reset",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Locale",
+            "in": "header",
+            "required": false,
+            "description": "Response language for localized content. Defaults to `en` when omitted.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "be",
+                "ru",
+                "pl"
+              ],
+              "default": "en"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Variable deleted successfully"
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "config"
+        ],
+        "security": [
+          {
+            "sessionAuth": []
+          }
+        ]
+      }
+    },
     "/auth/login": {
       "post": {
         "operationId": "AuthController_login",
@@ -424,6 +694,84 @@
                   "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/AuthUserResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "users"
+        ],
+        "security": [
+          {
+            "sessionAuth": []
+          }
+        ]
+      }
+    },
+    "/users/candidates": {
+      "get": {
+        "operationId": "UserController_searchCandidates",
+        "summary": "Search registered candidates by name or email",
+        "description": "Minimal id/name/email lookup for the interview-creation candidate picker. Granted to anyone who can create interviews (HR included), not gated by users:read.",
+        "parameters": [
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Substring matched against candidate name or email (case-insensitive).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "X-Locale",
+            "in": "header",
+            "required": false,
+            "description": "Response language for localized content. Defaults to `en` when omitted.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "be",
+                "ru",
+                "pl"
+              ],
+              "default": "en"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CandidateSummaryResponseDto"
                   }
                 }
               }
@@ -6011,6 +6359,70 @@
         ]
       }
     },
+    "/ai/chat/reset": {
+      "post": {
+        "operationId": "RecruiterAssistantController_resetChat",
+        "summary": "Reset recruiter assistant conversation",
+        "parameters": [
+          {
+            "name": "X-Locale",
+            "in": "header",
+            "required": false,
+            "description": "Response language for localized content. Defaults to `en` when omitted.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "be",
+                "ru",
+                "pl"
+              ],
+              "default": "en"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecruiterAssistantResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "ai"
+        ],
+        "security": [
+          {
+            "sessionAuth": []
+          }
+        ]
+      }
+    },
     "/feedback/share/{token}": {
       "get": {
         "operationId": "CandidateFeedbackShareController_getSharedCandidateFeedback",
@@ -6925,6 +7337,212 @@
           }
         ]
       }
+    },
+    "/portal/interviews": {
+      "get": {
+        "operationId": "PortalController_listMyInterviews",
+        "summary": "List the authenticated candidate's own interviews",
+        "description": "Matched by candidate_email against the caller's account email. Excludes demo/internal data. Most relevant (active, then most recently updated) first.",
+        "parameters": [
+          {
+            "name": "X-Locale",
+            "in": "header",
+            "required": false,
+            "description": "Response language for localized content. Defaults to `en` when omitted.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "be",
+                "ru",
+                "pl"
+              ],
+              "default": "en"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CandidatePortalInterviewListItemDto"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "portal"
+        ],
+        "security": [
+          {
+            "sessionAuth": []
+          }
+        ]
+      }
+    },
+    "/portal/interviews/{id}": {
+      "get": {
+        "operationId": "PortalController_getMyInterview",
+        "summary": "Get one of the authenticated candidate's own interviews",
+        "description": "Same shape and scoping as the list endpoint, for the interview-detail page.",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Locale",
+            "in": "header",
+            "required": false,
+            "description": "Response language for localized content. Defaults to `en` when omitted.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "be",
+                "ru",
+                "pl"
+              ],
+              "default": "en"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CandidatePortalInterviewListItemDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "portal"
+        ],
+        "security": [
+          {
+            "sessionAuth": []
+          }
+        ]
+      }
+    },
+    "/portal/interviews/{id}/results": {
+      "get": {
+        "operationId": "PortalController_getMyInterviewResults",
+        "summary": "Get the authenticated candidate's own published feedback for one interview",
+        "description": "Reuses the same publishable-block eligibility as the HR-generated share link, but scoped by the caller's own email instead of a share token.",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Locale",
+            "in": "header",
+            "required": false,
+            "description": "Response language for localized content. Defaults to `en` when omitted.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "be",
+                "ru",
+                "pl"
+              ],
+              "default": "en"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CandidatePortalInterviewResultsResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "portal"
+        ],
+        "security": [
+          {
+            "sessionAuth": []
+          }
+        ]
+      }
     }
   },
   "info": {
@@ -6949,6 +7567,204 @@
       }
     },
     "schemas": {
+      "SystemConfigEntryDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Configuration variable key in UPPER_SNAKE_CASE",
+            "example": "APP_THEME"
+          },
+          "value": {
+            "type": "string",
+            "description": "Current variable value",
+            "example": "innowise"
+          },
+          "valueType": {
+            "type": "string",
+            "description": "Data type hint for parsing and UI rendering",
+            "enum": [
+              "string",
+              "number",
+              "boolean",
+              "enum",
+              "json",
+              "secret"
+            ],
+            "example": "enum"
+          },
+          "options": {
+            "description": "Allowed option values for enum type variables",
+            "example": [
+              "innowise",
+              "red",
+              "blue",
+              "purple"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "description": {
+            "type": "string",
+            "description": "Human-readable description of variable purpose",
+            "example": "Active UI theme color preset"
+          },
+          "isPublic": {
+            "type": "boolean",
+            "description": "Whether this variable is exposed in GET /api/config/public",
+            "example": true
+          },
+          "isSecret": {
+            "type": "boolean",
+            "description": "Whether the value is masked on the frontend (••••••••)",
+            "example": false
+          },
+          "isOverridden": {
+            "type": "boolean",
+            "description": "Whether this variable has a custom database override applied",
+            "example": false
+          }
+        },
+        "required": [
+          "key",
+          "value",
+          "valueType",
+          "isPublic",
+          "isSecret",
+          "isOverridden"
+        ]
+      },
+      "ApiErrorCode": {
+        "type": "string",
+        "enum": [
+          "BAD_REQUEST",
+          "VALIDATION_ERROR",
+          "INVALID_LOCALE",
+          "REGISTRATION_FAILED",
+          "UPLOAD_FAILED",
+          "UPLOAD_NOT_ALLOWED",
+          "ANSWER_ATTEMPT_LIMIT_REACHED",
+          "ANSWER_VERSION_NOT_RESERVED",
+          "ANSWER_VERSION_OVERWRITE_FORBIDDEN",
+          "AVATAR_UNSUPPORTED_TYPE",
+          "AVATAR_TOO_LARGE",
+          "AVATAR_NO_GOOGLE_PICTURE",
+          "INVALID_CONFIG_VALUE",
+          "UNAUTHORIZED",
+          "INVALID_CREDENTIALS",
+          "AUTHENTICATION_REQUIRED",
+          "CANDIDATE_SESSION_REQUIRED",
+          "INVALID_CANDIDATE_SESSION",
+          "INTERVIEW_TOKEN_REQUIRED",
+          "INVALID_INTERVIEW_TOKEN",
+          "FORBIDDEN",
+          "INSUFFICIENT_PERMISSIONS",
+          "ACCESS_DENIED",
+          "NOT_FOUND",
+          "QUESTION_NOT_FOUND",
+          "INTERVIEW_NOT_FOUND",
+          "USER_NOT_FOUND",
+          "FEEDBACK_NOT_FOUND",
+          "CONFLICT",
+          "QUESTION_IN_USE",
+          "VALIDATION_RUNNING",
+          "QUESTION_DUPLICATE",
+          "SERVICE_UNAVAILABLE",
+          "AI_PROVIDER_NOT_CONFIGURED",
+          "EMBEDDING_PROVIDER_NOT_CONFIGURED",
+          "INTERNAL_SERVER_ERROR"
+        ]
+      },
+      "ApiErrorResponseDto": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "number",
+            "example": 400
+          },
+          "code": {
+            "$ref": "#/components/schemas/ApiErrorCode"
+          },
+          "message": {
+            "type": "string",
+            "example": "Validation failed"
+          },
+          "params": {
+            "type": "object",
+            "additionalProperties": true,
+            "example": {
+              "errors": [
+                "email must be an email"
+              ]
+            }
+          },
+          "path": {
+            "type": "string",
+            "example": "/questions/invalid-id"
+          }
+        },
+        "required": [
+          "statusCode",
+          "code",
+          "message"
+        ]
+      },
+      "UpsertConfigVariableDto": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "description": "Variable value as string (numbers and booleans are stored as text)",
+            "example": "240"
+          },
+          "valueType": {
+            "type": "string",
+            "description": "Data type hint for parsing and UI rendering",
+            "enum": [
+              "string",
+              "number",
+              "boolean",
+              "enum",
+              "json",
+              "secret"
+            ],
+            "default": "string"
+          },
+          "options": {
+            "description": "Allowed option values for enum variables",
+            "example": [
+              "innowise",
+              "red",
+              "blue",
+              "purple"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "isPublic": {
+            "type": "boolean",
+            "description": "Whether this variable is exposed to the frontend via GET /config/public",
+            "default": false
+          },
+          "isSecret": {
+            "type": "boolean",
+            "description": "Whether the value is masked in Super Admin list responses",
+            "default": false
+          },
+          "description": {
+            "type": "string",
+            "description": "Human-readable English description shown in Super Admin UI",
+            "example": "Maximum candidate video response recording limit in seconds per question"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      },
       "LoginDto": {
         "type": "object",
         "properties": {
@@ -7031,6 +7847,11 @@
             "type": "boolean",
             "example": true,
             "description": "Whether a Google photo is on file to restore, regardless of whether it is the currently active picture source."
+          },
+          "recruiterAssistantEnabled": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether Herman (recruiter AI assistant) is enabled for this user, based on org config and role."
           }
         },
         "required": [
@@ -7041,7 +7862,8 @@
           "demo",
           "createdAt",
           "avatarSource",
-          "hasGoogleAvatar"
+          "hasGoogleAvatar",
+          "recruiterAssistantEnabled"
         ]
       },
       "RegisterDto": {
@@ -7088,78 +7910,24 @@
           }
         }
       },
-      "ApiErrorCode": {
-        "type": "string",
-        "enum": [
-          "BAD_REQUEST",
-          "VALIDATION_ERROR",
-          "INVALID_LOCALE",
-          "REGISTRATION_FAILED",
-          "UPLOAD_FAILED",
-          "UPLOAD_NOT_ALLOWED",
-          "ANSWER_ATTEMPT_LIMIT_REACHED",
-          "ANSWER_VERSION_NOT_RESERVED",
-          "ANSWER_VERSION_OVERWRITE_FORBIDDEN",
-          "AVATAR_UNSUPPORTED_TYPE",
-          "AVATAR_TOO_LARGE",
-          "AVATAR_NO_GOOGLE_PICTURE",
-          "UNAUTHORIZED",
-          "INVALID_CREDENTIALS",
-          "AUTHENTICATION_REQUIRED",
-          "CANDIDATE_SESSION_REQUIRED",
-          "INVALID_CANDIDATE_SESSION",
-          "INTERVIEW_TOKEN_REQUIRED",
-          "INVALID_INTERVIEW_TOKEN",
-          "FORBIDDEN",
-          "INSUFFICIENT_PERMISSIONS",
-          "ACCESS_DENIED",
-          "NOT_FOUND",
-          "QUESTION_NOT_FOUND",
-          "INTERVIEW_NOT_FOUND",
-          "USER_NOT_FOUND",
-          "FEEDBACK_NOT_FOUND",
-          "CONFLICT",
-          "QUESTION_IN_USE",
-          "VALIDATION_RUNNING",
-          "QUESTION_DUPLICATE",
-          "SERVICE_UNAVAILABLE",
-          "AI_PROVIDER_NOT_CONFIGURED",
-          "EMBEDDING_PROVIDER_NOT_CONFIGURED",
-          "INTERNAL_SERVER_ERROR"
-        ]
-      },
-      "ApiErrorResponseDto": {
+      "CandidateSummaryResponseDto": {
         "type": "object",
         "properties": {
-          "statusCode": {
-            "type": "number",
-            "example": 400
-          },
-          "code": {
-            "$ref": "#/components/schemas/ApiErrorCode"
-          },
-          "message": {
+          "id": {
             "type": "string",
-            "example": "Validation failed"
+            "format": "uuid"
           },
-          "params": {
-            "type": "object",
-            "additionalProperties": true,
-            "example": {
-              "errors": [
-                "email must be an email"
-              ]
-            }
+          "name": {
+            "type": "string"
           },
-          "path": {
-            "type": "string",
-            "example": "/questions/invalid-id"
+          "email": {
+            "type": "string"
           }
         },
         "required": [
-          "statusCode",
-          "code",
-          "message"
+          "id",
+          "name",
+          "email"
         ]
       },
       "UserProfileResponseDto": {
@@ -9803,6 +10571,9 @@
           "versionNumber": {
             "type": "number",
             "description": "Reserved answer attempt/version being recorded."
+          },
+          "fileSizeBytes": {
+            "type": "number"
           }
         },
         "required": [
@@ -9838,6 +10609,9 @@
           "versionNumber": {
             "type": "number",
             "description": "Reserved answer attempt/version being confirmed."
+          },
+          "fileSizeBytes": {
+            "type": "number"
           }
         },
         "required": [
@@ -9884,6 +10658,9 @@
           "versionNumber": {
             "type": "number",
             "description": "Reserved answer attempt/version being recorded."
+          },
+          "fileSizeBytes": {
+            "type": "number"
           }
         },
         "required": [
@@ -10230,6 +11007,10 @@
           "maxAttempts": {
             "type": "number",
             "description": "Maximum recording attempts per question (MAX_ANSWER_ATTEMPTS_PER_QUESTION). Sole take-response source for FE attempt budget — not duplicated on currentAnswerMeta."
+          },
+          "maxDurationSeconds": {
+            "type": "number",
+            "description": "Maximum recording duration in seconds per question (MAX_ANSWER_DURATION_SECONDS)."
           },
           "completed": {
             "type": "boolean"
@@ -10759,6 +11540,28 @@
           "interviewLabel"
         ]
       },
+      "RecruiterAssistantCreateSingleQuestionPendingActionDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "create_single_question"
+            ]
+          },
+          "questionName": {
+            "type": "string"
+          },
+          "createQuestion": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "type",
+          "questionName",
+          "createQuestion"
+        ]
+      },
       "RecruiterAssistantChatDto": {
         "type": "object",
         "properties": {
@@ -10767,10 +11570,90 @@
           },
           "pendingActionId": {
             "type": "string"
+          },
+          "sessionId": {
+            "type": "string"
+          },
+          "pendingAction": {
+            "description": "Optional create-interview/question-plan override sent with confirmation. Questions may only be removed, not added or edited.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RecruiterAssistantCreatePendingActionDto"
+              }
+            ]
           }
         },
         "required": [
           "message"
+        ]
+      },
+      "RecruiterAssistantSimilarQuestionDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "questionText": {
+            "type": "string"
+          },
+          "score": {
+            "type": "number",
+            "description": "Similarity score from 0 to 1 (e.g. 0.85 = 85% match).",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "href": {
+            "type": "string",
+            "description": "Frontend route when the similar question card is clicked."
+          }
+        },
+        "required": [
+          "id",
+          "questionText",
+          "score",
+          "href"
+        ]
+      },
+      "RecruiterAssistantCreatedQuestionDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "questionText": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string",
+            "description": "Frontend route when the question card is clicked."
+          }
+        },
+        "required": [
+          "id",
+          "questionText",
+          "href"
+        ]
+      },
+      "RecruiterAssistantRedirectDto": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "example": "/interviews/new"
+          },
+          "query": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "example": {
+              "candidateName": "Alice",
+              "position": "React Developer"
+            }
+          }
+        },
+        "required": [
+          "path"
         ]
       },
       "RecruiterAssistantCreatedInterviewDto": {
@@ -10793,6 +11676,10 @@
         "properties": {
           "reviewed": {
             "type": "boolean"
+          },
+          "resultsReady": {
+            "type": "boolean",
+            "description": "True once HR has published at least one candidate-feedback block."
           },
           "shareLinkActive": {
             "type": "boolean"
@@ -10834,6 +11721,96 @@
           "status"
         ]
       },
+      "RecruiterAssistantQuestionCountDto": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number"
+          },
+          "filters": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "total"
+        ]
+      },
+      "RecruiterAssistantAssessmentCountDto": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number"
+          },
+          "filters": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "total"
+        ]
+      },
+      "RecruiterAssistantInterviewActivityDto": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number"
+          },
+          "active": {
+            "type": "number"
+          },
+          "completed": {
+            "type": "number"
+          },
+          "failed": {
+            "type": "number"
+          },
+          "pending": {
+            "type": "number"
+          },
+          "inProgress": {
+            "type": "number"
+          },
+          "processing": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "total",
+          "active",
+          "completed",
+          "failed",
+          "pending",
+          "inProgress",
+          "processing"
+        ]
+      },
+      "RecruiterAssistantTeamSummaryDto": {
+        "type": "object",
+        "properties": {
+          "superAdmin": {
+            "type": "number"
+          },
+          "admin": {
+            "type": "number"
+          },
+          "hr": {
+            "type": "number"
+          },
+          "candidate": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "superAdmin",
+          "admin",
+          "hr",
+          "candidate",
+          "total"
+        ]
+      },
       "RecruiterAssistantResponseDto": {
         "type": "object",
         "properties": {
@@ -10856,6 +11833,13 @@
               "$ref": "#/components/schemas/RecruiterAssistantSuggestedQuestionDto"
             }
           },
+          "similarQuestions": {
+            "description": "Existing questions with high similarity during create_question flow (clickable cards).",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecruiterAssistantSimilarQuestionDto"
+            }
+          },
           "pendingAction": {
             "oneOf": [
               {
@@ -10863,11 +11847,52 @@
               },
               {
                 "$ref": "#/components/schemas/RecruiterAssistantAssignHrPendingActionDto"
+              },
+              {
+                "$ref": "#/components/schemas/RecruiterAssistantCreateSingleQuestionPendingActionDto"
               }
             ]
           },
           "pendingActionId": {
             "type": "string"
+          },
+          "sessionId": {
+            "type": "string"
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "en",
+              "be",
+              "ru",
+              "pl"
+            ]
+          },
+          "createdQuestion": {
+            "$ref": "#/components/schemas/RecruiterAssistantCreatedQuestionDto"
+          },
+          "redirect": {
+            "$ref": "#/components/schemas/RecruiterAssistantRedirectDto"
+          },
+          "templates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TemplateSummaryResponseDto"
+            }
+          },
+          "awaitingInput": {
+            "type": "string",
+            "enum": [
+              "hr",
+              "interview",
+              "questionName",
+              "confirmAddDespiteSimilar",
+              "candidateName",
+              "candidateChoice",
+              "confirmRegisteredCandidate",
+              "position",
+              "templateChoice"
+            ]
           },
           "createdInterview": {
             "$ref": "#/components/schemas/RecruiterAssistantCreatedInterviewDto"
@@ -10886,8 +11911,46 @@
               "$ref": "#/components/schemas/InterviewListItemDto"
             }
           },
+          "hrs": {
+            "description": "HR reviewers returned for assign_hr picker steps or the list_hrs intent.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssignedHrDto"
+            }
+          },
           "interview": {
             "$ref": "#/components/schemas/RecruiterAssistantInterviewSummaryDto"
+          },
+          "questionCount": {
+            "$ref": "#/components/schemas/RecruiterAssistantQuestionCountDto"
+          },
+          "assessmentCount": {
+            "$ref": "#/components/schemas/RecruiterAssistantAssessmentCountDto"
+          },
+          "assessments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TemplateSummaryResponseDto"
+            }
+          },
+          "interviewActivity": {
+            "$ref": "#/components/schemas/RecruiterAssistantInterviewActivityDto"
+          },
+          "teamSummary": {
+            "$ref": "#/components/schemas/RecruiterAssistantTeamSummaryDto"
+          },
+          "teamMembers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuthUserResponseDto"
+            }
+          },
+          "candidates": {
+            "description": "Registered candidates returned during create_interview picker steps.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CandidateSummaryResponseDto"
+            }
           }
         },
         "required": [
@@ -11431,6 +12494,113 @@
         },
         "required": [
           "expiresAt"
+        ]
+      },
+      "CandidatePortalInterviewListItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "position": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "in_progress",
+              "processing",
+              "completed",
+              "failed"
+            ]
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "questionCount": {
+            "type": "number",
+            "minimum": 0
+          },
+          "maxAnswerAttempts": {
+            "type": "number",
+            "minimum": 1,
+            "description": "Recording attempts allowed per question (server-configured, same for every interview)."
+          },
+          "resultsReady": {
+            "type": "boolean",
+            "description": "True once HR has published at least one candidate-feedback block for this interview."
+          },
+          "continueUrl": {
+            "type": "string",
+            "description": "Relative take-flow URL with a freshly minted candidate token; present only while the interview is not yet finished."
+          }
+        },
+        "required": [
+          "id",
+          "position",
+          "status",
+          "createdAt",
+          "updatedAt",
+          "questionCount",
+          "maxAnswerAttempts",
+          "resultsReady"
+        ]
+      },
+      "CandidatePortalInterviewResultsResponseDto": {
+        "type": "object",
+        "properties": {
+          "interviewLocale": {
+            "type": "string",
+            "enum": [
+              "en",
+              "be",
+              "ru",
+              "pl"
+            ]
+          },
+          "position": {
+            "type": "string"
+          },
+          "interviewDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "overallScore": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "next_stage",
+              "keep_in_touch",
+              "custom"
+            ]
+          },
+          "outcomeMessage": {
+            "type": "string"
+          },
+          "overall": {
+            "$ref": "#/components/schemas/PublicCandidateFeedbackTextBlockDto"
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicCandidateFeedbackQuestionBlockDto"
+            }
+          }
+        },
+        "required": [
+          "interviewLocale",
+          "position"
         ]
       }
     }

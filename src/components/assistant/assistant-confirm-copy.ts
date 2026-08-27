@@ -27,6 +27,8 @@ export function getPendingActionConfirmMessage(
       return t('confirm.createQuestions')
     case 'assign_hr':
       return t('confirm.assignHr')
+    case 'create_single_question':
+      return t('confirm.createSingleQuestion')
     default:
       return t('confirm.action')
   }
@@ -82,6 +84,8 @@ export function getPendingActionConfirmDetails(
       }
       return rows
     }
+    case 'create_single_question':
+      return [{ label: t('confirm.details.questionName'), value: pendingAction.questionName }]
     default:
       return []
   }

@@ -6,8 +6,8 @@ import { cn } from '@/lib/utils'
 const panelVariants = cva('ring-1 ring-border/45', {
   variants: {
     tone: {
-      surface: 'bg-[hsl(var(--surface-low)/0.85)]',
-      surfaceStrong: 'bg-[hsl(var(--surface-low)/0.9)]',
+      surface: 'bg-surface-low/85',
+      surfaceStrong: 'bg-surface-low/90',
       white: 'bg-white/85',
       slateWell: 'bg-slate-50 dark:bg-slate-950/45',
     },

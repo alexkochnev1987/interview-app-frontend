@@ -15,14 +15,12 @@ import {
   type GenerateAllCandidateFeedbackPlan,
   type UpdateCandidateFeedbackPayload,
 } from './candidate-feedback'
-import { normalizeInterviewsResponse } from './interviews-response'
 import {
   buildGenerateDraftRequestPayload,
   buildTranslateDraftRequestPayload,
 } from './question-editor/ai-draft-request'
 
-export { ApiError, QuestionInUseError } from './api-error'
-export { resolveApiLocale } from './api-locale'
+export { ApiError } from './api-error'
 export type LocaleCode = Locale
 
 function getInitialClientApiLocale(): LocaleCode {
@@ -78,6 +76,8 @@ export type AuthUserResponseDto = Schemas['AuthUserResponseDto']
 /** `/auth/me` includes effective permissions; OpenAPI DTO does not list them yet. */
 export type MeResponse = AuthUserResponseDto & {
   permissions?: readonly string[]
+  /** Mirrors backend RECRUITER_ASSISTANT_ENABLED* env gates for this user's role. */
+  recruiterAssistantEnabled?: boolean
 }
 export type LoginPayload = Schemas['LoginDto']
 export type LogoutResponse = Schemas['LogoutResponseDto']
@@ -148,13 +148,11 @@ export type Answer = Schemas['AnswerDto']
 export type InterviewResult = Schemas['InterviewResultResponseDto']
 export type Interview = Schemas['InterviewResponseDto']
 export type UpdateInterviewPayload = Schemas['UpdateInterviewDto']
-export type InterviewStatus = Interview['status']
 
 type ValidateAllAnswersResponse = Schemas['StartAllAnswerValidationsResponseDto']
 export type StartAnswerValidationResult = Schemas['StartAnswerValidationResultDto']
 export type InterviewAnswerMediaResponse = Schemas['InterviewAnswerMediaResponseDto']
 export type CandidateLinkResponse = Schemas['CandidateLinkResponseDto']
-export type FeedbackLinkResponse = Schemas['FeedbackLinkResponseDto']
 export type CandidateFeedbackShareLinkResponse = Schemas['CandidateFeedbackShareLinkResponseDto']
 export type CandidateFeedbackShareLinkStatus =
   Schemas['CandidateFeedbackShareLinkStatusResponseDto']
@@ -170,6 +168,9 @@ export type InterviewListItem = Schemas['InterviewListItemDto'] & {
   demo?: boolean
 }
 export type PaginatedInterviews = Schemas['PaginatedInterviewsResponseDto']
+
+export type CandidatePortalInterviewListItem = Schemas['CandidatePortalInterviewListItemDto']
+export type CandidatePortalInterviewResults = Schemas['CandidatePortalInterviewResultsResponseDto']
 export type InterviewFacetsResponse = Schemas['InterviewFacetsResponseDto']
 export type InterviewFacetCount = Schemas['InterviewFacetCountDto']
 export type FetchInterviewsParams = NonNullable<
@@ -186,20 +187,30 @@ export type FetchInterviewFacetsParams = NonNullable<
 >
 
 export type CreateInterviewPayload = Schemas['CreateInterviewDto']
-export type RecruiterAssistantChatPayload = Schemas['RecruiterAssistantChatDto']
+export type RecruiterAssistantChatPayload = Schemas['RecruiterAssistantChatDto'] & {
+  pendingAction?: RecruiterAssistantCreatePendingAction
+}
 export type RecruiterAssistantResponse = Schemas['RecruiterAssistantResponseDto']
 export type RecruiterAssistantCreatePendingAction =
   Schemas['RecruiterAssistantCreatePendingActionDto']
 export type RecruiterAssistantAssignHrPendingAction =
   Schemas['RecruiterAssistantAssignHrPendingActionDto']
+export type RecruiterAssistantCreateSingleQuestionPendingAction =
+  Schemas['RecruiterAssistantCreateSingleQuestionPendingActionDto']
 export type RecruiterAssistantPendingAction =
   | RecruiterAssistantCreatePendingAction
   | RecruiterAssistantAssignHrPendingAction
+  | RecruiterAssistantCreateSingleQuestionPendingAction
 export type RecruiterAssistantSuggestedQuestion = Schemas['RecruiterAssistantSuggestedQuestionDto']
 export type RecruiterAssistantInterviewSummary = Schemas['RecruiterAssistantInterviewSummaryDto']
-export type RecruiterAssistantReviewState = Schemas['RecruiterAssistantReviewStateDto']
 export type RecruiterAssistantCreatedInterview = Schemas['RecruiterAssistantCreatedInterviewDto']
-export type RecruiterAssistantResponseStatus = RecruiterAssistantResponse['status']
+export type RecruiterAssistantCreatedQuestion = Schemas['RecruiterAssistantCreatedQuestionDto']
+export type RecruiterAssistantSimilarQuestion = Schemas['RecruiterAssistantSimilarQuestionDto']
+export type RecruiterAssistantRedirect = Schemas['RecruiterAssistantRedirectDto']
+export type RecruiterAssistantQuestionCount = Schemas['RecruiterAssistantQuestionCountDto']
+export type RecruiterAssistantAssessmentCount = Schemas['RecruiterAssistantAssessmentCountDto']
+export type RecruiterAssistantInterviewActivity = Schemas['RecruiterAssistantInterviewActivityDto']
+export type RecruiterAssistantTeamSummary = Schemas['RecruiterAssistantTeamSummaryDto']
 
 export type PresignedUrlResponse = Schemas['PresignedUrlResponseDto']
 
@@ -242,6 +253,14 @@ function messageFromBody(body: string, status: number): string {
   return trimmed
 }
 
+async function throwIfErrorResponse(res: Response, path: string): Promise<void> {
+  if (!res.ok) {
+    const body = await res.text()
+    const { code, params } = extractApiErrorFieldsFromBody(body)
+    throw new ApiError(res.status, messageFromBody(body, res.status), path, body, code, params)
+  }
+}
+
 async function handle<T>(promise: Promise<ApiResult<T>>): Promise<T> {
   const { data, error, response } = await promise
 
@@ -266,11 +285,7 @@ async function postWithQuery<T>(path: string, query?: Record<string, string>): P
     method: 'POST',
   })
 
-  if (!res.ok) {
-    const body = await res.text()
-    const { code, params } = extractApiErrorFieldsFromBody(body)
-    throw new ApiError(res.status, messageFromBody(body, res.status), path, body, code, params)
-  }
+  await throwIfErrorResponse(res, path)
 
   if (res.status === 204) {
     return undefined as T
@@ -396,6 +411,22 @@ export async function fetchHrUsers(init?: { signal?: AbortSignal }): Promise<Ass
   return hrUsers
 }
 
+export type CandidateSummary = Schemas['CandidateSummaryResponseDto']
+
+/** Minimal id/name/email lookup for the candidate-name typeahead on interview forms. */
+export async function fetchCandidates(
+  params?: { q?: string; limit?: number },
+  init?: { signal?: AbortSignal },
+): Promise<CandidateSummary[]> {
+  return handle(
+    client.GET('/users/candidates', {
+      ...LOCALIZED_HEADERS,
+      params: { query: { limit: 10, ...params } },
+      signal: init?.signal,
+    }),
+  )
+}
+
 export async function updateUserRole(
   id: string,
   role: 'super_admin' | 'admin' | 'hr' | 'candidate',
@@ -488,6 +519,17 @@ export async function sendRecruiterAssistantMessage(
     client.POST('/ai/chat', {
       ...LOCALIZED_HEADERS,
       body: data,
+      signal: init?.signal,
+    }),
+  )
+}
+
+export async function resetRecruiterAssistantChat(init?: {
+  signal?: AbortSignal
+}): Promise<RecruiterAssistantResponse> {
+  return handle(
+    client.POST('/ai/chat/reset', {
+      ...LOCALIZED_HEADERS,
       signal: init?.signal,
     }),
   )
@@ -718,11 +760,6 @@ export async function getInterview(id: string): Promise<Interview> {
   )
 }
 
-export async function getInterviews(): Promise<Interview[]> {
-  const data = await handle(client.GET('/interviews'))
-  return normalizeInterviewsResponse<Interview>(data, 'client:/interviews')
-}
-
 export async function fetchInterviews(
   params?: FetchInterviewsParams,
   init?: { signal?: AbortSignal },
@@ -790,44 +827,6 @@ export async function generateCandidateLink(id: string): Promise<CandidateLinkRe
   )
 }
 
-export async function generateFeedbackLink(id: string): Promise<FeedbackLinkResponse> {
-  return handle(
-    client.POST('/interviews/{id}/feedback-link', {
-      ...LOCALIZED_HEADERS,
-      params: { path: { id } },
-    }),
-  )
-}
-
-export type {
-  ApiCandidateFeedbackDto,
-  CandidateFeedbackBlock,
-  CandidateFeedbackBlockState,
-  CandidateFeedbackEditableState,
-  CandidateFeedbackQuestionBlock,
-  CandidateFeedbackResponse,
-  CandidateFeedbackSkipReason,
-  GenerateAllCandidateFeedbackOutcome,
-  GenerateAllCandidateFeedbackPlan,
-  GenerateAllCandidateFeedbackQuestionResult,
-  UpdateCandidateFeedbackOverallPayload,
-  UpdateCandidateFeedbackPayload,
-  UpdateCandidateFeedbackQuestionPayload,
-} from './candidate-feedback'
-export {
-  buildQuestionBlocksView,
-  candidateFeedbackPath,
-  canRegenerateAnyCandidateFeedbackBlock,
-  createEmptyCandidateFeedback,
-  getSkippedGenerateAllQuestionResults,
-  isCandidateFeedbackEmpty,
-  isCandidateFeedbackGenerating,
-  isOverallBlockGenerationBusy,
-  isQuestionBlockGenerationBusy,
-  mapCandidateFeedbackFromApi,
-  parseCandidateFeedbackBody,
-} from './candidate-feedback'
-
 export async function getCandidateFeedback(
   id: string,
   interviewLocale: Locale,
@@ -838,11 +837,7 @@ export async function getCandidateFeedback(
     credentials: 'include',
   })
 
-  if (!res.ok) {
-    const body = await res.text()
-    const { code, params } = extractApiErrorFieldsFromBody(body)
-    throw new ApiError(res.status, messageFromBody(body, res.status), path, body, code, params)
-  }
+  await throwIfErrorResponse(res, path)
 
   const body = await res.text()
   return parseCandidateFeedbackBody(body, id, interviewLocale)
@@ -861,11 +856,7 @@ export async function updateCandidateFeedback(
     body: JSON.stringify(payload),
   })
 
-  if (!res.ok) {
-    const body = await res.text()
-    const { code, params } = extractApiErrorFieldsFromBody(body)
-    throw new ApiError(res.status, messageFromBody(body, res.status), path, body, code, params)
-  }
+  await throwIfErrorResponse(res, path)
 
   const body = await res.text()
   if (!body) {
@@ -886,11 +877,7 @@ export async function generateCandidateFeedbackQuestion(
     credentials: 'include',
   })
 
-  if (!res.ok) {
-    const body = await res.text()
-    const { code, params } = extractApiErrorFieldsFromBody(body)
-    throw new ApiError(res.status, messageFromBody(body, res.status), path, body, code, params)
-  }
+  await throwIfErrorResponse(res, path)
 
   return getCandidateFeedback(interviewId, interviewLocale)
 }
@@ -995,11 +982,7 @@ export async function getSharedCandidateFeedback(
     signal: AbortSignal.timeout(15_000),
   })
 
-  if (!res.ok) {
-    const body = await res.text()
-    const { code, params } = extractApiErrorFieldsFromBody(body)
-    throw new ApiError(res.status, messageFromBody(body, res.status), path, body, code, params)
-  }
+  await throwIfErrorResponse(res, path)
 
   return (await res.json()) as PublicCandidateFeedbackResponse
 }
@@ -1106,11 +1089,7 @@ export async function syncCandidateSession(id: string, token: string): Promise<v
   const query = new URLSearchParams({ token })
   const res = await fetchClientApi(`/api${path}?${query}`, { credentials: 'include' })
 
-  if (!res.ok) {
-    const body = await res.text()
-    const { code, params } = extractApiErrorFieldsFromBody(body)
-    throw new ApiError(res.status, messageFromBody(body, res.status), path, body, code, params)
-  }
+  await throwIfErrorResponse(res, path)
 
   await res.text()
 }
@@ -1283,15 +1262,6 @@ export async function getTemplates(): Promise<TemplateSummary[]> {
   )
 }
 
-export async function getTemplate(id: string): Promise<Template> {
-  return handle(
-    client.GET('/templates/{id}', {
-      ...LOCALIZED_HEADERS,
-      params: { path: { id } },
-    }),
-  )
-}
-
 export async function createTemplate(data: CreateTemplatePayload): Promise<Template> {
   return handle(
     client.POST('/templates', {
@@ -1317,4 +1287,67 @@ export async function deleteTemplate(id: string): Promise<DeleteTemplateResponse
       params: { path: { id } },
     }),
   )
+}
+
+// ---------------------------------------------------------------------------
+// Dynamic application configuration
+// ---------------------------------------------------------------------------
+
+export type {
+  PublicAppConfig,
+  SystemConfigEntry,
+  SystemConfigValueType,
+  UpdateSystemConfigPayload,
+} from './app-config-types'
+
+import type {
+  PublicAppConfig,
+  SystemConfigEntry,
+  UpdateSystemConfigPayload,
+} from './app-config-types'
+import { parsePublicConfig } from './app-config-types'
+
+/** Fetch the public configuration snapshot (all authenticated users). */
+export async function getPublicConfig(): Promise<PublicAppConfig> {
+  const res = await fetchClientApi('/api/config/public')
+
+  await throwIfErrorResponse(res, '/config/public')
+
+  const raw = (await res.json()) as Record<string, unknown>
+  return parsePublicConfig(raw)
+}
+
+/** Fetch all system config entries (super-admin only). */
+export async function getSystemConfigs(): Promise<SystemConfigEntry[]> {
+  const res = await fetchClientApi('/api/config')
+
+  await throwIfErrorResponse(res, '/config')
+
+  return (await res.json()) as SystemConfigEntry[]
+}
+
+/** Update a single system config variable (super-admin only). */
+export async function updateSystemConfig(
+  key: string,
+  payload: UpdateSystemConfigPayload,
+): Promise<SystemConfigEntry> {
+  const path = `/config/${encodeURIComponent(key)}`
+  const res = await fetchClientApi(`/api${path}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  })
+
+  await throwIfErrorResponse(res, path)
+
+  return (await res.json()) as SystemConfigEntry
+}
+
+/** Delete (reset to default) a system config variable (super-admin only). */
+export async function deleteSystemConfig(key: string): Promise<void> {
+  const path = `/config/${encodeURIComponent(key)}`
+  const res = await fetchClientApi(`/api${path}`, {
+    method: 'DELETE',
+  })
+
+  await throwIfErrorResponse(res, path)
 }

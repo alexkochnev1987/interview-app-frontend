@@ -1,7 +1,8 @@
 import { useTranslations } from 'next-intl'
 
 import type { PermissionStatus } from '@/components/take/types'
-import { Inline, Stack } from '@/components/ui/layout'
+import { Inline } from '@/components/ui/layout/inline'
+import { Stack } from '@/components/ui/layout/stack'
 import { Panel } from '@/components/ui/panel'
 import { StatusPill, type StatusTone } from '@/components/ui/status-pill'
 import { Text } from '@/components/ui/text'

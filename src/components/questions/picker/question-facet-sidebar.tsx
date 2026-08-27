@@ -1,13 +1,13 @@
 'use client'
 
-import { RotateCcw, Search } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 import { EyebrowLabel } from '@/components/ui/eyebrow-label'
 import { FacetRowButton } from '@/components/ui/facet-row-button'
+import { FacetSidebarShell } from '@/components/ui/facet-sidebar-shell'
+import { Icon } from '@/components/ui/icon'
 import { IconAffix } from '@/components/ui/icon-affix'
 import { Input } from '@/components/ui/input'
 import { DividedStack, DividedStackItem } from '@/components/ui/layout/divided-stack'
@@ -50,6 +50,8 @@ export type QuestionFacetSidebarProps = {
   loading: boolean
   error: string | null
   onRetry: () => void
+  /** Suppress the built-in title row, e.g. when rendered inside a Sheet that already shows one. */
+  hideHeading?: boolean
 }
 
 export function QuestionFacetSidebar(props: QuestionFacetSidebarProps) {
@@ -73,6 +75,7 @@ export function QuestionFacetSidebar(props: QuestionFacetSidebarProps) {
     loading,
     error,
     onRetry,
+    hideHeading = false,
   } = props
   const toastMessages = useToastMessages()
   const t = useTranslations('questions.picker.facet')
@@ -87,105 +90,75 @@ export function QuestionFacetSidebar(props: QuestionFacetSidebarProps) {
     (showStatusFilter && selected.status !== 'active' ? 1 : 0)
 
   return (
-    <Card variant="surface" size="sm">
-      <CardContent spacing="md">
-        <Stack gap={3}>
-          <Inline gap={2} align="center" justify="between">
-            <BodyText as="span" size="base" tone="foreground" weight="semibold">
-              {t('filtersTitle')}
-            </BodyText>
-            {activeFilterCount > 0 ? (
-              <BodyText as="span" size="xs" tone="muted">
-                {t('activeFilters', { count: activeFilterCount })}
-              </BodyText>
-            ) : null}
-          </Inline>
-
-          <Button
-            type="button"
-            variant="default"
-            shape="pill"
-            size="xl"
-            width="full"
-            disabled={!canReset}
-            onClick={onReset}
-            title={t('resetTitle')}
-          >
-            <RotateCcw className="size-4" />
-            {activeFilterCount > 0
-              ? t('resetAllWithCount', { count: activeFilterCount })
-              : t('resetAll')}
-          </Button>
-
-          {error ? (
-            <Stack gap={2}>
-              <BodyText size="sm" weight="semibold">
-                {toastMessages.questionFacets.unavailableTitle}
-              </BodyText>
-              <BodyText size="sm" tone="muted">
-                {error}
-              </BodyText>
-              <Button type="button" variant="outline-pill" shape="pill" size="sm" onClick={onRetry}>
-                {t('retry')}
-              </Button>
-            </Stack>
-          ) : null}
-        </Stack>
-
-        <DividedStack>
-          {showStatusFilter ? (
-            <StatusFacetSection selected={selected.status} onChange={onStatusChange} />
-          ) : null}
-          <ScalarFacetSection
-            title={t('localeTitle')}
-            values={[
-              { value: 'en', count: 0 },
-              { value: 'be', count: 0 },
-              { value: 'ru', count: 0 },
-              { value: 'pl', count: 0 },
-            ]}
-            selected={selected.locale}
-            onChange={(value) => onLocaleChange(value as LocaleCode | undefined)}
-            loading={false}
-            hideCounts
-          />
-          <ScalarFacetSection
-            title={t('difficultyTitle')}
-            values={difficulties}
-            selected={selected.difficulty}
-            onChange={(value) => onDifficultyChange(value as QuestionDifficulty | undefined)}
-            loading={loading && difficulties.length === 0}
-          />
-          <ScalarFacetSection
-            title={t('categoryTitle')}
-            values={categories}
-            selected={selected.category}
-            onChange={onCategoryChange}
-            loading={loading && categories.length === 0}
-          />
-          <ScalarFacetSection
-            title={t('typeTitle')}
-            values={subcategories}
-            selected={selected.subcategory}
-            onChange={onSubcategoryChange}
-            loading={loading && subcategories.length === 0}
-          />
-          <ScalarFacetSection
-            title={t('roleTitle')}
-            values={roles}
-            selected={selected.role}
-            onChange={onRoleChange}
-            loading={loading && roles.length === 0}
-          />
-          <TagsFacetSection
-            values={tags}
-            selected={selected.tags}
-            onChange={onTagsChange}
-            loading={loading && tags.length === 0}
-          />
-        </DividedStack>
-      </CardContent>
-    </Card>
+    <FacetSidebarShell
+      hideHeading={hideHeading}
+      filtersTitle={t('filtersTitle')}
+      activeFilterCount={activeFilterCount}
+      activeFiltersText={t('activeFilters', { count: activeFilterCount })}
+      resetTitle={t('resetTitle')}
+      resetLabel={
+        activeFilterCount > 0 ? t('resetAllWithCount', { count: activeFilterCount }) : t('resetAll')
+      }
+      canReset={canReset}
+      onReset={onReset}
+      error={error}
+      unavailableTitle={toastMessages.questionFacets.unavailableTitle}
+      retryLabel={t('retry')}
+      onRetry={onRetry}
+    >
+      <DividedStack>
+        {showStatusFilter ? (
+          <StatusFacetSection selected={selected.status} onChange={onStatusChange} />
+        ) : null}
+        <ScalarFacetSection
+          title={t('localeTitle')}
+          values={[
+            { value: 'en', count: 0 },
+            { value: 'be', count: 0 },
+            { value: 'ru', count: 0 },
+            { value: 'pl', count: 0 },
+          ]}
+          selected={selected.locale}
+          onChange={(value) => onLocaleChange(value as LocaleCode | undefined)}
+          loading={false}
+          hideCounts
+        />
+        <ScalarFacetSection
+          title={t('difficultyTitle')}
+          values={difficulties}
+          selected={selected.difficulty}
+          onChange={(value) => onDifficultyChange(value as QuestionDifficulty | undefined)}
+          loading={loading && difficulties.length === 0}
+        />
+        <ScalarFacetSection
+          title={t('categoryTitle')}
+          values={categories}
+          selected={selected.category}
+          onChange={onCategoryChange}
+          loading={loading && categories.length === 0}
+        />
+        <ScalarFacetSection
+          title={t('typeTitle')}
+          values={subcategories}
+          selected={selected.subcategory}
+          onChange={onSubcategoryChange}
+          loading={loading && subcategories.length === 0}
+        />
+        <ScalarFacetSection
+          title={t('roleTitle')}
+          values={roles}
+          selected={selected.role}
+          onChange={onRoleChange}
+          loading={loading && roles.length === 0}
+        />
+        <TagsFacetSection
+          values={tags}
+          selected={selected.tags}
+          onChange={onTagsChange}
+          loading={loading && tags.length === 0}
+        />
+      </DividedStack>
+    </FacetSidebarShell>
   )
 }
 
@@ -279,7 +252,13 @@ function TagsFacetSection(props: {
   return (
     <FacetSection title={t('tagsTitle')} activeCount={selected.length}>
       <Stack gap={2}>
-        <IconAffix icon={<Search className="size-3.5" />}>
+        <IconAffix
+          icon={
+            <Icon size="sm">
+              <Search />
+            </Icon>
+          }
+        >
           <Input
             type="search"
             size="md"

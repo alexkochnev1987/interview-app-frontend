@@ -1,11 +1,12 @@
 'use client'
 
-import { ArrowRight, BriefcaseBusiness, UserRound } from 'lucide-react'
+import { ArrowRight, BriefcaseBusiness, Mail } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 
 import { DemoWriteGuard } from '@/components/demo/demo-write-guard'
 import { AssignedHrSelect } from '@/components/interviews/assigned-hr-select'
+import { CandidateNameCombobox } from '@/components/interviews/candidate-name-combobox'
 import {
   InterviewQuestionPickerAside,
   InterviewQuestionPickerMain,
@@ -38,14 +39,17 @@ import { createInterview, type Question } from '@/lib/api'
 import { useIsDemo } from '@/lib/auth-context'
 import { useAuth } from '@/lib/auth-context'
 import { canAssignInterviewHr } from '@/lib/auth-roles'
+import { isValidEmail } from '@/lib/email-validation'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
 import { runMutation } from '@/lib/run-mutation'
 import { useToastMessages } from '@/lib/use-toast-messages'
 
 type InterviewCreateFormProps = {
   initialPrefetch: QuestionsLibraryPrefetch
-  // Optional prefill: seeds the question picker and position; candidate name stays empty.
+  // Optional prefill: seeds the question picker, position, and candidate name.
   initialSelected?: Question[]
+  initialCandidateName?: string
+  initialCandidateEmail?: string
   initialPosition?: string
   // Set when prefilled from a template; its id is recorded on create to bump popularity.
   initialTemplateId?: string
@@ -68,6 +72,8 @@ function questionSupportsInterviewLocale(question: Question, locale: Locale): bo
 export function InterviewCreateForm({
   initialPrefetch,
   initialSelected,
+  initialCandidateName,
+  initialCandidateEmail,
   initialPosition,
   initialTemplateId,
   initialAssignedHrId,
@@ -80,7 +86,8 @@ export function InterviewCreateForm({
   const toastMessages = useToastMessages()
   const isDemo = useIsDemo()
   const readOnlyDemo = isDemo && !allowDemoWrite
-  const [candidateName, setCandidateName] = useState('')
+  const [candidateName, setCandidateName] = useState(initialCandidateName ?? '')
+  const [candidateEmail, setCandidateEmail] = useState(initialCandidateEmail ?? '')
   const [position, setPosition] = useState(initialPosition ?? '')
   const [assignedHrId, setAssignedHrId] = useState<string | undefined>(initialAssignedHrId)
   const { user } = useAuth()
@@ -126,6 +133,10 @@ export function InterviewCreateForm({
       setError(toastMessages.pageGate.interview.candidateNameRequired)
       return
     }
+    if (candidateEmail.trim() && !isValidEmail(candidateEmail.trim())) {
+      setError(toastMessages.pageGate.interview.candidateEmailInvalid)
+      return
+    }
     if (!position.trim()) {
       setError(toastMessages.pageGate.interview.positionRequired)
       return
@@ -142,6 +153,7 @@ export function InterviewCreateForm({
         () =>
           createInterview({
             candidateName: candidateName.trim(),
+            ...(candidateEmail.trim() ? { candidateEmail: candidateEmail.trim() } : {}),
             position: position.trim(),
             ...(canAssign && assignedHrId ? { assignedHrId } : {}),
             interviewLocale,
@@ -189,21 +201,44 @@ export function InterviewCreateForm({
                 <CardDescription>{t('candidateBriefDescription')}</CardDescription>
               </CardHeader>
               <CardContent spacing="lg">
-                <FormField htmlFor="candidateName" label={t('candidateNameLabel')}>
+                <FormField
+                  htmlFor="candidateName"
+                  label={t('candidateNameLabel')}
+                  hint={t('candidateNameHint')}
+                >
+                  <CandidateNameCombobox
+                    id="candidateName"
+                    value={candidateName}
+                    onChange={setCandidateName}
+                    onSelectCandidate={(candidate) => {
+                      setCandidateName(candidate.name)
+                      setCandidateEmail(candidate.email)
+                    }}
+                    placeholder={t('candidateNamePlaceholder')}
+                    disabled={submitting || readOnlyDemo}
+                  />
+                </FormField>
+
+                <FormField
+                  htmlFor="candidateEmail"
+                  label={t('candidateEmailLabel')}
+                  hint={t('candidateEmailHint')}
+                >
                   <IconAffix
                     icon={
                       <Icon size="md">
-                        <UserRound />
+                        <Mail />
                       </Icon>
                     }
                   >
                     <Input
-                      id="candidateName"
+                      id="candidateEmail"
+                      type="email"
                       iconAffix="leading"
-                      value={candidateName}
-                      onChange={(event) => setCandidateName(event.target.value)}
-                      placeholder={t('candidateNamePlaceholder')}
-                      autoComplete="name"
+                      value={candidateEmail}
+                      onChange={(event) => setCandidateEmail(event.target.value)}
+                      placeholder={t('candidateEmailPlaceholder')}
+                      autoComplete="email"
                       disabled={submitting || readOnlyDemo}
                     />
                   </IconAffix>

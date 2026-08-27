@@ -110,6 +110,7 @@
         "notFoundFallback": "Nie udało się załadować wybranego interview.",
         "setupBlockedTitle": "Konfiguracja interview zablokowana",
         "candidateNameRequired": "Imię i nazwisko kandydata jest wymagane.",
+        "candidateEmailInvalid": "Podaj prawidłowy adres e-mail lub pozostaw pole puste.",
         "positionRequired": "Stanowisko jest wymagane.",
         "questionsRequired": "Wybierz co najmniej jedno pytanie.",
         "creatingLabel": "Tworzenie..."

@@ -3,8 +3,8 @@ import { useTranslations } from 'next-intl'
 
 import { MicTestDropdown } from '@/components/take/lobby/mic-test-dropdown'
 import { Button } from '@/components/ui/button'
-import { Inline } from '@/components/ui/layout'
-import { MicActivityBadge } from '@/components/ui/take'
+import { Inline } from '@/components/ui/layout/inline'
+import { MicActivityBadge } from '@/components/ui/take/mic-activity-badge'
 
 interface TakeLobbyMediaToolbarProps {
   setupBusy: boolean

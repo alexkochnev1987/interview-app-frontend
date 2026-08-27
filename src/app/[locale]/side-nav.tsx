@@ -7,6 +7,7 @@ import {
   LibraryBig,
   LogOut,
   Plus,
+  SlidersHorizontal,
   Users,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
@@ -36,6 +37,7 @@ import {
   canManageTeam,
   canReadQuestions,
   canReviewAssessments,
+  isSuperAdmin,
 } from '@/lib/auth-roles'
 
 export function SideNav() {
@@ -97,6 +99,9 @@ export function SideNav() {
         ]
       : []),
     ...(canManageTeam(user?.role) ? [{ href: '/team', label: tNav('team'), icon: Users }] : []),
+    ...(isSuperAdmin(user?.role)
+      ? [{ href: '/config', label: tNav('config'), icon: SlidersHorizontal }]
+      : []),
   ]
 
   function isActive(href: string) {

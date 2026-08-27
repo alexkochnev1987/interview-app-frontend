@@ -2,17 +2,8 @@
 
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { useSearchParams } from 'next/navigation'
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type Dispatch,
-  type SetStateAction,
-} from 'react'
+import { useCallback, useMemo, useState, type Dispatch, type SetStateAction } from 'react'
 
-import { usePathname, useRouter } from '@/i18n/navigation'
 import {
   fetchQuestions,
   type LocaleCode,
@@ -33,11 +24,17 @@ import {
   type QuestionView,
   type QuestionsQueryState,
 } from '@/lib/questions-query-state'
+import { splitListQueryErrors } from '@/lib/split-query-errors'
+import {
+  usePageClamp,
+  useSearchDebounce,
+  useStoredViewHydration,
+  useUrlStateSync,
+} from '@/lib/use-facet-query-sync'
 import { useToastMessages } from '@/lib/use-toast-messages'
 
 import { isPlaceholderLoading, useVoidCallback } from './query-hook-helpers'
 import { questionsListQueryKey } from './query-keys'
-import { splitListQueryErrors } from './split-questions-query-errors'
 
 const VIEW_STORAGE_KEY = 'questions:view'
 
@@ -135,8 +132,6 @@ export function useQuestionsQuery(options: UseQuestionsQueryOptions = {}): UseQu
     eligibleForInterview,
   } = options
   const [capturedInitial] = useState<Partial<QuestionsQueryState> | undefined>(initial)
-  const router = useRouter()
-  const pathname = usePathname()
   const searchParams = useSearchParams()
 
   const toastMessages = useToastMessages()
@@ -147,30 +142,23 @@ export function useQuestionsQuery(options: UseQuestionsQueryOptions = {}): UseQu
     if (start.view === 'cards' && start.page !== 1) start.page = 1
     return start
   })
-  const hydratedStoredViewRef = useRef(false)
-  useEffect(() => {
-    if (hydratedStoredViewRef.current) return
-    hydratedStoredViewRef.current = true
-    if (serverHydrated) return
-    if (syncUrl && searchParams?.get('view') !== null) return
-    const stored = readStoredView()
-    if (stored) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- post-mount SSR-safe localStorage hydration of view preference
-      setState((prev) => (prev.view === stored ? prev : { ...prev, view: stored }))
-    }
-  }, [serverHydrated, syncUrl, searchParams])
-  const [debouncedQ, setDebouncedQ] = useState(() => state.q)
-  const lastWrittenUrlRef = useRef<string | null>(
-    syncUrl && searchParams ? searchParams.toString() : null,
-  )
 
-  useEffect(() => {
-    if (state.q === debouncedQ) return
-    const handle = window.setTimeout(() => setDebouncedQ(state.q), QUESTIONS_SEARCH_DEBOUNCE_MS)
-    return () => window.clearTimeout(handle)
-  }, [state.q, debouncedQ])
+  useStoredViewHydration({
+    serverHydrated,
+    syncUrl,
+    searchParams,
+    readStoredView,
+    onHydrate: (view) => setState((prev) => (prev.view === view ? prev : { ...prev, view })),
+  })
 
-  const isSearchPending = state.q !== debouncedQ
+  const {
+    debouncedValue: debouncedQ,
+    isPending: isSearchPending,
+    setDebouncedValue: setDebouncedQ,
+  } = useSearchDebounce({
+    value: state.q,
+    delayMs: QUESTIONS_SEARCH_DEBOUNCE_MS,
+  })
 
   const stateUrl = useMemo(
     () =>
@@ -181,25 +169,31 @@ export function useQuestionsQuery(options: UseQuestionsQueryOptions = {}): UseQu
     [state, debouncedQ],
   )
 
-  useEffect(() => {
-    if (!syncUrl) return
-    const currentUrl = searchParams ? searchParams.toString() : ''
-    if (stateUrl === currentUrl) {
-      lastWrittenUrlRef.current = currentUrl
-      return
-    }
-    if (currentUrl !== lastWrittenUrlRef.current) {
+  const readFromUrl = useCallback(
+    (params: URLSearchParams) => {
       const base = withLockedDefaults(capturedInitial, lockStatus)
-      const fromUrl = searchParams ? readQuestionsFromSearchParams(searchParams, base) : base
-      lastWrittenUrlRef.current = currentUrl
-      setState(fromUrl)
-      setDebouncedQ(fromUrl.q)
-      return
-    }
-    const url = stateUrl.length > 0 ? `${pathname}?${stateUrl}` : pathname
-    lastWrittenUrlRef.current = stateUrl
-    router.replace(url, { scroll: false })
-  }, [stateUrl, pathname, router, syncUrl, capturedInitial, lockStatus, searchParams])
+      const fromUrl = readQuestionsFromSearchParams(params, base)
+      if (fromUrl.view === 'cards' && fromUrl.page !== 1) fromUrl.page = 1
+      return fromUrl
+    },
+    [capturedInitial, lockStatus],
+  )
+
+  const handleExternalUrlChange = useCallback(
+    (nextState: QuestionsQueryState) => {
+      setState(nextState)
+      setDebouncedQ(nextState.q)
+    },
+    [setDebouncedQ],
+  )
+
+  useUrlStateSync({
+    syncUrl,
+    stateUrl,
+    searchParams,
+    readFromUrl,
+    onExternalUrlChange: handleExternalUrlChange,
+  })
 
   const fetchParams = useMemo(
     () => buildQuestionsFetchParams(state, debouncedQ, { eligibleForInterview }),
@@ -214,13 +208,9 @@ export function useQuestionsQuery(options: UseQuestionsQueryOptions = {}): UseQu
   })
 
   const total = query.data?.total ?? 0
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- clamp page after fetch when filters reduce total below current page
-    setState((prev) => {
-      const maxPage = Math.max(1, Math.ceil(total / prev.limit))
-      return prev.page > maxPage ? { ...prev, page: maxPage } : prev
-    })
-  }, [total])
+  usePageClamp(query.data?.total, state.limit, state.page, (clampedPage) => {
+    setState((prev) => (prev.page === clampedPage ? prev : { ...prev, page: clampedPage }))
+  })
 
   const items = query.data?.items ?? []
   const loading = isPlaceholderLoading(query)
@@ -307,7 +297,7 @@ export function useQuestionsQuery(options: UseQuestionsQueryOptions = {}): UseQu
     const base = withLockedDefaults(capturedInitial, lockStatus)
     setState((prev) => ({ ...base, view: prev.view }))
     setDebouncedQ(base.q)
-  }, [capturedInitial, lockStatus])
+  }, [capturedInitial, lockStatus, setDebouncedQ])
   const refetch = useVoidCallback(query.refetch)
 
   const canReset = useMemo(() => {

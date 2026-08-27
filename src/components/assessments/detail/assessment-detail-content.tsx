@@ -11,7 +11,7 @@ import { DetailHeader } from '@/components/assessments/detail/detail-header'
 import { EvaluationStatusBanner } from '@/components/assessments/detail/evaluation-status-banner'
 import { OverallPanel } from '@/components/assessments/detail/overall-panel'
 import { QuestionSection } from '@/components/assessments/detail/question-section'
-import { LiveRefreshNotice } from '@/components/assessments/live-refresh-notice'
+import { AssessmentLiveRefreshNotice } from '@/components/assessments/live-refresh-notice'
 import { InterviewReuseActions } from '@/components/templates/interview-reuse-actions'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -89,9 +89,19 @@ export function AssessmentDetailContent({ initialInterview }: AssessmentDetailCo
     <EvaluationActionsProvider onEvaluationStarted={onEvaluationStarted}>
       <DetailHeader interview={interview} actions={headerActions} />
 
+      {interview.result ? (
+        <Section gap={4}>
+          <Stack gap={2}>
+            <EyebrowLabel size="lg">{tAssessments('detail.scorecardEyebrow')}</EyebrowLabel>
+            <SectionHeading>{tAssessments('detail.scorecardHeading')}</SectionHeading>
+          </Stack>
+          <OverallPanel result={interview.result} />
+        </Section>
+      ) : null}
+
       {!isReadyToScore ? <EvaluationStatusBanner interview={interview} /> : null}
 
-      {paused ? <LiveRefreshNotice onRefresh={refresh} /> : null}
+      {paused ? <AssessmentLiveRefreshNotice onRefresh={refresh} /> : null}
 
       {isReadyToScore ? (
         <Card variant="floating" size="lg" accent="primary">
@@ -117,16 +127,6 @@ export function AssessmentDetailContent({ initialInterview }: AssessmentDetailCo
           <AlertTitle>{tAssessments('detail.failedTitle')}</AlertTitle>
           <AlertDescription>{tAssessments('detail.failedDescription')}</AlertDescription>
         </Alert>
-      ) : null}
-
-      {interview.result ? (
-        <Section gap={4}>
-          <Stack gap={2}>
-            <EyebrowLabel size="lg">{tAssessments('detail.scorecardEyebrow')}</EyebrowLabel>
-            <SectionHeading>{tAssessments('detail.scorecardHeading')}</SectionHeading>
-          </Stack>
-          <OverallPanel result={interview.result} />
-        </Section>
       ) : null}
 
       <Section gap={4}>

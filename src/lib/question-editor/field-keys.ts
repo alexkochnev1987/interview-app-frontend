@@ -52,9 +52,6 @@ export const GENERATE_DRAFT_FIELD_KEYS: GenerateDraftFieldKey[] = [
   ...IDENTITY_DRAFT_FIELD_KEYS,
 ]
 
-/** @deprecated Use TRANSLATE_DRAFT_FIELD_KEYS or GENERATE_DRAFT_FIELD_KEYS explicitly. */
-export const DRAFT_FIELD_KEYS: TranslateDraftFieldKey[] = TRANSLATE_DRAFT_FIELD_KEYS
-
 export const EDITABLE_FIELD_KEYS: Array<keyof QuestionInput> = [
   'primaryLocale',
   ...METADATA_FIELD_KEYS,

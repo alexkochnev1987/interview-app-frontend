@@ -1,0 +1,96 @@
+{
+  "config": {
+    "eyebrow": "Super Admin Control",
+    "title": "System Configuration",
+    "lead": "Manage dynamic application variables, timeouts, attempt limits, and feature toggles in real-time.",
+    "searchPlaceholder": "Filter configuration keys...",
+    "quickAdd": "Add Variable",
+    "featureToggles": {
+      "heading": "Feature toggles",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "recruiterAssistant": {
+        "label": "Herman (recruiter assistant)",
+        "description": "Show the AI hiring assistant widget for eligible users."
+      },
+      "recruiterAssistantRoles": {
+        "heading": "Role access",
+        "description": "Enable or disable Herman per role.",
+        "roleDescription": "Whether Herman is enabled for {role} users."
+      },
+      "liveTranscript": {
+        "label": "Live transcript",
+        "description": "Enable live speech-to-text transcript panel during candidate recordings."
+      },
+      "liveTranscriptDefaultExpanded": {
+        "label": "Live transcript expanded by default",
+        "description": "Whether the live transcript panel starts expanded by default for candidates."
+      }
+    },
+    "variableDescriptions": {
+      "ENABLE_LIVE_TRANSCRIPT": "Enable live speech-to-text transcript panel during candidate recordings.",
+      "LIVE_TRANSCRIPT_DEFAULT_EXPANDED": "Whether the live transcript panel starts expanded by default for candidates.",
+      "MAX_ANSWER_DURATION_SECONDS": "Maximum answer recording duration in seconds.",
+      "MAX_ANSWER_ATTEMPTS_PER_QUESTION": "Maximum recording attempts per question.",
+      "ENABLE_GOOGLE_OAUTH": "Whether Google OAuth sign-in button is shown.",
+      "ENABLE_FEEDBACK_SHARE_LINKS": "Whether candidate-feedback share links are available.",
+      "DEFAULT_THEME_MODE": "Default UI theme mode (system, light, dark).",
+      "APP_THEME": "Active UI color theme preset (innowise, red, blue, purple).",
+      "RECRUITER_ASSISTANT_ENABLED": "Whether Herman (recruiter AI assistant) is enabled org-wide.",
+      "AI_CANDIDATE_FEEDBACK": "Enable automated LLM feedback report generation for candidates upon interview completion.",
+      "AI_QUESTION_DRAFT_V2": "A/B testing switch to enable next-generation heuristic prompts for AI question generation.",
+      "ENABLE_AI_ANSWER_VALIDATION": "Master switch for Whisper media transcription and LLM answer grading workflow.",
+      "ENABLE_S3_MEDIA_CLEANUP": "Master switch for background orphan media cleaning job in AWS S3 or MinIO."
+    },
+    "forbiddenTitle": "Access Restricted",
+    "forbiddenDesc": "You need super_admin privileges to view or edit system configuration.",
+    "table": {
+      "colKey": "Variable Key & Description",
+      "colType": "Type & Scope",
+      "colValue": "Current Value",
+      "colActions": "Actions",
+      "publicBadge": "Public",
+      "secretBadge": "Secret",
+      "maskedSecret": "••••••••••••",
+      "edit": "Edit",
+      "reset": "Reset",
+      "noResultsTitle": "No variables found",
+      "noResultsDesc": "Try adjusting your search query."
+    },
+    "editModal": {
+      "title": "Edit Variable",
+      "description": "Update system configuration value for {key}.",
+      "valueLabel": "Value",
+      "save": "Save Changes",
+      "cancel": "Cancel",
+      "updating": "Saving..."
+    },
+    "addModal": {
+      "title": "Add System Variable",
+      "description": "Create or override a dynamic configuration variable.",
+      "keyLabel": "Variable Key (UPPER_SNAKE_CASE)",
+      "valueLabel": "Value",
+      "valueTypeLabel": "Type",
+      "isPublicLabel": "Public (Expose to client / candidates)",
+      "isSecretLabel": "Secret (Masked in UI)",
+      "descriptionLabel": "Description (Optional)",
+      "create": "Add Variable",
+      "cancel": "Cancel",
+      "creating": "Creating..."
+    },
+    "resetModal": {
+      "title": "Reset variable to default?",
+      "description": "This will remove the custom override for {key} and restore system defaults.",
+      "confirm": "Reset to Default",
+      "cancel": "Cancel"
+    },
+    "toast": {
+      "updatedSuccess": "Configuration updated successfully",
+      "updatedError": "Failed to update configuration",
+      "resetSuccess": "Configuration reset to default",
+      "resetError": "Failed to reset configuration",
+      "createdSuccess": "Variable added successfully",
+      "createdError": "Failed to add variable"
+    }
+  }
+}

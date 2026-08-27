@@ -5,13 +5,12 @@ import { InterviewCreateIntro } from '@/components/interviews/interview-create-i
 import { QueryHydrationBoundary } from '@/components/questions/query-hydration-boundary'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
-import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import type { Locale } from '@/i18n/locales'
 import { Link } from '@/i18n/navigation'
 import { routes } from '@/i18n/routes'
 import type { TeamMember } from '@/lib/api'
-import { loadAuthGate, redirectIfUnauthenticated } from '@/lib/auth-gate'
+import { enforcePageAuth } from '@/lib/auth-gate'
 import { APP_ROLE, canConfigureInterview } from '@/lib/auth-roles'
 import { prefetchInterviewCreatePicker } from '@/lib/questions-library-prefetch'
 import { requestServer } from '@/lib/server-fetch'
@@ -25,7 +24,14 @@ interface NewInterviewPageProps {
     templateId?: string | string[]
     fromInterview?: string | string[]
     assignedHrId?: string | string[]
+    candidateName?: string | string[]
+    candidateEmail?: string | string[]
+    position?: string | string[]
   }>
+}
+
+function firstSearchParam(value?: string | string[]): string | undefined {
+  return Array.isArray(value) ? value[0] : value
 }
 
 export default async function NewInterviewPage({ params, searchParams }: NewInterviewPageProps) {
@@ -34,39 +40,35 @@ export default async function NewInterviewPage({ params, searchParams }: NewInte
     templateId: templateIdParam,
     fromInterview: fromInterviewParam,
     assignedHrId: assignedHrIdParam,
+    candidateName: candidateNameParam,
+    candidateEmail: candidateEmailParam,
+    position: positionParam,
   } = await searchParams
-  const templateId = Array.isArray(templateIdParam) ? templateIdParam[0] : templateIdParam
-  const fromInterview = Array.isArray(fromInterviewParam)
-    ? fromInterviewParam[0]
-    : fromInterviewParam
-  const assignedHrIdQuery = Array.isArray(assignedHrIdParam)
-    ? assignedHrIdParam[0]
-    : assignedHrIdParam
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.interview' })
-  const tQuestions = await getTranslations({
-    locale,
-    namespace: 'toast.pageGate.questions',
-  })
-  const tCommon = await getTranslations({ locale, namespace: 'common' })
-  const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
-  const tPrefill = await getTranslations({ locale, namespace: 'templates.prefill' })
-  const auth = await loadAuthGate(canConfigureInterview, locale)
-  redirectIfUnauthenticated(auth, '/interviews/new', locale)
-  if (auth.kind === 'forbidden') {
-    return (
-      <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
-    )
-  }
-  if (auth.kind === 'error') {
-    return (
-      <FlashErrorPageFallback
-        title={t('createUnavailableTitle')}
-        description={`${tCommon('sessionVerificationFailed')} ${auth.message}`}
-        backHref={ERROR_BACK_HREF}
-        backLabel={tFallback('backToDashboard')}
-      />
-    )
-  }
+  const templateId = firstSearchParam(templateIdParam)
+  const fromInterview = firstSearchParam(fromInterviewParam)
+  const assignedHrIdQuery = firstSearchParam(assignedHrIdParam)
+  const candidateName = firstSearchParam(candidateNameParam)
+  const candidateEmail = firstSearchParam(candidateEmailParam)
+  const positionFromQuery = firstSearchParam(positionParam)
+  const [t, tFallback, tQuestions, tPrefill, auth] = await Promise.all([
+    getTranslations({ locale, namespace: 'toast.pageGate.interview' }),
+    getTranslations({ locale, namespace: 'shared.fallback' }),
+    getTranslations({
+      locale,
+      namespace: 'toast.pageGate.questions',
+    }),
+    getTranslations({ locale, namespace: 'templates.prefill' }),
+    enforcePageAuth({
+      roleCheck: canConfigureInterview,
+      locale,
+      returnPath: '/interviews/new',
+      gateNamespace: 'toast.pageGate.interview',
+      errorTitleKey: 'createUnavailableTitle',
+      backHref: ERROR_BACK_HREF,
+      backLabelKey: 'backToDashboard',
+    }),
+  ])
+  if (!auth.authorized) return auth.fallback
 
   let initialPrefetch
   try {
@@ -99,7 +101,7 @@ export default async function NewInterviewPage({ params, searchParams }: NewInte
     sourceInterviewMissing = !sourceInterview
   }
   const prefillQuestions = template?.questions ?? sourceInterview?.questions
-  const prefillPosition = template?.position ?? sourceInterview?.position
+  const prefillPosition = positionFromQuery ?? template?.position ?? sourceInterview?.position
 
   let initialAssignedHrId: string | undefined
   let lockAssignedHr = false
@@ -150,6 +152,8 @@ export default async function NewInterviewPage({ params, searchParams }: NewInte
         <InterviewCreateForm
           initialPrefetch={initialPrefetch}
           initialSelected={prefillQuestions}
+          initialCandidateName={candidateName}
+          initialCandidateEmail={candidateEmail}
           initialPosition={prefillPosition}
           initialTemplateId={template ? templateId : undefined}
           initialAssignedHrId={initialAssignedHrId}

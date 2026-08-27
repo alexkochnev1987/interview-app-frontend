@@ -4,6 +4,7 @@ import type { Dispatch, MutableRefObject, SetStateAction } from 'react'
 import type { TakeStage } from '@/components/take/types'
 import type { TakeInterviewData } from '@/lib/api'
 import { finalizeTakeAnswer, submitTakeAnswer } from '@/lib/api'
+import { useAppConfig } from '@/lib/app-config-context'
 import { runMutation } from '@/lib/run-mutation'
 import { notifyError } from '@/lib/toast'
 import { useToastMessages } from '@/lib/use-toast-messages'
@@ -107,6 +108,7 @@ export function useTakeVersionPersistence({
   onAnswerMetaUpdated,
   takeMessage,
 }: UseTakeVersionPersistenceParams) {
+  const appConfig = useAppConfig()
   const toastMessages = useToastMessages()
   const persistInFlightRef = useRef(false)
 
@@ -114,12 +116,12 @@ export function useTakeVersionPersistence({
     (message?: string) => {
       notifyError(
         takeMessage('answerAttemptLimitReached', {
-          max: interview?.maxAttempts ?? MAX_ANSWER_ATTEMPTS_PER_QUESTION,
+          max: interview?.maxAttempts ?? appConfig.MAX_ANSWER_ATTEMPTS_PER_QUESTION,
         }),
         { description: message },
       )
     },
-    [interview?.maxAttempts, takeMessage],
+    [interview?.maxAttempts, appConfig.MAX_ANSWER_ATTEMPTS_PER_QUESTION, takeMessage],
   )
 
   const handleAttemptLimitApiError = useCallback(
@@ -188,9 +190,13 @@ export function useTakeVersionPersistence({
           const answerMeta = interview.currentAnswerMeta
 
           if (
-            !canRequestRetake(currentVersion, {
-              maxAttempts: interview.maxAttempts,
-            })
+            !canRequestRetake(
+              currentVersion,
+              {
+                maxAttempts: interview.maxAttempts,
+              },
+              appConfig.MAX_ANSWER_ATTEMPTS_PER_QUESTION,
+            )
           ) {
             notifyAttemptLimitReached()
             setStage('interview')
@@ -244,10 +250,14 @@ export function useTakeVersionPersistence({
             await abortMultipartUploads()
             clearRecordingArtifacts()
             pendingVersionActionRef.current = null
-            const nextVersionNumber = resolveNextVersionAfterSave(currentVersion, {
-              versionCount: Math.max(savedVersionCount, currentVersion),
-              maxAttempts: interview.maxAttempts,
-            })
+            const nextVersionNumber = resolveNextVersionAfterSave(
+              currentVersion,
+              {
+                versionCount: Math.max(savedVersionCount, currentVersion),
+                maxAttempts: interview.maxAttempts,
+              },
+              appConfig.MAX_ANSWER_ATTEMPTS_PER_QUESTION,
+            )
             if (nextVersionNumber === null) {
               notifyAttemptLimitReached()
               setStage('interview')
@@ -288,10 +298,14 @@ export function useTakeVersionPersistence({
           clearRecordingArtifacts()
           pendingVersionActionRef.current = null
 
-          const nextVersionNumber = resolveNextVersionAfterSave(savedVersion, {
-            versionCount: usedAfterSave,
-            maxAttempts: interview.maxAttempts,
-          })
+          const nextVersionNumber = resolveNextVersionAfterSave(
+            savedVersion,
+            {
+              versionCount: usedAfterSave,
+              maxAttempts: interview.maxAttempts,
+            },
+            appConfig.MAX_ANSWER_ATTEMPTS_PER_QUESTION,
+          )
           if (nextVersionNumber === null) {
             notifyAttemptLimitReached()
             setStage('interview')
@@ -403,6 +417,7 @@ export function useTakeVersionPersistence({
       setSubmitError,
       setActionErrorKind,
       setStage,
+      // oxlint-disable-next-line react/memo-dependencies
       setVersionPersistKind,
       setCurrentVersionNumber,
       setRetakeCount,
@@ -431,6 +446,7 @@ export function useTakeVersionPersistence({
       toastMessages.take.submitError,
       toastMessages.take.submitSuccess,
       takeMessage,
+      appConfig.MAX_ANSWER_ATTEMPTS_PER_QUESTION,
     ],
   )
 

@@ -26,7 +26,7 @@ const valueVariants = cva('', {
     },
     tone: {
       foreground: 'text-foreground',
-      primary: 'text-[hsl(var(--primary))]',
+      primary: 'text-primary',
       none: '',
     },
     spacing: {

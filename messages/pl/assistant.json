@@ -2,6 +2,8 @@
   "assistant": {
     "name": "Herman",
     "closeAriaLabel": "Zamknij Hermana",
+    "newChatAriaLabel": "Nowy czat",
+    "newChatTooltip": "Nowy czat",
     "bubbleLabel": "Herman",
     "sendAriaLabel": "Wyślij wiadomość",
     "loading": "Przetwarzanie...",
@@ -21,9 +23,20 @@
     "input": {
       "placeholder": {
         "hr": "Zapytaj o swoje interview, recenzje lub tworzenie interview…",
-        "candidate": "Zapytaj, czy masz interview, jaki jest jego status lub termin…",
+        "candidate": "Zapytaj o status ostatniego interview, ocenę według roli lub otwarte interview…",
         "admin": "Zapytaj o nieprzypisane interview, filtry lub przypisywanie HR…",
         "super_admin": "Zapytaj o interview, przypisania, pytania lub dane całej organizacji…"
+      },
+      "awaiting": {
+        "candidateName": "Wpisz imię kandydata…",
+        "candidateChoice": "Wybierz kandydata powyżej lub wpisz nowe imię…",
+        "confirmRegisteredCandidate": "Wybierz Tak lub Nie powyżej…",
+        "position": "Wpisz stanowisko…",
+        "questionName": "Wpisz nazwę pytania…",
+        "confirmAddDespiteSimilar": "Wybierz Kontynuuj lub Anuluj powyżej…",
+        "templateChoice": "Wybierz szablon powyżej lub wpisz jego numer…",
+        "hr": "Wybierz pracownika HR powyżej lub wpisz imię…",
+        "interview": "Wybierz interview powyżej lub wpisz nazwę/ID…"
       }
     },
     "welcome": {
@@ -34,14 +47,21 @@
         "readyForReview": "Znajdź interview gotowe do oceny",
         "interviewStatus": "Sprawdź status i szczegóły swoich interview",
         "createFlow": "Przygotuj pytania i utwórz interview (po Twoim potwierdzeniu)",
-        "hasInterview": "Sprawdź, czy masz interview",
-        "candidateStatus": "Sprawdź status swojego interview",
-        "reviewed": "Sprawdź, czy Twoje interview zostało ocenione",
-        "schedule": "Pokaż termin i miejsce interview lub link dla kandydata",
+        "latestStatus": "Sprawdź status swojego ostatniego interview",
+        "statusByPosition": "Sprawdź status interview według nazwy roli",
+        "reviewedByPosition": "Sprawdź, czy konkretne interview zostało ocenione",
+        "openInterviews": "Wyświetl interview oczekujące na ukończenie",
         "unassigned": "Wyświetl nieprzypisane interview",
+        "showHrs": "Wyświetl dostępnych pracowników HR",
         "filters": "Filtruj interview według statusu, HR i innych filtrów aplikacji",
         "assignHr": "Przypisz interview do pracownika HR (po Twoim potwierdzeniu)",
-        "orgQueries": "Odpowiedz na pytania dotyczące interview, pytań i zespołu w organizacji"
+        "orgQueries": "Odpowiedz na pytania dotyczące interview, pytań i zespołu w organizacji",
+        "questionCount": "Policz pytania w banku z opcjonalnymi filtrami",
+        "assessments": "Pokaż i filtruj oceny",
+        "myAssessments": "Pokaż przypisane do mnie oceny",
+        "teamOverview": "Podsumuj zespół według ról",
+        "teamByRole": "Pokaż członków zespołu według roli",
+        "orgOverview": "Podsumuj aktywność interview w organizacji"
       }
     },
     "confirm": {
@@ -49,6 +69,7 @@
       "createInterview": "Utwórz brakujące pytania, a następnie utwórz interview.",
       "createQuestions": "Utwórz brakujące pytania z tego sugerowanego zestawu.",
       "assignHr": "Przypisz to interview do wybranego pracownika HR.",
+      "createSingleQuestion": "Utwórz to pytanie w banku pytań.",
       "action": "Potwierdź działanie",
       "userMessage": "Potwierdź",
       "cancel": "Anuluj",
@@ -62,6 +83,7 @@
         "interviewLocale": "Język interview",
         "interviewId": "ID interview",
         "assignedHrId": "ID pracownika HR",
+        "questionName": "Nazwa pytania",
         "questions": "Pytania",
         "questionsSummary": "{total} łącznie ({newCount} nowych)"
       }
@@ -69,15 +91,88 @@
     "questionPlan": {
       "title": "Plan pytań",
       "empty": "Sugerowane i dopasowane pytania pojawią się tutaj po wysłaniu zapytania.",
+      "emptySelected": "Dodaj co najmniej jedno pytanie przed potwierdzeniem.",
       "summary": "{existing} znaleziono w bazie pytań, {missing} wymaga utworzenia.",
       "newBadge": "Nowe",
-      "existingBadge": "Istniejące"
+      "existingBadge": "Istniejące",
+      "removeAria": "Usuń {title} z tego interview"
     },
     "createdInterview": {
-      "openLink": "Otwórz link dla kandydata"
+      "openLink": "Otwórz link dla kandydata",
+      "viewDetail": "Szczegóły interview"
+    },
+    "createdQuestion": {
+      "openLink": "Otwórz pytanie"
+    },
+    "similarQuestions": {
+      "heading": "Podobne pytania",
+      "matchScore": "dopasowanie {score}"
+    },
+    "confirmAddDespiteSimilar": {
+      "heading": "Mimo to utworzyć to pytanie?",
+      "continue": "Kontynuuj tworzenie",
+      "abort": "Anuluj"
+    },
+    "confirmRegisteredCandidate": {
+      "heading": "Użyć tego zarejestrowanego kandydata?",
+      "yes": "Tak, użyj tego kandydata",
+      "no": "Nie, wpisz inne imię"
+    },
+    "candidateList": {
+      "heading": "Zarejestrowani kandydaci",
+      "newCandidate": "Nowy kandydat"
+    },
+    "templateList": {
+      "heading": "Wybierz szablon",
+      "questionCount": "{count, plural, one {# pytanie} few {# pytania} many {# pytań} other {# pytania}}"
+    },
+    "hrList": {
+      "heading": "Wybierz pracownika HR",
+      "listHeading": "Pracownicy HR",
+      "showResponse": "Oto dostępni pracownicy HR:",
+      "empty": "W Twojej organizacji nie ma dostępnych pracowników HR."
+    },
+    "redirect": {
+      "continue": "Kontynuuj w aplikacji",
+      "openAssessments": "Otwórz oceny",
+      "openPortalInterview": "Zobacz w portalu",
+      "openingInterviewForm": "Otwieram formularz wywiadu."
+    },
+    "questionCount": {
+      "heading": "Bank pytań",
+      "total": "{count, plural, one {# pytanie} few {# pytania} many {# pytań} other {# pytania}}"
+    },
+    "assessmentCount": {
+      "heading": "Oceny",
+      "total": "{count, plural, one {# ocena} few {# oceny} many {# ocen} other {# oceny}}",
+      "statusFilter": "Status: {status}",
+      "statusScoring": "Ocenianie",
+      "queryFilter": "Szukaj: \"{query}\""
+    },
+    "interviewActivity": {
+      "heading": "Aktywność interview",
+      "total": "{count, plural, one {# interview łącznie} few {# interview łącznie} many {# interview łącznie} other {# interview łącznie}}",
+      "active": "Aktywne",
+      "completed": "Zakończone",
+      "pending": "Oczekujące",
+      "inProgress": "W trakcie",
+      "processing": "Przetwarzanie",
+      "failed": "Nieudane"
+    },
+    "teamSummary": {
+      "heading": "Przegląd zespołu",
+      "total": "{count, plural, one {# członek} few {# członków} many {# członków} other {# członka}}",
+      "superAdmin": "Super admini",
+      "admin": "Admini",
+      "hr": "HR",
+      "candidate": "Kandydaci"
+    },
+    "teamList": {
+      "heading": "Członkowie zespołu"
     },
     "interviewList": {
       "heading": "Interview",
+      "chooseHeading": "Wybierz interview",
       "viewDetail": "Szczegóły",
       "progress": "{submitted}/{total} odpowiedzi"
     },
@@ -92,27 +187,53 @@
       "viewDetail": "Szczegóły",
       "openCandidateLink": "Otwórz link do interview"
     },
+    "candidateInterviewSummary": {
+      "reviewed": "Ocenione",
+      "notReviewed": "Jeszcze nie ocenione",
+      "resultsReady": "Wyniki gotowe",
+      "outcome": "Wynik"
+    },
+    "candidateInterviewList": {
+      "heading": "Twoje interview"
+    },
     "prompts": {
       "hr": {
         "myInterviews": "Pokaż moje interview",
         "readyForReview": "Pokaż interview gotowe do oceny",
+        "myAssessments": "Pokaż moje oceny",
+        "questionCount": "Ile mamy pytań?",
+        "orgOverview": "Podsumuj aktywność interview w organizacji",
         "createInterview": "Pomóż mi przygotować pytania i utworzyć interview"
       },
       "candidate": {
-        "hasInterview": "Czy mam interview?",
-        "status": "Jaki jest status mojego interview?",
-        "reviewed": "Czy moje interview zostało ocenione?"
+        "latestStatus": "Jaki jest status mojego ostatniego interview?",
+        "statusByPosition": "Jaki jest status mojego interview na stanowisko React Developer?",
+        "reviewedByPosition": "Czy moje interview na stanowisko React Developer zostało ocenione?",
+        "openInterviews": "Pokaż moje nieukończone interview"
       },
       "admin": {
+        "questionCount": "Ile mamy pytań?",
+        "assessments": "Pokaż wszystkie oceny",
+        "orgOverview": "Podsumuj aktywność interview w organizacji",
         "unassigned": "Pokaż nieprzypisane interview",
+        "showHrs": "Pokaż pracowników HR",
         "byStatus": "Pokaż ukończone interview",
-        "assignHr": "Przypisz interview do pracownika HR"
+        "teamOverview": "Pokaż mój zespół",
+        "teamByRole": "Pokaż wszystkich pracowników HR",
+        "assignHr": "Przypisz interview do pracownika HR",
+        "createQuestion": "Pomóż mi utworzyć nowe pytanie rekrutacyjne"
       },
       "super_admin": {
+        "questionCount": "Ile mamy pytań?",
+        "assessments": "Pokaż wszystkie oceny",
+        "orgOverview": "Podsumuj aktywność interview w organizacji",
         "unassigned": "Pokaż nieprzypisane interview",
+        "showHrs": "Pokaż pracowników HR",
         "byStatus": "Pokaż interview według statusu",
+        "teamOverview": "Pokaż mój zespół",
+        "teamByRole": "Pokaż wszystkich adminów",
         "assignHr": "Przypisz interview do pracownika HR",
-        "orgOverview": "Podsumuj aktywność interview w organizacji"
+        "createQuestion": "Pomóż mi utworzyć nowe pytanie rekrutacyjne"
       }
     }
   }

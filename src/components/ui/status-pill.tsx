@@ -15,8 +15,7 @@ const statusPillVariants = cva('rounded-full border-0 shadow-none', {
       neutral: 'bg-pill-slate-bg text-pill-slate ring-1 ring-pill-slate-border',
       neutral_meta:
         'bg-pill-slate-bg text-pill-slate ring-1 ring-pill-slate-border normal-case tracking-chip',
-      primary:
-        'bg-[hsl(var(--primary)/0.15)] text-[hsl(var(--primary))] ring-1 ring-[hsl(var(--primary)/0.3)]',
+      primary: 'bg-primary/15 text-primary ring-1 ring-primary/30',
       pending: 'bg-pill-amber-bg text-pill-amber ring-1 ring-pill-amber-border',
       in_progress: 'bg-pill-sky-bg text-pill-sky ring-1 ring-pill-sky-border',
       processing: 'bg-pill-orange-bg text-pill-orange ring-1 ring-pill-orange-border',

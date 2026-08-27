@@ -7,16 +7,12 @@ import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import type { Locale } from '@/i18n/locales'
 import {
+  emptyPaginatedInterviews,
   type InterviewListItem,
   type PaginatedInterviews,
-  emptyPaginatedInterviews,
 } from '@/lib/api'
 import { selectHrVisibleListItems } from '@/lib/assessment-status'
-import {
-  loadAuthGate,
-  redirectIfUnauthenticated,
-  redirectIfUnauthorizedError,
-} from '@/lib/auth-gate'
+import { enforcePageAuth, redirectIfUnauthorizedError } from '@/lib/auth-gate'
 import { canReviewAssessments } from '@/lib/auth-roles'
 import { ASSESSMENTS_INTERVIEW_PAGE_SIZE, fetchAllInterviewPages } from '@/lib/fetch-all-interviews'
 import { isForbiddenError, requestServer } from '@/lib/server-fetch'
@@ -29,32 +25,25 @@ interface AssessmentsPageProps {
 
 export default async function AssessmentsPage({ params }: AssessmentsPageProps) {
   const { locale } = await params
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.assessments' })
-  const tCommon = await getTranslations({ locale, namespace: 'common' })
-  const tFallback = await getTranslations({ locale, namespace: 'shared.fallback' })
-  const auth = await loadAuthGate(canReviewAssessments, locale)
-  redirectIfUnauthenticated(auth, '/assessments', locale)
-  if (auth.kind === 'forbidden') {
-    return (
-      <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
-    )
-  }
-  if (auth.kind === 'error') {
-    return (
-      <FlashErrorPageFallback
-        title={t('unavailableTitle')}
-        description={`${tCommon('sessionVerificationFailed')} ${auth.message}`}
-        backHref={ERROR_BACK_HREF}
-        backLabel={tFallback('backToDashboard')}
-      />
-    )
-  }
+  const [t, tFallback, auth] = await Promise.all([
+    getTranslations({ locale, namespace: 'toast.pageGate.assessments' }),
+    getTranslations({ locale, namespace: 'shared.fallback' }),
+    enforcePageAuth({
+      roleCheck: canReviewAssessments,
+      locale,
+      returnPath: '/assessments',
+      gateNamespace: 'toast.pageGate.assessments',
+      backHref: ERROR_BACK_HREF,
+      backLabelKey: 'backToDashboard',
+    }),
+  ])
+  if (!auth.authorized) return auth.fallback
 
   let interviews: InterviewListItem[] = []
   let error: string | null = null
 
   try {
-    const items = await fetchAllInterviewPages(
+    interviews = await fetchAllInterviewPages(
       (queryParams) =>
         requestServer<PaginatedInterviews>('/interviews', auth.ctx, {
           query: queryParams,
@@ -69,8 +58,6 @@ export default async function AssessmentsPage({ params }: AssessmentsPageProps) 
         sortOrder: 'desc',
       },
     )
-
-    interviews = items
   } catch (err) {
     redirectIfUnauthorizedError(err, '/assessments', locale)
     if (isForbiddenError(err)) {

@@ -1,21 +1,18 @@
 'use client'
 
-import { X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { type ReactNode } from 'react'
+import { useMemo, type ReactNode } from 'react'
 
-import { Button } from '@/components/ui/button'
-import { Inline } from '@/components/ui/layout/inline'
-import { Stack } from '@/components/ui/layout/stack'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { StatusPill } from '@/components/ui/status-pill'
+  FilterChipsRow,
+  PickerToolbarShell,
+  SortSelect,
+  type ActiveFilterChip,
+  type SortOption,
+} from '@/components/ui/picker-toolbar-shell'
 import type { QuestionSortField, QuestionSortOrder } from '@/lib/api'
+
+export type { ActiveFilterChip }
 
 const SORT_OPTIONS: Array<{ value: `${QuestionSortField}:${QuestionSortOrder}`; key: string }> = [
   { value: 'updatedAt:desc', key: 'updatedAt_desc' },
@@ -29,12 +26,6 @@ const SORT_OPTIONS: Array<{ value: `${QuestionSortField}:${QuestionSortOrder}`; 
   { value: 'popularity:desc', key: 'popularity_desc' },
   { value: 'popularity:asc', key: 'popularity_asc' },
 ]
-
-export type ActiveFilterChip = {
-  key: string
-  label: string
-  onRemove: () => void
-}
 
 export type QuestionPickerToolbarProps = {
   sortBy: QuestionSortField
@@ -63,56 +54,40 @@ export function QuestionPickerToolbar(props: QuestionPickerToolbarProps) {
   const tToolbar = useTranslations('questions.picker.toolbar')
   const tSort = useTranslations('questions.picker.sort')
 
+  const sortOptions = useMemo<Array<SortOption<`${QuestionSortField}:${QuestionSortOrder}`>>>(
+    () =>
+      SORT_OPTIONS.map((option) => ({
+        value: option.value,
+        label: tSort(option.key),
+      })),
+    [tSort],
+  )
+
   return (
-    <Stack gap={3}>
-      <Inline gap={2} align="center" justify="end" wrap="wrap">
-        {viewToggle}
-        <Select
+    <PickerToolbarShell
+      desktopLayout="stacked"
+      chipsRow={
+        <FilterChipsRow
+          resultCountText={loading ? '…' : tToolbar('resultCount', { count: resultCount })}
+          chips={activeChips}
+          removeChipAriaLabel={(label) => tToolbar('removeChipAria', { label })}
+        />
+      }
+      sortSelect={
+        <SortSelect
           value={sortValue}
-          onValueChange={(value) => {
-            const [nextSortBy, nextSortOrder] = value.split(':') as [
+          onValueChange={(val) => {
+            const [nextSortBy, nextSortOrder] = val.split(':') as [
               QuestionSortField,
               QuestionSortOrder,
             ]
             onSortChange(nextSortBy, nextSortOrder)
           }}
-        >
-          <SelectTrigger variant="surface" size="md" shape="pill" width="auto-wide">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {SORT_OPTIONS.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {tSort(option.key)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {bulkActions}
-      </Inline>
-
-      <Inline gap={2} align="center" wrap="wrap">
-        <StatusPill tone="neutral">
-          {loading ? '…' : tToolbar('resultCount', { count: resultCount })}
-        </StatusPill>
-        {activeChips.map((chip) => (
-          <StatusPill key={chip.key} tone="neutral" casing="chip">
-            <Inline gap={1} align="center">
-              <span>{chip.label}</span>
-              <Button
-                type="button"
-                variant="ghost"
-                shape="pill"
-                size="icon-xxs"
-                aria-label={tToolbar('removeChipAria', { label: chip.label })}
-                onClick={chip.onRemove}
-              >
-                <X className="size-3" />
-              </Button>
-            </Inline>
-          </StatusPill>
-        ))}
-      </Inline>
-    </Stack>
+          options={sortOptions}
+        />
+      }
+      viewToggle={viewToggle}
+      bulkActions={bulkActions}
+    />
   )
 }

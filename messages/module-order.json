@@ -13,6 +13,8 @@
   "onboarding",
   "feedback",
   "takeFlow",
+  "portal",
   "apiErrors",
-  "toast"
+  "toast",
+  "config"
 ]

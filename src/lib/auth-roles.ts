@@ -64,6 +64,15 @@ export function canAccessDashboard(role: string | null | undefined): boolean {
   return hasAdminRole(role)
 }
 
+export function canAccessCandidatePortal(role: string | null | undefined): boolean {
+  return role === APP_ROLE.candidate
+}
+
+/** Gate for the shared `/` route: staff see the dashboard, candidates see their interview list. */
+export function canViewDashboardHome(role: string | null | undefined): boolean {
+  return canAccessDashboard(role) || canAccessCandidatePortal(role)
+}
+
 export function canReviewAssessments(role: string | null | undefined): boolean {
   return hasAdminRole(role)
 }
@@ -110,4 +119,11 @@ const AI_ASSISTANT_ROLES: ReadonlySet<AppRole> = new Set([
 export function canUseAiAssistant(role: string | null | undefined): boolean {
   if (!role || !isAppRole(role)) return false
   return AI_ASSISTANT_ROLES.has(role)
+}
+
+export function canShowRecruiterAssistant(
+  user: { role: string; recruiterAssistantEnabled?: boolean } | null | undefined,
+): boolean {
+  if (!user || !canUseAiAssistant(user.role)) return false
+  return user.recruiterAssistantEnabled !== false
 }

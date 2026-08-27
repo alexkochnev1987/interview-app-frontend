@@ -1,14 +1,11 @@
 'use client'
 
-import { RotateCcw } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useState, type ReactNode } from 'react'
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 import { EyebrowLabel } from '@/components/ui/eyebrow-label'
 import { FacetRowButton } from '@/components/ui/facet-row-button'
-import { Icon } from '@/components/ui/icon'
+import { FacetSidebarShell } from '@/components/ui/facet-sidebar-shell'
 import { DividedStack, DividedStackItem } from '@/components/ui/layout/divided-stack'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
@@ -39,6 +36,8 @@ export type InterviewFacetSidebarProps = {
   loading: boolean
   error: string | null
   onRetry: () => void
+  /** Suppress the built-in title row, e.g. when rendered inside a Sheet that already shows one. */
+  hideHeading?: boolean
 }
 
 export function InterviewFacetSidebar(props: InterviewFacetSidebarProps) {
@@ -55,6 +54,7 @@ export function InterviewFacetSidebar(props: InterviewFacetSidebarProps) {
     loading,
     error,
     onRetry,
+    hideHeading = false,
   } = props
   const t = useTranslations('interviews.library.facet')
 
@@ -62,75 +62,43 @@ export function InterviewFacetSidebar(props: InterviewFacetSidebarProps) {
     (selected.position ? 1 : 0) + (selected.status ? 1 : 0) + (selected.assignedHrId ? 1 : 0)
 
   return (
-    <Card variant="surface" size="sm">
-      <CardContent spacing="md">
-        <Stack gap={3}>
-          <Inline gap={2} align="center" justify="between">
-            <BodyText as="span" size="base" tone="foreground" weight="semibold">
-              {t('filtersTitle')}
-            </BodyText>
-            {activeFilterCount > 0 ? (
-              <BodyText as="span" size="xs" tone="muted">
-                {t('activeFilters', { count: activeFilterCount })}
-              </BodyText>
-            ) : null}
-          </Inline>
-
-          <Button
-            type="button"
-            variant="default"
-            shape="pill"
-            size="xl"
-            width="full"
-            disabled={!canReset}
-            onClick={onReset}
-            title={t('resetTitle')}
-          >
-            <Icon size="md">
-              <RotateCcw />
-            </Icon>
-            {activeFilterCount > 0
-              ? t('resetAllWithCount', { count: activeFilterCount })
-              : t('resetAll')}
-          </Button>
-
-          {error ? (
-            <Stack gap={2}>
-              <BodyText size="sm" weight="semibold">
-                {t('unavailable')}
-              </BodyText>
-              <BodyText size="sm" tone="muted">
-                {error}
-              </BodyText>
-              <Button type="button" variant="outline-pill" shape="pill" size="sm" onClick={onRetry}>
-                {t('retry')}
-              </Button>
-            </Stack>
-          ) : null}
-        </Stack>
-
-        <DividedStack>
-          {showAssignedHrFilter ? (
-            <AssignedHrFacetSection
-              selected={selected.assignedHrId}
-              onChange={onAssignedHrIdChange}
-            />
-          ) : null}
-          <StatusFacetSection
-            values={statuses}
-            selected={selected.status}
-            onChange={onStatusChange}
-            loading={loading && statuses.length === 0}
+    <FacetSidebarShell
+      hideHeading={hideHeading}
+      filtersTitle={t('filtersTitle')}
+      activeFilterCount={activeFilterCount}
+      activeFiltersText={t('activeFilters', { count: activeFilterCount })}
+      resetTitle={t('resetTitle')}
+      resetLabel={
+        activeFilterCount > 0 ? t('resetAllWithCount', { count: activeFilterCount }) : t('resetAll')
+      }
+      canReset={canReset}
+      onReset={onReset}
+      error={error}
+      unavailableTitle={t('unavailable')}
+      retryLabel={t('retry')}
+      onRetry={onRetry}
+    >
+      <DividedStack>
+        {showAssignedHrFilter ? (
+          <AssignedHrFacetSection
+            selected={selected.assignedHrId}
+            onChange={onAssignedHrIdChange}
           />
-          <PositionFacetSection
-            values={positions}
-            selected={selected.position}
-            onChange={onPositionChange}
-            loading={loading && positions.length === 0}
-          />
-        </DividedStack>
-      </CardContent>
-    </Card>
+        ) : null}
+        <StatusFacetSection
+          values={statuses}
+          selected={selected.status}
+          onChange={onStatusChange}
+          loading={loading && statuses.length === 0}
+        />
+        <PositionFacetSection
+          values={positions}
+          selected={selected.position}
+          onChange={onPositionChange}
+          loading={loading && positions.length === 0}
+        />
+      </DividedStack>
+    </FacetSidebarShell>
   )
 }
 

@@ -5,13 +5,19 @@ import { useTranslations } from 'next-intl'
 import { type KeyboardEvent, useEffect, useRef, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
-import { ChatComposerBar, ChatMessageViewport, ChatReplyAnnouncer } from '@/components/ui/chat'
+import { ChatComposerBar } from '@/components/ui/chat/chat-composer-bar'
+import { ChatMessageViewport } from '@/components/ui/chat/chat-message-viewport'
+import { ChatReplyAnnouncer } from '@/components/ui/chat/chat-reply-announcer'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText } from '@/components/ui/text'
 import { Textarea } from '@/components/ui/textarea'
 
-import { ASSISTANT_CHAT_COMPOSER_ID } from './assistant-api-contract'
+import {
+  ASSISTANT_CHAT_COMPOSER_ID,
+  resolveAssistantRegisteredCandidateMessage,
+  resolveAssistantSimilarityMessage,
+} from './assistant-api-contract'
 import { AssistantChatBubble } from './assistant-chat-bubble'
 import { useAssistantChatSession, useAssistantChatShell } from './assistant-chat-provider'
 import { AssistantExamplePrompts } from './assistant-example-prompts'
@@ -27,6 +33,7 @@ export function AiAssistantChat() {
     error,
     welcomeRole,
     submitMessage,
+    sendUserMessage,
     confirmPendingAction,
     dismissPendingAction,
   } = useAssistantChatSession()
@@ -34,6 +41,15 @@ export function AiAssistantChat() {
 
   const t = useTranslations('assistant')
   const showPrompts = !messages.some((message) => message.role === 'user')
+  const latestAssistant = messages.findLast((message) => message.role === 'assistant')
+  const awaitingInput = latestAssistant?.result?.awaitingInput
+  const awaitingSimilarityDecision = awaitingInput === 'confirmAddDespiteSimilar'
+  const awaitingRegisteredCandidateDecision = awaitingInput === 'confirmRegisteredCandidate'
+  const awaitingPickerDecision = awaitingSimilarityDecision || awaitingRegisteredCandidateDecision
+  const composerPlaceholder =
+    awaitingInput && t.has(`input.awaiting.${awaitingInput}`)
+      ? t(`input.awaiting.${awaitingInput}`)
+      : t(`input.placeholder.${welcomeRole}`)
   const bottomRef = useRef<HTMLDivElement>(null)
   const lastAnnouncedIdRef = useRef<string | null>(null)
   const [announcement, setAnnouncement] = useState('')
@@ -45,17 +61,16 @@ export function AiAssistantChat() {
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+    // oxlint-disable-next-line react/exhaustive-effect-dependencies
   }, [messages, loading])
 
   useEffect(() => {
     if (loading) return
-
-    const latestAssistant = messages.toReversed().find((message) => message.role === 'assistant')
     if (!latestAssistant || latestAssistant.id === lastAnnouncedIdRef.current) return
 
     lastAnnouncedIdRef.current = latestAssistant.id
     setAnnouncement(latestAssistant.text)
-  }, [loading, messages])
+  }, [latestAssistant, loading])
 
   function handleComposerKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
     if (event.key !== 'Enter' || event.shiftKey) return
@@ -69,9 +84,73 @@ export function AiAssistantChat() {
       <Stack gap={0} grow="fill" height="full">
         <ChatMessageViewport size="widget">
           <Stack gap={3}>
-            {messages.map((message) => (
-              <AssistantChatBubble key={message.id} message={message} />
-            ))}
+            {messages.map((message, index) => {
+              const isLatestAssistant =
+                message.role === 'assistant' &&
+                !messages.slice(index + 1).some((entry) => entry.role === 'assistant')
+
+              return (
+                <AssistantChatBubble
+                  key={message.id}
+                  message={message}
+                  disabled={loading}
+                  onSelectTemplate={
+                    isLatestAssistant && !loading
+                      ? (selection) =>
+                          void sendUserMessage(selection.message, {
+                            displayText: selection.displayText,
+                          })
+                      : undefined
+                  }
+                  onSelectHr={
+                    isLatestAssistant && !loading
+                      ? (selection) =>
+                          void sendUserMessage(selection.message, {
+                            displayText: selection.displayText,
+                          })
+                      : undefined
+                  }
+                  onSelectInterview={
+                    isLatestAssistant && !loading
+                      ? (selection) =>
+                          void sendUserMessage(selection.message, {
+                            displayText: selection.displayText,
+                          })
+                      : undefined
+                  }
+                  onSelectCandidate={
+                    isLatestAssistant && !loading
+                      ? (selection) =>
+                          void sendUserMessage(selection.message, {
+                            displayText: selection.displayText,
+                          })
+                      : undefined
+                  }
+                  onRegisteredCandidateDecision={
+                    isLatestAssistant && !loading
+                      ? (selection) =>
+                          void sendUserMessage(
+                            resolveAssistantRegisteredCandidateMessage(selection.intent),
+                            {
+                              displayText: selection.displayText,
+                            },
+                          )
+                      : undefined
+                  }
+                  onSimilarityDecision={
+                    isLatestAssistant && !loading
+                      ? (selection) =>
+                          void sendUserMessage(
+                            resolveAssistantSimilarityMessage(selection.intent),
+                            {
+                              displayText: selection.displayText,
+                            },
+                          )
+                      : undefined
+                  }
+                />
+              )
+            })}
             {loading ? (
               <AssistantChatBubble
                 message={{
@@ -108,13 +187,14 @@ export function AiAssistantChat() {
                   value={input}
                   onChange={(event) => setInput(event.target.value)}
                   onKeyDown={handleComposerKeyDown}
-                  placeholder={t(`input.placeholder.${welcomeRole}`)}
+                  placeholder={composerPlaceholder}
+                  disabled={loading || awaitingPickerDecision}
                 />
                 <Button
                   type="submit"
                   size="icon-xl"
                   loading={loading}
-                  disabled={!input.trim()}
+                  disabled={!input.trim() || awaitingPickerDecision}
                   aria-label={t('sendAriaLabel')}
                 >
                   <Send />

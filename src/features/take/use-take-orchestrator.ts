@@ -2,10 +2,10 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 
 import type { PermissionStatus, TakeStage } from '@/components/take/types'
 import { type TakeInterviewData } from '@/lib/api'
+import { useAppConfig, useRefreshAppConfig } from '@/lib/app-config-context'
 import { useBrowserTranscript } from '@/lib/use-browser-transcript'
 
 import {
-  MAX_ANSWER_ATTEMPTS_PER_QUESTION,
   canStartNewAttempt,
   canRequestRetake,
   getDisplayedAttemptNumber,
@@ -48,7 +48,6 @@ import {
   getPermissionErrorMessage,
   permissionLabel,
   permissionTone,
-  TAKE_RECORDING_LIMIT_SECONDS,
   type TakeBehaviorSignals,
 } from './utils'
 
@@ -119,15 +118,34 @@ export function useTakeOrchestrator({
     ],
   )
 
+  const appConfig = useAppConfig()
+  const refreshAppConfig = useRefreshAppConfig()
+  const recordingLimitSecondsRef = useRef(appConfig.MAX_ANSWER_DURATION_SECONDS)
+  const maxAttemptsFromConfigRef = useRef(appConfig.MAX_ANSWER_ATTEMPTS_PER_QUESTION)
+
   const [stage, setStage] = useState<TakeStage>(() =>
-    initialInterview ? stageAfterInterviewLoad(initialInterview, 'returning') : 'loading',
+    initialInterview
+      ? stageAfterInterviewLoad(
+          initialInterview,
+          'returning',
+          appConfig.MAX_ANSWER_ATTEMPTS_PER_QUESTION,
+        )
+      : 'loading',
   )
   const [interview, setInterview] = useState<TakeInterviewData | null>(initialInterview ?? null)
   const interviewRef = useRef<TakeInterviewData | null>(initialInterview ?? null)
   const [error, setError] = useState('')
   const [consent, setConsent] = useState(() => Boolean(initialInterview))
   const [recording, setRecording] = useState(false)
-  const [timeLeft, setTimeLeft] = useState(TAKE_RECORDING_LIMIT_SECONDS)
+
+  // Keep refs in sync with the latest config for use when a new question starts.
+  // We intentionally do NOT update timeLeft or in-flight attempt limits here.
+  useEffect(() => {
+    recordingLimitSecondsRef.current = appConfig.MAX_ANSWER_DURATION_SECONDS
+    maxAttemptsFromConfigRef.current = appConfig.MAX_ANSWER_ATTEMPTS_PER_QUESTION
+  }, [appConfig.MAX_ANSWER_DURATION_SECONDS, appConfig.MAX_ANSWER_ATTEMPTS_PER_QUESTION])
+
+  const [timeLeft, setTimeLeft] = useState(appConfig.MAX_ANSWER_DURATION_SECONDS)
   const [retakeCount, setRetakeCount] = useState(0)
   const [currentVersionNumber, setCurrentVersionNumber] = useState(
     () => initialInterview?.currentAnswerMeta?.selectedVersionNumber ?? 1,
@@ -673,12 +691,15 @@ export function useTakeOrchestrator({
     resetInterviewSetup,
     onAnswerMetaUpdated: syncAnswerMetaFromProgress,
     getAnswerMaxAttempts: () =>
-      interviewRef.current?.maxAttempts ?? MAX_ANSWER_ATTEMPTS_PER_QUESTION,
+      interviewRef.current?.maxAttempts ?? maxAttemptsFromConfigRef.current,
     canStartRecordingAttempt: () => {
       const current = interviewRef.current
       return (
-        resolveQuestionAnswerPhase(current) === 'recording' &&
-        canStartNewAttempt(answerAttemptMetaFromInterview(current))
+        resolveQuestionAnswerPhase(current, maxAttemptsFromConfigRef.current) === 'recording' &&
+        canStartNewAttempt(
+          answerAttemptMetaFromInterview(current),
+          maxAttemptsFromConfigRef.current,
+        )
       )
     },
     pendingReuseReservedRef,
@@ -689,6 +710,7 @@ export function useTakeOrchestrator({
     handleRecordedChunk,
     onRecordersStopped,
     primeBrowserTranscriptForRecordingSession: primeRecordingSession,
+    recordingLimitSeconds: recordingLimitSecondsRef.current,
     takeMessage,
   })
 
@@ -773,6 +795,9 @@ export function useTakeOrchestrator({
   ])
 
   function proceedToLobby() {
+    // Refresh config before the next question so updated limits take effect.
+    // This is fire-and-forget (best-effort) so the next question may start with the previous snapshot if the request hasn't settled.
+    void refreshAppConfig().catch(console.error)
     autoStartedQuestionKeyRef.current = ''
     pendingReuseReservedRef.current = null
     setSetupError('')
@@ -812,10 +837,15 @@ export function useTakeOrchestrator({
 
     const reusePending = pendingReuseReservedRef.current
     if (!reusePending) {
-      if (resolveQuestionAnswerPhase(interview) !== 'recording') {
+      if (resolveQuestionAnswerPhase(interview, maxAttemptsFromConfigRef.current) !== 'recording') {
         return
       }
-      if (!canStartNewAttempt(answerAttemptMetaFromInterview(interview))) {
+      if (
+        !canStartNewAttempt(
+          answerAttemptMetaFromInterview(interview),
+          maxAttemptsFromConfigRef.current,
+        )
+      ) {
         return
       }
     }
@@ -828,7 +858,10 @@ export function useTakeOrchestrator({
     autoStartedQuestionKeyRef.current = questionKey
     const nextVersionNumber =
       reusePending?.versionNumber ??
-      resolveInitialVersionNumber(answerAttemptMetaFromInterview(interview))
+      resolveInitialVersionNumber(
+        answerAttemptMetaFromInterview(interview),
+        maxAttemptsFromConfigRef.current,
+      )
     const beginOptions = reusePending
       ? {
           reuseReservedAttempt: true as const,
@@ -882,15 +915,19 @@ export function useTakeOrchestrator({
     Boolean(setupError) || questionAnswerPhase === 'recording' || inFlightAttempt
   const retakeDisabled =
     attemptsExhausted ||
-    !canRequestRetake(currentVersionNumber, {
-      maxAttempts: interview?.maxAttempts,
-    })
+    !canRequestRetake(
+      currentVersionNumber,
+      {
+        maxAttempts: interview?.maxAttempts,
+      },
+      maxAttemptsFromConfigRef.current,
+    )
   const displayedAttemptNumber = getDisplayedAttemptNumber(
     attemptMeta,
     currentVersionNumber,
     recording,
   )
-  const maxAttempts = interview?.maxAttempts ?? MAX_ANSWER_ATTEMPTS_PER_QUESTION
+  const maxAttempts = interview?.maxAttempts ?? maxAttemptsFromConfigRef.current
 
   return {
     stage,

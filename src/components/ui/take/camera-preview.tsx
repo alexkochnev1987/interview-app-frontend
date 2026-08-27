@@ -4,7 +4,7 @@ import type { RefObject } from 'react'
 
 import { cn } from '@/lib/utils'
 
-export const cameraPreviewSurfaceClass = 'bg-[hsl(var(--surface-low))]'
+export const cameraPreviewSurfaceClass = 'bg-surface-low'
 
 export interface CameraPreviewVideoRefProps {
   videoRef: RefObject<HTMLVideoElement | null>

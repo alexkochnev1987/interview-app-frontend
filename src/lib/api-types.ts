@@ -4,6 +4,70 @@
  */
 
 export interface paths {
+    "/config/public": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get public runtime variables
+         * @description Returns a key→value dictionary of all variables marked as public (is_public=true). Available to all users including unauthenticated visitors.
+         */
+        get: operations["PublicConfigController_getPublicConfig"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/config": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List all runtime variables
+         * @description Returns the full list of runtime configuration variables. Secret variable values are masked with "********".
+         */
+        get: operations["AppConfigController_listAll"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/config/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Create or update a runtime variable
+         * @description Upserts a variable in the database. The new value takes effect within 15 seconds across all running Fargate instances. Overrides any value set in .env or process.env.
+         */
+        put: operations["AppConfigController_upsert"];
+        post?: never;
+        /**
+         * Delete a runtime variable override
+         * @description Removes the variable from the database. The application falls back to reading from process.env / .env or the code-level default.
+         */
+        delete: operations["AppConfigController_remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/login": {
         parameters: {
             query?: never;
@@ -152,6 +216,26 @@ export interface paths {
         };
         /** List all users */
         get: operations["UserController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/candidates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Search registered candidates by name or email
+         * @description Minimal id/name/email lookup for the interview-creation candidate picker. Granted to anyone who can create interviews (HR included), not gated by users:read.
+         */
+        get: operations["UserController_searchCandidates"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1045,6 +1129,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/ai/chat/reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reset recruiter assistant conversation */
+        post: operations["RecruiterAssistantController_resetChat"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/feedback/share/{token}": {
         parameters: {
             query?: never;
@@ -1195,10 +1296,177 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/portal/interviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the authenticated candidate's own interviews
+         * @description Matched by candidate_email against the caller's account email. Excludes demo/internal data. Most relevant (active, then most recently updated) first.
+         */
+        get: operations["PortalController_listMyInterviews"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/portal/interviews/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get one of the authenticated candidate's own interviews
+         * @description Same shape and scoping as the list endpoint, for the interview-detail page.
+         */
+        get: operations["PortalController_getMyInterview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/portal/interviews/{id}/results": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the authenticated candidate's own published feedback for one interview
+         * @description Reuses the same publishable-block eligibility as the HR-generated share link, but scoped by the caller's own email instead of a share token.
+         */
+        get: operations["PortalController_getMyInterviewResults"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        SystemConfigEntryDto: {
+            /**
+             * @description Configuration variable key in UPPER_SNAKE_CASE
+             * @example APP_THEME
+             */
+            key: string;
+            /**
+             * @description Current variable value
+             * @example innowise
+             */
+            value: string;
+            /**
+             * @description Data type hint for parsing and UI rendering
+             * @example enum
+             * @enum {string}
+             */
+            valueType: "string" | "number" | "boolean" | "enum" | "json" | "secret";
+            /**
+             * @description Allowed option values for enum type variables
+             * @example [
+             *       "innowise",
+             *       "red",
+             *       "blue",
+             *       "purple"
+             *     ]
+             */
+            options?: string[];
+            /**
+             * @description Human-readable description of variable purpose
+             * @example Active UI theme color preset
+             */
+            description?: string;
+            /**
+             * @description Whether this variable is exposed in GET /api/config/public
+             * @example true
+             */
+            isPublic: boolean;
+            /**
+             * @description Whether the value is masked on the frontend (••••••••)
+             * @example false
+             */
+            isSecret: boolean;
+            /**
+             * @description Whether this variable has a custom database override applied
+             * @example false
+             */
+            isOverridden: boolean;
+        };
+        /** @enum {string} */
+        ApiErrorCode: "BAD_REQUEST" | "VALIDATION_ERROR" | "INVALID_LOCALE" | "REGISTRATION_FAILED" | "UPLOAD_FAILED" | "UPLOAD_NOT_ALLOWED" | "ANSWER_ATTEMPT_LIMIT_REACHED" | "ANSWER_VERSION_NOT_RESERVED" | "ANSWER_VERSION_OVERWRITE_FORBIDDEN" | "AVATAR_UNSUPPORTED_TYPE" | "AVATAR_TOO_LARGE" | "AVATAR_NO_GOOGLE_PICTURE" | "INVALID_CONFIG_VALUE" | "UNAUTHORIZED" | "INVALID_CREDENTIALS" | "AUTHENTICATION_REQUIRED" | "CANDIDATE_SESSION_REQUIRED" | "INVALID_CANDIDATE_SESSION" | "INTERVIEW_TOKEN_REQUIRED" | "INVALID_INTERVIEW_TOKEN" | "FORBIDDEN" | "INSUFFICIENT_PERMISSIONS" | "ACCESS_DENIED" | "NOT_FOUND" | "QUESTION_NOT_FOUND" | "INTERVIEW_NOT_FOUND" | "USER_NOT_FOUND" | "FEEDBACK_NOT_FOUND" | "CONFLICT" | "QUESTION_IN_USE" | "VALIDATION_RUNNING" | "QUESTION_DUPLICATE" | "SERVICE_UNAVAILABLE" | "AI_PROVIDER_NOT_CONFIGURED" | "EMBEDDING_PROVIDER_NOT_CONFIGURED" | "INTERNAL_SERVER_ERROR";
+        ApiErrorResponseDto: {
+            /** @example 400 */
+            statusCode: number;
+            code: components["schemas"]["ApiErrorCode"];
+            /** @example Validation failed */
+            message: string;
+            /**
+             * @example {
+             *       "errors": [
+             *         "email must be an email"
+             *       ]
+             *     }
+             */
+            params?: {
+                [key: string]: unknown;
+            };
+            /** @example /questions/invalid-id */
+            path?: string;
+        };
+        UpsertConfigVariableDto: {
+            /**
+             * @description Variable value as string (numbers and booleans are stored as text)
+             * @example 240
+             */
+            value: string;
+            /**
+             * @description Data type hint for parsing and UI rendering
+             * @default string
+             * @enum {string}
+             */
+            valueType: "string" | "number" | "boolean" | "enum" | "json" | "secret";
+            /**
+             * @description Allowed option values for enum variables
+             * @example [
+             *       "innowise",
+             *       "red",
+             *       "blue",
+             *       "purple"
+             *     ]
+             */
+            options?: string[];
+            /**
+             * @description Whether this variable is exposed to the frontend via GET /config/public
+             * @default false
+             */
+            isPublic: boolean;
+            /**
+             * @description Whether the value is masked in Super Admin list responses
+             * @default false
+             */
+            isSecret: boolean;
+            /**
+             * @description Human-readable English description shown in Super Admin UI
+             * @example Maximum candidate video response recording limit in seconds per question
+             */
+            description?: string;
+        };
         LoginDto: {
             /** @example admin@interview-app.com */
             email: string;
@@ -1249,6 +1517,11 @@ export interface components {
              * @example true
              */
             hasGoogleAvatar: boolean;
+            /**
+             * @description Whether Herman (recruiter AI assistant) is enabled for this user, based on org config and role.
+             * @example true
+             */
+            recruiterAssistantEnabled: boolean;
         };
         RegisterDto: {
             email: string;
@@ -1266,26 +1539,11 @@ export interface components {
              */
             status?: "completed" | "skipped";
         };
-        /** @enum {string} */
-        ApiErrorCode: "BAD_REQUEST" | "VALIDATION_ERROR" | "INVALID_LOCALE" | "REGISTRATION_FAILED" | "UPLOAD_FAILED" | "UPLOAD_NOT_ALLOWED" | "ANSWER_ATTEMPT_LIMIT_REACHED" | "ANSWER_VERSION_NOT_RESERVED" | "ANSWER_VERSION_OVERWRITE_FORBIDDEN" | "AVATAR_UNSUPPORTED_TYPE" | "AVATAR_TOO_LARGE" | "AVATAR_NO_GOOGLE_PICTURE" | "UNAUTHORIZED" | "INVALID_CREDENTIALS" | "AUTHENTICATION_REQUIRED" | "CANDIDATE_SESSION_REQUIRED" | "INVALID_CANDIDATE_SESSION" | "INTERVIEW_TOKEN_REQUIRED" | "INVALID_INTERVIEW_TOKEN" | "FORBIDDEN" | "INSUFFICIENT_PERMISSIONS" | "ACCESS_DENIED" | "NOT_FOUND" | "QUESTION_NOT_FOUND" | "INTERVIEW_NOT_FOUND" | "USER_NOT_FOUND" | "FEEDBACK_NOT_FOUND" | "CONFLICT" | "QUESTION_IN_USE" | "VALIDATION_RUNNING" | "QUESTION_DUPLICATE" | "SERVICE_UNAVAILABLE" | "AI_PROVIDER_NOT_CONFIGURED" | "EMBEDDING_PROVIDER_NOT_CONFIGURED" | "INTERNAL_SERVER_ERROR";
-        ApiErrorResponseDto: {
-            /** @example 400 */
-            statusCode: number;
-            code: components["schemas"]["ApiErrorCode"];
-            /** @example Validation failed */
-            message: string;
-            /**
-             * @example {
-             *       "errors": [
-             *         "email must be an email"
-             *       ]
-             *     }
-             */
-            params?: {
-                [key: string]: unknown;
-            };
-            /** @example /questions/invalid-id */
-            path?: string;
+        CandidateSummaryResponseDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            email: string;
         };
         UserProfileResponseDto: {
             /** @example 8d2a6457-7f4b-4cef-9f10-8cff885f7e15 */
@@ -2105,6 +2363,7 @@ export interface components {
             mediaType?: "camera" | "screen";
             /** @description Reserved answer attempt/version being recorded. */
             versionNumber: number;
+            fileSizeBytes?: number;
         };
         PresignedUrlResponseDto: {
             uploadUrl: string;
@@ -2115,6 +2374,7 @@ export interface components {
             mediaKey: string;
             /** @description Reserved answer attempt/version being confirmed. */
             versionNumber: number;
+            fileSizeBytes?: number;
         };
         ConfirmUploadResponseDto: {
             mediaKey: string;
@@ -2129,6 +2389,7 @@ export interface components {
             mediaType?: "camera" | "screen";
             /** @description Reserved answer attempt/version being recorded. */
             versionNumber: number;
+            fileSizeBytes?: number;
         };
         MultipartUploadSessionResponseDto: {
             mediaKey: string;
@@ -2236,6 +2497,8 @@ export interface components {
             currentAnswerMeta?: components["schemas"]["CurrentAnswerMetaDto"];
             /** @description Maximum recording attempts per question (MAX_ANSWER_ATTEMPTS_PER_QUESTION). Sole take-response source for FE attempt budget — not duplicated on currentAnswerMeta. */
             maxAttempts: number;
+            /** @description Maximum recording duration in seconds per question (MAX_ANSWER_DURATION_SECONDS). */
+            maxDurationSeconds?: number;
             completed: boolean;
         };
         BehaviorSignalsDto: {
@@ -2384,9 +2647,45 @@ export interface components {
             assignedHrName: string;
             interviewLabel: string;
         };
+        RecruiterAssistantCreateSingleQuestionPendingActionDto: {
+            /** @enum {string} */
+            type: "create_single_question";
+            questionName: string;
+            createQuestion: Record<string, never>;
+        };
         RecruiterAssistantChatDto: {
             message: string;
             pendingActionId?: string;
+            sessionId?: string;
+            /** @description Optional create-interview/question-plan override sent with confirmation. Questions may only be removed, not added or edited. */
+            pendingAction?: components["schemas"]["RecruiterAssistantCreatePendingActionDto"];
+        };
+        RecruiterAssistantSimilarQuestionDto: {
+            id: string;
+            questionText: string;
+            /** @description Similarity score from 0 to 1 (e.g. 0.85 = 85% match). */
+            score: number;
+            /** @description Frontend route when the similar question card is clicked. */
+            href: string;
+        };
+        RecruiterAssistantCreatedQuestionDto: {
+            id: string;
+            questionText: string;
+            /** @description Frontend route when the question card is clicked. */
+            href: string;
+        };
+        RecruiterAssistantRedirectDto: {
+            /** @example /interviews/new */
+            path: string;
+            /**
+             * @example {
+             *       "candidateName": "Alice",
+             *       "position": "React Developer"
+             *     }
+             */
+            query?: {
+                [key: string]: string;
+            };
         };
         RecruiterAssistantCreatedInterviewDto: {
             id: string;
@@ -2394,6 +2693,8 @@ export interface components {
         };
         RecruiterAssistantReviewStateDto: {
             reviewed: boolean;
+            /** @description True once HR has published at least one candidate-feedback block. */
+            resultsReady?: boolean;
             shareLinkActive?: boolean;
             outcome?: string;
         };
@@ -2405,18 +2706,62 @@ export interface components {
             candidateLink?: string;
             reviewState?: components["schemas"]["RecruiterAssistantReviewStateDto"];
         };
+        RecruiterAssistantQuestionCountDto: {
+            total: number;
+            filters?: Record<string, never>;
+        };
+        RecruiterAssistantAssessmentCountDto: {
+            total: number;
+            filters?: Record<string, never>;
+        };
+        RecruiterAssistantInterviewActivityDto: {
+            total: number;
+            active: number;
+            completed: number;
+            failed: number;
+            pending: number;
+            inProgress: number;
+            processing: number;
+        };
+        RecruiterAssistantTeamSummaryDto: {
+            superAdmin: number;
+            admin: number;
+            hr: number;
+            candidate: number;
+            total: number;
+        };
         RecruiterAssistantResponseDto: {
             response: string;
             /** @enum {string} */
             status: "answered" | "needs_confirmation" | "executed" | "refused" | "denied";
             suggestedQuestions?: components["schemas"]["RecruiterAssistantSuggestedQuestionDto"][];
-            pendingAction?: components["schemas"]["RecruiterAssistantCreatePendingActionDto"] | components["schemas"]["RecruiterAssistantAssignHrPendingActionDto"];
+            /** @description Existing questions with high similarity during create_question flow (clickable cards). */
+            similarQuestions?: components["schemas"]["RecruiterAssistantSimilarQuestionDto"][];
+            pendingAction?: components["schemas"]["RecruiterAssistantCreatePendingActionDto"] | components["schemas"]["RecruiterAssistantAssignHrPendingActionDto"] | components["schemas"]["RecruiterAssistantCreateSingleQuestionPendingActionDto"];
             pendingActionId?: string;
+            sessionId?: string;
+            /** @enum {string} */
+            locale?: "en" | "be" | "ru" | "pl";
+            createdQuestion?: components["schemas"]["RecruiterAssistantCreatedQuestionDto"];
+            redirect?: components["schemas"]["RecruiterAssistantRedirectDto"];
+            templates?: components["schemas"]["TemplateSummaryResponseDto"][];
+            /** @enum {string} */
+            awaitingInput?: "hr" | "interview" | "questionName" | "confirmAddDespiteSimilar" | "candidateName" | "candidateChoice" | "confirmRegisteredCandidate" | "position" | "templateChoice";
             createdInterview?: components["schemas"]["RecruiterAssistantCreatedInterviewDto"];
             /** @enum {string} */
             escalateTo?: "hr" | "admin" | "super_admin";
             interviews?: components["schemas"]["InterviewListItemDto"][];
+            /** @description HR reviewers returned for assign_hr picker steps or the list_hrs intent. */
+            hrs?: components["schemas"]["AssignedHrDto"][];
             interview?: components["schemas"]["RecruiterAssistantInterviewSummaryDto"];
+            questionCount?: components["schemas"]["RecruiterAssistantQuestionCountDto"];
+            assessmentCount?: components["schemas"]["RecruiterAssistantAssessmentCountDto"];
+            assessments?: components["schemas"]["TemplateSummaryResponseDto"][];
+            interviewActivity?: components["schemas"]["RecruiterAssistantInterviewActivityDto"];
+            teamSummary?: components["schemas"]["RecruiterAssistantTeamSummaryDto"];
+            teamMembers?: components["schemas"]["AuthUserResponseDto"][];
+            /** @description Registered candidates returned during create_interview picker steps. */
+            candidates?: components["schemas"]["CandidateSummaryResponseDto"][];
         };
         PublicCandidateFeedbackTextBlockDto: {
             /** @description Candidate-facing strengths / recommendations text. */
@@ -2612,6 +2957,37 @@ export interface components {
              */
             expiresAt: string;
         };
+        CandidatePortalInterviewListItemDto: {
+            /** Format: uuid */
+            id: string;
+            position: string;
+            /** @enum {string} */
+            status: "pending" | "in_progress" | "processing" | "completed" | "failed";
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            questionCount: number;
+            /** @description Recording attempts allowed per question (server-configured, same for every interview). */
+            maxAnswerAttempts: number;
+            /** @description True once HR has published at least one candidate-feedback block for this interview. */
+            resultsReady: boolean;
+            /** @description Relative take-flow URL with a freshly minted candidate token; present only while the interview is not yet finished. */
+            continueUrl?: string;
+        };
+        CandidatePortalInterviewResultsResponseDto: {
+            /** @enum {string} */
+            interviewLocale: "en" | "be" | "ru" | "pl";
+            position: string;
+            /** Format: date-time */
+            interviewDate?: string;
+            overallScore?: number;
+            /** @enum {string} */
+            outcome?: "next_stage" | "keep_in_touch" | "custom";
+            outcomeMessage?: string;
+            overall?: components["schemas"]["PublicCandidateFeedbackTextBlockDto"];
+            questions?: components["schemas"]["PublicCandidateFeedbackQuestionBlockDto"][];
+        };
     };
     responses: never;
     parameters: never;
@@ -2621,6 +2997,168 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    PublicConfigController_getPublicConfig: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Public configuration dictionary */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AppConfigController_listAll: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List of all configuration variables */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SystemConfigEntryDto"][];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    AppConfigController_upsert: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path: {
+                /** @description Variable key in UPPER_SNAKE_CASE */
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpsertConfigVariableDto"];
+            };
+        };
+        responses: {
+            /** @description The saved variable record */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SystemConfigEntryDto"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    AppConfigController_remove: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path: {
+                /** @description Variable key to reset */
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Variable deleted successfully */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
     AuthController_login: {
         parameters: {
             query?: never;
@@ -2871,6 +3409,40 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AuthUserResponseDto"][];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    UserController_searchCandidates: {
+        parameters: {
+            query?: {
+                /** @description Substring matched against candidate name or email (case-insensitive). */
+                q?: string;
+                limit?: number;
+            };
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CandidateSummaryResponseDto"][];
                 };
             };
             401: {
@@ -5713,6 +6285,44 @@ export interface operations {
             };
         };
     };
+    RecruiterAssistantController_resetChat: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecruiterAssistantResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
     CandidateFeedbackShareController_getSharedCandidateFeedback: {
         parameters: {
             query?: never;
@@ -6233,6 +6843,116 @@ export interface operations {
                 };
             };
             503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    PortalController_listMyInterviews: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CandidatePortalInterviewListItemDto"][];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    PortalController_getMyInterview: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CandidatePortalInterviewListItemDto"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    PortalController_getMyInterviewResults: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Response language for localized content. Defaults to `en` when omitted. */
+                "X-Locale"?: "en" | "be" | "ru" | "pl";
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CandidatePortalInterviewResultsResponseDto"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

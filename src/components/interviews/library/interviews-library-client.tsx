@@ -1,15 +1,18 @@
 'use client'
 
-import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
+import { PanelLeftClose, PanelLeftOpen, SlidersHorizontal } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
-import { InterviewFacetSidebar } from '@/components/interviews/picker'
-import { InterviewPickerFeed } from '@/components/interviews/picker'
-import { InterviewPickerRefetchAlert } from '@/components/interviews/picker'
-import { InterviewPickerToolbar } from '@/components/interviews/picker'
-import { InterviewViewToggle } from '@/components/interviews/picker'
-import { pickInterviewsViewSource } from '@/components/interviews/picker'
+import {
+  InterviewFacetSidebar,
+  type InterviewFacetSidebarProps,
+} from '@/components/interviews/picker/interview-facet-sidebar'
+import { InterviewPickerFeed } from '@/components/interviews/picker/interview-picker-feed'
+import { InterviewPickerRefetchAlert } from '@/components/interviews/picker/interview-picker-refetch-alert'
+import { InterviewPickerToolbar } from '@/components/interviews/picker/interview-picker-toolbar'
+import { InterviewViewToggle } from '@/components/interviews/picker/interview-view-toggle'
+import { pickInterviewsViewSource } from '@/components/interviews/picker/pick-interviews-view-source'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { CardGrid } from '@/components/ui/layout/card-grid'
@@ -17,6 +20,8 @@ import { Grid } from '@/components/ui/layout/grid'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { Pagination } from '@/components/ui/pagination'
+import { Sheet, SheetBody, SheetHeader } from '@/components/ui/sheet'
+import { StatusPill } from '@/components/ui/status-pill'
 import { useRouter } from '@/i18n/navigation'
 import { routes } from '@/i18n/routes'
 import { useInterviewChipLabels } from '@/i18n/use-interview-chip-labels'
@@ -34,7 +39,7 @@ import { useInterviewFacets } from '../hooks/use-interview-facets'
 import { useInterviewsInfinite } from '../hooks/use-interviews-infinite'
 import { useInterviewsQuery } from '../hooks/use-interviews-query'
 import { buildActiveInterviewFilterChips } from '../picker/build-active-chips'
-import { InfiniteCardsLoader } from './infinite-cards-loader'
+import { InterviewsInfiniteCardsLoader } from './infinite-cards-loader'
 import { InterviewCard } from './interview-card'
 import { InterviewTable } from './interview-table'
 
@@ -45,6 +50,8 @@ type InterviewsLibraryClientProps = {
 export function InterviewsLibraryClient({ initialPrefetch }: InterviewsLibraryClientProps) {
   const router = useRouter()
   const t = useTranslations('interviews.library.client')
+  const tFacet = useTranslations('interviews.library.facet')
+  const tCommon = useTranslations('common')
   const { user } = useAuth()
   const showAssignedHrFilter = canAssignInterviewHr(user?.role)
 
@@ -105,6 +112,7 @@ export function InterviewsLibraryClient({ initialPrefetch }: InterviewsLibraryCl
   const view = pickInterviewsViewSource(isCardsView, query, infinite, query.isSearchPending)
 
   const [sidebarHidden, setSidebarHidden] = useState(false)
+  const [filtersOpen, setFiltersOpen] = useState(false)
   const hydratedSidebarRef = useRef(false)
 
   useEffect(() => {
@@ -132,26 +140,24 @@ export function InterviewsLibraryClient({ initialPrefetch }: InterviewsLibraryCl
     setSidebarHidden((prev) => !prev)
   }
 
-  const sidebar = (
-    <InterviewFacetSidebar
-      positions={facetsResult.facets.positions}
-      statuses={facetsResult.facets.statuses}
-      selected={{
-        position: query.state.position,
-        status: query.state.status,
-        assignedHrId: query.state.assignedHrId,
-      }}
-      onPositionChange={query.setPosition}
-      onStatusChange={query.setStatus}
-      onAssignedHrIdChange={query.setAssignedHrId}
-      showAssignedHrFilter={showAssignedHrFilter}
-      onReset={query.reset}
-      canReset={query.canReset}
-      loading={facetsResult.loading}
-      error={facetsResult.error}
-      onRetry={facetsResult.refetch}
-    />
-  )
+  const facetSidebarProps: Omit<InterviewFacetSidebarProps, 'hideHeading'> = {
+    positions: facetsResult.facets.positions,
+    statuses: facetsResult.facets.statuses,
+    selected: {
+      position: query.state.position,
+      status: query.state.status,
+      assignedHrId: query.state.assignedHrId,
+    },
+    onPositionChange: query.setPosition,
+    onStatusChange: query.setStatus,
+    onAssignedHrIdChange: query.setAssignedHrId,
+    showAssignedHrFilter: showAssignedHrFilter,
+    onReset: query.reset,
+    canReset: query.canReset,
+    loading: facetsResult.loading,
+    error: facetsResult.error,
+    onRetry: facetsResult.refetch,
+  }
 
   const mainContent = (
     <Stack gap={4}>
@@ -166,25 +172,47 @@ export function InterviewsLibraryClient({ initialPrefetch }: InterviewsLibraryCl
         loading={view.toolbarLoading}
         viewToggle={
           <Inline gap={2} align="center">
-            <Button
-              type="button"
-              variant="outline-pill"
-              shape="pill"
-              size="icon-sm"
-              onClick={toggleSidebar}
-              aria-label={sidebarHidden ? t('showFiltersSidebar') : t('hideFiltersSidebar')}
-              aria-pressed={sidebarHidden}
-            >
-              {sidebarHidden ? (
-                <Icon size="md">
-                  <PanelLeftOpen />
+            <Inline visibility="lg-up">
+              <Button
+                type="button"
+                variant="outline-pill"
+                shape="pill"
+                size="icon-sm"
+                onClick={toggleSidebar}
+                aria-label={sidebarHidden ? t('showFiltersSidebar') : t('hideFiltersSidebar')}
+                aria-pressed={sidebarHidden}
+              >
+                {sidebarHidden ? (
+                  <Icon size="md">
+                    <PanelLeftOpen />
+                  </Icon>
+                ) : (
+                  <Icon size="md">
+                    <PanelLeftClose />
+                  </Icon>
+                )}
+              </Button>
+            </Inline>
+            <Inline visibility="below-lg">
+              <Button
+                type="button"
+                variant="outline-pill"
+                shape="pill"
+                size="sm"
+                onClick={() => setFiltersOpen(true)}
+                aria-expanded={filtersOpen}
+              >
+                <Icon size="sm">
+                  <SlidersHorizontal />
                 </Icon>
-              ) : (
-                <Icon size="md">
-                  <PanelLeftClose />
-                </Icon>
-              )}
-            </Button>
+                {tFacet('filtersTitle')}
+                {activeChips.length > 0 ? (
+                  <StatusPill tone="neutral" size="compact" casing="chip">
+                    {activeChips.length}
+                  </StatusPill>
+                ) : null}
+              </Button>
+            </Inline>
             <InterviewViewToggle view={query.state.view} onViewChange={query.setView} />
           </Inline>
         }
@@ -225,7 +253,7 @@ export function InterviewsLibraryClient({ initialPrefetch }: InterviewsLibraryCl
       ) : null}
 
       {isCardsView && view.items.length > 0 ? (
-        <InfiniteCardsLoader
+        <InterviewsInfiniteCardsLoader
           hasNextPage={infinite.hasNextPage}
           isFetchingNextPage={infinite.isFetchingNextPage}
           totalLoaded={infinite.items.length}
@@ -249,12 +277,29 @@ export function InterviewsLibraryClient({ initialPrefetch }: InterviewsLibraryCl
     </Stack>
   )
 
-  return sidebarHidden ? (
-    mainContent
-  ) : (
-    <Grid columns="aside-22-left" gap={6}>
-      {sidebar}
-      {mainContent}
-    </Grid>
+  return (
+    <>
+      {sidebarHidden ? (
+        mainContent
+      ) : (
+        <Grid columns="aside-22-left" gap={6}>
+          <Stack visibility="lg-up">
+            <InterviewFacetSidebar {...facetSidebarProps} />
+          </Stack>
+          {mainContent}
+        </Grid>
+      )}
+
+      <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
+        <SheetHeader
+          title={tFacet('filtersTitle')}
+          onClose={() => setFiltersOpen(false)}
+          closeLabel={tCommon('close')}
+        />
+        <SheetBody>
+          <InterviewFacetSidebar {...facetSidebarProps} hideHeading />
+        </SheetBody>
+      </Sheet>
+    </>
   )
 }

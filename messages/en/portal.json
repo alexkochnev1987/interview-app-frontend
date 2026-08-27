@@ -1,0 +1,46 @@
+{
+  "portal": {
+    "myInterviews": {
+      "eyebrow": "Candidate portal",
+      "title": "My interviews",
+      "lead": "Every interview tied to your account, most relevant first.",
+      "emptyTitle": "No interviews yet",
+      "emptyDescription": "Once you're invited to an interview, it will show up here.",
+      "loadFailedTitle": "Couldn't load your interviews",
+      "loadFailedFallback": "Something went wrong loading your interviews. Please try again.",
+      "forbiddenTitle": "Candidate portal only",
+      "forbiddenDescription": "This page is only available to candidate accounts."
+    },
+    "status": {
+      "not_started": "Not started",
+      "in_progress": "In progress",
+      "awaiting_results": "Awaiting results",
+      "results_ready": "Results ready",
+      "failed": "Unavailable"
+    },
+    "card": {
+      "updatedLabel": "Last updated"
+    },
+    "detail": {
+      "backToList": "Back to my interviews",
+      "continueTitle": "Ready to continue",
+      "continueDescription": "Pick up where you left off.",
+      "continueCta": "Continue interview",
+      "notReadyTitle": "Results are on the way",
+      "notReadyDescription": "We'll show your results here once they're ready.",
+      "failedTitle": "This interview couldn't be completed",
+      "failedDescription": "Something went wrong. Reach out if you have questions.",
+      "loadFailedTitle": "Couldn't load this interview",
+      "loadFailedFallback": "Something went wrong loading this interview. Please try again.",
+      "tips": {
+        "title": "Before you start",
+        "questionCount": "{count, plural, one {# question} other {# questions}}",
+        "retry": "{count, plural, one {# recording attempt allowed per question} other {# recording attempts allowed per question}}",
+        "camera": "Make sure your camera and microphone are working",
+        "connection": "Find a quiet space with a stable internet connection"
+      },
+      "resultsEyebrow": "Feedback",
+      "resultsTitle": "Your results"
+    }
+  }
+}

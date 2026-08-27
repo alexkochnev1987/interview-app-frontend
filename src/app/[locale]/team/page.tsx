@@ -6,11 +6,7 @@ import { PageShell } from '@/components/ui/layout/page-shell'
 import { TeamMembersContainer } from '@/features/team/team-members-container'
 import type { Locale } from '@/i18n/locales'
 import { type TeamMember } from '@/lib/api'
-import {
-  loadAuthGate,
-  redirectIfUnauthenticated,
-  redirectIfUnauthorizedError,
-} from '@/lib/auth-gate'
+import { enforcePageAuth, redirectIfUnauthorizedError } from '@/lib/auth-gate'
 import { canManageTeam } from '@/lib/auth-roles'
 import { isForbiddenError, requestServer } from '@/lib/server-fetch'
 
@@ -20,24 +16,18 @@ interface TeamPageProps {
 
 export default async function TeamPage({ params }: TeamPageProps) {
   const { locale } = await params
-  const t = await getTranslations({ locale, namespace: 'toast.pageGate.team' })
-  const tCommon = await getTranslations({ locale, namespace: 'common' })
-
-  const auth = await loadAuthGate(canManageTeam, locale)
-  redirectIfUnauthenticated(auth, '/team', locale)
-  if (auth.kind === 'forbidden') {
-    return (
-      <ForbiddenAccessPage title={t('forbiddenTitle')} description={t('forbiddenDescription')} />
-    )
-  }
-  if (auth.kind === 'error') {
-    return (
-      <FlashErrorPageFallback
-        title={t('unavailableTitle')}
-        description={`${tCommon('sessionVerificationFailed')} ${auth.message}`}
-      />
-    )
-  }
+  const [t, auth] = await Promise.all([
+    getTranslations({ locale, namespace: 'toast.pageGate.team' }),
+    enforcePageAuth({
+      roleCheck: canManageTeam,
+      locale,
+      returnPath: '/team',
+      gateNamespace: 'toast.pageGate.team',
+      backHref: '/',
+      backLabelKey: 'backToDashboard',
+    }),
+  ])
+  if (!auth.authorized) return auth.fallback
 
   let members: TeamMember[] = []
   let error: string | null = null

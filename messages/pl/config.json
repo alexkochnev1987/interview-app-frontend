@@ -1,0 +1,96 @@
+{
+  "config": {
+    "eyebrow": "Kontrola Super Admina",
+    "title": "Konfiguracja systemu",
+    "lead": "Zarządzaj dynamicznymi zmiennymi aplikacji, limitami czasowymi, próbami i przełącznikami funkcji w czasie rzeczywistym.",
+    "searchPlaceholder": "Filtruj klucze konfiguracji...",
+    "quickAdd": "Dodaj zmienną",
+    "featureToggles": {
+      "heading": "Przełączniki funkcji",
+      "enabled": "Włączone",
+      "disabled": "Wyłączone",
+      "recruiterAssistant": {
+        "label": "Herman (recruiter assistant)",
+        "description": "Pokaż widżet asystenta rekrutacji AI dla uprawnionych użytkowników."
+      },
+      "recruiterAssistantRoles": {
+        "heading": "Dostęp według ról",
+        "description": "Włączaj lub wyłączaj Hermana dla każdej roli.",
+        "roleDescription": "Czy Herman jest włączony dla użytkowników z rolą {role}."
+      },
+      "liveTranscript": {
+        "label": "Transkrypcja na żywo",
+        "description": "Włącz panel transkrypcji mowy na żywo podczas nagrywania odpowiedzi przez kandydata."
+      },
+      "liveTranscriptDefaultExpanded": {
+        "label": "Transkrypcja na żywo domyślnie rozwinięta",
+        "description": "Początkowy stan panelu transkrypcji dla kandydata (domyślnie rozwinięty)."
+      }
+    },
+    "variableDescriptions": {
+      "ENABLE_LIVE_TRANSCRIPT": "Włącz panel transkrypcji mowy na żywo podczas nagrywania odpowiedzi przez kandydata.",
+      "LIVE_TRANSCRIPT_DEFAULT_EXPANDED": "Początkowy stan panelu transkrypcji dla kandydata (domyślnie rozwinięty).",
+      "MAX_ANSWER_DURATION_SECONDS": "Maksymalny czas trwania nagrania odpowiedzi w sekundach.",
+      "MAX_ANSWER_ATTEMPTS_PER_QUESTION": "Maksymalna liczba prób nagrania odpowiedzi na jedno pytanie.",
+      "ENABLE_GOOGLE_OAUTH": "Czy przycisk logowania przez Google OAuth jest widoczny.",
+      "ENABLE_FEEDBACK_SHARE_LINKS": "Czy linki do udostępniania opinii o kandydacie są dostępne.",
+      "DEFAULT_THEME_MODE": "Domyślny motyw interfejsu (system, light, dark).",
+      "APP_THEME": "Aktywny zestaw kolorów motywu interfejsu (innowise, red, blue, purple).",
+      "RECRUITER_ASSISTANT_ENABLED": "Czy asystent rekrutacji AI Herman jest włączony w całej organizacji.",
+      "AI_CANDIDATE_FEEDBACK": "Włącz automatyczne generowanie raportów z opiniami dla kandydatów po zakończeniu rozmowy.",
+      "AI_QUESTION_DRAFT_V2": "Przełącznik testów A/B dla promptów nowej generacji do tworzenia pytań przez AI.",
+      "ENABLE_AI_ANSWER_VALIDATION": "Główny przełącznik transkrypcji Whisper i oceniania odpowiedzi przez LLM.",
+      "ENABLE_S3_MEDIA_CLEANUP": "Główny przełącznik zadania czyszczenia osieroconych plików multimedialnych w S3/MinIO."
+    },
+    "forbiddenTitle": "Dostęp ograniczony",
+    "forbiddenDesc": "Wymagane uprawnienia super_admin, aby przeglądać lub edytować konfigurację systemu.",
+    "table": {
+      "colKey": "Klucz zmiennej i opis",
+      "colType": "Typ i zakres",
+      "colValue": "Aktualna wartość",
+      "colActions": "Akcje",
+      "publicBadge": "Publiczny",
+      "secretBadge": "Sekret",
+      "maskedSecret": "••••••••••••",
+      "edit": "Edytuj",
+      "reset": "Resetuj",
+      "noResultsTitle": "Nie znaleziono zmiennych",
+      "noResultsDesc": "Spróbuj zmienić zapytanie wyszukiwania."
+    },
+    "editModal": {
+      "title": "Edytuj zmienną",
+      "description": "Aktualizacja wartości konfiguracji systemowej dla {key}.",
+      "valueLabel": "Wartość",
+      "save": "Zapisz zmiany",
+      "cancel": "Anuluj",
+      "updating": "Zapisywanie..."
+    },
+    "addModal": {
+      "title": "Dodaj zmienną systemową",
+      "description": "Utwórz lub nadpisz dynamiczną zmienną konfiguracji.",
+      "keyLabel": "Klucz zmiennej (UPPER_SNAKE_CASE)",
+      "valueLabel": "Wartość",
+      "valueTypeLabel": "Typ",
+      "isPublicLabel": "Publiczny (widoczny dla klientów / kandydatów)",
+      "isSecretLabel": "Sekretny (ukryty w UI)",
+      "descriptionLabel": "Opis (opcjonalny)",
+      "create": "Dodaj zmienną",
+      "cancel": "Anuluj",
+      "creating": "Tworzenie..."
+    },
+    "resetModal": {
+      "title": "Zresetować zmienną do domyślnej?",
+      "description": "Spowoduje to usunięcie własnego nadpisania dla {key} i przywrócenie wartości domyślnych.",
+      "confirm": "Przywróć domyślne",
+      "cancel": "Anuluj"
+    },
+    "toast": {
+      "updatedSuccess": "Konfiguracja została pomyślnie zaktualizowana",
+      "updatedError": "Nie udało się zaktualizować konfiguracji",
+      "resetSuccess": "Konfiguracja zresetowana do domyślnej",
+      "resetError": "Nie udało się zresetować konfiguracji",
+      "createdSuccess": "Zmienna dodana pomyślnie",
+      "createdError": "Nie udało się dodać zmiennej"
+    }
+  }
+}

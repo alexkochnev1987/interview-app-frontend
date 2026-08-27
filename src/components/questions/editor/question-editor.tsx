@@ -146,6 +146,25 @@ function setPrimaryDraftField(
   }
 }
 
+function mergeLocaleDraft(
+  base: Partial<LocaleQuestionDraft> | undefined,
+  patch: Partial<LocaleQuestionDraft>,
+): LocaleQuestionDraft {
+  const fallback = emptyLocaleDraft()
+  return {
+    questionText: patch.questionText ?? base?.questionText ?? fallback.questionText,
+    followUpQuestions:
+      patch.followUpQuestions ?? base?.followUpQuestions ?? fallback.followUpQuestions,
+    expectedConcepts: patch.expectedConcepts ?? base?.expectedConcepts ?? fallback.expectedConcepts,
+    redFlags: patch.redFlags ?? base?.redFlags ?? fallback.redFlags,
+    sampleGoodAnswer: patch.sampleGoodAnswer ?? base?.sampleGoodAnswer ?? fallback.sampleGoodAnswer,
+  }
+}
+
+function isPrimaryDraftField(field: DraftFieldKey): field is PrimaryDraftFieldKey {
+  return PRIMARY_DRAFT_FIELDS.has(field as PrimaryDraftFieldKey)
+}
+
 function handlePrimaryLocaleChange(_nextLocale: Locale) {
   // Primary locale is fixed at creation and cannot be changed.
 }
@@ -420,23 +439,6 @@ export function QuestionEditor({
     }
   }
 
-  function mergeLocaleDraft(
-    base: Partial<LocaleQuestionDraft> | undefined,
-    patch: Partial<LocaleQuestionDraft>,
-  ): LocaleQuestionDraft {
-    const fallback = emptyLocaleDraft()
-    return {
-      questionText: patch.questionText ?? base?.questionText ?? fallback.questionText,
-      followUpQuestions:
-        patch.followUpQuestions ?? base?.followUpQuestions ?? fallback.followUpQuestions,
-      expectedConcepts:
-        patch.expectedConcepts ?? base?.expectedConcepts ?? fallback.expectedConcepts,
-      redFlags: patch.redFlags ?? base?.redFlags ?? fallback.redFlags,
-      sampleGoodAnswer:
-        patch.sampleGoodAnswer ?? base?.sampleGoodAnswer ?? fallback.sampleGoodAnswer,
-    }
-  }
-
   function getLocaleDraft(locale: Locale): LocaleQuestionDraft {
     return normalizeLocaleDraft(localeDrafts[locale])
   }
@@ -576,10 +578,6 @@ export function QuestionEditor({
 
   function applyTranslationPatchToLocale(locale: Locale, patch: Partial<LocaleQuestionDraft>) {
     updateLocaleDraft(locale, patch)
-  }
-
-  function isPrimaryDraftField(field: DraftFieldKey): field is PrimaryDraftFieldKey {
-    return PRIMARY_DRAFT_FIELDS.has(field as PrimaryDraftFieldKey)
   }
 
   function getPrimaryQuestionTextFromState(): string {
