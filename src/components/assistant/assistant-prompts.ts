@@ -20,7 +20,12 @@ const PROMPT_KEYS: Record<AssistantWelcomeRole, AssistantPromptKey[]> = {
     'orgOverview',
     'createInterview',
   ],
-  [APP_ROLE.candidate]: ['hasInterview', 'status', 'reviewed'],
+  [APP_ROLE.candidate]: [
+    'latestStatus',
+    'statusByPosition',
+    'reviewedByPosition',
+    'openInterviews',
+  ],
   [APP_ROLE.admin]: [
     'questionCount',
     'assessments',

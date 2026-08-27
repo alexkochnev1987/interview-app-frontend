@@ -49,6 +49,7 @@ type InterviewCreateFormProps = {
   // Optional prefill: seeds the question picker, position, and candidate name.
   initialSelected?: Question[]
   initialCandidateName?: string
+  initialCandidateEmail?: string
   initialPosition?: string
   // Set when prefilled from a template; its id is recorded on create to bump popularity.
   initialTemplateId?: string
@@ -69,6 +70,7 @@ export function InterviewCreateForm({
   initialPrefetch,
   initialSelected,
   initialCandidateName,
+  initialCandidateEmail,
   initialPosition,
   initialTemplateId,
 }: InterviewCreateFormProps) {
@@ -78,7 +80,7 @@ export function InterviewCreateForm({
   const toastMessages = useToastMessages()
   const isDemo = useIsDemo()
   const [candidateName, setCandidateName] = useState(initialCandidateName ?? '')
-  const [candidateEmail, setCandidateEmail] = useState('')
+  const [candidateEmail, setCandidateEmail] = useState(initialCandidateEmail ?? '')
   const [position, setPosition] = useState(initialPosition ?? '')
   const [assignedHrId, setAssignedHrId] = useState<string | undefined>()
   const { user } = useAuth()

@@ -203,7 +203,6 @@ export type RecruiterAssistantQuestionCount = Schemas['RecruiterAssistantQuestio
 export type RecruiterAssistantAssessmentCount = Schemas['RecruiterAssistantAssessmentCountDto']
 export type RecruiterAssistantInterviewActivity = Schemas['RecruiterAssistantInterviewActivityDto']
 export type RecruiterAssistantTeamSummary = Schemas['RecruiterAssistantTeamSummaryDto']
-export type RecruiterAssistantResponseStatus = RecruiterAssistantResponse['status']
 
 export type PresignedUrlResponse = Schemas['PresignedUrlResponseDto']
 
