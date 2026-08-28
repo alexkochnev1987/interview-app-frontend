@@ -48,6 +48,13 @@
         "assigning": "Assigning…",
         "cancel": "Cancel"
       }
+    },
+    "candidateInterviews": {
+      "title": "Interviews they have",
+      "createAnother": "Create another interview for this candidate",
+      "expand": "Show interviews",
+      "collapse": "Hide interviews",
+      "empty": "No interviews linked to this candidate yet."
     }
   }
 }

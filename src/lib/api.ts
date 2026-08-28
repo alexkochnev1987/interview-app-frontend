@@ -178,13 +178,17 @@ export type FetchInterviewsParams = NonNullable<
 > & {
   /** When true, return only demo-scoped interviews. When false, exclude demo interviews. */
   demo?: boolean
+  /** Exact match on registered candidate account email (case-insensitive). */
+  candidateEmail?: string
 }
 export type InterviewSortField = NonNullable<FetchInterviewsParams['sortBy']>
 export type InterviewSortOrder = NonNullable<FetchInterviewsParams['sortOrder']>
 export type InterviewStatusFilter = NonNullable<FetchInterviewsParams['status']>
 export type FetchInterviewFacetsParams = NonNullable<
   paths['/interviews/facets']['get']['parameters']['query']
->
+> & {
+  candidateEmail?: string
+}
 
 export type CreateInterviewPayload = Schemas['CreateInterviewDto']
 export type RecruiterAssistantChatPayload = Schemas['RecruiterAssistantChatDto'] & {

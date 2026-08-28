@@ -48,6 +48,13 @@
         "assigning": "Przypisywanie…",
         "cancel": "Anuluj"
       }
+    },
+    "candidateInterviews": {
+      "title": "Rozmowy kandydata",
+      "createAnother": "Utwórz kolejną rozmowę dla tego kandydata",
+      "expand": "Pokaż rozmowy",
+      "collapse": "Ukryj rozmowy",
+      "empty": "Brak rozmów powiązanych z tym kandydatem."
     }
   }
 }

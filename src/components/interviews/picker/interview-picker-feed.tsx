@@ -21,7 +21,7 @@ export type InterviewPickerFeedProps = {
   view: InterviewView
   debouncedQ: string
   hasActiveFilters: boolean
-  onReset: () => void
+  onReset?: () => void
   renderTable: () => ReactNode
   renderCards: () => ReactNode
 }
@@ -78,11 +78,11 @@ export function InterviewPickerFeed({
             <Button asChild variant="gradient">
               <Link href={routes.interviews.new}>{tEmpty('createCta')}</Link>
             </Button>
-          ) : (
+          ) : onReset ? (
             <Button type="button" variant="outline-pill" shape="pill" onClick={onReset}>
               {t('resetFilters')}
             </Button>
-          )
+          ) : undefined
         }
       />
     )

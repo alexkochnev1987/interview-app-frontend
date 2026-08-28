@@ -138,3 +138,19 @@ export async function prefetchHrAssignedInterviews(
     prefetchInfinite: false,
   })
 }
+
+export async function prefetchCandidateInterviews(
+  ctx: ServerRequestContext,
+  candidateEmail: string,
+): Promise<InterviewsLibraryPrefetch> {
+  const queryState: InterviewsQueryState = {
+    ...DEFAULT_INTERVIEWS_QUERY,
+    candidateEmail,
+    view: 'table',
+  }
+
+  return hydrateInterviewsLibrary(ctx, queryState, {
+    prefetchList: true,
+    prefetchInfinite: false,
+  })
+}

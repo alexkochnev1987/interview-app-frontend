@@ -21,10 +21,16 @@ import { LOCALES, type Locale } from '@/i18n/locales'
 import { usePathname } from '@/i18n/navigation'
 import type { MeResponse } from '@/lib/api'
 import { useAuth } from '@/lib/auth-context'
-import { APP_ROLE, canAccessDashboard, canAssignInterviewHr } from '@/lib/auth-roles'
+import {
+  APP_ROLE,
+  canAccessDashboard,
+  canAssignInterviewHr,
+  canConfigureInterview,
+} from '@/lib/auth-roles'
 import type { InterviewsLibraryPrefetch } from '@/lib/interviews-library-prefetch'
 
 import { AvatarUploadControls } from './avatar-upload-controls'
+import { CandidateInterviewsSection } from './candidate-interviews-section'
 import { HrAssignedInterviewsSection } from './hr-assigned-interviews-section'
 import { ProfileField } from './profile-field'
 
@@ -32,9 +38,15 @@ interface ProfileViewProps {
   user: MeResponse
   mode?: 'self' | 'member'
   assignedInterviewsPrefetch?: InterviewsLibraryPrefetch
+  candidateInterviewsPrefetch?: InterviewsLibraryPrefetch
 }
 
-export function ProfileView({ user, mode = 'self', assignedInterviewsPrefetch }: ProfileViewProps) {
+export function ProfileView({
+  user,
+  mode = 'self',
+  assignedInterviewsPrefetch,
+  candidateInterviewsPrefetch,
+}: ProfileViewProps) {
   const t = useTranslations('profile')
   const tOnboarding = useTranslations('onboarding')
   const tLanguage = useTranslations('languageSwitcher')
@@ -172,6 +184,13 @@ export function ProfileView({ user, mode = 'self', assignedInterviewsPrefetch }:
 
       {canAssignInterviewHr(authUser?.role) && user.role === APP_ROLE.hr ? (
         <HrAssignedInterviewsSection hrUser={user} initialPrefetch={assignedInterviewsPrefetch} />
+      ) : null}
+
+      {canConfigureInterview(authUser?.role) && user.role === APP_ROLE.candidate ? (
+        <CandidateInterviewsSection
+          candidateUser={user}
+          initialPrefetch={candidateInterviewsPrefetch}
+        />
       ) : null}
     </Stack>
   )
