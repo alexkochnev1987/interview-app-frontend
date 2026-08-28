@@ -22,6 +22,7 @@ interface NewInterviewPageProps {
     templateId?: string | string[]
     fromInterview?: string | string[]
     candidateName?: string | string[]
+    candidateEmail?: string | string[]
     position?: string | string[]
   }>
 }
@@ -36,11 +37,13 @@ export default async function NewInterviewPage({ params, searchParams }: NewInte
     templateId: templateIdParam,
     fromInterview: fromInterviewParam,
     candidateName: candidateNameParam,
+    candidateEmail: candidateEmailParam,
     position: positionParam,
   } = await searchParams
   const templateId = firstSearchParam(templateIdParam)
   const fromInterview = firstSearchParam(fromInterviewParam)
   const candidateName = firstSearchParam(candidateNameParam)
+  const candidateEmail = firstSearchParam(candidateEmailParam)
   const positionFromQuery = firstSearchParam(positionParam)
   const [t, tFallback, tQuestions, tPrefill, auth] = await Promise.all([
     getTranslations({ locale, namespace: 'toast.pageGate.interview' }),
@@ -124,6 +127,7 @@ export default async function NewInterviewPage({ params, searchParams }: NewInte
           initialPrefetch={initialPrefetch}
           initialSelected={prefillQuestions}
           initialCandidateName={candidateName}
+          initialCandidateEmail={candidateEmail}
           initialPosition={prefillPosition}
           initialTemplateId={template ? templateId : undefined}
         />
