@@ -1,6 +1,7 @@
 {
   "nav": {
     "dashboard": "Панэль",
+    "myInterviews": "Мае інтэрв'ю",
     "questions": "Пытанні",
     "assistant": "Асістэнт",
     "assessments": "Ацэнкі",
@@ -10,6 +11,7 @@
     "logout": "Выйсці",
     "signIn": "Увайсці",
     "templates": "Шаблоны",
+    "help": "Дапамога",
     "config": "Канфігурацыя",
     "expandSidebar": "Разгарнуць бакавую панэль",
     "collapseSidebar": "Згарнуць бакавую панэль"

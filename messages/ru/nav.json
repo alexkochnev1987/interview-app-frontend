@@ -1,6 +1,7 @@
 {
   "nav": {
     "dashboard": "Панель",
+    "myInterviews": "Мои интервью",
     "questions": "Вопросы",
     "assistant": "Ассистент",
     "assessments": "Оценки",
@@ -10,6 +11,7 @@
     "logout": "Выйти",
     "signIn": "Войти",
     "templates": "Шаблоны",
+    "help": "Помощь",
     "config": "Конфигурация",
     "expandSidebar": "Развернуть боковую панель",
     "collapseSidebar": "Свернуть боковую панель"
