@@ -9518,6 +9518,34 @@
           "email"
         ]
       },
+      "MediaRemediationMetaDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "idle",
+              "processing",
+              "completed",
+              "failed"
+            ]
+          },
+          "startedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "completedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "errorMessage": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
       "MediaArtifactDto": {
         "type": "object",
         "properties": {
@@ -9533,6 +9561,9 @@
           "uploadedAt": {
             "format": "date-time",
             "type": "string"
+          },
+          "remediation": {
+            "$ref": "#/components/schemas/MediaRemediationMetaDto"
           }
         },
         "required": [
