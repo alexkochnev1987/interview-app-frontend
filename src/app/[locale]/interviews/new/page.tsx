@@ -11,7 +11,7 @@ import { Link } from '@/i18n/navigation'
 import { routes } from '@/i18n/routes'
 import type { TeamMember } from '@/lib/api'
 import { enforcePageAuth } from '@/lib/auth-gate'
-import { APP_ROLE, canConfigureInterview } from '@/lib/auth-roles'
+import { APP_ROLE, canAssignInterviewHr, canConfigureInterview } from '@/lib/auth-roles'
 import { prefetchInterviewCreatePicker } from '@/lib/questions-library-prefetch'
 import { requestServer } from '@/lib/server-fetch'
 import { fetchInterview, fetchTemplate } from '@/lib/templates-prefetch'
@@ -107,7 +107,7 @@ export default async function NewInterviewPage({ params, searchParams }: NewInte
   let lockAssignedHr = false
   let allowDemoWrite = false
 
-  if (assignedHrIdQuery) {
+  if (assignedHrIdQuery && canAssignInterviewHr(auth.me.role)) {
     try {
       const assignedHrUser =
         (await requestServer<TeamMember>(

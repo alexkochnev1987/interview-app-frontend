@@ -102,8 +102,8 @@ export function HrAssignedInterviewsSection({
             onRetry={query.refetch}
             view="table"
             debouncedQ={query.debouncedQ}
-            hasActiveFilters
-            onReset={query.reset}
+            hasActiveFilters={false}
+            profileEmpty={{ title: t('empty'), description: t('empty') }}
             renderTable={() => (
               <InterviewTable
                 items={query.items}

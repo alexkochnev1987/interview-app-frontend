@@ -3988,6 +3988,15 @@
             }
           },
           {
+            "name": "candidateEmail",
+            "required": false,
+            "in": "query",
+            "description": "Filter by registered candidate account email (exact match, case-insensitive).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "status",
             "required": false,
             "in": "query",
@@ -11717,6 +11726,10 @@
           "reviewed": {
             "type": "boolean"
           },
+          "resultsReady": {
+            "type": "boolean",
+            "description": "True once HR has published at least one candidate-feedback block."
+          },
           "shareLinkActive": {
             "type": "boolean"
           },
@@ -11924,6 +11937,8 @@
               "questionName",
               "confirmAddDespiteSimilar",
               "candidateName",
+              "candidateChoice",
+              "confirmRegisteredCandidate",
               "position",
               "templateChoice"
             ]
@@ -11977,6 +11992,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/AuthUserResponseDto"
+            }
+          },
+          "candidates": {
+            "description": "Registered candidates returned during create_interview picker steps.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CandidateSummaryResponseDto"
             }
           }
         },

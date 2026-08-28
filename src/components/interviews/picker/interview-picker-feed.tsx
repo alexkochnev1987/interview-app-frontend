@@ -22,6 +22,11 @@ export type InterviewPickerFeedProps = {
   debouncedQ: string
   hasActiveFilters: boolean
   onReset?: () => void
+  /** Profile-scoped lists use a dedicated empty state instead of the library filter copy. */
+  profileEmpty?: {
+    title: string
+    description: string
+  }
   renderTable: () => ReactNode
   renderCards: () => ReactNode
 }
@@ -36,6 +41,7 @@ export function InterviewPickerFeed({
   debouncedQ,
   hasActiveFilters,
   onReset,
+  profileEmpty,
   renderTable,
   renderCards,
 }: InterviewPickerFeedProps) {
@@ -69,6 +75,16 @@ export function InterviewPickerFeed({
   }
 
   if (items.length === 0) {
+    if (profileEmpty) {
+      return (
+        <EmptyStateCard
+          tone="ghost"
+          title={profileEmpty.title}
+          description={profileEmpty.description}
+        />
+      )
+    }
+
     return (
       <EmptyStateCard
         title={isEmptyBank ? tEmpty('title') : tEmpty('filteredTitle')}

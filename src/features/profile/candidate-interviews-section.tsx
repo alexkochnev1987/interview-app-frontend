@@ -80,7 +80,8 @@ export function CandidateInterviewsSection({
           onRetry={query.refetch}
           view="table"
           debouncedQ={query.debouncedQ}
-          hasActiveFilters
+          hasActiveFilters={false}
+          profileEmpty={{ title: t('empty'), description: t('empty') }}
           renderTable={() => (
             <InterviewTable
               items={query.items}
