@@ -194,7 +194,31 @@ export type CreateInterviewPayload = Schemas['CreateInterviewDto']
 export type RecruiterAssistantChatPayload = Schemas['RecruiterAssistantChatDto'] & {
   pendingAction?: RecruiterAssistantCreatePendingAction
 }
-export type RecruiterAssistantResponse = Schemas['RecruiterAssistantResponseDto']
+
+type RecruiterAssistantAwaitingInput =
+  | NonNullable<Schemas['RecruiterAssistantResponseDto']['awaitingInput']>
+  | 'confirmRegisteredCandidate'
+  | 'candidateChoice'
+
+export type RecruiterAssistantReviewState = Schemas['RecruiterAssistantReviewStateDto'] & {
+  resultsReady?: boolean
+}
+
+export type RecruiterAssistantInterviewSummary = Omit<
+  Schemas['RecruiterAssistantInterviewSummaryDto'],
+  'reviewState'
+> & {
+  reviewState?: RecruiterAssistantReviewState
+}
+
+export type RecruiterAssistantResponse = Omit<
+  Schemas['RecruiterAssistantResponseDto'],
+  'awaitingInput' | 'interview'
+> & {
+  awaitingInput?: RecruiterAssistantAwaitingInput
+  candidates?: CandidateSummary[]
+  interview?: RecruiterAssistantInterviewSummary
+}
 export type RecruiterAssistantCreatePendingAction =
   Schemas['RecruiterAssistantCreatePendingActionDto']
 export type RecruiterAssistantAssignHrPendingAction =
@@ -206,7 +230,6 @@ export type RecruiterAssistantPendingAction =
   | RecruiterAssistantAssignHrPendingAction
   | RecruiterAssistantCreateSingleQuestionPendingAction
 export type RecruiterAssistantSuggestedQuestion = Schemas['RecruiterAssistantSuggestedQuestionDto']
-export type RecruiterAssistantInterviewSummary = Schemas['RecruiterAssistantInterviewSummaryDto']
 export type RecruiterAssistantCreatedInterview = Schemas['RecruiterAssistantCreatedInterviewDto']
 export type RecruiterAssistantCreatedQuestion = Schemas['RecruiterAssistantCreatedQuestionDto']
 export type RecruiterAssistantSimilarQuestion = Schemas['RecruiterAssistantSimilarQuestionDto']
