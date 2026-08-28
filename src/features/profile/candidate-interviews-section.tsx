@@ -90,6 +90,7 @@ export function CandidateInterviewsSection({
               onRowClick={(interview) => router.push(routes.interviews.detail(interview.id))}
               page={query.state.page}
               loading={query.loading}
+              surfaceVariant="plain"
             />
           )}
           renderCards={() => null}
