@@ -80,7 +80,7 @@ export default function InterviewDetailClient({
     uploadFailedLabel: t('uploadFailed'),
   })
 
-  const { mediaByQuestion } = useAnswerMedia({
+  const { mediaByQuestion, loadMedia } = useAnswerMedia({
     id,
     interview,
     failedLoadMediaLabel: t('failedLoadMedia'),
@@ -200,6 +200,7 @@ export default function InterviewDetailClient({
           answersByIndex={answersByIndex}
           uploadStates={uploadStates}
           mediaByQuestion={mediaByQuestion}
+          onLoadMedia={loadMedia}
           isTerminal={isTerminal}
           hasActiveValidation={hasActiveValidation}
           validating={validating}

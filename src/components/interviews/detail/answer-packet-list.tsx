@@ -24,6 +24,7 @@ interface AnswerPacketListProps {
   hasActiveValidation: boolean
   validating: boolean
   onUpload: (questionIndex: number, fileInput: HTMLInputElement | null) => void
+  onLoadMedia?: (questionIndex: number) => void
 }
 
 export function AnswerPacketList({
@@ -35,6 +36,7 @@ export function AnswerPacketList({
   hasActiveValidation,
   validating,
   onUpload,
+  onLoadMedia,
 }: AnswerPacketListProps) {
   const t = useTranslations('questions.common')
 
@@ -68,6 +70,7 @@ export function AnswerPacketList({
               hasActiveValidation={hasActiveValidation}
               validating={validating}
               onUpload={onUpload}
+              onLoadMedia={onLoadMedia}
             />
           )
         })}
