@@ -14,7 +14,12 @@ const WELCOME_ITEM_KEYS: Record<AssistantWelcomeRole, string[]> = {
     'interviewStatus',
     'createFlow',
   ],
-  [APP_ROLE.candidate]: ['hasInterview', 'candidateStatus', 'reviewed', 'schedule'],
+  [APP_ROLE.candidate]: [
+    'latestStatus',
+    'statusByPosition',
+    'reviewedByPosition',
+    'openInterviews',
+  ],
   [APP_ROLE.admin]: [
     'questionCount',
     'assessments',

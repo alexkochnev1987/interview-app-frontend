@@ -15,6 +15,7 @@ import { Textarea } from '@/components/ui/textarea'
 
 import {
   ASSISTANT_CHAT_COMPOSER_ID,
+  resolveAssistantRegisteredCandidateMessage,
   resolveAssistantSimilarityMessage,
 } from './assistant-api-contract'
 import { AssistantChatBubble } from './assistant-chat-bubble'
@@ -43,6 +44,8 @@ export function AiAssistantChat() {
   const latestAssistant = messages.findLast((message) => message.role === 'assistant')
   const awaitingInput = latestAssistant?.result?.awaitingInput
   const awaitingSimilarityDecision = awaitingInput === 'confirmAddDespiteSimilar'
+  const awaitingRegisteredCandidateDecision = awaitingInput === 'confirmRegisteredCandidate'
+  const awaitingPickerDecision = awaitingSimilarityDecision || awaitingRegisteredCandidateDecision
   const composerPlaceholder =
     awaitingInput && t.has(`input.awaiting.${awaitingInput}`)
       ? t(`input.awaiting.${awaitingInput}`)
@@ -115,6 +118,25 @@ export function AiAssistantChat() {
                           })
                       : undefined
                   }
+                  onSelectCandidate={
+                    isLatestAssistant && !loading
+                      ? (selection) =>
+                          void sendUserMessage(selection.message, {
+                            displayText: selection.displayText,
+                          })
+                      : undefined
+                  }
+                  onRegisteredCandidateDecision={
+                    isLatestAssistant && !loading
+                      ? (selection) =>
+                          void sendUserMessage(
+                            resolveAssistantRegisteredCandidateMessage(selection.intent),
+                            {
+                              displayText: selection.displayText,
+                            },
+                          )
+                      : undefined
+                  }
                   onSimilarityDecision={
                     isLatestAssistant && !loading
                       ? (selection) =>
@@ -166,13 +188,13 @@ export function AiAssistantChat() {
                   onChange={(event) => setInput(event.target.value)}
                   onKeyDown={handleComposerKeyDown}
                   placeholder={composerPlaceholder}
-                  disabled={loading || awaitingSimilarityDecision}
+                  disabled={loading || awaitingPickerDecision}
                 />
                 <Button
                   type="submit"
                   size="icon-xl"
                   loading={loading}
-                  disabled={!input.trim() || awaitingSimilarityDecision}
+                  disabled={!input.trim() || awaitingPickerDecision}
                   aria-label={t('sendAriaLabel')}
                 >
                   <Send />
