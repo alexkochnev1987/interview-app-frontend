@@ -1,0 +1,37 @@
+{
+  "help": {
+    "eyebrow": "Candidate portal",
+    "title": "Help & FAQ",
+    "lead": "Everything you need to know before and during your interview.",
+    "whatToExpect": {
+      "title": "What to expect",
+      "body": "Each interview is a short recorded session: you'll see one question at a time, record a video answer, and move on when you're ready. There's no interviewer on the call, so take your time to think before you start recording. Once you finish the last question, your answers are submitted automatically and you'll see a confirmation on screen."
+    },
+    "techRequirements": {
+      "title": "Tech requirements",
+      "camera": "Make sure your camera and microphone are working",
+      "connection": "Find a quiet space with a stable internet connection",
+      "browser": "Use an up-to-date version of Chrome, Firefox, Edge, or Safari",
+      "permissions": "Allow camera and microphone access when your browser asks for it — without it you won't be able to record answers"
+    },
+    "gettingHelp": {
+      "title": "Getting help",
+      "body": "Running into a problem before or during your interview? Reach out and we'll help you sort it out.",
+      "emailLabel": "Support email",
+      "email": "support@yourcompany.example"
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "cameraQuestion": "What if my camera or microphone isn't working?",
+      "cameraAnswer": "Check your browser's site settings to make sure camera and microphone access is allowed, then refresh the page. If the problem continues, contact support using the details above.",
+      "retryQuestion": "Can I re-record an answer?",
+      "retryAnswer": "Some interviews allow a limited number of retries per question — if you have one left, you'll see a retry option after recording. The exact limit is shown on your interview's details page.",
+      "durationQuestion": "How long does an interview take?",
+      "durationAnswer": "It depends on the number of questions, but most interviews take between 15 and 30 minutes. You can check the question count on your interview's details page before you start.",
+      "resultsQuestion": "When will I see my results?",
+      "resultsAnswer": "You'll see a status update on your interview once results are ready — check back on your interview list any time."
+    },
+    "forbiddenTitle": "Candidate portal only",
+    "forbiddenDescription": "This page is only available to candidate accounts."
+  }
+}
