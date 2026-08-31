@@ -2,12 +2,26 @@ import type { QuestionUploadState } from '@/app/[locale]/interviews/[id]/intervi
 import type { Locale } from '@/i18n/locales'
 import { localizedPath } from '@/i18n/pathname'
 import { routes } from '@/i18n/routes'
-import type { Answer } from '@/lib/api'
+import type { Answer, Interview } from '@/lib/api'
 
 export function hasAnswerMedia(answer: Answer): boolean {
   return Boolean(
     answer.mediaKey || answer.screenMediaKey || answer.camera?.mediaKey || answer.screen?.mediaKey,
   )
+}
+
+export function getNextMediaQuestionIndex(
+  interview: Interview,
+  questionIndex: number,
+): number | undefined {
+  for (let index = questionIndex + 1; index < interview.questions.length; index += 1) {
+    const answer = interview.answers.find((item) => item.questionIndex === index)
+    if (answer && hasAnswerMedia(answer)) {
+      return index
+    }
+  }
+
+  return undefined
 }
 
 export interface AnswerStatusPill {

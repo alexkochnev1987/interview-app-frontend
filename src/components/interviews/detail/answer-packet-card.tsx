@@ -2,7 +2,7 @@
 
 import { CircleAlert, LoaderCircle, Upload } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 
 import type {
   AnswerMediaState,
@@ -351,14 +351,43 @@ export function AnswerPacketCard({
   const t = useTranslations('questions.common')
   const tDetail = useTranslations('interviews.detail')
   const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const cardRef = useRef<HTMLDivElement>(null)
 
   const answerHasMedia = answer ? hasAnswerMedia(answer) : false
+  const mediaReady = Boolean(media?.cameraUrl || media?.screenUrl)
+
+  useEffect(() => {
+    if (!onLoadMedia || !answerHasMedia || !showRecording || mediaReady || media?.loading) {
+      return
+    }
+
+    const element = cardRef.current
+    if (!element) {
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          onLoadMedia(questionIndex)
+          observer.disconnect()
+        }
+      },
+      { rootMargin: '200px 0px' },
+    )
+
+    observer.observe(element)
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [questionIndex, answerHasMedia, showRecording, onLoadMedia, mediaReady, media?.loading])
 
   const statusPill = getAnswerStatusPill(answer, uploadState)
 
   return (
     <HoverGroup>
-      <Card variant="surface" interaction="hover">
+      <Card variant="surface" interaction="hover" ref={cardRef}>
         <CardHeader spacing="md">
           <Inline gap={4} align="start" justify="between" wrap="wrap">
             <Stack gap={3}>
