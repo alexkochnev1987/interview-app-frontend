@@ -14,10 +14,6 @@ export const RECRUITER_ASSISTANT_ROLE_LOCKS: ReadonlyArray<{
   { role: 'candidate', key: 'RECRUITER_ASSISTANT_ENABLED_CANDIDATE' },
 ]
 
-export function getRecruiterAssistantRoleConfigKey(role: RecruiterAssistantLockRole): string {
-  return `RECRUITER_ASSISTANT_ENABLED_${role.toUpperCase()}`
-}
-
 export const RECRUITER_ASSISTANT_ROLE_CONFIG_KEYS = new Set<string>(
   RECRUITER_ASSISTANT_ROLE_LOCKS.map((entry) => entry.key),
 )

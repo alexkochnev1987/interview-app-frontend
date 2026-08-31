@@ -61,10 +61,6 @@ export function getAssistantPromptKeys(
   return keys.filter((key) => !WRITE_PROMPT_KEYS.has(key))
 }
 
-export function isAssistantWritePromptKey(promptKey: AssistantPromptKey): boolean {
-  return WRITE_PROMPT_KEYS.has(promptKey)
-}
-
 export function getAssistantPromptMessageKey(
   role: AssistantWelcomeRole,
   promptKey: AssistantPromptKey,
