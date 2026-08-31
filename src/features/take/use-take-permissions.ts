@@ -4,41 +4,12 @@ import type { PermissionStatus } from '@/components/take/types'
 import type { TakeStage } from '@/components/take/types'
 
 import type { TakeMessageGetter } from './messages'
-
-type ScreenTrackSettings = MediaTrackSettings & { displaySurface?: string }
-
-type InterviewDisplayMediaOptions = DisplayMediaStreamOptions & {
-  monitorTypeSurfaces?: 'include' | 'exclude'
-  selfBrowserSurface?: 'include' | 'exclude'
-  surfaceSwitching?: 'include' | 'exclude'
-  systemAudio?: 'include' | 'exclude'
-}
-
-const INTERVIEW_DISPLAY_MEDIA_OPTIONS: InterviewDisplayMediaOptions = {
-  video: true,
-  audio: true,
-  monitorTypeSurfaces: 'include',
-  selfBrowserSurface: 'exclude',
-  surfaceSwitching: 'include',
-  systemAudio: 'include',
-}
-
-function readDisplaySurface(screenTrack: MediaStreamTrack): string {
-  return (screenTrack.getSettings() as ScreenTrackSettings).displaySurface ?? 'unknown'
-}
-
-function isAcceptedInterviewDisplaySurface(displaySurface: string): boolean {
-  return displaySurface === 'monitor'
-}
-
-function logInterviewDisplaySurfaceRejected(context: string, displaySurface: string) {
-  if (process.env.NODE_ENV === 'development') {
-    console.debug('[take:screen] Rejected capture: expected displaySurface "monitor".', {
-      context,
-      displaySurface,
-    })
-  }
-}
+import {
+  INTERVIEW_DISPLAY_MEDIA_OPTIONS,
+  isAcceptedInterviewDisplaySurface,
+  logInterviewDisplaySurfaceRejected,
+  readDisplaySurface,
+} from './utils'
 
 interface UseTakePermissionsParams {
   setSetupBusy: (value: boolean) => void

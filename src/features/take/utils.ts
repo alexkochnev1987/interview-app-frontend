@@ -127,3 +127,38 @@ export function formatRecordingLimitLabel(seconds: number) {
   }
   return `${minutes} min ${remainder} sec`
 }
+
+export type ScreenTrackSettings = MediaTrackSettings & { displaySurface?: string }
+
+export type InterviewDisplayMediaOptions = DisplayMediaStreamOptions & {
+  monitorTypeSurfaces?: 'include' | 'exclude'
+  selfBrowserSurface?: 'include' | 'exclude'
+  surfaceSwitching?: 'include' | 'exclude'
+  systemAudio?: 'include' | 'exclude'
+}
+
+export const INTERVIEW_DISPLAY_MEDIA_OPTIONS: InterviewDisplayMediaOptions = {
+  video: true,
+  audio: true,
+  monitorTypeSurfaces: 'include',
+  selfBrowserSurface: 'exclude',
+  surfaceSwitching: 'include',
+  systemAudio: 'include',
+}
+
+export function readDisplaySurface(screenTrack: MediaStreamTrack): string {
+  return (screenTrack.getSettings() as ScreenTrackSettings).displaySurface ?? 'unknown'
+}
+
+export function isAcceptedInterviewDisplaySurface(displaySurface: string): boolean {
+  return displaySurface === 'monitor'
+}
+
+export function logInterviewDisplaySurfaceRejected(context: string, displaySurface: string) {
+  if (process.env.NODE_ENV === 'development') {
+    console.debug('[take:screen] Rejected capture: expected displaySurface "monitor".', {
+      context,
+      displaySurface,
+    })
+  }
+}
