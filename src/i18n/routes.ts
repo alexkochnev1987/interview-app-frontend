@@ -38,5 +38,8 @@ export const routes = {
     home: '/',
     interviewDetail: (id: string) => `/portal/interviews/${encodeURIComponent(id)}`,
     help: '/portal/help',
+    // Top-level (not nested under /portal), matching /take and /feedback —
+    // it's a chrome-less take-flow-style route, gated via isCandidateFlowPath.
+    practice: '/practice',
   },
 } as const

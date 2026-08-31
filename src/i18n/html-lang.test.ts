@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest'
 import { isCandidateFlowPath } from '@/i18n/html-lang'
 
 describe('isCandidateFlowPath', () => {
-  it('matches take and feedback paths', () => {
-    for (const base of ['/take', '/feedback']) {
+  it('matches take, feedback, and practice paths', () => {
+    for (const base of ['/take', '/feedback', '/practice']) {
       expect(isCandidateFlowPath(base)).toBe(true)
       expect(isCandidateFlowPath(`${base}/123`)).toBe(true)
     }
