@@ -10,6 +10,7 @@ import { Section } from '@/components/ui/layout/section'
 import { Stack } from '@/components/ui/layout/stack'
 import { BodyText, SectionHeading } from '@/components/ui/text'
 import { PortalInterviewList } from '@/features/portal/portal-interview-list'
+import { buildPracticeInterviewListItem } from '@/features/portal/practice-interview-item'
 import type { Locale } from '@/i18n/locales'
 import { routes } from '@/i18n/routes'
 import type { CandidatePortalInterviewListItem, InterviewFacetsResponse } from '@/lib/api'
@@ -119,6 +120,13 @@ async function renderCandidateDashboard(locale: Locale, ctx: ServerRequestContex
     failed: t('status.failed'),
   }
 
+  // Only shown once the candidate already has a real interview — keeps the
+  // true-empty state (no interviews at all) untouched.
+  const displayItems =
+    items.length > 0
+      ? [buildPracticeInterviewListItem(t('myInterviews.practiceCardTitle')), ...items]
+      : items
+
   return (
     <PageShell>
       <Section gap={4}>
@@ -130,11 +138,12 @@ async function renderCandidateDashboard(locale: Locale, ctx: ServerRequestContex
           </BodyText>
         </Stack>
         <PortalInterviewList
-          items={items}
+          items={displayItems}
           emptyTitle={t('myInterviews.emptyTitle')}
           emptyDescription={t('myInterviews.emptyDescription')}
           statusLabels={statusLabels}
           updatedLabel={t('card.updatedLabel')}
+          practiceTagLabel={t('myInterviews.practiceTag')}
         />
       </Section>
     </PageShell>
