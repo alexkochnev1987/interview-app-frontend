@@ -4,6 +4,12 @@ import { localizedPath } from '@/i18n/pathname'
 import { routes } from '@/i18n/routes'
 import type { Answer } from '@/lib/api'
 
+export function hasAnswerMedia(answer: Answer): boolean {
+  return Boolean(
+    answer.mediaKey || answer.screenMediaKey || answer.camera?.mediaKey || answer.screen?.mediaKey,
+  )
+}
+
 export interface AnswerStatusPill {
   tone: 'completed' | 'processing' | 'failed' | 'pending'
   labelKey: string

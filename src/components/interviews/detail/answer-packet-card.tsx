@@ -2,7 +2,7 @@
 
 import { CircleAlert, LoaderCircle, Upload } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
 
 import type {
   AnswerMediaState,
@@ -23,6 +23,7 @@ import {
   RecordingPlayerError,
   RecordingPlayerSkeleton,
 } from '@/components/ui/recording-player'
+import { RecordingViewBanner } from '@/components/ui/recording-view-banner'
 import { StatusPill } from '@/components/ui/status-pill'
 import { SurfaceTile } from '@/components/ui/surface-tile'
 import { BodyText } from '@/components/ui/text'
@@ -33,6 +34,7 @@ import {
   formatFileSize,
   getAnswerStatusPill,
   getValidationTone,
+  hasAnswerMedia,
 } from '@/lib/interview-detail-format'
 import { formatInterviewDateTime } from '@/lib/interview-formatters'
 
@@ -328,6 +330,8 @@ export interface AnswerPacketCardProps {
   validating: boolean
   onUpload: (questionIndex: number, fileInput: HTMLInputElement | null) => void
   onLoadMedia?: (questionIndex: number) => void
+  showRecording: boolean
+  onShowRecording: () => void
 }
 
 export function AnswerPacketCard({
@@ -341,45 +345,20 @@ export function AnswerPacketCard({
   validating,
   onUpload,
   onLoadMedia,
+  showRecording,
+  onShowRecording,
 }: AnswerPacketCardProps) {
   const t = useTranslations('questions.common')
   const tDetail = useTranslations('interviews.detail')
   const fileInputRef = useRef<HTMLInputElement | null>(null)
-  const cardRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    const el = cardRef.current
-    if (
-      !el ||
-      !onLoadMedia ||
-      !answer ||
-      (!answer.mediaKey && !answer.screenMediaKey && !answer.camera && !answer.screen)
-    ) {
-      return
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          onLoadMedia(questionIndex)
-          observer.disconnect()
-        }
-      },
-      { rootMargin: '200px 0px' },
-    )
-
-    observer.observe(el)
-
-    return () => {
-      observer.disconnect()
-    }
-  }, [questionIndex, answer, onLoadMedia])
+  const answerHasMedia = answer ? hasAnswerMedia(answer) : false
 
   const statusPill = getAnswerStatusPill(answer, uploadState)
 
   return (
     <HoverGroup>
-      <Card variant="surface" interaction="hover" ref={cardRef}>
+      <Card variant="surface" interaction="hover">
         <CardHeader spacing="md">
           <Inline gap={4} align="start" justify="between" wrap="wrap">
             <Stack gap={3}>
@@ -440,16 +419,21 @@ export function AnswerPacketCard({
             </SurfaceTile>
           ) : null}
 
-          {answer &&
-          (answer.mediaKey ||
-            answer.screenMediaKey ||
-            answer.camera?.mediaKey ||
-            answer.screen?.mediaKey) ? (
-            <AnswerMediaPanels
-              media={media}
-              answer={answer}
-              onRetry={onLoadMedia ? () => onLoadMedia(questionIndex) : undefined}
-            />
+          {answer && answerHasMedia ? (
+            showRecording ? (
+              <AnswerMediaPanels
+                media={media}
+                answer={answer}
+                onRetry={onLoadMedia ? () => onLoadMedia(questionIndex) : undefined}
+              />
+            ) : (
+              <RecordingViewBanner
+                eyebrowLabel={t('recordingBannerEyebrow')}
+                description={t('recordingBannerDescription')}
+                actionLabel={t('loadRecording')}
+                onAction={onShowRecording}
+              />
+            )
           ) : null}
 
           <ConceptsGrid question={question} />

@@ -32,11 +32,17 @@ export function useAnswerMedia({ id, interview, failedLoadMediaLabel }: UseAnswe
       }
 
       const answer = interview.answers.find((a) => a.questionIndex === questionIndex)
-      if (!answer || (!answer.mediaKey && !answer.screenMediaKey)) {
+      const hasMedia = Boolean(
+        answer?.mediaKey ||
+        answer?.screenMediaKey ||
+        answer?.camera?.mediaKey ||
+        answer?.screen?.mediaKey,
+      )
+      if (!answer || !hasMedia) {
         return
       }
 
-      const mediaFingerprint = `${answer.mediaKey ?? ''}|${answer.screenMediaKey ?? ''}`
+      const mediaFingerprint = `${answer.mediaKey ?? answer.camera?.mediaKey ?? ''}|${answer.screenMediaKey ?? answer.screen?.mediaKey ?? ''}`
       if (requestedMediaRef.current.get(questionIndex) === mediaFingerprint) {
         return
       }
