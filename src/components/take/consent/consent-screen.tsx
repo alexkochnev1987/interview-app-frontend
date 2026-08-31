@@ -26,6 +26,10 @@ interface TakeConsentScreenProps {
   setupError: string
   sessionSyncError?: string | null
   continueDisabled?: boolean
+  eyebrowOverride?: string
+  headingOverride?: string
+  fairnessDescriptionOverride?: string
+  checkboxHintOverride?: string
   onConsentChange: (checked: boolean) => void
   onContinueToLobby: () => void
   onRetrySessionSync?: () => void
@@ -37,6 +41,10 @@ export function TakeConsentScreen({
   setupError,
   sessionSyncError = null,
   continueDisabled = false,
+  eyebrowOverride,
+  headingOverride,
+  fairnessDescriptionOverride,
+  checkboxHintOverride,
   onConsentChange,
   onContinueToLobby,
   onRetrySessionSync,
@@ -46,13 +54,13 @@ export function TakeConsentScreen({
     <SurfaceCard tone="glassFloat" grow="fill" size="lg">
       <CardContent layout="fill-column" spacing="xl">
         <EyebrowBadge icon={<ListVideo size={14} strokeWidth={2} />}>
-          {tTake('consentEyebrow')}
+          {eyebrowOverride ?? tTake('consentEyebrow')}
         </EyebrowBadge>
         <Grid columns="consent-shell" gap={10} grow="fill">
           <Stack gap={5} height="full">
             <Stack gap={3}>
               <Heading variant="sectionHeroTitle">
-                {tTake('consentInterviewFor', { position: interview.position })}
+                {headingOverride ?? tTake('consentInterviewFor', { position: interview.position })}
               </Heading>
               <Text variant="heroDescription">
                 {tTake('consentWelcome', {
@@ -61,7 +69,7 @@ export function TakeConsentScreen({
                 })}
               </Text>
             </Stack>
-            <TakeCapabilityCards />
+            <TakeCapabilityCards fairnessDescriptionOverride={fairnessDescriptionOverride} />
           </Stack>
 
           <Stack gap={5} height="full">
@@ -122,7 +130,11 @@ export function TakeConsentScreen({
                 </Alert>
               ) : null}
 
-              <TakeConsentCheckboxBlock consent={consent} onConsentChange={onConsentChange} />
+              <TakeConsentCheckboxBlock
+                consent={consent}
+                onConsentChange={onConsentChange}
+                hintOverride={checkboxHintOverride}
+              />
 
               <Stack width="full">
                 <Button
