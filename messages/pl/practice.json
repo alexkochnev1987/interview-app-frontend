@@ -1,0 +1,21 @@
+{
+  "practice": {
+    "eyebrow": "Sesja treningowa",
+    "heading": "Rozmowa treningowa",
+    "position": "Rozmowa treningowa",
+    "exitLabel": "Zakończ trening",
+    "checkboxHint": "To sesja treningowa — nic, co nagrasz, nie jest zapisywane, oceniane ani nikomu pokazywane.",
+    "fairnessDescription": "To tylko trening — nic tutaj nie jest monitorowane ani oceniane.",
+    "questions": {
+      "aboutYourself": "Opowiedz o sobie.",
+      "whyInterested": "Dlaczego interesuje Cię to stanowisko?"
+    },
+    "complete": {
+      "title": "Świetna robota, {candidateName}!",
+      "description": "To ten sam proces, który czeka Cię podczas prawdziwej rozmowy. Nic z tej sesji treningowej nie zostało zapisane, ocenione ani nikomu udostępnione — jesteś gotowy/a, gdy przyjdzie czas.",
+      "homeCta": "Powrót do moich rozmów"
+    },
+    "forbiddenTitle": "Tylko dla portalu kandydata",
+    "forbiddenDescription": "Ta strona jest dostępna tylko dla kont kandydatów."
+  }
+}

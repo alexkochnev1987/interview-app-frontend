@@ -9,7 +9,9 @@
       "loadFailedTitle": "Couldn't load your interviews",
       "loadFailedFallback": "Something went wrong loading your interviews. Please try again.",
       "forbiddenTitle": "Candidate portal only",
-      "forbiddenDescription": "This page is only available to candidate accounts."
+      "forbiddenDescription": "This page is only available to candidate accounts.",
+      "practiceCardTitle": "Practice Interview",
+      "practiceTag": "Unlimited"
     },
     "status": {
       "not_started": "Not started",
