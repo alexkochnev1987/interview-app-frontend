@@ -289,6 +289,7 @@ export function useInterviewsQuery(
       state.position !== base.position ||
       state.status !== base.status ||
       state.assignedHrId !== base.assignedHrId ||
+      state.candidateEmail !== base.candidateEmail ||
       state.sortBy !== base.sortBy ||
       state.sortOrder !== base.sortOrder
     )

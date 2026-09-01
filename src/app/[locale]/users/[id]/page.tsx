@@ -1,5 +1,6 @@
 import { getTranslations } from 'next-intl/server'
 
+import { QueryHydrationBoundary } from '@/components/questions/query-hydration-boundary'
 import { FlashErrorPageFallback } from '@/components/ui/flash-error-page-fallback'
 import { ForbiddenAccessPage } from '@/components/ui/forbidden-access-page'
 import { PageShell } from '@/components/ui/layout/page-shell'
@@ -8,6 +9,12 @@ import type { Locale } from '@/i18n/locales'
 import { type TeamMember } from '@/lib/api'
 import { isApiError } from '@/lib/api-error'
 import { enforcePageAuth, redirectIfUnauthorizedError } from '@/lib/auth-gate'
+import { APP_ROLE, canAssignInterviewHr, canConfigureInterview } from '@/lib/auth-roles'
+import { normalizeEmail } from '@/lib/email-validation'
+import {
+  prefetchCandidateInterviews,
+  prefetchHrAssignedInterviews,
+} from '@/lib/interviews-library-prefetch'
 import { requestServer } from '@/lib/server-fetch'
 import { canViewUserProfile } from '@/lib/user-profile-access'
 
@@ -64,9 +71,47 @@ export default async function UserProfilePage({ params }: UserProfilePageProps) 
 
   const mode = auth.me.id === user.id ? 'self' : 'member'
 
+  let assignedInterviewsPrefetch
+  if (user.role === APP_ROLE.hr && canAssignInterviewHr(auth.me.role)) {
+    try {
+      assignedInterviewsPrefetch = await prefetchHrAssignedInterviews(auth.ctx, user.id)
+    } catch (err) {
+      redirectIfUnauthorizedError(err, returnPath, locale)
+    }
+  }
+
+  let candidateInterviewsPrefetch
+  if (user.role === APP_ROLE.candidate && canConfigureInterview(auth.me.role)) {
+    try {
+      candidateInterviewsPrefetch = await prefetchCandidateInterviews(
+        auth.ctx,
+        normalizeEmail(user.email),
+      )
+    } catch (err) {
+      redirectIfUnauthorizedError(err, returnPath, locale)
+    }
+  }
+
+  const profile = (
+    <ProfileView
+      user={user}
+      mode={mode}
+      assignedInterviewsPrefetch={assignedInterviewsPrefetch}
+      candidateInterviewsPrefetch={candidateInterviewsPrefetch}
+    />
+  )
+
+  const interviewsPrefetch = assignedInterviewsPrefetch ?? candidateInterviewsPrefetch
+
   return (
     <PageShell>
-      <ProfileView user={user} mode={mode} />
+      {interviewsPrefetch ? (
+        <QueryHydrationBoundary state={interviewsPrefetch.dehydratedState}>
+          {profile}
+        </QueryHydrationBoundary>
+      ) : (
+        profile
+      )}
     </PageShell>
   )
 }

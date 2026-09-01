@@ -3857,6 +3857,15 @@
             }
           },
           {
+            "name": "candidateEmail",
+            "required": false,
+            "in": "query",
+            "description": "Filter by registered candidate account email (exact match, case-insensitive).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "paginated",
             "required": false,
             "in": "query",
@@ -3974,6 +3983,15 @@
             "required": false,
             "in": "query",
             "description": "Filter by assigned HR reviewer UUID, or the literal `unassigned` for interviews with no assignee.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "candidateEmail",
+            "required": false,
+            "in": "query",
+            "description": "Filter by registered candidate account email (exact match, case-insensitive).",
             "schema": {
               "type": "string"
             }

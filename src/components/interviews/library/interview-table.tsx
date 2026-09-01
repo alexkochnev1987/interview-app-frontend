@@ -31,6 +31,7 @@ export type InterviewTableProps = {
   onRowClick: (interview: InterviewListItem) => void
   page: number
   loading: boolean
+  surfaceVariant?: 'card' | 'plain'
 }
 
 export function InterviewTable({
@@ -41,6 +42,7 @@ export function InterviewTable({
   onRowClick,
   page,
   loading,
+  surfaceVariant = 'card',
 }: InterviewTableProps) {
   const t = useTranslations('interviews.library.table')
   const sharedLabels = useSharedLabels()
@@ -61,7 +63,12 @@ export function InterviewTable({
   })
 
   return (
-    <DataTableSurface rootRef={rootRef} loading={loading} hasItems={items.length > 0}>
+    <DataTableSurface
+      rootRef={rootRef}
+      loading={loading}
+      hasItems={items.length > 0}
+      variant={surfaceVariant}
+    >
       <TableHeader>
         <TableRow interactive="none">
           <SortableTableHead

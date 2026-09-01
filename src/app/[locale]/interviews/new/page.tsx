@@ -9,9 +9,11 @@ import { PageShell } from '@/components/ui/layout/page-shell'
 import type { Locale } from '@/i18n/locales'
 import { Link } from '@/i18n/navigation'
 import { routes } from '@/i18n/routes'
+import type { TeamMember } from '@/lib/api'
 import { enforcePageAuth } from '@/lib/auth-gate'
-import { canConfigureInterview } from '@/lib/auth-roles'
+import { APP_ROLE, canAssignInterviewHr, canConfigureInterview } from '@/lib/auth-roles'
 import { prefetchInterviewCreatePicker } from '@/lib/questions-library-prefetch'
+import { requestServer } from '@/lib/server-fetch'
 import { fetchInterview, fetchTemplate } from '@/lib/templates-prefetch'
 
 const ERROR_BACK_HREF = '/'
@@ -21,6 +23,7 @@ interface NewInterviewPageProps {
   searchParams: Promise<{
     templateId?: string | string[]
     fromInterview?: string | string[]
+    assignedHrId?: string | string[]
     candidateName?: string | string[]
     candidateEmail?: string | string[]
     position?: string | string[]
@@ -36,12 +39,14 @@ export default async function NewInterviewPage({ params, searchParams }: NewInte
   const {
     templateId: templateIdParam,
     fromInterview: fromInterviewParam,
+    assignedHrId: assignedHrIdParam,
     candidateName: candidateNameParam,
     candidateEmail: candidateEmailParam,
     position: positionParam,
   } = await searchParams
   const templateId = firstSearchParam(templateIdParam)
   const fromInterview = firstSearchParam(fromInterviewParam)
+  const assignedHrIdQuery = firstSearchParam(assignedHrIdParam)
   const candidateName = firstSearchParam(candidateNameParam)
   const candidateEmail = firstSearchParam(candidateEmailParam)
   const positionFromQuery = firstSearchParam(positionParam)
@@ -98,6 +103,27 @@ export default async function NewInterviewPage({ params, searchParams }: NewInte
   const prefillQuestions = template?.questions ?? sourceInterview?.questions
   const prefillPosition = positionFromQuery ?? template?.position ?? sourceInterview?.position
 
+  let initialAssignedHrId: string | undefined
+  let lockAssignedHr = false
+  let allowDemoWrite = false
+
+  if (assignedHrIdQuery && canAssignInterviewHr(auth.me.role)) {
+    try {
+      const assignedHrUser =
+        (await requestServer<TeamMember>(
+          `/users/${encodeURIComponent(assignedHrIdQuery)}`,
+          auth.ctx,
+        )) ?? null
+      if (assignedHrUser?.role === APP_ROLE.hr && (!auth.me.demo || assignedHrUser.demo)) {
+        initialAssignedHrId = assignedHrUser.id
+        lockAssignedHr = true
+        allowDemoWrite = auth.me.demo && assignedHrUser.demo
+      }
+    } catch {
+      // Ignore invalid prefill; form stays unassigned.
+    }
+  }
+
   return (
     <PageShell>
       <InterviewCreateIntro />
@@ -130,6 +156,9 @@ export default async function NewInterviewPage({ params, searchParams }: NewInte
           initialCandidateEmail={candidateEmail}
           initialPosition={prefillPosition}
           initialTemplateId={template ? templateId : undefined}
+          initialAssignedHrId={initialAssignedHrId}
+          lockAssignedHr={lockAssignedHr}
+          allowDemoWrite={allowDemoWrite}
         />
       </QueryHydrationBoundary>
     </PageShell>
