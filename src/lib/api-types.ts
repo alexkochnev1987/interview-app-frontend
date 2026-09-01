@@ -4875,6 +4875,8 @@ export interface operations {
                 status?: "pending" | "in_progress" | "processing" | "completed" | "failed";
                 /** @description Filter by assigned HR reviewer UUID, or the literal `unassigned` for interviews with no assignee. */
                 assignedHrId?: string;
+                /** @description Filter by registered candidate account email (exact match, case-insensitive). */
+                candidateEmail?: string;
                 /**
                  * @deprecated
                  * @description Deprecated legacy flag from the pre-filter list API. Accepted for backward compatibility but ignored; this endpoint always returns a paginated { items, total, page, limit } envelope.
@@ -4967,6 +4969,8 @@ export interface operations {
             query?: {
                 /** @description Filter by assigned HR reviewer UUID, or the literal `unassigned` for interviews with no assignee. */
                 assignedHrId?: string;
+                /** @description Filter by registered candidate account email (exact match, case-insensitive). */
+                candidateEmail?: string;
                 status?: "pending" | "in_progress" | "processing" | "completed" | "failed";
                 /** @description Filter by position (exact match) */
                 position?: string;

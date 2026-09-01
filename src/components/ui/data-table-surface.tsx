@@ -13,6 +13,8 @@ export type DataTableSurfaceProps = {
   tabularWidth?: TableProps['tabularWidth']
   scrollbar?: TableProps['scrollbar']
   minRows?: TableProps['minRows']
+  /** `card` wraps the table in a surface card; `plain` renders the table only. */
+  variant?: 'card' | 'plain'
   children: ReactNode
 }
 
@@ -24,14 +26,25 @@ export function DataTableSurface({
   tabularWidth = 'wide',
   scrollbar = 'top',
   minRows,
+  variant = 'card',
   children,
 }: DataTableSurfaceProps) {
-  return (
-    <Card variant="surface" ref={rootRef}>
+  const content = (
+    <>
       <LoadingBar visible={loading && hasItems} />
       <Table tabularWidth={tabularWidth} scrollbar={scrollbar} minRows={minRows}>
         {children}
       </Table>
+    </>
+  )
+
+  if (variant === 'plain') {
+    return <div ref={rootRef}>{content}</div>
+  }
+
+  return (
+    <Card variant="surface" ref={rootRef}>
+      {content}
     </Card>
   )
 }
