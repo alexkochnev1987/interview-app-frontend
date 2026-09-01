@@ -12,6 +12,7 @@ import {
   buildInterviewsFetchParams,
   buildInterviewsInfiniteParams,
   DEFAULT_INTERVIEWS_LIMIT,
+  DEFAULT_INTERVIEWS_QUERY,
   emptyPaginatedInterviews,
   EMPTY_INTERVIEW_FACETS,
   resolveInterviewsQueryState,
@@ -119,5 +120,37 @@ export async function prefetchInterviewsLibrary(
   return hydrateInterviewsLibrary(ctx, queryState, {
     prefetchList: isTableView,
     prefetchInfinite: !isTableView,
+  })
+}
+
+export async function prefetchHrAssignedInterviews(
+  ctx: ServerRequestContext,
+  hrUserId: string,
+): Promise<InterviewsLibraryPrefetch> {
+  const queryState: InterviewsQueryState = {
+    ...DEFAULT_INTERVIEWS_QUERY,
+    assignedHrId: hrUserId,
+    view: 'table',
+  }
+
+  return hydrateInterviewsLibrary(ctx, queryState, {
+    prefetchList: true,
+    prefetchInfinite: false,
+  })
+}
+
+export async function prefetchCandidateInterviews(
+  ctx: ServerRequestContext,
+  candidateEmail: string,
+): Promise<InterviewsLibraryPrefetch> {
+  const queryState: InterviewsQueryState = {
+    ...DEFAULT_INTERVIEWS_QUERY,
+    candidateEmail,
+    view: 'table',
+  }
+
+  return hydrateInterviewsLibrary(ctx, queryState, {
+    prefetchList: true,
+    prefetchInfinite: false,
   })
 }

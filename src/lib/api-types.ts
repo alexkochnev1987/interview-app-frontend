@@ -2045,22 +2045,12 @@ export interface components {
             name: string;
             email: string;
         };
-        MediaRemediationMetaDto: {
-            /** @enum {string} */
-            status: "idle" | "processing" | "completed" | "failed";
-            /** Format: date-time */
-            startedAt?: string;
-            /** Format: date-time */
-            completedAt?: string;
-            errorMessage?: string;
-        };
         MediaArtifactDto: {
             mediaKey: string;
             contentType: string;
             fileSizeBytes?: number;
             /** Format: date-time */
             uploadedAt: string;
-            remediation?: components["schemas"]["MediaRemediationMetaDto"];
         };
         AnswerBehaviorSignalsDto: {
             tabHiddenCount: number;
@@ -4875,6 +4865,8 @@ export interface operations {
                 status?: "pending" | "in_progress" | "processing" | "completed" | "failed";
                 /** @description Filter by assigned HR reviewer UUID, or the literal `unassigned` for interviews with no assignee. */
                 assignedHrId?: string;
+                /** @description Filter by registered candidate account email (exact match, case-insensitive). */
+                candidateEmail?: string;
                 /**
                  * @deprecated
                  * @description Deprecated legacy flag from the pre-filter list API. Accepted for backward compatibility but ignored; this endpoint always returns a paginated { items, total, page, limit } envelope.
@@ -4967,6 +4959,8 @@ export interface operations {
             query?: {
                 /** @description Filter by assigned HR reviewer UUID, or the literal `unassigned` for interviews with no assignee. */
                 assignedHrId?: string;
+                /** @description Filter by registered candidate account email (exact match, case-insensitive). */
+                candidateEmail?: string;
                 status?: "pending" | "in_progress" | "processing" | "completed" | "failed";
                 /** @description Filter by position (exact match) */
                 position?: string;

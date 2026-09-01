@@ -25,6 +25,9 @@ interface AnswerPacketListProps {
   validating: boolean
   onUpload: (questionIndex: number, fileInput: HTMLInputElement | null) => void
   onLoadMedia?: (questionIndex: number) => void
+  loadAllRecordings: boolean
+  expandedRecordings: Set<number>
+  onShowRecording: (questionIndex: number) => void
 }
 
 export function AnswerPacketList({
@@ -37,6 +40,9 @@ export function AnswerPacketList({
   validating,
   onUpload,
   onLoadMedia,
+  loadAllRecordings,
+  expandedRecordings,
+  onShowRecording,
 }: AnswerPacketListProps) {
   const t = useTranslations('questions.common')
 
@@ -57,6 +63,7 @@ export function AnswerPacketList({
             status: 'idle',
           }
           const media = mediaByQuestion[questionIndex]
+          const showRecording = loadAllRecordings || expandedRecordings.has(questionIndex)
 
           return (
             <AnswerPacketCard
@@ -71,6 +78,8 @@ export function AnswerPacketList({
               validating={validating}
               onUpload={onUpload}
               onLoadMedia={onLoadMedia}
+              showRecording={showRecording}
+              onShowRecording={() => onShowRecording(questionIndex)}
             />
           )
         })}
