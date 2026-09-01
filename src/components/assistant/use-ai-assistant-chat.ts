@@ -22,7 +22,7 @@ import { resolveAssistantWelcomeRole } from './assistant-i18n'
 import {
   enrichInterviewFormRedirect,
   findRecentInterviewFormRedirect,
-  isCreateOwnChoiceMessage,
+  shouldInterceptCreateOwnChoice,
 } from './assistant-interview-form-redirect'
 import { shouldAttachHrList } from './assistant-show-hrs'
 import { buildAssistantRedirectHref } from './build-assistant-redirect-href'
@@ -185,7 +185,9 @@ export function useAiAssistantChat() {
     setError(null)
     clearPendingAction()
 
-    if (isCreateOwnChoiceMessage(text)) {
+    const interceptCreateOwn = shouldInterceptCreateOwnChoice(messages, text)
+
+    if (interceptCreateOwn) {
       const redirect = findRecentInterviewFormRedirect(messages)
       if (redirect) {
         completeCreateOwnRedirect(text, redirect, options?.displayText)
@@ -194,7 +196,11 @@ export function useAiAssistantChat() {
     }
 
     setLoading(true)
-    appendMessage({ role: 'user', text: options?.displayText ?? text })
+    appendMessage({
+      role: 'user',
+      text: options?.displayText ?? text,
+      ...(options?.displayText ? { sentMessage: text } : {}),
+    })
 
     const { abortController, requestId } = beginRequest()
 
@@ -221,7 +227,7 @@ export function useAiAssistantChat() {
         result,
       })
       applyLocaleFromResult(result)
-      if (isCreateOwnChoiceMessage(text) && result.redirect) {
+      if (interceptCreateOwn && result.redirect) {
         router.push(
           buildAssistantRedirectHref(enrichInterviewFormRedirect(result.redirect, messages)),
         )
