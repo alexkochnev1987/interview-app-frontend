@@ -15,6 +15,7 @@ import { Grid } from '@/components/ui/layout/grid'
 import { Inline } from '@/components/ui/layout/inline'
 import { Stack } from '@/components/ui/layout/stack'
 import { MetricPanel } from '@/components/ui/metric-panel'
+import { RecordingViewBanner } from '@/components/ui/recording-view-banner'
 import { StatusPill } from '@/components/ui/status-pill'
 import { BodyText } from '@/components/ui/text'
 import { UnstyledLink } from '@/components/ui/unstyled-link'
@@ -49,6 +50,8 @@ interface InterviewSummaryCardProps {
   onStartEditing: () => void
   onOpenCancelConfirm: () => void
   onOpenDeleteConfirm: () => void
+  showLoadAllRecordings?: boolean
+  onLoadAllRecordings?: () => void
 }
 
 function renderActionButtons(buttons: ReadonlyArray<{ id: string; node: ReactNode }>) {
@@ -70,6 +73,8 @@ export function InterviewSummaryCard({
   onStartEditing,
   onOpenCancelConfirm,
   onOpenDeleteConfirm,
+  showLoadAllRecordings,
+  onLoadAllRecordings,
 }: InterviewSummaryCardProps) {
   const t = useTranslations('questions.common')
   const tDetail = useTranslations('interviews.detail')
@@ -267,6 +272,15 @@ export function InterviewSummaryCard({
             valueSize="lg"
           />
         </Grid>
+
+        {showLoadAllRecordings && onLoadAllRecordings ? (
+          <RecordingViewBanner
+            eyebrowLabel={t('loadAllRecordingsEyebrow')}
+            description={t('loadAllRecordingsDescription')}
+            actionLabel={t('loadAllRecordings')}
+            onAction={onLoadAllRecordings}
+          />
+        ) : null}
       </CardContent>
     </Card>
   )
