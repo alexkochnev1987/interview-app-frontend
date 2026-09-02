@@ -9,7 +9,9 @@
       "loadFailedTitle": "Nie udało się wczytać Twoich rozmów",
       "loadFailedFallback": "Wystąpił błąd podczas wczytywania Twoich rozmów. Spróbuj ponownie.",
       "forbiddenTitle": "Tylko dla portalu kandydata",
-      "forbiddenDescription": "Ta strona jest dostępna tylko dla kont kandydatów."
+      "forbiddenDescription": "Ta strona jest dostępna tylko dla kont kandydatów.",
+      "practiceCardTitle": "Rozmowa treningowa",
+      "practiceTag": "Bez limitu"
     },
     "status": {
       "not_started": "Nie rozpoczęto",

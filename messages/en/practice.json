@@ -1,0 +1,21 @@
+{
+  "practice": {
+    "eyebrow": "Practice session",
+    "heading": "Practice interview",
+    "position": "Practice interview",
+    "exitLabel": "Exit practice",
+    "checkboxHint": "This is a practice session — nothing you record is saved, scored, or shown to anyone.",
+    "fairnessDescription": "This is just practice — nothing here is monitored or scored.",
+    "questions": {
+      "aboutYourself": "Tell us about yourself.",
+      "whyInterested": "Why are you interested in this position?"
+    },
+    "complete": {
+      "title": "Nice work, {candidateName}!",
+      "description": "That's the same flow you'll use for your real interview. Nothing from this practice session was saved, scored, or shared with anyone — you're ready when it counts.",
+      "homeCta": "Back to my interviews"
+    },
+    "forbiddenTitle": "Candidate portal only",
+    "forbiddenDescription": "This page is only available to candidate accounts."
+  }
+}

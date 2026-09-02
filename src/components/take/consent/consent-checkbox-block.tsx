@@ -10,11 +10,13 @@ import { Text } from '@/components/ui/text'
 interface TakeConsentCheckboxBlockProps {
   consent: boolean
   onConsentChange: (checked: boolean) => void
+  hintOverride?: string
 }
 
 export function TakeConsentCheckboxBlock({
   consent,
   onConsentChange,
+  hintOverride,
 }: TakeConsentCheckboxBlockProps) {
   const tTake = useTranslations('takeFlow')
   return (
@@ -32,7 +34,7 @@ export function TakeConsentCheckboxBlock({
               {tTake('consentCheckboxLabel')}
             </Text>
           </Label>
-          <Text variant="bodyMutedSm">{tTake('consentCheckboxHint')}</Text>
+          <Text variant="bodyMutedSm">{hintOverride ?? tTake('consentCheckboxHint')}</Text>
         </Stack>
       </Inline>
     </Panel>

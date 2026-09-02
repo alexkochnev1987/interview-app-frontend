@@ -32,7 +32,11 @@ function CapabilityCard({ icon: Icon, title, description }: CapabilityCardProps)
   )
 }
 
-export function TakeCapabilityCards() {
+interface TakeCapabilityCardsProps {
+  fairnessDescriptionOverride?: string
+}
+
+export function TakeCapabilityCards({ fairnessDescriptionOverride }: TakeCapabilityCardsProps) {
   const tTake = useTranslations('takeFlow')
   const capabilityItems: CapabilityCardProps[] = [
     {
@@ -53,7 +57,7 @@ export function TakeCapabilityCards() {
     {
       icon: ShieldCheck,
       title: tTake('capabilityFairnessTitle'),
-      description: tTake('capabilityFairnessDescription'),
+      description: fairnessDescriptionOverride ?? tTake('capabilityFairnessDescription'),
     },
   ]
 

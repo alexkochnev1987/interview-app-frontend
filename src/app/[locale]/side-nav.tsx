@@ -2,6 +2,8 @@
 
 import {
   ClipboardList,
+  HelpCircle,
+  Home,
   LayoutDashboard,
   LayoutTemplate,
   LibraryBig,
@@ -32,6 +34,7 @@ import { routes } from '@/i18n/routes'
 import { useSharedLabels } from '@/i18n/use-shared-labels'
 import { useAuth, useIsDemo } from '@/lib/auth-context'
 import {
+  canAccessCandidatePortal,
   canAccessDashboard,
   canConfigureInterview,
   canManageTeam,
@@ -64,6 +67,9 @@ export function SideNav() {
   const links = [
     ...(canAccessDashboard(user?.role)
       ? [{ href: '/', label: tNav('dashboard'), icon: LayoutDashboard }]
+      : []),
+    ...(canAccessCandidatePortal(user?.role)
+      ? [{ href: routes.portal.home, label: tNav('myInterviews'), icon: Home }]
       : []),
     ...(canReadQuestions(user?.role)
       ? [
@@ -101,6 +107,9 @@ export function SideNav() {
     ...(canManageTeam(user?.role) ? [{ href: '/team', label: tNav('team'), icon: Users }] : []),
     ...(isSuperAdmin(user?.role)
       ? [{ href: '/config', label: tNav('config'), icon: SlidersHorizontal }]
+      : []),
+    ...(canAccessCandidatePortal(user?.role)
+      ? [{ href: routes.portal.help, label: tNav('help'), icon: HelpCircle }]
       : []),
   ]
 

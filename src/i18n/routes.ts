@@ -37,5 +37,9 @@ export const routes = {
     // not a separate landing page — see DashboardPage's role branch.
     home: '/',
     interviewDetail: (id: string) => `/portal/interviews/${encodeURIComponent(id)}`,
+    help: '/portal/help',
+    // Top-level (not nested under /portal), matching /take and /feedback —
+    // it's a chrome-less take-flow-style route, gated via isCandidateFlowPath.
+    practice: '/practice',
   },
 } as const

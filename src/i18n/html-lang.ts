@@ -5,7 +5,9 @@ export function isCandidateFlowPath(pathnameWithoutLocale: string): boolean {
     pathnameWithoutLocale === '/take' ||
     pathnameWithoutLocale.startsWith('/take/') ||
     pathnameWithoutLocale === '/feedback' ||
-    pathnameWithoutLocale.startsWith('/feedback/')
+    pathnameWithoutLocale.startsWith('/feedback/') ||
+    pathnameWithoutLocale === '/practice' ||
+    pathnameWithoutLocale.startsWith('/practice/')
   )
 }
 

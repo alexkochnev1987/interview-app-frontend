@@ -1,6 +1,7 @@
 {
   "nav": {
     "dashboard": "Dashboard",
+    "myInterviews": "My Interviews",
     "questions": "Questions",
     "assistant": "Assistant",
     "assessments": "Assessments",
@@ -10,6 +11,7 @@
     "logout": "Logout",
     "signIn": "Sign In",
     "templates": "Templates",
+    "help": "Help",
     "config": "System Config",
     "expandSidebar": "Expand sidebar",
     "collapseSidebar": "Collapse sidebar"

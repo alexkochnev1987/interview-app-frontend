@@ -1,0 +1,37 @@
+{
+  "help": {
+    "eyebrow": "Portal kandydata",
+    "title": "Pomoc i FAQ",
+    "lead": "Wszystko, co warto wiedzieć przed rozmową i w jej trakcie.",
+    "whatToExpect": {
+      "title": "Czego się spodziewać",
+      "body": "Każda rozmowa to krótka nagrywana sesja: pytania pojawiają się jedno po drugim, nagrywasz odpowiedź wideo i przechodzisz dalej, gdy jesteś gotowy/a. Nikt nie prowadzi rozmowy na żywo, więc możesz spokojnie zastanowić się przed rozpoczęciem nagrywania. Po ostatnim pytaniu Twoje odpowiedzi zostają wysłane automatycznie, a na ekranie pojawi się potwierdzenie."
+    },
+    "techRequirements": {
+      "title": "Wymagania techniczne",
+      "camera": "Upewnij się, że kamera i mikrofon działają",
+      "connection": "Znajdź ciche miejsce ze stabilnym połączeniem internetowym",
+      "browser": "Użyj aktualnej wersji Chrome, Firefox, Edge lub Safari",
+      "permissions": "Zezwól na dostęp do kamery i mikrofonu, gdy poprosi o to przeglądarka — bez tego nie będziesz mógł/mogła nagrywać odpowiedzi"
+    },
+    "gettingHelp": {
+      "title": "Jak uzyskać pomoc",
+      "body": "Masz problem przed rozmową lub w jej trakcie? Napisz do nas, a pomożemy to rozwiązać.",
+      "emailLabel": "E-mail wsparcia",
+      "email": "support@yourcompany.example"
+    },
+    "faq": {
+      "title": "Najczęściej zadawane pytania",
+      "cameraQuestion": "Co zrobić, jeśli kamera lub mikrofon nie działają?",
+      "cameraAnswer": "Sprawdź ustawienia witryny w przeglądarce i upewnij się, że dostęp do kamery i mikrofonu jest dozwolony, a następnie odśwież stronę. Jeśli problem się powtarza, skontaktuj się ze wsparciem, korzystając z danych powyżej.",
+      "retryQuestion": "Czy mogę nagrać odpowiedź ponownie?",
+      "retryAnswer": "Niektóre rozmowy dopuszczają ograniczoną liczbę prób nagrania na pytanie — jeśli została Ci jeszcze próba, po nagraniu zobaczysz opcję powtórzenia. Dokładny limit znajdziesz na stronie szczegółów Twojej rozmowy.",
+      "durationQuestion": "Ile trwa rozmowa?",
+      "durationAnswer": "Zależy to od liczby pytań, ale większość rozmów trwa od 15 do 30 minut. Liczbę pytań możesz sprawdzić na stronie szczegółów rozmowy przed rozpoczęciem.",
+      "resultsQuestion": "Kiedy zobaczę wyniki?",
+      "resultsAnswer": "Gdy wyniki będą gotowe, status Twojej rozmowy się zaktualizuje — możesz sprawdzać listę rozmów w dowolnym momencie."
+    },
+    "forbiddenTitle": "Tylko dla portalu kandydata",
+    "forbiddenDescription": "Ta strona jest dostępna tylko dla kont kandydatów."
+  }
+}

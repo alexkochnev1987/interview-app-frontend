@@ -1,6 +1,7 @@
 {
   "nav": {
     "dashboard": "Panel",
+    "myInterviews": "Moje rozmowy",
     "questions": "Pytania",
     "assistant": "Asystent",
     "assessments": "Oceny",
@@ -10,6 +11,7 @@
     "logout": "Wyloguj",
     "signIn": "Zaloguj się",
     "templates": "Szablony",
+    "help": "Pomoc",
     "config": "Konfiguracja",
     "expandSidebar": "Rozwiń pasek boczny",
     "collapseSidebar": "Zwiń pasek boczny"
