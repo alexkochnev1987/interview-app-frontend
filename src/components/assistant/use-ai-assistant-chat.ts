@@ -17,12 +17,12 @@ import { ApiError } from '@/lib/api-error'
 import { useAuth } from '@/lib/auth-context'
 
 import type { AiAssistantChatMessage } from './ai-assistant-chat-types'
-import { ASSISTANT_CONFIRM_MESSAGE } from './assistant-api-contract'
+import { ASSISTANT_CONFIRM_MESSAGE, buildAssistantUserMessage } from './assistant-api-contract'
 import { resolveAssistantWelcomeRole } from './assistant-i18n'
 import {
   enrichInterviewFormRedirect,
   findRecentInterviewFormRedirect,
-  isCreateOwnChoiceMessage,
+  shouldInterceptCreateOwnChoice,
 } from './assistant-interview-form-redirect'
 import { shouldAttachHrList } from './assistant-show-hrs'
 import { buildAssistantRedirectHref } from './build-assistant-redirect-href'
@@ -185,7 +185,9 @@ export function useAiAssistantChat() {
     setError(null)
     clearPendingAction()
 
-    if (isCreateOwnChoiceMessage(text)) {
+    const interceptCreateOwn = shouldInterceptCreateOwnChoice(messages, text)
+
+    if (interceptCreateOwn) {
       const redirect = findRecentInterviewFormRedirect(messages)
       if (redirect) {
         completeCreateOwnRedirect(text, redirect, options?.displayText)
@@ -194,7 +196,10 @@ export function useAiAssistantChat() {
     }
 
     setLoading(true)
-    appendMessage({ role: 'user', text: options?.displayText ?? text })
+    appendMessage({
+      role: 'user',
+      ...buildAssistantUserMessage(text, options?.displayText),
+    })
 
     const { abortController, requestId } = beginRequest()
 
@@ -221,7 +226,7 @@ export function useAiAssistantChat() {
         result,
       })
       applyLocaleFromResult(result)
-      if (isCreateOwnChoiceMessage(text) && result.redirect) {
+      if (interceptCreateOwn && result.redirect) {
         router.push(
           buildAssistantRedirectHref(enrichInterviewFormRedirect(result.redirect, messages)),
         )
@@ -252,7 +257,10 @@ export function useAiAssistantChat() {
 
     setError(null)
     setLoading(true)
-    appendMessage({ role: 'user', text: t('confirm.userMessage') })
+    appendMessage({
+      role: 'user',
+      ...buildAssistantUserMessage(ASSISTANT_CONFIRM_MESSAGE, t('confirm.userMessage')),
+    })
 
     const { abortController, requestId } = beginRequest()
 

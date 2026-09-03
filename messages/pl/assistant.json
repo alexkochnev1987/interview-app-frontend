@@ -22,10 +22,10 @@
     },
     "input": {
       "placeholder": {
-        "hr": "Zapytaj o swoje interview, recenzje lub tworzenie interview…",
-        "candidate": "Zapytaj o status ostatniego interview, ocenę według roli lub otwarte interview…",
-        "admin": "Zapytaj o nieprzypisane interview, filtry lub przypisywanie HR…",
-        "super_admin": "Zapytaj o interview, przypisania, pytania lub dane całej organizacji…"
+        "hr": "Zapytaj o swoje rozmowy kwalifikacyjne, oceny lub tworzenie rozmowy kwalifikacyjnej…",
+        "candidate": "Zapytaj o status ostatniej rozmowy kwalifikacyjnej, ocenę według roli lub otwarte rozmowy kwalifikacyjne…",
+        "admin": "Zapytaj o nieprzypisane rozmowy kwalifikacyjne, filtry lub przypisywanie HR…",
+        "super_admin": "Zapytaj o rozmowy kwalifikacyjne, przypisania, pytania lub dane całej organizacji…"
       },
       "awaiting": {
         "candidateName": "Wpisz imię kandydata…",
@@ -36,52 +36,52 @@
         "confirmAddDespiteSimilar": "Wybierz Kontynuuj lub Anuluj powyżej…",
         "templateChoice": "Wybierz szablon powyżej lub wpisz jego numer…",
         "hr": "Wybierz pracownika HR powyżej lub wpisz imię…",
-        "interview": "Wybierz interview powyżej lub wpisz nazwę/ID…"
+        "interview": "Wybierz rozmowę kwalifikacyjną powyżej lub wpisz nazwę/ID…"
       }
     },
     "welcome": {
       "intro": "Cześć, jestem Herman, Twoim asystentem AI ds. rekrutacji.",
       "lead": "Oto, w czym mogę pomóc:",
       "items": {
-        "myInterviews": "Wyświetl interview, których jesteś właścicielem lub do których jesteś przypisany",
-        "readyForReview": "Znajdź interview gotowe do oceny",
-        "interviewStatus": "Sprawdź status i szczegóły swoich interview",
-        "createFlow": "Przygotuj pytania i utwórz interview (po Twoim potwierdzeniu)",
-        "latestStatus": "Sprawdź status swojego ostatniego interview",
-        "statusByPosition": "Sprawdź status interview według nazwy roli",
-        "reviewedByPosition": "Sprawdź, czy konkretne interview zostało ocenione",
-        "openInterviews": "Wyświetl interview oczekujące na ukończenie",
-        "unassigned": "Wyświetl nieprzypisane interview",
+        "myInterviews": "Wyświetl rozmowy kwalifikacyjne, których jesteś właścicielem lub do których jesteś przypisany",
+        "readyForReview": "Znajdź rozmowy kwalifikacyjne gotowe do oceny",
+        "interviewStatus": "Sprawdź status i szczegóły swoich rozmów kwalifikacyjnych",
+        "createFlow": "Przygotuj pytania i utwórz rozmowę kwalifikacyjną (po Twoim potwierdzeniu)",
+        "latestStatus": "Sprawdź status swojej ostatniej rozmowy kwalifikacyjnej",
+        "statusByPosition": "Sprawdź status rozmowy kwalifikacyjnej według nazwy roli",
+        "reviewedByPosition": "Sprawdź, czy konkretna rozmowa kwalifikacyjna została oceniona",
+        "openInterviews": "Wyświetl rozmowy kwalifikacyjne oczekujące na ukończenie",
+        "unassigned": "Wyświetl nieprzypisane rozmowy kwalifikacyjne",
         "showHrs": "Wyświetl dostępnych pracowników HR",
-        "filters": "Filtruj interview według statusu, HR i innych filtrów aplikacji",
-        "assignHr": "Przypisz interview do pracownika HR (po Twoim potwierdzeniu)",
-        "orgQueries": "Odpowiedz na pytania dotyczące interview, pytań i zespołu w organizacji",
+        "filters": "Filtruj rozmowy kwalifikacyjne według statusu, HR i innych filtrów aplikacji",
+        "assignHr": "Przypisz rozmowę kwalifikacyjną do pracownika HR (po Twoim potwierdzeniu)",
+        "orgQueries": "Odpowiedz na pytania dotyczące rozmów kwalifikacyjnych, pytań i zespołu w organizacji",
         "questionCount": "Policz pytania w banku z opcjonalnymi filtrami",
         "assessments": "Pokaż i filtruj oceny",
         "myAssessments": "Pokaż przypisane do mnie oceny",
         "teamOverview": "Podsumuj zespół według ról",
         "teamByRole": "Pokaż członków zespołu według roli",
-        "orgOverview": "Podsumuj aktywność interview w organizacji"
+        "orgOverview": "Podsumuj aktywność rozmów kwalifikacyjnych w organizacji"
       }
     },
     "confirm": {
       "title": "Oczekuje na potwierdzenie",
-      "createInterview": "Utwórz brakujące pytania, a następnie utwórz interview.",
+      "createInterview": "Utwórz brakujące pytania, a następnie utwórz rozmowę kwalifikacyjną.",
       "createQuestions": "Utwórz brakujące pytania z tego sugerowanego zestawu.",
-      "assignHr": "Przypisz to interview do wybranego pracownika HR.",
+      "assignHr": "Przypisz tę rozmowę kwalifikacyjną do wybranego pracownika HR.",
       "createSingleQuestion": "Utwórz to pytanie w banku pytań.",
       "action": "Potwierdź działanie",
       "userMessage": "Potwierdź",
       "cancel": "Anuluj",
       "noPermission": "Nie masz uprawnień do potwierdzenia tego działania.",
       "details": {
-        "interview": "Interview",
+        "interview": "Rozmowa kwalifikacyjna",
         "hrReviewer": "Pracownik HR",
         "position": "Stanowisko",
         "candidate": "Kandydat",
         "candidateEmail": "E-mail kandydata",
-        "interviewLocale": "Język interview",
-        "interviewId": "ID interview",
+        "interviewLocale": "Język rozmowy",
+        "interviewId": "ID rozmowy kwalifikacyjnej",
         "assignedHrId": "ID pracownika HR",
         "questionName": "Nazwa pytania",
         "questions": "Pytania",
@@ -95,11 +95,11 @@
       "summary": "{existing} znaleziono w bazie pytań, {missing} wymaga utworzenia.",
       "newBadge": "Nowe",
       "existingBadge": "Istniejące",
-      "removeAria": "Usuń {title} z tego interview"
+      "removeAria": "Usuń {title} z tej rozmowy kwalifikacyjnej"
     },
     "createdInterview": {
       "openLink": "Otwórz link dla kandydata",
-      "viewDetail": "Szczegóły interview"
+      "viewDetail": "Szczegóły rozmowy kwalifikacyjnej"
     },
     "createdQuestion": {
       "openLink": "Otwórz pytanie"
@@ -136,7 +136,7 @@
       "continue": "Kontynuuj w aplikacji",
       "openAssessments": "Otwórz oceny",
       "openPortalInterview": "Zobacz w portalu",
-      "openingInterviewForm": "Otwieram formularz wywiadu."
+      "openingInterviewForm": "Otwieram formularz rozmowy kwalifikacyjnej."
     },
     "questionCount": {
       "heading": "Bank pytań",
@@ -150,8 +150,8 @@
       "queryFilter": "Szukaj: \"{query}\""
     },
     "interviewActivity": {
-      "heading": "Aktywność interview",
-      "total": "{count, plural, one {# interview łącznie} few {# interview łącznie} many {# interview łącznie} other {# interview łącznie}}",
+      "heading": "Aktywność rozmów kwalifikacyjnych",
+      "total": "{count, plural, one {# rozmowa kwalifikacyjna łącznie} few {# rozmowy kwalifikacyjne łącznie} many {# rozmów kwalifikacyjnych łącznie} other {# rozmowy kwalifikacyjnej łącznie}}",
       "active": "Aktywne",
       "completed": "Zakończone",
       "pending": "Oczekujące",
@@ -171,13 +171,13 @@
       "heading": "Członkowie zespołu"
     },
     "interviewList": {
-      "heading": "Interview",
-      "chooseHeading": "Wybierz interview",
+      "heading": "Rozmowy kwalifikacyjne",
+      "chooseHeading": "Wybierz rozmowę kwalifikacyjną",
       "viewDetail": "Szczegóły",
       "progress": "{submitted}/{total} odpowiedzi"
     },
     "interviewSummary": {
-      "heading": "Interview",
+      "heading": "Rozmowa kwalifikacyjna",
       "statusLabel": "Status",
       "reviewed": "Ocenione",
       "notReviewed": "Jeszcze nie ocenione",
@@ -185,7 +185,7 @@
       "shareLinkActive": "Link do feedbacku aktywny",
       "shareLinkInactive": "Link do feedbacku nieaktywny",
       "viewDetail": "Szczegóły",
-      "openCandidateLink": "Otwórz link do interview"
+      "openCandidateLink": "Otwórz link do rozmowy kwalifikacyjnej"
     },
     "candidateInterviewSummary": {
       "reviewed": "Ocenione",
@@ -194,45 +194,45 @@
       "outcome": "Wynik"
     },
     "candidateInterviewList": {
-      "heading": "Twoje interview"
+      "heading": "Twoje rozmowy kwalifikacyjne"
     },
     "prompts": {
       "hr": {
-        "myInterviews": "Pokaż moje interview",
-        "readyForReview": "Pokaż interview gotowe do oceny",
+        "myInterviews": "Pokaż moje rozmowy kwalifikacyjne",
+        "readyForReview": "Pokaż rozmowy kwalifikacyjne gotowe do oceny",
         "myAssessments": "Pokaż moje oceny",
         "questionCount": "Ile mamy pytań?",
-        "orgOverview": "Podsumuj aktywność interview w organizacji",
-        "createInterview": "Pomóż mi przygotować pytania i utworzyć interview"
+        "orgOverview": "Podsumuj aktywność rozmów kwalifikacyjnych w organizacji",
+        "createInterview": "Pomóż mi przygotować pytania i utworzyć rozmowę kwalifikacyjną"
       },
       "candidate": {
-        "latestStatus": "Jaki jest status mojego ostatniego interview?",
-        "statusByPosition": "Jaki jest status mojego interview na stanowisko React Developer?",
-        "reviewedByPosition": "Czy moje interview na stanowisko React Developer zostało ocenione?",
-        "openInterviews": "Pokaż moje nieukończone interview"
+        "latestStatus": "Jaki jest status mojej ostatniej rozmowy kwalifikacyjnej?",
+        "statusByPosition": "Jaki jest status mojej rozmowy kwalifikacyjnej na stanowisko React Developer?",
+        "reviewedByPosition": "Czy moja rozmowa kwalifikacyjna na stanowisko React Developer została oceniona?",
+        "openInterviews": "Pokaż moje nieukończone rozmowy kwalifikacyjne"
       },
       "admin": {
         "questionCount": "Ile mamy pytań?",
         "assessments": "Pokaż wszystkie oceny",
-        "orgOverview": "Podsumuj aktywność interview w organizacji",
-        "unassigned": "Pokaż nieprzypisane interview",
+        "orgOverview": "Podsumuj aktywność rozmów kwalifikacyjnych w organizacji",
+        "unassigned": "Pokaż nieprzypisane rozmowy kwalifikacyjne",
         "showHrs": "Pokaż pracowników HR",
-        "byStatus": "Pokaż ukończone interview",
+        "byStatus": "Pokaż ukończone rozmowy kwalifikacyjne",
         "teamOverview": "Pokaż mój zespół",
         "teamByRole": "Pokaż wszystkich pracowników HR",
-        "assignHr": "Przypisz interview do pracownika HR",
+        "assignHr": "Przypisz rozmowę kwalifikacyjną do pracownika HR",
         "createQuestion": "Pomóż mi utworzyć nowe pytanie rekrutacyjne"
       },
       "super_admin": {
         "questionCount": "Ile mamy pytań?",
         "assessments": "Pokaż wszystkie oceny",
-        "orgOverview": "Podsumuj aktywność interview w organizacji",
-        "unassigned": "Pokaż nieprzypisane interview",
+        "orgOverview": "Podsumuj aktywność rozmów kwalifikacyjnych w organizacji",
+        "unassigned": "Pokaż nieprzypisane rozmowy kwalifikacyjne",
         "showHrs": "Pokaż pracowników HR",
-        "byStatus": "Pokaż interview według statusu",
+        "byStatus": "Pokaż rozmowy kwalifikacyjne według statusu",
         "teamOverview": "Pokaż mój zespół",
         "teamByRole": "Pokaż wszystkich adminów",
-        "assignHr": "Przypisz interview do pracownika HR",
+        "assignHr": "Przypisz rozmowę kwalifikacyjną do pracownika HR",
         "createQuestion": "Pomóż mi utworzyć nowe pytanie rekrutacyjne"
       }
     }
