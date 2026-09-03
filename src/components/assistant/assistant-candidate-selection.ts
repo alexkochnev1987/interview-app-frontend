@@ -1,5 +1,6 @@
-/** Backend NLU phrase to start a free-text candidate name instead of picking from the list. */
-export const ASSISTANT_NEW_CANDIDATE_MESSAGE = 'new candidate' as const
+import { ASSISTANT_NEW_CANDIDATE_MESSAGE } from './assistant-api-contract'
+
+export { ASSISTANT_NEW_CANDIDATE_MESSAGE } from './assistant-api-contract'
 
 export type AssistantCandidateSelection = {
   message: string

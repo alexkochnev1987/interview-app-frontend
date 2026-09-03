@@ -40,6 +40,9 @@ export const ASSISTANT_USE_REGISTERED_CANDIDATE_MESSAGE = 'yes' as const
 /** Exact backend NLU match to decline a matched registered candidate. */
 export const ASSISTANT_DECLINE_REGISTERED_CANDIDATE_MESSAGE = 'no' as const
 
+/** Backend NLU phrase to start a free-text candidate name instead of picking from the list. */
+export const ASSISTANT_NEW_CANDIDATE_MESSAGE = 'new candidate' as const
+
 export type AssistantSimilarityIntent = 'continue' | 'abort'
 
 export function resolveAssistantSimilarityMessage(intent: AssistantSimilarityIntent): string {
@@ -61,3 +64,28 @@ export function resolveAssistantRegisteredCandidateMessage(
 export const ASSISTANT_CHAT_LAUNCHER_ID = 'assistant-chat-launcher'
 export const ASSISTANT_CHAT_COMPOSER_ID = 'assistant-chat-composer'
 export const ASSISTANT_CHAT_WIDGET_TITLE_ID = 'assistant-chat-widget-title'
+
+/** Backend NLU phrase to skip templates and open the interview form manually. */
+export const ASSISTANT_CREATE_OWN_MESSAGE = 'create my own' as const
+
+/** Exact English wire phrases the backend NLU matches; never localize these payloads. */
+export const ASSISTANT_MACHINE_PROTOCOL_MESSAGES = [
+  ASSISTANT_CONFIRM_MESSAGE,
+  ASSISTANT_SIMILARITY_CONTINUE_MESSAGE,
+  ASSISTANT_SIMILARITY_ABORT_MESSAGE,
+  ASSISTANT_USE_REGISTERED_CANDIDATE_MESSAGE,
+  ASSISTANT_DECLINE_REGISTERED_CANDIDATE_MESSAGE,
+  ASSISTANT_NEW_CANDIDATE_MESSAGE,
+  ASSISTANT_CREATE_OWN_MESSAGE,
+] as const
+
+export function buildAssistantUserMessage(
+  wireMessage: string,
+  displayText?: string,
+): { text: string; sentMessage?: string } {
+  const normalizedDisplay = displayText?.trim()
+  if (normalizedDisplay && normalizedDisplay !== wireMessage) {
+    return { text: normalizedDisplay, sentMessage: wireMessage }
+  }
+  return { text: wireMessage }
+}

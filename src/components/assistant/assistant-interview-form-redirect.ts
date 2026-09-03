@@ -3,6 +3,7 @@ import type { RecruiterAssistantRedirect } from '@/lib/api'
 import type { AiAssistantChatMessage } from './ai-assistant-chat-types'
 import {
   ASSISTANT_DECLINE_REGISTERED_CANDIDATE_MESSAGE,
+  ASSISTANT_CREATE_OWN_MESSAGE,
   ASSISTANT_USE_REGISTERED_CANDIDATE_MESSAGE,
 } from './assistant-api-contract'
 import { ASSISTANT_NEW_CANDIDATE_MESSAGE } from './assistant-candidate-selection'
@@ -108,6 +109,7 @@ const CREATE_OWN_PATTERN = /\b(?:create\s+)?my\s+own\b/i
 export function isCreateOwnChoiceMessage(message: string): boolean {
   const trimmed = message.trim()
   if (!trimmed) return false
+  if (trimmed.toLowerCase() === ASSISTANT_CREATE_OWN_MESSAGE) return true
   return CREATE_OWN_PATTERN.test(trimmed) || /^own$/i.test(trimmed)
 }
 

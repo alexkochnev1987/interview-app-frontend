@@ -17,7 +17,7 @@ import { ApiError } from '@/lib/api-error'
 import { useAuth } from '@/lib/auth-context'
 
 import type { AiAssistantChatMessage } from './ai-assistant-chat-types'
-import { ASSISTANT_CONFIRM_MESSAGE } from './assistant-api-contract'
+import { ASSISTANT_CONFIRM_MESSAGE, buildAssistantUserMessage } from './assistant-api-contract'
 import { resolveAssistantWelcomeRole } from './assistant-i18n'
 import {
   enrichInterviewFormRedirect,
@@ -198,8 +198,7 @@ export function useAiAssistantChat() {
     setLoading(true)
     appendMessage({
       role: 'user',
-      text: options?.displayText ?? text,
-      ...(options?.displayText ? { sentMessage: text } : {}),
+      ...buildAssistantUserMessage(text, options?.displayText),
     })
 
     const { abortController, requestId } = beginRequest()
@@ -258,7 +257,10 @@ export function useAiAssistantChat() {
 
     setError(null)
     setLoading(true)
-    appendMessage({ role: 'user', text: t('confirm.userMessage') })
+    appendMessage({
+      role: 'user',
+      ...buildAssistantUserMessage(ASSISTANT_CONFIRM_MESSAGE, t('confirm.userMessage')),
+    })
 
     const { abortController, requestId } = beginRequest()
 
