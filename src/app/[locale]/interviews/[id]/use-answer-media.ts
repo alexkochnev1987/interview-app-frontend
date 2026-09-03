@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { getInterviewAnswerMedia, type Interview } from '@/lib/api'
+import { getNextMediaQuestionIndex, hasAnswerMedia } from '@/lib/interview-detail-format'
 
 import type { AnswerMediaState } from './interview-detail-types'
 
@@ -12,10 +13,19 @@ interface UseAnswerMediaParams {
   failedLoadMediaLabel: string
 }
 
+interface LoadMediaOptions {
+  prefetchNext?: boolean
+}
+
 export function useAnswerMedia({ id, interview, failedLoadMediaLabel }: UseAnswerMediaParams) {
   const [mediaByQuestion, setMediaByQuestion] = useState<Record<number, AnswerMediaState>>({})
   const requestedMediaRef = useRef<Map<number, string>>(new Map())
   const mediaFetchInterviewIdRef = useRef(id)
+  const interviewRef = useRef(interview)
+
+  useEffect(() => {
+    interviewRef.current = interview
+  }, [interview])
 
   useEffect(() => {
     if (mediaFetchInterviewIdRef.current !== id) {
@@ -25,18 +35,19 @@ export function useAnswerMedia({ id, interview, failedLoadMediaLabel }: UseAnswe
     }
   }, [id])
 
-  const loadMedia = useCallback(
+  const loadMediaForQuestion = useCallback(
     (questionIndex: number) => {
-      if (!interview) {
+      const currentInterview = interviewRef.current
+      if (!currentInterview) {
         return
       }
 
-      const answer = interview.answers.find((a) => a.questionIndex === questionIndex)
-      if (!answer || (!answer.mediaKey && !answer.screenMediaKey)) {
+      const answer = currentInterview.answers.find((item) => item.questionIndex === questionIndex)
+      if (!answer || !hasAnswerMedia(answer)) {
         return
       }
 
-      const mediaFingerprint = `${answer.mediaKey ?? ''}|${answer.screenMediaKey ?? ''}`
+      const mediaFingerprint = `${answer.mediaKey ?? answer.camera?.mediaKey ?? ''}|${answer.screenMediaKey ?? answer.screen?.mediaKey ?? ''}`
       if (requestedMediaRef.current.get(questionIndex) === mediaFingerprint) {
         return
       }
@@ -75,7 +86,29 @@ export function useAnswerMedia({ id, interview, failedLoadMediaLabel }: UseAnswe
           }))
         })
     },
-    [id, interview, failedLoadMediaLabel],
+    [id, failedLoadMediaLabel],
+  )
+
+  const loadMedia = useCallback(
+    (questionIndex: number, options: LoadMediaOptions = {}) => {
+      const { prefetchNext = true } = options
+      loadMediaForQuestion(questionIndex)
+
+      if (!prefetchNext) {
+        return
+      }
+
+      const currentInterview = interviewRef.current
+      if (!currentInterview) {
+        return
+      }
+
+      const nextQuestionIndex = getNextMediaQuestionIndex(currentInterview, questionIndex)
+      if (nextQuestionIndex !== undefined) {
+        loadMediaForQuestion(nextQuestionIndex)
+      }
+    },
+    [loadMediaForQuestion],
   )
 
   return {

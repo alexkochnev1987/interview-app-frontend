@@ -57,18 +57,3 @@ export function writeAssessmentsToSearchParams(state: AssessmentsQueryState): UR
 
   return params
 }
-
-export function toAssessmentsSearchParams(
-  searchParams: Record<string, string | string[] | undefined>,
-): URLSearchParams {
-  const params = new URLSearchParams()
-  for (const [key, value] of Object.entries(searchParams)) {
-    if (value === undefined) continue
-    if (Array.isArray(value)) {
-      value.forEach((item) => params.append(key, item))
-    } else {
-      params.set(key, value)
-    }
-  }
-  return params
-}

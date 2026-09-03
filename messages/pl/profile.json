@@ -33,6 +33,28 @@
       "themeDark": "Ciemny",
       "language": "Język",
       "productTour": "Przewodnik po produkcie"
+    },
+    "assignedInterviews": {
+      "title": "Rozmowy przypisane temu HR",
+      "assignAnother": "Przypisz kolejną rozmowę temu HR",
+      "expand": "Pokaż przypisane rozmowy",
+      "collapse": "Ukryj przypisane rozmowy",
+      "empty": "Brak rozmów przypisanych temu HR.",
+      "demoAssignOnlyDemoHr": "Konta demo mogą przypisywać rozmowy wyłącznie do demo HR.",
+      "assignDialog": {
+        "title": "Przypisz nieprzypisaną rozmowę",
+        "description": "Wybierz rozmowę bez przypisanego HR i przypisz ją do {name}.",
+        "assign": "Przypisz rozmowę",
+        "assigning": "Przypisywanie…",
+        "cancel": "Anuluj"
+      }
+    },
+    "candidateInterviews": {
+      "title": "Rozmowy kandydata",
+      "createAnother": "Utwórz kolejną rozmowę dla tego kandydata",
+      "expand": "Pokaż rozmowy",
+      "collapse": "Ukryj rozmowy",
+      "empty": "Brak rozmów powiązanych z tym kandydatem."
     }
   }
 }

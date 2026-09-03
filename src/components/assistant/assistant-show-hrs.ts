@@ -5,10 +5,6 @@ import { APP_ROLE } from '@/lib/auth-roles'
 
 import { getAssistantPromptMessageKey } from './assistant-prompts'
 
-export function canUseShowHrsPrompt(role: string | null | undefined): boolean {
-  return role === APP_ROLE.admin || role === APP_ROLE.super_admin
-}
-
 export function isShowHrsMessage(
   text: string,
   t: ReturnType<typeof useTranslations<'assistant'>>,

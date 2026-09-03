@@ -1,7 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { AnswerPacketList } from '@/components/interviews/detail/answer-packet-list'
 import { CandidateAccessPanel } from '@/components/interviews/detail/candidate-access-panel'
@@ -16,7 +16,7 @@ import { Grid } from '@/components/ui/layout/grid'
 import { PageShell } from '@/components/ui/layout/page-shell'
 import type { Interview, InterviewResult } from '@/lib/api'
 import { useAuth, useIsDemo } from '@/lib/auth-context'
-import { formatCandidateLinkPreview } from '@/lib/interview-detail-format'
+import { formatCandidateLinkPreview, hasAnswerMedia } from '@/lib/interview-detail-format'
 import type { QuestionsLibraryPrefetch } from '@/lib/questions-library-prefetch'
 import { useToastMessages } from '@/lib/use-toast-messages'
 
@@ -46,6 +46,8 @@ export default function InterviewDetailClient({
   const [showDemoTake, setShowDemoTake] = useState(false)
   const [interview, setInterview] = useState<Interview | null>(initialInterview)
   const [results, setResults] = useState<InterviewResult | null>(initialResults)
+  const [loadAllRecordings, setLoadAllRecordings] = useState(false)
+  const [expandedRecordings, setExpandedRecordings] = useState<Set<number>>(() => new Set())
 
   const {
     candidateLink,
@@ -106,6 +108,20 @@ export default function InterviewDetailClient({
     },
   })
 
+  const mediaQuestionIndices = useMemo(() => {
+    if (!interview) {
+      return []
+    }
+
+    return interview.questions.reduce<number[]>((indices, _, questionIndex) => {
+      const answer = interview.answers.find((item) => item.questionIndex === questionIndex)
+      if (answer && hasAnswerMedia(answer)) {
+        indices.push(questionIndex)
+      }
+      return indices
+    }, [])
+  }, [interview])
+
   if (!interview) {
     return null
   }
@@ -135,6 +151,25 @@ export default function InterviewDetailClient({
   )
   const totalQuestions = interview.questions.length
   const answersByIndex = new Map(interview.answers.map((a) => [a.questionIndex, a]))
+  const allRecordingsVisible =
+    loadAllRecordings ||
+    (mediaQuestionIndices.length > 0 &&
+      mediaQuestionIndices.every((questionIndex) => expandedRecordings.has(questionIndex)))
+  const showLoadAllRecordings = mediaQuestionIndices.length > 0 && !allRecordingsVisible
+
+  const handleLoadAllRecordings = () => {
+    setLoadAllRecordings(true)
+  }
+
+  const handleShowRecording = (questionIndex: number) => {
+    setExpandedRecordings((current) => {
+      const next = new Set(current)
+      next.add(questionIndex)
+      return next
+    })
+    loadMedia(questionIndex)
+  }
+
   const progressValue = answeredCount === 0 ? 0 : Math.round((validatedCount / answeredCount) * 100)
   const allAnswered = interview.questions.every((_, qi) =>
     interview.answers.some(
@@ -163,6 +198,8 @@ export default function InterviewDetailClient({
           onStartEditing={startEditing}
           onOpenCancelConfirm={() => setCancelConfirmOpen(true)}
           onOpenDeleteConfirm={() => setDeleteConfirmOpen(true)}
+          showLoadAllRecordings={showLoadAllRecordings}
+          onLoadAllRecordings={handleLoadAllRecordings}
         />
 
         <CandidateAccessPanel
@@ -205,6 +242,9 @@ export default function InterviewDetailClient({
           hasActiveValidation={hasActiveValidation}
           validating={validating}
           onUpload={handleUpload}
+          loadAllRecordings={loadAllRecordings}
+          expandedRecordings={expandedRecordings}
+          onShowRecording={handleShowRecording}
         />
       )}
 
